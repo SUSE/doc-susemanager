@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE chapter PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<chapter id="ch-gpg-keys">
+ <title>Importing Custom GPG Keys</title><indexterm>
+ <primary>GPG keys</primary>
+ <secondary>importing of</secondary></indexterm>
+ <para>
+  For customers who plan to build and distribute their own RPMs securely, it
+  is strongly recommended that all custom RPMs are signed using GNU Privacy
+  Guard (GPG). <!--Generating GPG keys and building GPG-signed packages are
+  covered in the <citetitle>Channel Management Guide</citetitle>.
+ <remark>emap: afaik we don't have a channel mgmt guide.</remark>-->
+ </para>
+ <para>
+  Once the packages are signed, the public key must be deployed on all
+  systems importing these RPMs creating a central location for the public
+  key for clients to retrieve it and then adding the key to the local GPG
+  keyring for each system. Follow these steps:
+ </para>
+ <procedure>
+  <step>
+   <para>
+    Use the Web interface recommended for deploying &susemgr; client
+    applications to create a central location for the public keys. (Refer to
+    <xref linkend="s1-latest-clients-deploying"/>.) Create a public
+    directory on the Web server and place the GPG public key in it:
+   </para>
+<screen>
+<command>cp <replaceable>/some/path/YOUR-RPM-GPG-KEY</replaceable> /srv/www/htdocs/pub/</command>
+</screen>
+   <para>
+    The key can then be downloaded by client systems using <command>wget</command>:
+   </para>
+<screen>
+<command>wget http://<replaceable>your_susemgr.your_domain.com/pub/YOUR-RPM-GPG-KEY</replaceable></command>
+</screen>
+   <para>
+    Remember to replace the <replaceable>YOUR-RPM-GPG-KEY</replaceable> variable with
+    the filename of your key.
+   </para>
+  </step>
+  <step>
+   <para>
+    Once the key is available on the client file system, import it into the
+    local GPG keyring using the following command:
+   </para>
+<screen>
+<command>rpm --import <replaceable>/path/to/YOUR-RPM-GPG-KEY</replaceable></command>
+</screen>
+   <para>
+    Once the GPG key has been successfully added to the client, the system
+    should be able to validate custom RPMs signed with the
+    corresponding private key.
+   </para>
+  </step>
+ </procedure>
+</chapter>

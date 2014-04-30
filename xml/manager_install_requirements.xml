@@ -1,0 +1,1338 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE chapter PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<chapter id="ch-requirements">
+ <title>Requirements</title><indexterm>
+ <primary>requirements</primary></indexterm>
+ <para>
+  For requirements and prerequisites to be met before installation, refer to
+  <xref linkend="sec.manager.requirements"/> and
+  <xref linkend="sec.manager.prerequisites"/>. If you want to use &susemgr;
+  with an external database, refer to
+  <xref linkend="s1-requirements-database"/>.
+ </para>
+<sect1 id="sec.manager.requirements">
+ <title>System Requirements</title>
+ <remark>emap 2014-04-29: copied from Quick Install Guide.</remark>
+ <para>
+  The following section informs you about the system requirements and
+  some prerequisites for &susemgr;, including hardware, database,
+  supported clients, and other requirements. The base system for
+  &susemgr;&nbsp;2.1 is SLES&nbsp;11 SP&nbsp;3.
+ </para>
+
+ <sect2 id="sec.manager.requirements.server">
+  <title>Server Requirements</title>
+  <informaltable>
+   <tgroup cols="2">
+    <colspec colname="c1" colwidth="1*"/>
+    <colspec colname="c2" colwidth="4*"/>
+    <thead>
+     <row>
+      <entry>
+       <para>
+        Hardware
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Required/Recommended
+       </para>
+      </entry>
+      <!--<entry><para></para></entry>-->
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        CPU
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Required: a multi-core 64bit CPU (x86_64).
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        RAM
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Required: 4&nbsp;GB when only managing a few
+        client systems.
+       </para>
+       <para>
+        Recommended (for production operation): 8&nbsp;GB.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Free Disk Space
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Required: 20&nbsp;GB for base installation.
+       </para>
+       <para>
+        Additionally: At least 50&nbsp;GB per package repository.
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </informaltable>
+ </sect2>
+
+ <sect2 id="sec.manager.requirements.clients">
+  <title>Supported Client Systems</title>
+  <para>
+   Clients with the following operating systems and architectures are
+   supported for registration at &susemgr;:
+  </para>
+  <informaltable>
+   <tgroup cols="2">
+    <colspec colname="c1"/>
+    <colspec colname="c2"/>
+    <thead>
+     <row>
+      <entry>
+       <para>
+        System
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported Architectures<remark>emap: still valid?</remark>
+       </para>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <!-- bnc#743430 -->
+     <row>
+      <entry>
+       <para>
+        &sle; 10 SP3 and SP4
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64, &ipf;, IBM &ppc;, IBM &zseries;
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &sle; 11 SP1, SP2, and SP3
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64, &ipf;, IBM &ppc;, IBM &zseries;
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &rhel; 5
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &rhel; 6
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <!-- SP1: http://doccomments.provo.novell.com/comments/24208 -->
+       <para>
+        Novell Open Enterprise Server 11 and SP1
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </informaltable>
+ </sect2>
+ </sect1>
+ <sect1 id="s1-requirements-database">
+<!--status="debranded, RFC"-->
+
+  <title>External Database Requirements</title>
+
+  <remark>taroth 2011-01-31: @QA: can you confirm the following
+   requirements?</remark><indexterm>
+
+  <primary>block sizes</primary></indexterm><indexterm>
+
+  <primary>database requirements</primary>
+
+  <secondary>Oracle access level</secondary></indexterm><indexterm>
+
+<!--<primary>Red Hat Network</primary>
+  <secondary>database</secondary>--></indexterm>
+
+  <para>
+   This section applies only to &susemgr; if used with a stand-alone
+   database. The requirements for the embedded database are included in <xref
+   linkend="sec.manager.requirements"/>.  &susemgr; supports Oracle Database
+   10g and 11g. The stand-alone database must not run on the same server as
+   the &susemgr;.
+  </para>
+
+  <para>
+   A single 6&nbsp;GB tablespace is recommended for most installations. It
+   possibly works for many customers with a smaller tablespace. An
+   experienced Oracle database administrator (DBA) will be necessary to
+   assess sizing issues. <phrase os="hidden">The following approximation
+   should be used to determine the required size of your database:</phrase>
+   <remark>toms 2011-02-10: Seems not very easy to have correct numbers.
+     According to svollath: "Nobody knows how many updates will be
+     released, how many child channels will be there, how customers will
+     count..." As such, I've wrote it relatively vague and only kept
+     some good recommendations. Anything else is disabled.
+   </remark>
+   However, keep in mind that the exact size of the database depends on many
+   factors, such as number of systems managed, number of packages installed
+   on the client systems, and number of packages imported. For example, 1000
+   packages need approximately 100&nbsp;MB in the database. Due to these
+   factors, database storage may grow rapidly.
+  </para>
+
+<!--<itemizedlist os="hidden">
+    <remark>toms 2011-02-11: Set itemizedlist to "hidden" as it is more
+      than unsure how much is really needed. Too many factors...</remark>
+   <listitem>
+    <para>
+     192 KB per client system
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     320 MB per product including updates (channel plus child channels)
+    </para>
+   </listitem>
+  </itemizedlist>
+  <para os="hidden">
+   For instance, &susemgr; containing 10 channels serving 10,000 systems
+   would require 1.92 GB for its clients and 640 MB for its channels. If
+   custom channels are to be established for testing and staging of
+   packages, they must be included in this formula.
+  </para>-->
+
+<!--<para>
+   Keep in mind, the database storage needs may grow rapidly, depending on
+   the variance of the following factors:
+  </para>
+  <remark>taroth 2011-01-31: todo - check if the distinction between public and
+   private packages also applies to us</remark>
+  <itemizedlist>
+   <listitem>
+    <para>
+     The number of public <!-\-Red Hat-\-> packages imported (typical: 5000)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The number of private packages to be managed (typical: 500)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The number of systems to be managed (typical: 1000)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The number of packages installed on the average system (typical: 500)
+    </para>
+   </listitem>
+  </itemizedlist>-->
+
+  <para>
+   Although you should be generous in your database sizing estimates, you
+   must consider that size affects the time to conduct backups and adds load
+   to other system resources. If the database is shared, selecting the right
+   hardware and spacing entirely depend on what else is using it.
+  </para>
+
+  <para>
+   Additionally, block sizes must be a minimum of 8&nbsp;KB for &susemgr; to
+   install properly.
+  </para>
+
+  <para>
+   The Oracle database should have a user assigned to &susemgr; with full
+   DDL and DML access to that user's default tablespace.
+   The user needs standard connection information for the database at the
+   time of installation.
+  </para>
+  <para>Before installing &susemgr; some system-level ALTER statements must be executed:
+  </para>
+  <screen>
+alter system set job_queue_processes=1000;
+alter system set processes = 400 scope=spfile;
+alter system set deferred_segment_creation=FALSE;
+  </screen>
+  <para>
+    Also, the charset must be set to UTF-8. The following example script switches the character set and executes the ALTER statements:
+  </para>
+  <screen>
+# Run this as user oracle:
+cat - &lt;&lt; EOF | sqlplus /nolog
+connect / as sysdba;
+select value from nls_database_parameters where parameter='NLS_CHARACTERSET';
+shutdown immediate;
+startup mount;
+alter system enable restricted session;
+alter system set job_queue_processes=0;
+alter database open;
+alter database character set UTF8;
+alter database character set internal_use utf8;
+shutdown immediate;
+startup;
+alter system set job_queue_processes=1000;
+alter system set processes = 400 scope=spfile;
+alter system set deferred_segment_creation=FALSE;
+EOF
+  </screen>
+  <para>
+   The precise access levels required by the Oracle user (<systemitem
+   class="username">susemanager</systemitem>) are as follows:
+  </para>
+
+  <itemizedlist>
+   <!-- see bnc#719605 -->
+   <listitem>
+    <para>
+     ALTER SESSION
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CONNECT
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE CLUSTER
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE INDEXTYPE
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE SEQUENCE
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE SYNONYM
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE TABLE
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE VIEW
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE OPERATOR
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE PROCEDURE
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE TRIGGER
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE TYPE
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     CREATE SESSION
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     EXECUTE ON DBMS_LOB
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     RESOURCE
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     UNLIMITED TABLESPACE
+    </para>
+   </listitem>
+  </itemizedlist>
+  <para>
+    Here's an example script to grant these permissions in one go:
+  </para><!-- taken from  http://wiki.novell.com/index.php/SUSE_Manager/RDBMS#Granting_Required_Permissions --> 
+  <screen>
+cat - &lt;&lt; EOF | sqlplus /nolog
+connect / as sysdba;
+create user susemanager identified by <replaceable>password</replaceable> default tablespace <replaceable>tablespace</replaceable>;
+GRANT CONNECT, RESOURCE TO SUSEMANAGER;
+ALTER USER SUSEMANAGER DEFAULT ROLE NONE;
+grant ALTER SESSION to susemanager;
+grant CREATE SEQUENCE to susemanager;
+grant CREATE SYNONYM to susemanager;
+grant CREATE TABLE to susemanager;
+grant CREATE VIEW to susemanager;
+grant CREATE PROCEDURE to susemanager;
+grant CREATE TRIGGER to susemanager;
+grant CREATE TYPE to susemanager;
+grant CREATE SESSION  to susemanager;
+grant CREATE CLUSTER to susemanager;
+grant CREATE INDEXTYPE to susemanager;
+grant CREATE OPERATOR to susemanager;
+grant UNLIMITED TABLESPACE to susemanager;
+grant EXECUTE on DBMS_LOB to susemanager;
+EOF
+  </screen>
+  <para>
+   Additional database requirements include:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Security Identifier (SID),
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Listener Port,
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Username,
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     UTF-8 character set.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Two additional <emphasis>suggested</emphasis> recommendations for the
+   user's default tablespace include:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Uniform Extent Size,
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Auto Segment Space Management.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <important>
+   <title>&quot;UTF8&quot; Charset Mandatory</title>
+   <para>
+    Ensure that the NLS/charset is set to &quot;UTF8&quot; when using an
+    external database, not &quot;AL32UTF8&quot; or other charsets. Using
+    other charsets may lead to problems later.
+   </para>
+  </important>
+
+  <para>
+   The disk layout on the database machine is independent of &susemgr; and
+   entirely up to the customer.
+  </para>
+
+  <note>
+   <title>For More Information</title>
+   <para>
+    For more information, see <ulink
+    url="http://wiki.novell.com/index.php/SUSE_Manager/RDBMS"/>.
+   </para>
+  </note>
+ </sect1>
+ <sect1 id="s1-requirements-additional">
+<!--status="debranded"-->
+
+  <title>Additional Requirements</title><indexterm>
+
+  <primary>chkconfig </primary></indexterm><indexterm>
+
+  <primary>entitlement certificate</primary></indexterm><indexterm>
+
+  <primary>firewall rules</primary>
+
+  <secondary>requirements</secondary></indexterm><indexterm>
+
+  <primary>httpd </primary></indexterm><indexterm>
+
+  <primary>Network Time Protocol</primary></indexterm><indexterm>
+
+  <primary>ntp</primary></indexterm><indexterm>
+
+  <primary>port 443</primary></indexterm><indexterm>
+
+  <primary>port 4545</primary></indexterm><indexterm>
+
+  <primary>port 5222</primary></indexterm><indexterm>
+
+  <primary>port 5269</primary></indexterm><indexterm>
+
+  <primary>port 80</primary></indexterm><indexterm>
+
+  <primary>&susemgr;</primary>
+
+  <secondary>additional</secondary></indexterm><indexterm>
+
+  <primary>&susemgr;</primary>
+
+  <secondary>DNS</secondary></indexterm><indexterm>
+
+  <primary>&susemgr;</primary>
+
+  <secondary>entitlement certificate</secondary></indexterm><indexterm>
+
+  <primary>&susemgr;</primary>
+
+  <secondary>firewall rules</secondary></indexterm><indexterm>
+
+  <primary>&susemgr;</primary>
+
+  <secondary>FQDN</secondary></indexterm><indexterm>
+
+  <primary>&susemgr;</primary>
+
+  <secondary>jabberd</secondary></indexterm><indexterm>
+
+  <primary>&susemgr;</primary>
+
+  <secondary>ntp</secondary></indexterm><indexterm>
+
+  <primary>&susemgr;</primary>
+
+  <secondary>TCP Ports</secondary></indexterm><indexterm>
+
+  <primary>&susemgr; Ports</primary></indexterm><indexterm>
+
+  <primary>sendmail </primary></indexterm><indexterm>
+
+  <primary>postfix</primary></indexterm>
+
+
+  <important>
+   <title>Network Setup</title>
+   <para>
+    For correct installation and setup of &susemgr;, make sure the following
+    requirements are met.
+   </para>
+  </important>
+
+   <variablelist>
+    <varlistentry>
+     <term>Fully Qualified Domain Name (FQDN):</term>
+     <listitem>
+      <para>
+       The &susemgr; server must resolve its own FQDN correctly, otherwise
+       cookies will not work properly on the Web interface.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Hostname and IP Address:</term>
+     <listitem>
+      <para>
+       To guarantee that &susemgr;'s domain name can be resolved by its
+       clients, the server and the client machines must be linked to a
+       working Domain Name System (DNS) server in the customer environment.
+      </para>
+      <para>
+       The hostname of the &susemgr; server must not contain uppercase
+       letters as this might cause
+       <systemitem class="daemon">jabberd</systemitem> to fail.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+     <important>
+      <!-- bnc#847662 -->
+      <title>Renaming &susemgr; Server Not Supported</title>
+      <para>
+       Choose the hostname of the &susemgr; server carefully. Once
+       installed renaming is not supported.
+      </para>
+      <para>
+       For more information, see <ulink
+       url="http://wiki.novell.com/index.php/SUSE_Manager/HostnameChange"/>.
+      </para>
+     </important>
+
+  <variablelist>
+   <varlistentry>
+    <term>
+     Full Access:
+    </term>
+   <listitem>
+    <para>
+     Client systems need full network access to the &susemgr;'s services and
+     ports.
+    </para>
+   </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>
+     Firewall Rules:
+    </term>
+    <listitem>
+    <para>
+     Protect your &susemgr; with a firewall against the Internet by
+     blocking all unnecessary and unused ports.
+    </para>
+    <para>
+     Client systems connect to &susemgr; via ports 80, 443, and 4545
+     (if monitoring is enabled). In addition, enabling push actions
+     from &susemgr; to client systems, as described in <xref
+     linkend="s1-maintenance-push-clients"/>, requires inbound
+     connections on port 5222. If &susemgr; will also push to a
+     &susemgr; proxy, you must allow inbound connections on port 5269.
+    </para>
+
+ <!-- bnc#705639 -->
+
+  <indexterm>
+   <primary>firewall</primary>
+   <secondary>open ports</secondary>
+  </indexterm>
+
+  <indexterm>
+   <primary>&susemgr;</primary>
+   <secondary>open ports</secondary>
+  </indexterm>
+
+  <indexterm>
+   <primary>ports</primary>
+   <secondary>open ports</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>ports</primary>
+   <secondary>&susemgr;</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>ports</primary>
+   <secondary>&susemgrproxy;</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>ports</primary>
+   <secondary>client systems</secondary>
+  </indexterm>
+
+
+
+    <table id="tab.install.ports.server">
+     <title>Ports to Open on &susemgr;</title>
+     <tgroup cols="3">
+       <colspec colwidth="20*"/>
+       <colspec colwidth="20*"/>
+       <colspec colwidth="60*"/>
+      <thead>
+       <row>
+        <entry>
+         <para>
+          Port
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Direction
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Reason
+         </para>
+        </entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>
+         <para>
+          67
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Inbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Open this port to configure the &susemgr; system as a DHCP server
+          for systems requesting IP addresses.
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>
+         <para>
+          69
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Inbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Open this port to configure &susemgr; as a PXE server and allow
+          installation and re-installation of PXE-boot enabled systems.
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>
+         <para>
+          80
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Outbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          &susemgr; server uses this port to reach &ncc;
+          <remark role="footnote">FIXME:
+          RHN's list of hosts are as follows:rhn.redhat.com, xmlrpc.rhn.redhat.com, satellite.rhn.redhat.com, content-xmlrpc.rhn.redhat.com, content-web.rhn.redhat.com, and content-satellite.rhn.redhat.com</remark>
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>
+         <para>
+          80
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Inbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          WebUI, client, and proxy server requests come in via either http or https.
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>
+         <para>
+          443
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Inbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          WebUI, client, and proxy server requests come in via either http or https.
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>
+         <para>
+          443
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Outbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          &susemgr;
+          uses this port to reach &ncc;
+          <remark role="footnote">FIXME:
+          RHN's list of hosts are as follows:rhn.redhat.com, xmlrpc.rhn.redhat.com, satellite.rhn.redhat.com, content-xmlrpc.rhn.redhat.com, content-web.rhn.redhat.com, and content-satellite.rhn.redhat.com</remark>
+          (unless running in a disconnected mode with &smt;&mdash;as described
+          in <xref linkend="s1-disconnected-setup"/>).
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>
+         <para>
+          4545
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Outbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          &susemgr;
+          Monitoring makes connections to <command>rhnmd</command> running
+          on client systems if Monitoring is enabled and probes are
+          configured for registered systems.
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>
+         <para>
+          5222
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Inbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Required by <command>osad</command> running on the client
+          systems if you plan to push actions to client systems.
+         </para>
+        </entry>
+       </row>
+       <row>
+        <entry>
+         <para>
+          5269
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Inbound/Outbound
+         </para>
+        </entry>
+        <entry>
+         <para>
+          Needed if you push actions to or via a &susemgrproxy;.
+         </para>
+        </entry>
+       </row>
+<!--       <row>
+        <entry>
+         <para/>
+        </entry>
+       </row>
+-->
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>For reference, here are also listings of ports to open on the client
+    systems and the &susemgrproxy; server.</para>
+
+     <table id="tab.install.ports.clients">
+      <title>Ports to Open on the Client Systems</title>
+      <tgroup cols="3">
+       <colspec colwidth="20*"/>
+       <colspec colwidth="20*"/>
+       <colspec colwidth="60*"/>
+       <thead>
+        <row>
+         <entry>
+          <para>Port</para>
+         </entry>
+         <entry>
+          <para>Direction</para>
+         </entry>
+         <entry>
+          <para>Reason</para>
+         </entry>
+        </row>
+       </thead>
+       <tbody>
+        <row>
+         <entry><para>80 and 443</para>
+         </entry>
+         <entry><para>Outbound</para>
+         </entry>
+         <entry>
+          <para>To reach the &susemgr; server or  &susemgrproxy;
+           server.</para>
+         </entry>
+        </row>
+        <row>
+         <entry>
+          <para>4545</para>
+         </entry>
+         <entry><para>Inbound</para>
+         </entry>
+         <entry>
+          <para>For connections from the server or proxy server for
+          monitoring.</para>
+         </entry>
+        </row>
+        <row>
+         <entry>
+          <para>5222</para>
+         </entry>
+         <entry>
+          <para>Outbound</para>
+         </entry>
+         <entry>
+          <para>For push actions with the server or proxy server.</para>
+         </entry>
+        </row>
+        </tbody>
+      </tgroup>
+     </table>
+     <table id="tab.install.ports.proxyserver">
+      <title>Ports to Open on the Proxy Servers</title>
+      <tgroup cols="3">
+       <colspec colwidth="20*"/>
+       <colspec colwidth="20*"/>
+       <colspec colwidth="60*"/>
+       <thead>
+        <row>
+         <entry>
+          <para>Port</para>
+         </entry>
+         <entry>
+          <para>Direction</para>
+         </entry>
+         <entry>
+          <para>Reason</para>
+         </entry>
+        </row>
+       </thead>
+       <tbody>
+        <row>
+         <entry><para>80 and 443</para>
+         </entry>
+         <entry><para>Outbound</para>
+         </entry>
+         <entry>
+          <para>To reach the &susemgr; server.</para>
+         </entry>
+        </row>
+        <row>
+         <entry>
+          <para>4545</para>
+         </entry>
+         <entry><para>Outbound</para>
+         </entry>
+         <entry>
+          <para>For monitoring and probes connecting <command>rhnmd</command>
+          running on the client systems.</para>
+         </entry>
+        </row>
+        <row>
+         <entry>
+          <para>5222</para>
+         </entry>
+         <entry><para>Inbound</para>
+         </entry>
+         <entry>
+          <para>For push actions and connections issued by
+           <command>osad</command> running on the client systems.</para>
+         </entry>
+        </row>
+        <row>
+         <entry>
+          <para>5269</para>
+         </entry>
+         <entry>
+          <para>Inbound/Outbound </para>
+         </entry>
+         <entry>
+          <para>For push actions with the server.</para>
+         </entry>
+        </row>
+        </tbody>
+      </tgroup>
+     </table>
+   </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>
+     Synchronized System Times:
+    </term>
+    <listitem>
+    <para>
+     The connection to the Web server via Secure Sockets Layer (SSL)
+     requires correct system time on server and clients. For this
+     reason, &susemgr; server and all client systems must use NTP. If
+     &susemgr; is used with a stand-alone database, the machine
+     running the database must be set to the same time zone as
+     &susemgr;.
+    </para>
+   </listitem>
+   </varlistentry>
+   <varlistentry os="hidden">
+    <term>     Setting System Language and Locale:</term>
+    <listitem>
+    <remark>taroth 2011-01-31: @mc: the following should not be
+    necessary as this is set during the firstboot
+    process</remark>
+    <para>
+     Set the UTF-8 encoding for your language and locale on your &susemgr;
+     system via the <filename>/etc/sysconfig/i18n</filename> file. The
+     <option>LANG</option> setting in the file must be in the following
+     format:
+    </para>
+<screen>LANG=&quot;[language_TERRITORY].UTF-8&quot;</screen>
+    <para>
+     The <literal>language</literal> and <literal>TERRITORY</literal> are
+     entered as two-letter codes. For example if your language is English
+     and your locale is the United States, you set your
+     <option>LANG</option> setting to <literal>en_US.UTF-8</literal>.
+    </para>
+   </listitem>
+   </varlistentry>
+   <varlistentry os="hidden">
+    <term>     An Entitlement Certificate:</term>
+    <listitem>
+     <remark>taroth 2011-01-31: @kkaempf, @joe: how is this solved in &susemgr;? does
+      https://bugzilla.novell.com/show_bug.cgi?id=670003#c8 refer to the certificate below?</remark>
+    <para>
+     The customer will receive, via email from the sales representative, a
+     signed Entitlement Certificate explaining the services provided by Red
+     Hat through RHN Satellite. This certificate will be required during the
+     installation process.
+     <remark>emap 2011-03-26: Sounds like this whole
+     section still needs to be adjusted for SUSE.</remark>
+    </para>
+    <para>
+     If you do not have an Entitlement Certificate at installation time,
+     contact Red Hat Global Support Services at:
+    </para>
+    <para>
+     <ulink url="https://www.redhat.com/apps/support/"/>
+    </para>
+   </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>
+     &ncc; account:
+    </term>
+    <listitem>
+    <para>
+     For using &susemgr;, you need an account at the &ncc; (NCC), where your
+     purchased products and product subscriptions are defined.  Make sure to
+      have the following subscriptions:
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        one or more subscriptions for &susemgr;,
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        subscriptions for the products on the client systems you want to
+        register with &susemgr;,
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        subscriptions to client entitlements for the client system you want
+        to register with &susemgr;.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>
+     Keep backups of login information in multiple secure places:
+    </term>
+    <listitem>
+    <para>
+     Record all relevant usernames, passwords and other login
+     information.  For &susemgr;, this includes usernames and passwords
+     for the Organization Administrator account, the primary
+     administrator account on &susemgr; itself, SSL certificate
+     generation, and database connection (which also requires a SID, or
+     net service name). We strongly recommend this information be copied
+     onto two separate electronic media, printed out on paper, and
+     stored in a fireproof safe.
+    </para>
+   </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Supported Browsers</term>
+    <listitem>
+     <para><remark>emap 2014-04-29: copied from quick inst</remark>
+      &susemgr; can be used with Mozilla Firefox 3 and any later
+      version, or Microsoft Internet Explorer 8 and any later
+      version. Other browsers might work, but are not tested.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry id="vle.manager.req.virt">
+    <term>Virtual Environments</term>
+    <listitem>
+     <para><remark>emap 2014-04-29: copied from quick inst</remark>
+      For running &susemgr; server in virtual environments, use the
+      following settings for the virtual machine (VM):
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        At least 2 GB of RAM
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Bridged network
+       </para>
+      </listitem>
+     </itemizedlist>
+     <para>
+      The following virtual environments are supported:
+      <remark>taroth
+       2011-01-18: EC2 needs some special stuff, will be added for a later
+       release</remark>
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        &kvm;
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        &vmware;
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Hyper-V
+       </para>
+      </listitem>
+     </itemizedlist>
+     <!-- remove xen: bnc#786341 -->
+     <para>
+      For running &susemgr; in &kvm;, &vmware;, or Hyper-V, use the
+      &susemgr; ISO image.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   In addition to these requirements, we recommend to configure
+   &susemgr; in the following way:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     The entire &susemgr; solution should be protected by a firewall if
+     the &susemgr; server accesses or is accessed via the Internet. An
+     Internet connection is not required for &susemgr; servers running
+     in completely disconnected environments. Instead they can use
+     channel content downloaded to &smtool; (&smt;) for
+     synchronizing &susemgr; with &novell; <!--now SUSE?--> channels.  For
+     more information, see <xref linkend="s1-disconnected-setup"/>.
+    </para>
+<!--<note>
+     <para>
+      If you are running a disconnected Satellite that is not registered with
+      RHN Hosted the installation program will note and return a list of any
+      missing additional packages needed beyond
+      <computeroutput>@base</computeroutput> to be installed, then the
+      installation program will exit. This allows you to install those
+      packages. You may want to use the installation ISO image or DVD media
+      to create a repository for those additional packages, and then rerun
+      the Satellite installer.
+     </para>
+    </note>-->
+   </listitem>
+   <listitem>
+    <para>
+     No system components should be directly publicly available. No users
+     other than the system administrators should have command line access to these
+     machines.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     All unnecessary services should be disabled using
+     <command>chkconfig</command>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The httpd service should be enabled.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     If &susemgr; serves monitoring-entitled systems and you want to
+     acknowledge incoming alert notifications via email, you must
+     have installed and configured a mail transfer agent such as
+     postfix to properly handle email. This can be done with &yast;.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+<sect1 id="sec.manager.prerequisites">
+ <title>Prerequisites</title>
+ <remark>emap 2014-04-29: copied from quick inst.</remark>
+ <para>
+  For the basic &susemgr; setup, you need to have your mirror credentials
+  from the NCC at hand. To look up your credentials and the email address
+  with which you are registered in NCC, proceed as follows.
+ </para>
+
+ <procedure id="pro.manager.ncc.cred">
+  <title>Looking Up Mirror Credentials in NCC</title>
+  <step>
+   <para>
+    Start a Web browser and go to
+    <ulink url="http://www.novell.com/center"/>.
+   </para>
+  </step>
+  <step>
+   <para>
+    Log in to the NCC.
+   </para>
+  </step>
+  <step id="st.manager.basics.repo-setup.mirror-credentials">
+   <para>
+    From the left navigation bar, select <menuchoice><guimenu>My
+    Products</guimenu><guimenu>Mirror Credentials</guimenu></menuchoice>. A
+    Web page opens showing your credentials (username and password).
+   </para>
+  </step>
+  <step>
+   <para>
+    Memorize the username and the password listed there.
+   </para>
+  </step>
+  <step>
+   <para>
+    Select <menuchoice><guimenu>My Profile</guimenu><guimenu>Login
+    Profile</guimenu></menuchoice> and memorize the email address with
+    which you are registered.
+   </para>
+  </step>
+  <step>
+   <para>
+    Log out from the NCC.
+   </para>
+  </step>
+ </procedure>
+</sect1>
+
+ <sect1 os="hidden">
+<!--status="revised"-->
+
+  <title>Additional Documentation</title>
+
+  <para>
+   In addition to this &mgrinstguide;, more documentation is available as a
+   reference or tailored to specific administration tasks. For an overview,
+   refer to <xref linkend="preface.susemanager.install"/>.<remark>emap: Why this little section here when there's all the info about documentation at the beginning of this guide? Am boldly hiding it.</remark>
+  </para>
+
+<!--<orderedlist>
+   <listitem>
+    <para>
+     <citetitle>The RHN Satellite<!-\- [GALAXY] '&susemgr;' -\-> Installation Guide</citetitle> — This
+     guide, which you are now reading, provides the essential steps
+     necessary to get an RHN Satellite<!-\- [GALAXY] '&susemgr;' -\-> up and running.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <citetitle>The RHN Client Configuration Guide</citetitle> — This
+     guide explains how to configure the systems to be served by an RHN
+     Proxy Server or RHN Satellite. (This will also likely require
+     referencing <citetitle>The RHN Reference Guide</citetitle>, which
+     contains steps for registering and updating systems.)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <citetitle>The RHN Channel<!-\- [GALAXY] 'Channel' -\-> Management Guide</citetitle> — This guide
+     identifies in great detail the recommended methods for building custom
+     packages, creating custom channels, and managing private Errata.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     <citetitle>The RHN Reference Guide</citetitle> — This guide describes
+     how to create RHN accounts, register and update systems, and use the
+     RHN website to its utmost potential. This guide will probably come in
+     handy throughout the installation and configuration process.
+    </para>
+   </listitem>
+  </orderedlist>
+-->
+ </sect1>
+</chapter>

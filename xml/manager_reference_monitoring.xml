@@ -1,0 +1,1188 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE chapter PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<!-- 
+@maintainer:
+Extend it for SUSE Manager
+
+-->
+<chapter id="ch-monitoring">
+ <title>Monitoring</title><indexterm>
+ <primary>macros</primary>
+ <secondary>introduction</secondary></indexterm><indexterm>
+ <primary>Scout Config Push </primary></indexterm>
+ <para>
+  The monitoring entitlement allows you to perform actions designed to
+  keep your systems running properly and efficiently. Keep close watch on
+  system resources, network services, databases, standard and custom
+  applications.
+ </para>
+ <para>
+  Monitoring provides both real-time and historical state-change
+  information, as well as specific metric data. You are notified of
+  failures immediately and warned of performance degradation before it
+  becomes critical. You also receive the information necessary to conduct
+  capacity planning and event correlation. For instance, the results of a
+  probe recording CPU usage across systems would prove invaluable in
+  balancing loads on those systems.
+ </para>
+ <para>
+  Monitoring consists of two components: the monitoring system and the
+  monitoring scout. T he monitoring system is installed in the &susemgr; and
+  performs backend functions such as storing monitoring data and acting on
+  it. T he monitoring scout runs all the probes and collects monitoring data.
+  The monitoring scout can be enabled to run on a &susemgr; or Proxy
+  system. Using monitoring scout on Proxy allows you to offload work from the
+  Satellite, providing scalability for probes.
+ </para>
+ <para>
+  Monitoring entails establishing notification methods, installing probes on
+  systems, regularly reviewing the status of all probes, and generating
+  reports displaying historical data for a system or service. This chapter
+  describes common tasks associated with the Monitoring entitlement.
+  Virtually all changes affecting your Monitoring infrastructure must be
+  finalized by updating your configuration via the <guimenu>Scout Config
+  Push</guimenu> page.
+ </para>
+ <sect1 id="s1-mon-prereqs">
+  <title>Prerequisites</title><indexterm>
+
+  <primary>macros</primary>
+
+  <secondary>prerequisites</secondary></indexterm>
+
+  <para>
+   Before starting to set up monitoring for your infrastructure, ensure you
+   have all the necessary prerequisites in place:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Monitoring entitlements — These entitlements are required for all
+     systems to be monitored. Monitoring is supported on all target platforms.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     &susemgr; with monitoring — Monitoring systems must be connected to
+     &susemgr; with a base operating system of &sle;&nbsp;11. Refer to the
+     &susemgr; Installation Guide via <guimenu>Help</guimenu> for
+     installation instructions.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Monitoring administrator — This role must be granted to users
+     installing probes, creating notification methods, or altering the
+     monitoring infrastructure in any way. The &susemgr; administrator
+     automatically inherits the abilities of all other roles within an
+     organization and can therefore carry out these tasks as well. Assign
+     this role via the <guimenu>User Details</guimenu> page to other
+     users.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     &susemgr; monitoring daemon — This daemon, along with the SSH key for
+     the scout, must be running on all systems to be monitored for the
+     internal process monitors to be executed. You may be able to run these
+     probes using the systems' existing SSH daemon
+     (<filename>sshd</filename>). Refer to <xref linkend="s1-mon-rhnmd"/>
+     for installation instructions and a quick list of probes requiring this
+     secure connection. Refer to <xref linkend="ap-probes-monitoring"/> for
+     the complete list of available probes.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <procedure>
+   <!-- bnc#849411 -->
+   <title>Enabling Monitoring in the Web Interface</title>
+   <step>
+    <para>
+     Log in as the administrator and click
+     <menuchoice><guimenu>Admin</guimenu><guimenu>&susemgr;
+     Configuration</guimenu></menuchoice>.
+    </para>
+   </step>
+   <step>
+    <para>
+     In the <guimenu>General</guimenu> tab check <guimenu>Enable
+     Monitoring</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Then to make the SSH key available via the Web interface, open the
+     <guimenu>Monitoring</guimenu> tab and check <guimenu>Enable
+     Monitoring Scout</guimenu>.  For more information on SSH key
+     handling, see <xref linkend="s2-mon-rhnmd-install"/>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Finally, restart &susemgr; by opening the
+     <guimenu>Restart</guimenu> tab, check <guimenu>Restart SUSE
+     Manager?</guimenu>, and confirm this dialog with the
+     <guimenu>Restart</guimenu> button.
+    </para>
+   </step>
+  </procedure><remark>emap: procedure quite different to RH, but ours matches sumars21.</remark>
+  <note>
+   <title>SSH Key on the &susemgr; Server</title>
+   <para>
+    Find the SSH key on the &susemgr; filesystem here:
+   </para>
+   <para>
+    <filename>/var/lib/nocpulse/.ssh/nocpulse-identity.pub</filename>
+   </para>
+  </note>
+ <remark role="needinfo">emap: RH note recommends keeping defaults, and Sendmail needs to be configured.</remark>
+
+ <sect2 id="s1-mon-rhnmd">
+  <title>&susemgr; Monitoring Daemon (rhnmd)</title><indexterm>
+
+  <primary>port 4545</primary></indexterm><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>(rhnmd) monitoring daemon</secondary></indexterm>
+
+  <para>
+   To get the most out of your monitoring entitlement, we suggest installing
+   the &susemgr; monitoring daemon on your client systems. Based on OpenSSH,
+   <filename>rhnmd</filename> enables &susemgr; to communicate securely with
+   the client system to access internal processes and retrieve probe status.
+  </para>
+
+  <para>
+   The &susemgr; monitoring daemon requires monitored systems to allow
+   connections on port
+   <remark>taroth 2011-03-22: comment by bwiedemann: port number not IANA
+    assigned (see /etc/services)</remark>
+   <literal>4545</literal>. You may avoid opening this port and installing
+   the daemon altogether by using <filename>sshd</filename> instead. Refer
+   to <xref linkend="s2-mon-rhnmd-sshd"/> for details.
+  </para>
+  <para>
+   Some probes require the daemon. An encrypted connection, either via the
+   &susemgr; monitoring daemon or <filename>sshd</filename>, is required on
+   client systems for the following probes to run:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      Linux::CPU Usage
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Disk IO Throughput
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Disk Usage
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Inodes
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Interface Traffic
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Load
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Memory Usage
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Process Counts by State
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Process Count Total
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Process Health
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Process Running
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Swap Usage
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::TCP Connections by State
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Users
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Linux::Virtual Memory
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      LogAgent::Log Pattern Match
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      LogAgent::Log Size
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Network Services::Remote Ping
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Oracle::Client Connectivity
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      General::Remote Program
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      General::Remote Program with Data
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    Note that all probes in the Linux group have this requirement.
+   </para>
+  </sect2>
+
+  <sect2 id="s2-mon-rhnmd-install">
+<!--status="rfc"-->
+   <title>Installing the &susemgr; Monitoring Daemon</title><indexterm>
+   <primary>reactivating</primary>
+   <secondary>installation</secondary></indexterm><indexterm>
+   <primary>Client tools channel
+   </primary></indexterm><indexterm>
+   <primary>rhnmd daemon</primary></indexterm>
+   <para>
+    Install the &susemgr; monitoring daemon to prepare systems for
+    monitoring with the probes listed in
+    <xref linkend="s1-mon-rhnmd"/>. Note that the steps in this
+    section are optional if you intend to use <filename>sshd</filename> to
+    allow secure connections between the monitoring infrastructure and the
+    monitored systems. Refer to <xref linkend="s2-mon-rhnmd-sshd"/> for
+    instructions.
+   </para>
+   <para>
+    The <filename>rhnmd</filename> package is available from the
+    <systemitem>client tools</systemitem> channel for all &sle;
+    distributions. To install it:
+   </para>
+   <orderedlist>
+    <listitem>
+     <para>
+      <remark>toms 2011-01-27: No RHN Tools channel for SUSE?</remark>
+      Subscribe the systems to be monitored to the <systemitem>client
+      tools</systemitem> channel associated with the system. This can be
+      done individually through the <menuchoice><guimenu>System
+      Details</guimenu><guimenu>Channels</guimenu><guimenu>Software</guimenu></menuchoice>
+      subtab or for multiple systems at once through the
+      <menuchoice><guimenu>Channel Details</guimenu><guimenu>Target
+      Systems</guimenu></menuchoice> tab.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Once subscribed, open the <menuchoice><guimenu>Channel
+      Details</guimenu><guimenu>Packages</guimenu></menuchoice> tab and find
+      the <filename>rhnmd</filename> package (under 'R').
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click the package name to open the <guimenu>Package Details</guimenu>
+      page. Go to the <guimenu>Target Systems</guimenu> tab, select the
+      desired systems, and click <guimenu>Install Packages</guimenu>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Install the SSH public key on all client systems to be monitored, as
+      described in <xref linkend="s2-mon-rhnmd-ssh"/>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Start the &susemgr; monitoring daemon on all client systems using the
+      command:
+     </para>
+<screen>rcrhnmd start</screen>
+    </listitem>
+    <listitem>
+     <para>
+      When adding probes requiring the daemon, accept the default values for
+      <guimenu>RHNMD User</guimenu> and <guimenu>RHNMD Port</guimenu>:
+      <literal>nocpulse</literal> and <literal>4545</literal>, respectively.
+     </para>
+    </listitem>
+   </orderedlist>
+  </sect2>
+
+  <sect2 id="s2-mon-rhnmd-sshd">
+<!--status="rfc"-->
+   <title>Configuring SSH</title><indexterm>
+   <primary>port 22</primary></indexterm><indexterm>
+   <primary>reactivating</primary>
+   <secondary>using sshd instead</secondary></indexterm><indexterm>
+   <primary>SSH</primary></indexterm><indexterm>
+   <primary>sshd </primary></indexterm>
+   <para>
+    If you wish to avoid installing the &susemgr; monitoring daemon and
+    opening port 4545 on client systems, you may configure
+    <filename>sshd</filename> to provide the encrypted connection required
+    between the systems and &susemgr;. This may be especially desirable if
+    you already have <filename>sshd</filename> running. To configure the
+    daemon for monitoring follow these instructions:
+   </para>
+   <orderedlist>
+    <listitem>
+     <para>
+      Ensure the SSH package is installed on all systems to be monitored:
+     </para>
+<screen>rpm -qi openssh</screen>
+<!-- yast2-sshd -->
+    </listitem>
+    <listitem>
+     <para>
+      Identify the user to be associated with the daemon. This can be any
+      user available on the system as long as the required SSH key can be
+      put in the user's <filename>~/.ssh/authorized_keys</filename> file.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Identify the port used by the daemon, as identified in its
+      <filename>/etc/ssh/sshd_config</filename> configuration file. The
+      default is port 22.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Install the SSH public key on all client systems to be monitored, as
+      described in <xref linkend="s2-mon-rhnmd-ssh"/>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Start the <filename>sshd</filename> on all client systems using the
+      command:
+     </para>
+<screen>service sshd start</screen>
+    </listitem>
+    <listitem>
+     <para>
+      <remark>toms 2011-01-27: the RHNMD * fields are probably the
+         same, right?</remark>
+      When adding probes requiring the daemon, insert the values derived
+      from steps 2 and 3 in the <guimenu>RHNMD User</guimenu> and
+      <guimenu>RHNMD Port</guimenu> fields.
+     </para>
+    </listitem>
+   </orderedlist>
+  </sect2>
+
+  <sect2 id="s2-mon-rhnmd-ssh">
+   <title>Installing the SSH key</title><indexterm>
+   <primary>reactivating</primary>
+   <secondary>SSH key installation</secondary></indexterm><indexterm>
+   <primary>SSH key</primary></indexterm>
+   <para>
+    Whether you use <filename>rhnmd</filename> or <filename>sshd</filename>,
+    you must install the &susemgr; monitoring daemon public SSH key on the
+    systems to be monitored to complete the secure connection:
+   </para>
+   <orderedlist>
+    <listitem>
+     <para>
+      Navigate to the
+      <menuchoice><guimenu>Monitoring</guimenu><guimenu>Scout Config
+      Push</guimenu></menuchoice> page on the &susemgr; interface and click
+      the name of the Scout that will monitor the client system. The SSH
+      <filename>id_dsa.pub</filename> key is visible on the resulting page.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Copy the character string beginning with <literal>ssh-dss</literal>
+      and ending with the hostname of the &susemgr; server.
+<!--RHN Server-->
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Select the systems you want to send the key to from the
+      <guimenu>Systems</guimenu> page, then select
+      <guimenu>Systems</guimenu> from the left menu, click the checkbox next
+      to the systems you want to send the SSH key, then click the
+      <guimenu>Manage</guimenu> button at the top.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      On the <guimenu>System Set Manager</guimenu> page, click <guimenu>Run
+      remote commands</guimenu>, then in the <guimenu>Script</guimenu> text
+      box, type the following line:
+     </para>
+<screen><![CDATA[#!/bin/sh
+cat <<EOF >> ~nocpulse/.ssh/authorized_keys]]></screen>
+     <para>
+      Then press <keycap>Enter</keycap> and paste the SSH Key and add EOF. The result should looks similar to the following:
+     </para>
+<screen><![CDATA[#!/bin/sh
+cat <<EOF >> ~nocpulse/.ssh/authorized_keys
+ssh-dss AABBAB3NzaC3kc3MABCCBAJ4cmyf5jt/ihdtFbNE1YHsT0np0SYJz7xk
+hzoKUUWnZmOUqJ7eXoTbGEcZjZLppOZgzAepw1vUHXfa/L9XiXvsV8K5Qmcu70h0
+1gohBIder/1I1QbHMCgfDVFPtfV5eedau4AAACAc99dHbWhk/dMPiWXgHxdI0vT2
+SnuozIox2klmfbTeO4Ajn/Ecfxqgs5diat/NIaeoItuGUYepXFoVv8DVL3wpp45E
+02hjmp4j2MYNpc6Pc3nPOVntu6YBv+whB0VrsVzeqX89u23FFjTLGbfYrmMQflNi
+j8yynGRePIMFhI= root@example.com
+EOF]]></screen>
+    </listitem>
+    <listitem>
+     <para>
+      Set the date and time you want the action to take place, then click
+      <guimenu>Schedule Remote Command</guimenu>.
+     </para>
+    </listitem>
+   </orderedlist>
+   <para>
+    Once the key is in place and accessible, all probes that require it
+    should allow <command>ssh</command> connections between the Monitoring
+    infrastructure and the monitored system. Now you can schedule probes
+    requiring the monitoring daemon to run on the newly configured systems.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1 id="s1-mon-mysql">
+  <title>Configuring the mysql Package for Probes</title><indexterm>
+
+  <primary>MySQL </primary></indexterm><indexterm>
+
+  <primary>mysql package</primary></indexterm>
+
+  <para>
+   If your &susemgr; serves monitoring-entitled client systems on which you
+   run MySQL probes, you must configure the <filename>mysql</filename>
+   package on the &susemgr;. Refer to <xref linkend="ap-probes-monitoring"/>
+   for a listing of all available probes.
+  </para>
+
+  <para>
+   Subscribe the &susemgr; to the &sle; base channel and install the
+   <filename>mysql</filename> package either with <command>zypper up
+   </command> or &yast;.
+  </para>
+
+  <para>
+   Once finished, you can schedule MySQL probes with &susemgr;.
+  </para>
+ </sect1>
+ <sect1 id="s1-mon-notifs">
+  <title>Enabling Notifications</title><indexterm>
+
+  <primary>navigation</primary>
+
+  <secondary>Monitoring</secondary></indexterm>
+
+  <para>
+   In addition to viewing probe status in the &susemgr; interface, you can
+   receive notifications whenever a probe changes state. This is especially
+   important for mission-critical production systems.
+<!--For this reason, Red
+   Hat recommends taking advantage of this feature.-->
+  </para>
+
+  <para>
+   To enable probe notifications in &susemgr;, you must have identified a
+   mail exchange server and mail domain during installation of your
+   &susemgr; and configured a mail transfer agent (such as postfix or
+   sendmail) to properly handle incoming mail.
+  </para>
+
+  <sect2 id="s2-mon-notifs-methods">
+   <title>Creating Notification Methods</title><indexterm>
+   <primary>navigation</primary>
+   <secondary>creating methods</secondary></indexterm>
+   <para>
+    Notifications are sent via a notification method to an email
+    address associated with a specific &susemgr; user. Although the address
+    is tied to a particular user account, it may serve multiple
+    administrators through an alias or mailing list. Each user account can
+    contain multiple notification methods. To create a notification method:
+   </para>
+   <orderedlist>
+    <listitem>
+     <para>
+      Log into the &susemgr; Web interface as either a &susemgr; administrator or
+      monitoring administrator.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Navigate to <guimenu>User</guimenu> and select the username. On the
+      <menuchoice><guimenu>User Details</guimenu><guimenu>Notification
+      Methods</guimenu></menuchoice> tab, click <guimenu>create new
+      method</guimenu>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Enter an intuitive, descriptive label for the method name, such as
+      <literal>DBA day email</literal>, then provide the correct email
+      address. Remember, the labels for all notification methods are available
+      in a single list during probe creation, so they should be unique to your
+      organization.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Select the checkbox if you desire abbreviated messages to be sent to the
+      email address. This shorter format contains only the probe state, system
+      hostname, probe name, time of message, and Send ID. The standard, longer
+      format displays additional message headers, system and probe details,
+      and instructions for response.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      When finished, click <guimenu>Create Method</guimenu>. The new method
+      shows up in the <menuchoice><guimenu>User
+      Details</guimenu><guimenu>Notification Methods</guimenu></menuchoice>
+      tab and the <guimenu>Notification</guimenu> page under the top
+      <guimenu>Monitoring</guimenu> category. Click its name to edit or
+      delete it.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      While adding probes, select the <guimenu>Probe Notifications</guimenu>
+      checkbox and select the new notification method from the resulting
+      dropdown menu. Notification methods assigned to probes cannot be
+      deleted until they are disassociated from the probe.
+     </para>
+    </listitem>
+   </orderedlist>
+  </sect2>
+
+  <sect2 id="s2-mon-notifs-acks">
+   <title>Receiving Notifications</title><indexterm>
+   <primary>navigation</primary>
+   <secondary>receiving</secondary></indexterm>
+   <para>
+    If you create notification methods and associate them with probes, you
+    must be prepared to receive them. These notifications come in the form
+    of brief text messages sent to the specified email address. <!-- Here is
+    an example of an email notification: -->
+   </para>
+   <remark>toms 2011-01-27: which is the correct mail?</remark>
+<screen os="hidden">Subject: CRITICAL: [hostname]: &susemgr;: Users at 1
+From: &quot;Monitoring &susemgr; Notification&quot; (monitor@mgr-example.com)
+Date: Mon, 26 Aug 2013 13:42:28 -0800  
+To: tux@example.com
+
+This is Monitoring &susemgr; notification 01dc8hqw. 
+
+Time: Mon Aug 26, 21:42:25 PST 
+State: CRITICAL
+System: [hostname] ([IP address]) 
+Probe: &susemgr;: Users 
+Message: Users 6 (above critical threshold of 2)
+Notification #116 for Users
+ 
+Run from: &susemgr; Monitoring</screen>
+   <para>
+    The longer email notifications contain virtually
+    everything you would need to know about the associated probe. In
+    addition to the probe command, run time, system monitored, and state,
+    the message contains the Send ID, which is a unique character string
+    representing the precise message and probe. <!-- In the above message, the
+    Send ID is <literal>01dc8hqw</literal>.-->
+   </para>
+   <note>
+    <para>
+     Since notifications can be generated whenever a probe changes state,
+     simple changes in your network can result in a flood of
+     notifications. Notifications may be redirected to a specific inbox for
+     notifications to avoid issues with higher priority mail. The next section
+     discusses redirecting notifications.
+    </para>
+   </note>
+  </sect2>
+
+  <sect2 id="s2-mon-notifs-redirs">
+   <title>Redirecting Notifications</title><indexterm>
+   <primary>navigation</primary>
+   <secondary>redirecting</secondary></indexterm>
+   <para><remark>emap: taken from RH docs 5.6, from here to</remark>
+    Upon receiving a notification, you may redirect it by including
+    advanced notification rules within an acknowledgment
+    email. <guimenu>Enable email reply</guimenu> redirects by opening
+    <filename>/etc/aliases</filename> and adding the following line:
+   </para>
+   <screen>
+    rogerthat01:    "| /etc/smrsh/ack_queuer.pl"
+   </screen>
+   <para>
+    Once the parameter has been set, reply to the notification email
+    and include the desired option. These are the possible redirect
+    options, or filter types:
+   </para><remark>emap: to here. Correct?</remark>
+   <itemizedlist>
+    <listitem>
+     <para>
+      ACK METOO — Sends the notification to the redirect destination(s)
+      <emphasis>in addition to</emphasis> the default destination.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      ACK SUSPEND — Suspends the notification method for a specified time
+      period.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      ACK AUTOACK — Does not change the destination of the notification,
+      but automatically acknowledges matching alerts as soon as they are
+      sent.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      ACK REDIR — Sends the notification to the redirect destination(s)
+      <emphasis>instead of</emphasis> the default destination.
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    The format of the rule should be <replaceable>filter_type probe_type
+    duration email_address</replaceable> where
+    <replaceable>filter_type</replaceable> indicates one of the previous
+    advanced commands, <replaceable>probe_type</replaceable> indicates probe
+    or system, <replaceable>duration</replaceable> indicates the length of
+    time for the redirect, and <replaceable>email_address</replaceable>
+    indicates the intended recipient. For example:
+   </para>
+<screen>ACK METOO system 1h boss@domain.com</screen>
+   <para>
+    Capitalization is not required. Duration can be listed in minutes (m),
+    hours (h), or days (d). Email addresses are needed only for redirects
+    (REDIR) and supplemental (METOO) notifications.
+   </para>
+   <para>
+    The description of the action contained in the resulting email defaults
+    to the command entered by the user. The reason listed is a summary of
+    the action, such as <literal>email ack redirect by
+    user@domain.com</literal> where user equals the sender of the email.
+   </para>
+   <note>
+    <para>
+     You can halt or redirect almost all probe notifications by replying to
+     a notification email with a variation of the command <command>ack
+     suspend host</command>. However, you cannot halt &susemgr; probe
+     notifications by responding to a probe with <command>ack suspend
+     host</command> or other redirect responses. These probes require you to
+     change the notifications within the &susemgr; Web interface.
+    </para>
+   </note>
+  </sect2>
+
+  <sect2 id="s2-mon-notifs-delete">
+   <title>Deleting Notification Methods</title><indexterm>
+   <primary>navigation</primary>
+   <secondary>deleting methods</secondary></indexterm>
+   <para>
+    Existing relationships between methods and probes can complicate the
+    process of deleting notification methods. Follow these steps to remove a notification method:
+   </para>
+   <orderedlist>
+    <listitem>
+     <para>
+      Log into the &susemgr; Web interface as a &susemgr; administrator or
+      monitoring administrator.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Navigate to the
+      <menuchoice><guimenu>Monitoring</guimenu><guimenu>Notifications</guimenu></menuchoice>
+      page and click the name of the method to be removed.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      On the <menuchoice><guimenu>User
+      Details</guimenu><guimenu>Notification Methods</guimenu></menuchoice>
+      tab, click <guimenu>delete method</guimenu>. If the method is not
+      associated with any probes, you are presented with a confirmation
+      page. Click <guimenu>Confirm Deletion</guimenu>. The notification
+      method is removed.
+     </para>
+     <note>
+      <para>
+       Since both the notification method name and address can be edited,
+       consider updating the method rather than deleting it. This redirects
+       notifications from all probes using the method without having to edit
+       each probe and create a new notification method.
+      </para>
+     </note>
+    </listitem>
+    <listitem>
+     <para>
+      If the method is associated with one or more probes, you are presented
+      with a list of the probes using the method and the systems to which
+      the probes are attached instead of a confirmation page. Click the
+      probe name to go directly to the <menuchoice><guimenu>System
+      Details</guimenu><guimenu>Probes</guimenu></menuchoice> tab.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Select another notification method and click <guimenu>Update
+      Probe</guimenu>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Return to the
+      <menuchoice><guimenu>Monitoring</guimenu><guimenu>Notifications</guimenu></menuchoice>
+      page and delete the notification method.
+     </para>
+    </listitem>
+   </orderedlist>
+  </sect2>
+ </sect1>
+ <sect1 id="s1-mon-probes">
+  <title>About Probes</title><indexterm>
+
+  <primary>package installation</primary>
+
+  <secondary>Monitoring</secondary></indexterm>
+
+  <para>
+   Now that the &susemgr; monitoring daemon has been installed and
+   notification methods have been created, you can install probes on your
+   monitoring-entitled systems. If a system is entitled to monitoring, a
+   <guimenu>Probes</guimenu> tab appears within its <guimenu>System
+   Details</guimenu> page. This is where you will conduct most probe-related
+   work.
+  </para>
+
+  <sect2 id="s2-mon-probes-manage">
+   <title>Managing Probes</title><indexterm>
+   <primary>package installation</primary>
+   <secondary>managing</secondary></indexterm>
+   <para>
+    Probes are created on the &susemgr;, then propagated to the specified monitoring-entitled systems. Follow the steps below to add a probe to &susemgr;:
+   </para>
+   <procedure>
+    <step>
+     <para>
+      Log into the &susemgr; Web interface as either a &susemgr; administrator or
+      the system group administrator for the system.
+     </para>
+    </step>
+    <step>
+     <para>
+      Navigate to the <menuchoice><guimenu>System
+      Details</guimenu><guimenu>Probes</guimenu></menuchoice> tab and click
+      <guimenu>create new probe</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      On the <guimenu>System Probe Creation</guimenu> page, complete all
+      required fields. First, select the probe command group. This alters
+      the list of available probes and other fields and requirements. Refer
+      to <xref linkend="ap-probes-monitoring"/> for the complete list of
+      probes by command group. Remember that some probes require the
+      &susemgr; monitoring daemon to be installed on the client system.
+     </para>
+    </step>
+    <step>
+     <para>
+      Select the desired probe command and the monitoring scout.  Enter
+      a brief but unique description for the probe.
+     </para>
+    </step>
+    <step>
+     <para>
+      Select the <guimenu>Probe Notifications</guimenu> checkbox to receive
+      notifications when the probe changes state. Use the <guimenu>Probe
+      Check Interval</guimenu> dropdown menu to determine how often
+      notifications should be sent. Selecting <literal>1 minute</literal>
+      (and the <guimenu>Probe Notification</guimenu> checkbox) means you
+      will receive notifications every minute the probe surpasses its
+      CRITICAL or WARNING thresholds. Refer to
+      <xref linkend="s1-mon-notifs"/> to find out how to create notification
+      methods and acknowledge their messages.
+     </para>
+    </step>
+    <step>
+     <para>
+      Use the <guimenu>RHNMD User</guimenu> and <guimenu>RHNMD
+      Port</guimenu> fields, if they appear, to force the probe to
+      communicate via <filename>sshd</filename>, rather than the &susemgr;
+      monitoring daemon. Refer to <xref linkend="s2-mon-rhnmd-sshd"/> for
+      details. Otherwise, accept the default values of
+      <literal>nocpulse</literal> and <literal>4545</literal>, respectively.
+     </para>
+    </step>
+    <step>
+     <para>
+      If the <guimenu>Timeout</guimenu> field appears, review the default
+      value and adjust to meet your needs. Most but not all timeouts result
+      in an UNKNOWN state. If the probe's metrics are time-based, ensure the
+      timeout is not less than the time allotted to thresholds. Otherwise,
+      the metrics serve no purpose, as the probe will time out before any
+      thresholds are crossed.
+     </para>
+    </step>
+    <step>
+     <para>
+      Use the remaining fields to establish the probe's alert thresholds, if
+      applicable. These CRITICAL and WARNING values determine at what point
+      the probe changes state. Refer to
+      <xref linkend="s2-mon-probes-thresholds"/> for best practices
+      regarding these thresholds.
+     </para>
+    </step>
+    <step>
+     <para>
+      When finished, click <guimenu>Create Probe</guimenu>. Remember, you
+      must commit your monitoring configuration change on the <guimenu>Scout
+      Config Push</guimenu> page for this to take effect.
+     </para>
+    </step>
+   </procedure>
+   <para>
+    To delete a probe, navigate to its <guimenu>Current State</guimenu> page
+    (by clicking the name of the probe from the <menuchoice><guimenu>System
+    Details</guimenu><guimenu>Probes</guimenu></menuchoice> tab), and click
+    <guimenu>delete probe</guimenu>. Finally, confirm the deletion.
+   </para>
+  </sect2>
+
+  <sect2 id="s2-mon-probes-thresholds">
+   <title>Establishing Thresholds</title><indexterm>
+   <primary>package installation</primary>
+   <secondary>thresholds</secondary></indexterm>
+   <para>
+    Many of the probes offered by &susemgr; contain alert thresholds that,
+    when crossed, change the state of the probe. For instance, the
+    Linux::CPU Usage probe allows you to set CRITICAL and WARNING thresholds
+    for the percent of CPU used. If the monitored system reports 75 percent
+    of its CPU used, and the WARNING threshold is set to 70 percent, the
+    probe will go into a WARNING state. Some probes offer a multitude of
+    such thresholds.
+   </para>
+   <para>
+    In order to get the most out of your monitoring entitlement and avoid
+    false notifications, it is recommended to run your probes without
+    notifications for a time to establish baseline performance for each of
+    your systems. Although the default values provided for probes may suit
+    you, every organization has a different environment that may require
+    altering thresholds.
+   </para>
+  </sect2>
+
+  <sect2 id="s2-mon-probes-rhnserver">
+   <title>Monitoring the &susemgr; Server</title><indexterm>
+   <primary>package installation</primary>
+   <secondary>on the &susemgr; Server</secondary></indexterm>
+   <para>
+    In addition to your client systems, you may also monitor your &susemgr; or
+    proxy server. Select a system monitored by the server and go to that
+    system's <menuchoice><guimenu>System
+    Details</guimenu><guimenu>Probes</guimenu></menuchoice> tab.
+   </para>
+   <para>
+    Click <guimenu>create new probe</guimenu> and select the
+    <literal>&susemgr;</literal> probe command group. Next, complete the
+    remaining fields as you would for any other probe. Refer to
+    <xref linkend="s2-mon-probes-manage"/> for instructions.
+   </para>
+   <para>
+    Although the &susemgr; or proxy server appears to be monitored by the client
+    system, the probe is actually run from the server on itself. Thresholds
+    and notifications work normally.
+   </para>
+   <note>
+    <para>
+     Any probes that require &susemgr; monitoring daemon connections cannot
+     be run on a &susemgr; or a &susemgr; proxy server on which monitoring
+     software is running. This includes most probes in the Linux command
+     group as well as the log agent probes and the remote program probes.
+     Use the &susemgr; command group probes to monitor &susemgr; and
+     &susemgr; proxy servers. In the case of proxy scouts, the probes are
+     listed under the system for which they are reporting data.
+    </para>
+   </note>
+  </sect2>
+ </sect1>
+ <sect1 id="s1-mon-trouble">
+  <title>Troubleshooting</title><indexterm>
+
+  <primary>Troubleshooting</primary>
+
+  <secondary>Monitoring</secondary></indexterm>
+
+<remark>emap: now as Q&amp;A in Troubleshooting Chap RH RefG. Compared by skimming text.</remark>
+
+  <para>
+   Though all monitoring-related activities are conducted through the
+   &susemgr; Web interface, &suse; provides access to some command line diagnostic
+   tools that may help you determine the cause of errors. To use these
+   tools, you must be able to become the <literal>nocpulse</literal> user on
+   the &susemgr; server conducting the monitoring.
+  </para>
+
+  <para>
+   First log into the &susemgr; server as root. Then switch to the
+   <literal>nocpulse</literal> user with the following command:
+  </para>
+
+<screen>su - nocpulse</screen>
+
+  <para>
+   You may now use the diagnostic tools described in the rest of this
+   section.
+  </para>
+
+  <sect2 id="s2-mon-trouble-catalog">
+   <title>Examining Probes with rhn-catalog</title><indexterm>
+   <primary>reactivating</primary>
+   <secondary>troubleshooting with</secondary></indexterm>
+   <para>
+    <remark>toms 2011-01-27: rhn-catalog -&gt; SUSE?</remark>
+    To thoroughly troubleshoot a probe, you must first obtain its probe ID.
+    You may obtain this information by running
+    <command>rhn-catalog</command> on the &susemgr; server as the
+    <literal>nocpulse</literal> user. The output will resemble:
+   </para>
+<screen>2 ServiceProbe on exa1.example.com (199.168.36.245): test 2
+3 ServiceProbe on exa2.example.com (199.168.36.173): rhel2.1 test
+4 ServiceProbe on exa3.example.com (199.168.36.174): SSH
+5 ServiceProbe on exa4.example.com (199.168.36.175): HTTP</screen>
+   <para>
+    The probe ID is the first number, while the probe name (as entered in
+    the &susemgr; Web interface) is the final entry on the line. In the
+    above example, the probe ID <literal>5</literal> corresponds to the
+    probe named <literal>HTTP</literal>.
+   </para>
+   <para>
+    Pass the <option>--commandline</option> (<option>-c</option>) and
+    <option>--dump</option> (<option>-d</option>) options along with a probe
+    ID to <command>rhn-catalog</command> to obtain additional details about
+    the probe:
+   </para>
+<screen>rhn-catalog --commandline --dump 5</screen>
+   <para>
+    The <option>--commandline</option> option yields the command parameters
+    set for the probe, while <option>--dump</option> retrieves everything
+    else, including alert thresholds and notification intervals and methods.
+   </para>
+   <para>
+    The command above will result in output similar to:
+   </para>
+<screen>5 ServiceProbe on exa4.example.com (199.168.36.175):
+linux:cpu usage
+      Run as: Unix::CPU.pm --critical=90 --sshhost=199.168.36.175  
+--warn=70 --timeout=15 --sshuser=nocpulse
+--shell=SSHRemoteCommandShell --sshport=4545</screen>
+   <para>
+    Use the ID with <command>rhn-runprobe</command> to examine the probe's
+    output. Refer to <xref linkend="s2-mon-trouble-runprobe"/> for
+    instructions.
+   </para>
+  </sect2>
+
+  <sect2 id="s2-mon-trouble-runprobe">
+   <title>Viewing the output of rhn-runprobe</title><indexterm>
+   <primary>reactivating</primary>
+   <secondary>options</secondary></indexterm><indexterm>
+   <primary>reactivating</primary>
+   <secondary>troubleshooting with</secondary></indexterm>
+   <para>
+    Now that you have obtained the probe ID with
+    <command>rhn-catalog</command>, use it with
+    <command>rhn-runprobe</command> to examine the complete output of the
+    probe. Note that by default, <command>rhn-runprobe</command> works in
+    test mode, meaning no results are entered in the database. The following
+    options are available:
+   </para>
+   <table>
+    <title><command>rhn-runprobe</command> Options</title>
+    <tgroup cols="2">
+     <thead>
+      <row>
+       <entry>
+        <para>
+         Option
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Description
+        </para>
+       </entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <option>--help</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         List the available options and exit.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>--probe=<replaceable>PROBE_ID</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Run the probe with this ID.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>--prob_arg=<replaceable>PARAMETER</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Override any probe parameters from the database.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>--module=<replaceable>PERL_MODULE</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Package name of alternate code to run.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>--log=all=<replaceable>LEVEL</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Set log level for a package or package prefix.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>--debug=<replaceable>LEVEL</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Set numeric debugging level.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>--live</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Execute the probe, enqueue data and send out notifications (if
+         needed).
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+   <para>
+    Always include the <option>--probe</option> option, the
+    <option>--log</option> option, and values for each. The
+    <option>--probe</option> option takes the probeID as its value and the
+    <option>--log</option> option takes the value &quot;all&quot; (for all
+    run levels) and a numeric verbosity level as its values. Here is an
+    example:
+   </para>
+<screen>rhn-runprobe --probe=5 --log=all=4</screen>
+   <para>
+    The above command requests the probe output for probeID 5, for all run
+    levels, with a high level of verbosity.
+   </para>
+   <para>
+    Provide the command parameters derived from
+    <command>rhn-catalog</command>:
+   </para>
+<screen>rhn-runprobe --probe=5 --log=all=4 --sshuser=nocpulse --sshport=4545</screen>
+   <para>
+    This yields verbose output depicting the probe's attempted execution.
+    Errors are clearly identified.
+   </para>
+  </sect2>
+ </sect1>
+</chapter>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE sect1 PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+
+<sect1 id="s1-clone-satellite">
+ <title>Cloning &susemgr; with the Embedded Database</title>
+ <indexterm>
+ <primary>cloning &susemgr;</primary></indexterm>
+ 
+ <para>
+  You may limit outages caused by hardware or other failures by entirely
+  cloning the &susemgr; server with its embedded database. The secondary
+  server can take over if the primary one fails. To clone the &susemgr;
+  server, perform these tasks:
+ </para>
+
+ <!-- ke, 2013-07-09: changed according to bnc#825727 -->
+ <orderedlist>
+  <listitem>
+   <para>
+    Clone the &susemgr; server at the operating system level (OS level)
+    with your backup tools (e.g., <command>rsync</command>) to a
+    separate machine.  As needed, repeat this step daily.
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    Back up the primary &susemgr; database daily using the commands
+    described in <xref linkend="s1-config-smdb"/>. If this is
+    done, only changes made the day of the failure will be lost.
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    Establish a mechanism to copy the backup to the secondary &susemgr; and
+    keep the repositories synchronized using a file transfer program such
+    as <command>rsync</command>. If you are using a SAN, copying is not
+    necessary.
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    Use the <command>smdba</command> <option>backup-restore</option>
+    subcommand to import the database backup data.
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    If the primary &susemgr; fails, change DNS to point to the new
+    machine or configure your load-balancer accordingly.
+   </para>
+  </listitem>
+ </orderedlist>
+
+ <warning>
+  <para>
+   The database backup is valid only on an identical system clone,
+   which can be restored only from the backup as described above.  The
+   database backup will not work on a system that you reinstalled from NCC!
+  </para>
+ </warning>
+
+</sect1>
+

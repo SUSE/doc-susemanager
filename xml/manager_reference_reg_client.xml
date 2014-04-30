@@ -1,0 +1,711 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE appendix PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<!-- 
+@maintainer:
+Seems not much to do
+-->
+<appendix os="hidden" id="ap-register">
+ <title>&susemgr; Registration Client</title><indexterm>
+ <primary>Registration</primary></indexterm>
+ <para>
+  Before you begin using &susemgr;, you must create a username, password,
+  and System Profile. The &susemgr; Network Registration Client walks you
+  through this process.
+ </para>
+ <warning>
+  <para>
+<!--Only systems running Red Hat Enterprise Linux 2.1 need to use the
+   <application>Red Hat Network Registration Client</application> before
+   starting the <application>Red Hat Update Agent</application>. Systems
+   running Red Hat Enterprise Linux 3 and later have this registration
+   functionality built into the <application>Red Hat Update
+   Agent</application>.-->
+   After registering your system, refer to <xref linkend="ch-up2date"/> for
+   instructions on starting the &susemgr; Update Agent.
+  </para>
+ </warning>
+ <sect1 id="s1-register-config">
+  <title>Configuring the &susemgr; Registration Client</title><indexterm>
+
+  <primary>package installation</primary>
+
+  <secondary>with &susemgr; Registration Client</secondary></indexterm><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>Configuration</secondary></indexterm><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>with a proxy server</secondary></indexterm>
+
+  <para>
+   To start the graphical interface for configuring the application to
+   connect through an HTTP proxy server, type the following command at a
+   shell prompt:
+  </para>
+
+  <remark>toms 2011-02-11: No --configure option available, see also
+     bnc#671257</remark>
+
+<screen>mgr_register --configure</screen>
+
+  <para>
+   The window shown in <xref linkend="fig-register-config-fig"/> appears.
+  </para>
+
+  <figure id="fig-register-config-fig">
+   <title>&susemgr; Registration Client Configuration</title>
+   <mediaobject>
+    <imageobject>
+     <imagedata fileref="H-config.png"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   To start the command line version, use the command:
+  </para>
+
+  <remark>toms 2011-02-11: Also no --nox option</remark>
+
+<screen>mgr_register --nox --configure</screen>
+
+  <para>
+   It has more configuration options than the graphical version.
+  </para>
+
+  <para>
+   You will be presented with a list of options and their current values:
+  </para>
+
+<screen>0. enableProxyAuth No 
+1. noSSLServerURL http://xmlrpc.&exampledomain;/XMLRPC 
+2. oemInfoFile /etc/sysconfig/rhn/oeminfo 
+3. enableProxy No 
+4. networkSetup Yes 
+5. httpProxy 
+6. proxyUser 
+7. serverURL https://xmlrpc.&exampledomain;/XMLRPC 
+8. proxyPassword 
+9. debug No 
+Enter number of item to edit &lt;return to exit, q to quit without saving&gt;:</screen>
+
+  <para>
+   Enter the number of the item to modify and enter a new value for the
+   option. When finished changing your configuration, press
+   <keycap function="enter"/> to save your changes and exit. Press
+   <keycap>q</keycap> and then <keycap function="enter"/> to quit without
+   saving your changes.
+  </para>
+
+  <para>
+   The most common options configured are <literal>enableProxy</literal> and
+   <literal>httpProxy</literal> to enable a proxy server. To enable a proxy
+   server, change the value for <literal>enableProxy</literal> to
+   <literal>Yes</literal> and the value of <literal>httpProxy</literal> to
+   the name of the proxy server and port number in the format HOST:PORT. For
+   example, to use the proxy server squid.mysite.org on port 3128, you would
+   change the value to <literal>squid.mysite.org:3128</literal>.
+  </para>
+
+  <para>
+   If you require a proxy username and password, set
+   <literal>enableProxyAuth</literal> to <literal>Yes</literal> to enable
+   username/password authentication for the proxy, and set
+   <literal>proxyUser</literal> and <literal>proxyPassword</literal> to the
+   appropriate username and password for the proxy.
+  </para>
+
+  <para>
+   To bypass SSL, change the protocol for <option>serverURL</option> from
+   <literal>https</literal> to <literal>http</literal> in the
+   <filename>/etc/sysconfig/rhn/rhn_register</filename> file.
+  </para>
+ </sect1>
+ <sect1 id="s1-start-welcome">
+  <title>Starting the &susemgr; Registration Client</title>
+
+  <para>
+   You must be root to register a system with &susemgr;. If started by a
+   standard users, the &susemgr; Registration Client prompts you to enter
+   the root password before proceeding.
+  </para>
+
+  <important>
+   <para>
+    If your username is part of a larger organizational account, be cautious
+    when registering your systems. By default, all systems registered with
+    the &susemgr; Registration Client end up in the Ungrouped section of
+    systems visible only to &susemgr; administrators. To ensure that you
+    retain management of these systems, Red Hat recommends that your
+    organization create an activation key associated with a specific system
+    group and grant you permissions to that group. You may then register
+    your systems using that activation key and find those system profiles
+    within &susemgr; immediately. <phrase os="hidden">Refer to
+    <xref linkend="s1-up2date-actkeys"/> for instructions.</phrase>
+   </para>
+  </important>
+
+  <para>
+   To start the &susemgr; Registration Client, use one of the following
+   methods:
+  </para>
+
+  <orderedlist>
+   <remark>toms 2011-01-31: Is it also possible with GNOME/KDE?</remark>
+<!--   <listitem>
+    <para>
+     On the GNOME desktop, go to Applications (the main menu on the panel)
+     =&gt; <guimenu>Programs</guimenu> =&gt; <guimenu>System</guimenu> =&gt;
+     <guimenuitem>Red Hat Network</guimenuitem>
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     On the KDE desktop, go to Applications (the main menu on the panel)
+     =&gt; <guimenu>System</guimenu> =&gt; <guimenuitem>Red Hat
+     Network</guimenuitem>
+    </para>
+   </listitem>-->
+   <listitem>
+    <para>
+     Type the command <command>mgr_register</command> at a shell prompt (for
+     example an XTerm or GNOME terminal)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     If you are not running the X Window System, type the command
+     <command>mgr_register</command> at a shell prompt. Refer to
+     <xref linkend="s1-text-registration"/> for further details.
+    </para>
+   </listitem>
+  </orderedlist>
+
+  <para>
+   If you have already registered your system and try to register it again,
+   a dialog box appears. If you continue, it overwrites your existing
+   digital certificate file
+   (<filename>/etc/sysconfig/rhn/systemid</filename>), and creates a
+   different system profile. You will no longer be able to use your previous
+   system profile — be sure this is what you want to do before you choose
+   <guimenu>Yes</guimenu>.
+  </para>
+
+<!--<para>
+   If you overwrite an existing system registration, you can delete the
+   unused profile via the website at <ulink url="https://rhn.redhat.com"/>.
+  </para>-->
+
+  <para>
+   The opening screen for the &susemgr; Registration Client provides a brief
+   overview of the services available and the steps required to register
+   (see <xref linkend="fig-opening"/>). Click <guimenu>Next</guimenu> to
+   continue with the registration process. If you click
+   <guimenu>Cancel</guimenu>, the registration process ends and no
+   information is sent.
+  </para>
+
+  <figure id="fig-opening">
+   <title>Welcome Screen</title>
+   <mediaobject>
+    <imageobject>
+     <imagedata fileref="H-opening.png" width="444"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   &novell; is committed to protecting your privacy (see
+   <xref linkend="fig-privacy"/>). The information gathered during the
+   registration process is used to create a system profile. The system
+   profile is essential if you wish to receive update notifications about
+   your system.
+  </para>
+
+  <figure id="fig-privacy">
+   <title>&novell;'s Privacy Statement</title>
+   <mediaobject>
+    <imageobject>
+     <imagedata fileref="H-privacy.png" width="444"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+ </sect1>
+ <sect1 id="s1-register-user-account">
+  <title>Registering a User Account</title><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>as part of an organization</secondary></indexterm><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>Email notification</secondary></indexterm><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>Password</secondary></indexterm><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>System Profile</secondary></indexterm><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>username</secondary></indexterm><indexterm>
+
+  <primary>user account</primary></indexterm>
+
+  <para>
+   Before you can create a system profile, you must create a user account.
+   The only required information in this section is a unique username,
+   password, and a valid email address.
+  </para>
+
+  <para>
+   In the screen shown in <xref linkend="fig-useraccount"/>, you must choose
+   a username and password. Once logged in to &ncc;, you can modify your
+   preferences, view your existing system profile, or obtain the latest
+   software packages. You must choose a unique username. If you enter one
+   already in use, you will see an error message (see
+   <xref linkend="fig-warning"/>). Try different usernames until you find
+   one that has not been used.
+  </para>
+
+  <figure id="fig-warning">
+   <title>Error: Username Already Exists</title>
+   <mediaobject>
+    <imageobject>
+     <imagedata fileref="H-warning.png"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+  <note>
+   <para>
+    If you are already a member of &novell;, you can use the same user name
+    and password. However, you must continue with the registration process
+    to create your system profile.
+   </para>
+  </note>
+
+  <para>
+   Your username has the following restrictions:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Cannot contain any spaces
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Cannot contain the characters &amp; +, %, or '
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Is not case-sensitive, thereby eliminating the possibility of duplicate
+     usernames differing only by capitalization
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   In addition, the following restrictions apply to both your username and
+   password:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Must be at least four characters long
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Cannot contain any tabs
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Cannot contain any line feeds
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Passwords are case-sensitive for obvious reasons.
+  </para>
+
+  <para>
+   If you have already registered a machine and created a system profile,
+   you can add a new machine to your account. Run the &susemgr; Registration
+   Client on the new machine you wish to add, and enter your existing
+   &susemgr; username and password. The new machine is added to your
+   existing account, and you can log into &susemgr; with your username and
+   password to view all your systems simultaneously.
+  </para>
+
+  <figure id="fig-useraccount">
+   <title>Create a Unique Username and Password</title>
+   <mediaobject>
+    <imageobject>
+     <imagedata fileref="H-useraccount.png" width="444"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   Most users can leave the <guimenu>Org Info</guimenu> section blank. If
+   you have an existing organization account, work with your &susemgr;
+   administrator to ensure that your system is added to that account. This
+   requires entering your organization's ID and password in the provided
+   text fields. If the values are valid, the system is added to the
+   organization's &susemgr; account. Your &susemgr; administrator can then
+   create your user account through the <guimenu>Users</guimenu> category of
+   the &susemgr; Web interface. Refer to <xref linkend="s1-sm-users"/> for
+   instructions.
+  </para>
+
+  <para>
+   Click <guimenu>Next</guimenu> to continue.
+  </para>
+ </sect1>
+ <sect1 id="s1-register-system-profile">
+  <title>Registering a System Profile</title><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>System Profile</secondary></indexterm><indexterm>
+
+  <primary>System Profile</primary></indexterm>
+
+  <para>
+   Now that you have a user account, you can create a system profile that
+   consists of hardware and software information about your &sle; system.
+   The software system profile information is used
+<!--by Red Hat Network-->
+   to determine what software update notifications you receive.
+  </para>
+
+  <sect2 id="s2-hardware">
+   <title>Hardware System Profile</title><indexterm>
+   <primary>reactivating</primary>
+   <secondary>Hardware System Profile</secondary></indexterm>
+   <para>
+    After creating a username and password for your &ncc; account, the
+    &susemgr; Registration Client probes your system for the following
+    information:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      &sle; version
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Hostname
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      IP address
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      CPU model
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      CPU speed
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Amount of RAM
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      PCI devices
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Disk sizes
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Mount points
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    The next step is choosing a profile name for your system as shown in
+    <xref linkend="fig-systemprofile-hardware"/>. The default value is the
+    hostname for the system. You may modify this to be a more descriptive
+    string, such as <literal>Email Server for Support Team</literal>.
+    Optionally, you can enter a computer serial or identification number for
+    the system.
+   </para>
+   <para>
+    If you do not wish to include information about your hardware or network
+    in your system profile, deselect <guimenu>Include information about
+    hardware and network</guimenu> (see
+    <xref linkend="fig-systemprofile-hardware"/>).
+   </para>
+   <para>
+    Click <guimenu>Next</guimenu> to continue with the registration process.
+   </para>
+   <figure id="fig-systemprofile-hardware">
+    <title>System Profile - Hardware</title>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="H-systemprofile.png" width="444"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+  </sect2>
+
+  <sect2 id="s2-software">
+   <title>Software System Profile</title><indexterm>
+   <primary>reactivating</primary>
+   <secondary>RPM Package List</secondary></indexterm><indexterm>
+   <primary>reactivating</primary>
+   <secondary>Software System Profile</secondary></indexterm>
+   <para>
+    The software system profile consists of a list of RPM packages for which
+    you wish to receive notifications. The &susemgr; Registration Client
+    displays a list of all RPM packages listed in the RPM database on your
+    system and then allows you to customize the list by deselecting
+    packages.
+   </para>
+   <sect3 id="s3-rpm-packages">
+    <title>Gathering RPM Database Information</title>
+    <para>
+     Only those packages you choose during this part of the registration are
+     included in your system profile, and you will only receive
+     notifications about the packages in your system profile. Thus, if you
+     use an older version of a package and deselect it from the list, it
+     will not be replaced with a newer version. This RPM list can be
+     modified through the &susemgr; Web interface or by using the &susemgr; Update
+     Agent. <xref linkend="fig-registrationwizard"/> shows the progress bar
+     displayed while the &susemgr; Registration Client gathers a list of the
+     RPM packages installed on your system. This operation may take some
+     time depending on your system.
+    </para>
+    <figure id="fig-registrationwizard">
+     <title>Registration Wizard</title>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="H-registrationwizard.png"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+    <para>
+     Once the RPM package list is built, the list is displayed as shown in
+     <xref linkend="fig-systemprofile-software"/>. Deselecting
+     <guimenu>Include RPM Packages installed on this system in my System
+     Profile</guimenu> omits this information from your system profile.
+    </para>
+    <figure id="fig-systemprofile-software">
+     <title>RPM Package Information</title>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="H-packages.png" width="444"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </sect3>
+   <sect3 id="s3-exclude-rpm-packages">
+    <title>Choosing RPM Packages to Exclude from the System Profile</title>
+    <para>
+     By default, all RPM packages in your RPM database are included in your
+     system profile to be updated by Red Hat Network. To exclude a package,
+     uncheck the package from the list by clicking the checkbox beside the
+     package name. For example, <xref linkend="fig-excludepackages"/> shows
+     that the <guimenu>procmail</guimenu>, <guimenu>procps</guimenu>, and
+     <guimenu>psgml</guimenu> packages have been omitted from the package
+     list.
+    </para>
+    <para>
+     Choose which packages to exclude, if any, from the system profile, and
+     click <guimenu>Next</guimenu> to continue with the registration
+     process.
+    </para>
+    <figure id="fig-excludepackages">
+     <title>Choose which RPM Packages to Exclude from System Profile</title>
+     <mediaobject>
+      <imageobject>
+       <imagedata fileref="H-excludepackages.png" width="444"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </sect3>
+  </sect2>
+ </sect1>
+ <sect1 id="s1-send-finish">
+  <title>Finishing Registration</title>
+
+  <para>
+   As seen in <xref linkend="fig-sendprofile"/>, the last step of
+   registration is to confirm that you want to send your System Profile to
+   your &susemgr; server. If you choose <guimenu>Cancel</guimenu> at this
+   point, no information is sent. Clicking <guimenu>Next</guimenu> submits
+   your &susemgr; system profile. This process may take some time depending
+   on your connection speed.
+  </para>
+
+  <figure id="fig-sendprofile">
+   <title>Finished Collecting Information for System Profile</title>
+   <mediaobject>
+    <imageobject>
+     <imagedata fileref="H-sendprofile.png" width="444"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   The &susemgr; Registration Client displays the <guimenu>Registration
+   Finished</guimenu> screen (<xref linkend="fig-finished"/> once your
+   System Profile has been sent successfully. Click
+   <guimenu>Finish</guimenu> to exit the &susemgr; Registration Client.
+  </para>
+
+  <para>
+   After completing the registration, you must entitle your system to a
+<!--n RHN-->
+   service level. Refer to <xref linkend="s1-entitling-system"/> for
+   details.
+  </para>
+
+  <figure id="fig-finished">
+   <title>Registration Finished</title>
+   <mediaobject>
+    <imageobject>
+     <imagedata fileref="H-finished.png" width="444"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+ </sect1>
+ <sect1 id="s1-entitling-system">
+  <title>Entitling Your System</title>
+
+  <remark>toms 2011-01-31: This seems to me more of NCC to me.</remark>
+
+  <para>
+   Now that you have registered your system, it must be entitled before you
+   can receive updated packages. In other words, you must subscribe it to a
+   service level offering.
+  </para>
+
+  <para>
+   To entitle a system, go to <ulink url="http://www.novell.com/center"/>
+   and log in using the same username and password you just used in the
+   &susemgr; Registration Client.
+<!--Click
+   <guimenuitem>Systems</guimenuitem> on the top navigation bar and then
+   <guimenuitem>Systems Entitlements</guimenuitem> in the left navigation
+   bar.-->
+  </para>
+
+<!--<para>
+   The <guimenuitem>System Entitlements</guimenuitem> page displays the
+   following items:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     a list of the system for which the user can choose an entitlement level
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     the current entitlements applied to each of these systems
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     buttons that allow the user to change entitlement level
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     an overview of the number and types of purchased entitlements that
+     remain available to the organization
+    </para>
+   </listitem>
+  </itemizedlist>
+  <para>
+   To change the entitlement level of a system or systems, check the box to
+   the left of the systems and click the appropriate button for the desired
+   entitlement level. Note that you must apply a Management entitlement to a
+   system before you can add a Provisioning entitlement. You can change
+   entitlements to any available level at any time.
+  </para>
+  <note>
+   <para>
+    Removing a required entitlement (such as Provisioning) will not cancel a
+    previously scheduled action (such as a &kickstart;/&ay;).
+   </para>
+  </note>
+  <para>
+   As you change the selected entitlements for your systems, the number of
+   available entitlements is updated at the bottom of the screen.
+  </para>-->
+ </sect1>
+ <sect1 id="s1-text-registration">
+  <title>Text Mode &susemgr; Registration Client</title><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>text mode</secondary></indexterm>
+
+  <para>
+   If you are not running the X Window System, the &susemgr; Registration
+   Client starts in text mode.
+  </para>
+
+  <para>
+   You can force the &susemgr; Registration Client to run in text mode with
+   the command:
+  </para>
+
+<screen>mgr_register --nox</screen>
+
+<!--<para>
+   The screens for the text mode <application>&susemgr; Registration
+   Client</application> are almost identical to the screens for the
+   graphical <application>&susemgr; Registration Client</application>.
+   Some of the text in the text mode version is more concise due to lack of
+   space in the interface. However, there are equal numbers of screens and
+   fields in both versions. Thus, if you are using the text mode version,
+   you can still follow the instructions that begin in
+   <xref linkend="s1-start-welcome"/>.</para>
+   
+   <figure>
+    <title>Text Mode Welcome Screen</title>
+    <mediaobject>
+     <imageobject>
+      <imagedata fileref="tuiopening.png" width="444"/>
+     </imageobject>
+   </figure>-->
+ </sect1>
+</appendix>

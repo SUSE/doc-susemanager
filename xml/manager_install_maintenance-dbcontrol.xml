@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE sect1 PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+
+
+<sect1 id="s1-use-db-control" os="hidden">
+<!--status="revised"-->
+  <title>Using DB Control</title>
+     <indexterm>
+       <primary>db-control use</primary>
+     </indexterm>
+   <remark>
+    2012-08-09 (toms): According to mc, db-control is not supported
+   anymore from SUSE Manager v1.7
+
+   2014-03-11 (froh): it's still active in Satellite 5.6
+   </remark>
+  <para>
+   &susemgrdb; provides a utility for managing that database: DB Control. 
+   This command line utility <command>db-control</command> allows you to do
+   everything from creating, verifying, and restoring backups to obtain
+   database status and restart it if necessary. You
+   <emphasis>must</emphasis> be user <systemitem 
+       class="username">oracle</systemitem> to invoke DB Control. To
+   start, switch to the <systemitem class="username">oracle</systemitem>
+   user:
+   <remark>toms 2012-03-21: Needs to be extended with -s option. It is
+       not enough just to run "su - oracle". User "oracle" is
+       lower-case.</remark>
+  </para>
+
+  <screen>su -s /bin/bash - oracle</screen>
+
+  <para>
+   Then issue the following command:
+  </para>
+
+  <screen>db-control <replaceable>option</replaceable></screen>
+     
+  <warning>
+     <title>Read Database Update Procedure Carefully</title>
+     <para>If you need to update the embedded database, take 
+           special care and attention. Read carefully the patch 
+           descriptions and perform the process exactly as described.
+     </para>
+  </warning>
+
+  <sect2 id="s2-rhn-db-control-options">
+<!--status="revised"-->
+   <title>DB Control Options</title><indexterm>
+   <primary>database requirements</primary>
+   <secondary>options</secondary></indexterm>
+   <para>
+    DB Control offers many command line options. To use them, insert the
+    option and the appropriate value after the <command>db-control</command>
+    command with user <systemitem class="username">oracle</systemitem>.
+   </para>
+   <table>
+    <title>DB Control Options</title>
+    <tgroup cols="2">
+     <thead>
+      <row>
+       <entry>
+        <para>
+         Option
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Description
+        </para>
+       </entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>
+        <para>
+         <option>help</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Lists these <filename>db-control</filename> options with additional
+         details.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>backup <replaceable>DIRNAME</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Backs up the database to the specified directory.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>examine <replaceable>DIRNAME</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Examines the contents of a backup directory. Returns the timestamp
+         of backup creation and reports on its contents.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>extend</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Increases the tablespace
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>gather-stats <replaceable>PCT</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Gathers statistics on the database objects.
+         <replaceable>PCT</replaceable> is the percentage of rows to
+         estimate (the default is 15%).
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>report</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Reports on current usage of database space.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>report-stats</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Reports on segments with stale or empty statistics.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>restore <replaceable>DIRNAME</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Restores the database from a backup kept in DIRNAME. The database
+         must be stopped for this command to run successfully.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>start</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Starts the database instance. This can also be accomplished by
+         issuing the <command>service oracle start</command> command as
+         &rootuser;.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>shrink-segments</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Shrinks &susemgr; Oracle database segments with significant amounts
+         of free space.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>status</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Shows the current status of the database, either
+         &quot;running&quot; or &quot;offline&quot;.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>stop</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Stops the database instance. This can also be accomplished by
+         issuing the <command>service oracle stop</command> command as
+         &rootuser;.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>tablesizes</option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Shows a space report for each table.
+        </para>
+       </entry>
+      </row>
+      <row>
+       <entry>
+        <para>
+         <option>verify <replaceable>DIRNAME</replaceable></option>
+        </para>
+       </entry>
+       <entry>
+        <para>
+         Verifies the contents of the backup kept in DIRNAME. This command
+         runs a checksum of each of the files kept in the backup.
+        </para>
+       </entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+   <note>
+    <title>Knowing about Database Statistics</title>
+    <para>
+     Database statistics describe the database in more detail and the
+     objects in it. These statistics are used by the query optimizer to
+     choose the best execution plan for each SQL statement. Because the
+     objects in a database can be constantly changing, statistics must be
+     updated regularly so that they accurately describe these database
+     objects. <!--Statistics are maintained automatically by Oracle.--> However, if
+     your database has performance issues after a significant amount of data
+     changes, consider performing manual gathering of statistics.
+    </para>
+   </note>
+   <note>
+    <title>Reclaim Fragmented Database Segments</title>
+    <para>
+     After deleting large amounts of data, use the
+     <option>segment-shrink</option> feature to reclaim fragmented free
+     space in a database segment. The benefits of
+     <option>segment-shrink</option> are compaction of data that leads to
+     better cache utilization and the compacted data requires fewer blocks
+     to be scanned in full table scans. Both lead to better performance.
+    </para>
+   </note>
+  </sect2>
+
+  <sect2 id="s2-rhn-db-control-backup">
+<!--status="revised"-->
+   <title>Backing Up the Database</title><indexterm>
+   <primary>Backup</primary>
+   <secondary>database</secondary></indexterm>
+   <para>
+    It is recommended to perform nightly backups of the embedded database
+    and move the resulting directory to another system via NFS, SCP, FTP,
+    etc. Preferably, this backup system resides off-site. To conduct a
+    backup, proceed as follows:
+   </para>
+      
+   <procedure>
+      <step>
+         <para>Make sure, you have switched to your database user:</para>
+         <screen>su -s /bin/bash - oracle</screen>
+      </step>
+      <step>
+         <para>Stop the database first:</para>
+         <screen>db-control stop</screen>
+      </step>
+      <step>
+         <para>Wait a minute before proceeding further. This is a cold
+             backup; the database must be stopped before running this 
+             command. This process takes several minutes. The first 
+             backup is a good indicator of how long subsequent backups 
+             will take.</para>
+      </step>
+      <step>
+         <para>Create the backup and pass a directory where
+               you want to store your backup:</para>
+         <screen>db-control backup <replaceable>DIRNAME</replaceable></screen>
+      </step>
+      <step>
+         <para>Verify the backup:</para>
+         <screen>db-control examine <replaceable>DIRNAME</replaceable></screen>
+      </step>
+      <step>
+         <para>Start the database again:</para>
+         <screen>db-control start</screen>
+      </step>
+   </procedure>
+   
+   <para>
+    Once the backup is completed, copy the backup to another system using 
+    <command>rsync</command> or another file-transfer utility. It is 
+    strongly recommended scheduling the backup process automatically 
+    using cron jobs. For instance, back up the system at 3 a.m. and then
+    copy the backup to the separate repository (partition, disk, or 
+    system) at 6 a.m.
+   </para>
+  </sect2>
+
+  <sect2 id="s2-rhn-db-control-verify">
+<!--status="revised"-->
+   <title>Verifying the Backup</title><indexterm>
+   <primary>backup</primary>
+   <secondary>verify</secondary></indexterm>
+   <para>
+    Backing up the embedded database is only useful if you can ensure the
+    integrity of the resulting backup. DB Control provides two methods for
+    reviewing backups, one brief, one more detailed. To conduct a quick
+    check of the backup's timestamp and determine any missing files, issue
+    this command as the <systemitem class="username">oracle</systemitem> user:
+   </para>
+<screen>db-control examine <replaceable>DIRNAME</replaceable>
+</screen>
+   <para>
+    To conduct a more thorough review, including computing a checksum of each
+    of the files in the backup, issue this command as the <systemitem class="username">oracle</systemitem> user:
+   </para>
+<screen>db-control verify <replaceable>DIRNAME</replaceable>
+</screen>
+  </sect2>
+
+  <sect2 id="s2-rhn-db-control-restore">
+<!--status="revised"-->
+   <title>Restoring the Database</title><indexterm>
+   <primary>backup</primary>
+   <secondary>restore</secondary></indexterm>
+   <para>
+    DB Control makes embedded database restoration a relatively simple
+    process. As in the creation of backups, you will need to shut down the
+    database and related services. Proceed as follows:
+   </para>
+   <procedure>
+      <step>
+         <para>Make sure, you have switched to your database user:</para>
+         <screen>su -s /bin/bash - oracle</screen>
+      </step>
+      <step>
+         <para>Stop the database first:</para>
+         <screen>db-control stop</screen>
+      </step>
+      <step>
+         <para>Wait a minute before proceeding further.</para>
+      </step>
+      <step>
+         <para>Run the following command, including the
+            directory containing the backup, to begin the 
+            restoration:</para>
+         <screen>db-control restore <replaceable>DIRNAME</replaceable></screen>
+         <para>
+    This restores the embedded database and verifies the contents of the
+    backup directory using checksums. 
+   </para>
+      </step>
+      <step>
+         <para>Once the restoration is complete, start the database:</para>
+         <screen>db-control start</screen>
+      </step>
+   </procedure>
+  </sect2>
+ 
+  <sect2 id="s2-rhn-db-control-extend">
+    <title>Extending the Database</title>
+    <para>In case you need to claim more space of your database,
+          extend it with the following procedure: </para>
+    <procedure>
+          <step>
+              <para>Make sure, you have switched to your database user:</para>
+              <screen>su -s /bin/bash - oracle</screen>
+          </step>
+          <step>
+              <para>List all available tablespaces and their size:</para>
+              <screen>db-control report
+Tablespace                  Size    Used   Avail   Use%
+DATA_TBS                    500M   74.6M  425.3M    15%
+SYSAUX                      550M  516.3M   33.6M    94%
+SYSTEM                      710M  708.1M    1.8M   100%
+TEMP                         20M      0B     20M     0%
+UNDOTBS1                     70M   16.4M   53.5M    23%
+USERS                         5M    1.3M    3.6M    26%</screen>
+          </step>
+          <step>
+              <para>Extend the database. With the following command, the
+                  database will be extended by 500 MB (default):</para>
+              <screen>db-control extend DATA_TBS<!--
+Extending DATA_TBS... done.--></screen>
+          </step>
+          <step>
+              <para>Check the new sizes:</para>
+              <screen>db-control report
+Tablespace                  Size    Used   Avail   Use%
+DATA_TBS                   1000M   75.6M  924.3M     8%
+SYSAUX                      550M  516.3M   33.6M    94%
+SYSTEM                      710M  708.1M    1.8M   100%
+TEMP                         20M      0B     20M     0%
+UNDOTBS1                     70M   16.4M   53.5M    23%
+USERS                         5M    1.3M    3.6M    26%</screen>
+          </step>
+      </procedure>
+  </sect2>
+ </sect1>
+

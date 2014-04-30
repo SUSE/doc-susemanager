@@ -1,0 +1,495 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE chapter PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<chapter id="ch-intro-install">
+ <title>Conceptual Overview</title><indexterm>
+ <primary>Apache HTTP</primary></indexterm><indexterm>
+ <primary>how it works</primary></indexterm><indexterm>
+ <secondary>components</secondary></indexterm>
+ <para>
+  &susemgr; provides a solution to organizations requiring absolute control
+  over and privacy of the maintenance and package deployment of their
+  servers. It allows customers the greatest flexibility and power in keeping
+  servers secure and updated.
+ </para>
+ <sect1 id="sec.install.intro.comp">
+  <title>Main Components</title>
+
+  <para>
+   &susemgr; consists of the following components:
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Database</term>
+    <listitem>
+     <para>
+      &susemgr; can be used in conjunction with a stand-alone database (for
+      example, the organizations' existing database) or with an embedded
+      database. The embedded database comes bundled with &susemgr; and is
+      installed on the same machine as the &susemgr; server.
+      <!-- toms 2012-03-20: Don't mention according to Klaus -->
+      <!--For a list of supported database versions, refer to
+      <xref linkend="sec.manager.requirements.db"/>.-->
+     </para>
+     <para>
+      Some differences exist when using &susemgr; with an external database
+      as opposed to the embedded database. These affect mainly hardware
+      requirements, but also some installation steps, maintenance or
+      troubleshooting activities. Differing instructions are either marked
+      with <emphasis>embedded database</emphasis> or <emphasis>stand-alone
+      database</emphasis> throughout this guide.
+<!--<remark>taroth 2011-01-21: todo: think of this for
+       any changed/added snippets</remark>-->
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>&susemgr; </term>
+    <listitem>
+     <para>
+      Core business logic and entry point for the update tool running on
+      client systems. The &susemgr; server also includes an Apache HTTP
+      Server that serves XML-RPC requests.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>&susemgr; Web Interface</term>
+    <listitem>
+     <para>
+      For advanced management of systems, system groups, users, and
+      channels.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>RPM Repository </term>
+    <listitem>
+     <para>
+      Repository for default packages (and custom RPM packages identified by
+      the organization).
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Management Tools</term>
+    <listitem>
+     <para>
+      The following tools are available:
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Database and file system synchronization tools.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        RPM importing tools.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Channel maintenance tools (Web-based).
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Patch management tools (Web-based).
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        User management tools (Web-based).
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Client system and system grouping tools (Web-based).
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        An update tool on the client systems.
+       </para>
+       <para>
+        If you have &rhel; clients that use the &updagent;
+        (<command>&up2date;</command> or <command>yum</command>) or &rhnregcl;
+        (<command>rhn_register</command>), these applications must be
+        reconfigured or replaced with
+        <systemitem>spacewalk-client-tools</systemitem> to retrieve
+        updates from the organization's internal &susemgr; server or
+        &susemgrproxy;. After this one-time reconfiguration, these
+        client systems can retrieve updates locally using the
+        &updagent;, or system administrators can schedule actions
+        through the &susemgr; Web interface.
+       </para>
+      </listitem>
+     </itemizedlist>
+     <para>
+      The &susemgr; management tools are used to synchronize the &susemgr;
+      database and package repository with the &ncc; (NCC). The &susemgr; import tool
+      allows the system administrator to include custom RPM packages in the
+      package repository.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   For an explanation of key terms in the &susemgr; context, refer to the
+   <xref linkend="cha.manager.glossary"/>.
+  </para>
+ </sect1>
+ <sect1 id="sec.install.intro.process">
+  <title>Process Flow</title>
+
+  <para>
+   When receiving an update request from a client, the organization's
+   internal &susemgr; server queries its database, authenticates the client
+   system, identifies the updated packages available for the client system,
+   and sends the requested RPMs to the client system. Depending on
+   the client's preferences, the package may also be installed. If the
+   packages are installed, the client system sends an updated package
+   profile to the &susemgr; database. Those packages are removed from the
+   list of outdated packages for the client.
+  </para>
+ </sect1>
+ <sect1 id="sec.install.intro.setup">
+  <title>Setup Scenarios and Security</title>
+
+  <para>
+   The organization can configure the Web site for &susemgr; server to be
+   accessible from the local area network only or from both the local area
+   network and the Internet. Both setups allow full control over client
+   systems, system groups, and users. System profiles containing hardware
+   and software information of the client systems are stored locally on the
+   customer's &susemgr; server. When a client system requests package
+   updates, only the applicable packages for the client are returned. All
+   package management tasks, including patch updates, are performed through
+   the local area network.
+  </para>
+
+  <para>
+   &susemgr; can be used in combination with a &susemgrproxy; server to
+   deliver a distributed, self-contained deployment for the organization.
+   For example, an organization can maintain one &susemgr; server in a
+   secure location. Any client systems with local network access to
+   &susemgr; can connect to it. Other remote offices can maintain
+   &susemgrproxy; server installations that connect to the &susemgr; server.
+   The different locations inside the organization must be networked. This
+   can be a private network&mdash;an Internet connection is not required for
+   any of the systems.
+<!--taroth
+   2011-01-24: commenting for now as we don't have this guide in our doc set
+   yet: Refer to the <citetitle>RHN Proxy Server Installation Guide</citetitle> for more
+   information.-->
+  </para>
+
+  <figure>
+   <title>Using &susemgr; and &susemgr; Proxy Server Together</title>
+   <mediaobject>
+    <imageobject role="html">
+     <imagedata fileref="susemanager_overview.png" width="80%"/>
+    </imageobject>
+    <imageobject role="fo">
+     <imagedata fileref="susemanager_overview.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+ </sect1>
+ <sect1 id="sec.install.intro.benefits">
+  <title>Benefits</title>
+
+  <para>
+   Advantages of using &susemgr; include:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Scalability — a single system administrator can set up and maintain
+     hundreds or thousands of &sle; or &rhel; client systems more easily,
+     accurately, and quickly than they could maintain a single system
+     without &susemgr;.
+    </para>
+    <para>
+     &susemgr; may oversee an entire organization's servers in combination
+     with a &susemgrproxy; server.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Security — all communication between registered systems and &susemgr;
+     takes place over secure Internet connections.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Control — clients' system profiles are stored on the local &susemgr;
+     server.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Access control — system administrators can be restricted to access
+     only those systems within their maintenance responsibilities.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Efficiency and bandwidth — packages are delivered significantly
+     faster over a local area network. The bandwidth used for transactions
+     between the clients and the &susemgr; server is controlled by the
+     organization on the local area network.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Overview about patches — easily view patch alerts for all your client
+     systems through one Web site.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Customized updates — custom channels allow fine-grained control of
+     the delivery of custom software packages. &susemgr; allows you to
+     create a truly automated delivery system for custom packages as well as
+     any &sle; or &rhel; packages required by client systems.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Scheduled actions — use the &susemgr; Web interface to schedule
+     actions, including patch updates, package installations, and software
+     profile updates.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Standard protocols — used to maintain security and increase
+     capability. For example, XML-RPC enables &susemgr; to do much more than
+     merely download files.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Simplification — maintaining &sle; and &rhel; systems becomes a
+     simple, automated process.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <sect1 os="hidden" id="s1-upgrades">
+<!--status="notrevised"-->
+
+  <title>Upgrades</title>
+
+  <remark>taroth 2010-10-25: this is about major release upgrades, SUSE Manager
+   1.2 will have no upgrade -&gt; later, need migration docs instead: 
+ * RHN Satellite to SUSE Manager
+ * SMT to SUSE Manager
+  </remark>
+
+  <remark>taroth 2011-03-10: move the complet update/upgrade topic to individual
+ chapter at the end of this guide</remark>
+  <para>
+   To upgrade a Satellite from one version to another, the following items
+   are required:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Satellite Certificate
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Satellite Upgrade Documentation Package
+     (<filename>rhn-upgrade</filename>)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     New Installation ISO
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <sect2 id="s2-upgrades-cert">
+<!--status="notrevised"-->
+   <title>Satellite Certificate</title>
+   <para>
+    To obtain a Satellite certificate, visit &rh; support at
+    <ulink url="http://support.redhat.com"/>.
+   </para>
+  </sect2>
+
+  <sect2 id="s2-upgrades-rhnup">
+<!--status="notrevised"-->
+   <title>Satellite Upgrade Documentation Package (rhn-upgrade)</title>
+   <para>
+    To install the <filename>rhn-upgrade</filename> package, ensure the
+    satellite is registered with &rhna; and with the &rhn; Satellite
+    Channel, then using the package updating tool for your version of Red
+    Hat Enterprise Linux to install the <filename>rhn-upgrade</filename>
+    package with the following commmand (on &rhel; 5 and above):
+   </para>
+<screen>yum install rhn-upgrade</screen>
+   <para>
+    For &rhel; 4 users, run the following command:
+   </para>
+<screen>up2date rh-upgrade</screen>
+   <para>
+    You may also download the package directly from &rhn; by performing the
+    following steps:
+   </para>
+   <orderedlist>
+    <listitem>
+     <para>
+      Log into the &rhna; hosted Web interface at
+      <ulink url="https://rhn.redhat.com/"/>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click the <guimenu>Channels</guimenu> tab.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Under <guimenu>Filter by Product Channel</guimenu> select
+      <guimenu>&rhn; Products</guimenu>, then your
+      <emphasis>current</emphasis> version of &susemgr;, and finally your
+      Satellite server's architecture from the drop-down menus.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Press the <guimenu>Filter</guimenu> button.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click to expand the <guimenu>Red Hat Enterprise Linux</guimenu> tree
+      for your version of the base operating system.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click the link in the <guimenu>Architecture</guimenu> column
+      corresponding to <guimenu>&rhn; Satellite</guimenu>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click on the <guimenu>Packages</guimenu> subtab.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      In the <guimenu>Filter by Package</guimenu> text box, type
+      <literal>rhn-upgrade</literal> and press <guimenu>Go</guimenu>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click on the latest <filename>rhn-upgrade</filename> package release
+      for the version of Satellite to which you are upgrading.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click the <guimenu>Download Package</guimenu> link.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Copy the package to the Satellite server.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      On the Satellite server run the following command:
+     </para>
+<screen>
+rpm -Uvh rhn-upgrade-<replaceable>version</replaceable>.rpm
+
+
+</screen>
+    </listitem>
+   </orderedlist>
+  </sect2>
+
+  <sect2 id="s2-upgrades-iso">
+<!--status="notrevised"-->
+   <title>New Installation ISO</title>
+   <para>
+    This ISO can be downloaded by performing the following steps:
+   </para>
+   <orderedlist>
+    <listitem>
+     <para>
+      Log into &rhna;.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click on <guimenu>Software Downloads</guimenu> on the left-hand side
+      of the screen.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Navigate to the version of &rhel; you are currently using.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Click on the latest version of &susemgr;.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Then choose if you want the embedded &postgresql; database ISO or the
+      non-embedded Oracle version.
+     </para>
+    </listitem>
+   </orderedlist>
+   <para>
+    Once you have followed all steps, refer to the instructions for a
+    Satellite upgrade within the
+    <filename>/etc/sysconfig/rhn/satellite-upgrade/README</filename> file in
+    the <filename>rhn-upgrade</filename> package.
+   </para>
+   <important>
+    <para>
+     If you perform an upgrade from RHN Satellite 5.2 or previous to RHN
+     Satellite 5.3 or newer, be aware that &kickstart; files created in
+     previous versions need to be updated to work on your upgraded
+     Satellite.
+    </para>
+    <para>
+     For example, if your RHN Satellite 5.2 &kickstart; file pointed to the
+     following URL:
+    </para>
+<screen>http://satellite.example.com/kickstart/dist/ks-rhel-i386-server-5</screen>
+    <para>
+     You must change the URL to the following once you have upgraded to RHN
+     Satellite 5.3 or newer:
+    </para>
+<screen>http://satellite.example.com/ks/dist/ks-rhel-i386-server-5</screen>
+   </important>
+  </sect2>
+ </sect1>
+</chapter>

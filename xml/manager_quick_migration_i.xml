@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE sect1 PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<sect1 id="sec.manager.server.migration">
+ <title>Server Migration</title>
+
+ <para>
+  If you have a &susemgr; server installed in parallel to an existing
+  Satellite server, you can migrate the Satellite server to &susemgr;. The
+  &yast; &susemgr; setup module first collects the necessary information.
+  Then you execute the migration in several steps with the
+  <filename>migration.sh</filename> script as described in
+  <xref linkend="pro.manager.server.migration"/>. Use <option>-h</option> to
+  see the available options:
+ </para>
+
+<screen><?dbsuse-fo font-size="0.85em"?>/usr/lib/susemanager/bin/migration.sh -h</screen>
+
+ <note>
+  <title>Supported Migration</title><remark role="needinfo">Now also 5.5 and 5.6?</remark>
+  <para>
+   &susemgr; only supports migration from Satellite 5.3 and 5.4 servers.
+  </para>
+ </note>
+
+ <procedure id="pro.manager.server.migration">
+  <title>Migrating a &rh; Satellite to &susemgr;</title>
+  <step>
+   <para>
+    Log in to your existing &susemgr; server as &rootuser;.
+   </para>
+  </step>
+<!--taroth 2011-01-27: according to ug, this is automatically done in the
+  background now <step>
+   <para>In <filename>/ect/hosts</filename>, replace the hostname of your
+    &susemgr; with the hostname of the Satellite server that you want
+    to migrate.</para>
+  </step>
+ -->
+  <step>
+   <para>
+    Execute <command>yast2&nbsp;susemanager_setup</command> to start the
+    &yast; module.
+   </para>
+  </step>
+  <step>
+   <para>
+    Select <guimenu>Migrate a Satellite/Spacewalk compatible
+    server</guimenu>. Proceed with <guimenu>Next</guimenu>.
+   </para>
+  </step>
+  <step>
+   <para>
+    In the next screen, enter the <guimenu>Hostname of the Satellite
+    Server</guimenu>, its <guimenu>Domain Name</guimenu>, the
+    <guimenu>Satellite Database Username</guimenu>, the <guimenu>Satellite
+    Database Password</guimenu>, and the <guimenu>Satellite Database
+    SID</guimenu>.
+   </para>
+   <figure>
+    <title>Migration&mdash;Satellite Information</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="susemanager_migration_dialog_satellite.png" width="90%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="susemanager_migration_dialog_satellite.png" width="75%"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    Proceed with <guimenu>Next</guimenu>.
+   </para>
+  </step>
+  <step>
+   <para>
+    In the next screen, enter the <guimenu>IP Address of the &susemgr;
+    Server</guimenu>, the <guimenu>Database Administrator Password</guimenu>
+    (belonging to the database's &rootuser;), and the email address of the
+    &susemgr; administrator.
+   </para>
+   <figure>
+    <title>Migration&mdash;&susemgr; Information</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="susemanager_migration_dialog_mgr.png" width="90%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="susemanager_migration_dialog_mgr.png" width="75%"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    Proceed with <guimenu>Next</guimenu>.
+   </para>
+  </step>
+  <step>
+   <para>
+    The next screen asks for details about the database to be migrated.
+   </para>
+   <substeps>
+    <step>
+     <para>
+      If you want to migrate data from an embedded database, select
+      <guimenu>Local Database</guimenu>. &yast; automatically sets the
+      <guimenu>Port</guimenu> and <guimenu>Protocol</guimenu>.
+     </para>
+     <para>
+      To migrate data from an existing remote database instead, select
+      <guimenu>Remote Database</guimenu> and enter the following details for
+      the connection to the database: the database system (SID) used to
+      identify a particular database instance, the FQDN of the remote
+      database, the external <guimenu>Port</guimenu> to use (usually
+      <literal>1521</literal>), and the <guimenu>Protocol</guimenu> to use
+      (usually <literal>TCP</literal>).
+     </para>
+    </step>
+    <step>
+     <para>
+      Enter or set the name and password of the &susemgr; database user
+      (that is used to connect to the local or remote database).
+     </para>
+    </step>
+    <step>
+     <para>
+      Repeat the password in the next field.
+     </para>
+     <figure>
+      <title>Migration&mdash;Local Database</title>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="susemanager_setup_db.png" width="90%"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="susemanager_setup_db.png" width="75%"/>
+       </imageobject>
+      </mediaobject>
+     </figure>
+     <para>
+      Proceed with <guimenu>Next</guimenu>.
+     </para>
+    </step>
+   </substeps>
+  </step>
+  <step>
+   <para>
+    The next screen asks for your mirror credentials from the NCC. Enter
+    your <guimenu>NCC Mirror Credentials Username</guimenu>, the
+    <guimenu>NCC Mirror Credentials Password</guimenu>), and your
+    <guimenu>NCC E-mail Address</guimenu>.
+   </para>
+   <figure>
+    <title>Migration&mdash;NCC Information</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="susemanager_setup_ncc.png" width="95%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="susemanager_setup_ncc.png" width="75%"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    Proceed with <guimenu>Next</guimenu>.
+   </para>
+  </step>
+  <step>
+   <para>
+    Click <guimenu>Next</guimenu> to close &yast; and to write the collected
+    information to a file that will be parsed by the
+    <command>migration.sh</command> script during the next steps.
+   </para>
+  </step>
+  <step>
+   <para>
+    Using the <option>-r</option> option, first copy the RPM packages and
+    configuration files from the Satellite server:
+   </para>
+<screen><?dbsuse-fo font-size="0.85em"?>/usr/lib/susemanager/bin/migration.sh -r</screen>
+   <important>
+    <title>Long Operation</title>
+    <para>
+     This step may take hours to finish.
+    </para>
+   </important>
+  </step>
+  <step>
+   <para>
+    Before you start the final migration process, make sure that nothing is
+    changed on your Satellite server from this point on. Log in to your
+    Satellite server and shut down the Web interface:
+   </para>
+<screen>rcapache2 stop</screen>
+  </step>
+  <step>
+   <para>
+    On the &susemgr; server, start the final migration process:
+   </para>
+<screen><?dbsuse-fo font-size="0.85em"?>/usr/lib/susemanager/bin/migration.sh -m</screen>
+   <para>
+    It synchronizes any remaining changes (that may have occurred during the
+    first run with the <option>-r</option> option) and migrates the
+    database.
+   </para>
+  </step>
+  <step>
+   <para>
+    After the process has been finished successfully, shut down the
+    Satellite server.
+   </para>
+  </step>
+  <step>
+   <para>
+    In the DNS server, change the name of the Satellite server to the
+    &susemgr; server's IP address, so that the new &susemgr; server gets the
+    hostname of the former Satellite server.
+   </para>
+  </step>
+ </procedure>
+
+ <para>
+  From now on, use your &susemgr; as a replacement for your Satellite
+  server. Since the hostname is the same, all certificates will still work.
+  Any registered clients are automatically directed to the &susemgr; server.
+ </para>
+</sect1>

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE section PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<chapter id="s1-sm-audit">
+ <title>Audit</title>
+ <para>
+  Select the <guimenu>Audit</guimenu> tab from the top navigation bar to
+  audit your managed systems.
+ </para>
+ <sect1 id="s2-sm-audit-cve">
+ <title>CVE Audit</title>
+ <!-- see bnc#833950 -->
+ <indexterm>
+ <primary>CVE audit</primary>
+ <secondary>&susemgr; data</secondary>
+ </indexterm>
+ <para>
+  <!-- The CVE Audit feature is integrated into the &susemgr; Web
+  interface. -->
+  The <guimenu>CVE Audit</guimenu> page will display a list of client
+  systems with their patch status regarding a given CVE (Common
+  Vulnerabilities and Exposures) number.
+ </para>
+  <figure>
+   <title>CVE Audit</title>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="cve-audit.png" width="333"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="cve-audit.png" width="444"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+ <sect2 id="s1-cve-usage">
+  <title>Normal Usage</title>
+  <indexterm>
+  <primary>CVE Audit</primary>
+  <secondary>usage</secondary>
+  </indexterm>
+  <para>
+   Proceed as follows if you want to verify that a client system has
+   received a given CVE patch:
+  </para>
+
+  <procedure>
+   <step>
+    <para>
+     Make sure that the CVE data is up-to-date.  For more
+     information, see <xref linkend="sec-cve-maint"/>.
+    </para>
+   </step>
+   <step>
+    <para>
+     <!--In the Web interface, -->Click the <guimenu>Audit</guimenu> tab to
+     open the <guimenu>CVE Audit</guimenu> page.
+    </para>
+   </step>
+   <step>
+    <para>
+    Input a 13-char CVE identifier in the <guimenu>CVE
+    Number</guimenu> field. The year setting will be automatically
+    adjusted. Alternatively, set the year manually and add the last
+    four digits.
+    </para>
+   </step>
+   <step>
+    <para>
+    Optionally, uncheck the patch statuses you are not interested in.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click <guimenu>Audit systems</guimenu>.
+    </para>
+   </step>
+  </procedure>
+  <para>
+   Then a list of client systems is displayed, where each system comes
+   with a <guimenu>Patch Status</guimenu> describing its situation
+   regarding the given CVE identifier. Possible statuses are:
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>
+     Affected, patch is available in a channel that is not assigned:
+    </term>
+    <listitem>
+     <para>
+      The system is affected by the vulnerability and &susemgr; has a
+      patch for it, but at this moment, the channel offering the patch
+      is not assigned to the system.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Affected, patch available in an assigned channel:</term>
+   <listitem>
+    <para>
+     The system is affected by the vulnerability, &susemgr; has a patch
+     for it in a channel that is directly assigned to the system.
+    </para>
+   </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Not affected:</term>
+   <listitem>
+    <para>
+     The system does not have any packages installed that are patchable.
+    </para>
+   </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Patched:</term>
+   <listitem>
+    <para>
+     A patch has already been installed.
+    </para>
+   </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   For a more precise definitions of these states, see <xref
+   linkend="sec-cve-tips"/>.
+  </para>
+  <note>
+   <title>Unknown CVE Number</title>
+   <para>
+    If the CVE number is not known to &susemgr;, an error message is
+    displayed because &susemgr; is unable to collect and
+    display any audit data.
+   </para>
+  </note>
+  <para>
+   For each system, the <guimenu>Next Action</guimenu> column contains
+   suggestions on the steps to take in order to address the
+   vulnerabilities.  Under these circumstances it is either sensible to
+   install a certain patch or assign a new channel. If
+   applicable, a list of <quote>candidate</quote> channels or patches is
+   displayed for your convenience.
+  </para>
+
+  <para>
+   You can also assign systems to a <guimenu>System Set</guimenu> for
+   further batch processing.
+  </para>
+ </sect2>
+
+  <sect2>
+  <title>API Usage</title>
+
+  <para>
+   An API method called
+   <literal>audit.listSystemsByPatchStatus</literal> is available to run
+   CVE audits from custom scripts. Details on how to use it are
+   available in the API guide.
+  </para>
+  </sect2>
+
+ <sect2 id="sec-cve-maint">
+  <title>Maintaining CVE Data</title>
+
+  <para>
+   To produce correct results, CVE Audit must periodically refresh the
+   data needed for the search in the background. By default, the
+   refresh is scheduled at 11:00 PM every night. It is recommended to
+   run such a refresh right after the &susemgr; installation
+   to get proper results immediately instead of waiting until the
+   next day.
+  </para>
+
+  <procedure>
+   <step>
+   <para>
+    In the Web interface, click the <guimenu>Admin</guimenu> tab.
+   </para>
+   </step>
+   <step>
+   <para>
+    Click <guimenu>Task schedules</guimenu> in the left menu.
+   </para>
+   </step>
+   <step>
+   <para>
+    Click the <literal>cve-server-channels-default</literal> schedule link.
+   </para>
+   </step>
+   <step>
+   <para>
+    Click the <literal>cve-server-channels-bunch</literal> link.
+   </para>
+   </step>
+   <step>
+   <para>
+    Click the <literal>Single Run Schedule</literal> button.
+   </para>
+   </step>
+   <step>
+   <para>
+    After some minutes, refresh the page and check that the scheduled run status is <literal>FINISHED</literal>. 
+   </para>
+   </step>
+  </procedure>
+  <para>
+   A direct link is also available in the <guimenu>CVE Audit</guimenu>
+   tab.
+  </para>
+ </sect2>
+  <sect2 id="sec-cve-tips">
+   <title>Tips and Background Information</title>
+   <para>
+    Audit results are only correct if the assignment of channels to
+    systems did not change since the last scheduled refresh (normally
+    at 11:00 PM every night). If a CVE audit is needed and channels were
+    assigned or unassigned to any system during the day, a manual run is
+    recommended.  For more information, see <xref linkend="sec-cve-maint"/>.
+   </para>
+   <para>
+    Systems are called <quote>affected</quote>, <quote>not
+    affected</quote> or <quote>patched</quote> not in an absolute sense,
+    but based on information available to &susemgr;. This implies that
+    concepts such as <quote>being affected by a vulnerability</quote> have
+    particular meanings in this context. The following definitions apply:
+   </para>
+
+   <variablelist>
+    <varlistentry>
+     <term>System affected by a certain vulnerability:</term>
+   <listitem>
+    <para>
+    A system which has an installed package with version lower than the version of the same package in a relevant patch marked for the vulnerability.
+    </para>
+   </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>System not affected by a certain vulnerability:</term>
+   <listitem>
+    <para>
+     A system which has no installed package that is also in a relevant
+     patch marked for the vulnerability.
+    </para>
+   </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>System patched for a certain vulnerability:</term>
+   <listitem>
+    <para>A system which has an installed package with version equal to
+    or greater than the version of the same package in a relevant patch
+    marked for the vulnerability.</para>
+   </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Relevant patch:</term>
+   <listitem>
+    <para>A patch known by &susemgr; in a relevant channel.</para>
+   </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Relevant channel:</term>
+   <listitem>
+    <para>
+     A channel managed by &susemgr;, which is either assigned to the
+     system, the original of a cloned channel which is assigned to the
+     system, a channel linked to a product which is installed on the
+     system or a past or future service pack channel for the system.
+    </para>
+   </listitem>
+    </varlistentry>
+   </variablelist>
+   <para>
+    A notable consequence of the above definitions is that results can
+    be incorrect in cases of unmanaged channels, unmanaged packages, or
+    non-compliant systems.
+   </para>
+  </sect2>
+ </sect1>
+ <!--
+ toms 2012-05-25: According to Jo: not ready yet.
+                  Disabled for the time being
+
+ ke 2013-08-21: I'm going to enable it now.  Must be finished along with
+ bnc#794772.
+ ke 2013-08-29: With the new chapter (s2-sm-audit-openscap) I consider
+ it done.
+ -->
+ <sect1 id="s2-sm-audit-openscap">
+  <title>OpenSCAP</title><remark>emap: Combine this with openscap chap and make every sect1 in User Guide a sect1, sect1 ->chap?</remark>
+  <para>If you click the <guimenu>OpenSCAP</guimenu> tab on the left
+  navigation bar, an overview of the &openscap; Scans appears.  SCAP
+  (Security Content Automation Protocol) is a framework to maintain
+  the security of enterprise systems. It mainly performs the
+  following tasks:
+  </para>
+  <itemizedlist>
+    <listitem>
+      <para>automatically verifies the presence of patches,</para>
+    </listitem>
+    <listitem>
+      <para>checks system security configuration settings,</para>
+    </listitem>
+    <listitem>
+      <para>examines systems for signs of compromise.</para>
+    </listitem>
+  </itemizedlist>
+  <para>
+   For a description of the Web interface dialogs, see <xref
+   linkend="s2-openscap-suma-pages"/>.
+  </para>
+  <para>
+   For instructions and tips on how to best use OpenSCAP with
+   &susemgr;, refer to <xref linkend="ch-openscap"/>. To learn mor
+   about OpenSCAP check out the project homepage at <ulink
+   url="http://open-scap.org"/>.
+  </para>
+ </sect1>
+</chapter>

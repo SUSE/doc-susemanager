@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE appendix PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<appendix id="app.ay.example_simple">
+ <title>Minimalist &ay; Profile for Automated Installations and Useful
+ Enhancements</title>
+ <para>
+  The following &ay; profile will install a &sls; system with all default
+  installation options including a default network configuration with DHCP.
+  After the installation is completed, a bootstrap script located on the
+  &susemgr; server will be executed in order to register the freshly
+  installed system with susemgr;. You need to adjust the IP address of the
+  &susemgr; server, the name of the bootstrap script and the &rootuser;
+  password according to your needs in the following lines:
+ </para>
+<screen>&lt;user&gt;
+ ...
+ &lt;username&gt;root&lt;/username&gt;
+ &lt;user_password&gt;<replaceable>linux</replaceable>&lt;/user_password&gt;
+&lt;/user&gt;
+
+&lt;location&gt;http://<replaceable>192.168.1.1</replaceable>/pub/bootstrap/<replaceable>my_bootstrap.sh</replaceable>&lt;/location&gt;
+</screen>
+ <para>
+  The complete &ay; file:
+ </para>
+<screen>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE profile&gt;
+&lt;profile xmlns="http://www.suse.com/1.0/yast2ns"
+         xmlns:config="http://www.suse.com/1.0/configns"&gt;
+ &lt;general&gt;
+  &lt;mode&gt;
+   &lt;confirm config:type="boolean"&gt;false&lt;/confirm&gt;
+  &lt;/mode&gt;
+ &lt;/general&gt;
+ &lt;networking&gt;
+  &lt;keep_install_network config:type="boolean"&gt;true&lt;/keep_install_network&gt;
+ &lt;/networking&gt;
+ &lt;software&gt;
+  &lt;install_recommended config:type="boolean"&gt;true&lt;/install_recommended&gt;
+   &lt;patterns config:type="list"&gt;
+    &lt;pattern&gt;base&lt;/pattern&gt;
+   &lt;/patterns&gt;
+ &lt;/software&gt; 
+ &lt;users config:type="list"&gt;
+  &lt;user&gt;
+   &lt;encrypted config:type="boolean"&gt;false&lt;/encrypted&gt;
+   &lt;fullname&gt;root&lt;/fullname&gt;
+   &lt;gid&gt;0&lt;/gid&gt;
+   &lt;home&gt;/root&lt;/home&gt;
+   &lt;password_settings&gt;
+    &lt;expire&gt;&lt;/expire&gt;
+    &lt;flag&gt;&lt;/flag&gt;
+    &lt;inact&gt;&lt;/inact&gt;
+    &lt;max&gt;&lt;/max&gt;
+    &lt;min&gt;&lt;/min&gt;
+    &lt;warn&gt;&lt;/warn&gt;
+   &lt;/password_settings&gt;
+   &lt;shell&gt;/bin/bash&lt;/shell&gt;
+   &lt;uid&gt;0&lt;/uid&gt;
+   &lt;username&gt;root&lt;/username&gt;
+   &lt;user_password&gt;linux&lt;/user_password&gt;
+  &lt;/user&gt;
+ &lt;/users&gt;
+ &lt;scripts&gt;
+  &lt;init-scripts config:type="list"&gt;
+   &lt;script&gt;
+    &lt;interpreter&gt;shell&lt;/interpreter&gt;
+    &lt;location&gt;http://192.168.1.1/pub/bootstrap/my_bootstrap.sh&lt;/location&gt;
+   &lt;/script&gt;
+  &lt;/init-scripts&gt;
+ &lt;/scripts&gt;
+&lt;/profile&gt;</screen>
+
+<!-- bnc#788758 and bnc#780261: about child channels -->
+<para>
+ Use the following enhancement fragment to add child channels:
+</para>
+
+<screen>&lt;add-on&gt;
+ &lt;add_on_products config:type="list"&gt;
+  &lt;listentry&gt;
+   &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+   &lt;media_url&gt;http://$c_server/ks/dist/child/<replaceable>channel-label</replaceable>/<replaceable>distribution-label</replaceable>&lt;/media_url&gt;
+   &lt;name&gt;$c_name&lt;/name&gt;
+   &lt;product&gt;$c_product&lt;/product&gt;
+   &lt;product_dir&gt;/&lt;/product_dir&gt;
+  &lt;/listentry&gt;
+...
+ &lt;/add_on_products&gt;
+&lt;/add-on&gt;</screen>
+
+ <para>
+  Replace <replaceable>channel-label</replaceable> and
+  <replaceable>distribution-label</replaceable> with actual labels such
+  as <literal>sles11-sp1-updates-x86_64</literal> and
+  <literal>sles11-sp2-x86_64</literal>, and set the variables
+  (<literal>$c_server</literal>, etc.) according to your environment.
+  For information about variable, see <xref
+  linkend="s4-sm-system-kick-dist-variables"/>.
+ </para>
+</appendix>

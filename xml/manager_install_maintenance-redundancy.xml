@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE sect1 PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<sect1 id="s1-redundant-satellite">
+    <!--status="revised"-->
+    
+    <title>Establishing Redundant &susemgr; Servers with Stand-Alone Database</title><indexterm>
+        
+        <primary>redundant &susemgr;</primary></indexterm><indexterm>
+            
+            <primary>&susemgr; redundancy</primary></indexterm>
+    
+    <para>
+        If you are using a standalone database, you can limit outages
+        on &susemgr; servers by preparing redundant &susemgr; servers.
+        Unlike cloning a &susemgrdb;, redundant &susemgr; servers with
+        stand-alone database may be run as active, as well as standby.
+        This is entirely up to your network topology and is
+        independent of the steps listed here.
+    </para>
+    
+    <para>
+        To establish this redundancy, first install the primary &susemgr; server
+        as usual, except that the value specified in the Common Name field for
+        the SSL certificate must represent your high-availability configuration
+        rather than the hostname of the individual server. Proceed with the
+        following steps:
+    </para>
+    
+    <orderedlist>
+        <listitem>
+            <para>
+                Consult your database administrator on how to prepare the stand-alone
+                database for failover, using Oracle's recommendations for building a
+                fault-tolerant database.
+            </para>
+        </listitem>
+        <listitem>
+            <para>
+                Install &susemgr; with stand-alone database
+                <!-- (and a base install of
+     Red Hat Enterprise Linux AS) -->
+                on a separate machine, skipping the database configuration, database
+                schema, SSL certificate, and bootstrap script generation steps. Include
+                the same &ncc; account and database connection information provided
+                during the initial &susemgr; installation and register the new
+                &susemgr; server.
+            </para>
+            <para>
+                If your original SSL certificate does not take your high-availability
+                solution into account, create a new one with a more appropriate Common
+                Name value now. In this case, also generate a new bootstrap script that
+                captures this new value.
+            </para>
+        </listitem>
+        <listitem>
+            <para>
+                After installation, copy the following files from the primary to the
+                secondary &susemgr;:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <filename>/etc/rhn/rhn.conf</filename>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <filename>/etc/tnsnames.ora</filename>
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </listitem>
+        <listitem>
+            <para>
+                Copy and install the server-side SSL certificate RPMs from the primary
+                &susemgr; to the secondary.
+                <remark>taroth 2011-02-03: todo - add proper
+                    xref</remark>
+                <!-- ke: is this documented in the client config? -->
+                Refer to the Sharing Certificates section of the &mgrclientconfguide;
+                for precise instructions. Remember, the Common Name value must
+                represent the combined &susemgr; solution, not a single machine's
+                hostname.
+            </para>
+            <para>
+                If you generated a new SSL certificate during the &susemgr;
+                installation that included a new Common Name value, copy the SSL
+                certificate RPMs from the secondary to the primary server and
+                redistribute the client-side certificate. If you also created another
+                bootstrap script, you may use this to install the certificate on client
+                systems.
+            </para>
+        </listitem>
+        <listitem>
+            <para>
+                If you did not create a new bootstrap script, copy the contents of
+                <filename>/srv/www/htdocs/pub/bootstrap/</filename> from the primary
+                server to the secondary. If you did generate a new one, copy that
+                directory's contents to the primary &susemgr;.
+            </para>
+        </listitem>
+        <listitem>
+            <para>
+                Turn off the Task Engine on the secondary server with the following
+                command:
+            </para>
+            <screen>rctaskomatic stop</screen>
+            <para>
+                You may use custom scripting or other means to establish automatic
+                start-up or failover of the Task Engine on the secondary server. It
+                will need to be started upon failover.
+            </para>
+        </listitem>
+        <listitem>
+            <para>
+                Share channel package data (by default located in
+                <filename>/var/spacewalk</filename>) between the &susemgr; servers via
+                a networked storage device. This eliminates data replication and
+                ensures a consistent store of data for each &susemgr;.
+            </para>
+        </listitem>
+        <listitem>
+            <para>
+                Share cache data (by default located in
+                <filename>/var/cache/rhn</filename>) between the &susemgr; servers via
+                a networked storage device. This eliminates data replication and
+                ensures a consistent store of cached data for each server.
+            </para>
+        </listitem>
+        <listitem>
+            <para>
+                Make the various &susemgr; servers available on your network via Common
+                Name and a method suiting your infrastructure. Options include
+                round-robin DNS, a network load-balancer, and a reverse-proxy setup.
+            </para>
+        </listitem>
+    </orderedlist>
+</sect1>

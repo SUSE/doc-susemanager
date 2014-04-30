@@ -1,0 +1,1649 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE chapter PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<chapter id="ch-troubleshooting">
+ <title>Troubleshooting</title><indexterm>
+ <primary>troubleshooting</primary></indexterm>
+ <para>
+  This chapter provides tips for determining the cause of and resolving the
+  most common errors associated with &susemgr;. For services and support
+  options available for &susemgr;, refer to
+  <ulink url="http://www.suse.com/products/suse-manager/"/>.
+ </para>
+ <para>
+  In addition, you may package configuration information and logs from
+  &susemgr; and send them to &suse; for further diagnosis. Refer to
+  <xref linkend="s1-satellite-debug"/> for instructions.
+ </para>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="manager_quick_trouble_i.xml"/>
+
+<!-- ==================================================================== -->
+ <sect1 id="s1-general-problem">
+
+  <title>General Problems</title><indexterm>
+
+  <primary>/etc/rhn/rhn.conf</primary></indexterm><indexterm>
+
+  <primary>general problems</primary></indexterm><indexterm>
+
+  <primary>terms to understand</primary>
+
+  <secondary>/etc/hosts</secondary></indexterm><indexterm>
+
+  <primary>terms to understand</primary>
+
+  <secondary>Embedded Database</secondary></indexterm><indexterm>
+
+  <primary>terms to understand</primary>
+
+  <secondary>full disk space</secondary></indexterm><indexterm>
+
+  <primary>terms to understand</primary>
+
+  <secondary>traceback email address</secondary></indexterm>
+
+  <para>
+   When having general problems, examine the log files related to the
+   component exhibiting failures.  For more information, see <xref
+   linkend="s1-log-files"/>.
+  </para>
+
+  <para>
+   A common issue is full disk space. For example, if you observe the
+   halted writing in the log files, or logging suddenly
+   stopped during writing, you likely have not enough disk space left. Run the following
+   command to check the percentage in the <guimenu>Use%</guimenu> column:
+  </para>
+
+<screen>df -h</screen>
+
+  <para>
+   In addition to log files, you can obtain valuable information by
+   retrieving the status of your &susemgr; and its various components. This
+   can be done with the command:
+  </para>
+
+<screen>/usr/sbin/spacewalk-service status</screen>
+
+  <para>
+   Furthermore, you can obtain the status of components such as the Apache
+   Web server and the Task Engine individually. For example, to view the
+   status of the Apache Web server, run the command:
+  </para>
+
+<screen>rcapache2 status</screen>
+
+  <para>
+   If the Apache Web server is not running, entries in your
+   <filename>/etc/hosts</filename> file may be incorrect. For more
+   information, see <xref linkend="s1-host-not-found"/>.
+  </para>
+
+  <para>
+   To obtain the status of the Task Engine, run the command:
+  </para>
+
+<screen>rctaskomatic status</screen>
+
+  <para>
+   If a &susemgr;'s embedded database is in use, run one of the
+   following commands to obtain its status:
+  </para>
+
+  <screen>service oracle status</screen>
+
+  <!-- http://doccomments.provo.novell.com/comments/24215 -->
+  <para>Or:</para>
+
+  <screen>service postgresql status</screen>
+
+  <para>
+   To determine the version of your database schema, run the command:
+  </para>
+
+<screen>rhn-schema-version</screen>
+
+  <para>
+   To list the character set types of your &susemgr;'s database, run the
+   command:
+  </para>
+
+<screen>rhn-charsets</screen>
+
+  <para>
+   If the administrator is not receiving emails from &susemgr;, confirm
+   that the correct email addresses have been set for
+   <option>traceback_mail</option> in
+   <filename>/etc/rhn/rhn.conf</filename>.
+  </para>
+
+  <para>
+   If the traceback email is marked from
+   <literal>susemanager@example.com</literal> and you would like the address to
+   be valid for your organization, set the
+   <option>web.default_mail_from</option> variable in
+   <filename>/etc/rhn/rhn.conf</filename> to the desired email address.
+  </para>
+
+  <para>
+   If importing or synchronizing
+   a channel fails and you cannot recover it in any other way, run this
+   command to delete the cache:
+  </para>
+
+<screen>rm -rf <replaceable>temporary-directory</replaceable></screen>
+
+  <!-- http://doccomments.provo.novell.com/comments/24216 -->
+  <para>
+   Note that <xref linkend="s2-import-local"/> suggested that this temporary
+   directory be <filename>/var/sw-import/</filename>.
+  </para>
+
+  <para>
+   Then restart the import or synchronization.
+  </para>
+
+  <para>
+   If <command>zypper up</command> or the push capability of &susemgr;
+   ceases to function, old log files might be the reason for this. Stop the
+   <systemitem class="daemon">jabberd</systemitem> daemon before removing
+   these files. To do so, issue the following commands as root:
+  </para>
+
+<screen>rcjabberd stop
+cd /var/lib/jabberd
+rm -f db*
+rcjabberd start</screen>
+ </sect1>
+<!-- ==================================================================== -->
+ <sect1 id="s1-spacewalk-report">
+  <title>Gathering Information with <command>spacewalk-report</command></title>
+
+  <para>
+   There are instances where administrators may need a concise, formatted
+   summary of their &susemgr; resources, whether it is to take inventory of
+   their entitlements, subscribed systems, or users and organizations.
+   Rather than gathering such information manually from the &susemgr; Web
+   interface, &susemgr; includes the <command>spacewalk-report</command>
+   command to fetch and display vital &susemgr; information at once.
+  </para>
+
+  <note>
+   <para>
+    To use <command>spacewalk-report</command>, you must have the
+    <filename>spacewalk-reports</filename> package installed.
+   </para>
+  </note>
+
+  <para>
+   <command>spacewalk-report</command> allows administrators to organize and
+   display reports about content, systems, and user resources across
+   &susemgr;. Using <command>spacewalk-report</command>, you can receive
+   reports on:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     System Inventory: lists all of the systems registered to &susemgr;.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Entitlements: lists all organizations on &susemgr;, sorted by system
+     or channel entitlements.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Patches: lists all the patches relevant to the registered systems
+     and sorts patches by severity, as well as the systems that apply to a
+     particular patch.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Users: lists all the users registered to &susemgr; and any
+     systems associated with a particular user.
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   <command>spacewalk-report</command> allows administrators to organize and
+   display reports about content, systems, and user resources across
+   &susemgr;. To get the report in CSV format, run the following at the
+   command line of your &susemgr; server.
+  </para>
+
+<screen>spacewalk-report <replaceable>report_name</replaceable></screen>
+
+  <para>
+   The following reports are available:
+  </para>
+
+  <table>
+   <title><command>spacewalk-report</command> Reports</title>
+   <tgroup cols="3">
+    <thead>
+     <row>
+      <entry>
+       <para>
+        Report
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Invoked as
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Description
+       </para>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        Channel Packages
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>channel-packages</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of packages in a channel.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Channel Report
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>channels</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Detailed report of a given channel.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Cloned Channel Report
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>cloned-channels</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Detailed report of cloned channels.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        Custom Info
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>custom-info</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        System custom information.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Entitlements
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>entitlements</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Lists all organizations on &susemgr; with their system or channel
+        entitlements.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Patches in Channels
+       </para>
+      </entry>
+      <entry>
+        <remark>ke 2013-08-06: still: errata-channels</remark>
+       <para>
+        <command>errata-channels</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Lists of patches in channels.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Patches Details
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <remark>ke 2013-08-06: still: errata-list</remark>
+        <command>errata-list</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Lists all patches that affect systems registered to &susemgr;.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        All patches
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <remark>ke 2013-08-06: still: errata-list-all</remark>
+        <command>errata-list-all</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Complete list of all patches.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Patches for Systems
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <remark>ke 2013-08-06: still: errata-systems</remark>
+        <command>errata-systems</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Lists applicable patches and any registered systems that are
+        affected.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        Host Guests
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>host-guests</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of host-guests mapping.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        Inactive Systems
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>inactive-systems</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of inactive systems.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        System Inventory
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>inventory</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of systems registered to the server, together with hardware and
+        software information.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        Kickstart Trees
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>kickstartable-trees</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of kickstartable trees.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        All Upgradable Versions
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>packages-updates-all</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of all newer package versions that can be upgraded.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        Newest Upgradable Version
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>packages-updates-newest</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of only newest package versions that can be upgraded.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        Result of SCAP
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>scap-scan</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Result of OpenSCAP sccdf eval.<remark role="needinfo">emap: should this read xccdf?</remark>
+       </para>
+      </entry>
+     </row>
+      <row>
+       <!-- FIXME: what are the differences: bnc#833566 -->
+      <entry>
+       <para>
+        Result of SCAP
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>scap-scan-results</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Result of OpenSCAP sccdf eval, in a different format.<remark role="needinfo">emap: here too rather xccdf?</remark>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        System Data
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>splice-export</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        System data needed for splice integration.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        System Groups
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>system-groups</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of system groups.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        Activation Keys for System Groups
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>system-groups-keys</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of activation keys for system groups.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        Systems in System Groups
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>system-groups-systems</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of systems in system groups.
+       </para>
+      </entry>
+     </row>
+      <row>
+      <entry>
+       <para>
+        System Groups Users
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>system-groups-users</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Report of system groups users.
+       </para>
+      </entry>
+     </row>
+<!--
+system-history: System event history
+system-history-channels: Channel event history
+system-history-configuration: Configuration event history
+system-history-entitlements: System entitlement event history
+system-history-errata: Errata event history
+system-history-kickstart: Kickstart event history
+system-history-packages: Package event history
+system-history-scap: OpenSCAP event history
+-->
+      <row>
+      <entry>
+       <para>
+        Installed Packages
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>system-packages-installed</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of packages installed on systems.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Users in the System
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>users</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Lists all users registered to &susemgr;.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Systems administered
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <command>users-systems</command>
+       </para>
+      </entry>
+      <entry>
+       <para>
+        List of systems that individual users can administer.
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
+  <para>
+   For more information about an individual report, run
+   <command>spacewalk-report</command> with the option <option>--info</option> or
+   <option>--list-fields-info</option> and the report name. The description
+   and list of possible fields in the report will be shown.
+  </para>
+
+  <para>
+   For further information, the <command>spacewalk-report(8)</command> man
+   page as well as the <command>--help</command> parameter of the
+   <command>spacewalk-report</command> program can be used to get additional
+   information about the program invocations and their options.
+  </para>
+ </sect1>
+ <!-- ============================================================ -->
+ <sect1 id="s1-trouble-cvssep">
+  <!-- bnc#833954 -->
+  <title>Changing the CSV Separator</title>
+
+  <para>
+   The character used as the delimiter in downloadable CSV files
+   throughout &susemgr; can now be configured per user via the Web
+   interface. When navigating to <guimenu>Your Preferences</guimenu> on
+   the <guimenu>Overview</guimenu> page, the following options are
+   available:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+    Comma (",", default)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+    Semicolon (";", compatible with Microsoft® Excel®)
+    </para>
+   </listitem>
+  </itemizedlist>
+  <para>
+   Whenever downloading a CSV file from anywhere within &susemgr;, the
+   configured separator character will be used as the delimiter.
+  </para>
+ </sect1>
+
+ <sect1 id="s1-log-files">
+<!--status="debranded, RFC"-->
+
+  <title>Log Files</title><indexterm>
+
+  <primary>log files</primary></indexterm><indexterm>
+
+  <primary>log files</primary>
+
+  <secondary>table</secondary></indexterm>
+
+  <para>
+   If having trouble with &susemgr;, examine the associated log
+   files. Log files provide important information about the activity
+   that has taken place on the device or within the application that can
+   be used to monitor performance and ensure proper configuration. See
+   <xref linkend="tb-log-files"/> for the location of all the relevant
+   log files.
+  </para>
+
+  <note>
+   <para>
+    There may be numbered log files (such as
+    <filename>mgr-ncc-sync.log.1</filename>,
+    <filename>mgr-ncc-sync.log.2</filename>, etc.) within the
+    <filename>/var/log/rhn</filename> directory. When the current
+    <filename>mgr-ncc-sync.log</filename> file fills up to a size as
+    specified by the <command>logrotate(8)</command> daemon, rotated log
+    files are created with a
+    <filename>.<replaceable>NUMBER</replaceable></filename> extension.
+    The file with the highest number contains the oldest rotated logs.
+   </para>
+
+   <para>
+    <!-- fate#312437 -->
+    Not all files are fully covered by the <command>logrotate</command>
+    daemon.  For example, with every run <command>reposync</command> log
+    files get a new name containing date and time information&mdash;see
+    its <command>logrotate</command> configuration in
+    <filename>/etc/logrotate.d/spacewalk-backend-tools</filename>.  If
+    you want to keep only recent files in the
+    <filename>/var/log/rhn/reposync</filename> directory and thus
+    preventing the log process from filling up the storage space,
+    specify after how many days untouched log files should be removed.
+    Set the <literal>MAX_DAYS</literal> system configuration variable in
+    <filename>/etc/sysconfig/rhn/reposync</filename> accordingly; then,
+    the daily <command>cron</command> maintenance procedure removes
+    outdated files.
+   </para>
+
+  </note>
+
+  <table id="tb-log-files">
+   <title>Log Files</title>
+   <tgroup cols="2">
+    <thead>
+     <row>
+      <entry>
+       <para>
+        Component/Task
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Log File Location
+       </para>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        Apache Web server
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <filename>/var/log/apache2/</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &susemgr;
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <filename>/var/log/rhn/</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &susemgr; Installation
+       </para>
+      </entry>
+<!-- does not exist on the manager.qa.suse.de installation. 2011-03-01-->
+      <entry>
+       <para>
+        <filename>/var/log/susemanager_setup.log</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Database installation (<emphasis>Embedded Database</emphasis>)
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <filename>/var/log/rhn/install_db.log</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Database population
+       </para>
+      </entry>
+<!-- does not exist on the manager.qa.suse.de installation. 2011-03-01-->
+      <entry>
+       <para>
+        <filename>/var/log/rhn/populate_db.log</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &susemgr; Synchronization Tool
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <filename>/var/log/rhn/mgr-ncc-sync.log</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Monitoring infrastructure
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <filename>/var/log/nocpulse/</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Monitoring notifications
+       </para>
+      </entry>
+<!-- does not exist on the manager.qa.suse.de installation. 2011-03-01-->
+      <entry>
+       <para>
+        <filename>/var/log/notification/</filename>
+       </para>
+      </entry>
+     </row>
+     <row os="hidden">
+      <entry>
+       <para>
+        <remark>taroth 2011-02-02: @DEVs, do we ship this one?
+       couldn't find the mentioned log file - therefore disabling for now
+        </remark>
+        <remark>ke 2013-08-08: Replaced with smdba, but I'm not sure
+        about its log files.</remark>
+        RHN DB Control (<emphasis>Embedded Database</emphasis>)
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <filename>/var/log/rhn/rhn_database.log</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Task Engine (taskomatic)
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <filename>/var/log/rhn/rhn_taskomatic_daemon.log</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        zypper
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <filename>/var/log/zypper.log</filename>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        XML-RPC transactions
+       </para>
+      </entry>
+<!-- does not exist on the manager.qa.suse.de installation. 2011-03-01-->
+      <entry>
+       <para>
+        <filename>/var/log/rhn/rhn_server_xmlrpc.log</filename>
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+  <para>
+   If "OutOfMemoryError" strings appear in the
+   <filename>rhn_taskomatic_daemon.log</filename> file, the parameter
+   <literal>taskomatic.maxmemory</literal> in the
+   <filename>/etc/rhn/rhn.conf</filename> file should be set to at least
+   <literal>2048</literal> when dealing with a large number of
+   packages and repositories. This parameter overrides the setting in
+   <filename>/etc/rhn/default/rhn_taskomatic_daemon.conf</filename>.
+  </para>  
+ </sect1>
+ <!-- ============================================================== -->
+ <sect1 id="s1-custom-channel-names">
+  <!-- bnc#844257 -->
+  <title>Naming Custom Channels</title>
+  <para>
+   To avoid conflicts, do not use names for custom channels that
+   vendors such as SUSE or Red Hat use or might use.
+  </para>
+ </sect1>
+ <!-- ============================================================== -->
+ <sect1 id="s1-trouble-noproxy">
+  <!-- fate#315039 -->
+  <title>Accessing Local Channels without Proxy</title>
+  <para>
+   Even if a proxy is configured for accessing external Internet
+   resources and a &susemgr; Proxy for NCC connections and channel
+   synchronization, it is possible to access local custom channels
+   directly without a proxy.
+  </para>
+  <para>
+   To access local channels directly, set the
+   <literal>server.satellite.no_proxy</literal> variable in
+   <filename>/etc/rhn/rhn.conf</filename> accordingly.
+  </para>
+  <!-- bnc#846431 -->
+  <para>
+   <literal>server.satellite.no_proxy</literal> is a comma-separated
+   list of hosts that do not use the proxy.  Each name is matched as
+   either a domain that contains the hostname or the hostname itself.
+   For example, <literal>example.com</literal> would match
+   <literal>example.com</literal>, <literal>example.com:80</literal>,
+   and <literal>www.example.com</literal>, but not
+   <literal>www.notexample.com</literal>.
+   Additionally, it matches all subdomains;
+   <literal>example.com</literal> would also disable the proxy for
+   <literal>my.sub.example.com</literal>.  This would be a valid
+   setting:
+  </para>
+  <screen>server.satellite.no_proxy = example.com, host.example.org</screen>
+  <para>
+   The only allowed wildcard is a single <literal>*</literal> character,
+   which matches all hosts, and thus effectively disables the proxy.
+  </para>
+ </sect1>
+ <!-- ============================================================ -->
+ <!-- Based on http://wiki.novell.com/index.php/SM_NetworkScanner  -->
+ <sect1 id="s1-network-dicovery">
+  <title>Discovering Hosts and Subnets in the Network</title><indexterm>
+
+  <primary>network scanner</primary></indexterm><indexterm>
+
+  <primary>dicovering hosts</primary></indexterm>
+
+  <para>
+   The &susemgr; Network Scanner is a tool for scanning the network and
+   finding hosts and subnets in it.  It consists of the &susemgr;
+   Network Discovery daemon and its client.  By default, the daemon runs
+   on the network port 5000.
+  </para>
+
+  <sect2>
+   <title>Installation and Configuration</title>
+
+  <procedure>
+   <title>Installation and Configuartion Instructions</title>
+   <step>
+    <para>
+     On the &susemgr; server install the SUSE Manager Network Discovery
+     daemon and its client with the following commands as
+     <systemitem>root</systemitem>:
+    </para>
+    <screen>zypper install sm-network-discovery
+zypper install sm-network-discovery-client</screen>
+   </step>
+   <step>
+    <para>
+     For configuring the network device on which the daemon is
+     listening, see the <filename>sm-netscan.conf</filename> manpage.
+     Additionally you can change other defaults according to your needs.
+    </para>
+    <para>
+     Background information: The Network Scanner does not need the SNMP
+     protocol or any other special hints about the network that you want
+     to scan.  It must just be allowed to send ICMP packets to ping its
+     targets. Thus it can work on any network layout without a specific
+     configuration or assumptions that some credentials need to be sent
+     somewhere in order to get the needed starting info.
+    </para>
+   </step>
+  </procedure>
+  </sect2>
+
+  <sect2>
+   <title>Usage</title>
+   <para>
+    The Network Scanner consists of two pars: the daemon that discovers
+    the network and the client that returns the already captured data.
+   </para>
+
+   <para>
+    To start the daemon:
+   </para>
+
+   <screen>rcsm-network-discovery start</screen>
+
+   <para>
+    To view the scanned network, use the &susemgr; Network Discovery
+    client <command>sm-netscan</command> that comes with the
+    <option>--help</option> option to display an online help.
+   </para>
+
+   <note>
+    <title>Scanning the Network</title>
+    <para>
+     Scanning your network may take some time.  So after starting the
+     daemon, wait some minutes before running the client tool.
+    </para>
+   </note>
+
+   <para>To see the found subnets:</para>
+
+   <screen>sm-netscan --subnets</screen>
+
+   <para>To see the hosts in particular subnets:</para>
+
+   <screen>sm-netscan --hosts=<replaceable>SUBNET_IP</replaceable></screen>
+
+   <para>
+    To retrieve the data in XML, pass the <option>format</option>
+    parameter to the client tool.
+   </para>
+
+   <para>
+    For more details, see the <filename>sm-netscan</filename> manpage
+    and the online documentation at <ulink
+    url="http://wiki.novell.com/index.php/SM_NetworkScanner"/>.
+   </para>
+  </sect2>
+
+ </sect1>
+ <!-- ============================================================ -->
+ <sect1 id="s1-host-not-found">
+
+  <title>Host Not Found/Could Not Determine FQDN</title><indexterm>
+
+  <primary>/etc/nsswitch.conf </primary></indexterm><indexterm>
+
+  <primary>host not found error</primary>
+
+  <secondary>could not determine FQDN</secondary></indexterm>
+
+  <para>
+   &susemgr; configuration files rely exclusively on fully qualified domain
+   names (FQDN). Therefore, it is imperative that key applications are able
+   to resolve the name of the &susemgr; server into an IP address. Red Hat
+   Update Agent
+<!--taroth 2011-02-02: not
+    supported on &susemgr;<application>Red Hat
+   Network Registration Client</application>-->
+   and the Apache Web server are particularly prone to this problem with the
+   applications issuing errors of &quot;Host not found&quot; and the Web
+   server stating &quot;Could not determine the server's fully qualified
+   domain name&quot; upon failing to start.
+  </para>
+
+  <para>
+   This problem typically originates from the
+   <filename>/etc/hosts</filename> file. The
+   <filename>/etc/nsswitch.conf</filename> file defines the methods and the
+   order by which domain names are resolved. Usually, the
+   <filename>/etc/hosts</filename> file is checked first, followed by
+   Network Information Service (NIS) if used, followed by DNS. One of the
+   files has to succeed for the Apache Web server to start and the client
+   applications to work.
+  </para>
+
+ <procedure>
+  <step>
+  <para>
+   To resolve this problem, check the <filename>/etc/hosts</filename> file.
+   It looks like this:
+  </para>
+
+<screen>127.0.0.1 <replaceable>this_machine.example.com</replaceable> <replaceable>this_machine</replaceable> localhost.localdomain \
+localhost
+</screen>
+  </step>
+  <step>
+  <para>
+   In a text editor, remove the offending machine information so that the
+   line in <filename>/etc/hosts</filename> looks like this:
+  </para>
+
+<screen>127.0.0.1 localhost.<replaceable>localdomain.com</replaceable> localhost</screen>
+  </step>
+  <step>
+  <para>
+   Save the file and try to run the client applications or the Apache Web
+   server again. If they still fail, explicitly identify &susemgr; server's
+   IP address in the file, such as:
+  </para>
+
+<screen>127.0.0.1 localhost.<replaceable>localdomain.com</replaceable> localhost
+<replaceable>192.0.2.34</replaceable> <replaceable>this_machine.example.com</replaceable> <replaceable>this_machine</replaceable>
+</screen>
+  </step>
+  <step>
+  <para>
+   Replace the value <literal>192.0.2.34</literal> with the actual IP
+   address of the &susemgr; server. Keep in mind, if the IP address
+   is specified here, the file will need to be updated in case the machine receives
+   a new address.
+  </para>
+  </step>
+  </procedure>
+ </sect1>
+ <!-- ============================================================ -->
+ <sect1 id="s1-trouble-timeouts">
+  <title>RPC Connection Timeout Settings</title>
+  <indexterm>
+  <primary>connection timeout</primary>
+  </indexterm>
+  <indexterm>
+  <primary>timeout settings</primary>
+  <secondary>RPC connection</secondary>
+  </indexterm>
+  <!-- https://bugzilla.novell.com/show_bug.cgi?id=833947 -->
+
+  <para>
+   RPC connection timeouts are configurable on the &susemgr; server,
+   &susemgrproxy; server, and the clients.  For example, if package
+   downloads take longer then expected, you can increase timeout
+   values.
+  </para>
+
+  <para>
+   Set the following variables to a value in seconds specifying how long
+   an RPC connection may take at maximum:
+  </para>
+
+  <!--
+- Comment #1 from Michael Calmer <mc@suse.com> 2013-08-08 08:33:38 UTC -
+You can configure the timeout (how long a RPC connection maximal take) now on
+Server, Proxy and Client.
+  -->
+  <variablelist>
+   <varlistentry>
+    <term>Server &mdash; <filename>/etc/rhn/rhn.conf</filename>:</term>
+    <listitem>
+    <screen>server.timeout = <replaceable>number</replaceable></screen>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Proxy Server &mdash; <filename>/etc/rhn/rhn.conf</filename>:</term>
+    <listitem>
+    <screen>server.proxy = <replaceable>number</replaceable></screen>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>&sls; Clients (using zypp-plugin-spacewalk) &mdash; <filename>/etc/zypp/zypp.conf</filename>:</term>
+    <listitem>
+    <screen>## Valid values:  [0,3600]
+## Default value: 180
+download.transfer_timeout = 180</screen>
+<para>
+ This is the maximum time in seconds that a transfer operation is
+ allowed to take.  This is useful for preventing batch jobs from hanging
+ for hours due to slow networks or links going down. If limiting operations
+ to less than a few minutes, you risk aborting perfectly normal operations.
+</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>&rhel; Clients (using yum-rhn-plugin) &mdash; <filename>/etc/yum.conf</filename>:</term>
+    <listitem>
+     <screen>timeout = <replaceable>number</replaceable></screen>
+     <!--
+(yum has multiple places where you can configure something and I am not sure
+where it read all the timeout from. Possible is also the special 
+/etc/yum/pluginconf.d/rhnplugin.conf and per repo in /etc/yum.repos.d/...repo )
+     -->
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+ <!-- ============================================================ -->
+ <sect1 id="s1-connection-errors">
+  <!--status="debranded"-->
+
+  <title>Connection Errors</title><indexterm>
+
+  <primary>connection errors</primary></indexterm><indexterm>
+
+  <primary>terms to understand</primary>
+
+  <secondary>SSL_CONNECT errors</secondary></indexterm>
+
+  <para>
+   A common connection problem, indicated by SSL_CONNECT errors, is
+   the result of a &susemgr; server being installed on a machine with
+   an inaccurate time. In that case, SSL certificates are created with
+   inaccurate times during the installation process. If the time on
+   &susemgr; is then corrected, the certificate start date and time
+   may be set in the future, making it invalid.
+  </para>
+
+  <para>
+   To troubleshoot this, check the date and time on the clients and on
+   &susemgr; with <command>date</command>.
+  </para>
+
+  <para>
+   The results should be nearly identical for all machines and within the
+   &quot;notBefore&quot; and &quot;notAfter&quot; validity windows of the
+   certificates. Check the client certificate dates and times with the
+   following command:
+  </para>
+
+<screen>openssl x509 -dates -noout -in /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT</screen>
+
+  <para>
+   Check the &susemgr; server certificate dates and times with the following
+   command:
+  </para>
+<!-- http://doccomments.provo.novell.com/comments/24218 -->
+<screen>openssl x509 -dates -noout -in /etc/apache2/ssl.crt/server.crt</screen>
+
+  <para>
+   By default, the server certificate has a one-year life while client
+   certificates are valid for 10 years. If the certificates are incorrect, you
+   can either wait for the valid start time, or create new certificates,
+   with an accurate time setting.
+<!-- GMT or not GMT should not matter.-->
+  </para>
+
+  <para>
+   Do the following to troubleshoot general connection errors:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Attempt to connect to &susemgr;'s database in the command line using
+     the correct connection string as found in
+     <filename>/etc/rhn/rhn.conf</filename>:
+    </para>
+<screen>sqlplus <replaceable>username/password@sid</replaceable>
+</screen>
+   </listitem>
+   <listitem>
+    <para>
+     Ensure &susemgr; is using Network Time Protocol (NTP) and is set to the
+     appropriate time zone. This also applies to all client systems and the
+     separate database machine in &susemgr; (if used with a stand-alone
+     database).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Confirm the correct package:
+    </para>
+<screen>rhn-org-httpd-ssl-key-pair-<replaceable>MACHINE_NAME-VER-REL</replaceable>.noarch.rpm 
+</screen>
+    <para>
+     is installed on &susemgr;, and the corresponding
+     <filename>rhn-org-trusted-ssl-cert-*.noarch.rpm</filename> or raw CA
+     SSL public (client) certificate is installed on all client systems.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Verify the client systems are configured to use the appropriate
+     certificate.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     If also using one or more &susemgr; Proxy Servers, ensure each Proxy's
+     SSL certificates are prepared correctly. The Proxy should have both its
+     own server SSL key-pair and CA SSL public (client) certificate
+     installed, since it serves in both capacities. Refer to
+     <xref linkend="ch-certificates"/> for specific instructions.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Make sure client systems are not using firewalls of their own, blocking
+     required ports<phrase os="hidden"> as identified in
+     <xref linkend="s1-requirements-additional"/></phrase>.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <!-- ==================================================================== -->
+<!-- taroth 2011-02-02: no SELinux on &susemgr;-->
+<!--<section status="notrevised" id="sat-trouble-selinux">
+  <title>SELinux Issues</title>
+  <para>
+   If you encounter any issues with SELinux messages (such as AVC denial
+   messages) on Red Hat Enterprise Linux 5 while installing RHN Satellite<!-\- [GALAXY] '&susemgr;' -\->,
+   be sure to have the <filename>audit.log</filename> files available so
+   that Red Hat Support personnel can assist you. You can find the file in
+   <filename>/var/log/audit/audit.log</filename> and can attach the file to
+   your Support ticket for engineers to assist you.
+  </para>
+ </section>
+ -->
+ <sect1 os="hidden" id="sat-trouble-update">
+<!--status="notrevised"-->
+
+  <title>Updated Software Components</title>
+
+  <para>
+   Do not subscribe your RHN Satellite
+<!-- [GALAXY] '&susemgr;' -->
+   to any of the following child channels available from RHN's central
+   servers:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Red Hat Developer Suite
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Red Hat Application Server
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Red Hat Extras
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Subscribing to these channels and updating your Satellite (such as by
+   running <command>yum</command> on Red Hat Enterprise Linux 5 or
+   <command>up2date
+<!-- [GALAXY] 'zypper up [b]' -->
+   </command> on earlier Red Hat Enterprise Linux versions) may install
+   newer, incompatible versions of critical software components, causing the
+   Satellite to fail.
+  </para>
+ </sect1>
+ <sect1 id="s1-satellite-debug">
+<!--status="debranded"-->
+
+  <title>&susemgr; Debugging</title><indexterm>
+
+  <primary>spacewalk-debug </primary></indexterm>
+
+  <para>
+   If you have followed the steps above but still need more help, contact
+   the &suse; support providing &susemgr;'s configuration parameters, log
+   files, and database information.
+   <remark>taroth
+    2011-02-03: todo - add URL for support contact</remark>
+  </para>
+
+  <para>
+   &susemgr; provides a command line tool explicitly for this purpose. Log
+   in to your &susemgr; server as &rootuser; and execute the following
+   command:
+  </para>
+
+<screen>spacewalk-debug</screen>
+
+  <para>
+   It collects several pieces of information and stores them in a tarball:
+  </para>
+
+<screen>Collecting and packaging relevant diagnostic information.
+Warning: this may take some time...
+   * copying configuration information
+   * copying logs
+   * copying cobbler files
+   * copying monitoring moc logs
+   * copying monitoring scout logs
+   * copying ssl-build
+   * copying /etc/sudoers
+   * copying apache, oracle, tomcat, nocpulse entries from /etc/passwd
+   * copying apache, oracle, tomcat, nocpulse entries from /etc/group
+   * querying RPM database (versioning of Spacewalk, etc.)
+   * querying schema version, database charactersets and database
+   * get diskspace available
+   * get database statistics
+   * get schema statistics
+   * copying audit.log
+   * timestamping
+   * creating tarball (may take some time): /tmp/spacewalk-debug.tar.bz2
+   * removing temporary debug tree
+   
+Debug dump created, stored in /tmp/spacewalk-debug.tar.bz2</screen>
+ </sect1>
+ <sect1 id="s1-reset-password">
+   <title>Resetting the &susemgr; Password</title>
+    <para>If you want to change the password for your Web instance of
+      &susemgr; or you have forgotten it, use the
+        <command>satpasswd</command> command. Log in to your &susemgr;
+      with SSH and run it like this:</para>
+   <screen>satpasswd admin</screen>
+   <para>Type your password twice or cancel with <keycombo>
+     <keycap function="control"></keycap>
+     <keycap>C</keycap>
+   </keycombo>. </para>
+ </sect1>
+ <!-- bnc# -->
+ <sect1 id="s1-registering">
+  <title>Registering a Client Manually with <command>suse_register</command></title>
+   <para>If you have problems registering your clients or you want to do
+   it manually, use  <command>suse_register</command>. Before you
+     register a client, collect the following information:</para>
+   <itemizedlist>
+     <listitem>
+       <para>Your email address.</para>
+     </listitem>
+     <listitem>
+       <para>Your product key, starting with
+         <literal>regcode-</literal>. In the case of &susemgr;, it is
+         <literal>regcode-sms</literal>.
+       </para>
+     </listitem>
+     <listitem>
+       <para>Your registration key. Get it from your &ncc;.</para>
+     </listitem>
+   </itemizedlist>
+   <para>To register your client, run <command>suse_register</command>
+     as follows:</para>
+   <screen><command>suse_register</command> -n \
+  -L register.log \
+  -a email=<replaceable>YOUR_EMAIL</replaceable> \
+  -a regcode-sms=<replaceable>REG_KEY</replaceable></screen>
+   <para>The <option>-n</option> option (<option>--no-optional</option>)
+     collects so called <quote>optional data</quote> which can be
+     necessary for your registration. However, this depends on your
+     contract.</para>
+    <para>The <option>-L</option> option tells
+        <command>suse_register</command> to write a log message to
+        <filename>register.log</filename>. You need this if you have to
+      provide detailed information about the registration process to our
+      support.</para>
+   <para>Find other options and their explanations with
+     <option>--help</option>.</para>
+ </sect1>
+ <!-- ================================================================ -->
+ <!-- http://wiki.novell.com/index.php/SUSE_Manager/MultipleMirrorCredentials -->
+ <sect1 id="s1-multi-mirror-credentials">
+  <title>Multiple Mirror Credentials</title>
+  <para>
+   The Spacewalk backend (<systemitem>spacewalk-backend</systemitem>)
+   and the &susemgr; Tools
+   (<systemitem>susemanager-tools</systemitem>) can handle multiple
+   mirror credentials.
+  </para>
+
+  <procedure id="pro.multi.mirror.credentials">
+   <title>Configuring Multiple Mirror Credentials</title>
+   <!--
+   <para>
+    Configure multiple mirror credentials as follows:
+   </para>
+   -->
+   <step>
+    <para>
+     Add all your additional credentials to
+     <filename>/etc/rhn/rhn.conf</filename> as follows:
+    </para>
+<screen># This is already configured. Do not change it.
+server.susemanager.mirrcred_user = 111111
+server.susemanager.mirrcred_pass = secret
+
+# Add an additional set of credentials like this:
+server.susemanager.mirrcred_user_1 = 222222
+server.susemanager.mirrcred_pass_1 = secret
+
+# Add as many additional credentials as needed by incrementing
+# the suffix (mirrcred_user_#); e.g.:
+server.susemanager.mirrcred_user_2 = 333333
+server.susemanager.mirrcred_pass_2 = secret</screen>
+<para>
+ The numbers appended to the <literal>mirrcred_</literal> keys must be
+ numbered consecutively.  If you skip one number,
+ <command>mgr-ncc-sync</command> will stop looking for more credentials.
+</para>
+   </step>
+   <step>
+    <para>
+     After editing <filename>/etc/rhn/rhn.conf</filename>, run:
+    </para>
+<screen>mgr-ncc-sync --refresh</screen>
+   </step>
+  </procedure>
+
+  <para>
+   Now, if you type <command>mgr-ncc-sync -l</command>, you
+   will see a channel listing with the combination of all mirror
+   credentials.
+  </para>
+
+   <para>
+    If you have configured client registration forwarding, all clients
+    are registered against the company identified by
+    <literal>mirrcred_user</literal>.
+   </para>
+
+   <warning>
+    <title>Changing Credentials</title>
+    <para>
+     To change credentials, edit <filename>/etc/rhn/rhn.conf</filename>
+     as needed.  If the previous credentials were used by one of your
+     installed channels and the new credentials no longer provide access
+     to that channel, connecting to NCC for that channel will no longer
+     work.
+    </para>
+    <para>
+     If <command>mgr-ncc-sync</command> detects that a channel is not
+     accessible anymore with the so far used credentials, it will test
+     all credentials listed in <filename>rhn.conf</filename> and the
+     first one that works will be stored in the database for further
+     use.
+    </para>
+    <para>
+     Only remove a channel (with
+     <command>spacewalk-remove-channel</command>) if you are sure that
+     you do not need it anymore!
+    </para>
+   </warning>
+
+  <para>
+   For more information, see <ulink
+   url="http://wiki.novell.com/index.php/SUSE_Manager/MultipleMirrorCredentials"/>.
+  </para>
+
+ </sect1>
+ <!-- ================================================================ -->
+ <!-- http://wiki.novell.com/index.php/SUSE_Manager/Spacecmd -->
+ <sect1 id="s1-trouble-spacecmd">
+  <title>Invoking Spacecmd</title>
+  <para>
+   <command>Spacecmd</command> does not seem to accept
+   commands or options, instead only prints a usage message.
+  </para>
+  <!--
+  spacecmd user_create -u tux -l lotr -e tux@example.com -\-pam
+  Usage: spacecmd [options] [command]
+  -->
+
+  <para>
+   When running <command>spacecmd</command> non-interactively, take care
+   to escape arguments passed to the <command>spacecmd</command>
+   functions.  This involves inserting <literal>--</literal> before the
+   function name to prevent the arguments to the function to be treated
+   as global arguments to <command>spacecmd</command>.  Also escape any
+   quotes that are passed to the function so that the shell does not
+   interpret them.
+  </para>
+  <para>
+   Example:
+  </para>
+
+<screen>spacecmd -s server1 -- softwarechannel_create -n \'My Channel\' \
+  -l channel1 -a x86_64</screen>
+ </sect1>
+</chapter>

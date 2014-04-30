@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE sect1 PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<sect1 id="s1-maintenance-migration">
+    <title>Performing an Offline Migration</title>
+    <para>This section deals with <emphasis>offline</emphasis>
+    migration. In this case, the machine reboots and performs the
+    upgrade. The process is controlled by &yast; and &ay; and not by
+    <command>zypper</command>.</para> <para>Only perform offline
+    migration on client systems managed by &susemgr; servers, not for
+    server migration. This is a viable method for major version
+    ugrades like from &sle; 10 to 11. Perform the following steps:</para>
+    
+    <procedure>
+        <step>
+            <para>Make sure your &susemgr; and all the clients you want
+                to migrate have installed all available updates,
+                including the &susemgr; tools. This is absolutly
+                necessary, otherwise the migration will fail.</para>
+        </step>
+        <step>
+         <para>Update the SP2 channels.</para><remark role="needinfo">emap: Do we simply replace all sp1 with sp2 and sp2 with sp3? Otherwise same channel names? Or will sp1 stay the base channel with new sp3 child channels? Any other necessary changes?</remark>
+         <para>
+          SP2 is not an extra base-channel, but the SLES11 SP1
+          base-channel will be enhanced by two new child channels SLES11
+          SP2 core and SLES11 SP2 updates. Use the following steps to
+          integrate them:
+         </para>
+          
+         <substeps>
+          <step>
+           <para>Open a shell and list your channels:</para>
+           <screen>mgr-ncc-sync -l --all-childs</screen>
+           <para>The result will look similar to this:</para>
+           <screen>[P] sles11-sp1-pool-i586
+    [.] sle11-hae-sp1-pool-i586
+    [.] sle11-hae-sp1-updates-i586
+    [.] sle11-hae-sp2-pool-i586
+    [.] sle11-hae-sp2-updates-i586
+    [.] sle11-sdk-sp1-pool-i586
+    [.] sle11-sdk-sp1-updates-i586
+    [X] sle11-sdk-sp2-core-i586
+    [.] sle11-sdk-sp2-updates-i586
+    [.] sle11-smt-updates-i586
+    [.] sle11-sp1-debuginfo-pool-i586
+    [.] sle11-sp1-debuginfo-updates-i586
+    [.] sle11-webyast-sp1-pool-i586
+    [.] sle11-webyast-sp1-updates-i586
+    [.] sles11-extras-i586
+    [P] sles11-sp1-suse-manager-tools-i586
+    [P] sles11-sp1-updates-i586
+    [.] sles11-sp2-core-i586
+    [.] sles11-sp2-updates-i586</screen>
+          </step>
+          <step>
+           <para>Subscribe to the core and update channels with
+           <command>mgr-ncc-sync</command>:</para>
+           <screen>mgr-ncc-sync -c sles11-sp2-core-i586
+mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
+          </step>
+          <step>
+           <para>Check the status again with
+           <command>mgr-ncc-sync -l --all-childs</command>. You should
+           see a <literal>P</literal> this time.</para>
+           <para>In your &susemgr; Web interface, go to
+           <menuchoice>
+            <guimenu>Channels</guimenu>
+            <guimenu>All Channels</guimenu>
+            </menuchoice> and click <guimenu>Show All Child
+            Channels</guimenu> to see the parent/child
+           relationship of your channels.</para>
+          </step>
+         </substeps>
+        </step>
+        <step>
+            <para>Create an autoinstall distribution.</para><remark role="needinfo">emap: Simply replace SP2 with SP3 here?</remark>
+            <para>For all distributions we want to perform an
+                autoinstallation, we need to create a SLES11 SP2
+                distribution in &susemgr;. Use the
+                following steps to create one:</para>
+            <substeps>
+                <step>
+                    <para>Mount the SLES11 SP2 DVD</para>
+                </step>
+                <step>
+                    <para>In the &susemgr; Web interface go to <menuchoice>
+                        <guimenu>Systems</guimenu>
+                        <guimenu>Autoinstallation</guimenu>
+                        <guimenu>Distributions</guimenu>
+                    </menuchoice> and click <guimenu>create new
+                        distribution</guimenu>.</para>
+                </step>
+                <step>
+                    <para>Enter a label for your distribution and the mount
+                        point.</para>
+                </step>
+                <step>
+                    <para>Select the SP1 base channel.</para>
+                </step>
+            </substeps>
+        </step>
+        <step>
+            <para>Create an activation key for your SP2 systems.</para>
+            <para>In order to switch from the old SLES10<remark role="needinfo">emap: rather SLES11?</remark> base channel to
+                the new SP2 base channel, we need an activation key.
+                Use the following steps to create one:
+            </para>
+            <substeps>
+                <step>
+                    <para>
+                    Go to <menuchoice>
+                    <guimenu>Systems</guimenu>
+                    <guimenu>Activation Keys</guimenu>
+                </menuchoice> and click <guimenu>create new
+                    key</guimenu>.</para>
+                </step>
+                <step id="st.maintenance-migration.activationkey">
+                    <para>Enter a description for your key.</para>
+                </step>
+                <step>
+                    <para>Enter a key or leave it blank to generate an
+                        automatic key.</para>
+                </step>
+                <step>
+                    <para>If you limit the usage, enter your value in
+                        the <guimenu>Usage</guimenu> textfield.
+                    </para>
+                </step>
+                <step>
+                    <para>Select the SLES11 SP1 base channel.</para>
+                </step>
+                <step>
+                    <para>Decide the entitlements.</para>
+                </step>
+                <step>
+                    <para>Click <guimenu>Create Activation
+                        Key</guimenu>.</para>
+                </step>
+                <step>
+                    <para>Click <guimenu>Child Channels</guimenu> and
+                        select the required channels. Finish with
+                        <guimenu>Update key</guimenu>.</para>
+                </step>
+            </substeps>
+        </step>
+        <step id="st.maintenance-migration.upload">
+            <para>Upload an &ay; profile.</para>
+            <para></para>
+            <substeps>
+                <step>
+                    <para>Create an &ay; XML file.</para>
+                    <remark>toms 2012-03-23: This maybe too vague. Where
+                        to link to some content how to create an AutoYaST file? </remark>
+                </step>
+                <step>
+                    <para>Go to <menuchoice>
+                <guimenu>System</guimenu>
+                <guimenu>Profiles</guimenu>
+            </menuchoice> and click <guimenu>upload new
+                kickstart/autoyast file</guimenu>.</para>
+                </step>
+                <step>
+                    <para>Paste the XML content in the text area or
+                        select the file to upload. Click
+                        <guimenu>Create</guimenu>.</para>
+                </step>
+                <step>
+                    <para>Add <literal>autoupgrade=1</literal> in the
+                            <guimenu>Kernel parameters</guimenu> of the
+                            <guimenu>Details</guimenu> tab and click
+                            <guimenu>Update</guimenu>.</para>
+                </step>
+                <step>
+                    <para>Switch to the <guimenu>Variable</guimenu> tab.
+                        </para>
+                </step>
+                <step>
+                    <para>Enter in the text field
+                        <literal>registration_key=</literal> and the key
+                    name from <xref linkend="st.maintenance-migration.activationkey"/>.
+                    </para>
+                </step>
+                <step>
+                    <para>Click <guimenu>Update Variables</guimenu>.</para>
+                </step>
+            </substeps>
+        </step>
+    </procedure>
+    
+    <para>After you have successfully finished the previous procedure,
+        everything is prepared for an upgrade. If you want to upgrade a
+        system, do the following:</para>
+    <procedure>
+        <step>
+            <para>Go to <menuchoice>
+            <guimenu>Provisioning</guimenu>
+            <guimenu>Autoinstallation</guimenu>
+            <guimenu>Schedule</guimenu>
+        </menuchoice>, and choose the &ay; XML profile you have uploaded
+    in <xref linkend="st.maintenance-migration.upload"/>.</para>
+        </step>
+        <step>
+            <para>Click <guimenu>Schedule Autoinstallation</guimenu>.</para>
+        </step>
+        <step>
+            <para>Click <guimenu>Finish</guimenu> at the bottom of that page.</para>
+        </step>
+    </procedure>
+    
+    <para>Next time the machine asks the &susemgr; server for jobs, it
+        will receive a reinstallation job which fetches Kernel and initrd and writes a new <filename>/boot/grub/menu.lst</filename> (contains pointers to the new Kernel and initrd).</para> 
+    <para>When the machine boots, it will use the &grub; configuration
+        and boots the new Kernel with its initrd. No PXE boot is
+        required for this process. A shutdown of the machine is
+        initiated as well, effectively 3 minutes after the job was
+        fetched.</para>
+</sect1>

@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml" title="Profiling step"?>
+<!DOCTYPE sect1 PUBLIC "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+
+<sect1 id="s1-sm-susestudio">
+  <title>Integrating &suseonsite; Appliances into &susemgr;</title>
+  <para>&susemgr; allows you to integrate your appliances built with
+    &suseonsite; and to create virtual hosts based on one of your
+    appliances. The guest can be started, stopped, resumed.</para>
+  
+  <sect2 id="sec.sm-susestudio-requirements">
+    <title>Requirements</title>
+    <para>In order to integrate your &suseonsite; appliances in
+      &susemgr;, make sure you have fulfilled the following requirements:</para>
+    <itemizedlist>
+      <listitem>
+        <para>Real hardware which is not virtualized.</para>
+      </listitem>
+      <listitem>
+        <para>Have installed the package
+          <systemitem class="resource">rhn-virtualization-host</systemitem> on your
+          client (see <xref linkend="sec.sm-susestudio-package"/>).</para>
+      </listitem>
+      <listitem>
+        <para>Have an account either on the &suseonsite; Web site at
+          <ulink url="http://susestudio.com"/>, or you have your own
+          &suseonsite; service.</para>
+      </listitem>
+      <listitem>
+        <para>Your activation key contains the Virtualization
+          entitlement (see <xref linkend="sec.sm-susestudio-activationkey"/>).</para>
+      </listitem>
+      <listitem>
+        <para>Have set the &suseonsite; credentials in &susemgr;
+          (see <xref linkend="sec.sm-susestudio-apikey"/>).</para>
+      </listitem>
+      <listitem>
+        <para>Have built your appliance as either in &xen; or &kvm;
+          output (see <xref linkend="sec.sm-susestudio-xenkvm"/>).</para>
+      </listitem>
+    </itemizedlist>
+    
+    <sect3 id="sec.sm-susestudio-package">
+      <title>Needed Packages</title>
+      <para>In order to start deploying virtual appliances, install the
+        package <systemitem 
+          class="resource">rhn-virtualization-host</systemitem> on your
+          client. The package is distributed in the &susemgr; Tools channel.</para>
+    </sect3>
+    <sect3 id="sec.sm-susestudio-activationkey">
+      <title>Activation Keys</title>
+      <para>To enable virtualization for &suseonsite; check the
+        virtualization entitlement flag as follows: </para>
+      <procedure>
+        <step>
+          <para>Log in to &susemgr;.</para>
+        </step>
+        <step>
+          <para>Go to <menuchoice>
+              <guimenu>Systems</guimenu>
+              <guimenu>Activation Keys</guimenu>
+            </menuchoice> to get a list of all keys.</para>
+        </step>
+        <step>
+          <para>Create a new key or select an existing key.</para>
+        </step>
+        <step>
+          <para>Scroll down and enable the
+              <guimenu>Virtualization Platform</guimenu>
+            entitlements.</para>
+        </step>
+        <step>
+          <para>Finish with <guimenu>Update Activation
+            Key</guimenu>.</para>
+        </step>
+      </procedure>
+    </sect3>
+    <sect3 id="sec.sm-susestudio-apikey">
+      <title>Getting your &suseonsite; API Key</title>
+      <para>The &suseonsite; API key is needed to associate your 
+        &suseonsite; credentials with your &susemgr; account.
+        Log in to &susemgr;, go to <menuchoice>
+          <guimenu>Overview</guimenu>
+          <guimenu>Your Account</guimenu>
+          <guimenu>Credentials</guimenu>
+        </menuchoice> and add your user name, API key, and your 
+        &suseonsite; instance.
+      </para>
+      <para>The API key can be found in &suseonsite; when you select
+        your user name in the main tab and go to <guimenu>API &amp;
+          hook</guimenu>.</para>
+    </sect3>
+    <sect3 id="sec.sm-susestudio-xenkvm">
+      <title>Providing the Correct Formats</title>
+      <para>&suseonsite; offers a couple of formats to output your
+        appliance. At the moment, &susemgr; supports only deploying
+        &kvm; or &xen; formats. Log into &suseonsite;, select your
+        appliance, and go to the <guimenu>Build</guimenu> tab. Build a
+        new version and choose as default format
+          <guimenu>VMware/VirtualBox KVM (.vmdk)</guimenu> or
+          <guimenu>Xen guest</guimenu>. After the build has succeeded,
+        you can build additional formats.</para>
+      <para>Additionally, &suseonsite; allows you to build your
+        appliance with support for &susemgr;. To activate it, do the
+        following:</para>
+      <procedure id="pro.sm-susestudio-enable-integration">
+        <step>
+          <para>Log in to &suseonsite;.</para>
+        </step>
+        <step>
+          <para>Create a new appliance or click an existing appliance
+            link.</para>
+        </step>
+        <step>
+          <para>Go to <menuchoice>
+            <guimenu>Configuration</guimenu>
+            <guimenu>Appliance</guimenu>
+          </menuchoice>.</para>
+        </step>
+        <step>
+          <para>Enable the <guimenu>Integrate with SUSE
+            Manager</guimenu> checkbox. </para>
+        </step>
+        <step>
+          <para>Enter the hostname or the IP address of your &susemgr; 
+            server and the name of the bootstrap script.</para>
+        </step>
+        <step>
+          <para>Rebuild your appliance.</para>
+        </step>
+      </procedure>
+      
+      <para>When you start your appliance the first time, it will be
+        register on your &susemgr; server.</para>
+    </sect3>
+  </sect2>
+  
+  
+  <sect2 id="sec.sm-susestudio-suma">
+    <title>Setting Up &susemgr;</title>
+    <para>In order to add virtualization support to one of your
+      &susemgr; clients, proceed as follows:</para>
+    <procedure>
+      <step>
+        <para>Check if you have fulfilled all requirements from
+          <xref linkend="sec.sm-susestudio-requirements"/>.</para>
+      </step>
+      <step>
+        <para>Prepare your &susemgr; client:</para>
+        <substeps>
+          <step>
+            <para>Start a shell, log into your &susemgr; client and
+              turn on virtualization support.</para>
+          </step>
+          <step>
+            <para>Start &yast; in your console and go to <menuchoice>
+                <guimenu>Virtualization</guimenu>
+                <guimenu>Install Hypervisor and Tools</guimenu>
+              </menuchoice>.</para>
+          </step>
+          <step>
+            <para>Choose your hypervisor, be it &kvm; (recommended) or 
+              &xen;. After you have selected your preferred hypervisor, 
+              &yast; will perform the following actions:</para>
+            <orderedlist>
+              <listitem>
+                <para>Installing the necessary packages.</para>
+              </listitem>
+              <listitem>
+                <para>Creating a network bridge.</para>
+              </listitem>
+              <listitem>
+                <para>Rebooting your client.</para>
+              </listitem>
+            </orderedlist>
+          </step>
+          <step>
+            <para>After the reboot is finished, login again into your
+             &susemgr; client and start &yast;.</para>
+          </step>
+          <!--<step>
+            <para>Go to <menuchoice>
+                <guimenu>Virtualization</guimenu>
+                <guimenu>Create Virtual Machines</guimenu>
+              </menuchoice> to start the installation process. For
+              details about &kvm; or &xen; guest installation, refer to <ulink
+                url="http://www.suse.com/documentation/sles11/book_kvm/data/book_kvm.html"/>
+              or <ulink url="http://www.suse.com/documentation/sles11/book_xen/data/book_xen.html"/>.</para>
+          </step>-->
+        </substeps>
+      </step>
+      <step>
+        <para>Log into &susemgr;.</para>
+      </step>
+      <step>
+        <para>Go to <guimenu>Systems</guimenu> tab and select one of
+          your machines which should run the &kvm; or &xen; appliance.</para>
+      </step>
+      <step>
+        <para>Go to the <menuchoice>
+          <guimenu>Virtualization</guimenu>
+          <guimenu>Images</guimenu>
+        </menuchoice> subtab. &susemgr; prints a list of all your
+          available appliances, which provides a &kvm; or &xen; type.</para>
+      </step>
+      <step>
+        <para>Choose from the list of your appliances and click the link.</para>
+      </step>
+      <step>
+        <para>If needed, change any values, like number of virtual CPUs,
+        proxy server, memory, etc.</para>
+      </step>
+      <step>
+        <para>Click <guimenu>Schedule Deployment</guimenu> to start the
+          image deployment process.</para>
+      </step>
+    </procedure>
+    
+    <para>If you want to stop, resume, or interact with the guest,
+      select the checkbox of your guest, choose one of the options from
+      the popup menu, and click <guimenu>Apply Action</guimenu>. The
+      same actions can be performed on the commandline by using
+      <command>virsh</command> (&kvm;, see <ulink 
+        url="http://www.suse.com/documentation/sles11/book_kvm/data/book_kvm.html"/>) or
+      <command>xm</command> (&xen;, see <ulink 
+        url="http://www.suse.com/documentation/sles11/book_xen/data/book_xen.html"/>).
+    </para>
+  </sect2>
+</sect1>

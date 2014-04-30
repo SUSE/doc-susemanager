@@ -1,0 +1,1139 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE chapter PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<chapter id="ch-installation">
+ <title>Installation</title>
+ <para>
+  &susemgr; is an appliance: a management server application combined with
+  an operating system. It can be deployed on industry hardware or in a
+  virtual environment and used with an embedded or a
+  stand-alone database.
+ </para>
+ <para>
+  If your future &susemgr; server is connected to the Internet, it will
+  receive any updates directly from the &ncc;. For a disconnected setup
+  scenario, configure &susemgr; to receive updates from an internal
+  update server (like &smt;) instead.
+ </para>
+ <para>
+  The &yast; graphical user interface will guide you through the
+  installation and the setup process. It is started in text mode. Use the
+  <keycap function="tab"/> key to navigate among individual elements. To
+  select a value from a list, use the <keycap function="up"/> and
+  <keycap function="down"/> arrow keys and press <keycap function="enter"/>.
+  To activate an option, press the <keycap function="space"/> key.
+ </para>
+ <para>
+  For new features and changes, see <xref linkend="ap-changes"/>.
+ </para>
+ <para>
+  To migrate an existing &susemgr; server 1.7 to version 2.1, refer to <xref linkend="sec.update.online.wagon"/>.
+ </para>
+  <sect1 id="sec.manager.inst.overview">
+  <title>Summary of Steps</title><indexterm>
+
+  <primary>summary of steps</primary></indexterm>
+  <para>
+   The following installation and setup scenarios,
+   including all required steps for basic configuration of
+   &susemgr; are covered in this guide:
+  </para>
+  <variablelist>
+   <varlistentry>
+    <term>Setup From Scratch&mdash;With Internet Connection</term>
+    <listitem>
+     <para>
+      For installation and initial setup, you need to execute the following
+      basic steps:
+     </para>
+     <orderedlist>
+      <listitem>
+       <para>
+        If using a stand-alone database: Preparing your database instance
+        according to the formula provided in
+        <xref linkend="ch-requirements"/>.
+       </para>
+      </listitem>
+      <listitem>
+       <para><remark>emap: replace/check links after reorg.</remark>
+        <xref linkend="pro.manager.installation" xrefstyle="select:title"/>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <xref linkend="pro.manager.setup" xrefstyle="select:title"/>
+       </para>
+      </listitem>
+     </orderedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Setup From Scratch&mdash;Without Internet Connection</term>
+    <listitem>
+     <para>
+      For installation and initial setup, execute the same basic steps as
+      listed above, but skip the registration of the product at NCC.
+      <!-- refer directly to the SMT setup -->
+      For details, refer to <xref linkend="s1-disconnected-setup"/>.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Migration from a Satellite Server</term>
+    <listitem>
+     <para>
+      Instead of setting up a &susemgr; server from scratch, you can also
+      migrate from an existing Satellite server. For details, refer to
+      <xref linkend="sec.manager.server.migration"/>.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <!-- find the same warning in the QS -->
+  <important>
+   <!-- bnc#847662 -->
+   <title>Renaming &susemgr; Server Not Supported</title>
+   <para>
+    Choose the hostname of the &susemgr; server carefully. Once
+    installed renaming is not supported.
+   </para>
+   <para>
+    For more information, see <ulink
+    url="http://wiki.novell.com/index.php/SUSE_Manager/HostnameChange"/>.
+   </para>
+  </important>
+
+
+  <remark>taroth 2011-01-25: argh, those links create a really broken layout if
+   build with the DocBook Stylesheets - todo: ask toms to have a look</remark>
+
+  <sect2 id="sec.stepsummary.install" os="hidden">
+<!-- taroth 2011-02-17: xref in title will not work in novdoc anyway, therefore replacing with
+    simple text <title><xref linkend="sec.manager.inst" xrefstyle="select:title"/></title>-->
+   <title>Installation and Setup</title><remark>emap 2014-04-29: now hidden since summary will be replaced with actual instructions from quick inst.</remark>
+<!--taroth 2011-01-25: keep in SYNC with Quick Start, file
+    xml/manager_quick_install_i.xml, summary of steps-->
+   <variablelist>
+    <varlistentry>
+     <term>Setup From Scratch&mdash;With Internet Connection</term>
+     <listitem>
+      <para>
+       For installation and initial setup, you need to execute the following
+       basic steps:
+      </para>
+      <orderedlist>
+       <listitem>
+        <para>
+         If using a stand-alone database: Preparing your database instance
+         according to the formula provided in
+         <xref linkend="ch-requirements"/>.
+        </para>
+       </listitem>
+       <listitem><remark>emap: replace with new links in this guide</remark>
+        <para>
+         <xref linkend="pro.manager.installation" xrefstyle="select:title"/>
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         <xref linkend="pro.manager.setup" xrefstyle="select:title"/>
+        </para>
+       </listitem>
+      </orderedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Setup From Scratch&mdash;Without Internet Connection</term>
+     <listitem>
+      <para>
+       For installation and initial setup, execute the same basic steps as
+       listed above, but skip the registration of the product at NCC.
+       <!--
+       ke 2011-08-12: Better point to the SMT way now
+       During basic configuration, the setup of &suse; channels differs
+       from the standard procedure: Instead of importing channels from NCC,
+       you need to create custom channels, and add repositories to be
+       synchronized with such a custom channel. For details, refer to
+       <xref linkend="s1-sm-channels-packages"/> and
+       <xref linkend="s3-chnl-mgmt-mng-repos"/>, respectively.
+       -->
+       For details, refer to
+       <xref linkend="s1-disconnected-setup"/>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Migration from a Satellite Server</term>
+     <listitem>
+      <para>
+       Instead of setting up a &susemgr; server from scratch, you can also
+       migrate from an existing Satellite server. For details, refer to
+       <xref linkend="sec.manager.server.migration"/>.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 id="sec.stepsummary.config" os="hidden">
+   <title>Basic Configuration</title><remark>emap 2014-04-29: now hidden since summary will be replaced with actual instructions from quick inst.</remark>
+<!--taroth 2011-01-25: keep in SYNC with Quick Start, file
+     xml/manager_quick_config_i.xml, introductory para-->
+   <para>
+    To complete the basic &susemgr; configuration, you need to execute the
+    following steps:
+   </para>
+   <orderedlist>
+    <listitem>
+     <para><remark>emap: replace with new links in this guide</remark>
+      <xref linkend="pro.manager.admin.account" xrefstyle="select:title"/>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <xref linkend="pro.manager.nccsync" xrefstyle="select:title"/>
+     </para>
+     <!-- ke 2011-08-13: commented for clarity
+     <para>
+      In case of disconnected setup with an internal update server like
+      &smt; (see <xref linkend="s1-disconnected-setup"/>), you need to
+      create custom channels, and add repositories to be synchronized
+      with the custom channels.
+     </para>
+     -->
+    </listitem>
+    <listitem>
+     <para>
+      <xref linkend="pro.manager.activationkey" xrefstyle="select:title"/>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <xref linkend="pro.manager.generate.bootstrap" xrefstyle="select:title"/>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <xref linkend="pro.manager.clients.register" xrefstyle="select:title"/>
+     </para>
+    </listitem>
+   </orderedlist>
+   <para>
+    The following tasks are not part of the initial installation, setup, and
+    configuration but they represent common tasks for basic administration
+    and further configuration:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      <xref linkend="sec.manager.config.organizations" xrefstyle="select:title"/>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <xref linkend="sec.manager.config.entitlements" xrefstyle="select:title"/>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <xref linkend="sec.manager.config.users" xrefstyle="select:title"/>
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    After &susemgr; is populated with standard channels and packages and all
+    clients are connected to it, you can create and serve custom
+    channels and packages. Once the custom RPMs are developed, you can
+    import them into &susemgr; using <command>mgrpush</command>.
+
+     <remark>taroth 2011-01-25: todo - find out if this command will get
+     a symlink, too</remark>
+
+     <remark>ke 2011-08-03: According to
+     http://git.suse.de/galaxy/pages/TerminologyTools, the symlink is
+     available.</remark>
+
+    In the &susemgr; Web interface, add custom channels in which to store
+    them.
+<!--taroth 2011-01-25: we don't have that guide in our set yet: 
+    Refer to the <citetitle>&susemgr; Channel Management Guide</citetitle> for details.-->
+   </para>
+   <para>
+    As can be seen from the overview above, implementing a fully functional
+    &susemgr; requires more than installing software and a database. Many
+    tasks extending beyond the basic installation and setup are covered in
+    detail in other guides. For a full list of available documentation for
+    this product, refer to <xref linkend="preface.susemanager.install"/>.<remark>emap: another link to the top of this guide for additional documentation. Necessary?</remark>
+   </para>
+  </sect2>
+ </sect1>
+ <sect1 os="hidden" id="s1-installation-httpproxy">
+<!--status="RFC"-->
+
+  <title>Installing Satellite behind an HTTP Proxy
+  <remark>5.4/Installation_Guide.html/920</remark>
+  </title>
+
+  <para>
+   <remark>taroth 2011-02-01:
+    https://bugzilla.novell.com/show_bug.cgi?id=668546</remark>
+   Due to the way that RHN Satellite
+<!-- [GALAXY] '&susemgr;' -->
+   uses the <filename>rhn.conf</filename> to control its connection
+   settings, there is no way to add options to that file prior to
+   installation of RHN Satellite. If your network is behind an HTTP proxy in
+   your organization, you cannot activate the RHN Satellite at installation
+   time. A workaround to this issue is to first perform a disconnected
+   installation of RHN Satellite
+<!-- [GALAXY] '&susemgr;' -->
+   , then switch the configuration to a connected method after installation
+   is completed. The following demonstrates how to create a connected RHN
+   Satellite
+<!-- [GALAXY] '&susemgr;' -->
+   installation behind an HTTP proxy:
+  </para>
+
+  <orderedlist>
+   <listitem>
+    <para>
+     Complete a minimal installation of Red Hat Enterprise Linux 4 or 5
+     (depending on the version of RHN Satellite
+<!-- [GALAXY] '&susemgr;' -->
+     that you will install).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Configure the system so that it can connect to RHN behind the HTTP
+     proxy. Edit the file
+     <filename>/etc/sysconfig/rhn/up2date.conf</filename> as follows:
+    </para>
+<screen>enableProxy=1
+enableProxyAuth=1
+httpProxy=&lt;http-proxy-fqdn&gt;
+proxyUser=&lt;proxy-username&gt;
+proxyPassword=&lt;proxy-password&gt;</screen>
+   </listitem>
+   <listitem>
+    <para>
+     Register the system to RHN.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Begin the installation of RHN Satellite
+<!-- [GALAXY] '&susemgr;' -->
+     with the disconnected option:
+    </para>
+<screen>./install.pl --disconnected</screen>
+   </listitem>
+   <listitem>
+    <para>
+     Once the installation is completed, you will need to add or modify your
+     settings in the <filename>/etc/rhn/rhn.conf
+<!-- [GALAXY] '/etc/rhn/rhn.conf' -->
+     </filename> file:
+    </para>
+<screen>server.satellite.http_proxy = &lt;http-proxy-fqdn&gt;
+server.satellite.http_proxy_username = &lt;proxy-username&gt;
+server.satellite.http_proxy_password = &lt;proxy-password&gt;
+
+disconnected=0</screen>
+   </listitem>
+   <listitem>
+    <para>
+     Restart the Satellite service:
+    </para>
+<screen>service rhn-satellite restart</screen>
+   </listitem>
+   <listitem>
+    <para>
+     Reactivate the Satellite as a connected Satellite:
+    </para>
+<screen>rhn-satellite-activate --rhn-cert=&lt;path-to-cert&gt;</screen>
+   </listitem>
+  </orderedlist>
+
+  <para>
+   You should now have a connected RHN Satellite
+<!-- [GALAXY] '&susemgr;' -->
+   that will work behind an HTTP proxy.
+  </para>
+ </sect1>
+<!--taroth 2011-02-01: not needed according to mantel, see galaxy-devel-->
+<!--<section status="RFC" id="s1-installation-sendmail">
+  <title>Sendmail Configuration</title><indexterm>
+  <primary>import</primary>
+  <secondary>sendmail</secondary></indexterm><indexterm>
+  <primary>rogerthat01@{mail domain} </primary></indexterm>
+  <para>
+   If &susemgr; will serve Monitoring-entitled systems and you wish
+   to acknowledge via email the alert notifications you receive, you must
+   configure <application>sendmail</application> to properly handle incoming
+   mail. This is required by the email redirect feature, which allows you to
+   stop notifying users about a Monitoring-related event with a single
+   reply.
+  </para>
+  <important>
+   <para>
+    Some more restrictive corporate mail configurations will not allow mail
+    to be sent from an address that is not recognized as valid. Therefore,
+    it may be necessary to configure <userinput>rogerthat01@{mail
+    domain}</userinput> as a valid email address in your corporate
+    environment. Check with your mail systems administrator.
+   </para>
+  </important>
+  <para>
+   To configure <application>sendmail</application> correctly, run the
+   following commands as root. First, create a symbolic link allowing
+   sendmail to run the notification enqueuer with the following command:
+  </para>
+<screen>ln -s /usr/bin/ack_enqueuer.pl /etc/smrsh/.</screen>
+  <para>
+   Next, edit the <filename>/etc/aliases</filename> file on the mail server
+   and add the following line:
+  </para>
+<screen>rogerthat01: | /etc/smrsh/ack_enqueuer.pl</screen>
+  <para>
+   Next, edit the <filename>/etc/mail/sendmail.mc</filename> file and
+   change:
+  </para>
+<screen>&quot;DAEMON_OPTIONS(`Port=smtp,Addr=127.0.0.1, Name=MTA')dnl&quot;</screen>
+  <para>
+   to:
+  </para>
+<screen>&quot;DAEMON_OPTIONS(`Port=smtp, Name=MTA')dnl&quot;</screen>
+  <para>
+   Then, have the alias processed like so:
+  </para>
+<screen>newaliases</screen>
+  <para>
+   Finally, update the <filename>sendmail-cf</filename> package:
+  </para>
+<screen>yum update sendmail-cf</screen>
+  <para>
+   Note, disconnected installs must obtain this package from the ISO.
+  </para>
+  <para>
+   Restart sendmail:
+  </para>
+<screen>service sendmail restart</screen>
+</section>-->
+ <sect1 os="hidden" id="s1-installation-mysql">
+<!--status="RFC"-->
+
+  <title>MySQL Installation<remark>
+5.5/Installation_Guide.html/1061
+  </remark></title><indexterm>
+
+  <primary>import</primary>
+
+  <secondary>MySQL</secondary></indexterm><indexterm>
+  
+  <primary>mysql-server </primary></indexterm>
+ 
+  <para>
+   This sections is applicable only if &susemgr; will serve
+   Monitoring-entitled systems and you wish to run MySQL probes against
+   them. For a list of available MySQL probes, refer to the probes appendix
+   in <xref linkend="s1-probes-mysql"/>.
+  </para>
+
+  <para>
+   For running MySQL probes, install the <filename>mysql-server</filename>
+   package on the system conducting the monitoring for the probes. Proceed
+   as follows:
+  </para>
+
+  <procedure>
+   <step>
+    <para>
+     <remark>taroth 2011-01-31: @DEVs: do we cover that channel or its contents
+      in our expanded support? if not, where to get the mysql-server package
+      from?</remark>
+     Subscribe your &susemgr; server to the Red Hat Enterprise Linux AS
+     channel.
+    </para>
+   </step>
+   <step>
+    <para>
+     Install the <filename>mysql-server</filename> package, using either the
+     &susemgr; Web interface or the respective command line tools
+     (<command>yum</command> or <command>up2date</command> for &rhel;
+     systems, or <command>zypper</command> for &sle; systems).
+    </para>
+   </step>
+  </procedure>
+
+  <para>
+   Two extra packages will also be downloaded in the transaction. These are
+   needed for the <filename>mysql-server</filename> package to be installed
+   and run successfully. Once finished, your &susemgr; server may be used to
+   schedule MySQL probes.
+  </para>
+ </sect1>
+<!-- ================================================================ -->
+ <sect1 id="sec.manager.inst.installation">
+  <title>Installation</title>
+  <para><remark>emap 2014-04-29: copied from quick inst.</remark>
+   The following procedure describes the installation on a physical machine.
+   Make sure the machine you intend to use fulfills the
+   <xref linkend="sec.manager.requirements.server" xrefstyle="select: quotedtitle page"/>.
+   If you want to install the appliance in a virtual machine, additionally
+   check the settings listed in
+   <xref linkend="vle.manager.req.virt" xrefstyle="select: quotedtitle page"/>.
+  </para>
+  <procedure id="pro.manager.installation">
+   <title>Installing the Appliance</title>
+   <warning>
+    <title>Loss of Data</title>
+    <para>
+     Installing &susemgr; on a physical machine will completely erase any
+     data on the hard disk that will be used for installation. Before you
+     start the installation process, create a backup of your hard disks.
+    </para>
+   </warning>
+   <step>
+    <para>
+     Boot your future &susemgr; server from the installation medium. Select
+     <guimenu>Install/Restore &susemgr;</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     If your machine contains more than one hard disk, you are asked which
+     one to use for the installation of &susemgr;. Navigate with the arrow
+     keys, and use the space key to mark the desired hard disk. You are
+     asked if you want to continue and you are warned that the installation
+     will destroy all data on the disk.
+    </para>
+   </step>
+   <step>
+    <para>
+     To proceed, answer with <guimenu>Yes</guimenu>. The deployment process
+     takes over. This step may take some time as large amounts of data need
+     to be unpacked and verified. After the verification, &yast; firstboot
+     is started.
+    </para>
+   </step>
+   <step>
+    <para>
+     In the first screen, set the system <guimenu>Language</guimenu> and
+     <guimenu>Keyboard Layout</guimenu> for your future &susemgr; server.
+     Proceed with <guimenu>Next</guimenu>.
+    </para>
+   </step>
+   <step id="step.manager.install.root.pwd">
+    <para>
+     In the next screen, set the &rootuser; password for your &susemgr;
+     server and confirm it.
+    </para>
+    <figure>
+     <title>&yast; Firstboot&mdash;Password for the System Administrator</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="susemanager_firstboot_root_pwd.png" width="85%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="susemanager_firstboot_root_pwd.png" width="75%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+    <para>
+     Proceed with <guimenu>Next</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     In the next screen, read the licenses and agree to them. Proceed with
+     <guimenu>Next</guimenu>. The installation routine checks some basic
+     system requirements and depending on the results, lets you decide
+     whether to proceed with the installation or cancel.
+    </para>
+   </step>
+   <step>
+    <para>
+     In the next screen, configure the network settings. Note the network
+     requirements listed in
+     <xref linkend="s1-requirements-additional"/>. Either choose to
+     <guimenu>Use Following Configuration</guimenu> or
+     <guimenu>Change</guimenu> the network setup according to your wishes.
+    </para>
+    <figure>
+     <title>&yast; Firstboot&mdash; Network Configuration</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="susemanager_firstboot_network.png" width="90%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="susemanager_firstboot_network.png" width="75%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+    <para>
+     Proceed with <guimenu>Next</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     In the next screen, configure the <guimenu>Clock and Time
+     Zone</guimenu> to use for your &susemgr; server. Proceed with
+     <guimenu>Next</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     In the next screen, configure the NTP settings according to your
+     wishes. For more information about the options, refer to
+     <guimenu>Help</guimenu>. Note the NTP requirements listed in
+     <xref linkend="s1-requirements-additional"/>. Proceed with
+     <guimenu>Next</guimenu>.
+    </para>
+   </step>
+<!--https://bugzilla.novell.com/show_bug.cgi?id=664925#c8-->
+   <step id="step.manager.install.register.ncc">
+    <para>
+     In the next screen, your are asked to register and activate your
+     product at NCC. During registration, the respective online update
+     repositories are automatically configured.
+    </para>
+    <important>
+     <title>NCC Registration and Updates</title>
+     <para>
+      Proper registration is mandatory for the system to receive updates and
+      to ensure that any known installation problems are fixed. In case of a
+      disconnected &susemgr; setup, skip this step by selecting
+      <guimenu>Configure Later</guimenu>.
+     </para>
+    </important>
+    <figure>
+     <title>&yast; Firstboot&mdash;NCC Configuration</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="susemanager_firstboot_ncc.png" width="80%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="susemanager_firstboot_ncc.png" width="75%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+    <para>
+     If you decide to <guimenu>Configure Later</guimenu>, you can
+     call the respective &yast; module on the &susemgr; server with the
+     <command>yast&nbsp;inst_suse_register</command> command any time.
+    </para>
+    <para>
+     If you need to check the registration status of your &susemgr;, use the <command>isRegistered</command> command on the server. If the system is registered, more detailed information is available in the <filename>/var/lib/suseRegister/registration-status.xml</filename> file.
+    </para>
+    <para>
+     To register directly:
+    </para>
+    <substeps>
+     <step>
+      <para>
+       Select <guimenu>Configure Now (Recommended)</guimenu>.
+      </para>
+     </step>
+     <step>
+      <para>
+       Confirm that you want to continue. A text-based browser (w3m)
+       appears. Use the <keycap function="tab"/> key or the arrow keys to
+       navigate among individual elements. To enter data into an input
+       field, activate text input mode by pressing the
+       <keycap function="enter"/> key once, then enter the value and press
+       <keycap function="enter"/> again to confirm.
+      </para>
+     </step>
+     <step>
+      <para>
+       After all values are entered according to your wishes,
+       <guimenu>Submit</guimenu> your input and press
+       <keycombo><keycap function="shift"/><keycap>Q</keycap></keycombo> to
+       close the text-based browser.
+      </para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>
+     On the <guimenu>Installation Completed</guimenu> screen, select
+     <guimenu>Finish</guimenu> to close &yast; firstboot. The boot process
+     continues.
+    </para>
+   </step>
+   <step>
+    <para>
+     Wait for the boot process to finish.
+<!--When the login prompt appears on
+    the console, write down the hostname listed there&mdash;you will need it to
+    access the &susemgr; Web interface later. -->
+    </para>
+    <important>
+     <title>&susemgr; Update Required</title>
+     <para>
+      After installation, update your &susemgr; server to apply the latest
+      patches before starting the setup process. To receive updates,
+      registration at NCC (or a connection to an internal update server like
+      &smt;) is required. For details on how to execute the update, refer to
+      <xref linkend="pup-sle"/>.
+     </para>
+    </important>
+   </step>
+  </procedure>
+ </sect1>
+
+ <sect1 id="sec.manager.inst.setup">
+  <title>Setup</title>
+  <para><remark>emap 2014-04-29: copied from quick inst.</remark>
+  After running &yast; firstboot and updating &susemgr; server, use a
+  setup script run via &yast; to configure the basic data for setup
+  and the database connection on several consecutive screens. Enter a
+  value in each input field, otherwise the setup may fail.
+  </para>
+  <para>
+   In the setup screens, you will also be prompted for two passwords.
+  </para>
+  <note>
+   <title>Password Criteria</title>
+   <para>
+    Both passwords must match the following criteria (otherwise the
+    connection to the database or the creation of the certificate might
+    fail):
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      Length: At least 7 characters.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Special characters: Must not contain any of the following characters:
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Spaces
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Quotation marks (neither <literal>"</literal> nor
+        <literal>'</literal>)
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Exclamation marks (<literal>!</literal>)
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Dollar symbols (<literal>$</literal>)
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </itemizedlist>
+  </note>
+  <procedure id="pro.manager.setup">
+   <title>Setting Up &susemgr;</title>
+   <step>
+    <para>
+     Log in to the machine as &rootuser; with the password you set during
+     the installation in <xref linkend="step.manager.install.root.pwd"/>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Execute <command>yast2&nbsp;susemanager_setup</command> to start the
+     setup process.
+    </para>
+   </step>
+   <step>
+    <para>
+     The first setup screen lets you choose between setting up &susemgr;
+     from scratch and migrating to &susemgr; from a Satellite/Spacewalk
+     compatible server. Choose <guimenu>Set up &susemgr; from
+     scratch</guimenu>. Proceed with <guimenu>Next</guimenu>.
+    </para>
+    <figure>
+     <title>Setup&mdash;Type</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="susemanager_setup_type.png" width="80%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="susemanager_setup_type.png" width="75%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </step>
+   <step>
+    <para>
+     In the next setup screen, enter an email address for the
+     &susemgr; administrator. It is used for notifications by
+     &susemgr; and is associated with the SSL certificate to be
+     created in the next step. In the same dialogue, decide whether
+     &susemgr; should advertise its services via SLP under the name
+     <literal>susemanager</literal>. Clients can then find the closest
+     &susemgr; server to connect to. Proceed with
+     <guimenu>Next</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     In the next setup screen, enter the details needed for the creation of
+     an SSL certificate. The certificate is used for a number of purposes
+     like connections to a proxy, HTTPS protocol in browsers, and more.
+    </para>
+    <substeps>
+     <step id="step.manager.setup.org">
+      <para>
+       Enter the name of your organization, the organization unit, and the
+       city, state and country that your &susemgr; server is located in. The
+       <guimenu>Organization</guimenu> name defines the name of the default
+       administrative organization that is automatically created during
+       setup.
+      </para>
+     </step>
+     <step>
+      <para>
+       Set an SSL (Secure Sockets Layer) password and repeat it in the next
+       field.
+      </para>
+      <figure>
+       <title>Setup&mdash;Certificate</title>
+       <mediaobject>
+        <imageobject role="fo">
+         <imagedata fileref="susemanager_setup_cert.png" width="90%"/>
+        </imageobject>
+        <imageobject role="html">
+         <imagedata fileref="susemanager_setup_cert.png" width="75%"/>
+        </imageobject>
+       </mediaobject>
+      </figure>
+      <para>
+       Proceed with <guimenu>Next</guimenu>.
+      </para>
+     </step>
+    </substeps>
+   </step>
+   <step id="st.manager.install.server-and-database">
+    <para>
+     In the next setup screen, set the details for the setup of the server
+     and the database:
+    </para>
+    <substeps>
+     <step>
+      <para>
+       Decide whether to use the embedded (local) or a remote database for
+       &susemgr;.
+      </para>
+      <para>
+       If you select <guimenu>Local Database</guimenu>, &yast; automatically
+       sets the <guimenu>Port</guimenu> and <guimenu>Protocol</guimenu>.
+      </para>
+      <para>
+       To use an existing, remote database instead, select <guimenu>Remote
+       Database</guimenu> and enter the following details for the connection
+       to the database: the database system (SID) used to identify a
+       particular database instance, the FQDN of the remote database, the
+       external <guimenu>Port</guimenu> to use (usually
+       <literal>1521</literal>), and the <guimenu>Protocol</guimenu> to use
+       (usually <literal>TCP</literal>).
+      </para>
+     </step>
+     <step>
+      <para>
+       If you use the embedded database, set a user name and a password for
+       the &susemgr; database user (that is used to connect to the
+       database).
+      </para>
+      <para>
+       For a remote database, enter a user name that already exists in the
+       database configuration, and enter the correct password for this user.
+       Otherwise the connection to the database will fail.
+      </para>
+     </step>
+     <step>
+      <para>
+<!-- bwiedemann 20110210:  is this needed for remote DB account (where it does not make sense), too? -->
+       Repeat the password in the next field.
+      </para>
+      <figure>
+       <title>Setup&mdash;Local Database</title>
+       <mediaobject>
+        <imageobject role="fo">
+         <imagedata fileref="susemanager_setup_db.png" width="90%"/>
+        </imageobject>
+        <imageobject role="html">
+         <imagedata fileref="susemanager_setup_db.png" width="75%"/>
+        </imageobject>
+       </mediaobject>
+      </figure>
+      <para>
+       Proceed with <guimenu>Next</guimenu>.
+      </para>
+     </step>
+    </substeps>
+   </step>
+<!--taroth 2011-02-09: IP address no longer needed (=already set during
+   firstboot procedure   
+   <step> 
+    <para> Enter the IP address of the &susemgr; server. By default, the
+      setup script inserts the IP address of your machine taken from your DHCP
+      server. </para>
+    </step>-->
+<!--  taroth 2011-01-24: seems this option is no longer present: <step>
+     <para>
+      Keep TFTP (trivial file transfer protocol) enabled. Its default value
+      is <literal>y</literal>. If you set it to <literal>n</literal>, remote
+      network booting via PXE (Preboot eXecution Environment) will not work.
+     </para>
+    </step>-->
+   <step>
+    <para>
+     The last setup screen asks for your mirror credentials from the
+     NCC.  Select <guimenu>Connect to NCC</guimenu> and enter your
+     <guimenu>NCC Mirror Credentials Username</guimenu>, the
+     <guimenu>NCC Mirror Credentials Password</guimenu>, and your
+     <guimenu>NCC Email Address</guimenu>.
+    </para>
+    <figure>
+     <title>Setup&mdash;NCC Settings</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="susemanager_setup_ncc.png" width="95%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="susemanager_setup_ncc.png" width="75%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </step>
+   <step id="step.manager.show.hostname">
+    <para>
+     Proceed with <guimenu>Next</guimenu> and confirm with
+     <guimenu>Yes</guimenu> to start the setup.
+    </para>
+    <note>
+     <title>Long Operation</title>
+     <para>
+      This step may take some time. Wait until the <guimenu>Setup is
+      completed</guimenu> message appears in the upper part of the &yast;
+      screen.
+     </para>
+    </note>
+   </step>
+   <step>
+    <para>
+     Click <guimenu>Next</guimenu> and read the instructions about the next
+     steps. Close &yast; by pressing <guimenu>Finish</guimenu>.
+    </para>
+   </step>
+  </procedure>
+  <para>
+   The basic &susemgr; settings are written to
+   <filename>/etc/rhn/rhn.conf</filename>. If you have chosen to use a local
+   database, the initial database is created and populated. If you have
+   chosen to use a remote database, the setup script connects to the
+   database.
+  </para>
+  <para>
+   The setup script also runs the
+   <filename>/usr/sbin/mgr-ncc-sync</filename> command which downloads the
+   subscriptions listed in your NCC Mirror Credentials. The respective
+   <guimenu>Software Channel Entitlements</guimenu> will be listed in the
+   &susemgr; Web interface (select
+   <menuchoice><guimenu>Admin</guimenu><guimenu>Subscriptions</guimenu></menuchoice>).
+  </para>
+  <para>
+   To switch from a trial license to a full license, repeat server registration with the new registration key (or keys, in case more than one applies), with the following command after replacing <replaceable>EMAIL_ADDRESS</replaceable> and <replaceable>REGISTRATION_CODE</replaceable> with appropriate values:</para>
+   <screen>
+    suse_register -a email=EMAIL_ADDRESS -a regcode-sms=REGISTRATION_CODE
+   </screen>
+  <para>
+   Then refresh &susemgr; channels to reflect the new entitlements
+   with the <command>mgr-ncc-sync -r</command> command.
+  </para>
+  <tip>
+   <!-- bnc#785462 -->
+   <title>Running &susemgr; Behind an HTTP Proxy</title>
+   <para>
+    If <command>mgr-ncc-sync</command> fails because you are running
+    the &susemgr; server behind an HTTP proxy configured with &yast;,
+    check in the Web interface whether the proxy is actually known to
+    &susemgr;.  For more information, see <xref
+    linkend="s3-sattools-config-gen" />.
+   </para>
+  </tip>
+
+  <note>
+   <!-- bnc#793700 -->
+   <title>Accessing NCC <literal>nu.novell.com</literal></title>
+   <para>
+    <literal>nu.novell.com</literal> uses proxy technologies to provide
+    a fast download service world-wide.  Depending on the location, the
+    real hostname and the IP address is different.
+   </para>
+   <para>
+    To correctly setup company firewalls, to allow access to the repositories,
+    check which proxy you are using with the following command:
+   </para>
+   <screen>nslookup nu.novell.com</screen>
+  </note>
+ </sect1>
+
+ <sect1 id="s1-disconnected-setup">
+  <title>Setup Without Internet Connection</title>
+  <indexterm>
+   <primary>disconnected setup</primary>
+  </indexterm>
+  <indexterm>
+   <primary>setup, disconnected</primary>
+  </indexterm>
+  <para>
+   <remark>For info about this feature, see
+   http://wiki.novell.com/index.php/SUSE_Manager/DisconnectedSetup and
+   FATE#311604.</remark>
+  </para>
+
+  <para>If it is not possible to connect &susemgr; directly or via a
+  proxy to the Internet, a disconnected setup in combination with
+  &smtool; (&smt;) is the recommended solution.  In this scenario, &smt;
+  stays in an <quote>external</quote> network with a connection to &ncc;
+  and synchronizes the software channels and repositories on a removable
+  storage medium. Then you separate the storage medium from &smt;, and
+  let the &susemgr; server mount it locally to read the data.
+  </para>
+
+  <sect2>
+   <title>Basic Configuration and Usage</title>
+
+  <procedure id="pro.manager.disconnected.smt">
+   <title>&smt;: Fetching Data from the Internet</title> 
+   <step>
+    <para>
+     Install &smt; in the external network with &ncc; connection.  For
+     details about installing &smt;, see <ulink
+     url="http://www.suse.com/documentation/smt11/"/>.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     In &smt;, mirror all wanted repositories.
+    </para>
+   </step>
+   <step>
+    <para>
+     Create a <quote>database replacement file</quote> (e.g.,
+     <filename>/tmp/dbrepl.xml</filename>):
+    </para>
+    <screen>smt-ncc-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
+   </step>
+   <step id="pro.manager.disconnected.smt.mounting">
+    <para>
+     Mount a removable storage medium such as an external hard disk or
+     USB flash drive.
+    </para>
+   </step>
+   <step>
+    <para>Export the data to the mounted medium:</para>
+    <screen>smt-ncc-sync --todir /media/<replaceable>disk</replaceable>/
+smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/<replaceable>disk</replaceable> \
+           --fromlocalsmt -L /var/log/smt/smt-mirror-export.log
+    </screen>
+   </step>
+   <step>
+    <para>Unmount the storage medium to carry it to your &susemgr; server.</para>
+   </step>
+  </procedure>
+
+  <!-- ============================================================== -->
+
+  <para>Continue with the configuration on your &susemgr; server.</para>
+
+  <procedure id="pro.manager.disconnected.mgr">
+   <title>&susemgr; Server: Updating Data from the Storage Medium</title>
+   <step>
+    <para>Mount the storage medium on your &susemgr; server (e.g., at
+    <filename>/media/<replaceable>disk</replaceable></filename>).</para>
+   </step>
+   <step>
+    <para>
+<!-- bnc#794155 -->
+<command>mgr-ncc-sync</command> can now be used as usual<!--&mdash;see
+<xref linkend="s2-import-rhnsst"/>-->.  Use the
+<option>--from-dir</option> parameter to point the sync to the mounted
+disk.  First import the data about products, subscriptions, channels,
+and more without additional options or with the <option>--refresh</option>
+option.  Then use <option>-l</option> to list the base channels and the
+child channels of the already synced base channels, and together with
+<option>--all-childs</option> to list all child channels, even if the
+parent channel is not synced yet.  Use
+<option>-c</option> to add a new channel and trigger a repository
+sync:</para>
+    <screen>mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> --refresh
+mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> -l
+mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> -c <replaceable>channel-name</replaceable></screen>
+   </step>
+  </procedure>
+  <para>Now the up-to-date data are available on your &susemgr; and
+  ready for updating the client systems.  According to your needs,
+  refresh the data on the storage medium:</para>
+
+  <procedure id="pro.manager.disconnected.refresh">
+   <title>Refreshing Data on the Storage Medium</title>
+
+   <step>
+    <para>On the &susemgr; server, unmount the storage medium to carry
+    it to your &smt;.</para>
+   </step>
+
+   <step>
+    <para>On your &smt;, continue with <xref
+    linkend="pro.manager.disconnected.smt.mounting"/>.</para>
+   </step>
+  </procedure>
+
+  <warning>
+   <title>Data Corruption
+   </title>
+   <para>The storage medium must always be available at the same mount
+   point. To avoid data corruption, do not trigger a
+   <command>sync</command> if the storage medium is not mounted.
+   </para>
+  </warning>
+  </sect2>
+
+  <sect2>
+   <title>Additional Settings</title>
+
+   <para>
+    To disable the forwarding of registrations to &ncc; via
+    <command>mgr-register</command>, set the following value in
+    <filename>/etc/rhn/rhn.conf</filename>:
+   </para>
+
+   <screen>server.susemanager.forward_registration = 0</screen>
+
+   <para>Without this setting, the logfile will be populated with many
+    error messages.</para>
+
+  </sect2>
+ </sect1>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="manager_quick_config_i.xml"/>
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="manager_quick_migration_i.xml"/>
+
+</chapter>

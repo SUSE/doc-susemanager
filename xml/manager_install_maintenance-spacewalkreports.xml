@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE sect1 PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<sect1 id="s1-maintenance-spacewalkreports">
+    <title>Generating Spacewalk Reports</title>
+    <para>The <command>spacewalk-report</command> tool creates a report
+        from the &susemgr; server in a comma separated value (CSV) format.
+    </para>
+    
+    <sect2>
+        <title>Options for <command>spacewalk-report</command></title>
+        <para>The <command>spacewalk-report</command> offers some
+            options, which are briefly explained in <xref 
+                linkend="tab.maintenance.spacewalk-report"/>. </para>
+        <table id="tab.maintenance.spacewalk-report">
+            <title>Options for <command>spacewalk-report</command></title>
+            <tgroup cols="2">
+                <tbody>
+                    <!--<row>
+                        <entry><para><option>-\-mulitval-on-rows</option></para></entry>
+                        <entry>
+                            <para></para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry><para><option>-\-multival-separator</option></para></entry>
+                        <entry><para></para></entry>
+                    </row>-->
+                    <row>
+                        <entry><para><option>--db</option></para></entry>
+                        <entry><para>Passes alternative database string
+                            (username/password@sid); default is taken
+                            from
+                            <filename>/etc/rhn/rhn.conf</filename>
+                            (default_db keyword).</para>
+                            </entry>
+                    </row>
+                    <row>
+                        <entry><para><option>--info</option></para></entry>
+                        <entry><para>Prints available reports.</para></entry>
+                    </row>
+                    <row>
+                        <entry><para><option>--list-fields</option></para></entry>
+                        <entry><para>Lists fields of the report.</para></entry>
+                    </row>
+                    <row>
+                        <entry><para><option>--list-fields-info</option></para></entry>
+                        <entry><para>Same as <option>--list-fields</option>.</para></entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
+    </sect2>
+    
+    <sect2>
+        <title>Using <command>spacewalk-report</command></title>
+        <para>To get an overview of available reports, use the
+        <option>--info</option> option:</para>
+    <screen><command>spacewalk-report</command> --info
+channel-packages: Packages in channels
+channels: Channel report
+entitlements: Entitlement and channel list and usage
+errata-list: Errata out of compliance information - errata details
+errata-list-all: List of all erratas
+errata-systems: Errata out of compliance information - erratas for systems
+inventory: Inventory report
+users: Users in the system
+users-systems: Systems administered by individual users</screen>
+    <para>This gives you a list of all available report generators and
+            their description. For example, to list all the available
+            channels, use this command:</para><remark role="needinfo">emap: replace sp1 with sp3?</remark>
+    <screen><command>spacewalk-report</command> channels
+channel_label,channel_name,number_of_packages
+sles11-sp1-pool-i586,SLES11-SP1-Pool for i586,0
+sles11-sp1-pool-x86_64,SLES11-SP1-Pool for x86_64,0</screen>
+       <para>If you need to get a list of all users, pass the
+           <option>users</option> option to the command:</para>
+        <screen><command>spacewalk-report users</command>
+organization_id,organization,user_id,username,last_name,first_name,position,email,role,creation_time,last_login_time,active
+1,Penguin Inc.,1,admin,Penguin,Tux,,tux@example.org,Organization Administrator;SUSE Manager Administrator,2012-03-19 15:59:40,2012-03-21 13:43:45,enabled
+</screen>
+    </sect2>
+     
+</sect1>

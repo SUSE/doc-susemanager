@@ -1,0 +1,1311 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE sect1 PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<sect1 id="sec.manager.config">
+ <title>Basic Configuration</title>
+
+<!--taroth 2011-01-25: keep in SYNC with Install Guide, file
+  xml/manager_install_installation.xml, section id="s1-summary-steps"-->
+
+ <para>
+  To complete the basic &susemgr; configuration, you need to execute the
+  following steps:
+ </para>
+
+ <orderedlist>
+  <listitem>
+   <para>
+    <xref linkend="pro.manager.admin.account" xrefstyle="select:title"/>
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    <xref linkend="pro.manager.nccsync" xrefstyle="select:title"/>
+   </para>
+   <!-- ke 2011-08-13: commented for clarity
+   <para>
+    In case of disconnected setup with an internal update server like &smt;,
+    you need to create custom channels, and add repositories to be
+    synchronized with the custom channels.
+   </para>
+   -->
+  </listitem>
+  <listitem>
+   <para>
+    <xref linkend="pro.manager.activationkey" xrefstyle="select:title"/>
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    <xref linkend="pro.manager.generate.bootstrap" xrefstyle="select:title"/>
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    <xref linkend="pro.manager.clients.register" xrefstyle="select:title"/>
+   </para>
+  </listitem>
+ </orderedlist>
+
+ <sect2 id="sec.manager.config.login">
+  <title>Login to the Web Interface</title>
+  <para>
+   After installation of the appliance, you need to log in and create the
+   first administrator account for &susemgr;. This administrator has access
+   to all resources on &susemgr; and has the right to create and manage user
+   accounts. Additionally, he is given the role of an
+   <systemitem>organization administrator</systemitem> for the default
+   organization created during &susemgr; installation and setup.
+  </para>
+  <para>
+   To access the &susemgr; Web interface, ask your system administrator for
+   the URL of your &susemgr; server. It is shown on the console after
+   completion of the installation&mdash; see
+   <xref linkend="step.manager.show.hostname"/> from
+   <xref linkend="pro.manager.installation"/>.
+  </para>
+  <procedure id="pro.manager.admin.account">
+   <title>Creating the &susemgr; Administrator Account</title>
+   <step id="st.manager.basics.server-url">
+    <para>
+     Start a Web browser. Enter the URL of your &susemgr; server, using the
+     Fully Qualified Domain name as in the following example:
+     <literal>susemanager.example.com</literal>. The &susemgr; Web interface
+     appears. On first login, you are prompted to create the &susemgr;
+     administrator account.
+    </para>
+   </step>
+   <step>
+    <para>
+     Enter the data for the administrator account and click <guimenu>Create
+     Login</guimenu>.
+    </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="susemanager_create_admin.png" width="95%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="susemanager_create_admin.png" width="95%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+    <para>
+     You will be logged in as administrator.
+    </para>
+   </step>
+   <step>
+    <para>
+     On the <guimenu>Overview</guimenu> tab, a message notifies you to
+     finalize your basic system configuration. To make use of the monitoring
+     features provided by &susemgr;, click the link in the message, activate
+     <guimenu>Enable Monitoring</guimenu> and click
+     <guimenu>Update</guimenu>.
+    </para>
+    <para>
+     Monitoring allows an organization to install probes that can
+     immediately detect failures and identify performance degradation on
+     client systems. <phrase os="hidden">For more information, refer to
+     <xref linkend="s1-intro-rhn-monitoring"/> and
+     <xref linkend="s1-sm-monitor"/>.</phrase>
+    </para>
+   </step>
+  </procedure>
+ </sect2>
+
+ <sect2 id="sec.manager.config.basechannels">
+  <title>Setup of &suse; Channels</title>
+  <para>
+   Channels are collections of repositories which are assigned to client
+   systems. Without a channel, clients cannot be grouped nor can they
+   receive updates.
+  </para>
+  <procedure id="pro.manager.nccsync">
+   <title>Importing &suse; Channels from NCC</title>
+<!--taroth 2011-2-14: bnc#671192-->
+<!--ke 2011-08-13: now refer directly to the SMT setup -->
+   <note>
+    <title>&susemgr; Server Without Internet Connection</title>
+    <para>
+     This procedure only applies to scenarios where your &susemgr; server is
+     connected to the Internet.  For a disconnected scenario using &smtool;,
+     refer to <xref linkend="s1-disconnected-setup"/>.
+    </para>
+   </note>
+   <para>
+    During installation, a first synchronization between &ncc; and &susemgr;
+    is automatically done by <command>mgr-ncc-sync</command>.
+<!--taroth 2011-01-17: run without any options, the command downloads the
+     subscription data and *if* any channels are already enabled
+     (=imported into the DB), it triggers a resync of those channels (directly
+     after installation no channels are available, therefore only downloading
+     subscription data) - command can also be run with a cron-job each night to keep
+     subscriptions and channel data always up-to-date-->
+    At this point in time, it only downloads the subscriptions to the
+    products you have registered for, but it does not synchronize any
+    channel data yet. After installation, you have to import the channels
+    you need.
+   </para>
+   <step>
+    <para>
+     On a shell, log in to the &susemgr; server as &rootuser;.
+    </para>
+   </step>
+   <step>
+    <para>
+     Execute <command>mgr-ncc-sync <option>-l</option></command> to view all
+     channels that you are allowed to synchronize with &susemgr;. The output
+     lists both parent and child channels. The following notation is used to
+     mark each channel:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       <literal>[.]</literal>: A channel not imported or synchronized yet.
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       <literal>[p]</literal>: A previously imported or synchronized
+       channel.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </step>
+   <step>
+    <para>
+     Select the channels you want to import. You can only import child
+     channels if their respective parent channel is already imported.
+    </para>
+    <warning>
+     <title>&suse; Channels Cannot Be Deleted</title>
+     <para>
+      Once imported, &suse; channels cannot be deleted. Only custom
+      software channels can be deleted.
+     </para>
+    </warning>
+   </step>
+   <step>
+    <para>
+     For each channel that you want to import, run
+     <command>mgr-ncc-sync</command> with the <option>-c</option> option and
+     add the respective channel label. For example:
+    </para>
+<screen>mgr-ncc-sync -c suse_sles_11.i586-base</screen>
+    <para>
+     The respective channel data is imported into the &susemgr; database and
+     a full synchronization is triggered for that channel.
+    </para>
+   </step>
+  </procedure>
+  <note>
+   <title>Client Tools Channel</title>
+   <para>
+    Make sure to also import the <systemitem>client tools</systemitem>
+    channel. It provides the packages that need to be installed on a system
+    to make it a &susemgr; client system.
+   </para>
+  </note>
+  <para>
+   Any channel that has been imported is also displayed in the &susemgr; Web
+   interface. To see a list of all channels, go to the
+   <guimenu>Channels</guimenu> tab and select <guimenu>&suse;
+   Channels</guimenu> from the left navigation bar.
+  </para>
+
+  <para>
+   <!-- xref because of bnc#817869 -->
+   For setting up automatic channel synchronization, see <xref
+   linkend="s1-maintenance-auto-sync"/>.
+  </para>
+ </sect2>
+
+ <sect2 id="sec.manager.config.setup.client">
+  <title>Client Setup</title>
+  <para>
+   For a list of client systems supported by &susemgr;, refer to
+   <xref linkend="sec.manager.requirements.clients"/>. Registering clients
+   to &susemgr; is done with a bootstrap script that deploys all necessary
+   information to the clients. The bootstrap script refers some parameters like
+   activation keys or GNU Privacy Guard (GPG) keys that depend on your
+   particular setup.
+  </para>
+  <procedure id="pro.manager.activationkey">
+   <title>Creating Activation Keys</title>
+   <para>
+    Activation keys define entitlements and which channels and groups the
+    client system is allowed to subscribe to. This information is passed on
+    to all systems registered with a key. Each activation key is bound to
+    the organization for which it has been created.
+   </para>
+   <note>
+    <title>Activation Keys for New Organizations</title>
+    <para>
+     If you need to create activation keys for a new organization,
+      assign system entitlements first. For details, refer to
+     <xref linkend="pro.manager.config.entitlements"/> and
+     <xref linkend="sec.manager.config.organizations"/>. The default
+     organization has all necessary prerequisites by default.
+    </para>
+   </note>
+   <step>
+    <para>
+     Log in to the &susemgr; Web interface as administrator.
+    </para>
+   </step>
+   <step>
+    <para>
+     Switch to the <guimenu>Systems</guimenu> tab and select
+     <menuchoice><guimenu>Activation Keys</guimenu></menuchoice>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click the <guimenu>Create New Key</guimenu> link at the upper right
+     corner.
+    </para>
+   </step>
+   <step>
+    <para>
+     Enter a <guimenu>Description</guimenu> to identify the generated
+     activation key.
+    </para>
+   </step>
+   <step>
+    <para>
+     If you want the key to be generated automatically, leave the
+     <guimenu>Key</guimenu> input field empty. If you want to use a certain
+     string for the key, define the desired string in the
+     <guimenu>Key</guimenu> input field.
+    </para>
+    <warning>
+     <title>Allowed Characters</title>
+     <para>
+      Do not use commas within the key string. All other characters are
+      allowed.  Commas are used as separators when registering client
+      systems with multiple activation keys with
+      <command>rhnreg_ks</command>.
+     </para>
+    </warning>
+   </step>
+   <step>
+    <para>
+     To restrict the number of client systems that can be registered with
+     the activation key, set a <guimenu>Usage Limit</guimenu> by entering a
+     maximum number of systems.
+    </para>
+    <para>
+     For unlimited use, leave this field empty.
+    </para>
+   </step>
+   <step>
+    <para>
+     With <guimenu>Base Channels</guimenu>, set the primary channel for the
+     key. This can be either the <literal>SUSE Manager Default</literal>
+     channel or a custom base channel.
+    </para>
+    <para>
+     Choosing <literal>&susemgr; Default</literal> allows client systems to
+     register with the default &suse;-provided channel that corresponds to
+     their installed version of &sle;.
+    </para>
+   </step>
+   <step>
+    <para>
+     Activate the <guimenu>Add-On Entitlements</guimenu> that you want to
+     give to the client systems that are registered with that key.
+    </para>
+   </step>
+   <step>
+    <para>
+     If all newly registered client systems of your organization should
+     inherit the properties of this key, activate the <guimenu>Universal
+     Default</guimenu> checkbox. Only one universal default activation key
+     can be defined per organization.
+    </para>
+   <warning>
+       <title>Changing the Default Activation Key</title>
+       <para>
+        Only one universal default activation key can be defined per
+        organization.  If some other key is already the default
+        activation key for your organisation, this checkbox will
+        automatically unset the checkbox for that other key.
+       </para>
+      </warning></step>
+   <step>
+    <para>
+     Generate the key by clicking <guimenu>Create Activation Key</guimenu>.
+     The prefix of the activation key indicates which organization (by ID
+     number) owns the activation.
+    </para>
+   </step>
+   <step>
+    <para>
+     To create more activation keys, repeat the steps above.
+    </para>
+   </step>
+  </procedure>
+  <?dbfo-need height="20em"?>
+  <figure>
+   <title>Example Activation Key</title>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="susemanager_create_activation_key.png" width="95%"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="susemanager_create_activation_key.png" width="75%"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+  <note>
+   <title>Activation Key Update</title>
+   <para>
+    After modifying or adding any components that are bound to an existing
+    activation key (for example adding channels), make
+    sure to update the key under
+    <menuchoice><guimenu>Systems</guimenu><guimenu>Activation
+    Keys</guimenu><guimenu>KEY_TO_MODIFY</guimenu><guimenu>Update Activation
+    Key</guimenu></menuchoice>.
+    <remark>2014-03-31 froh: why is this not automatic??</remark>
+   </para>
+  </note>
+  <para>
+   The next steps are to generate the <filename>bootstrap.sh</filename>
+   script on the &susemgr; server, then edit a copy of the script and  run
+   the modified script on each client machine that you want to register
+   with &susemgr;.
+  </para>
+  <procedure id="pro.manager.generate.bootstrap">
+   <title>Generating the Bootstrap Script</title>
+   <para>
+    Several options in the bootstrap script can be set via the &susemgr; Web
+    interface, for example, if remote command execution or remote
+    configuration of clients should be allowed.
+   </para>
+   <step>
+    <para>
+     On the &susemgr; Web interface, switch to the <guimenu>Admin</guimenu>
+     tab and select <menuchoice><guimenu>SUSE Manager
+     Configuration</guimenu><guimenu>Bootstrap
+     Script</guimenu></menuchoice>.
+    </para>
+   </step>
+   <step id="step.manager.bootstrap.options">
+    <para>
+     Check the options listed on the page and activate or deactivate them
+     according to your needs.
+    </para>
+    <note>
+     <title>Remote Command Execution and Configuration</title>
+     <para>
+      If you choose to <guimenu>Enable Remote Configuration</guimenu> or
+      <guimenu>Enable Remote Commands</guimenu>, make sure that the
+      <systemitem>rhncfg-actions</systemitem> package is installed on the
+      client systems:
+     </para>
+     <orderedlist>
+      <listitem>
+       <para>
+        Switch to the <guimenu>Systems</guimenu> tab and select
+        <menuchoice><guimenu>Activation Keys</guimenu></menuchoice>.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        From the list of activation keys, click the one you want
+        to modify.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Click the <guimenu>Packages</guimenu> subtab, enter
+        <systemitem>rhncfg-actions</systemitem> into the input field and
+        click <guimenu>Update Key</guimenu>.
+       </para>
+      </listitem>
+     </orderedlist>
+     <para>
+      The required package for remote command execution and configuration
+      will automatically be installed on all client systems registered with
+      the respective activation key.
+     </para>
+    </note>
+   </step>
+   <step id="step.manager.create.bootstrap">
+    <para>
+     Click the <guimenu>Update</guimenu> button. The necessary bootstrap
+     script is generated and stored on the server's filesystem in the
+     <filename>/srv/www/htdocs/pub/bootstrap</filename> directory. It is
+     also available from
+     <filename>https://susemanager.example.com/pub/bootstrap/</filename>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Proceed with the following procedure,<xref linkend="pro.manager.clients.register"/>.
+    </para>
+   </step>
+  </procedure>
+  <procedure id="pro.manager.clients.register">
+   <title>Editing the Bootstrap Script and Registering Clients</title>
+   <para>
+    Adjust the generated bootstrap script according to your needs. The
+    minimal requirement is to include the activation key. We strongly
+    recommend to also include one or more GPG keys (for example, your
+    organization key, and package signing keys). Then execute the resulting
+    script on each client machine that you want to register with &susemgr;
+    (either centrally, from the &susemgr; server, or decentralized, on each
+    client.)
+   </para>
+<!--taroth 2011-02-10: fix for https://bugzilla.novell.com/show_bug.cgi?id=670971-->
+   <note>
+    <title>Access to Installation Media During Registration</title>
+    <para>
+     The bootstrap process triggers installation of packages on the client
+     machines. Before executing the bootstrap script on a client, make sure
+     the client can access its default installation medium: network access
+     (in case of network repositories) or inserted DVD (in case of physical
+     media).
+    </para>
+   </note>
+   <step>
+    <para>
+     Log in as &rootuser; to the &susemgr; server.
+    </para>
+   </step>
+   <step>
+    <para>
+     Create a copy of the automatically generated script:
+    </para>
+<screen><?dbsuse-fo font-size="0.85em"?>cd /srv/www/htdocs/pub/bootstrap
+cp bootstrap.sh bootstrap-<replaceable>edited</replaceable>.sh</screen>
+   </step>
+   <step>
+    <para>
+     Edit the copy as follows:
+    </para>
+    <substeps>
+     <step>
+      <para>
+       Search for the <varname>ACTIVATION_KEYS</varname> entry and enter the
+       activation key from <xref linkend="pro.manager.activationkey"/>. Make
+       sure to also include the organization prefix in the key, for example:
+      </para>
+<screen><?dbsuse-fo font-size="0.85em"?>ACTIVATION_KEYS=1-fef154ddcf0d515fc</screen>
+     </step>
+     <step>
+      <para>
+       Search for the <literal>ORG_GPG_KEY</literal> entry and enter one or
+       more filenames, separated by commas. The GPG key is located under
+       the <filename>/srv/www/htdocs/pub/</filename> directory and must
+        be entered without any path name, for example:
+      </para>
+       <screen>ORG_GPG_KEY=foo-12345678.key,bar-87654321.key</screen>
+       <para>If you do not need or have a GPG key, search for the
+         variable <varname>USING_GPG</varname> and set it to
+         <literal>0</literal>.</para>
+<!--taroth 2011-02-09:
+        https://bugzilla.novell.com/show_bug.cgi?id=662996-->
+      <note>
+       <title>Package Signing Key for &rh; Support</title>
+       <para>
+        If you receive maintenance and support for your &rh; client systems
+        through &suse;, make sure to include the package signing key you
+        received from &suse;. Otherwise RPM packages cannot be
+        installed on the &rh; client systems. On the client system, run:
+       </para>
+       <screen>
+        rpm --import http://sumaserver/pub/res.key
+        rpm --import http://sumaserver/pub/suse-307E3D54.key
+       </screen>
+      </note>
+     </step>
+     <step>
+      <para>
+       Adjust further parameters, if needed. For details, refer to the
+       comments in <filename>bootstrap.sh</filename>.
+      </para>
+     </step>
+     <step>
+      <para>
+       To enable the script for execution, remove the <literal>exit
+       1</literal> entry from the message block. The last lines of the
+       message block should now read:
+      </para>
+<screen><?dbsuse-fo font-size="0.85em"?>echo "the exit below)"
+echo</screen>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>
+     Save the edited version of the script.
+    </para>
+   </step>
+   <step>
+    <para>
+     Use one of the following possibilities to execute the edited script on
+     all client machines that you want to register with &susemgr;:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       Log in as &rootuser; on the &susemgr; server and execute the
+       following commands:
+      </para>
+<screen><?dbsuse-fo font-size="0.85em"?>cd /srv/www/htdocs/pub/bootstrap/
+cat bootstrap-<replaceable>edited</replaceable>.sh | ssh \
+root@<replaceable>client_hostname</replaceable> /bin/bash</screen>
+     </listitem>
+     <listitem>
+      <para>
+       Log in to each client and execute the following command (all on one
+       line):
+      </para>
+<screen><?dbsuse-fo font-size="0.85em"?>curl -Sks https://<replaceable>server_hostname</replaceable>/pub
+/bootstrap/bootstrap-<replaceable>edited</replaceable>.sh | /bin/bash</screen>
+     </listitem>
+    </itemizedlist>
+    <para>
+     The clients are registered with the &susemgr; server as specified in the
+     bootstrap script. The &susemgr; Web interface shows the registered
+     client systems on the <guimenu>Systems</guimenu> tab.
+    </para>
+   </step>
+  </procedure>
+  <para>
+   For more information about bootstrapping, refer to
+   <xref linkend="ch-bootstrap"/>.
+  </para>
+
+  <note>
+   <!-- bnc#794530 -->
+   <title>Client-side PackageKit Conflicting with Remote &susemgr;
+   package management</title>
+
+   <para>
+    If client-side PackageKit conflicts with remote &susemgr; package
+    management, consider to uninstall PackageKit.
+   </para>
+  </note>
+
+ </sect2>
+
+ <sect2 id="sec.manager.config.organizations">
+  <title>Organization Management</title>
+  <para>
+   During installation and setup, &susemgr; automatically creates a default
+   administrative organization. It gets the organization ID
+   <literal>1</literal> and the organization name that you entered in
+   <xref linkend="step.manager.setup.org"/> in
+   <xref linkend="pro.manager.setup"/>. For management of larger
+   environments, create multiple organizations: for example, for different
+   departments within your company&mdash;or for administering several
+   distinct third-party companies.</para>
+  <para>For more information and details about creating organizations,
+   refer to <xref linkend="s1-multiorg-creating"/>.
+  </para>
+ </sect2>
+
+ <sect2 id="sec.manager.config.entitlements">
+  <title>Management of System and Software Entitlements</title>
+  <para>
+   One important task after creating a new organization is to assign
+   entitlements to the new organization. There are two types of entitlements
+   that are important:
+  </para>
+  <variablelist>
+   <varlistentry>
+    <term>System Entitlements</term>
+    <listitem>
+     <para>
+      Various categories of system entitlements are available: management,
+      provisioning, monitoring, and virtualization entitlements. Having
+      management entitlements is a base requirement for an organization to
+      function in &susemgr;.
+<!--The maximum number of systems that may register
+      with an organization in &susemgr; depends on the number of management
+      entitlements allocated to that organization&mdash;regardless of the
+      number of software entitlements available.-->
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Software Channel Entitlements</term>
+    <listitem>
+     <para>
+      Apart from system entitlements, software channel entitlements are
+      needed for each organization. For example, you must grant
+      <systemitem>client tools</systemitem> channel entitlements to each
+      organization (as this channels contains client software required for
+      extended &susemgr; functionality, such as &ay; or Kickstart or
+      virtualization support).
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  <para>
+   For more details and instructions on how to transfer the respective
+   entitlements from the default organization to any newly created
+   organization, refer to <xref linkend="s1-admin-orgs-details-subs"/>.
+  </para>
+ </sect2>
+
+ <sect2 id="sec.manager.config.users">
+  <title>User Management</title>
+  <para>
+   When first logging in to the &susemgr; Web interface, the account for the
+   first &susemgr; administrator needs to be created as described in
+   <xref linkend="pro.manager.admin.account"/>. The &susemgr; administrator
+   can then add more &susemgr; users and grant and edit permissions for each
+   user.
+  </para>
+  <note>
+   <title>Users and Organizations</title>
+   <para>
+    Each user belongs to the organization within which the user account has
+    been created. A user cannot belong to more than one organization. For
+    creating or editing a user account, log in with an <literal>organization
+    administrator</literal> account for the organization to which the user
+    belongs or should belong.
+   </para>
+  </note>
+  <procedure id="pro.manager.user.add">
+   <title>Creating User Accounts</title>
+   <para>
+    Only organization administrators or &susemgr; administrators can create
+    and edit user accounts.
+   </para>
+   <step>
+    <para>
+     Log in to the &susemgr; Web interface as administrator. The top level
+     row of the Web interface shows the organization you are currently
+     logged in to.
+    </para>
+   </step>
+   <step>
+    <para>
+     Switch to the <guimenu>Users</guimenu> tab and click the
+     <guimenu>create new user</guimenu> link at the upper right corner.
+    </para>
+   </step>
+   <step>
+    <para>
+     Enter the <guimenu>Desired Login</guimenu> and the <guimenu>Desired
+     Password</guimenu> for the new user and confirm the password. Both
+     login and password must consist of at least 5 characters.
+    </para>
+   </step>
+   <step>
+    <para>
+     Enter the first and last name and the email address of the new user
+     and click <guimenu>Create Login</guimenu>. The Web interface switches
+     to the <guimenu>User List</guimenu>, showing either
+     <guimenu>Active</guimenu>, <guimenu>Deactivated</guimenu>, or
+     <guimenu>All</guimenu> users.
+    </para>
+   </step>
+  </procedure>
+  <para>
+   With the creation of a new user account, the user can log in to the
+   &susemgr; Web interface, but he does not have any administrative
+   permissions yet. Administrative permissions are granted via roles. Each
+   user can have multiple roles. To assign roles to a user and to set other
+   permissions and options proceed as described in
+   <xref linkend="pro.manager.user.edit"/>:
+  </para>
+<!-- bwiedemann 20110210: # reference to next line ??? Procedure 8 ->
+   Procedure 12 ?-->
+<!--taroth 2011-02-16: that nevertheless makes sense from my POV as the
+    referred object may move to another place if the file needs restructuring 
+    and even in that case,  the reference is still intact-->
+  <procedure id="pro.manager.user.edit">
+   <title>Editing User Accounts</title>
+   <step>
+    <para>
+     Log in to the &susemgr; Web interface as administrator. The top level
+     row of the Web interface shows the organization you are currently
+     logged in to.
+    </para>
+   </step>
+   <step>
+    <para>
+     Switch to the <guimenu>Users</guimenu> tab.
+    </para>
+   </step>
+   <step>
+    <para>
+     From the left navigation bar, select if you want to see
+     <guimenu>Active</guimenu>, <guimenu>Deactivated</guimenu>, or
+     <guimenu>All</guimenu> users.
+    </para>
+   </step>
+   <step>
+    <para>
+     From the list of users, click the user entry you want to modify. The
+     Web interface shows the <guimenu>User Details</guimenu> for the
+     selected entry. Apart from the user's name and password, the
+     <guimenu>Details</guimenu> subtab also lets you assign roles to the
+     user.
+    </para>
+   </step>
+   <step>
+    <para>
+     Select the roles that you want to assign to the user. For
+     detailed information about the roles, refer to <xref
+     linkend="s4-usr-active-details-details"/>.<remark>emap: check if
+     this should be consolidated.</remark> If you activate the
+     <guimenu>Organization Administrator</guimenu> check box, the user
+     will automatically inherit the roles listed below. To assign or
+     remove individual roles, activate or deactivate the respective
+     check boxes.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click <guimenu>Submit</guimenu> to confirm your changes on the
+     <guimenu>Details</guimenu> subtab.
+    </para>
+   </step>
+   <step>
+    <para>
+     To set or modify the user's permissions for system groups, systems or
+     channels that exist within the current organization, switch to the
+     respective subtabs and follow the instructions on the Web interface.
+    </para>
+   </step>
+   <step>
+    <para>
+     To modify preferences, addresses or notification methods for the
+     currently selected user, switch to the respective subtabs and confirm
+     your changes.
+    </para>
+   </step>
+  </procedure>
+<!--<para>
+   If a user account is no longer needed (or temporarily not needed) , it
+   can be deleted or deactivated:
+  </para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     Deletion of a user account is irreversible and can only be done by an
+     organization administrator. Any schedules associated with this user
+     will no longer be tied to this user.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Deactivation of a user account can either be done by an organization
+     administrator or by the respective user. Deactivated users cannot log
+     in to the &susemgr; Web interface, nor may they schedule any actions.
+     Actions scheduled prior to their deactivation remain in the action
+     queue. Deactivated users may be reactivated by organization
+     administrators.
+    </para>
+   </listitem>
+  </itemizedlist>
+  <para>
+   User accounts that have the organization administrator role assigned to
+   them cannot be deleted or deactivated. To delete or deactivate a user,
+   remove this role first.
+  </para>
+  <procedure id="pro.manager.user.activate">
+   <title>Deactivating and Reactivating User Accounts</title>
+   <step>
+    <para>
+     To deactivate a user account as organization administrator:
+    </para>
+    <substeps>
+     <step>
+      <para>
+       Check at the top level row of the Web interface that you are logged
+       in to the organization that the user belongs to.
+      </para>
+     </step>
+     <step>
+      <para>
+       Switch to the <guimenu>Users</guimenu> tab and click the user entry
+       you want to modify.
+      </para>
+     </step>
+     <step>
+      <para>
+       Verify that the role <systemitem>organization
+       administrator</systemitem> is not activated for the user. Otherwise,
+       deactivate the role and click <guimenu>Submit</guimenu> to confirm
+       this change.
+      </para>
+     </step>
+     <step>
+      <para>
+       Click the <guimenu>deactivate user</guimenu> link in the upper right
+       corner of the screen.
+      </para>
+     </step>
+     <step>
+      <para>
+       Click the <guimenu>Deactivate User</guimenu> button in the lower
+       right corner to confirm.
+      </para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>
+     To deactivate a user account as the respective user:
+    </para>
+    <substeps>
+     <step>
+      <para>
+       Log in to the Web interface with your user account.
+      </para>
+     </step>
+     <step>
+      <para>
+       On the <guimenu>Overview</guimenu> tab, select <menuchoice>
+       <guimenu>Your Account</guimenu> <guimenu>Account
+       Deactivation</guimenu> </menuchoice>.
+      </para>
+     </step>
+     <step>
+      <para>
+       Click the <guimenu>Deactivate Account</guimenu> button in the upper
+       right corner.
+      </para>
+     </step>
+     <step>
+      <para>
+       After reading the warning, confirm with the same button that you want
+       to proceed. You will be logged out of the &susemgr; Web interface.
+      </para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>
+     To reactivate a user account:
+    </para>
+    <substeps>
+     <step>
+      <para>
+       Log in to the &susemgr; Web interface as organization administrator
+       for the organization the user belongs to.
+      </para>
+     </step>
+     <step>
+      <para>
+       Switch to the <guimenu>Users</guimenu> tab.
+      </para>
+     </step>
+     <step>
+      <para>
+       From the left navigation bar, select <guimenu>Deactivated</guimenu>
+       to see a list of deactivated users.
+      </para>
+     </step>
+     <step>
+      <para>
+       Click the user entry you want to modify.
+      </para>
+     </step>
+     <step>
+      <para>
+       Click the <guimenu>reactivate user</guimenu> link in the upper right
+       corner of the screen.
+      </para>
+     </step>
+     <step>
+      <para>
+       Click the <guimenu>Reactivate User</guimenu> button in the lower
+       right corner to confirm.
+      </para>
+     </step>
+    </substeps>
+   </step>
+  </procedure>
+  <procedure id="pro.manager.user.delete">
+   <title>Deleting User Accounts</title>
+   <warning>
+    <title>Irreversible Deletion</title>
+    <para>
+     User deletion is irreversible. Consider deactivating the user account
+     first in order to assess the effect deletion will have on your
+     infrastructure.
+    </para>
+   </warning>
+   <step>
+    <para>
+     Log in to the &susemgr; Web interface as organization administrator for
+     the organization the user belongs to.
+    </para>
+   </step>
+   <step>
+    <para>
+     Switch to the <guimenu>Users</guimenu> tab and click the user entry you
+     want to modify.
+    </para>
+   </step>
+   <step>
+    <para>
+     Verify that the role <systemitem>organization
+     administrator</systemitem> is not activated for the user. Otherwise,
+     deactivate the role and click <guimenu>Submit</guimenu> to confirm this
+     change.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click the <guimenu>delete user</guimenu> link in the upper right corner
+     of the screen.
+    </para>
+   </step>
+   <step>
+    <para>
+     After reading the warning, click the <guimenu>Delete User</guimenu>
+     button in the lower right corner to confirm. The user account is
+     removed and does not longer appear in any user list.
+    </para>
+   </step>
+  </procedure>-->
+  <procedure id="pro.manager.user.admin">
+   <title>Adding or Removing the &susemgr; Administrator Role</title>
+   <para>
+    As &susemgr; administrator, you can assign the permission to become
+    &susemgr; administrator to other users.
+   </para>
+   <step>
+    <para>
+     Log in to the Web interface as &susemgr; administrator.
+    </para>
+   </step>
+   <step>
+    <para>
+     For an overview of all users that exist within &susemgr; (across all
+     organizations), switch to the <guimenu>Admin</guimenu> tab and select
+     <guimenu>Users</guimenu> from the left navigation bar.
+    </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="susemanager_list_all_users.png" width="100%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="susemanager_list_all_users.png" width="75%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+    <para>
+     A green checkmark in the <guimenu>&susemgr; Administrator</guimenu>
+     column marks users that have the respective permission.
+    </para>
+   </step>
+   <step>
+    <para>
+     To assign or remove the <systemitem>&susemgr;
+     administrator</systemitem> role, activate or deactivate the
+     <guimenu>&susemgr; Administrator</guimenu> checkbox for the respective
+     user.
+    </para>
+   </step>
+  </procedure>
+  <para>
+   For more details about user management, refer to
+   <xref linkend="s1-sm-users"/>.
+  </para>
+ </sect2>
+
+<!--taroth 2011-01-17: todo - adjust/reuse this procedure for *custom* repository
+  setup (move to Reference Guide), for basic repo and channel setup, use sm-nnc-sync-->
+
+<!--<sect2 id="sec.manager.basics.repo-setup">
+  <title>Repository Setup</title>
+  <para>A repository is a collection of software packages. Depending on the
+  operating systems and architectures of the clients that you want to
+  register with &susemgr;, you need to define one or more repositories:
+  for example, a repository for <literal>SLES 11 SP1</literal>, or for
+  <literal>&rhel;&nbsp;5</literal>. To see a list of all
+  repositories that are configured for &susemgr;, click <guimenu>Manage
+  Repositories</guimenu> from the left navigation bar. </para>
+  <para>To add a repository in &susemgr;, specify a repository URL (for
+  which you need information from the &ncc;). </para>
+  
+  <procedure id="pro.manager.repo.setup">
+  <title>Adding Repositories to &susemgr;</title>
+  <step>
+  <para>In the &susemgr; Web interface, go to the
+  <guimenu>Channels</guimenu> tab. </para>
+  </step>
+  <step>
+  <para>From the left navigation bar, select <menuchoice>
+  <guimenu>Manage Software Channels</guimenu>
+  <guimenu>Manage Repositories</guimenu>
+  </menuchoice>.</para>
+  </step>
+  <step>
+  <para>Click the <guimenu>create new repository</guimenu> link at the
+  upper right corner.</para>
+  </step>
+  <step>
+  <para>Enter a name for the new repository in the <guimenu>Repository
+  Label</guimenu> input field. For better overview, it is recommended
+  to specify the product name and the architecture for which the
+  repository is to provide packages.</para>
+  </step>
+  <step>
+  <para>Enter the <guimenu>Repository URL</guimenu> that is a combination
+  of a username, a password, an invariant component
+  (<literal>nu.novell.com</literal>), and a path. The complete URL has
+  the following structure:</para>
+  <screen>https://<replaceable>USERNAME</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/<replaceable>PATH</replaceable></screen>
+  <para>Compose the URL as follows and enter it into the input
+  field:</para>
+  <substeps>
+  <step>
+  <para>In <xref linkend="tab.manager.basics.repo-urls"/>, look up the
+  URL of the product for which you want to add a repository. In the
+  respective URL, replace the placeholder
+  <replaceable>USER</replaceable> with the username and
+  <replaceable>PW</replaceable> with the password that you looked
+  up in <xref linkend="pro.manager.ncc.cred"/>. </para>
+  </step>
+  </substeps>
+  </step>
+  <step>
+  <para>Click <guimenu>Create Repository</guimenu>.</para>
+  </step>
+  </procedure>
+  
+  
+  <para><xref linkend="tab.manager.basics.repo-urls"/> lists the URLs for the
+  most commonly used &sle; 11 SP1 products for your convenience. The
+  following abbreviations and placeholders are used:
+  <literal>SDK</literal>&mdash;Software Development Kit;
+  <literal>SLES</literal>&mdash;&sls;;
+  <replaceable>USER</replaceable>&mdash;username of mirror credentials
+  in NCC; <replaceable>PW</replaceable>&mdash;password of mirror
+  credentials in NCC.</para>
+  <table id="tab.manager.basics.repo-urls">
+  <title>Repository URLs for Common &suse; Products</title>
+  <tgroup cols="2">
+  <colspec colnum="1" colwidth="1*" colname="c1"/>
+  <colspec colnum="2" colwidth="4*" colname="c2"/>
+  <thead>
+  <row>
+  <entry>
+  <para>Product</para>
+  </entry>
+  <entry>
+  <para>URL</para>
+  </entry>
+  </row>
+  </thead>
+  <tbody>
+  <row>
+  <entry morerows="1">
+  <para>SDK 32-bit</para>
+  </entry>
+  <entry>
+  <para>
+  <filename>https://<replaceable>USER</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/repo/$RCE/SLE11-SDK-SP1-Pool/sle-11-i586/</filename>
+  </para>
+  </entry>
+  </row>
+  <row>
+  <!-\-<entry />-\->
+  <entry>
+  <para>
+  <filename>https://<replaceable>USER</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/repo/$RCE/SLE11-SDK-SP1-Updates/sle-11-i586/</filename>
+  </para>
+  </entry>
+  </row>
+  
+  <row>
+  <entry morerows="1">
+  <para>SDK 64-bit</para>
+  </entry>
+  <entry>
+  <para>
+  <filename>https://<replaceable>USER</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/repo/$RCE/SLE11-SDK-SP1-Pool/sle-11-x86_64/</filename>
+  </para>
+  </entry>
+  </row>
+  <row>
+  <!-\-<entry />-\->
+  <entry>
+  <para>
+  <filename>https://<replaceable>USER</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/repo/$RCE/SLE11-SDK-SP1-Updates/sle-11-x86_64/</filename>
+  </para>
+  </entry>
+  </row>
+  
+  <row>
+  <entry morerows="1">
+  <para>SLES 32-bit</para>
+  </entry>
+  <entry>
+  <para>
+  <filename>https://<replaceable>USER</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/repo/$RCE/SLES11-SP1-Pool/sle-11-i586/</filename>
+  </para>
+  </entry>
+  </row>
+  <row>
+  <!-\-<entry />-\->
+  <entry>
+  <para>
+  <filename>https://<replaceable>USER</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/repo/$RCE/SLES11-SP1-Updates/sle-11-i586/</filename>
+  </para>
+  </entry>
+  </row>
+  <row>
+  <entry morerows="1">
+  <para>SLES 64-bit</para>
+  </entry>
+  <entry>
+  <para>
+  <filename>https://<replaceable>USER</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/repo/$RCE/SLES11-SP1-Pool/sle-11-x86_64/</filename>
+  </para>
+  </entry>
+  </row>
+  <row>
+  <!-\-<entry />-\->
+  <entry>
+  <para>
+  <filename>https://<replaceable>USER</replaceable>:<replaceable>PW</replaceable>@nu.novell.com/repo/$RCE/SLES11-SP1-Updates/sle-11-x86_64/</filename>
+  </para>
+  </entry>
+  </row>
+  </tbody>
+  </tgroup>
+  </table>
+  <para><xref linkend="fig.manager.list.repos"/> shows an example list of
+  repositories that are configured in &susemgr;.After adding one or more
+  repositories, you need to set up channels.</para>
+  
+  <figure id="fig.manager.list.repos">
+  <title>List of Repositories</title>
+  <mediaobject>
+  <imageobject role="fo">
+  <imagedata fileref="susemanager_list_repos.png" width="95%"
+  format="PNG"/>
+  </imageobject>
+  <imageobject role="html">
+  <imagedata fileref="susemanager_list_repos.png" width="95%"
+  format="PNG"/>
+  </imageobject>
+  </mediaobject>
+  </figure>
+  </sect2>-->
+
+<!--taroth 2011-01-17: todo - adjust this procedure for *custom* channel
+  setup (move to Reference Guide), for basic repo and channel setup, use sm-nnc-sync-->
+
+<!--<sect2 id="sec.manager.basics.channel-setup">
+  <title>Channel Setup</title>
+  <para>Channels are collections of repositories which are assigned to client
+  systems. Without a channel, clients can not be grouped nor can they
+  receive updates.</para>
+  
+  <procedure id="pro.manager.channel.setup">
+  <title>Adding Channels to &susemgr;</title>
+  <step>
+  <para>In the &susemgr; Web interface, go to <menuchoice>
+  <guimenu>Channels</guimenu>
+  <guimenu>Manage Software Channels</guimenu>
+  </menuchoice>. </para>
+  </step>
+  <step>
+  <para>Click the <guimenu>create new channel</guimenu> link in the upper
+  right corner.</para>
+  </step>
+  <step>
+  <para>Enter the following required information and follow the
+  instructions at the top of the page:</para>
+  <substeps>
+  <step>
+  <para>Enter a <guimenu>Channel Name</guimenu>. It must be at least 6
+  characters in length.</para>
+  </step>
+  <step>
+  <para>In <guimenu>Channel Label</guimenu>, enter the internal
+  channel name. </para>
+  </step>
+  <step>
+  <para>Enter a short, descriptive <guimenu>Channel
+  Summary</guimenu>.</para>
+  </step>
+  </substeps>
+  </step>
+  <step>
+  <para>If you want to create a base channel, set <guimenu>Parent
+  Channel</guimenu> to <literal>None</literal>. For more information,
+  refer to <xref linkend="vle.base.child.channel"/>.</para>
+  </step>
+  <step>
+  <para>Choose the <guimenu> Channel Architecture</guimenu>.
+  <!-\-taroth 2010-12-15: see
+  https://bugzilla.novell.com/show_bug.cgi?id=659596-\-></para>
+  <informalfigure>
+  <mediaobject>
+  <imageobject role="fo">
+  <imagedata fileref="susemanager_create_channel.png" width="95%"
+  format="PNG"/>
+  </imageobject>
+  <imageobject role="html">
+  <imagedata fileref="susemanager_create_channel.png" width="75%"
+  format="PNG"/>
+  </imageobject>
+  </mediaobject>
+  </informalfigure>
+  </step>
+  <step>
+  <para>Click <guimenu>Create Channel</guimenu>. This creates an empty
+  channel that is not yet associated with any repositories and does not
+  contain any packages. The page displays the <guimenu>Basic Channel
+  Details</guimenu> of the newly created channel.</para>
+  </step>
+  <step>
+  <para>Select the <guimenu>Repositories</guimenu> subtab. (If you do not
+  see a <guimenu>Repositories</guimenu> subtab, select <guimenu>Manage
+  Software Channels</guimenu> from the left navigation bar and on the
+  <guimenu>Software Channel Management</guimenu> page, click the
+  channel name from the list.)</para>
+  </step>
+  <step>
+  <para>From the list of repositories, select the ones that you want to
+  associate with the current channel and click <guimenu>Update
+  Repositories</guimenu>.</para>
+  </step>
+  <step>
+  <para>
+  <remark>taroth 2010-12-16: @mc: is the following correct?</remark>To initially fill the channel with the packages from the
+  associated repositories, select the <guimenu>Sync</guimenu> subtab
+  and click the <guimenu>Sync Now</guimenu> button.<remark>taroth
+  2010-12-16: @mc: what about the scheduling options at the bottom of
+  the page? seems regular resync is needed and can be configured
+  here...?</remark></para>
+  </step>
+  </procedure>
+  <para><remark>taroth 2011-01-18: On the "Channel" tab, "Manage Software Channels" only
+  shows any custom channels you added (this is on purpose, as the "default"
+  ones should not be changed) - however, the *full* list of channels is
+  available from the "Channels" tab with "All Channels"</remark></para> 
+  </sect2>-->
+    
+  <sect2 id="sec.manager.config.database">
+      <title>Management of &susemgrdb;</title><remark>emap: drop or flesh out.</remark>
+      <para>For maintenance and administration purposes, &susemgrdb; is
+          bundled with tools to administer your &susemgr; database.
+          Refer to the <citetitle>&mgrrefguide;</citetitle> for more 
+          information. <!-- See <xref linkend="ch-sm-with-db"/>  --></para>
+  </sect2>  
+    
+</sect1>

@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE appendix PUBLIC
+  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<appendix os="hidden" id="ap-sample-rhn-conf">
+ <title>Sample RHN Satellite
+<!-- [GALAXY] '&susemgr;' -->
+  Configuration File</title>
+ <remark>taroth 2011-012-01: disabled - as displaying this file and its contents promotes
+  RHN, RH etc. very clearly </remark><indexterm>
+ <primary>Red Hat Network</primary>
+ <secondary>sample file</secondary></indexterm>
+ <para>
+  The <filename>/etc/rhn/rhn.conf
+<!-- [GALAXY] '/etc/rhn/rhn.conf' -->
+  </filename> configuration file for the RHN Satellite provides a means for
+  you to establish key settings. Be warned, however, that errors inserted
+  into this file may cause Satellite failures. So make configuration changes
+  with caution.
+ </para>
+ <para>
+  You should be particularly concerned with the following parameters:
+  traceback_mail, default_db, and server.satellite.http_proxy. Review the
+  sample and its comments, beginning with a hash mark (#), for additional
+  details.
+ </para>
+<screen>#/etc/rhn/rhn.conf<!-- [GALAXY] '/etc/rhn/rhn.conf' --> example for an RHN Satellite<!-- [GALAXY] '&susemgr;' -->
+#----------------------------------------------
+
+# Destination of all tracebacks, such as crash information, etc.
+traceback_mail = test@pobox.com, test@redhat.com
+
+# Location of RPMs (Red Hat and custom) served by the RHN Satellite<!-- [GALAXY] '&susemgr;' -->
+mount_point = /var/spacewalk
+
+# Corporate gateway (hostname:PORT):
+server.satellite.http_proxy = corporate_gateway.example.com:8080
+server.satellite.http_proxy_username = 
+server.satellite.http_proxy_password = 
+
+# Database connection information username/password@SID
+default_db = test01/test01@test01
+
+
+### DON'T TOUCH ANY OF THE FOLLOWING ###
+web.satellite = 1
+
+web.session_swap_secret_1 = ea6c79f71cfcf307d567fed583c393b9
+web.session_swap_secret_2 = 01dee83a7b7f27157f5335744eb02327
+web.session_swap_secret_3 = 4e89e7697ce663149ca9e498cbc08b4f
+web.session_swap_secret_4 = a0fed2d77a950fc9a800b450a45e89d2
+
+web.session_secret_1 = 24bc562e04c9b93f5be94f793738e104
+web.session_secret_2 = 7667a7c2db311b1ea04271ecc1b82314
+web.session_secret_3 = 442e7dc4f06f63eba9a0408d499c6a8d
+web.session_secret_4 = 587a0db47856f685d989095629a9bd6f
+
+encrypted_passwords = 1
+
+web.param_cleansers = RHN::Cleansers-&gt;cleanse
+web.base_acls = RHN::Access
+
+web.default_taskmaster_tasks = RHN::Task::SessionCleanup,
+                               RHN::Task::ErrataQueue, 
+                               RHN::Task::ErrataEngine, 
+                               RHN::Task::DailySummary, 
+                               RHN::Task::SummaryPopulation, 
+                               RHN::Task::RHNProc, 
+                               RHN::Task::PackageCleanup
+
+web.rhn_gpg_backend_module = RHN::GPG::OpenPGP
+
+web.restrict_mail_domains =</screen>
+</appendix>
