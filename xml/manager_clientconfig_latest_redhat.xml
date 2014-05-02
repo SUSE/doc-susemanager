@@ -49,7 +49,7 @@
 
   <para>
    There are several approaches to accomplish this update of the
-   &susemgr; client software. One of which involves storing the RPMs in
+   &susemgr; client software. One of them involves storing the RPMs in
    a location that is accessible by all client systems and deploying the
    packages with the simplest command possible.
   </para>
@@ -95,7 +95,7 @@
   </note>
 
   <para>
-   Remember, only systems running Red Hat Enterprise Linux 5 or 6 systems must
+   Remember, only systems running Red Hat Enterprise Linux 5 or 6 must
    have registered with &susemgr; in <command>firstboot</command> after
    installation. Systems running Red Hat Enterprise
    Linux 4 can use the registration functionality built into the Red Hat
@@ -237,7 +237,17 @@ http://<replaceable>your-suse_manager-FQDN</replaceable>/pub/rhn-org-trusted-ssl
     multiple lines for print and PDF purposes but should be typed as one
     line at a shell prompt:
    </para>
-<screen>wget -0 - http://your-suse_manager-FQDN/pub/bootstrap.sh | bash</screen>
+   <screen>
+    wget -0 - http://your-suse_manager-FQDN/pub/bootstrap.sh | bash
+    &amp;&amp; rhnreg_ks --activation-key my_key --serverUrl
+    https://susemanager.example.com/XMLRPC
+   </screen>
+   <note>
+    <para>
+     This command has been split into multiple lines for layout
+     purposes but should be typed as one line at a shell prompt.
+    </para>
+   </note>
    <para>
     The bootstrap script, generated at installation and available for
     both &susemgr; Server and &susemgr; Proxy Server, is such a
@@ -299,7 +309,7 @@ http://<replaceable>your-suse_manager-FQDN</replaceable>/pub/rhn-org-trusted-ssl
      functionality built into the Red Hat Update Agent and therefore do
      not install the Red Hat Network Registration Client. Systems on Red
      Hat Enterprise Linux 5 or 6 do not use <command>up2date</command>,
-     and need <command>rhnreg_ks</command> to register their systems to
+     and need <command>rhnreg_ks</command> to register their systems with
      &susemgr; and <command>yum</command> and <command>pup</command> to
      update their packages.
     </para>
@@ -348,15 +358,7 @@ noSSLServerURL=http://your_primary.your_domain.com/XMLRPC</screen>
    <primary>client applications</primary>
    <secondary>server failover</secondary></indexterm>
    <para>
-    Beginning with <filename>up2date-4.2.38</filename>, the Red Hat Update
-    Agent can be configured to seek updates from a series of &susemgr;
-    Servers. This can be especially helpful in sustaining constant updates
-    if your primary &susemgr; Proxy Server or &susemgr; Server is taken
-    offline.
-   </para>
-   <para>
-    To use this feature, first ensure that you are running the required
-    version of <command>up2date</command>. Then manually add the secondary servers to the
+    Ensure that you are running Red Hat Enterprise Linux 5 or 6. I your still using &rhel;&nbs;4 or3 systems, make sure you have the latest version of <command>up2date</command> installed. Then manually add the secondary servers to the
     <command>serverURL</command> and <command>noSSLServerURL</command>
     settings in the <filename>/etc/sysconfig/rhn/up2date</filename>
     configuration file (as &rootuser;). Add the fully qualified domain names
@@ -410,24 +412,24 @@ https://your_secondary.your_domain.com/XMLRPC;</screen>
   <itemizedlist>
    <listitem>
     <para>
-     Refresh — Check &susemgr; for new updates
+     Refresh: check &susemgr; for new updates.
     </para>
    </listitem>
    <listitem>
     <para>
-     View Updates — Launch the Package Updater application so you can see
+     View Updates: launch the Package Updater application so you can see
      any available updates in more detail and configure the updates
      according to your needs.
     </para>
    </listitem>
    <listitem>
     <para>
-     Apply Updates — Download and install all updated packages.
+     Apply Updates: download and install all updated packages.
     </para>
    </listitem>
    <listitem>
     <para>
-     Quit — Close the applet.
+     Quit: close the applet.
     </para>
    </listitem>
   </itemizedlist>
@@ -459,7 +461,8 @@ https://your_secondary.your_domain.com/XMLRPC;</screen>
   </screen>
   <note>
    <para>
-    Neither the abrt nor spacewalk-abrt packages are available for Red Hat Enterprise Linux 5.
+    Neither the abrt nor spacewalk-abrt packages are available for Red
+    Hat Enterprise Linux 5 and earlier versions.
    </para>
   </note>
   </sect2>
