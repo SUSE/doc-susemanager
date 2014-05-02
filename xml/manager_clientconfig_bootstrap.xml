@@ -23,35 +23,35 @@
   &susemgr; Bootstrap, invoked with the command
   <command>mgr-bootstrap</command>, is installed by default on both
   &susemgr; Server and &susemgr; Proxy Server.
-  The Bootstrap tool generates a script that can be run from any
+  The Bootstrap tool generates a script that can be run on any
   client system to conduct the following tasks:
  </para>
  <itemizedlist>
   <listitem>
    <para>
-    Redirect client applications to the &susemgr; Proxy or &susemgr;
+    Redirect client applications to the &susemgr; Proxy or &susemgr;.
    </para>
   </listitem>
   <listitem>
    <para>
-    Import custom GPG keys
+    Import custom GPG keys.
    </para>
   </listitem>
   <listitem>
    <para>
-    Install SSL certificates
+    Install SSL certificates.
    </para>
   </listitem>
   <listitem>
    <para>
     Register the system to &susemgr; and particular system groups and
-    channels with the help of activation keys
+    channels with the help of activation keys.
    </para>
   </listitem>
   <listitem>
    <para>
-    Perform miscellaneous post-configuration activities, including updating
-    packages, performing reboots, and altering &susemgr; configuration
+    Perform miscellaneous post-configuration activities including updating
+    packages, performing reboots, and altering &susemgr; configuration.
    </para>
   </listitem>
  </itemizedlist>
@@ -59,7 +59,7 @@
   <title>Security Risks</title>
   <para>
    The inherent risks of using a script for configuration: Security
-   tools such as SSL certificates are installed by the script itself and
+   tools such as SSL certificates are installed by the script and
    therefore, do not yet exist on the systems and cannot be used to
    process transactions. This allows for the possibility of someone
    impersonating the &susemgr; server and transmitting bad
@@ -74,9 +74,9 @@
   placed in the <filename>/srv/www/htdocs/pub/bootstrap/</filename>
   directory on the &susemgr; server. From there it can be downloaded and run
   on all client systems. Some preparation and post-generation
-  editing is required, as identified in the following sections. Refer to
+  editing is required as identified in the following sections. Refer to
   <xref linkend="s1-bootstrap-options"/> for the tool's complete list of
-  options, and to the <xref linkend="ap-sample-bootstrap-script"/> for an
+  options and to the <xref linkend="ap-sample-bootstrap-script"/> for an
   example script.
  </para>
  <sect1 id="s1-bootstrap-prep">
@@ -113,14 +113,11 @@
    <listitem>
     <para>
      We recommend to sign your RPMs with a custom GPG key. Make the key
-     available so you are able to refer to it from the script. <!-- Generate the
+     available so you are able to refer to it in the script. <!-- Generate the
      key as described in the <citetitle>Channel Management Guide</citetitle>
      and--> Place the key in the <filename>/srv/www/htdocs/pub/</filename>
-     directory of the &susemgr; server, per <xref linkend="ch-gpg-keys"/>.
+     directory of the &susemgr; server as described in  <xref linkend="ch-gpg-keys"/>.
     </para>
-    <remark>mdejmek: reference to a guide &gt; please refer to it properly</remark>
-    <remark>ke 2011-08-24: done</remark>
-
     <note>
      <!-- bnc#722047 -->
      <title>Importing Red Hat RPM GPG Key</title>
@@ -158,7 +155,7 @@ specific key.
      reconfiguration options, use it to generate different bootstrap
      scripts to accommodate each type of system. For instance,
      <filename>bootstrap-web-servers.sh</filename> might be used to
-     reconfigure your Web servers, while
+     reconfigure your Web servers while
      <filename>bootstrap-app-servers.sh</filename> can handle the
      application servers. See <xref linkend="s1-bootstrap-options"/> for
      the complete options list.
@@ -167,8 +164,8 @@ specific key.
 
    <listitem>
     <para>
-     If necessary, create bootstrap repositories.  This is
-     required only, if your product or appliance does not come with all
+     If necessary, create bootstrap repositories.  This is only
+     required if your product or appliance does not come with all
      the up-to-date packages needed for bootstrapping and registration.
      For more information, see <xref
      linkend="s1-bootstrap-create-repos"/>.
@@ -185,11 +182,14 @@ specific key.
 
   <secondary>creating</secondary></indexterm>
   <para>
-   If you want to register a &sle; client with &susemgr;, but the
+   If you want to register a &sle; client with &susemgr; but the
    required packages are not installed on the client, you need a
-   repository that provides these packages.  On &susemgr; 1.2, &suse;
-   delivered these repositories as RPM packages to be installed on the
-   &susemgr; server for just the following distributions:
+   repository that provides these packages. <remark
+   role="needinfo">emap: Should we still keep the following about 1.2
+   or update it? The past tense makes it sound obsolete while possibly
+   interesting.</remark>On &susemgr; 1.2, &suse; delivered these
+   repositories as RPM packages to be installed on the &susemgr;
+   server for just the following distributions:
   </para>
   <itemizedlist>
    <listitem>
@@ -204,16 +204,16 @@ specific key.
    </listitem>
   </itemizedlist>
   <para>
-   The bootstrap script then tried to add these repositories depending
-   on a special structured path and installed the required tools
-   automatically before the registration would start.
+   The bootstrap script then tried to add these repositories, depending
+   on a special structured path, and installed the required tools
+   automatically before the registration started.
   </para>
 
   <para>
-   The new <command>mgr-create-bootstrap-repo</command> comming with
-   &susemgr; 1.7 now obsoletes this special RPM packages. The
+   The new <command>mgr-create-bootstrap-repo</command> introduced with
+   &susemgr; 1.7 obsoletes these special RPM packages. The
    <command>mgr-create-bootstrap-repo</command> script creates the
-   repositories on the &susemgr; server re-using the current RPMs from
+   repositories on the &susemgr; server reusing the current RPMs from
    the synced channels that are available on the &susemgr; server.
   </para>
    <variablelist>
@@ -275,14 +275,14 @@ specific key.
     the script will write to the same paths.
    </para>
    <para>
-    The advantage of this tool is that uses the official RPMs synced
+    The advantage of this tool is that it uses the official RPMs synced
     with <command>mgr-ncc-sync</command>. This also means that you can
     only create repositories for distributions you have synced in
     &susemgr;.
    </para>
    <note>
-    <para>
-     For compatibility reasons with old distribution consider to create
+    <para><remark role="needinfo">emap: Does the path need updating?</remark>
+     For compatibility reasons with old distributions consider to create
      a <filename>susemanager-client-setup</filename> symlink pointing to
      the <filename>sle/11/1/bootstrap</filename> path component with the
      following commands:
@@ -300,7 +300,7 @@ ln -s sle/11/1/bootstrap susemanager-client-setup</screen>
   <secondary>generating the script</secondary></indexterm>
 
   <para>
-   With all the necessary components in place now, use <command>mgr-bootstrap</command> to generate the required scripts. Log in to
+   With all the necessary components in place, use <command>mgr-bootstrap</command> to generate the required scripts. Log in to
    your &susemgr; server or &susemgr; Proxy server as root and issue the
    <command>mgr-bootstrap</command> command followed by the desired options
    and values. If no options are included, a
@@ -377,8 +377,8 @@ ln -s sle/11/1/bootstrap susemanager-client-setup</screen>
   <para>
    When your script is prepared, log in to the &susemgr; server or
    &susemgr; Proxy server, navigate to the
-   <filename>/srv/www/htdocs/pub/bootstrap/</filename> directory and run the
-   following command, altering the hostname and name of the script as needed
+   <filename>/srv/www/htdocs/pub/bootstrap/</filename> directory, and run the
+   following command after altering the hostname and name of the script as needed
    to suit the system type:
   </para>
 
@@ -389,7 +389,7 @@ ln -s sle/11/1/bootstrap susemanager-client-setup</screen>
    A less secure alternative is to use either <command>wget</command> or
    <command>curl</command> to retrieve and run the script from every
    client system. Log in to each client machine and issue the following
-   command, altering script and hostname accordingly:
+   command after altering script and hostname accordingly:
   </para>
 
   <para>
@@ -423,7 +423,7 @@ ln -s sle/11/1/bootstrap susemanager-client-setup</screen>
   <secondary>command line options</secondary></indexterm>
 
   <para>
-   The &susemgr; Bootstrap offers many command line options for creating
+   &susemgr; Bootstrap offers many command line options for creating
    client bootrap scripts. Although descriptions of these options can be
    found in the following table, ensure that they are available in the
    version of the tool installed on your &susemgr; server by using the
@@ -447,7 +447,7 @@ ln -s sle/11/1/bootstrap susemanager-client-setup</screen>
      <listitem>
       <para>
         Activation key(s) with multiple
-        entries separated by a comma and no space
+        entries separated by a comma and no space.
       </para>
      </listitem>
     </varlistentry>
