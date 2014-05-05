@@ -469,11 +469,6 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
    profiles in the &susemgr; interface, refer to
    <xref linkend="s3-system-ks-list-profiles"/>.
   </para>
-<!--  <note>
-   <para><remark>emap: keep?</remark>
-    When using regular &kickstart; files, any dollar <keycap>$</keycap> signs need to be escaped by adding a backslash before the sign: <literal>\$</literal>.
-   </para>
-  </note>-->
   <para>
    Use <command>cobbler</command> to create profiles on the command line:
   </para>
@@ -613,12 +608,6 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
     </para>
    </listitem>
   </itemizedlist>
-<!--  <note>
-   <para><remark>emap: Keep?</remark>
-    The dollar sign <keycap>$</keycap> needs to be escaped in Cheetah
-    templates: <literal>\$</literal>.
-   </para>
-  </note>-->
   <sect2 id="s2-cobbler-templates-usage">
    <title>Using Templates</title>
    <para>
@@ -644,6 +633,49 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
     profile variables or in your system detail variables. If the same
     variables are defined in both the profile and the system detail, then the
     system variable takes precedence.
+   </para>
+   <note>
+    <para>
+     The template for the autoinstallation has syntax rules, using
+     punctuation symbols. To avoid clashes, they need to be properly
+     treated.
+    </para>
+   </note>
+   <para>
+    In case the autoinstallation scenario contains any shell script
+    using variables like <literal>$(example)</literal>, its content should be escaped by
+    using the backslash symbol: <literal>\$(example)</literal>.
+   </para>
+   <para>
+    If the variable named <command>example</command> is defined in the
+    autoinstallation snippet, the templating engine will evaluate
+    <command>$example</command> with its content. If there is no such
+    variable, the content will be left unchanged. Escaping the
+    <keycap>$</keycap> symbol will prevent the templating engine to
+    perform its evaluation as an internal variable. Long scripts or
+    strings can be escaped by wrapping them with the
+    <command>#raw</command> and <command>#end raw</command>
+    directives. For example:
+   </para>
+   <screen>
+#raw
+#!/bin/bash
+for i in {0..2}; do
+ echo "$i - Hello World!"
+done
+#end raw
+   </screen>
+   <para>
+    Also, pay attention to similar scenarios like the following:
+   </para>
+   <screen>
+#start some section (this is a comment)
+echo "Hello, world"
+#end some section (this is a comment)
+   </screen>
+   <para>
+    Any line with a hash symbol <keycap>#</keycap> followed by a
+    whitespace is treated as a comment and is therefore not evaluated.
    </para>
    <para>
     For more information about Kickstart templates, refer to the Cobbler
