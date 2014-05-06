@@ -22,7 +22,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
   With &susemgr; 2.1, it is possible to set up Web interface
   authentication via external identity providers and management
   solutions, for example ​FreeIPA. The new feature extends the original
-  per-user PAM authentication and includes support for:
+  per-user PAM authentication and includes the following features:
  </para>
   <itemizedlist>
    <listitem>
@@ -32,7 +32,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
    </listitem>
   <listitem>
    <para>
-     Users do not need to be pre-created in the &susemgr; database.
+     Users do not need to be created in the &susemgr; database first.
    </para>
    </listitem>
    <listitem>
@@ -47,7 +47,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
    </listitem>
   <listitem>
    <para>
-    System groups administrators can be derived from user group
+    System group administrators can be derived from user group
     membership in the external identity provider per organization.
    </para>
    </listitem>
@@ -56,19 +56,19 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     From a technical point of view, both Kerberos and PAM
     authentication take place on the Apache HTTP server, not in the
     &susemgr; appliance. That makes it possible to extend this
-    authentication mechanism to other authentication providers. Here
-    we will focus on getting it up and running with FreeIPA. For more
-    information on the FreeIPA project, see <ulink
+    authentication mechanism to other authentication providers. The
+    following procedures describe how to get it up and running with
+    FreeIPA. For detailed information on the FreeIPA project, see <ulink
     url="http://http://www.freeipa.org/"/>.
   </para>
   <sect1>
-   <title>Enrolling &susemgr; to identity provider
+   <title>Enrolling &susemgr; to Identity Provider
    </title>
    <para>
     In the following sections, we assume that there is a FreeIPA server
     installed and running and that the &susemgr; server is
-    IPA-enrolled to it. The enrolement can be achieved using the
-    ipa-client-install command:
+    IPA-enrolled in it. The enrollment can be achieved using the
+    <command>ipa-client-install</command> command:
    </para>
    <screen>
     zypper install /usr/sbin/ipa-client-install -y
@@ -76,8 +76,8 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     ipa-client-install
    </screen>
    <para>
-    If we want to enroll the &susemgr; server directly to a particular
-    FreeIPA server to a particular domain, we can point the
+    If you want to enroll the &susemgr; server directly for a particular
+    FreeIPA server to a particular domain, point the
     resolv.conf to that server and specify the domain:
    </para>
    <screen>
@@ -86,18 +86,18 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     ipa-client-install --domain example.com
    </screen>
   </sect1>
-  <sect1><title>Kerberos prerequisites</title>
+  <sect1><title>Kerberos Prerequisites</title>
    <para>
-    For the Kerberos authentication to work, we need the keytab of the
-    &susemgr; HTTP service. For that, we first create the service on
-    the FreeIPA server:
+    For the Kerberos authentication to work, you need the keytab of the
+    &susemgr; HTTP service. First, create the service on the FreeIPA server:
    </para>
    <screen>
     kinit admin
     ipa service-add HTTP/hostname-susemanager-server
    </screen>
    <para>
-    We can also run this directly on the &susemgr; server if the ipa command is installed there:
+    You can also run this directly on the &susemgr; server if the
+    <command>ipa</command> command is installed there:
    </para>
    <screen>
     zypper install /usr/bin/ipa -y
@@ -105,7 +105,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     ipa service-add HTTP/$( hostname )
    </screen>
    <para>
-    We then can retrieve the keytab on the &susemgr; server:
+    Then retrieve the keytab on the &susemgr; server:
    </para>
    <screen>
 kinit admin
@@ -114,9 +114,9 @@ chown apache /etc/http.keytab
 chmod 600 /etc/http.keytab
    </screen>
   </sect1>
-  <sect1><title>Host-based access control prerequisites</title>
+  <sect1><title>Host-based Access Control Prerequisites</title>
    <para>
-     To use the host-based access control (HBAC) with the &susemgr; server, we want to create HBAC service and rule on the FreeIPA server, and set up PAM service of the same name on the &susemgr; server. We need to start with disabling the default allow_all rule, otherwise any user will be allowed access. The page <ulink url="​http://www.freeipa.org/page/Howto/HBAC_and_allow_all"/> describes the process in detail, here we just show the commands: 
+     To use the host-based access control (HBAC) with the &susemgr; server, create the HBAC service and rule on the FreeIPA server and set up PAM service of the same name on the &susemgr; server. Start with disabling the default allow_all rule, otherwise any user will be allowed access. The page <ulink url="​http://www.freeipa.org/page/Howto/HBAC_and_allow_all"/> describes the process in detail. These are the commands to use: 
    </para>
    <screen>
 ipa hostgroup-add --desc 'Host group which will have allow_all_users_services HBAC enabled.' allow_all_hosts
@@ -126,15 +126,16 @@ ipa hbacrule-add allow_all_users_services --usercat=all --servicecat=all --desc=
 ipa hbacrule-add-host allow_all_users_services --hostgroups=allow_all_hosts
 ipa hbacrule-disable allow_all
    </screen>
-   <para><remark>emap: renamed spacewalk-prod to susemanager-prod</remark>
-    We then create a new user <systemitem>bob</systemitem> and the new
-    service <systemitem>susemanager-prod</systemitem>, and grant
-    <systemitem>bob</systemitem> access to this service on our
-    &susemgr; server. In the example bellow, we assume that it is run
-    on the &susemgr; server and therefore the $( hostname ) expands
-    to the &susemgr; server hostname. If you run the commands on the
-    FreeIPA server or other machines, put in the &susemgr; server
-    hostname.
+   <para><remark>emap: renamed spacewalk-prod to
+   susemanager-prod</remark> Then create a new user and the new
+   service. In the following examples user
+   <systemitem>bob</systemitem> and service
+   <systemitem>susemanager-prod</systemitem> are created. The new user
+   needs access to the service on your &susemgr; server. We assume you
+   enter the commands on the &susemgr; server and therefore the $(
+   hostname ) expands to the &susemgr; server hostname. If you run the
+   commands on the FreeIPA server or other machines, put in the
+   &susemgr; server hostname.
    </para>
    <screen>
 # As admin user
@@ -151,14 +152,14 @@ ipa hbacrule-add allow_susemanager-prod
 ipa hbacrule-add-service allow_susemanager-prod --hbacsvcs=susemanager-prod
 ipa hbacrule-add-user allow_susemanager-prod --user=bob
 ipa hbacrule-add-host allow_susemanager-prod --hosts=$( hostname )
-# Remove the &susemgr; server from the host group we've created
-# when we've disabled the allow_all rule
+# Remove the &susemgr; server from the host group we created
+# when we have disabled the allow_all rule
 ipa hostgroup-remove-member allow_all_hosts --hosts=$( hostname )
 # Test that just the allow_susemanager-prod rule matches
 ipa hbactest --user=bob --host=$( hostname ) --service=susemanager-prod
    </screen>
    <para>
-    On the &susemgr; server, we define the susemanager-prod PAM service and point it to sssd: 
+    On the &susemgr; server, define the <systemitem>susemanager-prod</systemitem> PAM service and point it to sssd: 
    </para>
    <screen>
     # /etc/pam.d/susemanager-prod content:
@@ -166,15 +167,15 @@ ipa hbactest --user=bob --host=$( hostname ) --service=susemanager-prod
     account required   pam_sss.so
    </screen>
   </sect1>
-  <sect1><title>Configure sssd to provide information about auto-populated users</title>
+  <sect1><title>Configure sssd to Provide Information about Auto-populated Users</title>
    <para><remark role="needinfo">emap: still needs rebranding. Where
-   to get sssd-dbus package for SUSE?</remark> When a user
+   to get sssd-dbus package for SUSE? Tools Channel?</remark> When a user
    authenticates either via Kerberos ticket or via form-based PAM
-   authentication, it might be the first time that user logged in to
-   the &susemgr; server. &susemgr; needs to create record about that
-   user in its internal database and for that, certain additional
+   authentication, it might be the first time this user logs in to
+   the &susemgr; server. &susemgr; needs to create a record about the
+   user in its internal database and for that certain additional
    attributes are needed besides the obvious login name. The <systemitem>sssd-dbus</systemitem>
-   package provides new <systemitem>ifp</systemitem> sssd service.
+   package provides the new <systemitem>ifp</systemitem> sssd service.
    </para>
 <!-- The package is available from repos for recent Fedoras and Red Hat
    Enterprise Linux distributions:
@@ -196,8 +197,9 @@ sed -i 's/enabled=.*/enabled=0/' /etc/yum.repos.d/adelton-identity_demo.repo
    </screen>
 -->
    <para>
-    The sssd needs to be configured to enable ifp and retrieval and
-    caching of attributes needed by &susemgr;:
+    The <systemitem>sssd</systemitem> service needs to be configured
+    to enable ifp, retrieval and caching of attributes needed by
+    &susemgr;:
    </para>
    <screen>
 # /etc/sssd/sssd.conf, the [domain/...] section, add:
@@ -223,7 +225,7 @@ dbus-send --print-reply --system --dest=org.freedesktop.sssd.infopipe \
    /org/freedesktop/sssd/infopipe org.freedesktop.sssd.infopipe.GetUserAttr \
    string:bob array:string:mail
    </screen>
-   <para>
+   <para><remark role="needinfo">emap: We don't support SELinux, right? Should the following stay or go?</remark>
     For the above test, you might need to put SELinux to permissive:
    </para>
    <screen>
@@ -333,7 +335,7 @@ service tomcat6 restart
     &susemgr; with your regular admin login and password.
    </para>
   </sect1>
-  <sect1><title>Enable use of external authentication in &susemgr;</title>
+  <sect1><title>Enabling External Authentication in &susemgr;</title>
    <para>
      By following the configuration steps above, external
      authentication is enabled. Existing &susemgr; users may login to
@@ -388,7 +390,7 @@ service tomcat6 restart
     </para>
    </note>
   </sect1>
-  <sect1><title>Try form-based PAM authentication</title>
+  <sect1><title>Try Form-based PAM Authentication</title>
    <para>
     Purge your Kerberos ticket cache: 
    </para>
@@ -403,7 +405,7 @@ service tomcat6 restart
     out.
    </para>
   </sect1>
-  <sect1><title>Try Kerberos authentication</title>
+  <sect1><title>Try Kerberos Authentication</title>
    <para>
     Kinit as <systemitem>bob</systemitem> and attempt to access the
     home page of your &susemgr; server:
@@ -417,7 +419,7 @@ service tomcat6 restart
     with the kinit command.
    </para>
   </sect1>
-  <sect1><title>Grant additional privileges according to the external group membership</title>
+  <sect1><title>Grant Additional Privileges According to the External Group Membership</title>
    <para>
     To make use of external group membership, uncomment following line
     in /etc/httpd/conf.d/lookup_identity.conf:
@@ -429,7 +431,7 @@ service tomcat6 restart
     Restart the <systemitem>httpd</systemitem> service.
    </para>
   </sect1>
-   <sect1><title>Set additional &susemgr; roles</title>
+   <sect1><title>Set Additional &susemgr; Roles</title>
    <para>
     Let's create a separate group for <systemitem>bob</systemitem>. Run on FreeIPA server:
    </para>
