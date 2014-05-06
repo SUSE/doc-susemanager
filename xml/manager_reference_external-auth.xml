@@ -232,7 +232,7 @@ dbus-send --print-reply --system --dest=org.freedesktop.sssd.infopipe \
     setenforce 0
    </screen>
    <para>
-    For the production operation of Apache, provided you have new
+    For production operation of Apache, provided you have new
     enough selinux-policy, enforcing with one boolean should work:
    </para>
    <screen>
@@ -243,14 +243,14 @@ dbus-send --print-reply --system --dest=org.freedesktop.sssd.infopipe \
   <sect1><title>Configure Apache</title>
    <para>
     Authentication against the external identity provider (FreeIPA) is achieved via a set of Apache modules. They need to be installed.
-   </para><remark>emap: adjust below.</remark>
+   </para><remark role="needinfo">emap: how to adjust below for SUSE?</remark>
    <screen>
 zypper install mod_auth_kerb mod_authnz_pam mod_lookup_identity mod_intercept_form_submit -y
 # For RHEL and Fedora 19, the last three modules can be found in the same zypper repo as the sssd-dbus package installed above:
 zypper install --enablerepo=adelton-identity_demo  mod_authnz_pam mod_lookup_identity mod_intercept_form_submit -y
    </screen>
    <para>
-     We then need to configure <systemitem>mod_authnz_pam</systemitem> and <systemitem>mod_intercept_form_submitm</systemitem> to use the <systemitem>susemanager-prod</systemitem> PAM service we've set up above:
+     Next, configure <systemitem>mod_authnz_pam</systemitem> and <systemitem>mod_intercept_form_submitm</systemitem> to use the <systemitem>susemanager-prod</systemitem> PAM service set up earlier:
    </para>
    <screen>
 # /etc/httpd/conf.d/auth_kerb.conf
@@ -297,7 +297,7 @@ LoadModule lookup_identity_module modules/mod_lookup_identity.so
 &lt;/LocationMatch&gt;
    </screen>
    <para>
-    You can certainly put all the configuration into one configuration
+    You can put all configuration steps into one configuration
     file and not list the <systemitem>mod_authnz_pam</systemitem> twice.
    </para>
    <para>
@@ -309,7 +309,7 @@ LoadModule lookup_identity_module modules/mod_lookup_identity.so
   </sect1>
   <sect1><title>Configure Tomcat</title>
    <para>
-    For tomcat to observe the authentication done by the Apache
+    For Tomcat to observe authentication done by the Apache
     server, its server.xml configuration file needs to be amended:
    </para>
    <screen>
@@ -331,27 +331,27 @@ service tomcat restart
 service tomcat6 restart
    </screen>
    <para>
-    Wait for tomcat to be back up and test that you can log in to
-    &susemgr; with your regular admin login and password.
+    Wait for Tomcat to be back up and test that you can log in to
+    &susemgr; with your regular administrator login and password.
    </para>
   </sect1>
   <sect1><title>Enabling External Authentication in &susemgr;</title>
    <para>
-     By following the configuration steps above, external
+     After the configuration steps above, external
      authentication is enabled. Existing &susemgr; users may login to
-     &susemgr; externally authenticated by the FreeIPA server. To
-     allow login also to users, that currently do not have &susemgr;
-     accounts you have the following options:
+     &susemgr; externally authenticated by the FreeIPA server. To also
+     allow login for users that currently do not have &susemgr;
+     accounts, there are the following options:
    </para>
    <itemizedlist>
     <listitem>
      <para>
-      Pre-create their accounts in desired organization via Web interface or API.
+      Pre-create their accounts in the desired organization via Web interface or API.
      </para>
     </listitem>
    <listitem>
     <para>
-     Set the Org. Unit for every user on the FreeIPA server (that shall be able to login):
+     On the FreeIPA server, set the org. unit for every user who should be able to log in:
     </para>
     <screen>
      ipa user-mod bob --orgunit="My Organization"
@@ -360,13 +360,13 @@ service tomcat6 restart
      Select the <guimenu>Use organization unit name passed from
      IPA</guimenu> option on the
      <menuchoice><guimenu>Admin</guimenu><guimenu>Users</guimenu><guimenu>External
-     Authentication</guimenu></menuchoice> page. If the orgunit
-     matches to any organization name within &susemgr;, the
+     Authentication</guimenu></menuchoice> page. If the org. unit
+     matches any organization name within &susemgr;, the
      appropriate &susemgr; account will automatically be created for
      the user in <guimenu>My Organization</guimenu> at first login.
     </para>
     <para>
-     To make use out of the orgunit option, uncomment following line
+     To make use out of the <command>orgunit</command> option, uncomment the following line
      in <filename>/etc/httpd/conf.d/lookup_identity.conf</filename>:
     </para>
     <screen>
@@ -398,31 +398,32 @@ service tomcat6 restart
     kdestroy -A
    </screen>
    <para>
-    Log out from your admin session and attempt to log in as <systemitem>bob</systemitem>
-    enterring the password selected during the <command>kinit</command> <systemitem>bob</systemitem> step. You
-    should be able to log in and if you check the user details, the
-    name and email address is populated from the FreeIPA server. Log
-    out.
+    Log out from your administrator session and attempt to log in as
+    <systemitem>bob</systemitem> entering the password selected during
+    the <command>kinit</command> <systemitem>bob</systemitem>
+    step. You should be able to log in and if you check the user
+    details, the name and email address is populated from the FreeIPA
+    server. Log out.
    </para>
   </sect1>
   <sect1><title>Try Kerberos Authentication</title>
    <para>
     Kinit as <systemitem>bob</systemitem> and attempt to access the
-    home page of your &susemgr; server:
+    start page of your &susemgr; server:
    </para>
    <screen>
     kinit bob
    </screen>
    <para>
     You should be authenticated directly, without any login form
-    shown, based on your ticket granting ticket that you've obtained
+    shown, based on your ticket-granting ticket that you have obtained
     with the kinit command.
    </para>
   </sect1>
   <sect1><title>Grant Additional Privileges According to the External Group Membership</title>
    <para>
     To make use of external group membership, uncomment following line
-    in /etc/httpd/conf.d/lookup_identity.conf:
+    in <filename>/etc/httpd/conf.d/lookup_identity.conf</filename>:
    </para>
    <screen>
     LookupUserGroupsIter AJP_REMOTE_USER_GROUP
@@ -433,21 +434,21 @@ service tomcat6 restart
   </sect1>
    <sect1><title>Set Additional &susemgr; Roles</title>
    <para>
-    Let's create a separate group for <systemitem>bob</systemitem>. Run on FreeIPA server:
+    Create a separate group for <systemitem>bob</systemitem>. Run on FreeIPA server:
    </para>
    <screen>
     ipa group-add susemanager-channel-admins
     ipa group-add-member susemanager-channel-admins --users=bob
    </screen>
    <para>
-    Log in to &susemgr; Web interface as &susemgr; administrator and
+    Log in to the &susemgr; Web interface as &susemgr; administrator and
     navigate to
     <menuchoice><guimenu>Admin</guimenu><guimenu>Users</guimenu><guimenu>External
     Authentication</guimenu><guimenu>Group Role
     Mapping</guimenu></menuchoice>.
    </para>
    <para>
-    Click <guimenu>Create new External Group</guimenu> and fill in the
+    Click <guimenu>Create New External Group</guimenu> and fill in the
     name of the external group created on the FreeIPA server in the
     previous step:
     <systemitem>susemanager-channel-admins</systemitem>. Additionally
@@ -456,15 +457,15 @@ service tomcat6 restart
    </para>
    <para>
     Next time <systemitem>bob</systemitem> logs in to &susemgr;
-    authenticated by the FreeIPA server, he will additionally be
-    granted the Channel Administrator role. Unless the <guimenu>Keep
+    authenticated by the FreeIPA server, he will additionally have
+    the <guimenu>Channel Administrator</guimenu> role assigned. Unless the <guimenu>Keep
     temporary roles granted due to external authentication
     configuration</guimenu> option is checked on the
     <menuchoice><guimenu>Admin</guimenu><guimenu>Users</guimenu><guimenu>External
     Authentication</guimenu><guimenu>Configuration
     page</guimenu></menuchoice>, <systemitem>bob</systemitem> will
     lose the additional role(s) when he logs in to &susemgr; using
-    his username and &susemgr; password.
+    his internal username and &susemgr; password.
    </para>
   </sect1>
 </chapter>
