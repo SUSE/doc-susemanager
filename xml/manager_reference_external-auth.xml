@@ -27,7 +27,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
   <itemizedlist>
    <listitem>
     <para>
-     Kerberos authentication in the WebUI (tickets). 
+     Kerberos authentication in the Web interface (tickets). 
     </para>
    </listitem>
   <listitem>
@@ -62,11 +62,11 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     url="http://http://www.freeipa.org/"/>.
   </para>
   <sect1>
-   <title>Enrolling Spacewalk to identity provider
+   <title>Enrolling &susemgr; to identity provider
    </title>
    <para>
     In the following sections, we assume that there is a FreeIPA server
-    installed and running and that the Spacewalk server is
+    installed and running and that the &susemgr; server is
     IPA-enrolled to it. The enrolement can be achieved using the
     ipa-client-install command:
    </para>
@@ -76,7 +76,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     ipa-client-install
    </screen>
    <para>
-    If we want to enroll the Spacewalk server directly to a particular
+    If we want to enroll the &susemgr; server directly to a particular
     FreeIPA server to a particular domain, we can point the
     resolv.conf to that server and specify the domain:
    </para>
@@ -89,15 +89,15 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
   <sect1><title>Kerberos prerequisites</title>
    <para>
     For the Kerberos authentication to work, we need the keytab of the
-    Spacewalk HTTP service. For that, we first create the service on
+    &susemgr; HTTP service. For that, we first create the service on
     the FreeIPA server:
    </para>
    <screen>
     kinit admin
-    ipa service-add HTTP/hostname-of-the-Spacewalk-server
+    ipa service-add HTTP/hostname-susemanager-server
    </screen>
    <para>
-    We can also run this directly on the Spacewalk server if the ipa command is installed there:
+    We can also run this directly on the &susemgr; server if the ipa command is installed there:
    </para>
    <screen>
     zypper install /usr/bin/ipa -y
@@ -105,7 +105,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     ipa service-add HTTP/$( hostname )
    </screen>
    <para>
-    We then can retrieve the keytab on the Spacewalk server:
+    We then can retrieve the keytab on the &susemgr; server:
    </para>
    <screen>
 kinit admin
@@ -116,7 +116,7 @@ chmod 600 /etc/http.keytab
   </sect1>
   <sect1><title>Host-based access control prerequisites</title>
    <para>
-     To use the host-based access control (HBAC) with the Spacewalk server, we want to create HBAC service and rule on the FreeIPA server, and set up PAM service of the same name on the Spacewalk server. We need to start with disabling the default allow_all rule, otherwise any user will be allowed access. The page <ulink url="​http://www.freeipa.org/page/Howto/HBAC_and_allow_all"/> describes the process in detail, here we just show the commands: 
+     To use the host-based access control (HBAC) with the &susemgr; server, we want to create HBAC service and rule on the FreeIPA server, and set up PAM service of the same name on the &susemgr; server. We need to start with disabling the default allow_all rule, otherwise any user will be allowed access. The page <ulink url="​http://www.freeipa.org/page/Howto/HBAC_and_allow_all"/> describes the process in detail, here we just show the commands: 
    </para>
    <screen>
 ipa hostgroup-add --desc 'Host group which will have allow_all_users_services HBAC enabled.' allow_all_hosts
@@ -126,14 +126,14 @@ ipa hbacrule-add allow_all_users_services --usercat=all --servicecat=all --desc=
 ipa hbacrule-add-host allow_all_users_services --hostgroups=allow_all_hosts
 ipa hbacrule-disable allow_all
    </screen>
-   <para>
+   <para><remark>emap: renamed spacewalk-prod to susemanager-prod</remark>
     We then create a new user <systemitem>bob</systemitem> and the new
-    service <systemitem>spacewalk-prod</systemitem>, and grant
+    service <systemitem>susemanager-prod</systemitem>, and grant
     <systemitem>bob</systemitem> access to this service on our
-    Spacewalk server. In the example bellow, we assume that it is run
-    on the Spacewalk server, and therefore the $( hostname ) expands
-    to the Spacewalk server hostname. If you run the commands on the
-    FreeIPA server or other machines, put in the Spacewalk server
+    &susemgr; server. In the example bellow, we assume that it is run
+    on the &susemgr; server and therefore the $( hostname ) expands
+    to the &susemgr; server hostname. If you run the commands on the
+    FreeIPA server or other machines, put in the &susemgr; server
     hostname.
    </para>
    <screen>
@@ -144,49 +144,60 @@ ipa user-add --random bob
 kinit bob
 # To continue working, kinit back as admin
 kinit admin
-# Create UBAC service spacewalk-prod and HBAC rule allow_spacewalk-prod
-ipa hbacsvc-add spacewalk-prod
-ipa hbacrule-add allow_spacewalk-prod
-# Add just bob and the Spacewalk server to this rule for this service
-ipa hbacrule-add-service allow_spacewalk-prod --hbacsvcs=spacewalk-prod
-ipa hbacrule-add-user allow_spacewalk-prod --user=bob
-ipa hbacrule-add-host allow_spacewalk-prod --hosts=$( hostname )
-# Remove the Spacewalk server from the host group we've created when we've disabled the allow_all rule
+# Create UBAC service susemanager-prod and HBAC rule allow_susemanager-prod
+ipa hbacsvc-add susemanager-prod
+ipa hbacrule-add allow_susemanager-prod
+# Add just bob and the &susemgr; server to this rule for this service
+ipa hbacrule-add-service allow_susemanager-prod --hbacsvcs=susemanager-prod
+ipa hbacrule-add-user allow_susemanager-prod --user=bob
+ipa hbacrule-add-host allow_susemanager-prod --hosts=$( hostname )
+# Remove the &susemgr; server from the host group we've created
+# when we've disabled the allow_all rule
 ipa hostgroup-remove-member allow_all_hosts --hosts=$( hostname )
-# Test that just the allow_spacewalk-prod rule matches
-ipa hbactest --user=bob --host=$( hostname ) --service=spacewalk-prod
+# Test that just the allow_susemanager-prod rule matches
+ipa hbactest --user=bob --host=$( hostname ) --service=susemanager-prod
    </screen>
    <para>
-    On the Spacewalk server, we define the spacewalk-prod PAM service and point it to sssd: 
+    On the &susemgr; server, we define the susemanager-prod PAM service and point it to sssd: 
    </para>
    <screen>
-    # /etc/pam.d/spacewalk-prod content:
+    # /etc/pam.d/susemanager-prod content:
     auth    required   pam_sss.so
     account required   pam_sss.so
    </screen>
   </sect1>
   <sect1><title>Configure sssd to provide information about auto-populated users</title>
-   <para><remark role="needinfo">emap: still needs rebranding. Where to get sssd-dbus package for SUSE?</remark>
-    When a user authenticates either via Kerberos ticket or via form-based PAM authentication, it might be the first time that user logged in to the Spacewalk server. Spacewalk needs to create record about that user in its internal database and for that, certain additional attributes are needed besides the obvious login name. The sssd-dbus package provides new ifp sssd service. The package is available from repos for recent Fedoras and Red Hat Enterprise Linux distributions:
-
-​http://copr-fe.cloud.fedoraproject.org/coprs/adelton/identity_demo/
-
-Retrieve the .repo file and put it to /etc/yum.repos.d, you can disable it by default: 
+   <para><remark role="needinfo">emap: still needs rebranding. Where
+   to get sssd-dbus package for SUSE?</remark> When a user
+   authenticates either via Kerberos ticket or via form-based PAM
+   authentication, it might be the first time that user logged in to
+   the &susemgr; server. &susemgr; needs to create record about that
+   user in its internal database and for that, certain additional
+   attributes are needed besides the obvious login name. The <systemitem>sssd-dbus</systemitem>
+   package provides new <systemitem>ifp</systemitem> sssd service.
    </para>
-   <screen>
+<!-- The package is available from repos for recent Fedoras and Red Hat
+   Enterprise Linux distributions:
+​http://copr-fe.cloud.fedoraproject.org/coprs/adelton/identity_demo/
+Retrieve the .repo file and put it to /etc/yum.repos.d, you can disable it by default: -->
+<!--   <screen>
 # Example for RHEL 6:
-curl -o /etc/yum.repos.d/adelton-identity_demo.repo http://copr-fe.cloud.fedoraproject.org/coprs/adelton/identity_demo/repo/epel-6-x86_64/
+curl -o /etc/yum.repos.d/adelton-identity_demo.repo \
+http://copr-fe.cloud.fedoraproject.org/coprs/adelton/identity_demo/repo/epel-6-x86_64/
 sed -i 's/enabled=.*/enabled=0/' /etc/yum.repos.d/adelton-identity_demo.repo
    </screen>
-   <para>
+-->
+<!--   <para>
     Install sssd-dbus:
    </para>
-   <screen>
-     zypper install --enablerepo=adelton-identity_demo sssd-dbus -y
+-->
+<!--   <screen>
+     zypper install &ndash;&ndash;enablerepo=adelton-identity_demo sssd-dbus -y
    </screen>
+-->
    <para>
     The sssd needs to be configured to enable ifp and retrieval and
-    caching of attributes needed by Spacewalk:
+    caching of attributes needed by &susemgr;:
    </para>
    <screen>
 # /etc/sssd/sssd.conf, the [domain/...] section, add:
@@ -205,7 +216,7 @@ user_attributes = +mail, +givenname, +sn
     service sssd restart
    </screen>
    <para>
-    Test that it is possible to retrieve information about bob: 
+    Test that it is possible to retrieve information about <systemitem>bob</systemitem>: 
    </para>
    <screen>
 dbus-send --print-reply --system --dest=org.freedesktop.sssd.infopipe \
@@ -230,16 +241,14 @@ dbus-send --print-reply --system --dest=org.freedesktop.sssd.infopipe \
   <sect1><title>Configure Apache</title>
    <para>
     Authentication against the external identity provider (FreeIPA) is achieved via a set of Apache modules. They need to be installed.
-   </para>
+   </para><remark>emap: adjust below.</remark>
    <screen>
-yum install mod_auth_kerb mod_authnz_pam mod_lookup_identity mod_intercept_form_submit -y
-# For RHEL and Fedora 19, the last three modules can be found in the same yum repo as the sssd-dbus package installed above:
-yum install --enablerepo=adelton-identity_demo  mod_authnz_pam mod_lookup_identity mod_intercept_form_submit -y
+zypper install mod_auth_kerb mod_authnz_pam mod_lookup_identity mod_intercept_form_submit -y
+# For RHEL and Fedora 19, the last three modules can be found in the same zypper repo as the sssd-dbus package installed above:
+zypper install --enablerepo=adelton-identity_demo  mod_authnz_pam mod_lookup_identity mod_intercept_form_submit -y
    </screen>
    <para>
-     We then need to configure the modules. Note that we configure
-     mod_authnz_pam and mod_intercept_form_submit to use the
-     spacewalk-prod PAM service we've configured above:
+     We then need to configure <systemitem>mod_authnz_pam</systemitem> and <systemitem>mod_intercept_form_submitm</systemitem> to use the <systemitem>susemanager-prod</systemitem> PAM service we've set up above:
    </para>
    <screen>
 # /etc/httpd/conf.d/auth_kerb.conf
@@ -253,10 +262,15 @@ LoadModule authnz_pam_module modules/mod_authnz_pam.so
   KrbAuthRealms EXAMPLE.COM
   Krb5KeyTab /etc/http.keytab
   KrbLocalUserMapping On
-  require pam-account spacewalk-prod
-  ErrorDocument 401 '&lt;html&gt;&lt;meta http-equiv="refresh" content="0; URL=/rhn/Login2.do"&gt;&lt;body&gt;Kerberos authentication did not pass.&lt;/body&gt;&lt;/html&gt;'
-  # The following is needed as a workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1020087
-  ErrorDocument 500 '&lt;html&gt;&lt;meta http-equiv="refresh" content="0; URL=/rhn/Login2.do"&gt;&lt;body&gt;Kerberos authentication did not pass.&lt;/body&gt;&lt;/html&gt;'
+  require pam-account susemanager-prod
+  ErrorDocument 401 '&lt;html&gt;&lt;meta http-equiv="refresh" content="0; 
+  URL=/rhn/Login2.do"&gt;&lt;body&gt;Kerberos authentication did not 
+  pass.&lt;/body&gt;&lt;/html&gt;'
+  # The following is needed as a workaround for 
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1020087
+  ErrorDocument 500 '&lt;html&gt;&lt;meta http-equiv="refresh" content="0; 
+  URL=/rhn/Login2.do"&gt;&lt;body&gt;Kerberos authentication did not 
+  pass.&lt;/body&gt;&lt;/html&gt;'
 &lt;/Location&gt;
    </screen>
    <screen>
@@ -264,7 +278,7 @@ LoadModule authnz_pam_module modules/mod_authnz_pam.so
 LoadModule intercept_form_submit_module modules/mod_intercept_form_submit.so
 LoadModule authnz_pam_module modules/mod_authnz_pam.so
 &lt;LocationMatch ^/rhn/(Re)?LoginSubmit\.do&gt;
-  InterceptFormPAMService spacewalk-prod
+  InterceptFormPAMService susemanager-prod
   InterceptFormLogin username
   InterceptFormPassword password
 &lt;/LocationMatch&gt;
@@ -281,7 +295,8 @@ LoadModule lookup_identity_module modules/mod_lookup_identity.so
 &lt;/LocationMatch&gt;
    </screen>
    <para>
-    You can certainly put all the configuration into one configuration file and not list the mod_authnz_pam twice.
+    You can certainly put all the configuration into one configuration
+    file and not list the <systemitem>mod_authnz_pam</systemitem> twice.
    </para>
    <para>
     Restart Apache: 
@@ -315,21 +330,21 @@ service tomcat6 restart
    </screen>
    <para>
     Wait for tomcat to be back up and test that you can log in to
-    Spacewalk with your regular admin login and password.
+    &susemgr; with your regular admin login and password.
    </para>
   </sect1>
-  <sect1><title>Enable use of external authentication in Spacewalk</title>
+  <sect1><title>Enable use of external authentication in &susemgr;</title>
    <para>
      By following the configuration steps above, external
-     authentication is enabled. Existing Spacewalk users may login to
-     Spacewalk externally authenticated by the FreeIPA server. To
-     allow login also to users, that currently do not have Spacewalk
+     authentication is enabled. Existing &susemgr; users may login to
+     &susemgr; externally authenticated by the FreeIPA server. To
+     allow login also to users, that currently do not have &susemgr;
      accounts you have the following options:
    </para>
    <itemizedlist>
     <listitem>
      <para>
-      Pre-create their accounts in desired organization via WebUI or API.
+      Pre-create their accounts in desired organization via Web interface or API.
      </para>
     </listitem>
    <listitem>
@@ -340,11 +355,17 @@ service tomcat6 restart
      ipa user-mod bob --orgunit="My Organization"
     </screen>
     <para>
-     select "Use organization unit name passed from IPA" option on the Admin > Users > External Authentication page. If the orgunit matches to any organization name within Spacewalk, the appropriate Spacewalk account will automatically be created for the user in that "My Organization" at the very first login attempt.
+     Select the <guimenu>Use organization unit name passed from
+     IPA</guimenu> option on the
+     <menuchoice><guimenu>Admin</guimenu><guimenu>Users</guimenu><guimenu>External
+     Authentication</guimenu></menuchoice> page. If the orgunit
+     matches to any organization name within &susemgr;, the
+     appropriate &susemgr; account will automatically be created for
+     the user in <guimenu>My Organization</guimenu> at first login.
     </para>
     <para>
      To make use out of the orgunit option, uncomment following line
-     in /etc/httpd/conf.d/lookup_identity.conf:
+     in <filename>/etc/httpd/conf.d/lookup_identity.conf</filename>:
     </para>
     <screen>
      LookupUserAttr ou AJP_REMOTE_USER_ORGUNIT
@@ -355,17 +376,15 @@ service tomcat6 restart
     </listitem>
     <listitem>
     <para>
-     Select "Default organization" on the External Authentication page
-     and the Spacewalk account will automatically be created for the
-     user at the very first login attempt in the "Default
-     organization".
+     On the <guimenu>External Authentication</guimenu> page, select <guimenu>Default organization</guimenu> and the &susemgr; account will automatically be created for the
+     user at first login in the <guimenu>Default organization</guimenu>.
     </para>
     </listitem>
    </itemizedlist>
    <note>
     <para>
      Automatically created accounts can only be used for local logins
-     after setting a valid Spacewalk password.
+     after setting a valid &susemgr; password.
     </para>
    </note>
   </sect1>
@@ -377,8 +396,8 @@ service tomcat6 restart
     kdestroy -A
    </screen>
    <para>
-    Log out from your admin session and attempt to log in as bob
-    enterring the password selected during the kinit bob step. You
+    Log out from your admin session and attempt to log in as <systemitem>bob</systemitem>
+    enterring the password selected during the <command>kinit</command> <systemitem>bob</systemitem> step. You
     should be able to log in and if you check the user details, the
     name and email address is populated from the FreeIPA server. Log
     out.
@@ -386,7 +405,8 @@ service tomcat6 restart
   </sect1>
   <sect1><title>Try Kerberos authentication</title>
    <para>
-    Kinit as bob and attempt to access the home page of your Spacewalk server:
+    Kinit as <systemitem>bob</systemitem> and attempt to access the
+    home page of your &susemgr; server:
    </para>
    <screen>
     kinit bob
@@ -409,32 +429,40 @@ service tomcat6 restart
     Restart the <systemitem>httpd</systemitem> service.
    </para>
   </sect1>
-   <sect1><title>Set additional Spacewalk roles</title>
+   <sect1><title>Set additional &susemgr; roles</title>
    <para>
-    Let's create a separate group for bob. Run on FreeIPA server:
+    Let's create a separate group for <systemitem>bob</systemitem>. Run on FreeIPA server:
    </para>
    <screen>
-    ipa group-add spacewalk-channel-admins
-    ipa group-add-member spacewalk-channel-admins --users=bob
+    ipa group-add susemanager-channel-admins
+    ipa group-add-member susemanager-channel-admins --users=bob
    </screen>
    <para>
-    Log in to Spacewalk WebIU as Spacewalk administrator and navigate to Admin > Users > External Authentication > Group Role Mapping.
+    Log in to &susemgr; Web interface as &susemgr; administrator and
+    navigate to
+    <menuchoice><guimenu>Admin</guimenu><guimenu>Users</guimenu><guimenu>External
+    Authentication</guimenu><guimenu>Group Role
+    Mapping</guimenu></menuchoice>.
    </para>
    <para>
-    Create new External Group by continuing on create new external
-    group and filling in the name of the external group we created on
-    the FreeIPA server in the previous step -
-    "spacewalk-channel-admins". Additionally select "Channel
-    Administrator" or any other roles bob shall inherit.
+    Click <guimenu>Create new External Group</guimenu> and fill in the
+    name of the external group created on the FreeIPA server in the
+    previous step:
+    <systemitem>susemanager-channel-admins</systemitem>. Additionally
+    select <guimenu>Channel Administrator</guimenu> or any other roles
+    <systemitem>bob</systemitem> shall inherit.
    </para>
    <para>
-    Next time bob logs in to Spacewalk authenticated by the FreeIPA
-    server, he'll additionally be granted the "Channel Administrator"
-    role. (Unless the "Keep temporary roles granted due to external
-    authentication configuration" option is checked (on the Admin >
-    Users > External Authentication > Configuration page), bob will
-    lose the additional role(s), when he logs in to Spacewalk using
-    his username and Spacewalk password.)
+    Next time <systemitem>bob</systemitem> logs in to &susemgr;
+    authenticated by the FreeIPA server, he will additionally be
+    granted the Channel Administrator role. Unless the <guimenu>Keep
+    temporary roles granted due to external authentication
+    configuration</guimenu> option is checked on the
+    <menuchoice><guimenu>Admin</guimenu><guimenu>Users</guimenu><guimenu>External
+    Authentication</guimenu><guimenu>Configuration
+    page</guimenu></menuchoice>, <systemitem>bob</systemitem> will
+    lose the additional role(s) when he logs in to &susemgr; using
+    his username and &susemgr; password.
    </para>
   </sect1>
 </chapter>
