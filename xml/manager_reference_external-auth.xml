@@ -67,7 +67,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
    <para>
     In the following sections, we assume that there is a FreeIPA server
     installed and running and that the &susemgr; server is
-    IPA-enrolled in it. The enrollment can be achieved using the
+    IPA-enrolled there. The enrollment can be achieved using the
     <command>ipa-client-install</command> command:
    </para>
    <screen>
@@ -76,9 +76,9 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     ipa-client-install
    </screen>
    <para>
-    If you want to enroll the &susemgr; server directly for a particular
-    FreeIPA server to a particular domain, point the
-    resolv.conf to that server and specify the domain:
+    If you want to enroll the &susemgr; server directly to a particular
+    FreeIPA server with a particular domain, point to that server and specify the domain in
+    <filename>resolv.conf</filename> after saving a copy of the original file:
    </para>
    <screen>
     cp /etc/resolv.conf /etc/resolv.conf.orig
@@ -88,7 +88,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
   </sect1>
   <sect1><title>Kerberos Prerequisites</title>
    <para>
-    For the Kerberos authentication to work, you need the keytab of the
+    For Kerberos authentication to work, you need the keytab of the
     &susemgr; HTTP service. First, create the service on the FreeIPA server:
    </para>
    <screen>
@@ -132,9 +132,9 @@ ipa hbacrule-disable allow_all
    <systemitem>bob</systemitem> and service
    <systemitem>susemanager-prod</systemitem> are created. The new user
    needs access to the service on your &susemgr; server. We assume you
-   enter the commands on the &susemgr; server and therefore the $(
+   enter the commands on the &susemgr; server and therefore $(
    hostname ) expands to the &susemgr; server hostname. If you run the
-   commands on the FreeIPA server or other machines, put in the
+   commands on the FreeIPA server or another machine, put in the
    &susemgr; server hostname.
    </para>
    <screen>
@@ -168,34 +168,32 @@ ipa hbactest --user=bob --host=$( hostname ) --service=susemanager-prod
    </screen>
   </sect1>
   <sect1><title>Configure sssd to Provide Information about Auto-populated Users</title>
-   <para><remark role="needinfo">emap: still needs rebranding. Where
-   to get sssd-dbus package for SUSE? Tools Channel?</remark> When a user
+   <para>When a user
    authenticates either via Kerberos ticket or via form-based PAM
    authentication, it might be the first time this user logs in to
    the &susemgr; server. &susemgr; needs to create a record about the
    user in its internal database and for that certain additional
    attributes are needed besides the obvious login name. The <systemitem>sssd-dbus</systemitem>
    package provides the new <systemitem>ifp</systemitem> sssd service.
-   </para>
-<!-- The package is available from repos for recent Fedoras and Red Hat
-   Enterprise Linux distributions:
+   </para><remark role="needinfo">emap: still needs rebranding. Where
+   to get sssd-dbus package for SUSE? Tools Channel?
+The package is available from repos for recent Fedoras and Red Hat
+Enterprise Linux distributions:
 ​http://copr-fe.cloud.fedoraproject.org/coprs/adelton/identity_demo/
 Retrieve the .repo file and put it to /etc/yum.repos.d, you can disable it by default: -->
-<!--   <screen>
+<!--<screen>-->
 # Example for RHEL 6:
 curl -o /etc/yum.repos.d/adelton-identity_demo.repo \
 http://copr-fe.cloud.fedoraproject.org/coprs/adelton/identity_demo/repo/epel-6-x86_64/
 sed -i 's/enabled=.*/enabled=0/' /etc/yum.repos.d/adelton-identity_demo.repo
-   </screen>
--->
-<!--   <para>
+<!--   </screen>-->
+<!--   <para>-->
     Install sssd-dbus:
-   </para>
--->
-<!--   <screen>
+<!--   </para>-->
+<!--   <screen>-->
      zypper install &ndash;&ndash;enablerepo=adelton-identity_demo sssd-dbus -y
-   </screen>
--->
+<!--   </screen>
+--></remark>
    <para>
     The <systemitem>sssd</systemitem> service needs to be configured
     to enable ifp, retrieval and caching of attributes needed by
