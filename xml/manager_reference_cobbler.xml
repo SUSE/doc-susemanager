@@ -23,7 +23,7 @@ Ask uwe for details
  <para>
   &susemgr; features the Cobbler server that allows administrators to
   centralize their system installation and provisioning infrastructure.
-  Cobbler is an installation server that provides the various methods of
+  Cobbler is an installation server that provides various methods of
   performing unattended system installations, whether it be server,
   workstation, or guest systems in a full or para-virtualized setup.
  </para>
@@ -53,14 +53,14 @@ Ask uwe for details
   </listitem>
   <listitem>
    <para>
-    Building installation ISOs with PXE-like menus using the <command>cobbler buildiso</command> command for &susemgr; systems with x86_64 architecture. <remark role="needinfo">emap: added in RH docs. Valid for SUSE as well? There's also a new section on building ISOs with Cobbler at the end.</remark>
+    building installation ISOs with PXE-like menus using the <command>cobbler buildiso</command> command for &susemgr; systems with x86_64 architecture. <remark role="needinfo">emap: added in RH docs. Valid for SUSE as well? There's also a new section on building ISOs with Cobbler at the end.</remark>
    </para>
   </listitem>
  </itemizedlist>
 
  <para>
   We only support those Cobbler functions that are either listed
-  within our formal documentation or exposed within the Web Interface
+  within our formal documentation or available via the Web Interface
   and API.
  </para>
 
@@ -94,7 +94,7 @@ Ask uwe for details
     <para>
      The latest <filename>cobbler-loaders</filename> package needs to be
      installed. This is to ensure that the <filename>pxelinux.0</filename>
-     boot image is installed and available on the Satellite before PXE
+     boot image is installed and available on the &susemgr; before PXE
      booting. To install the latest version, use: <command>zypper install
      cobbler-loaders</command>.<remark role="needinfo">emap: added in RH. Valid? Replaced yum
      with zypper.</remark>
@@ -128,7 +128,7 @@ Ask uwe for details
     <title>Configuring an Existing DHCP Server</title>
     <para>
      If you have a DHCP server deployed on another system in the network,
-     you will need administrative access to the DHCP server in order to edit
+     you will need administrative access to the DHCP server to edit
      the DHCP configuration file so that it points to the Cobbler server and
      PXE boot image.
     </para>
@@ -194,9 +194,9 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
    </para>
    <para>
     To configure TFTP, you must first enable the service via Xinetd. To do
-    this, edit the <filename>/etc/xinetd.d/tftp</filename> as root and
+    this, edit the <filename>/etc/xinetd.d/tftp</filename> file as root and
     change the <option>disable = yes</option> line to <literal>disable =
-    no</literal>.<remark>emap: shouldn't this be done via YaST as well?</remark>
+    no</literal>.
    </para>
    <para>
     Before TFTP can serve the <filename>pxelinux.0</filename> boot
@@ -249,7 +249,7 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
     </para>
     <para>
      This setup script asks for hostnames and IP addresses of the
-     &susemgr; server and of the proxy itself. Additionally, it asks for
+     &susemgr; server and the proxy. Additionally, it asks for
      the <literal>tftpboot</literal> directory on the proxy.  For more
      information, see the output of <command>configure-tftpsync.sh
      --help</command>.
@@ -265,7 +265,7 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
     <screen>configure-tftpsync.sh proxy1.example.com proxy2.example.com</screen>
 
     <para>
-     Finally execute <command>cobbler sync</command> to initially push
+     Execute <command>cobbler sync</command> to initially push
      the files to the proxy systems. This will succeed if all listed
      proxies are properly configured.
     </para>
@@ -397,7 +397,7 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
    <warning>
     <para>
      Do not start or stop the <command>cobblerd</command> service
-     independent of the &susemgr; service, as doing so may cause errors and
+     independent of the &susemgr; service. Doing so may cause errors and
      other issues.
     </para>
     <para>
@@ -436,12 +436,12 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
   <para>
    The <option>--name=<replaceable>string</replaceable></option> option is a
    label used to differentiate one distribution choice from another (for
-   example, <literal>sles11server</literal>)
+   example, <literal>sles11server</literal>).
   </para>
 
   <para>
    The <option>--kernel=<replaceable>path</replaceable></option> option
-   specifies the path to the kernel image file
+   specifies the path to the kernel image file.
   </para>
 
   <para>
@@ -457,7 +457,7 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
   </para>
 
   <para>
-   Cobbler profiles associate a distribution with additional options, like &ay;
+   Cobbler profiles associate a distribution with additional options like &ay;
    or Kickstart files. Profiles are the core unit of provisioning and there
    must be at least one Cobbler profile for every distribution added.  For
    example, two profiles might be created for a web server and a desktop
@@ -547,7 +547,7 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
 
   <para>
    The <option>--profile=<replaceable>string</replaceable></option>
-   specifies one of the profile names added in
+   specifies the name of one of the profiles added in
    <xref linkend="s1-cobbler-addprofile"/>.
   </para>
 
@@ -573,9 +573,9 @@ filename &quot;pxelinux.0&quot;; <co id="co.s2-cobbler-dhcp.exist.bootloader"/>
   </para>
 
   <para>
-   Kickstart variables are a part of an infrastructural change in &susemgr;
+   Kickstart variables are part of an infrastructural change in &susemgr;
    to support templating in Kickstart files. Kickstart templates are files
-   describing how to build actual Kickstart files, rather than creating
+   describing how to build actual Kickstart files rather than creating
    specific Kickstarts.
   </para>
 
@@ -674,7 +674,7 @@ echo "Hello, world"
 #end some section (this is a comment)
    </screen>
    <para>
-    Any line with a hash symbol <keycap>#</keycap> followed by a
+    Any line with a <keycap>#</keycap> symbol followed by a
     whitespace is treated as a comment and is therefore not evaluated.
    </para>
    <para>
@@ -766,7 +766,7 @@ logvol /var --name=var vgname=vg00 --fstype ext3 --size=5000</screen>
    </para>
    <para>
     Start creating the image file and the installation of the virtual guest
-    system.
+    system:
    </para>
 <screen>koan --virt --server=cobbler-server.example.com \
   --profile=virtualfileserver --virtname=marketingfileserver</screen>
