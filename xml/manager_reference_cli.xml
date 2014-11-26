@@ -1063,14 +1063,81 @@ Uploading /tmp/ola_world.txt from blah4/tmp/ola_world.txt</screen>
   </indexterm>
   <para>
    <command>mgr-sync</command> is the new tool replacing
-   <command>mgr-ncc-sync</command>.  <command>mgr-sync</command> can
-   only be used, if &susemgr; is connected to &scc; (SCC).
+   <command>mgr-ncc-sync</command>.  <command>mgr-sync</command> must be
+   used, if &susemgr; is connected to &scc; (SCC).  With
+   <command>mgr-sync</command> you add or synchronize products and
+   channels.  It also enables and refreshes SCC data. This tool requires
+   that SCC is enabled by running <command>mgr-sync enable-scc</command>
+   first.
   </para>
   <para>
    <command>mgr-sync</command> has a new command structure using
    sub-commands similar to <command>git</command> or
-   <command>osc</command>.
+   <command>osc</command>.  For a complete list of command line option,
+   see the <literal>mgr-sync</literal> manpage (<command>man
+   mgr-sync</command>).  Basic actions are:
   </para>
+
+  <screen>mgr-sync enable-scc
+
+mgr-sync list channels|product|credentials
+mgr-sync add channels|product|credentials
+mgr-sync delete credentials
+
+mgr-sync refresh [--refresh-channels] [--from-mirror <replaceable>MIRROR</replaceable>]</screen>
+<para>
+ Here are some usage examples.  List channels:
+</para>
+<screen>mgr-sync list channels</screen>
+<para>
+ Add a channel:
+</para>
+
+<screen>mgr-sync add channel <replaceable>label</replaceable></screen>
+<para>
+ List products:
+</para>
+<screen>mgr-sync list products</screen>
+
+<para>
+Add a Products:
+
+ $> mgr-sync add product
+
+Refresh the data:
+
+ $> mgr-sync refresh
+
+Refresh the data and schedule reposync of all installed vendor channels:
+
+ $> mgr-sync refresh --refresh-channels
+
+
+mgr-sync now requires an username/password from a "SUSE Manager administrator". Most of the functions are available as public API now.
+
+ WARNING
+ -------
+ Most of the calls take some time. It is expected to wait for up to 3 minutes for some of them.
+ Making this faster is part of the next iteration.
+
+List SCC credentials:
+
+ $> mgr-sync list credentials
+
+Add a new SCC credential:
+
+ $> mgr-sync add credentials
+
+To add a primary SCC credential:
+
+ $> mgr-sync add credentials --primary
+
+There can be only one primary credential. This is the username/password used first when retrieving the list of available channels and packages.
+
+Delete a SCC credential:
+
+ $> mgr-sync delete credentials
+</para>
  </sect1>
 
  <sect1 id="s1-cli-config-ncc-sync">
