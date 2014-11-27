@@ -36,6 +36,53 @@
   </para>
   </note>
 
+  <para>
+   To migrate your &susemgr; server to SCC perform an update as usual
+   (see <xref linkend="s1-maintenance-update"/> and enable SCC before
+   refreshing your customer center data:
+  </para>
+
+  <procedure>
+   <title>Migrating to and Enabling SCC</title>
+
+   <step>
+    <para>
+     Stop the Spacewalk service:
+    </para>
+    <screen>spacewalk-service stop</screen>
+   </step>
+   <step>
+    <para>
+     Apply the &susemgr; update using either <command>zypper</command> or &yast;
+     Online Update.
+    </para>
+   </step>
+   <step>
+    <para>
+     Upgrade the database schema with
+    </para>
+    <screen>spacewalk-schema-upgrade</screen>
+   </step>
+   <step>
+    <para>
+     Start the Spacewalk service:
+    </para>
+    <screen>spacewalk-service start</screen>
+   </step>
+   <step>
+    <para>
+     Call <command>mgr-sync</command> to enable SCC:
+    </para>
+    <screen>mgr-sync enable-scc</screen>
+   </step>
+   <step>
+    <para>
+     Call <command>mgr-sync</command> to refresh customer center data:
+    </para>
+    <screen>mgr-sync refresh</screen>
+   </step>
+  </procedure>
+
  </sect2>
 
 
