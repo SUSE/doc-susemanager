@@ -2017,25 +2017,41 @@ GATEWAY=192.168.0.1</screen>
     <remark role="generic">
        2011-02-09 - ke: Probably &ay; is also supported, but ug will
        check it more closely next time.
-      </remark>
+    </remark>
+    <remark>
+     2015-01-28 - ke: feedback by Silvio is in: bsc#906851.
+    </remark>
     <para>
      Snapshots enable you to roll back the system's package profile,
      configuration files, and &susemgr; settings. Snapshots are always
-     captured automatically whenever an action takes place on a
-     Provisioning-entitled system. The <guimenu>Snapshots</guimenu>
+     captured automatically after an action takes place on a
+     Provisioning-entitled system.  The <guimenu>Snapshots</guimenu>
      subtab lists all snapshots for the system, including the reason why
      the snapshot was taken, the time it was taken, and the number of
      tags applied to each snapshot.
     </para>
     <note>
      <title>Technical Details</title>
-     <para>
-      A snapshots is always done <emphasis>after</emphasis> a successful
-      operation and not before, as you might expect. It is possible to
-      disable snapshotting globally (in <filename>rhn.conf</filename>
-      set <literal>enable_snapshots = 0</literal>), but it is enabled by
-      default. No further fine tuning is possible.
-     </para>
+     <itemizedlist>
+      <!-- bsc#906851: 2 separate items and more info for clarification -->
+      <listitem>
+       <para>
+        A snapshots is always done <emphasis>after</emphasis> a successful
+        operation and not before, as you might expect.  One consequence
+        of the fact that snapshots are taken after the action is that,
+        if you want to undo action number X, then you must roll back to
+        the snapshot number X-1.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        It is possible to disable snapshotting globally (in
+        <filename>rhn.conf</filename> set <literal>enable_snapshots =
+        0</literal>), but it is enabled by default. No further fine
+        tuning is possible.
+       </para>
+      </listitem>
+     </itemizedlist>
     </note>
     <para>
      To revert to a previous configuration, click the
