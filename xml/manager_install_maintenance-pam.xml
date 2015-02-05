@@ -38,17 +38,17 @@
     <procedure>
         <step>
             <para>
-                On a &sls; 11 SP1 system,<remark role="needinfo">emap: can SP1 simply be replaced with SP3?</remark> a typical generic PAM service file
+                On a &sls; 11 SP3 system, a typical generic PAM service file
                 could look as follows (save it as
                 <filename>/etc/pam.d/susemanager</filename> to make it work with
                 the settings below):
             </para>
+            <!-- bsc#895870 -->
             <screen>#%PAM-1.0
-auth     include        common-auth
-account  include        common-account
-password include        common-password
-session  include        common-session
-  </screen>
+auth        required      pam_env.so
+auth        sufficient    pam_krb5.so no_user_check
+auth        required      pam_deny.so
+account     required      pam_krb5.so no_user_check</screen>
         </step>
         <step>
             <para>Make &susemgr; use this service file
