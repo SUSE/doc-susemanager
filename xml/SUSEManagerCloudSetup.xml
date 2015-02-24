@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!-- <!DOCTYPE set PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.docbook.org/xml/4.5/docbookx.dtd" -->
+
+<!DOCTYPE set PUBLIC
+"-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
 
 <article lang="en">
-  <articleinfo>
-    <title>Public Cloud - Documentation</title>
-    <copyright>
-      <year>2015</year>
-      <holder>@ 2015 SUSE</holder>
-    </copyright>
-  </articleinfo>
-  <title>User Guide: SUSE Manager in the Public Cloud</title>
+ <?suse-quickstart color="suse"?>
+ <title>&susemgr; in the Public Cloud</title>
+ <subtitle>SUSE Manager in the Public Cloud</subtitle>
+ <articleinfo>
+  <productnumber>&productnumber;</productnumber><productname>&productname;</productname><date>
+  <?dbtimestamp format="B d, Y" ?></date>
+ </articleinfo>
+ <abstract>
   <para>
     SUSE Manager delivers best-in-class Linux server management capabilities.
     For detailed information about the product please refer to the
@@ -23,36 +36,8 @@
     instance is launched SUSE Manager needs to be set up and configured
     following the procedure in the SUSE Manager documentation.
   </para>
-  <sect2 id="contents">
-    <title>Contents</title>
-    <itemizedlist>
-      <listitem>
-        <para>
-          <link linkend="instance-requirements">Instance Requirements</link>
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          <link linkend="setup">Setup</link>
-        </para>
-        <itemizedlist>
-          <listitem>
-            <para>
-              <link linkend="using-separate-storage-volume">Using
-              Separate Storage Volume</link>
-            </para>
-          </listitem>
-        </itemizedlist>
-      </listitem>
-      <listitem>
-        <para>
-          <link linkend="registration-of-cloned-systems">Registration of
-          Cloned Systems</link>
-        </para>
-      </listitem>
-    </itemizedlist>
-  </sect2>
-  <sect2 id="instance-requirements">
+ </abstract>
+  <sect1 id="instance-requirements">
     <title>Instance Requirements</title>
     <para>
       Select an instance size that meets the system requirements as
@@ -61,7 +46,7 @@
     <itemizedlist>
       <listitem>
         <para>
-          Minimal main memory: 16G;
+          Minimal main memory: 16G
         </para>
       </listitem>
       <listitem>
@@ -86,11 +71,11 @@
       and the repositories are stored on a separate device it is still
       recommended to set the root volume size of the instance to 20G.
     </para>
-  </sect2>
-  <sect2 id="setup">
+  </sect1>
+  <sect1 id="setup">
     <title>Setup</title>
-    <orderedlist numeration="arabic">
-      <listitem>
+    <procedure>
+      <step>
         <para>
           Run an instance of the SUSE Manager image as published by SUSE
         </para>
@@ -106,8 +91,8 @@
           accessible SUSE Manager instance violates the terms of the
           EULA.
         </para>
-      </listitem>
-      <listitem>
+      </step>
+      <step>
         <para>
           Run YaST as follows:
         </para>
@@ -121,9 +106,7 @@
           <ulink url="https://www.suse.com/documentation/suse_manager">SUSE
           Manager</ulink> guide.
         </para>
-        <programlisting>
-          $ yast2 susemanager_setup
-        </programlisting>
+        <screen>yast2 susemanager_setup</screen>
         <para>
           if you are prompted with a message that there is not enough space
           available for the setup of SUSE Manager, verify that your root
@@ -132,40 +115,30 @@
           Storage Volume</link>
           had the desired effects.
         </para>
-      </listitem>
-      <listitem>
+      </step>
+      <step>
         <para>
           After the completion of the YaST setup for SUSE Manager the
           application is properly configured and functional. Prior to
           accessing SUSE Manager the web browser, one additional step
           needs to be completed to create a default user.
         </para>
-        <programlisting>
-          $ /etc/init.d/spacewalk_firstuser start
-        </programlisting>
+        <screen>/etc/init.d/spacewalk_firstuser start</screen>
         <para>
           This creates the admin user with the following credentials:
         </para>
-        <para>
-          User name:
-        </para>
-        <programlisting>
-          admin
-        </programlisting>
-        <para>
-          Password:
-        </para>
-        <programlisting>
-          admin
-        </programlisting>
+	<simplelist>
+         <member>User name: <literal>admin</literal></member>
+         <member>Password: <literal>admin</literal></member>
+	</simplelist>
         <para>
           After logging in through the SUSE Manager Web UI
           <emphasis role="strong">change</emphasis>
           the default password.
         </para>
-      </listitem>
-    </orderedlist>
-    <sect3 id="using-separate-storage-volume">
+      </step>
+    </procedure>
+    <sect2 id="using-separate-storage-volume">
       <title>Using Separate Storage Volume</title>
       <para>
         We recommend that the repositories and the database for SUSE Manager
@@ -175,8 +148,8 @@
         <emphasis role="strong">must</emphasis>
         be performed prior to running the YaST SUSE Manager setup procedure.
       </para>
-      <orderedlist numeration="arabic">
-        <listitem>
+      <procedure>
+        <step>
           <para>
             Provision a disk device in the public cloud environment, refer
             to the cloud service provider documentation for detailed
@@ -187,15 +160,13 @@
             Manager sizing examples</ulink>. A rule of thumb is 25 GB per
             distribution per channel.
           </para>
-        </listitem>
-        <listitem>
+        </step>
+        <step>
           <para>
             Once attached the device appears as Unix device node in your
             instance. Use
           </para>
-          <programlisting>
-            $ fdisk -l
-          </programlisting>
+          <screen>fdisk -l</screen>
           <para>
             to find the device. In the following example we use
             <filename>/dev/sdb</filename>
@@ -204,44 +175,36 @@
           <para>
             Create one primary partition on the disk
           </para>
-          <programlisting>
-            $ fdisk /dev/sdb
-
+          <screen>&prompt.root;fdisk /dev/sdb
             n
             p
             &lt;Enter&gt; accept start sector
             &lt;Enter&gt; accept end sector
             w
             q
-          </programlisting>
-        </listitem>
-        <listitem>
+          </screen>
+        </step>
+        <step>
           <para>
             Create a filesystem, we recommend xfs. To create the
             filesystem, use:
           </para>
-          <programlisting>
-            $ mkfs.xfs /dev/sdb1
-          </programlisting>
-        </listitem>
-        <listitem>
+          <screen>mkfs.xfs /dev/sdb1</screen>
+        </step>
+        <step>
           <para>
             Create a directory (<filename>/manager_storage</filename>) to
             be used as the mount point for the virtual disk.
           </para>
-          <programlisting>
-            $ mkdir /manager_storage
-          </programlisting>
-        </listitem>
-        <listitem>
+          <screen>mkdir /manager_storage</screen>
+        </step>
+        <step>
           <para>
             Mount the device
           </para>
-          <programlisting>
-            $ mount /dev/sdb1 /manager_storage
-          </programlisting>
-        </listitem>
-        <listitem>
+	  <screen>mount /dev/sdb1 /manager_storage</screen>
+        </step>
+        <step>
           <para>
             Create an entry in /etc/fstab (optional)
           </para>
@@ -251,39 +214,41 @@
             refer to the cloud environment documentation for guidance
             about the fstab entry.
           </para>
-        </listitem>
-        <listitem>
+        </step>
+        <step>
           <para>
             Check with the <command>df</command> tool if
             <filename>/manager_storage</filename> is mounted and has
             enough ( &gt;= 15G ) of free space
           </para>
-        </listitem>
-        <listitem>
+        </step>
+        <step>
           <para>
             Re-link the directories in the filesystem SUSE Manager uses
             to store data (the database and the repositories).
           </para>
-          <programlisting>
-            - /var/spacewalk contains repositories
-            - /var/lib/pgsql contains postgress database
-          </programlisting>
+	  <simplelist>
+           <member>
+	    <filename>/var/spacewalk</filename>: contains repositories
+	   </member>
+           <member>
+	    <filename>/var/lib/pgsql</filename>: contains postgress database
+	   </member>
+	  </simplelist>
           <para>
             The following bash script handles the move and relinking:
           </para>
-          <programlisting>
-            for location in /var/lib/spacewalk /var/lib/pgsql; do
+          <screen>for location in /var/lib/spacewalk /var/lib/pgsql; do
               rsync -zav $location /manager_storage
               dname=`basename $location`
               rm -rf $location
               ln -s /manager_storage/$dname $location
-            done
-          </programlisting>
-        </listitem>
-      </orderedlist>
-    </sect3>
-  </sect2>
-  <sect2 id="registration-of-cloned-systems">
+            done</screen>
+        </step>
+      </procedure>
+    </sect2>
+  </sect1>
+  <sect1 id="registration-of-cloned-systems">
     <title>Registration of Cloned Systems</title>
     <para>
       Cloud environments generally support the creation of new images
@@ -295,8 +260,8 @@
       wiki to an instance of the cloned image.
     </para>
     <para>
-      http://wiki.novell.com/index.php/SUSE_Manager/Register_Clones
+      <ulink url="http://wiki.novell.com/index.php/SUSE_Manager/Register_Clones"/>
     </para>
-  </sect2>
+  </sect1>
 </article>
 
