@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<article lang="en">
+  <articleinfo>
+    <title>Public Cloud - Documentation</title>
+    <copyright>
+      <year>2015</year>
+      <holder>@ 2015 SUSE</holder>
+    </copyright>
+  </articleinfo>
+  <title>User Guide: SUSE Manager in the Public Cloud</title>
+  <para>
+    SUSE Manager delivers best-in-class Linux server management capabilities.
+    For detailed information about the product please refer to the
+    <ulink url="https://www.suse.com/documentation/suse_manager">SUSE
+    Manager</ulink>
+    documentation.
+  </para>
+  <para>
+    The SUSE Manager images published by SUSE in select Public Cloud
+    environments are provided as Bring Your Own Subscription (BYOS)
+    images and need to be registered with the customer center. After an
+    instance is launched SUSE Manager needs to be set up and configured
+    following the procedure in the SUSE Manager documentation.
+  </para>
+  <sect2 id="contents">
+    <title>Contents</title>
+    <itemizedlist>
+      <listitem>
+        <para>
+          <link linkend="instance-requirements">Instance Requirements</link>
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="setup">Setup</link>
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              <link linkend="using-separate-storage-volume">Using
+              Separate Storage Volume</link>
+            </para>
+          </listitem>
+        </itemizedlist>
+      </listitem>
+      <listitem>
+        <para>
+          <link linkend="registration-of-cloned-systems">Registration of
+          Cloned Systems</link>
+        </para>
+      </listitem>
+    </itemizedlist>
+  </sect2>
+  <sect2 id="instance-requirements">
+    <title>Instance Requirements</title>
+    <para>
+      Select an instance size that meets the system requirements as
+      documented in the SUSE Manager documentation.
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Minimal main memory: 16G;
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Minimal free disk space for SUSE Manager 15G. For public cloud
+          instances we recommend that the repositories and the SUSE Manager
+          database be located on an external virtual disk. The details of
+          this setup are provided in the
+          <link linkend="using-separate-storage-volume">Using Separate
+          Storage Volume</link> section.
+        </para>
+        <para>
+          Storing the database and the repositories on an external
+          virtual disk ensures that the data is not lost should the
+          instance need to be terminated for some reason.
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      Please ensure that the selected instance type matches the
+      requirements listed above. Although we recommend that the database
+      and the repositories are stored on a separate device it is still
+      recommended to set the root volume size of the instance to 20G.
+    </para>
+  </sect2>
+  <sect2 id="setup">
+    <title>Setup</title>
+    <orderedlist numeration="arabic">
+      <listitem>
+        <para>
+          Run an instance of the SUSE Manager image as published by SUSE
+        </para>
+        <para>
+          The images are identifiable by the suse, manager, byos
+          keywords in each public cloud environment.
+        </para>
+        <para>
+          The SUSE Manager instance must run in a network access
+          restricted environment such as the private subnet of a VPC or
+          with an appropriate firewall setting such that it can only be
+          accessed by machines in the IP ranges you use. A generally
+          accessible SUSE Manager instance violates the terms of the
+          EULA.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Run YaST as follows:
+        </para>
+        <para>
+          After the instance is launched and the external storage is
+          attached and prepared according to
+          <link linkend="using-separate-storage-volume">Using Separate
+          Storage Volume</link>
+          begin with the setup of SUSE Manager. The steps that follow do
+          not differ from the documentation in the
+          <ulink url="https://www.suse.com/documentation/suse_manager">SUSE
+          Manager</ulink> guide.
+        </para>
+        <programlisting>
+          $ yast2 susemanager_setup
+        </programlisting>
+        <para>
+          if you are prompted with a message that there is not enough space
+          available for the setup of SUSE Manager, verify that your root
+          volume is at least 20GB and double check that the instructions in
+          <link linkend="using-separate-storage-volume">Using Separate
+          Storage Volume</link>
+          had the desired effects.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          After the completion of the YaST setup for SUSE Manager the
+          application is properly configured and functional. Prior to
+          accessing SUSE Manager the web browser, one additional step
+          needs to be completed to create a default user.
+        </para>
+        <programlisting>
+          $ /etc/init.d/spacewalk_firstuser start
+        </programlisting>
+        <para>
+          This creates the admin user with the following credentials:
+        </para>
+        <para>
+          User name:
+        </para>
+        <programlisting>
+          admin
+        </programlisting>
+        <para>
+          Password:
+        </para>
+        <programlisting>
+          admin
+        </programlisting>
+        <para>
+          After logging in through the SUSE Manager Web UI
+          <emphasis role="strong">change</emphasis>
+          the default password.
+        </para>
+      </listitem>
+    </orderedlist>
+    <sect3 id="using-separate-storage-volume">
+      <title>Using Separate Storage Volume</title>
+      <para>
+        We recommend that the repositories and the database for SUSE Manager
+        be stored on a virtual storage device. This best practice will avoid
+        data loss in cases where the SUSE Manager instance may need to be
+        terminated. These steps
+        <emphasis role="strong">must</emphasis>
+        be performed prior to running the YaST SUSE Manager setup procedure.
+      </para>
+      <orderedlist numeration="arabic">
+        <listitem>
+          <para>
+            Provision a disk device in the public cloud environment, refer
+            to the cloud service provider documentation for detailed
+            instructions. The size of the disk is dependent on the number
+            of distributions and channels you intend to manage with SUSE
+            Manager. For sizing information refer to
+            <ulink url="https://www.suse.com/support/kb/doc.php?id=7015050">SUSE
+            Manager sizing examples</ulink>. A rule of thumb is 25 GB per
+            distribution per channel.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Once attached the device appears as Unix device node in your
+            instance. Use
+          </para>
+          <programlisting>
+            $ fdisk -l
+          </programlisting>
+          <para>
+            to find the device. In the following example we use
+            <filename>/dev/sdb</filename>
+            as the device name.
+          </para>
+          <para>
+            Create one primary partition on the disk
+          </para>
+          <programlisting>
+            $ fdisk /dev/sdb
+
+            n
+            p
+            &lt;Enter&gt; accept start sector
+            &lt;Enter&gt; accept end sector
+            w
+            q
+          </programlisting>
+        </listitem>
+        <listitem>
+          <para>
+            Create a filesystem, we recommend xfs. To create the
+            filesystem, use:
+          </para>
+          <programlisting>
+            $ mkfs.xfs /dev/sdb1
+          </programlisting>
+        </listitem>
+        <listitem>
+          <para>
+            Create a directory (<filename>/manager_storage</filename>) to
+            be used as the mount point for the virtual disk.
+          </para>
+          <programlisting>
+            $ mkdir /manager_storage
+          </programlisting>
+        </listitem>
+        <listitem>
+          <para>
+            Mount the device
+          </para>
+          <programlisting>
+            $ mount /dev/sdb1 /manager_storage
+          </programlisting>
+        </listitem>
+        <listitem>
+          <para>
+            Create an entry in /etc/fstab (optional)
+          </para>
+          <para>
+            Different cloud frameworks treat the attachment of external
+            storage devices differently at instance boot time. Please
+            refer to the cloud environment documentation for guidance
+            about the fstab entry.
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Check with the <command>df</command> tool if
+            <filename>/manager_storage</filename> is mounted and has
+            enough ( &gt;= 15G ) of free space
+          </para>
+        </listitem>
+        <listitem>
+          <para>
+            Re-link the directories in the filesystem SUSE Manager uses
+            to store data (the database and the repositories).
+          </para>
+          <programlisting>
+            - /var/spacewalk contains repositories
+            - /var/lib/pgsql contains postgress database
+          </programlisting>
+          <para>
+            The following bash script handles the move and relinking:
+          </para>
+          <programlisting>
+            for location in /var/lib/spacewalk /var/lib/pgsql; do
+              rsync -zav $location /manager_storage
+              dname=`basename $location`
+              rm -rf $location
+              ln -s /manager_storage/$dname $location
+            done
+          </programlisting>
+        </listitem>
+      </orderedlist>
+    </sect3>
+  </sect2>
+  <sect2 id="registration-of-cloned-systems">
+    <title>Registration of Cloned Systems</title>
+    <para>
+      Cloud environments generally support the creation of new images
+      from a running instance. Images created using this functionality
+      are clones and contain data that will have the effect that SUSE
+      Manager will treat both systems as if they were only 1 system. In
+      order to let SUSE Manager handle instances of cloned images as a
+      new registration apply the procedure outlined on the following
+      wiki to an instance of the cloned image.
+    </para>
+    <para>
+      http://wiki.novell.com/index.php/SUSE_Manager/Register_Clones
+    </para>
+  </sect2>
+</article>
+
