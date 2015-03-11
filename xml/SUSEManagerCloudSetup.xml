@@ -208,7 +208,8 @@
         data loss in cases where the SUSE Manager instance may need to be
         terminated. These steps
         <emphasis role="strong">must</emphasis>
-        be performed prior to running the YaST SUSE Manager setup procedure.
+        be performed <emphasis role="strong">prior</emphasis> to running
+        the YaST SUSE Manager setup procedure.
       </para>
       <procedure>
         <step>
@@ -226,44 +227,28 @@
         <step>
           <para>
             Once attached the device appears as Unix device node in your
-            instance. Use
+            instance. For the following command to work this device node
+            name is required. In many cases the attached storage appears
+            as <emphasis role="strong">/dev/sdb</emphasis>. In order to
+            check which disk devices exists on your system, call the
+            following command:
           </para>
-          <screen>fdisk -l</screen>
-          <para>
-            to find the device. In the following example we use
-            <filename>/dev/sdb</filename>
-            as the device name.
-          </para>
-          <para>
-            Create one primary partition on the disk
-          </para>
-          <screen>&prompt.root;fdisk /dev/sdb
-n
-p
-&lt;Enter&gt; accept default partition number (1)
-&lt;Enter&gt; accept start sector
-&lt;Enter&gt; accept end sector
-w</screen>
+          <screen>hwinfo --disk | grep -E "Device File:"</screen>
         </step>
         <step>
           <para>
-            Create a filesystem, we recommend xfs. To create the
-            filesystem, use:
+            With the device name at hand the process of re-linking the
+            directories in the filesystem SUSE Manager uses to store
+            data is handled by the suma-storage script. In the following
+            example we use <filename>/dev/sdb</filename> as the device name.
           </para>
-          <screen>mkfs.xfs /dev/sdb1</screen>
-        </step>
-        <step>
+          <screen>sudo /usr/bin/suma-storage /dev/sdb</screen>
           <para>
-            Create a directory (<filename>/manager_storage</filename>) to
-            be used as the mount point for the virtual disk.
+            After the call all database and repository files used
+            by SUSE Manager are moved to the newly created xfs based
+            storage. The xfs partition is mounted below the path
+            <filename>/manager_storage</filename>.
           </para>
-          <screen>mkdir /manager_storage</screen>
-        </step>
-        <step>
-          <para>
-            Mount the device
-          </para>
-	  <screen>mount /dev/sdb1 /manager_storage</screen>
         </step>
         <step>
           <para>
@@ -275,36 +260,12 @@ w</screen>
             refer to the cloud environment documentation for guidance
             about the fstab entry.
           </para>
-        </step>
-        <step>
           <para>
-            Check with the <command>df</command> tool if
-            <filename>/manager_storage</filename> is mounted and has
-            enough ( &gt;= 15G ) of free space
+            If your cloud framework recommends to add an fstab entry, add
+            the following line to the
+            <emphasis role="strong">/etc/fstab</emphasis> file.
           </para>
-        </step>
-        <step>
-          <para>
-            Re-link the directories in the filesystem SUSE Manager uses
-            to store data (the database and the repositories).
-          </para>
-	  <simplelist>
-           <member>
-	    <filename>/var/spacewalk</filename>: contains repositories
-	   </member>
-           <member>
-	    <filename>/var/lib/pgsql</filename>: contains postgress database
-	   </member>
-	  </simplelist>
-          <para>
-            The following bash script handles the move and relinking:
-          </para>
-          <screen>for location in /var/lib/spacewalk /var/lib/pgsql; do
-  rsync -zav $location /manager_storage
-  dname=`basename $location`
-  rm -rf $location
-  ln -s /manager_storage/$dname $location
-done</screen>
+          <screen>/dev/sdb1 /manager_storage xfs defaults 1 1</screen>
         </step>
       </procedure>
     </sect2>
