@@ -107,6 +107,66 @@
       </step>
       <step>
         <para>
+          Setup the hostname as follows:
+        </para>
+
+        <para>
+          SUSE Manager requires a stable and reliable hostname and does
+          not take kindly to host name changes.
+        </para>
+        <orderedlist>
+          <listitem>
+            <para>
+              Set the hostname to a name of your choice
+            </para>
+            <screen>hostname instance-host-name</screen>
+          </listitem>
+
+          <listitem>
+            <para>
+              Disable hostname setup in the dhcp configuration
+              file: <filename>/etc/sysconfig/network/dhcp</filename>
+            </para>
+            <screen>DHCLIENT_SET_HOSTNAME="no"</screen>
+          </listitem>
+
+          <listitem>
+            <para>
+               Let the hostname resolve to the instance external IP address
+            </para>
+            <screen>echo "IP-address instance-host-name" >> /etc/hosts</screen>
+          </listitem>
+
+          <listitem>
+            <para>
+              The current value for the external IP-address can be obtained from the
+              public cloud Web console or from within a terminal session as follows:
+            </para>
+            <itemizedlist>
+              <listitem>
+                <para>
+                  Obtain external IP-address from within Amazon EC2 instance
+                </para>
+                <screen>nslookup $(ec2metadata --public-hostname)</screen>
+              </listitem>
+              <listitem>
+                <para>
+                  Obtain external IP-address from within Google Compute Engine instance
+                </para>
+                <screen>gcemetadata --query instance --external-ip</screen>
+              </listitem>
+              <listitem>
+                <para>
+                  Obtain external IP-address from within Microsoft Azure instance
+                </para>
+                <screen>azuremetadata --external-ip</screen>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </orderedlist>
+      </step>
+      <step>
+        <para>
           Run YaST as follows:
         </para>
         <para>
