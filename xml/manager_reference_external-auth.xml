@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
- type="text/xml"
- title="Profiling step"?>
-<!DOCTYPE chapter PUBLIC
-  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+<!DOCTYPE chapter
 [
-  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
   <!ENTITY % entities SYSTEM "entity-decl.ent">
-  %entities;
+    %entities;
 ]>
-<!-- taken from:
-https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
--->
+<!-- Converted by suse-upgrade version 1.1 -->
 
-<chapter id="ch-ipa-integration" os="hidden">
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ch-ipa-integration" os="hidden">
  <title>&susemgr; and IPA integration</title><indexterm>
  <primary>external authentication</primary>
  <secondary>IPA</secondary></indexterm><indexterm>
@@ -25,7 +18,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
   solutions, for example ​FreeIPA. The new feature extends the original
   per-user PAM authentication and includes the following features:
  </para>
-  <itemizedlist>
+  <itemizedlist mark="bullet" spacing="normal">
    <listitem>
     <para>
      Kerberos authentication in the Web interface (tickets). 
@@ -59,8 +52,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
     &susemgr; appliance. That makes it possible to extend this
     authentication mechanism to other authentication providers. The
     following procedures describe how to get it up and running with
-    FreeIPA. For detailed information on the FreeIPA project, see <ulink
-    url="http://http://www.freeipa.org/"/>.
+    FreeIPA. For detailed information on the FreeIPA project, see <link xlink:href="http://http://www.freeipa.org/"/>.
   </para>
   <sect1>
    <title>Enrolling &susemgr; to Identity Provider
@@ -83,7 +75,7 @@ https://fedorahosted.org/spacewalk/wiki/SpacewalkAndIPA
    </para>
    <screen>
     cp /etc/resolv.conf /etc/resolv.conf.orig
-    echo nameserver IP-address-of-the-FreeIPA-server > /etc/resolv.conf
+    echo nameserver IP-address-of-the-FreeIPA-server &gt; /etc/resolv.conf
     ipa-client-install --domain example.com
    </screen>
   </sect1>
@@ -117,7 +109,7 @@ chmod 600 /etc/http.keytab
   </sect1>
   <sect1><title>Host-based Access Control Prerequisites</title>
    <para>
-     To use the host-based access control (HBAC) with the &susemgr; server, create the HBAC service and rule on the FreeIPA server and set up PAM service of the same name on the &susemgr; server. Start with disabling the default allow_all rule, otherwise any user will be allowed access. The page <ulink url="​http://www.freeipa.org/page/Howto/HBAC_and_allow_all"/> describes the process in detail. These are the commands to use: 
+     To use the host-based access control (HBAC) with the &susemgr; server, create the HBAC service and rule on the FreeIPA server and set up PAM service of the same name on the &susemgr; server. Start with disabling the default allow_all rule, otherwise any user will be allowed access. The page <link xlink:href="​http://www.freeipa.org/page/Howto/HBAC_and_allow_all"/> describes the process in detail. These are the commands to use: 
    </para>
    <screen>
 ipa hostgroup-add --desc 'Host group which will have allow_all_users_services HBAC enabled.' allow_all_hosts
@@ -181,20 +173,19 @@ ipa hbactest --user=bob --host=$( hostname ) --service=susemanager-prod
 The package is available from repos for recent Fedoras and Red Hat
 Enterprise Linux distributions:
 ​http://copr-fe.cloud.fedoraproject.org/coprs/adelton/identity_demo/
-Retrieve the .repo file and put it to /etc/yum.repos.d, you can disable it by default: -->
-<!--<screen>-->
+Retrieve the .repo file and put it to /etc/yum.repos.d, you can disable it by default: --&gt;
+
 # Example for RHEL 6:
 curl -o /etc/yum.repos.d/adelton-identity_demo.repo \
 http://copr-fe.cloud.fedoraproject.org/coprs/adelton/identity_demo/repo/epel-6-x86_64/
 sed -i 's/enabled=.*/enabled=0/' /etc/yum.repos.d/adelton-identity_demo.repo
-<!--   </screen>-->
-<!--   <para>-->
+
+
     Install sssd-dbus:
-<!--   </para>-->
-<!--   <screen>-->
+
+
      zypper install &ndash;&ndash;enablerepo=adelton-identity_demo sssd-dbus -y
-<!--   </screen>
---></remark>
+</remark>
    <para>
     The <systemitem>sssd</systemitem> service needs to be configured
     to enable ifp, retrieval and caching of attributes needed by
@@ -342,7 +333,7 @@ service tomcat6 restart
      allow login for users that currently do not have &susemgr;
      accounts, there are the following options:
    </para>
-   <itemizedlist>
+   <itemizedlist mark="bullet" spacing="normal">
     <listitem>
      <para>
       Pre-create their accounts in the desired organization via Web interface or API.

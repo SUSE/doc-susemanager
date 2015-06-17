@@ -1,90 +1,87 @@
-<?xml version="1.0"?>
-<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
- type="text/xml"
- title="Profiling step"?>
-<!DOCTYPE appendix PUBLIC
-  "-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE appendix
 [
-  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
   <!ENTITY % entities SYSTEM "entity-decl.ent">
-  %entities;
+    %entities;
 ]>
-<appendix id="ap-sample-autoinst-tracking-script">
+<!-- Converted by suse-upgrade version 1.1 -->
+
+<appendix xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ap-sample-autoinst-tracking-script">
  <title>Sample Autoinstallation Script with Tracking</title><indexterm>
  <primary>autoinstallation with tracking</primary>
  <secondary>sample file</secondary></indexterm>
  <para>
  </para>
-<screen><![CDATA[<?xml version="1.0"?>
-<!DOCTYPE profile>
-<profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
-  <networking>
-    <keep_install_network config:type="boolean">true</keep_install_network>
-  </networking>
-  <add-on>
-    <add_on_products config:type="list">
-      <listentry>
-        <ask_on_error config:type="boolean">true</ask_on_error>
-        <media_url
->http://$redhat_management_server/ks/dist/child/sm-tools-i586/sles11-sp1-i586-ks2</media_url>
-        <name>susemanager tools</name>
-        <product>SM Tools</product>
-        <product_dir>/</product_dir>
-      </listentry>
-      <listentry>
-        <ask_on_error config:type="boolean">true</ask_on_error>
-        <media_url
->http://$redhat_management_server/ks/dist/child/clone-sles11-sp1-updates-i586/sles11-sp1-i586-ks2</media_url>
-        <name>SLES11 updates</name>
-        <product>sles11 updates</product>
-        <product_dir>/</product_dir>
-      </listentry>
-    </add_on_products>
-  </add-on>
-<scripts>
-  <init-scripts config:type="list">
-    <script>
-      <source><![CDATA[
+<screen>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE profile&gt;
+&lt;profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns"&gt;
+  &lt;networking&gt;
+    &lt;keep_install_network config:type="boolean"&gt;true&lt;/keep_install_network&gt;
+  &lt;/networking&gt;
+  &lt;add-on&gt;
+    &lt;add_on_products config:type="list"&gt;
+      &lt;listentry&gt;
+        &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+        &lt;media_url
+&gt;http://$redhat_management_server/ks/dist/child/sm-tools-i586/sles11-sp1-i586-ks2&lt;/media_url&gt;
+        &lt;name&gt;susemanager tools&lt;/name&gt;
+        &lt;product&gt;SM Tools&lt;/product&gt;
+        &lt;product_dir&gt;/&lt;/product_dir&gt;
+      &lt;/listentry&gt;
+      &lt;listentry&gt;
+        &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+        &lt;media_url
+&gt;http://$redhat_management_server/ks/dist/child/clone-sles11-sp1-updates-i586/sles11-sp1-i586-ks2&lt;/media_url&gt;
+        &lt;name&gt;SLES11 updates&lt;/name&gt;
+        &lt;product&gt;sles11 updates&lt;/product&gt;
+        &lt;product_dir&gt;/&lt;/product_dir&gt;
+      &lt;/listentry&gt;
+    &lt;/add_on_products&gt;
+  &lt;/add-on&gt;
+&lt;scripts&gt;
+  &lt;init-scripts config:type="list"&gt;
+    &lt;script&gt;
+      &lt;source&gt;&lt;![CDATA[
 $SNIPPET('spacewalk/sles_register')
-]]]]><![CDATA[>
-      </source>
-      <filename>ay_suse_manager_register.sh</filename>
-      <debug config:type="boolean">true</debug>
-    </script>
-  </init-scripts>
-</scripts>
-<software>
-  <packages config:type="list">
-    <package>spacewalk-client-tools</package>
-    <package>spacewalk-client-setup</package>
-  </packages>
-</software>
-<general>
+]]&gt;
+      &lt;/source&gt;
+      &lt;filename&gt;ay_suse_manager_register.sh&lt;/filename&gt;
+      &lt;debug config:type="boolean"&gt;true&lt;/debug&gt;
+    &lt;/script&gt;
+  &lt;/init-scripts&gt;
+&lt;/scripts&gt;
+&lt;software&gt;
+  &lt;packages config:type="list"&gt;
+    &lt;package&gt;spacewalk-client-tools&lt;/package&gt;
+    &lt;package&gt;spacewalk-client-setup&lt;/package&gt;
+  &lt;/packages&gt;
+&lt;/software&gt;
+&lt;general&gt;
   $SNIPPET('spacewalk/sles_no_signature_checks')
-  <mode>
-    <confirm config:type="boolean">true</confirm>
-  </mode>
-</general>
-<users config:type="list">
-    <user>
-      <encrypted config:type="boolean">false</encrypted>
-      <fullname>root</fullname>
-      <gid>0</gid>
-      <home>/root</home>
-      <password_settings>
-        <expire></expire>
-        <flag></flag>
-        <inact></inact>
-        <max></max>
-        <min></min>
-        <warn></warn>
-      </password_settings>
-      <shell>/bin/bash</shell>
-      <uid>0</uid>
-      <user_password>linux</user_password>
-      <username>root</username>
-    </user>
-</users>
-</profile>
-]]></screen>
+  &lt;mode&gt;
+    &lt;confirm config:type="boolean"&gt;true&lt;/confirm&gt;
+  &lt;/mode&gt;
+&lt;/general&gt;
+&lt;users config:type="list"&gt;
+    &lt;user&gt;
+      &lt;encrypted config:type="boolean"&gt;false&lt;/encrypted&gt;
+      &lt;fullname&gt;root&lt;/fullname&gt;
+      &lt;gid&gt;0&lt;/gid&gt;
+      &lt;home&gt;/root&lt;/home&gt;
+      &lt;password_settings&gt;
+        &lt;expire&gt;&lt;/expire&gt;
+        &lt;flag&gt;&lt;/flag&gt;
+        &lt;inact&gt;&lt;/inact&gt;
+        &lt;max&gt;&lt;/max&gt;
+        &lt;min&gt;&lt;/min&gt;
+        &lt;warn&gt;&lt;/warn&gt;
+      &lt;/password_settings&gt;
+      &lt;shell&gt;/bin/bash&lt;/shell&gt;
+      &lt;uid&gt;0&lt;/uid&gt;
+      &lt;user_password&gt;linux&lt;/user_password&gt;
+      &lt;username&gt;root&lt;/username&gt;
+    &lt;/user&gt;
+&lt;/users&gt;
+&lt;/profile&gt;
+</screen>
 </appendix>
