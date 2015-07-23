@@ -5,7 +5,7 @@
 **This readme is currently under development**
 
 This is the source for the official SUSE Manager documentation update.
-This update aims to condense the current 6 SUSE Manager official documentation books into three brand new manuals and one new quickstart guide. This update will include up-to-date & detailed information covering several subjects generated in combination with feedback from customers, engineers, and sales. A short list of subjects being looked at & in improvment planning include:
+This update aims to condense the current six SUSE Manager official documentation books into three brand new manuals and one new quickstart guide. This update will include up-to-date & detailed information covering several subjects generated in combination with feedback from customers, engineers, and sales. A short list of subjects being looked at & in improvment planning include:
 * Channel Management
 * Channel Assignment
 * What is Channel Cloning 
