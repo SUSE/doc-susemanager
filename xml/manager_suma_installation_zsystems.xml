@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE chapter 
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ch-installation-zsystems">
+    <title>&susemgr; on IBM &zseries; </title>
+  
+
+    <sect1>
+
+        <title>Introduction</title>
+        <para> This best practice guide is intended for z/VM administrators responsible for
+            operating the IBM &zseries; Mainframe. The goal of this guide is to lead an z/VM
+            administrator trained on normal &zseries; operating protocols through the installation
+            of &susemgr; &productnumber; onto an existing mainframe system. The intent of this
+            chapter is not to cover the variety of hardware configuration profiles available on
+            &zseries; but instead to provide a foundational overview of the procedure and
+            requirements necessary for a successful &susemgr; server deployment. </para>
+
+    </sect1>
+
+    <sect1>
+
+        <title>Base System Requirements</title>
+        <para>The z/VM administrator should acquire and prepare the following resources for a
+            successful SUSE Manager installation. SUSE Manager 2.1 for IBM z Systems is delivered as
+            an appliance image. During setup it will be required to dump this SUSE Manager image
+            onto a disk assigned to your designated z/VM guest. The following sections describe this
+            procedure using the tools located on the SLES 12 installation media. These sections
+            will provide you with the minimum recommended system requirements for &susemgr; to include:
+            hardware, database, and disk space. The base system for &susemgr;&nbsp;2.1 is SLES 11
+            SP3. </para>
+
+        <itemizedlist>
+            <title>Hardware Requirements</title>
+            <listitem>
+                <para>See this link : <link xlink:href="https://www.suse.com/products/systemz/technical-information/#System"/>
+                 for supported IBM mainframes. </para>
+            </listitem>
+
+            <listitem>
+                <!-- link here link to typical requirements for a production system in reference manual -->
+                <para> 5GB Memory (3GB RAM + 2GB VDISK swap) for a small number of clients.
+                        <emphasis>For a larger production system the ratio of physical memory to
+                        vdisk will need to be re-evaluated based on the number of clients being
+                        supported. </emphasis>
+                    <remark>We need more info regarding numbers of clients vs. Ram and VDISK.
+                    </remark>
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <itemizedlist>
+            <title>Media Requirements</title>
+
+            <listitem>
+                <para>A copy of the SLES 12 Installation media will be required for additional tools
+                    during the installation procedure. 
+                    <link xlink:href="https://download.suse.com/Download?buildid=727vh-9Go98~"/>
+                        SLE-12-Server-DVD-s390x-GM-DVD1.iso</para>
+            </listitem>
+            <listitem>
+                <para>&susemgr; &productnumber; &zseries; Installation Media: <remark>location will be fixed on release.</remark>
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <para> The following tables contain the network and device information used for this guide.
+            Your configuration data including network and device numbers will be different. </para>
+        <informaltable>
+            <tgroup cols="2">
+
+                <thead>
+                    <row>
+                        <entry>
+                            <para>Network Type</para>
+                        </entry>
+                        <entry>
+                            <para>IP Addresses</para>
+                        </entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>
+                            <para>HOSTIP</para>
+                        </entry>
+                        <entry>
+                            <para>192.168.0.10</para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>NETMASK</para>
+                        </entry>
+                        <entry>
+                            <para>255.255.255.0</para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>nameserver</para>
+                        </entry>
+                        <entry>
+                            <para>192.168.0.1</para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>GATEWAY</para>
+                        </entry>
+                        <entry>
+                            <para>192.168.0.254</para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>FTP Server</para>
+                        </entry>
+                        <entry>
+                            <para>ftp://example.com</para>
+                        </entry>
+                    </row>
+
+                </tbody>
+            </tgroup>
+        </informaltable>
+
+
+
+        <informaltable>
+            <tgroup cols="2">
+                <thead>
+                    <row>
+                        <entry>
+                            <para>Device Type</para>
+                        </entry>
+                        <entry>
+                            <para>Device ID Number</para>
+                        </entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>
+                            <para>EDEV Device</para>
+                        </entry>
+                        <entry>
+                            <para>&lt;EDEV_DEVICE_ID&gt;</para>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </informaltable>
+
+    </sect1>
+
+    <sect1>
+        <title>Additional Requirements</title>
+        <para>There are a few additional resource requirements you will need to prepare before
+            installing the SUSE Manager appliance on your system. This section overviews these
+            requirements.</para>
+
+        <formalpara>
+            <title>Guest z/VM Network Information</title>
+            <para>The guest z/VM should be provided with a static IP address and hostname as these
+                cannot be easily changed after initial setup. The hostname should contain less than
+                8 characters. For example: <systemitem>SUMA21</systemitem></para>
+        </formalpara>
+        <formalpara>
+            <title>FTP Server Accessible from Guest</title>
+            <para>An ftp server must be reachable from the z/VM guest. This must contain the
+                &susemgr; installation media and a directory containing the contents of the &sle; 12
+                installation image. The extracted SLES12 directory is necessary for additional tools
+                and will not be installed. For more information on loop mounting See also: 
+                <link xlink:href="https://www.suse.com/documentation/sled-12/book_sle_deployment/data/sec_deployment_remoteinst_instserver.html#sec_deployment_remoteinst_iso"/>
+                    </para>
+        </formalpara>
+
+        <itemizedlist>
+            <title>FTP Server Contents</title>
+            <listitem>
+                <para>Directory containing the extracted SLES12 installation image.</para>
+                <screen>ftp://example.com/SLE-12-Server-GM/s390x/DVD1</screen>
+            </listitem>
+            <listitem>
+                <para>SUSE Manager image</para>
+                <screen>ftp://example.com/SUSE_Manager-2.1.iso</screen>
+            </listitem>
+        </itemizedlist>
+
+        <formalpara>
+            <title>parmfile for Network Configuration</title>
+            <para>A parmfile is required during the initial installation of SUSE Manager for network
+                configuration. See also: (The parmfile-Automating the System Configuration) <link xlink:href="https://www.suse.com/documentation/sles-12/book_sle_deployment/data/sec_appdendix_parm.html"/>
+            </para>
+        </formalpara>
+
+        <formalpara>
+            <title>Pre-Installation Storage Requirements</title>
+            <para>There are several storage devices that must be configured and added before
+                installation of SUSE Manager. You are required to calculate sufficient disk storage
+                for &susemgr;<emphasis> before
+                    running</emphasis><command>yast2</command><command>susemanager_setup</command>.
+                The following information will help fulfill these requirements.</para>
+
+        </formalpara>
+        <warning>
+            <title>&susemgr; Default Volume Groups and Disk Space</title>
+            <para>The &susemgr; installation defaults to creating one volume group and a single
+                volume for the root filesystem. The file system of &susemgr; including the embedded
+                database and patch directories will reside within this root volume. While
+                adjustments are possible once installation has completed it becomes the
+                administrators responsibility to specify and monitor these adjustments.</para>
+
+            <para> If your &susemgr; runs out of disk space, this can have a severe impact on its
+                database and file structure. Preparing storage requirements in accordance with this
+                section will aid in preventing these harmful effects. </para>
+
+            <para>
+                <emphasis>SUSE technical services will be unable to provide support for systems
+                    suffering from low disk space conditions as this can have an effect on an entire
+                    system and therefore becomes unresolvable. A full recovery is only possible with
+                    a previous backup or a new SUSE Manager installation.</emphasis>
+            </para>
+
+
+        </warning>
+
+        <itemizedlist>
+            <title>Required Storage Devices</title>
+            <listitem>
+                <para>A <systemitem>read/writeable 191 minidisk</systemitem> with at least 100MB of
+                    available storage.</para>
+            </listitem>
+            <listitem>
+                <para>A 512-byte block EDEV emulated <systemitem>DASD</systemitem> device with at
+                    least 10GB of allocated space for SUSE Manager system files.</para>
+
+            </listitem>
+            <listitem>
+                <para>An additional disk is required for database storage. This should be an
+                        <systemitem>zFCP</systemitem> or <systemitem>DASD</systemitem> device as
+                    these are preferred for use with <systemitem>HYPERPAV</systemitem>. This disk
+                    should fulfill the following requirements</para>
+                <para>At least 30GB for</para>
+                <screen>/var/lib/pgSQL</screen>
+                <para>At least 100GB for</para>
+                <screen>/var/spacewalk</screen>
+
+            </listitem>
+            <listitem><para>For more information regarding storage requirements see also: <link xlink:href="https://www.suse.com/support/kb/doc.php?id=7015050"/></para></listitem>
+        </itemizedlist>
+
+    </sect1>
+
+    <sect1>
+
+        <title>Storage Preparation</title>
+        <para>This procedure covers the preparation of the required storage devices in the
+            Additional Requirements section. It is assumed that the SLES 12 installation image
+            contents have been extracted to a directory on your ftp server. For more information on
+            loop mounting See also: <link xlink:href="https://www.suse.com/documentation/sled-12/book_sle_deployment/data/sec_deployment_remoteinst_instserver.html#sec_deployment_remoteinst_iso"/>
+                </para>
+        <procedure>
+            <step>
+                <para>Logon to z/VM guest.</para>
+            </step>
+            <step>
+                <para>Give access to the ftp command with:</para>
+                <screen><prompt>==&gt; </prompt><command>vmlink tcpmaint 592</command></screen>
+            </step>
+            <step>
+                <para>Continue via ftp to your server: </para>
+                <screen><prompt>==&gt; </prompt><command>ftp example.com</command> </screen>
+            </step>
+            <step>
+                <para>Log on to your ftp server.</para>
+            </step>
+            <step>
+                <para>On the ftp server change to the extracted SLES 12 installation media directory
+                    and execute the following commands:</para>
+                <screen>
+<prompt>==&gt; </prompt><command>get boot/s390x/sles12.exec sles12.exec.a</command>
+                    
+<prompt>==&gt; </prompt><command>get boot/s390x/parmfile sles12.parmfile.a</command>
+                    
+<prompt>==&gt; </prompt><command>bin</command> 
+
+<prompt>==&gt; </prompt><command>locsite fix 80</command>  
+                    
+<prompt>==&gt; </prompt><command>get boot/s390x/linux sles12.linux.a</command>
+                    
+<prompt>==&gt; </prompt><command>get boot/s390x/initrd sles12.initrd.a</command>
+                    
+<prompt>==&gt; </prompt><command>quit</command>  
+                </screen>
+            </step>
+            <step>
+                <para>Next prepare Initial Program Loader (IPL) with:</para>
+                <screen>
+<prompt>==&gt; </prompt><command>PIPE &lt; SLES12 LINUX A | fblock 80 00 | &gt; SLES12 LINUX A</command>
+                    
+<prompt>==&gt; </prompt><command>PIPE &lt; SLES12 INITRD A | fblock 80 00 | &gt; SLES12 INITRD A</command>
+                </screen>
+            </step>
+            <step>
+                <para>Advance to the next section.</para>
+            </step>
+        </procedure>
+
+    </sect1>
+    <sect1>
+        <title>SUSE Linux Enterprise 12 Required Functionality</title>
+        <para>This procedure walks through the necessary steps of installing the SLES 12 tools to
+            memory which are required for dumping the SUSE Manager image.</para>
+        <procedure>
+            <step>
+                <para>Start the Installation of SLES12.</para>
+                <screen><prompt>==&gt; </prompt><command>SLES12</command></screen>
+                <substeps>
+                    <step>
+                        <para>After initial boot select <systemitem>1</systemitem> to start
+                            installation.</para>
+                        <screen linenumbering="numbered">
+Main Menu
+0)&lt;-- Back &lt;--
+1) Start Installation
+2) Settings
+3) Expert
+4) Exit or Reboot
+
+==&gt; 1</screen>
+                    </step>
+                    <step>
+                        <para>Select <systemitem>1</systemitem> to continue with the
+                            installation.</para>
+                        <screen linenumbering="numbered">
+Start Installation
+
+0)&lt;-- Back &lt;--
+1) Installation
+2) Upgrade
+3) Rescue System
+4) Boot Installed System
+5) Network Setup
+
+==&gt; 1
+                        </screen>
+                    </step>
+
+                    <step>
+                        <para>Select <systemitem>2</systemitem> as the source medium.</para>
+                        <screen linenumbering="numbered">
+Choose the source medium
+                    
+0) &lt;-- Back &lt;--
+1) DVD / CD-ROM
+2) Network
+3) Hard Disk
+
+==&gt; 2</screen>
+                    </step>
+
+
+
+
+                </substeps>
+
+
+            </step>
+
+
+
+            <step>
+                <para>You will now configure your network. Select <systemitem>1</systemitem> as the
+                    network protocol.</para>
+                <screen linenumbering="numbered">
+Choose the network protocol
+
+0) &lt;-- Back &lt;--
+1) FTP
+2) HTTP
+3) HTTPS
+4) NFS
+5) SMB / CIFS (Windows Share)
+6) TFTP
+
+==&gt; 1
+                </screen>
+                <substeps>
+                    <step>
+                        <para>Choose the network device appropriate for your configuration. </para>
+
+                    </step>
+
+                    <step>
+                        <para>Enter the port number if necessary.</para>
+                    </step>
+                    <step>
+                        <para>Enable OSI Layer 2 support (yes or no).</para>
+                    </step>
+
+                    <step>
+                        <para>Enter a mac address if necessary.</para>
+                    </step>
+
+                    <step>
+                        <para>Select automatic network configuration via DHCP only if your
+                            environment supports it.</para>
+                    </step>
+
+                </substeps>
+            </step>
+            <step>
+                <para>Next input your ftp information. Enter your ftp server address.</para>
+                <screen>
+Enter the name of the FTP server. (Enter '+++' to abort).
+
+192.168.178.30
+                </screen>
+                <substeps>
+                    <step>
+                        <para>Enter the directory which contains the SLES12 installation disk
+                            contents. </para>
+                        <screen>
+Enter the directory on the server. (Enter '+++' to abort).
+
+/SLE-12-Server-GM/s390x/DVD1
+                </screen>
+                    </step>
+
+                    <step>
+                        <para>Select user and password requirements, (yes or no) for your FTP
+                            server.</para>
+                    </step>
+                    <step>
+                        <para>Select proxy information (yes or no). The installation system will
+                            load.</para>
+                    </step>
+                </substeps>
+            </step>
+
+            <step>
+                <para>Select SSH as the desired display type. This will allow you to login via SSH. </para>
+                <screen linenumbering="numbered">
+Select the display type.
+
+0) &lt;-- Back &lt;--
+1) X11
+2) VNC
+3) SSH
+4) ASCII Console
+
+==&gt; 3
+                </screen>
+                <substeps>
+                    <step>
+                        <para>Enter a temporary SSH password</para>
+                    </step>
+                </substeps>
+            </step>
+
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>SUSE Manager Installation</title>
+        <para>This section covers the installation of &susemgr; on the required EDEV device.</para>
+        <procedure>
+            <title>Preparing EDEV Disk Device</title>
+
+            <para>The following procedure prepares the EDEV device for dumping the &susemgr; image
+                to and sets it as the default boot disk. Log into your &sle; &zseries; guest as
+                <systemitem>root</systemitem> and issue the following commands.</para>
+            <step>
+                <para>Log into the &susemgr; server guest via SSH.</para>
+                <screen><prompt>tux &gt; </prompt><command>ssh root@SUMA21</command></screen>
+            </step>
+            <step>
+                <para>Bring the disk online with:</para>
+                <screen><prompt>root# &gt; </prompt><command>chccwdev -e &lt;EDEV_DEVICE_ID&gt; </command></screen>
+            </step>
+            <step>
+                <para>Use the <command>lsdasd</command> command to list devices available on your
+                    system and their assigned id's:</para>
+                <screen><prompt>root# &gt; </prompt><command>lsdasd</command>
+                    
+Bus-ID     Status      Name      Device  Type  BlkSz  Size      Blocks
+==============================================================================
+ 0.0.0240   active      dasda     94:0    FBA   512    10240MB   20971520
+</screen>
+
+            </step>
+            <step>
+                <para>Continue by writing the &susemgr; image to the EDEV disk device:</para>
+                <screen><prompt>root# &gt;</prompt><command> wget -O - ftp://your_ftpserver/susemanager21.raw.xz | xzcat &gt; /dev/dasda</command></screen>
+                <para>Run sync to ensure the buffer is empty.</para>
+                <screen><prompt>root# &gt; </prompt><command>sync</command></screen>
+            </step>
+
+            <step>
+                <para>Wait for the image to finish dumping to disk.</para>
+            </step>
+
+            <step>
+                <para>After the image has finished dumping to your EDEV disk, you must execute the
+                    following command. This command takes the device offline and sets it as the
+                    default boot disk.</para>
+                <screen><prompt>root# &gt; </prompt><command>chccwdev -d &lt;EDEV_DEVICE_ID&gt;</command></screen>
+            </step>
+            <step>
+                <para>On the 3270 console run the following command:</para>
+                <screen><prompt>==&gt; </prompt><command>#cp ipl cms</command></screen>
+
+            </step>
+            <step>
+                <para>Create the SUMA21 PARM-S11 A file and add the required kernel parameters for
+                    your setup. See also <link xlink:href="https://www.suse.com/documentation/sles-12/book_sle_deployment/data/sec_appdendix_parm.html"/>
+                </para>
+                <warning>
+                    <title>Parameter Contents</title>
+                    <para>Configuration parameters in the parmfile are case sensitive. Note the
+                        following example.</para>
+                </warning>
+                <screen>
+HOSTIP=10.161.155.98
+NETMASK=255.255.240.0
+nameserver=10.160.2.88
+GATEWAY=10.161.159.254
+InstNetDev=osa Layer2=1
+OSAInterface=qdio OSAMedium=eth portno=0 portname=whatever
+ReadChannel=0.0.0800 WriteChannel=0.0.0801 DataChannel=0.0.0802
+Hostname=s390vsl098.suse.de
+ </screen>
+            </step>
+            <step>
+                <para>Initial program load the edev device.</para>
+                <screen><prompt>==&gt; </prompt><command>ipl &lt;EDEV_DEVICE_ID&gt;</command></screen>
+            </step>
+            <step>
+                <para>Log into the SUSE Manager server guest via SSH as root. The default password is
+                        <systemitem>linux</systemitem>.</para>
+            </step>
+
+            <step>
+                <para>YaST firstboot will auto start. Accept the license agreement and Follow the
+                    steps to complete YaST firstboot procedures</para>
+            </step>
+            <step>
+                <para>After firstboot procedures have completed continue by updating SUSE Manager
+                    using online update and reboot the system.</para>
+            </step>
+        </procedure>
+
+
+        <para>After rebooting you will need to setup the additional storage required for
+            /var/spacewalk and /var/lib/pgSQL and swap space using the yast partitioner tool. This
+            step is required before running <systemitem>yast2 susemanager_setup</systemitem>
+        </para>
+        <para>After having configured the storage requirements, executed a yast update and completed
+            a system reboot, run &susemgr; setup to finalize the &susemgr; installation on your
+            &zseries; mainframe:</para>
+        <screen><prompt>root# &gt; </prompt><command>yast2 susemanager_setup</command></screen>
+        <para>Proceed through the &susemgr; setup until complete. For more information on a typical
+            &susemgr; setup, see also: </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    <link xlink:href="https://www.suse.com/documentation/suse_manager/book_susemanager_install/data/sec_manager_inst_setup.html"/>
+                </para>
+            </listitem>
+        </itemizedlist>
+
+    </sect1>
+</chapter>
+
+
+
