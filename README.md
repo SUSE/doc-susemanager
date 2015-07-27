@@ -41,8 +41,9 @@ New work items will be added here. The status of these items will be marked with
 ##The Working List:##
 
 - [x] This repo setup with DAPS & DocBook directory requires Status: DONE June 19, 2015
-- [ ] New TOC which includes customer, engineering & sales feedback topics Status: IN_PROGRESS June 19, 2015
-
+- [x] New TOC which includes customer, engineering & sales feedback topics Status: DONE June 29, 2015
+- [x] Channel Management research: DONE July 25, 2015
+- [ ] Chapter 4 Channel Mangament: In_Progress July 28, 2015
 
 ##Planning:##
 
