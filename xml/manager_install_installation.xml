@@ -1011,24 +1011,25 @@ disconnected=0</screen>
    FATE#311604.</remark>
   </para>
 
-  <para>If it is not possible to connect &susemgr; directly or via a
-  proxy to the Internet, a disconnected setup in combination with
-  &smtool; (&smt;) is the recommended solution.  In this scenario, &smt;
-  stays in an <quote>external</quote> network with a connection to &ncc;
-  and synchronizes the software channels and repositories on a removable
-  storage medium. Then you separate the storage medium from &smt;, and
-  let the &susemgr; server mount it locally to read the data.
+  <para>
+   If it is not possible to connect &susemgr; directly or via a proxy to
+   the Internet, a disconnected setup in combination with &smtool;
+   (&smt;) is the recommended solution.  In this scenario, &smt; stays
+   in an <quote>external</quote> network with a connection to &ncc; and
+   synchronizes the software channels and repositories on a removable
+   storage medium. Then you separate the storage medium from &smt;, and
+   let the &susemgr; server mount it locally to read the data.
   </para>
 
   <sect2>
    <title>Basic Configuration and Usage</title>
 
   <procedure id="pro.manager.disconnected.smt">
-   <title>&smt;: Fetching Data from the Internet</title> 
+   <title>&smt;: Fetching Data from the Internet</title>
    <step>
     <para>
-     Install &smt; in the external network with &ncc; connection.  For
-     details about installing &smt;, see <ulink
+     Install &smt; in the external network with &scc; (SCC) or &ncc;
+     (NCC) connection.  For details about installing &smt;, see <ulink
      url="http://www.suse.com/documentation/smt11/"/>.
     </para>
    </step>
@@ -1043,7 +1044,7 @@ disconnected=0</screen>
      Create a <quote>database replacement file</quote> (e.g.,
      <filename>/tmp/dbrepl.xml</filename>):
     </para>
-    <screen>smt-ncc-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
+    <screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
    </step>
    <step id="pro.manager.disconnected.smt.mounting">
     <para>
@@ -1053,10 +1054,19 @@ disconnected=0</screen>
    </step>
    <step>
     <para>Export the data to the mounted medium:</para>
-    <screen>smt-ncc-sync --todir /media/<replaceable>disk</replaceable>/
+    <screen>smt-sync --todir /media/<replaceable>disk</replaceable>/
 smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/<replaceable>disk</replaceable> \
            --fromlocalsmt -L /var/log/smt/smt-mirror-export.log
     </screen>
+    <note>
+     <title>Synchronizing Meta Data</title>
+     <para>
+       <command>smt-sync</command> also exports the subscription and
+       entitlement data. To keep &susemgr; up-to-date with the amount of
+       subscriptions and entitlements, you must export and import these
+       data frequently.
+     </para>
+    </note>
    </step>
    <step>
     <para>Unmount the storage medium to carry it to your &susemgr; server.</para>
@@ -1075,23 +1085,65 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/<replaceable>disk</re
    </step>
    <step>
     <para>
-<!-- bnc#794155 -->
-<command>mgr-ncc-sync</command> can now be used as usual<!--&mdash;see
-<xref linkend="s2-import-rhnsst"/>-->.  Use the
-<option>--from-dir</option> parameter to point the sync to the mounted
-disk.  First import the data about products, subscriptions, channels,
-and more without additional options or with the <option>--refresh</option>
-option.  Then use <option>-l</option> to list the base channels and the
-child channels of the already synced base channels, and together with
-<option>--all-childs</option> to list all child channels, even if the
-parent channel is not synced yet.  Use
-<option>-c</option> to add a new channel and trigger a repository
-sync:</para>
-    <screen>mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> --refresh
-mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> -l
-mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> -c <replaceable>channel-name</replaceable></screen>
+     Specify the local path on the &susemgr; server in <filename>/etc/rhn/rhn.conf</filename>:
+    </para>
+    <screen>server.susemanager.fromdir = /media/<replaceable>disk</replaceable></screen>
+    <para>
+     This setting is optional if you are still using NCC with
+     <command>mgr-ncc-sync</command>, while it is mandatory for SCC
+     using <command>mgr-sync</command>.
+    </para>
    </step>
+   <step>
+    <para>
+     Restart Tomcat:
+    </para>
+    <screen>rctomcat6 restart</screen>
+   </step>
+   <step>
+    <para>
+     Do a full sync before anything else:
+    </para>
+    <screen>mgr-sync refresh                       # SCC (fromdir in rhn.conf required!)
+mgr-ncc-sync --from-dir /media/disk    # NCC</screen>
+   </step>
+
+   <step>
+    <para>
+     <command>mgr-ncc</command> or <command>mgr-ncc-sync</command> can
+     now be used as usual.  SCC, for example:
+    </para>
+    <screen>mgr-sync list channels
+    mgr-sync add channel <replaceable>channel-label</replaceable></screen>
+    <para>
+     With <command>mgr-ncc-sync</command> using NCC specify
+     <option>--from-dir</option> parameter to point the sync to the
+     mounted disk, if not set in <filename>rhn.conf</filename>:
+    </para>
+    <screen>mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> -l
+mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> -c <replaceable>channel-name</replaceable></screen>
+    <warning>
+     <title>Data Corruption</title>
+     <para>
+      The disk must always be available at the same mount point. To
+      avoid data corruption, do not trigger a sync, if the storage
+      medium is not mounted. If you have already added a channel from a
+      local repository path, you will not be able to change its URL to
+      point to a different path afterwards (this includes NCC).
+     </para>
+    </warning>
+   </step>
+   <!--
+   <step>
+    <para>
+     To disable the forwarding of registrations to NCC set the following
+     value in <filename>/etc/rhn/rhn.conf</filename>:
+     <screen>server.susemanager.forward_registration = 0</screen>
+    </para>
+    </step>
+   -->
   </procedure>
+
   <para>Now the up-to-date data are available on your &susemgr; and
   ready for updating the client systems.  According to your needs,
   refresh the data on the storage medium:</para>
@@ -1131,8 +1183,10 @@ mgr-ncc-sync --from-dir /media/<replaceable>disk</replaceable> -c <replaceable>c
 
    <screen>server.susemanager.forward_registration = 0</screen>
 
-   <para>Without this setting, the log file will be populated with many
-    error messages.</para>
+   <para>
+    Without this setting, the log file will be populated with many
+    error messages.
+   </para>
 
   </sect2>
  </sect1>
