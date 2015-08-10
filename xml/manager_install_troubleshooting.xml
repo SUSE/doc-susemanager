@@ -1025,6 +1025,103 @@ system-history-scap: OpenSCAP event history
   </para>
  </sect1>
  <!-- ============================================================ -->
+ <!-- Based on
+      https://wiki.novell.com/index.php/SUSE_Manager/Proxy_to_internet
+ -->
+ <sect1 id="s1-trouble-proxy-with-certs">
+  <title>Using a Proxy with Certificates to Access the Internet</title>
+
+  <para>
+   Some proxies need certificates to access the internet. Often these
+   certificates are created on the own CA of the company. This will
+   cause problems when &susemgr; wants to access <literal>suse.com</literal> or
+   <literal>novell.com</literal> servers.  In these cases, you could see
+   the following error messages:
+  </para>
+  <variablelist>
+   <varlistentry>
+    <term>In <filename>/var/log/tomcat6/catalina.out</filename>:</term>
+    <listitem>
+     <screen>2015-04-28 09:31:00,886 [TP-Processor6] INFO  org.directwebremoting.log.accessLog - Method execution failed:
+com.redhat.rhn.frontend.action.satellite.SCCConfigAction$SCCConfigException:
+com.suse.scc.client.SCCClientException:
+javax.net.ssl.SSLPeerUnverifiedException: peer not authenticated</screen>
+     <para>
+      or
+     </para>
+<screen>2015-01-08 17:07:20,240 [TP-Processor6] ERROR com.redhat.rhn.manager.setup.SCCMirrorCredentialsManager - Error getting subscriptions for 6419084, 
+javax.net.ssl.SSLHandshakeException: com.ibm.jsse2.util.j: PKIX path building failed:</screen>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>wget will show the following:</term>
+    <listitem>
+<screen>wget http://updates.suse.com
+ --2015-04-28 11:12:23--  http://updates.suse.com/
+ Resolving xxxxxxxxxxxxxx... yyy.yyy.yyy.yyy
+ Connecting to XXXXXXXXXXXXXX|yyy.yyy.yyy.yyy|:8080... connected.
+ Proxy request sent, awaiting response... 301 Moved Permanently
+ Location: https://updates.suse.com// [following]
+ --2015-04-28 11:12:23--  https://updates.suse.com//
+ Connecting to XXXXXXXXXXXXXX|yyy.yyy.yyy.yyy|:8080... connected.
+ ERROR: cannot verify updates.suse.com's certificate, issued by `/C=XX/O=XXXXXX/CN=XXXXXXXXXXXXXXX':
+ Unable to locally verify the issuer's authority.
+ To connect to updates.suse.com insecurely, use `--no-check-certificate'.
+ Unable to establish SSL connection.</screen>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  <para>
+   To solve this issue use the following procedure:
+  </para>
+
+  <procedure>
+   <step>
+    <para>
+     Copy the root and&mdash;if needed&mdash;intermediate CA certificates to <filename>/tmp</filename>
+    </para>
+   </step>
+   <step>
+    <para>
+     Copy the files to <filename>/etc/ssl/certs</filename> and change suffix to <literal>.pem</literal>:
+    </para>
+    <screen>cp /tmp/<replaceable>filename_of_root_CA</replaceable>.cer /etc/ssl/certs/<replaceable>filename_of_root_CA</replaceable>.pem
+cp /tmp/<replaceable>filename_of_intermediate_CA</replaceable>.cer /etc/ssl/certs/<replaceable>filename_of_intermediate_CA</replaceable>.pem</screen>
+   </step>
+   <step>
+    <para>Update the information for the SSL certificates:</para>
+
+    <screen>c_rehash /etc/ssl/certs</screen>
+   </step>
+   <step>
+    <para>
+     Import the certificates into the java keystore:
+    </para>
+
+<screen>keytool -import -alias root -file /tmp/<replaceable>filename_of_root_CA</replaceable>.cer \
+  -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit
+keytool -import -alias intermediate \
+  -file /var/tmp/<replaceable>filename_of_intermediate_CA</replaceable>.cer \
+  -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit</screen>
+   </step>
+   <step>
+    <para>The last step is to restart spacewalk:</para>
+
+<screen>spacewalk-service restart</screen>
+   </step>
+  </procedure>
+  <para>
+    To check whether everything works, run the following commands:
+  </para>
+<screen>mgr-sync refresh
+wget http://updates.suse.com</screen>
+
+<para>
+ It works correctly, if the <command>wget</command> call will cause a
+ 404 http error.
+</para>
+ </sect1>
+ <!-- ============================================================ -->
  <!-- Based on http://wiki.novell.com/index.php/SM_NetworkScanner  -->
  <sect1 id="s1-network-discovery">
   <title>Discovering Hosts and Subnets in the Network</title><indexterm>
