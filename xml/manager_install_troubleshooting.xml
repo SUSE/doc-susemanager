@@ -28,27 +28,23 @@
 <!-- ==================================================================== -->
  <sect1 id="s1-general-problem">
 
-  <title>General Problems</title><indexterm>
-
-  <primary>/etc/rhn/rhn.conf</primary></indexterm><indexterm>
-
-  <primary>general problems</primary></indexterm><indexterm>
-
-  <primary>terms to understand</primary>
-
-  <secondary>/etc/hosts</secondary></indexterm><indexterm>
-
-  <primary>terms to understand</primary>
-
-  <secondary>Embedded Database</secondary></indexterm><indexterm>
-
-  <primary>terms to understand</primary>
-
-  <secondary>full disk space</secondary></indexterm><indexterm>
-
-  <primary>terms to understand</primary>
-
-  <secondary>traceback email address</secondary></indexterm>
+  <title>General Problems</title>
+  <!--idx--><indexterm>
+   <primary>/etc/rhn/rhn.conf</primary></indexterm><indexterm>
+   <primary>general problems</primary></indexterm><indexterm>
+   <primary>terms to understand</primary>
+   <secondary>/etc/hosts</secondary></indexterm><indexterm>
+   <primary>terms to understand</primary>
+   <secondary>Embedded Database</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>terms to understand</primary>
+   <secondary>full disk space</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>terms to understand</primary>
+   <secondary>traceback email address</secondary>
+  </indexterm>
 
   <para>
    When having general problems, examine the log files related to the
@@ -162,6 +158,41 @@
 cd /var/lib/jabberd
 rm -f db*
 rcjabberd start</screen>
+ </sect1>
+ <!-- ==================================================================== -->
+ <!-- https://bugzilla.suse.com/show_bug.cgi?id=919093 -->
+ <sect1 id="s1-suma-connection-settings">
+  <title>Configuring Reliable &susemgr; Setup</title>
+  <para>
+   It is important to get the server/client &susemgr; communication
+   parameters right.  For example, by default Apache is configured with
+   150 clients maximum (MaxClients). If you ping 1000 clients at the
+   same time to perform a kernel update, this must fail.  Even if you
+   increase MaxClients to 1000, you will run out of database
+   connections, which is configured to 400 by default.
+  </para>
+
+  <para>
+   osa-dispatcher is able to set a threshold on notifying clients to run
+   <command>rhn_check</command>.  In /etc/rhn/rhn.conf set
+  </para>
+
+  <screen>osa-dispatcher.notify_threshold = 80</screen>
+  <para>
+   to allow 80 clients in parallel to execute
+   <command>rhn_check</command>.  Note, clients doing "SSH PUSH" do not
+   count. This is configured separately with the
+   taskomatic.ssh_push_workers parameter.
+  </para>
+  <para>
+   Both settings together should not exceed Apache's MaxClients
+   option. Better allow some unused connections for the webUI and
+   internal communication. It is recommended to keep 20 or 30 free.  As
+   a rough calculation use:
+  </para>
+  <para>
+   notify_threshold + ssh_push_workers + 30 = Apache's MaxClients
+  </para>
  </sect1>
 <!-- ==================================================================== -->
  <sect1 id="s1-spacewalk-report">
