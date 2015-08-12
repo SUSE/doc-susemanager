@@ -43,8 +43,8 @@ New work items will be added here. The status of these items will be marked with
 - [x] This repo setup with DAPS & DocBook directory requires Status: DONE June 19, 2015
 - [x] New TOC which includes customer, engineering & sales feedback topics Status: DONE June 29, 2015
 - [x] Channel Management research: DONE July 25, 2015
-- [x] Started internal feedback tool for engineers and developers July 29, 2015
- 	Tool will be finished in the upcoming sprint.
+- [x] Started internal feedback tool for engineers and developers TEMP_BLOCK July 29, 2015
+ 	Tool will be finished in an upcoming August sprint.
 - [ ] Chapter 4 Channel Managament: In_Progress "continued" August 6, 2015
 
 ##Planning:##
