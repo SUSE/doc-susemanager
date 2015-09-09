@@ -41,64 +41,69 @@
     <!-- need to add links here going to the API and CLI
         documentation! -->
 
-    <para>Key channel management concepts.</para>
+    <sect2>
+      <title>Important Channel Concepts.</title>
 
-    <formalpara>
-      <title>Channels vs Repositories</title>
-      <para> A channel could also be called a repository manager within SUSE Manager. A channel is a
-        collection of RPMs and errata data (when present). Each base channel also contains
-        information specific to the product and architecture. Within SUSE Manager there is also
-        another often confused term, <systemitem>repository</systemitem>. This simply means that
-        &susemgr; can include external repositories. One or more of these repositories may be added
-        to a base channel or assigned to multiple child channels.</para>
-    </formalpara>
 
-    <formalpara>
-      <title>Clone</title>
-      <para> A clone is a copy of a channel and will include exactly the same information as the
-        original SUSE Manager channel up to the point from when the channel was created. If the
-        original channel, receives updates after the clone has been created, these changes have to
-        be updated (or cloned) to the cloned channel. This is a manual process which can be
-        automated with the standard SLES tools. The concept of cloning and relevant uses cases will
-        be described within the following section:<!-- INCLUDE CLONING SECTION HERE -->.</para>
-    </formalpara>
+      <formalpara>
+        <title>Channels vs Repositories</title>
+        <para>A channel could also be called a repository manager within SUSE Manager. A channel is
+          a collection of RPMs and errata data (when present). Each base channel also contains
+          information specific to the product and architecture. Within SUSE Manager there is also
+          another often confused term, <systemitem>repository</systemitem>. This simply means that
+          &susemgr; can include external repositories. One or more of these repositories may be
+          added to a base channel or assigned to multiple child channels.</para>
+      </formalpara>
 
-    <formalpara>
-      <title> Base or parent channels</title>
-      <para> A base or parent channel, can contain one or more other channels (so called child
-        channels). A system can only be assigned to one base channel. If the base channel is a clone
-        of a SUSE channel (or is a clone of a cloned channel previously cloned from a SUSE Channel)
-        it contains also meta information that is needed to do a SUSE Manager support pack
-        migration.</para>
-    </formalpara>
+      <formalpara>
+        <title>Base Channels</title>
+        <para>A base or parent channel, can contain one or more other channels (referred to as child
+          channels). A system may only be assigned to one base channel. If the base channel is a
+          clone of a SUSE channel (or is a clone of a cloned channel previously cloned from a SUSE
+          Channel) it contains also meta information that is needed to do a SUSE Manager support
+          pack migration.</para>
+      </formalpara>
 
-    <formalpara>
-      <title>Child channels</title>
-      <para> These channels belong to one parent channel and are from the same architecture and SLES
-        or RHEL release. A registered system may have one or more child channels, but all children
-        must belong to the same base channel.</para>
-    </formalpara>
+      <formalpara>
+        <title>Child channels</title>
+        <para>These channels belong to one parent channel and are from the same architecture and
+          SLES or RHEL release. A registered system may have one or more child channels, but all
+          children must belong to the same base channel.</para>
+      </formalpara>
 
-    <formalpara>
-      <title>Stages</title>
-      <!--    #########################################     -->
-      <!--   Staging should also include an overview here.  -->
-      <!--    #########################################     -->
-      <para>This will be described in the next sub-chapter about staging.</para>
-    </formalpara>
-    <formalpara>
-      <title> Patches</title>
-      <para> Patches are a collection of packages which belong together and help in solving security
-        issues, in fixing bugs or often to simply provide an update. The data within in a patch is
-        gathered together into errata information. In regards to SUSE Manager most of the actions
-        performed in software channels are done against these patches. </para>
-    </formalpara>
+      <formalpara>
+        <title>Patches</title>
+        <para>Patches are a collection of packages which belong together and help in solving
+          security issues, fixing bugs or often to simply provide an update. The data within in a
+          patch is gathered together into errata information. In regards to SUSE Manager most of the
+          actions performed in software channels are done against these patches. </para>
+      </formalpara>
 
-    <formalpara>
-      <title>Packages</title>
-      <para> A package is an RPM that contains all necessary files: configuration, binaries,
-        scripts, as well as pre- and post-install scripts.</para>
-    </formalpara>
+      <formalpara>
+        <title>Packages</title>
+        <para>A package is an RPM that contains all necessary files: configuration, binaries,
+          scripts, as well as pre and post installation scripts.</para>
+      </formalpara>
+
+      <formalpara>
+        <title>Clones</title>
+        <para>A clone is a copy of a channel and will include exactly the same information as the
+          original SUSE Manager channel up to the point from when the channel was created. If the
+          original channel, receives updates after the clone has been created, these changes have to
+          be updated (or cloned) to the cloned channel. This is a manual process which can be
+          automated with the standard SLES tools. Cloning is especially useful in lifecycle
+          management. The concept of cloning and relevant uses cases will be described within the
+          following section:<!-- INCLUDE CLONING SECTION HERE -->.</para>
+      </formalpara>
+
+      <formalpara>
+        <title>Stages</title>
+        <!--    #########################################     -->
+        <!--   Staging should also include an overview here.  -->
+        <!--    #########################################     -->
+        <para>This will be described in the next sub-chapter about staging.</para>
+      </formalpara>
+    </sect2>
 
 
   </sect1>
@@ -107,21 +112,14 @@
     <title> Base Channels vs. Child Channels</title>
     <para>It is important to understand channel hierarchy within &susemgr;. There are two types of
       channels: <systemitem>base</systemitem> channels and <systemitem>child</systemitem> channels.
-      A base channel consists of packages based on a specific architecture and SUSE Linux Enterprise
-      Server or Red Hat Enterprise Linux release. A child channel is a channel associated with a base channel and contains
-      extra packages for its base channel. A client system needs to be assigned a base channel as this provides it's main
-      media sources. A client may only have one base channel assigned to it, but a base channel may
-      be assigned multiple child channels. A base channel could also be referred to as a parent
-      channel to which all child channels belong. A subscribed client system may only install or update packages available through its &susemgr; channels.</para>
-
-    <figure>
-      <title>Base(Parent) Channels and Child Channels.</title>
-      <mediaobject>
-        <imageobject>
-          <imagedata fileref="base-child-channels.png"/>
-        </imageobject>
-      </mediaobject>
-    </figure>
+      A base channel consists of packages built for a specific architecture and SUSE Linux Enterprise
+      Server or Red Hat Enterprise Linux release. A child channel is a channel associated with a
+      base channel and contains extra packages to extend its base channel. A client system must be
+      assigned a base channel as this provides it's main media sources. A client may only have one
+      base channel assigned to it, but a base channel may be assigned multiple child channels. A
+      base channel could also be referred to as a parent channel to which all child channels belong.
+      A subscribed client system may only install or update packages available through its &susemgr;
+      channels.</para>
 
   </sect1>
 
