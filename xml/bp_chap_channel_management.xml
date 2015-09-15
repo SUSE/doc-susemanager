@@ -10,7 +10,7 @@
   %entities;
 ]>
 <!-- ################################################################################# -->
-<!-- This chapter under construction incomplete data and placeholder text blocks. -->
+<!-- Draft 1 Channel Management-->
 <!-- ################################################################################# -->
 
 <chapter id="chapt.bp.channel.management">
@@ -26,7 +26,7 @@
     </para>
   </sect1>
   <sect1 id="chapt.bp.channel.management.channel.design.concepts">
-    <title>Channel Design Concepts</title>
+    <title>The Importance of Channel Design</title>
     <para>The design of your channels influence all other component interaction within &susemgr; and
       as such, channel design requires careful consideration and a concrete understanding of channel
       terminology. While re-working channels after initial setup is possible, in large environments
@@ -46,21 +46,21 @@
 
       <formalpara>
         <title>Channels vs Repositories</title>
-        <para>A <xref linkend="bp.gloss.channel"/>channel could also be called a repository manager within SUSE Manager. A channel is
-          a collection of RPMs and errata data (when present). Each base channel also contains
-          information specific to the product and architecture. Within SUSE Manager there is also
-          another often confused term, <systemitem>repository</systemitem>. This simply means that
-          &susemgr; can include external repositories. One or more of these repositories may be
-          added to a base channel or assigned to multiple child channels.</para>
+        <para>A <xref linkend="bp.gloss.channel"/>channel could also be called a repository manager
+          within SUSE Manager. A channel is a collection of RPMs and when present, errata data. Each
+          base channel also contains information specific to the product and architecture. Another
+          often confused term, <systemitem>repository</systemitem>. This simply means that &susemgr;
+          can include external repositories. One or more of these repositories may be added to a
+          base channel or assigned to multiple child channels.</para>
       </formalpara>
 
       <formalpara>
         <title>Base Channels</title>
-        <para>A <xref linkend="bp.gloss.base"/>base or parent channel, can contain one or more other channels (referred to as child
-          channels). A system may only be assigned to one base channel. If the base channel is a
-          clone of a SUSE channel (or is a clone of a cloned channel previously cloned from a SUSE
-          Channel) it contains also meta information that is needed to do a SUSE Manager support
-          pack migration.</para>
+        <para>A <xref linkend="bp.gloss.base"/>base or parent channel, can contain one or more other
+          channels (referred to as child channels). A system may only be assigned to one base
+          channel. If the base channel is a clone of a SUSE channel (or is a clone of a cloned
+          channel previously cloned from a SUSE Channel) it contains also meta information that is
+          needed to do a SUSE Manager support pack migration.</para>
       </formalpara>
 
       <formalpara>
@@ -90,7 +90,7 @@
           original SUSE Manager channel up to the point from when the channel was created. If the
           original channel, receives updates after the clone has been created, these changes have to
           be updated (or cloned) to the cloned channel. This is a manual process which can be
-          automated with the standard SLES tools. Cloning is especially useful in lifecycle
+          automated with the standard SLES tools. Cloning is especially useful in life-cycle
           management. The concept of cloning and relevant uses cases will be described within the
           following section:<!-- INCLUDE CLONING SECTION HERE -->.</para>
       </formalpara>
@@ -106,7 +106,33 @@
 
 
   </sect1>
-
+  <sect1>
+    <title>Channel Life-cycle Management (In Development)</title>
+    <para>This section describes &susemgr; Life-cycle best practices.<!-- add more later after speaking with MB and TH --></para>
+  </sect1>
+  
+  <sect1>
+    <title>Life-cycle Design with Staging (In development)</title>
+    <para>Staging is the next step in channel Life-cycle management. Selecting a staging model based on your organizational requirements is highly recommended to increase the stability of your systems and environment. </para>
+    
+    <para>There are several staging models available for use in &susemgr;</para>
+    <itemizedlist>
+      <listitem><para>Three tier model. Tiers may be reduced or extended depending on your requirements </para></listitem>
+      <listitem><para>A clone model based on a date or period of time</para></listitem>
+      <listitem><para>A clone model based on specific projects</para></listitem>
+      <listitem><para>A combination of one or more of the above models</para></listitem>
+    </itemizedlist>
+    
+    <figure>
+      <title>Three Tier Model</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="3tier.png"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
+  </sect1>
+  
   <sect1 id="chapt.bp.channel.management.base.child.relationships">
     <title> Base Channels vs. Child Channels</title>
     <para>It is important to understand channel hierarchy within &susemgr;. There are two types of
@@ -118,10 +144,43 @@
       have one base channel assigned to it, but a base channel may be assigned multiple child
       channels. A base channel could also be referred to as a parent channel to which all child
       channels belong. A subscribed client system may only install or update packages available
-      through its &susemgr; channels.</para>
+      through its assigned base  and child channels.</para>
 
   </sect1>
-
+  
+<sect1>
+  <title> Connecting Clients to &susemgr;</title>
+  <para>Below you will find the different methods available for registering client systems with
+      &susemgr;.</para>
+  
+  <formalpara>
+    <title>Registering Client Systems with Salt (In development)</title>
+    <para>In the future it will be possible to register client systems to a &susemgr; server master as minions as well as accepting keys to assign base and child channels. <!-- Description will be added at a later time as well as links to reference book--></para>
+  </formalpara>
+  
+  <formalpara>
+    <title>Registering Clients with Activation Keys</title>
+    <para>Due to the simplicity and speed of activation keys, this is the preferred method
+        <!-- is this still the preferred method with salt-stack on the way? -->for registering
+        client systems with either an &susemgrproxy; server or  a &susemgr; Server. Systems
+        registered using an activation key are subscribed to all channels associated with its unique
+        activation key. For more information about activation keys, see
+        "<!-- link to section for activation keys --> the &susemgr; Reference Guide. </para>
+  </formalpara>
+  
+  <formalpara>
+    <title>Registering Client Systems Using the &susemgr; Web Interface</title>
+    <para>Specific child channels are available through subscription, depending on the system's base channel. A system may be subscribed to a child channel through the &susemgr; web interface. If your organization has created custom base channels, the systems may also be reassigned to these custom channels through the &susemgr; web interface. For more information about subscribing to channels online, see the &susemgr; web interface chapter of the &susemgr; Reference Guide. <!-- add links to reference guide here explaining this process! --></para>
+  </formalpara>
+  
+  <formalpara>
+    <title>Registering Client systems with the <command>spacewalk-channel</command> Command</title>
+    <para>The <command>spacewalk-channel</command> command line tool allows you to subscribe a system to specific channels via the command line without logging into </para>
+  </formalpara>
+  
+  
+</sect1>
+  
   <sect1>
     <title>Relationship Between Products and Channels</title>
     <para/>
@@ -147,11 +206,6 @@
   </sect1>
   <sect1>
     <title> Cloning Channels by Date</title>
-    <para/>
-
-  </sect1>
-  <sect1>
-    <title>Channel Lifecycle Management</title>
     <para/>
 
   </sect1>
