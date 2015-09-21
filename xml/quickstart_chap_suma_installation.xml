@@ -28,7 +28,7 @@
         <para>Use the <command>up</command> and <command>down</command> arrow keys to select the
           option <systemitem>Install/Restore SUSE-Manager-Server</systemitem> and then press
             <command>enter</command>.</para>
-        <figure>
+        <figure id="boot.selection.screen.quick">
           <title>Boot Selection Screen</title>
           <mediaobject>
             <imageobject>
@@ -47,8 +47,8 @@
           <para>After selecting <command>Yes</command> all data on this drive will be
             destroyed!</para>
         </warning>
-        <figure>
-          <title>Language and License Agreement</title>
+        <figure id="destroy.data.quick">
+          <title>Format Drive</title>
           <mediaobject>
             <imageobject>
               <imagedata fileref="step2-quick.png"/>
@@ -71,7 +71,7 @@
       </step>
       <step>
         <para>Press <command>alt + n</command> to continue.</para>
-        <figure>
+        <figure id="keyboard.language.quick">
           <title>Language and Keyboard Settings</title>
           <mediaobject>
             <imageobject>
@@ -88,7 +88,7 @@
       </step>
       <step>
         <para>Press <command>alt + n</command> to continue.</para>
-        <figure>
+        <figure id="license.agreement.quick">
           <title>License Agreement</title>
           <mediaobject>
             <imageobject>
@@ -109,7 +109,7 @@
       </step>
       <step>
         <para>Press <command>alt + n</command> to continue.</para>
-        <figure>
+        <figure id="root.password.quick">
           <title>&susemgr; <systemitem>root</systemitem> Password</title>
           <mediaobject>
             <imageobject>
@@ -129,7 +129,7 @@
         <para>At the network Configuration screen select <systemitem>change</systemitem> to
           configure your network interfaces. Select <systemitem>Network Interfaces</systemitem> when
           the pop-up menu appears. </para>
-        <figure>
+        <figure id="network.config.quick">
           <title>Configure Network Interface</title>
           <mediaobject>
             <imageobject>
@@ -140,7 +140,7 @@
       </step>
       <step>
         <para>Select <systemitem>edit</systemitem> to edit your network interface.</para>
-        <figure>
+        <figure id="network.interface.edit.quick">
           <title>Edit Network Interface</title>
           <mediaobject>
             <imageobject>
@@ -152,7 +152,7 @@
       <step>
         <para>We will be using <systemitem>DHCP</systemitem> for this setup. Select Dynamic Address
           and press <command>alt + n</command> to continue. </para>
-        <figure>
+        <figure id="network.config.dhcp.quick">
           <title>Select <systemitem>DHCP</systemitem></title>
           <mediaobject>
             <imageobject>
@@ -174,15 +174,15 @@
     <title>Clock and Time Zone</title>
     <important>
       <title>Date, Time, and NTP</title>
-      <para>Current date, time and NTP is very important for SUSE Manager. If your NTP settings are setup improperly during
-        installation you should be aware that this will have a severe impact on the creation of your
-        SSL certificate and will prohibit &susemgr; from syncing with &scc;. NTP failure will also
-        prevent &susemgr; from receiving updates as well as the required software sources/channels
-        for your client systems. There should be an NTP server available and enabled upon
-        boot.</para>
+      <para>Current date, time and NTP is very important for SUSE Manager. If your NTP settings are
+        setup improperly during installation you should be aware that this will have a severe impact
+        on the creation of your SSL certificate and will prohibit &susemgr; from syncing with &scc;.
+        An NTP failure will also prevent &susemgr; from receiving updates as well as the required
+        software sources/channels for your client systems. There should be an NTP server available
+        and enabled upon boot.</para>
     </important>
 
-    
+
     <procedure>
       <title>Clock and Time Settings</title>
       <step>
@@ -194,7 +194,7 @@
       <step>
         <para>To change your date, time, or to configure your NTP settings press the <command>alt +
             c</command>command now.</para>
-        <figure>
+        <figure id="clock.and.time.zone.quick">
           <title>Clock and Time Zone</title>
           <mediaobject>
             <imageobject>
@@ -202,52 +202,124 @@
             </imageobject>
           </mediaobject>
         </figure>
-        <para> If you encounter certificate errors please review the following list.</para>
-        <itemizedlist>
-          <title>Troubleshooting NTP</title>
-          <listitem>
-            <para>Check the time settings in your servers <systemitem>BIOS</systemitem>.</para>
-          </listitem>
-          <listitem>
-            <para>Ensure your server's <systemitem>CMOS</systemitem> battery is not dead or in need of
-              replacement.</para>
-          </listitem>
-          <listitem>
-            <para>Ensure you are not blocking NTP servers with your firewall.</para>
-          </listitem>
-          <listitem>
-            <para><remark>add a note that for VMware servers the localtime option needs to be disabled.
-            </remark></para>
-          </listitem>
-          <listitem>
-            <para>After this installation has completed and before running the <command>yast2
-              susemanager_setup</command>command to setup &susemgr;, use the
-              <command>date</command>command to ensure your date and time is current.</para>
-          </listitem>
-        </itemizedlist>
+
       </step>
 
     </procedure>
-    
+    <para> If you encounter certificate errors please review the following list.</para>
+    <itemizedlist>
+      <title>Troubleshooting NTP</title>
+      <listitem>
+        <para>Check that the time settings in your servers <systemitem>BIOS</systemitem> are
+          up-to-date.</para>
+      </listitem>
+      <listitem>
+        <para>Ensure your server's <systemitem>CMOS</systemitem> battery is not dead or in need of
+          replacement.</para>
+      </listitem>
+      <listitem>
+        <para>Ensure you are not blocking the NTP server with your firewall.</para>
+      </listitem>
+      <listitem>
+        <para><remark>add a note that for VMware servers the localtime option needs to be disabled.
+          </remark></para>
+      </listitem>
+      <listitem>
+        <para>After this installation has completed and before running the <command>yast2
+            susemanager_setup</command>command to setup &susemgr;, use the
+          <command>date</command>command from the command line to ensure your date and time is
+          current.</para>
+      </listitem>
+    </itemizedlist>
+
     <procedure>
       <title>Advanced NTP Configuration</title>
-   
-    <step>
-      <para>At the <systemitem>Advanced NTP Configuration</systemitem> screen select
-        <systemitem>Now and on Boot</systemitem>.</para>
-    </step>
-    <step>
-      <para>You may <systemitem>Add</systemitem>,<systemitem>Edit</systemitem> or
-        <systemitem>Delete</systemitem>
-        <systemitem>Synchronization</systemitem> configurations here.</para>
-    </step>
-    <step>
-      <para>Select <systemitem>Add</systemitem> to add an NTP server from your region or
-        alternatively add your local NTP server.</para>
-    </step>
-    <step><para>Select <command>alt + o</command> to continue.</para></step> 
+
+      <step>
+        <para>At the <systemitem>Advanced NTP Configuration</systemitem> screen select
+            <systemitem>Now and on Boot</systemitem>.</para>
+      </step>
+
+      <step>
+        <para>You may <systemitem>Add</systemitem>,<systemitem>Edit</systemitem> or
+            <systemitem>Delete</systemitem>
+          <systemitem>Synchronization</systemitem> configurations here.</para>
+      </step>
+
+      <step>
+        <para>Select <systemitem>Add</systemitem> to add an NTP server from your region or
+          alternatively you may add a local NTP server from your network.</para>
+        <figure id="advanced.ntp.config.quick">
+          <title>Advanced NTP Configuration</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="step13-ntp-quick.png"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
+      </step>
+
+      <step>
+        <para>Select <command>alt + o</command> to continue.</para>
+        <figure id="advanced.ntp.config.screen.quick">
+          <title>Advanced NTP Configuration</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref=""/>
+            </imageobject>
+          </mediaobject>
+        </figure>
+        <remark>Add this The Advanced NTP Configuration screen image. Missed during
+          testing.</remark>
+      </step>
+      
+      <step>
+        <para>Once you have finished the setup of NTP you may continue to the &scc; registration
+          screen.</para>
+      </step>
     </procedure>
   </sect1>
-
+  
+  <sect1>
+    <title>&scc; Configuration</title>
+    <procedure>
+      
+      <step>
+        <para> This section requires your &susemgr; product registration code. This should be on
+          hand now. At the &scc; screen select the <systemitem>Registration Code</systemitem> check
+          box with <command>tab</command> then press <command>enter</command>. Finally press <command>alt
+            + n</command> to continue.</para>
+        <figure id="scc.configuration.reg.quick">
+          <title>&scc; Configuration</title>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="step14ccconfig-quick.png"/>
+            </imageobject>
+          </mediaobject>
+        </figure>
+      </step>
+      
+      <step>
+        <para> The registration browser will open. Move through the registration browser with
+            <command>tab</command> and use the <command>enter</command> enter key to edit fields. If
+          you get lost you may use the <command>left</command> and <command>right</command> arrow
+          keys to go back and forwards a page at a time.</para>
+      </step>
+      
+      <step>
+        <para> Insert the email address associated with your &scc; account.</para>
+      </step>
+      
+      <step>
+        <para>Enter your activation code provided via email or alternatively listed under your
+          product subscriptions page at the &scc;.</para>
+      </step>
+      
+      <step>
+        <para>Scroll the page using <systemitem>tab</systemitem> and select
+            <systemitem>Submit</systemitem> to proceed. Naming your system is optional.</para>
+      </step>
+    </procedure>
+  </sect1>
 
 </chapter>
