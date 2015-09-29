@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE chapter PUBLIC
+"-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+<chapter id="suma.installation.within.kvm">
+    <title>&susemgr; &productnumber3; Installation: KVM</title>
+    <sect1>
+        <title>What's Covered Here?</title>
+
+        <para> Installation has been greatly simplified as &susemgr; &productnumber3; may now be
+            selected as an extension during installation of &sle; 12. This chapter provides
+            instruction on getting started with &susemgr; in a simple test environment. The
+            following sections will guide you through: </para>
+
+        <itemizedlist>
+            <listitem>
+                <para>Installation of &susemgr; &productnumber3; within a KVM virtual machine
+                </para>
+            </listitem>
+
+            <listitem>
+                <para> Using the command line to initiate &susemgr; setup</para>
+            </listitem>
+            <listitem>
+                <para>Creating the <systemitem>admin</systemitem> user with the &susemgr; Web
+                    Interface</para>
+            </listitem>
+            <listitem>
+                <para> Making installation media and software available to your clients through
+                    &suse; Vendor channels </para>
+            </listitem>
+            <listitem>
+                <para>Using <systemitem>bootstrap</systemitem> to connect and manage your first
+                    client with &susemgr; </para>
+            </listitem>
+        </itemizedlist>
+
+        <important>
+            <title>Prerequisites for this Guide</title>
+            <para>This section assumes you have already reviewed the <link
+                    linkend="suma3.overview.requirements">&susemgr; Overview and Requirements</link>
+                section. </para>
+        </important>
+    </sect1>
+    <sect1>
+        <title>Installation Within KVM</title>
+        <para><remark>This section is for internal use and guides an employee unfamiliar with
+                &susemgr; through installing SUMA3 from the internal development repositories using
+                &sle; 12.</remark></para>
+
+        <procedure>
+            <title>Installation using Virtual Machine Manager</title>
+            <step>
+                <para>Create a new virtual machine with <systemitem>Virtual Machine
+                        Manager</systemitem></para>
+            </step>
+            <step>
+                <para>Within the <systemitem>New VM</systemitem> dialog box select
+                        <systemitem>Network Boot (PXE)</systemitem>. </para>
+                <figure>
+                    <title>PXE Boot</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-vmm-1.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+            <step>
+                <para>Select <systemitem>Forward</systemitem> to continue.</para>
+            </step>
+            <step>
+                <para>For the operating system and Version choose <systemitem>Linux</systemitem> and
+                        <systemitem>&sle; 12 (or later)</systemitem>. </para>
+                <figure>
+                    <title>OS and Version Selection</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-vmm-2.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+            <step>
+                <para>Select <systemitem>Forward</systemitem> to continue.</para>
+            </step>
+            <step>
+                <para>On the next screen you will need to select the amount of memory and number of
+                    CPU's you wish to make available for the Virtual Machine. For testing we
+                    selected <systemitem>4096 MB</systemitem> ram and <systemitem>4</systemitem>
+                    CPUs. </para>
+                <figure>
+                    <title>Selecting Ram and Number of CPUs</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-vmm-3.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+            <step>
+                <para>Select <systemitem>Forward</systemitem> to proceed.</para>
+            </step>
+            <step>
+                <para>Select <systemitem>Managed or other existing storage</systemitem> and then
+                    Browse. You need to create a storage device with enough space to fulfil
+                    &susemgr; requirements. We will cover partitioning requirements within the
+                    installation section.</para>
+                <figure>
+                    <title>Storage Selection</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-vmm-4.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+
+            <step>
+                <para>Next select <systemitem>New Volume</systemitem>.</para>
+            </step>
+            <step>
+                <para>For this guide &susemgr; requires 170 GB for its partitions. Name your storage
+                    volume and accept the default format of <systemitem>qcow2</systemitem>. Check
+                    the <systemitem>Storage Volume Quota</systemitem> available space to ensure you
+                    meet the 170 GB space requirement. Next adjust the <systemitem>Max
+                        Capacity</systemitem> field change the default value of <systemitem>8.0
+                        GB</systemitem> to 170 GB. </para>
+                <figure>
+                    <title>Add Storage Volume</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-vmm-5.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+
+
+            <step>
+                <para>Select <systemitem>Finish</systemitem> to proceed.</para>
+            </step>
+            <step>
+                <para>Select <systemitem>Choose Volume</systemitem> to continue. At the following
+                    dialog select <systemitem>Forward</systemitem> to continue.</para>
+            </step>
+            <step>
+                <para>Name your virtual machine. </para>
+                <figure>
+                    <title>Naming Your Machine</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-vmm-7.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+            <step>
+                <para>Finally select <systemitem>Finish</systemitem> to finalize your virtual
+                    machine setup.</para>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>PXE Booting &sle; 12 With KVM</title>
+        <para>After completing VM setup the VM will boot to the PXE menu. The following procedure
+            will guide you through PXE boot. </para>
+
+        <procedure>
+            <title>PXE Boot</title>
+            <step>
+                <para>Select <systemitem>Unpacked SLE-12 ISOs via SLP</systemitem> to
+                    continue.</para>
+                <figure>
+                    <title>PXE Boot Menu</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-pxeboot-sles12.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+            <step>
+                <para>Select <systemitem>SLE 12 SP1 Server LATEST x86_64 DVD1</systemitem></para>
+                <figure>
+                    <title>&sle; 12 ISO Selection Screen</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-pxeboot-sles12-2.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>&sle; 12 Installation Procedure</title>
+        <para/>
+    </sect1>
+    
+    <sect1>
+        <title>Enabling &susemgr; &productnumber3; as an Extension</title>
+        <para></para>
+    </sect1>
+    
+
+
+</chapter>
