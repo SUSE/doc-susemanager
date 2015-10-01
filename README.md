@@ -58,8 +58,9 @@ New work items will be added here. The status of these items will be marked with
 * SUSE Manager Reference Manual
 * SUSE Manager Advanced Topics Manual
 
-**One article is currently PLANNED:**
-* SUSE Manager Reference Setup Quickstart Guide
+**One short book is currently PLANNED:**
+* SUSE Manager 3 Quickstart Guide
+* Update October 1, 2015 A quickstart guide will be released for Manager 2.1 in the near future
 
 
 
