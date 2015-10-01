@@ -10,7 +10,7 @@
   %entities;
 ]>
 <chapter id="suma.installation.within.kvm">
-    <title>&susemgr; &productnumber3; Installation</title>
+    <title>&susemgr; &productnumber3; Installation With KVM</title>
     <sect1>
         <title>What's Covered Here?</title>
 
@@ -21,26 +21,14 @@
             for your first installation. The following sections will guide you through: </para>
 
         <itemizedlist>
+           <listitem><para>Configuring (KVM) for a &sle; 12 installation using PXE boot</para></listitem> 
             <listitem>
-                <para>Installation of &susemgr; &productnumber3; within a KVM virtual machine
+                <para>Adding &susemgr; &productnumber3; to &sle; 12 as an extension
                 </para>
             </listitem>
+            <listitem><para>Completing the &sle; 12 installation</para></listitem>
+            
 
-            <listitem>
-                <para> Using the command line to initiate &susemgr; setup</para>
-            </listitem>
-            <listitem>
-                <para>Creating the <systemitem>admin</systemitem> user with the &susemgr; Web
-                    Interface</para>
-            </listitem>
-            <listitem>
-                <para> Making installation media and software available to your clients through
-                    &suse; Vendor channels </para>
-            </listitem>
-            <listitem>
-                <para>Using <systemitem>bootstrap</systemitem> to connect and manage your first
-                    client with &susemgr; </para>
-            </listitem>
         </itemizedlist>
 
         <important>
@@ -51,7 +39,7 @@
         </important>
     </sect1>
     <sect1>
-        <title>KVM: Setting up the Playground</title>
+        <title>Preparing Your &susemgr; Playground</title>
         <para><remark>This section is for internal use and guides an employee unfamiliar with
                 &susemgr; through installing SUMA3 from the internal development repositories using
                 &sle; 12.</remark></para>
@@ -128,12 +116,12 @@
                 <para>Next select <systemitem>New Volume</systemitem>.</para>
             </step>
             <step>
-                <para>For this guide &susemgr; requires 170 GB for its partitions. Name your storage
+                <para>For this guide &susemgr; requires 180 GB for its partitions. Name your storage
                     volume and accept the default format of <systemitem>qcow2</systemitem>. Check
                     the <systemitem>Storage Volume Quota</systemitem> available space and ensure
-                    your filesystem fulfils the 170 GB space requirement. Change the default vaule
+                    your filesystem fulfils the 180 GB space requirement. Change the default vaule
                     of <systemitem>8.0 GB</systemitem> in the <systemitem>Max Capacity</systemitem>
-                    field to 170 GB. </para>
+                    field to 180 GB. </para>
                 <figure>
                     <title>Adding a Storage Volume</title>
                     <mediaobject>
@@ -171,7 +159,7 @@
     </sect1>
 
     <sect1>
-        <title>KVM: PXE Booting &sle; 12</title>
+        <title>PXE Booting &sle; 12</title>
         <para>After completing VM setup in KVM the VM will automatically boot to the PXE boot menu.
             The following procedure will guide you through PXE boot. </para>
 
@@ -205,7 +193,7 @@
     </sect1>
 
     <sect1>
-        <title>KVM: &sle; 12 Installation Procedure</title>
+        <title>&sle; 12 Installation Procedure</title>
         <procedure>
             <step>
                 <para>Select your language and desired keyboard settings, you may change them if
@@ -256,14 +244,14 @@
     </sect1>
 
     <sect1>
-        <title>KVM: Enabling &susemgr; &productnumber3; as an Extension</title>
+        <title>Enabling &susemgr; &productnumber3; as an Extension</title>
         <remark>This section is currently blocked. The option to choose manager as an extension does
-            not yet exist! This step will never be used by our customers. The current screenshot is
-            a placeholder and will need to be updated.</remark>
+            not yet exist! The current screenshot is a placeholder and will need to be
+            updated.</remark>
         <important>
             <title/>
             <para><remark>Ornela, follow the guide in the next procedure to add the devel suma3
-                    extension. :) </remark></para>
+                    extension. :) This step will never be used by our customers. </remark></para>
         </important>
         <remark/>
         <procedure>
@@ -352,26 +340,145 @@
     </sect1>
 
     <sect1>
-        <title>Configuring &susemgr; &productnumber3; Partitions</title>
-        <para>This section covers the critical topic of configuring partitions for use by
-            &susemgr;.</para>
+        <title>Configuring &susemgr; &productnumber3; Storage</title>
+        <para>This section introduces the critical topic of correctly configuring storage for use
+            by &susemgr;.</para>
         <warning>
             <title>Space Requirements</title>
-            <para>&sle; 12 defaults to 40 GB for its base file system. &susemgr; requires 100+ GB
+            <para>&sle; 12 defaults to 40 GiB for its base file system. &susemgr; requires 100+ GiB
                 for channel mirror data mounted at <filename>/var/spacewalk</filename> and an
-                additional 30+ GB for its database mounted at <filename>/var/lib/pgsql</filename>.
+                additional 30+ GiB for its database mounted at <filename>/var/lib/pgsql</filename>.
                 If these requirements are not met the installation of &susemgr; will fail. Review
                 this section carefully to ensure you have properly configured the necessary
                 partitions. </para>
         </warning>
 
-        <remark>When &susemgr; &productnumber3; is released <systemitem>Suggested
-                Partitioning</systemitem> will be sufficient for most installations. When selecting
-            &susemgr; as an extension partitioner should create the required directories with the
-            correct spacial requirements and mount them at default locations. Currently in development we must
-            manually use partitioner to create the required directories for &susemgr;.</remark>
+
+        <para>This step of the installation guide starts at the <systemitem>Suggested Partitioning
+            </systemitem> screen. You will now use the expert partitioner to configure the required
+            directories and fullfil &susemgr;'s space requirements.</para>
+
+        <procedure>
+            <title>Suggested Partitioning</title>
+            <step>
+                <para>Select <systemitem>Expert Partitioner...</systemitem> to initiate the
+                    partition tool.</para>
+
+                <figure>
+                    <title>Suggested Partitioning</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-partition1.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+
+            <step>
+                <para>In the Expert Partitioner you can find your virtual hard disk (vda) located on
+                    the left under the <systemitem>System View</systemitem> panel. Choose
+                        <systemitem>Hard Disks</systemitem>. The system has already created a
+                    temporary scheme which we will change to suit &susemgr;'s needs.</para>
+            </step>
+            <step>
+                <para>Select the top level (vda) located under <systemitem>Hard
+                    Disks</systemitem>and you will see your current partitions displayed within the
+                    Partitions tab to the right.</para>
+            </step>
+
+            <step>
+                <para>Delete the <filename>root /</filename> and <filename>/home</filename>
+                    partitions with the <systemitem>Delete</systemitem> button. If these partition
+                    are not deleted you will not have enough space later during setup for the
+                    required directories. </para>
+
+            </step>
+            <step>
+                <para>Next click <systemitem>Add</systemitem> to add a new partition.</para>
+            </step>
+            <step>
+                <para>Under <systemitem>New Partition Type</systemitem> select <systemitem>Primary
+                        Partition</systemitem> then click <systemitem>Next</systemitem> to
+                    continue.</para>
+                <figure>
+                    <title>Root Partition Type</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-root1.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+            <step>
+                <para>Leave the default <systemitem>New Partition Size</systemitem> to custom and
+                    click <systemitem>Next</systemitem> to continue.</para>
+                <figure>
+                    <title>Root Partition Size</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-root2.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+            <step>
+                <para>For the partitions role select <systemitem>Data and ISV
+                        Applications</systemitem>. Continue with <systemitem>Next</systemitem>.
+                </para>
+            </step>
+            <step>
+                <para>Under <systemitem>Formatting Options</systemitem> select
+                        <systemitem>BTrFS</systemitem> from the drop down menu. Click
+                        <systemitem>Next</systemitem> to proceed. Your final setup should look like
+                    the following example.</para>
+                <figure>
+                    <title>Completed Partition Setup</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-root4.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+            </step>
+
+            <step>
+                <para>This concludes partition setup. Select <systemitem>Next</systemitem> to
+                    continue.</para>
+            </step>
+        </procedure>
+        <para>The next section covers the remaining steps required to complete the &sle; 12
+            installation. </para>
     </sect1>
 
+    <sect1>
+        <title>Completing the &sle; 12 Installation</title>
+        <procedure>
+            <title>Completing Installation</title>
+            <step>
+                <para>You will now select your date and time zone. These settings are critical for
+                    syncing with &scc;. Ensure your servers time matches that of your host machine.
+                    Select <systemitem>Next</systemitem> to continue when the <systemitem>Date and
+                        Time:</systemitem> field match that of your host system.</para>
+            </step>
+            <step>
+                <para>Create a new user and password. You can optionally select to use the same
+                    password for administrator. If this option remains unselected you will be prompted
+                    to create a new root password at the following screen.</para>
+            </step>
+            <step>
+                <para>At the <systemitem>Installation Settings</systemitem> screen you may alter any
+                    of the optional settings required for your organization. For this guide the
+                    firewall has been disabled to decrease complications. Select
+                        <systemitem>Next</systemitem> to proceed.</para>
+               
+            </step>
+            
+        </procedure> <warning>
+                    <title>Disabling the Firewall</title>
+                    <para>Do not disable the firewall in a production environment!</para>
+                </warning>
+        <para>Installation will begin by installing &sle; 12, the &susemgr; &productnumber3; extension. If the update option was selected during installation the latest patches will be downloaded bringing your new system up-to-date. Grab a cup of coffee! This concludes the installation section of this guide.</para>
+    </sect1>
 
 
 </chapter>
