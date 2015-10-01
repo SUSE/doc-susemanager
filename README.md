@@ -55,7 +55,7 @@ New work items will be added here. The status of these items will be marked with
 **Three book are currently PLANNED:**
 
 * SUSE Manager Best Practices Manual
-* SUSE Manager Referance Manual
+* SUSE Manager Reference Manual
 * SUSE Manager Advanced Topics Manual
 
 **One article is currently PLANNED:**
