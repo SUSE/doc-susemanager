@@ -46,8 +46,9 @@ New work items will be added here. The status of these items will be marked with
 - [x] Started internal feedback tool for engineers and developers TEMP_BLOCK July 29, 2015
  	Tool will be finished in an upcoming August sprint.
 - [ ] Chapter 4 Channel Managament: TEMP_BLOCKED "continued" August 6, 2015
-- [x] SUSE Manager 3 Quickstart Guide D1 Installation Section DONE September 28, 2015
-- [ ] SUSE Manager 3 Quickstart Guide D1 Setup Section IN_PROGRESS October 1, 2015
+- [x] Internal Feedback tool Operational: DONE
+- [x] SUSE Manager 3 Quickstart Guide D1 Installation Section: DONE September 28, 2015
+- [ ] SUSE Manager 3 Quickstart Guide D1 Setup Section: IN_PROGRESS October 1, 2015
 
 ##Planning:##
 
