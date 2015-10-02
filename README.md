@@ -49,6 +49,8 @@ New work items will be added here. The status of these items will be marked with
 - [x] SUSE Manager 3 Quickstart Guide D1 Installation Section: DONE September 28, 2015
 - [ ] SUSE Manager 3 Quickstart Guide D1 Setup Section: IN_PROGRESS October 1, 2015
 - [ ] Chapter 4 Channel Managament: TEMP_BLOCKED August 14, 2015
+
+
 ##Planning:##
 
 **Three book are currently PLANNED:**
