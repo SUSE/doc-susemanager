@@ -31,7 +31,7 @@
 
             <listitem>
                 <para>Create the <systemitem>admin</systemitem> user with the &susemgr;
-                    WebGUI</para>
+                    Web-GUI</para>
             </listitem>
 
             <listitem>
@@ -77,7 +77,7 @@
             <step>
                 <para>Enter an email address which will receive notifications about the servers
                     status. The number of emails sent from Manager can be extensive, therefore
-                    notifications via email may be disabled from the webGUI after setup if desired.
+                    notifications via email may be disabled from the web-GUI after setup if desired.
                     Select <keycap>Next</keycap> to continue.</para>
                 <informalfigure>
                     <mediaobject>
@@ -133,7 +133,7 @@
 
             <step>
                 <para>Select <systemitem>Yes</systemitem> to run setup when prompted. When completed
-                    you will be presented with your new &susemgr; webGUI address. Select
+                    you will be presented with your new &susemgr; web-GUI address. Select
                         <keycap>Finish</keycap> to complete &susemgr; setup. </para>
                 <informalfigure>
                     <mediaobject>
@@ -155,10 +155,63 @@
             recommended that an administrator creates low level user accounts designated for
             administration of each organization or group under the administrator account for
             security. </para>
+        <procedure id="suma.setup.admin.account">
+            <title>Setting up the Administrators Account</title>
+            <step>
+                <para>To begin open your browser and direct it to your &susemgr; Server URL which
+                    was provided to you after completing setup.</para>
+                <para>Enter your <systemitem>Desired Login*:</systemitem> name and <systemitem>Desired Password*:</systemitem>. Fill in the Account Information fields including an email for system notifications. Select <command>Create Login</command> to finish creating your administration account.</para>
+          <informalfigure>
+              <mediaobject>
+                  <imageobject>
+                      <imagedata fileref="quickstart-mgr-setup-admin1.png"/>
+                  </imageobject>
+              </mediaobject>
+          </informalfigure>
+            </step>
+            
+            <step><para>You should now be presented with the &susemgr; Front Page.</para>
+            <informalfigure>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="quickstart-mgr-setup-admin2.png"/>
+                    </imageobject>
+                </mediaobject>
+            </informalfigure>
+                
+            </step>
+        </procedure>
+        <para>Congratulations! Welcome to the &susemgr; web-GUI. The next section will help prepare the server for connecting your first client.</para>
 
 
     </sect1>
 
+<sect1>
+    <title>Synchronizing with &scc; from the Web-GUI </title>
+    <para>Before you connect your first clients to &susemgr; you must setup each clients software sources. For example: one of your clients might be running &sle; 12 and another might be running &rhel; 6. This presents a challenge normally for an administrator when managing multiple software sources for varying distributions, releases or a specific architecture. In &susemgr; a channel is simply a repository which has been copied/mirrored to the server. These copies are then given a distinct name and are always based on a distribution, release and architecture specific to a clients needs. This allows &susemgr; to safely manage and control installation media, applications, updates and security patches across multiple distributions, release versions and architectures. In this guide you will setup a client running &sle; 12 and &sle; 11 SP4. This procedure is the same for all versions of &sle;. Channel terminology will become clearer as we progress throughout the rest of this guide.</para>
+    <note>
+        <title>Synchronizing from the Command Line</title>
+      <para>  For information on synchronizing with &scc; from the command line see: <ulink url="">&susemgr; Administration from the Command Line: Reference Guide</ulink> </para><remark>add this link to reference!</remark>
+    </note>
+    
+    <procedure>
+        <title>Synchronizing with &scc;</title>
+        <step><para>From the &susemgr; Web-GUI front-page select the <systemitem>Admin</systemitem> tab.</para></step>
+        <step><para>From the <systemitem>Setup Wizard</systemitem> page select the <systemitem>&suse; Products</systemitem> tab. Wait a moment for the <systemitem>Available Products Below</systemitem> list to populate. You are present with a list of repositories provided from &scc;. Each of these repositories represents a single software source known as a <systemitem>Base Channel</systemitem> within &susemgr;. You can see the distribution, architecture and version from this page.</para>
+        <informalfigure>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="quickstart-webgui2.png"/>
+                </imageobject>
+            </mediaobject>
+        </informalfigure>
+        </step>
+        <step><para>Since you will be installing &sle; 12 and &sle; 11 SP4 based on the <systemitem>x86_64</systemitem> architecture, select the check-boxes for each of these channels now. You can add the channels to &susemgr; by selecting the single <command>+</command> button on the right or by selecting the <command>+ Add products</command> button from the bottom of the page after selecting your channels. &susemgr; will then schedule these channels for copying and begin mirroring them. This will take a long time as &susemgr; is now copying all software from the &suse; Vendor repositories located at &scc; to your servers <replaceable>/var/spacewalk/</replaceable> directory.</para>
+        <warning><title>Finishing a Scheduled Synchronization</title>
+        <para><remark>Add the warning here about stopping a sync and its implications.</remark></para></warning></step>
+    </procedure>
+</sect1>
+    
     <sect1>
         <title>Useful Topics From this Section</title>
         <itemizedlist>
