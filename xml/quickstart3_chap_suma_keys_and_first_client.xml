@@ -11,10 +11,11 @@
 ]>
 <chapter>
     <title>Preparing and Registering Clients</title>
-    <para> Client registration with SUSE Manager is executed with a bootstrap script on the server
-        which deploys all necessary information to clients. The bootstrap script contains parameters
-        which assigns a client system to its base channel. Two of these important parameters
-        are:</para>
+    <para><?oxy_comment_start author="coyote" timestamp="20151023T162152+0200" comment="This section needs to be clarified. The intro is a little vague"?>
+        <?oxy_comment_end?>Client registration with SUSE Manager is executed with a bootstrap script
+        on the server which deploys all necessary information to clients. The bootstrap script
+        contains parameters which assigns a client system to its base channel. Two of these
+        important parameters are:</para>
     <itemizedlist>
         <listitem>
             <para>Activation Keys</para>
@@ -34,7 +35,7 @@
     </note>
     <formalpara>
         <title>Activation
-            <?oxy_comment_start author="coyote" timestamp="20151023T151635+0200" comment="I would like to reword this to better suit entitlements, subscription counts and channels"?>Keys<?oxy_comment_end?></title>
+            <?oxy_comment_start author="coyote" timestamp="20151023T151635+0200" comment="Re-Work this to better suit entitlements, subscription counts and channels"?>Keys<?oxy_comment_end?></title>
         <para>Activation keys define the number of software entitlements, channels and groups a
             client system is allowed to subscribe to. This information is passed on to all systems
             registered with a key. Each activation key is bound to the organization for which it has
@@ -85,8 +86,8 @@
                 <para>Enter a Description to identify the generated activation key.</para>
             </step>
             <step>
-                <para> Enter a human readable key string value such as: <replaceable>SLES12-SP1
-                    </replaceable>. </para>
+                <para> Enter a human readable key string value such as: <command>SLES12-SP1
+                    </command>. </para>
                 <warning>
                     <title>Allowed Characters</title>
                     <para>For all &suse; Products do not use commas within the key string. All other
@@ -95,25 +96,25 @@
                 </warning>
             </step>
             <step>
-                <para>Enter 1 in the <systemitem>Usage:</systemitem> field. This will allow 1 client
-                    to register using this key.</para>
+                <para>Enter 1 in the <command>Usage:</command> field. This allows one client to
+                    register using this key and uses one of your subscription entitlements.</para>
             </step>
 
             <step>
-                <para>Select the &sle; 12 SP1 channel you added earlier from the <systemitem>Base
-                        Channels:</systemitem> drop down.</para>
+                <para>Select the &sle; 12 SP1 channel you added earlier from the <command>Base
+                        Channels:</command> drop down.</para>
             </step>
 
             <step>
-                <para>Select the virtualization check box as an <systemitem>Add-on
-                        entitlement:</systemitem>.</para>
+                <para>Select the virtualization check box as an <command>Add-on
+                        entitlement:</command>.</para>
             </step>
             <step>
-                <para>Leave the <systemitem>Contact Method:</systemitem> at default.</para>
+                <para>Leave the <command>Contact Method:</command> at default.</para>
             </step>
             <step>
-                <para>Leave Universal Default unchecked. Click <systemitem>Create Activation
-                        key</systemitem> to finish creating the key for the first channel.</para>
+                <para>Leave Universal Default unchecked. Click <command>Create Activation
+                        key</command> to finish creating the key for the first channel.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
@@ -122,14 +123,89 @@
                     </mediaobject>
                 </informalfigure>
             </step>
+            <step>
+                <para>Repeat this procedure from step 2 and create a key for the &sle; 11 SP4
+                    channel. The final list of keys should look similar to the following
+                    image.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-activationkeys3.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
         </procedure>
 
-        <para>Repeat this procedure from step 2 and create a key for the &sle; 11 SP4 channel and
-            then proceed to the next section.</para>
+        <para> Proceed to the next section.</para>
     </sect1>
     <sect1>
         <title>Generating a Bootstrap Script</title>
-        <para>Covers boot-strapping</para>
+        <para>This section provides an example of using bootstrap to register clients. You
+            will:</para>
+        <itemizedlist>
+            <listitem>
+                <para>Generate a bootstrap.sh script using &susemgr;</para>
+            </listitem>
+            <listitem>
+                <para>Edit the generated copies of the script for use with your clients</para>
+            </listitem>
+            <listitem>
+                <para>Run the modified script on your clients machines</para>
+            </listitem>
+        </itemizedlist>
+        <note>
+            <title>Bootstrap Best
+                <?oxy_comment_start author="coyote" timestamp="20151023T161448+0200" comment="Add some best practice examples of bootstrapping clients in mass."?>Practices<?oxy_comment_end?></title>
+            <para>Customers use various methods to register clients for use with &susemgr; in mass
+                using bootstrap. Using batch scripts for mass registration of both VM and Bare Metal
+                machines is a possibility. Some of these methods will be covered in the Best
+                Practice Guide and will be added at a later time.</para>
+        </note>
+
+        <para>The following procedure will guide you through generating a bootstrap script.</para>
+        <procedure>
+            <title>Creating a Bootstrap Script</title>
+            <step>
+                <para>On the SUSE Manager Web interface, switch to the <guimenu>Admin</guimenu> tab
+                    and select <menuchoice>
+                        <guimenu>SUSE Manager Configuration</guimenu>
+                        <guimenu>Bootstrap Script.</guimenu>
+                    </menuchoice></para>
+            </step>
+            <step>
+                <para>Leave the defaults settings and click the <guimenu>Update</guimenu> button. </para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-bootstrap1.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+
+            <step>
+                <para>The default bootstrap script is generated and stored on the server's file
+                    system in the <filename>/srv/www/htdocs/pub/bootstrap</filename> directory. </para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-bootstrap3.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+                
+                <para>It is also available from
+                        <filename>https://susemanager.example.com/pub/bootstrap/</filename>.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-bootstrap2.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+        </procedure>
     </sect1>
     <sect1>
         <title>Connecting Your First Client</title>
