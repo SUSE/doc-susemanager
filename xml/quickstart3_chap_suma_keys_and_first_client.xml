@@ -10,28 +10,36 @@
   %entities;
 ]>
 <chapter>
-    <title>Preparing and Registering a Client</title>
-    <para> Registering clients with SUSE Manager is done with a bootstrap script that deploys all
-        necessary information to the clients. The bootstrap script contains several parameters which
-        define which channel a client system will have access to. Two of these parameters
-        are:</para>
+    <title>Preparing and Registering Clients</title>
+    <para> Client registration with SUSE Manager is executed with a bootstrap script on the server
+        which deploys all necessary information to clients. The bootstrap script contains parameters
+        which assigns a client system to its base channel. Two important parameters are:</para>
     <itemizedlist>
         <listitem>
             <para>Activation Keys</para>
         </listitem>
         <listitem>
             <para>GNU Privacy Guard (GPG) Keys</para>
+
         </listitem>
     </itemizedlist>
-    <para>The first parameter (Activation Keys) should be created from the web-GUI. These keys
-        should be created and assigned to a previously added software channel. These keys act as
-        identifiers for specific channels, and all client systems associated with a channel key will receive
-        updates from the  channel its key is associated with. By design a client may only be connected to one base
-        channel through its activation or GPG key. This quick-start guide does not cover GPG key
-        usage. For more information on using GPG Keys with Bootstrap see: <ulink url="">Using
-            Bootstrap with GPG Keys: Reference Guide</ulink><remark>Add this link!</remark> For a
-        list of client operating systems supported by SUSE Manager, refer to Section 3.1.2,
-        “Supported Client Systems”.</para>
+    <formalpara>
+        <title>Activation Keys</title>
+        <para> Activation keys can be managed from the web-GUI. These keys should be created and
+            assigned to one of your previously added software channels. These keys act as
+            identifiers for individual channels, and all client systems associated with a channel
+            key receive updates from the channel its key was assigned to. By design a client may
+            only be connected to one base channel through its activation or GPG key. This
+            quick-start guide does not cover GPG key usage. For more information on using GPG Keys
+            with Bootstrap see: <ulink url=""
+                ><?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>Using Bootstrap
+                with GPG Keys: Reference Guide<?oxy_custom_end?></ulink>
+            <?oxy_comment_start author="coyote" timestamp="20151023T125002+0200" comment="Add a link to the reference guide on GPG and activation keys
+
+"?>For<?oxy_comment_end?>
+            a list of client operating systems supported by SUSE Manager, refer to Section 3.1.2,
+            “Supported Client Systems”.</para>
+    </formalpara>
 
     <para>In this chapter you will:</para>
     <orderedlist>
@@ -40,16 +48,91 @@
                 SLES12 SP1)</para>
         </listitem>
         <listitem>
-            <para>Creating A Bootstrap Repository</para>
+            <para>Create a bootstrap repository</para>
         </listitem>
         <listitem>
-            <para>Connecting Your First Client</para>
+            <para>Edit your bootstrap script</para>
+        </listitem>
+        <listitem>
+            <para>Connect your clients to &susemgr;</para>
         </listitem>
     </orderedlist>
 
     <sect1>
-        <title>Generating Activation Keys</title>
-        <para/>
+        <title>What are Activation Keys?</title>
+        <para>Activation keys define the number of software entitlements, channels and groups a
+            client system is allowed to subscribe to. This information is passed on to all systems
+            registered with a key. Each activation key is bound to the organization for which it has
+            been created. For this guide you will be using the default &susemgr; organization which
+            includes all software entitlements.</para>
+        <note>
+            <title>Activation Keys for New Organizations</title>
+            <para>When creating activation keys for a new organization, assign system software
+                entitlements first. The default organization includes all necessary entitlements.
+                For more information, see also:
+                <?oxy_custom_start type="oxy_content_highlight" color="255,255,0"?>“Organization
+                Management: Reference
+                Guide"<?oxy_comment_start author="coyote" timestamp="20151023T125403+0200" comment="Add link to reference section on entitlements" mid="3"?>.<?oxy_custom_end?><?oxy_comment_end mid="3"?>
+            </para>
+        </note>
+        <procedure>
+            <title>Creating Activation
+                <?oxy_comment_start author="coyote" timestamp="20151023T130613+0200" comment="Add screenshots to this procedure
+"?>Keys<?oxy_comment_end?></title>
+            <step>
+                <para>Log in to the SUSE Manager Web interface as administrator. </para>
+            </step>
+            <step>
+                <para>Switch to the Systems tab and select Activation Keys. </para>
+            </step>
+            <step>
+                <para> Click the Create New Key link at the upper right corner. </para>
+            </step>
+            <step>
+                <para>Enter a Description to identify the generated activation key.</para>
+            </step>
+            <step>
+                <para> Enter a human readable key string value such as: <replaceable>SLES12-SP1
+                    </replaceable>. </para>
+                <warning>
+                    <title>Allowed Characters</title>
+                    <para>Do not use commas within the key string. All other characters are allowed.
+                        <?oxy_comment_start author="coyote" timestamp="20151023T130819+0200" comment="This note about commas should be used in the reference guide when using rhnreg_ks with RHEL. Not in the quickstart"?><?oxy_custom_start type="oxy_content_highlight" color="255,60,255" mid="6"?>Commas<?oxy_comment_end?>
+                        are used as separators when registering client systems with multiple
+                        activation keys with rhnreg_ks<?oxy_custom_end mid="6"?></para>
+                </warning>
+            </step>
+            <step>
+                <para>Enter 5 in the <systemitem>Usage:</systemitem> field. This will allow up to 5
+                    clients to register using this key.</para>
+            </step>
+
+            <step>
+                <para>Select the &sle; 12 SP1 channel you added earlier from the <systemitem>Base
+                        Channels:</systemitem> drop down.</para>
+            </step>
+
+            <step>
+                <para>Select the virtualization check box as an <systemitem>Add-on
+                    entitlement:</systemitem>.</para>
+            </step>
+            <step>
+                <para>Leave the <systemitem>Contact Method:</systemitem> at default.</para>
+            </step>
+            <step>
+                <para>Leave Universal Default unchecked. Click <systemitem>Create Activation
+                        key</systemitem> to finish creating the key for the first channel.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="quickstart-activationkeys1.png" width="100%"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+        </procedure>
+        
+<para>Repeat this procedure and create a key for the &sle; 11 SP4 channel and proceed to the next section.</para>
     </sect1>
     <sect1>
         <title>Generating a Bootstrap Script</title>
