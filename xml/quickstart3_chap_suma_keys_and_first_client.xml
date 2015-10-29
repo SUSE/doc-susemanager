@@ -178,16 +178,14 @@
             <step>
                 <para>A template bootstrap script is generated and stored on the server's file
                     system in the <filename>/srv/www/htdocs/pub/bootstrap</filename> directory. </para>
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-bootstrap3.png"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
+                <screen><prompt>example-server: /srv/www/htdocs/pub/bootstrap#</prompt> <command>ls</command>
+bootstrap.sh  client-config-overrides.txt  client_config_update.py  sm-client-tools.rpm
+<prompt>example-server: /srv/www/htdocs/pub/bootstrap#</prompt>
+ 
+ </screen>
 
-                <para>The bootstrap script is also available from
-                        <filename>https://susemanager.example.com/pub/bootstrap/</filename>.</para>
+                <para>The bootstrap script is also available at:
+                        <filename>https://example-server.com/pub/bootstrap/</filename>.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
@@ -204,42 +202,94 @@
         <title>Modifying the Bootstrap Script</title>
         <para>In this section you will copy and modify the template bootstrap script you created
             from the previous section.</para>
+        <remark>this section should go towards the end during modification</remark>
+
         <para>The minimal requirement when modifying a bootstrap script for use with &susemgr; is
-            inclusion of an activation key. We also strongly recommend to include one or more (GPG)
-            keys (for example, your organization key, and package signing keys). In this guide we
-            will be sticking with the minimum requirement of an activation key. Once a key has been
-            modified, you will execute the final script on each client machine that you wish to
-            register with &susemgr;. This can be executed either centrally from the &susemgr;
-            Server, or decentralized from each client.</para>
-        <note>
-            <title>Network or Media Access During Registration</title>
-            <para>The bootstrap process triggers installation of packages on your client machines.
-                Before executing the bootstrap script on your clients, make sure the client can
-                access its default installation medium: network access (in case of network
-                repositories) or an inserted DVD (in case of physical media). </para>
-        </note>
-        
+            inclusion of an activation key. Depending on your organizations security requirements it
+            is strongly recommended to include one or more (GPG) keys (for example, your
+            organization key, and package signing keys). For the purposes of this guide you will be
+            registering with the activation keys created in the previous section.</para>
+
         <procedure>
             <title>Modifying the Bootstrap Script</title>
-            <step><para>Log in as <systemitem>root</systemitem> to the &susemgr; Server.</para></step>
-            <step><para>Create two copies of the template bootstrap script for each of your clients.</para>
-            <informalfigure>
-                <mediaobject>
-                    <imageobject>
-                        <imagedata fileref="quickstart-modboot1.png"/>
-                    </imageobject>
-                </mediaobject>
-            </informalfigure>
+            <step>
+                <para>Log in as <systemitem>root</systemitem> to the &susemgr; Server.</para>
             </step>
-            <step><para>Open the new copy in your editor of choice and search for
-                the<systemitem>ACTIVATION_KEYS</systemitem> entry. Enter your human readable
-                activation key.</para></step>
-            <step><para></para></step>
-            <step><para></para></step>
-            <step><para></para></step>
-            <step><para></para></step>
-            
+            <step>
+                <para>Navigate to the bootstrap directory with:</para>
+                <screen>
+<prompt>example-server:# </prompt><command>cd /srv/www/htdocs/pub/bootstrap/</command>
+</screen>
+            </step>
+            <step>
+                <para>Create and rename two copies of the template bootstrap script for use with
+                    each of your clients.</para>
+                <screen><prompt>example-server:/srv/www/htdocs/pub/bootstrap# </prompt><command>cp bootstrap.sh bootstrap-sles11-sp4.sh</command>
+<prompt>example-server:/srv/www/htdocs/pub/bootstrap# </prompt><command>cp bootstrap.sh bootstrap-sles12-sp1.sh</command>
+</screen>
+            </step>
+            <step>
+                <para>Open <systemitem>sles12-sp1.sh</systemitem> for modification. Scroll down and
+                    modify both lines marked in green. You must comment out <systemitem>#exit
+                        1</systemitem> to activate the script and then enter the name of the key for
+                    this script in the<systemitem>ACTIVATION_KEYS=</systemitem> field. See the
+                    example script below.</para>
+                <screen>
+
+echo
+echo
+echo "MINOR MANUAL EDITING OF THIS FILE MAY BE REQUIRED!"
+echo
+echo "If this bootstrap script was created during the initial installation"
+echo "of a SUSE Manager Server, the ACTIVATION_KEYS, and ORG_GPG_KEY values will"
+echo "probably *not* be set (see below). If this is the case, please do the"
+echo "following:"
+echo "  - copy this file to a name specific to its use."
+echo "    (e.g., to bootstrap-SOME_NAME.sh - like bootstrap-web-servers.sh.)"
+echo "  - on the website create an activation key or keys for the system(s) to"
+echo "    be registered."
+echo "  - edit the values of the VARIABLES below (in this script) as"
+echo "    appropriate:"
+echo "    - ACTIVATION_KEYS needs to reflect the activation key(s) value(s)"
+echo "      from the website. XKEY or XKEY,YKEY"
+echo "    - ORG_GPG_KEY needs to be set to the name(s) of the corporate public"
+echo "      GPG key filename(s) (residing in /srv/www/htdocs/pub) if appropriate. XKEY or XKEY,YKEY"
+echo
+echo "Verify that the script variable settings are correct:"
+echo "    - CLIENT_OVERRIDES should be only set differently if a customized"
+echo "      client-config-overrides-VER.txt file was created with a different"
+echo "      name."
+echo "    - ensure the value of HOSTNAME is correct."
+echo "    - ensure the value of ORG_CA_CERT is correct."
+echo
+echo "Enable this script: comment (with #'s) this block (or, at least just"
+echo "the exit below)"
+echo
+<command>#exit 1</command>
+
+# can be edited, but probably correct (unless created during initial install):
+# NOTE: ACTIVATION_KEYS *must* be used to bootstrap a client machine.
+<command>ACTIVATION_KEYS=1-sles12-sp1</command>
+ORG_GPG_KEY=
+    
+</screen>
+            </step>
+            <step>
+                <para>When you have finished your modifications save the file and repeat this
+                    procedure for the second bootstrap script. Then proceed to the next
+                    section.</para>
+            </step>
         </procedure>
+        <note>
+            <title>Finding Your Keys</title>
+            <para>To find key names you have created: Select the <guimenu>Overview</guimenu> tab
+                from the Web-GUI and then <menuchoice>
+                    <guimenu>Manage Activation keys</guimenu>
+                    <guimenu>Key Field</guimenu>
+                </menuchoice>. All keys created for channels are listed here. You must enter the
+                full name of the key you wish to use in the bootstrap script exactly as
+                presented in the key field.</para>
+        </note>
     </sect1>
     <sect1>
         <title>Connecting Your First Client</title>
