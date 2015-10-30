@@ -9,29 +9,23 @@
   <!ENTITY % entities SYSTEM "entity-decl.ent">
   %entities;
 ]>
-<chapter id="suma.installation.within.kvm">
-    <title>&susemgr; &productnumber3; Installation as an Extension</title>
+<chapter id="sles.installation.within.kvm">
+    <title>Constructing the &susemgr; Playground</title>
     <sect1>
         <title>What's Covered Here?</title>
 
-        <para> Installation has been greatly simplified as &susemgr; &productnumber3; may now be
-            selected as an extension during installation of &sle; 12. This chapter provides
-            instruction on getting started with &susemgr; in a simple test environment. A kernel
-            virtual machine (KVM) combined with Virt Manager will be used as a safe testing ground
-            for your first installation. The following sections will guide you through: </para>
+        <para>This chapter provides instruction on installation of &sle; 12 SP1 within KVM as the
+            Linux base for a &susemgr; 3 installation within a simple test environment. A kernel virtual
+            machine (KVM) combined with Virt-Manager will be used as a safe testing ground for your
+            first installation. The following sections will guide you through: </para>
 
         <itemizedlist>
             <listitem>
-                <para>Configuring (KVM) for a &sle; 12 installation using PXE boot</para>
+                <para>Preparing (KVM) for a &sle; 12 installation</para>
             </listitem>
             <listitem>
-                <para>Adding &susemgr; &productnumber3; to &sle; 12 as an extension </para>
+                <para>Booting the &sle; 12 SP1 installation using PXE</para>
             </listitem>
-            <listitem>
-                <para>Completing the &sle; 12 installation</para>
-            </listitem>
-
-
         </itemizedlist>
 
         <important>
@@ -42,10 +36,8 @@
         </important>
     </sect1>
     <sect1>
-        <title>Preparing Your &susemgr; Playground</title>
-        <para><remark>This section is for internal use and guides an employee unfamiliar with
-                &susemgr; through installing SUMA3 from the internal development repositories using
-                &sle; 12.</remark></para>
+        <title>&sle; 12 SP1 Installation Using KVM and virt-manager</title>
+        <para></para>
 
         <procedure>
             <title>Installation using Virtual Machine Manager</title>
@@ -54,12 +46,12 @@
                         Manager</systemitem></para>
             </step>
             <step>
-                <para>Within the <systemitem>New VM</systemitem> dialog box select
+                <para>When presented with the <systemitem>New VM</systemitem> dialog box select
                         <systemitem>Network Boot (PXE)</systemitem>. </para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-vmm-1.png" width="100%"/>
+                            <imagedata fileref="kvm-setup1.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -70,31 +62,31 @@
             </step>
 
             <step>
-                <para>For the operating system and Version choose <systemitem>Linux</systemitem> and
-                        <systemitem>&sle; 12 (or later)</systemitem>. </para>
+                <para>For the operating system and Version choose <command>Linux</command> and
+                        <command>&sle; 12 (or later)</command>. </para>
 
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-vmm-2.png" width="100%"/>
+                            <imagedata fileref="kvm-setup2.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
             </step>
+
             <step>
                 <para>Select <systemitem>Forward</systemitem> to continue.</para>
             </step>
 
             <step>
-                <para>On the next screen you will need to select the amount of memory and number of
-                    CPU's you wish to make available for the Virtual Machine. For testing we
-                    selected <systemitem>4096 MB</systemitem> ram and <systemitem>4</systemitem>
-                    CPUs. </para>
+                <para>Set the virtual machine <systemitem>Memory (RAM):</systemitem> to
+                        <command>4096 MB </command> and <systemitem>CPUs:</systemitem> to<command>4
+                    </command>.</para>
 
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-vmm-3.png" width="100%"/>
+                            <imagedata fileref="kvm-setup3.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -104,33 +96,39 @@
             </step>
             <step>
                 <para>Select <systemitem>Managed or other existing storage</systemitem> and then
-                    Browse. You need to create a storage device with enough space to fulfil
-                    &susemgr; requirements. We will cover partitioning requirements within the
-                    installation section.</para>
+                    Browse.</para>
 
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-vmm-4.png" width="100%"/>
+                            <imagedata fileref="kvm-setup4.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
             </step>
-
             <step>
-                <para>Next select <systemitem>New Volume</systemitem>.</para>
-            </step>
-            <step>
-                <para>For this guide &susemgr; requires 180 GB for its partitions. Name your storage
-                    volume and accept the default format of <systemitem>qcow2</systemitem>. Check
-                    the <systemitem>Storage Volume Quota</systemitem> available space and ensure
-                    your filesystem fulfils the 180 GB space requirement. Change the default vaule
-                    of <systemitem>8.0 GB</systemitem> in the <systemitem>Max Capacity</systemitem>
-                    field to 180 GB. </para>
+                <para>Select the <systemitem>New Volume</systemitem> button.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-vmm-5.png" width="100%"/>
+                            <imagedata fileref="kvm-setup5.png" width="100%"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+            <step>
+                <para>For the purposes of this guide you will create a storage device with 200 GB to
+                    fulfil &susemgr; space requirements. Name your storage volume
+                        <emphasis>suma3-testing</emphasis> and accept the default format of
+                        <systemitem>qcow2</systemitem>. Check your local <systemitem>Storage Volume
+                        Quota</systemitem> and ensure your local file system can provide the
+                    required 200 GB of disk space. Change the default value of <command>8.0
+                        GB</command> in the <systemitem>Max Capacity</systemitem> field to
+                        <command>200 GB</command>. </para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="kvm-setup6.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -142,348 +140,94 @@
             </step>
 
             <step>
-                <para>Select <systemitem>Choose Volume</systemitem> to continue. At the following
-                    dialog select <systemitem>Forward</systemitem> to continue.</para>
-            </step>
-
-            <step>
-                <para>Name your virtual machine. </para>
+                <para>Select <systemitem>Choose Volume</systemitem> to continue.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-vmm-7.png" width="100%"/>
+                            <imagedata fileref="kvm-setup7.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+            <step>
+                <para> Select <systemitem>Forward</systemitem> to continue. </para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="kvm-setup8.png"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+            <step>
+                <para>Name your virtual machine <emphasis>suma3-testing</emphasis>. </para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="kvm-setup9.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
             </step>
 
             <step>
-                <para>Finally select <systemitem>Finish</systemitem> to finalize your virtual
-                    machine setup.</para>
+                <para>Finalize your virtual machine setup by selecting
+                        <systemitem>Finish</systemitem> to proceed with pxe boot and installation of
+                    &sle; 12 SP1 RC3</para>
             </step>
         </procedure>
+        <para>This completes the construction of your &susemgr; playground. To continue proceed to
+            the next section.</para>
     </sect1>
 
     <sect1>
         <title>PXE Booting &sle; 12</title>
-        <para>After completing VM setup in KVM the VM will automatically boot to the PXE boot menu.
-            The following procedure will guide you through PXE boot. </para>
+        <para>After selecting the <systemitem>Finish</systemitem> button your new VM will
+            automatically boot to the PXE boot menu. The following procedure will guide you through
+            selecting the correct installation image during PXE boot. </para>
 
         <procedure>
             <title>PXE Boot Procedure</title>
             <step>
-                <para>Select <systemitem>Unpacked SLE-12 ISOs via SLP</systemitem> to
-                    continue.</para>
+                <para>Select <systemitem>Unpacked SLE-12 ISOs via SLP</systemitem> press
+                        <keycap>Enter</keycap> to continue.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-pxeboot-sles12.png" width="100%"/>
+                            <imagedata fileref="pxeboot2.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
             </step>
             <step>
-                <para>Select <systemitem>SLE 12 SP1 Server LATEST x86_64 DVD1</systemitem></para>
+                <para>Select <systemitem>SLE 12 SP1 Server LATEST x86_64 DVD1</systemitem> press
+                        <keycap>Enter</keycap> to continue.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-pxeboot-sles12-2.png" width="100%"/>
+                            <imagedata fileref="pxeboot3.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
             </step>
 
         </procedure>
+
+        <para>Installation of &sle; 12 SP1 will begin. For more information on completing an
+            installation of &sle; 12 see also: <ulink
+                url="https://www.suse.com/documentation/sles-12/book_quickstarts/data/sec_sle_installquick.html"
+                >&sle; 12 Quickstart Installation Guide</ulink>
+        </para>
+        <important>
+            <title>Internal Registration Keys</title>
+            <para>As this is an internal testing guide for Alpha remember to use the developer registration
+                keys during the &sle; 12 SP1 installation for registration with &scc;.</para>
+        </important>
+        <para>Complete the &sle; 12 SP1 installation and then proceed to the next
+            section.</para>
     </sect1>
 
-    <sect1>
-        <title>&sle; 12 Installation Procedure</title>
-        <procedure>
-            <step>
-                <para>Select your language and desired keyboard settings, you may change them if
-                    necessary. You need to accept the license agreement by checking <systemitem>I
-                        Agree to the License Terms</systemitem> to continue.</para>
 
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-sles12-1.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-            <step>
-                <para>Proceed with <systemitem>Next</systemitem> to continue. </para>
-            </step>
-
-            <step>
-                <para>Enter the e-mail address associated with your (SCC) account and the
-                    registration code for &sle; Server. A successful registration is a prerequisite
-                    for getting product updates and being entitled to technical support. </para>
-
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-sles12-2.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-            <step>
-                <para>Proceed with Next.</para>
-            </step>
-
-        </procedure>
-        <note>
-            <title>&susemgr; and Updating</title>
-            <para>If &sle; Server has been successfully registered at (SCC) you will be asked if you
-                would like to install the latest available online updates. Choosing
-                    <systemitem>Yes</systemitem> provides the system with the most current updates
-                and packages. If this option is selected, a manual update will be unnecessary after
-                installation. These updates will also include the &susemgr; &productnumber3; updates
-                if it was selected as an extension during installation.</para>
-        </note>
-        <para>The next section will continue by enabling the &susemgr; &productnumber3; extension
-            within the &sle; 12 installation.</para>
-    </sect1>
-
-    <sect1>
-        <title>Selecting &susemgr; &productnumber3; as an Extension</title>
-        <remark>This section is currently blocked. The option to choose manager as an extension does
-            not yet exist! The current screen shot is a placeholder and will need to be updated.
-            This step will not be used by our customers.</remark>
-
-        <procedure>
-            <title>Selecting &susemgr; as an Extension</title>
-            <step>
-                <para>Select &susemgr; &productnumber3; as an extension.</para>
-
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-sles12-extensions1.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-
-            </step>
-            <step>
-                <para>Click <systemitem>Next</systemitem> to continue.</para>
-            </step>
-        </procedure>
-
-        <procedure>
-            <title>Adding the &susemgr; &productnumber3; Developer's Extension Preview</title>
-            <step>
-                <para>Select <systemitem>I would like to install an additional Add On
-                        Product</systemitem>. Since you are working internally, you will need to
-                    specify the URL leading to the &susemgr; &productnumber3; developer image
-                    repository. </para>
-
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-devel-ext1.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-
-            <step>
-                <para>Leave the default value of <systemitem>Specify URL...</systemitem> and click
-                        <systemitem>Next</systemitem> to continue.</para>
-            </step>
-
-            <step>
-                <para>On the <systemitem>Repository URL</systemitem> screen you need to name the
-                    repository you will be adding and provide the URL to the developer repository.
-                    Internal Up-to-date builds are found here: <ulink
-                        url="http://dist.suse.de/ibs/Devel:/Galaxy:/Manager:/Head/images/repo/"
-                        >Up-to-date &susemgr; Developer Builds</ulink> Select the latest build and
-                    input the full URL including the <emphasis>latest build
-                    number</emphasis>.</para>
-
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-sles12-suma-repo.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-
-            <step>
-                <para>Click <systemitem>Next</systemitem> to continue.</para>
-
-            </step>
-            <step>
-                <para>You will be prompted to trust the repository key. Select
-                        <systemitem>Trust</systemitem>.</para>
-            </step>
-            <step>
-                <para>At the following screen you will see the latest build has been added to your
-                    list of repositories. Click <systemitem>Next</systemitem> to continue.</para>
-
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-addon-final.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-        </procedure>
-    </sect1>
-
-    <sect1>
-        <title>Configuring &susemgr; &productnumber3; Storage</title>
-        <para>This section introduces the critical topic of correctly configuring storage for use by
-            &susemgr;.</para>
-        <warning>
-            <title>Space Requirements</title>
-            <?oxy_comment_start author="coyote" timestamp="20151023T115000+0200" comment="This section should be re-worded its messy"?>
-            <para><?oxy_comment_end?>&sle; 12 defaults to 40 GiB for its base file system. &susemgr;
-                requires 100+ GiB for channel mirror data mounted at
-                    <filename>/var/spacewalk</filename> and an additional 30+ GiB for its database
-                mounted at <filename>/var/lib/pgsql</filename>. If these requirements are not met
-                the installation of &susemgr; will fail. &sle; creates a home partion by default.
-                The root partition should have enough space for the required directories. In this
-                guide you will remove the home partition and assign the remaining space to the root
-                partition. Review this section carefully to ensure you have properly configured the
-                necessary partitions. </para>
-        </warning>
-
-
-        <para>This step of the installation guide starts at the <systemitem>Suggested Partitioning
-            </systemitem> screen. You will now use the expert partitioner to configure the required
-            directories and fulfil &susemgr;'s space requirements.</para>
-
-        <procedure>
-            <title>Suggested Partitioning</title>
-            <step>
-                <para>Select <systemitem>Expert Partitioner...</systemitem> to initiate the
-                    partition tool.</para>
-
-                <informalfigure>
-
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-partition1.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-
-            <step>
-                <para>In the Expert Partitioner you can find your virtual hard disk (vda) located on
-                    the left under the <systemitem>System View</systemitem> panel. Choose
-                        <systemitem>Hard Disks</systemitem>. The system has already created a
-                    temporary scheme which we will change to suit &susemgr;'s needs.</para>
-            </step>
-            <step>
-                <para>Select the top level (vda) located under <systemitem>Hard
-                    Disks</systemitem>and you will see your current partitions displayed within the
-                    Partitions tab to the right.</para>
-            </step>
-
-            <step>
-                <para>Delete the <filename>root /</filename> and <filename>/home</filename>
-                    partitions with the <systemitem>Delete</systemitem> button. If these partition
-                    are not deleted you will not have enough space later during setup for the
-                    required directories.
-                    <?oxy_comment_start author="coyote" timestamp="20151023T115122+0200" comment="There should be a note here on removing the /home partition and resizing the root partition with remaining space."?></para>
-                <?oxy_comment_end?>
-            </step>
-            <step>
-                <para>Next click <systemitem>Add</systemitem> to add a new partition.</para>
-            </step>
-            <step>
-                <para>Under <systemitem>New Partition Type</systemitem> select <systemitem>Primary
-                        Partition</systemitem> then click <systemitem>Next</systemitem> to
-                    continue.</para>
-                <informalfigure>
-
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-root1.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-
-            <step>
-                <para>Leave the default <systemitem>New Partition Size</systemitem> to custom and
-                    click <systemitem>Next</systemitem> to continue.</para>
-                <informalfigure>
-
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-root2.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-            <step>
-                <para>For the partitions role select <systemitem>Data and ISV
-                        Applications</systemitem>. Continue with <systemitem>Next</systemitem>.
-                </para>
-            </step>
-            <step>
-                <para>Under <systemitem>Formatting Options</systemitem> select
-                        <systemitem>BTrFS</systemitem> from the drop down menu. Click
-                        <systemitem>Next</systemitem> to proceed. Your final setup should look like
-                    the following example.</para>
-
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-root4.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-
-            <step>
-                <para>This concludes partition setup. Select <systemitem>Next</systemitem> to
-                    continue.</para>
-            </step>
-        </procedure>
-        <para>The next section covers the remaining steps required to complete the &sle; 12
-            installation. </para>
-    </sect1>
-
-    <sect1>
-        <title>Completing the &sle; 12 Installation</title>
-        <procedure>
-            <title>Completing Installation</title>
-            <step>
-                <para>Select your date and time zone. These settings are critical for syncing with
-                    &scc;. Ensure your servers time matches that of your host machine. Select
-                        <systemitem>Next</systemitem> to continue when the <systemitem>Date and
-                        Time:</systemitem> field matches that of your host system.</para>
-                <remark>Add link to sles12 guide for NTP date and time advanced setup.</remark>
-            </step>
-            <step>
-                <para>Create a new user and password. You may choose to use the same password for
-                    the root account. If this option remains unselected you will be prompted to
-                    create a new root password at the following screen.</para>
-            </step>
-            <step>
-                <para>At the <systemitem>Installation Settings</systemitem> screen you may alter any
-                    of the optional settings required for your organization. Select
-                        <systemitem>Next</systemitem> to proceed.</para>
-
-            </step>
-            <!-- TODO: fix this -->
-        </procedure>
-
-        <para>Installation will begin by installing &sle; 12, the &susemgr; &productnumber3;
-            extension. If the update option was selected during installation the latest patches will
-            be downloaded bringing your new system up-to-date. This concludes the installation
-            section of this guide.</para>
-        <para>The Next section will cover final setup of &susemgr; using a terminal within &sle;
-            12.</para>
-    </sect1>
 
 
 </chapter>
