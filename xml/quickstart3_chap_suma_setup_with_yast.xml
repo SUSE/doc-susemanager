@@ -16,7 +16,8 @@
         <note>
             <title>Prerequisites for this Guide</title>
             <para>This section assumes you have completed the section: <link
-                linkend="suma.installation.addon.yast">&susemgr; 3 Installation as an Add-on</link></para>
+                    linkend="suma.installation.addon.yast">&susemgr; 3 Installation as an
+                    Add-on</link></para>
         </note>
 
         <para>This section covers setup procedures of &susemgr; 3. You will perform the following
@@ -36,8 +37,7 @@
                     clients. </para>
             </listitem>
             <listitem>
-                <para>Select and add the &sle; 12 SP1 and &sle; 11 SP4 channels as your first two
-                    clients</para>
+                <para>Add the &sle; 12 SP1 channel</para>
             </listitem>
 
         </itemizedlist>
@@ -64,7 +64,7 @@
 
             <step>
                 <para>On the initial screen select <systemitem>Set up SUSE Manager from
-                        scratch</systemitem> and then select <keycap>Next</keycap> to
+                        scratch</systemitem> and then select <systemitem>Next</systemitem> to
                     continue.</para>
                 <informalfigure>
                     <mediaobject>
@@ -79,7 +79,7 @@
                 <para>Enter an email address which will receive notifications about the servers
                     status. The number of emails sent from Manager can be extensive, therefore
                     notifications via email may be disabled from the web-GUI after setup if desired.
-                    Select <keycap>Next</keycap> to continue.</para>
+                    Select <systemitem>Next</systemitem> to continue.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
@@ -93,7 +93,7 @@
                 <para>Enter your Certificate information and a password. The password should be
                     stored in a secure location. <emphasis>Without this password it will not be
                         possible to setup a &susemgr; Proxy Server.</emphasis> Select
-                        <keycap>Next</keycap> to proceed.</para>
+                        <systemitem>Next</systemitem> to proceed.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
@@ -106,7 +106,7 @@
             <step>
                 <para>You will be using an <systemitem>Embedded Database</systemitem> for this
                     guide. Enter a database user and password. This password should be stored in a
-                    secure location. Select <keycap>Next</keycap> to continue.</para>
+                    secure location. Select <systemitem>Next</systemitem> to continue.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
@@ -122,7 +122,8 @@
                     without this information. Enter your &scc; <systemitem>Organization
                         Credentials</systemitem>. You may register or <ulink
                         url="https://scc.suse.com/login">Login</ulink> for access to your
-                    organization credentials. Select <keycap>Next</keycap> to continue.</para>
+                    organization credentials. Select <systemitem>Next</systemitem> to
+                    continue.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
@@ -135,7 +136,7 @@
             <step>
                 <para>Select <systemitem>Yes</systemitem> to run setup when prompted. When completed
                     you will be presented with your new &susemgr; web-GUI address. Select
-                        <keycap>Finish</keycap> to complete &susemgr; setup. </para>
+                        <systemitem>Finish</systemitem> to complete &susemgr; setup. </para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
@@ -229,20 +230,44 @@
                 </informalfigure>
             </step>
             <step>
-                <para>Since you will be installing &sle; 12 and &sle; 11 SP4 based on the
-                        <systemitem>x86_64</systemitem> architecture, select the check-boxes for
-                    each of these channels now. You can add a channel to &susemgr; by selecting the
-                    single <command>+</command> button on the right or by selecting the <command>+
-                        Add products</command> button from the bottom of the page after selecting
-                    your channels. &susemgr; will then schedule these channels for copying and begin
-                    mirroring them. This will take a long time as &susemgr; must copy all software
-                    from the &suse; Vendor repositories located at &scc; to your servers
-                        <replaceable>/var/spacewalk/</replaceable> directory.</para>
-                <warning>
-                    <title>Finishing a Scheduled Synchronization</title>
-                    <para><remark>Add the warning here about stopping a sync and its
-                            implications.</remark></para>
-                </warning>
+                <para>As you are adding a &sle; 12 client based on the
+                        <systemitem>x86_64</systemitem> architecture, scroll down the page and
+                    select the check box for this channel now. </para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+                <itemizedlist>
+                    <listitem>
+                        <para>Add single channels to &susemgr; by selecting the <command>+</command>
+                            button to the right of each channel</para>
+                    </listitem>
+                    <listitem>
+                        <para>Add multiple channels by selecting the check boxes to the left of the
+                            channels list and then complete the process by clicking the <command>+
+                                Add products</command> button located at the bottom of the
+                            page.</para>
+                    </listitem>
+                </itemizedlist>
+
+                <para>After adding your channel &susemgr; will schedule the channel to be copied and
+                    begin mirroring them. This can take a long time as &susemgr; must copy all
+                    software sources from the &suse; Vendor repositories located at &scc; to your
+                    servers local <replaceable>/var/spacewalk/</replaceable> directory.</para>
+
+                <important>
+                    <title>Completing A Scheduled Channel Sync</title>
+                    <para>If you wish to monitor a channel synchronization process in realtime you
+                        may wish to utilize the following command to provide a per channel per
+                        package overview of the mirroring process. </para>
+
+<screen>
+<prompt>example-server:/var/log/rhn/reposync/#</prompt>tail -f &lt;Channel_Name&gt;.log
+</screen>
+                </important>
             </step>
         </procedure>
     </sect1>
