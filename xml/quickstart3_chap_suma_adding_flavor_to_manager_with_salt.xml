@@ -12,19 +12,96 @@
 <chapter id="suma.add.flavor.with.salt">
     <title>Adding Flavor to Manager: Introducing SaltStack</title>
     <subtitle>A Technical Preview</subtitle>
-    
+
     <sect1>
         <title>Introducing Saltstack</title>
-<para>Of the many new features added during the development &susemgr; 3  the addition
-        of Saltstack is perhaps the most powerful. Salt provides a generous improvement to the current
-        configuration management system and is capable of:</para>
+        <para>The addition of Saltstack in &susemgr; 3 fulfils customer demands by providing the
+            latest in configuration management and includes a more consistent systems management
+            framework. </para>
+
+        <para>In this chapter you will learn how to setup and configure your VM's created in the
+            previous sections for use with the new Saltstack framework. In this section of the guide
+            you will:</para>
         <itemizedlist>
-        <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            <listitem><para></para></listitem>
-            
-    </itemizedlist>
+            <listitem>
+                <para>Configure &susemgr; 3 as the Salt-master</para>
+            </listitem>
+            <listitem>
+                <para>Configure your &sle; 12 client as the Salt-minion</para>
+            </listitem>
+            <listitem>
+                <para>Accept the Salt-minion key using the &susemgr; WebGUI</para>
+            </listitem>
+            <listitem>
+                <para>Use Saltstack to manage your client</para>
+            </listitem>
+        </itemizedlist>
+
+        <note>
+            <title>Completed the First Sections of This Guide?</title>
+            <para>This chapter of the guide is assumes you have sequentially completed this guide.
+                Although you do not need to complete the section: <link
+                    linkend="preparing.and.registering.clients">Preparing and Registering
+                    Clients</link>. It is recommended that you follow and execute the steps in order
+                as this will provide your client with software sources and updates. </para>
+        </note>
+
+    </sect1>
+
+    <sect1>
+        <title>Setup &susemgr; as Salt-master</title>
+        <para>Once &susemgr; has been installed and setup, by default it is configured as a fully
+            functional Salt-master. In the rest of this chapter &susemgr; will be referred to the
+            Salt-master. </para>
+        <important>
+            <title>Technical Preview Salt-master Modifications</title>
+            <para>
+                <emphasis>When you are testing with the early technical preview a configuration file
+                    change is necessary to ensure your client can connect to the
+                    Salt-master</emphasis></para>
+        </important>
+        <para>The following procedure will walk you through adding the technical preview
+            configuration file change on the Salt-master</para>
+        <procedure>
+            <title>Technical Preview: Required Modification</title>
+            <step>
+                <para>On the Salt-master (&susemgr; Server) as root browse to the
+                        <replaceable>/etc/salt</replaceable> directory and enter the following
+                    commands.</para>
+                <screen>
+<prompt>example-server:~ #</prompt> cd /etc/salt
+<prompt>example-server: /etc/salt #</prompt> ls
+master  master.d  pki  roster
+<prompt>example-server: /etc/salt #</prompt> vi master
+</screen>
+            </step>
+            <step>
+                <para> Search for the <systemitem>#max_event_size:</systemitem> parameter and change
+                    its value to <command>6000000</command>. When you are finished, uncomment the
+                    parameter then save and quit <systemitem>VI</systemitem>. </para>
+
+                <screen>
+# Passing very large events can cause the minion to consume large amounts of
+# memory. This value tunes the maximum size of a message allowed onto the
+# master event bus. The value is expressed in bytes.
+<command>max_event_size: 6000000</command>
+
+</screen>
+                <note>
+                    <title>Why change the max_event_size?</title>
+                    <para>Currently when the Salt-master requests Grains (various information about
+                        a client: hardware, software, etc.) the list size is larger than the default
+                        value so the request times out. Changing this to a higher value enables to
+                        client to connect despite grain size. The number of packages installed
+                        effects this the most currently. </para>
+                </note>
+            </step>
+<step><para>Once you have set the <systemitem>max_event_size</systemitem> you need to restart the
+    Salt-master. </para>
+<screen>
+<prompt>example-server: /etc/salt #</prompt> systemctl restart salt-master   
+</screen>
+</step>
+        </procedure>
     </sect1>
 </chapter>
