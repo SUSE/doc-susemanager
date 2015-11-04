@@ -10,7 +10,7 @@
   %entities;
 ]>
 <chapter id="suma.add.flavor.with.salt">
-    <title>Adding Flavor to Manager: Introducing SaltStack</title>
+    <title>Adding Flavor to Manager with SaltStack</title>
     <subtitle>A Technical Preview</subtitle>
 
     <sect1>
@@ -38,9 +38,9 @@
         </itemizedlist>
 
         <note>
-            <title>Completed the First Sections of This Guide?</title>
-            <para>This chapter of the guide is assumes you have sequentially completed this guide.
-                Although you do not need to complete the section: <link
+            <title>Early Steps</title>
+            <para>This section assumes you have completed all earlier steps in this guide. Although
+                you do not need to complete the chapter: <link
                     linkend="preparing.and.registering.clients">Preparing and Registering
                     Clients</link>. It is recommended that you follow and execute the steps in order
                 as this will provide your client with software sources and updates. </para>
@@ -49,7 +49,7 @@
     </sect1>
 
     <sect1>
-        <title>Setup &susemgr; as Salt-master</title>
+        <title>&susemgr; as the Salt-master</title>
         <para>Once &susemgr; has been installed and setup, by default it is configured as a fully
             functional Salt-master. In the rest of this chapter &susemgr; will be referred to the
             Salt-master. </para>
@@ -96,12 +96,158 @@ master  master.d  pki  roster
                         effects this the most currently. </para>
                 </note>
             </step>
-<step><para>Once you have set the <systemitem>max_event_size</systemitem> you need to restart the
-    Salt-master. </para>
-<screen>
+            <step>
+                <para>Once you have set the <systemitem>max_event_size</systemitem> you need to
+                    restart the Salt-master. </para>
+                <screen>
 <prompt>example-server: /etc/salt #</prompt> systemctl restart salt-master   
 </screen>
-</step>
+            </step>
         </procedure>
+        <para>This concludes configuration of the Salt-master. The next section will guide you
+            through configuration of the salt-minion.</para>
     </sect1>
+
+    <sect1>
+        <title>salt-minion Setup and Configuration</title>
+        <para>This section covers setup of Saltstack on the client. </para>
+        <para>Clients unlike the Salt-master do not have Saltstack installed by default. Therefore
+            you must add the required packages. In this section you will:</para>
+        <itemizedlist>
+            <listitem>
+                <para>Download the &susemgr; 3 ISO on the client</para>
+            </listitem>
+            <listitem>
+                <para>Add the &susemgr; 3 ISO as an ISO repository on the client</para>
+            </listitem>
+            <listitem>
+                <para>Install the required salt-minion packages</para>
+            </listitem>
+            <listitem>
+                <para>Change the <systemitem>event_max_size</systemitem> value on the client</para>
+            </listitem>
+        </itemizedlist>
+
+        <procedure>
+            <title>Installing salt-minion Packages on the Client</title>
+            <step>
+                <para>On your client system point your browser to: <ulink
+                        url="http://download.nue.suse.com/install/SUSE-Manager-3-Snapshot1/"
+                        >SUSE-Manager-Server-3.0-DVD-x86_64.iso</ulink>. Download the DVD 1 image
+                    and mount it as an ISO repository. See also: <link
+                        linkend="suma.installation.addon.yast">&susemgr; 3 Installation as an
+                        Add-on</link>.</para>
+                <important>
+                    <title>Installing the &susemgr; Pattern</title>
+                    <para>
+                        <emphasis>Do not install the full &susemgr; 3 pattern. This will install a
+                            &susemgr; server instance on your client. You only need the salt-minion
+                            packages. This process should be automated for
+                        release.</emphasis></para>
+                </important>
+            </step>
+            <step>
+                <para>Open the <systemitem>YaST Software Management</systemitem> tool. In the search
+                    field enter <systemitem>salt</systemitem> and press <keycap>Enter</keycap>.
+                    Select the salt-minion package then click <systemitem>Accept</systemitem> to
+                    continue.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="minion1.png" width="100%"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+            <step>
+                <para>Once installation has completed, open a terminal and enter the following
+                    commands:</para>
+                <screen>
+<prompt>example-server: ~ #</prompt> cd /etc/salt
+<prompt>example-server: /etc/salt #</prompt>ls
+minion  minion.d  pki
+<prompt>example-server: /etc/salt #</prompt> vi minion 
+</screen>
+            </step>
+            <step>
+                <para>Within the minion file, find, uncomment and replace the:</para>
+                <screen>
+#master: salt
+</screen>
+                <para>entry with:</para>
+                <screen>
+master: example-server.com
+</screen>
+                <para>Where <replaceable>example-server-com</replaceable> represents your &susemgr;
+                    3 Server FQDN</para>
+            </step>
+            <step>
+                <para>Adjust the <systemitem>max_event_size</systemitem> to
+                        <command>6000000</command>.</para>
+            </step>
+            <step>
+                <para>Save and exit VI.</para>
+            </step>
+            <step>
+                <para>Restart the salt-minion service with:</para>
+                <screen>
+<prompt>example-server: /etc/salt #</prompt> systemctl restart salt-minion
+</screen>
+            </step>
+        </procedure>
+        <para>This concludes the salt-minion configuration section. The next part of this guide will
+            cover acceptance of minions for management via the WebGUI.</para>
+    </sect1>
+    
+    <sect1>
+        <title>Accepting Minions for Management</title>
+        <para>In this section you will accept minions using the &susemgr; WebGUI.</para>
+        
+
+        <procedure>
+            <title>Accepting Minions for Management</title>
+            <step><para>To get started open your browser and point it to your &susemgr; Server address and log
+            in.</para></step>
+            <step>
+                <para>Select the <guimenu>Systems</guimenu> tab then
+                        <guimenu>Minions</guimenu> from the sidebar.</para>
+            </step>
+
+            <step>
+                <para>On the <systemitem>All Minions</systemitem> page you can see a list of
+                        <systemitem>Pending</systemitem> and <systemitem>Rejected</systemitem>
+                    minions.</para>
+                <informalfigure>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="minion2.png" width="100%"/>
+                        </imageobject>
+                    </mediaobject>
+                </informalfigure>
+            </step>
+            <step>
+                <para>The minion you configured in the previous section should be listed under the
+                        <systemitem>Pending</systemitem> column.</para>
+            </step>
+            <step>
+                <para>To accept the minion for management click the <systemitem>Check</systemitem>
+                    button.</para>
+            </step>
+            <step>
+                <para>Confirm your minion was added by going to the <guimenu>Systems</guimenu> tab.
+                    Your new minion is now ready for management by &susemgr; 3.</para>
+            </step>
+        </procedure>
+
+        <important>
+            <title>Minion not Showing Up?</title>
+            <para>If your minion consistently fails to show up under the System listing after
+                refreshing your browser you can perform the following step.</para>
+            <screen>
+<prompt>example-server: ~ #</prompt> systemctl restart tomcat        
+</screen>
+        </important>
+
+    </sect1>
+
 </chapter>
