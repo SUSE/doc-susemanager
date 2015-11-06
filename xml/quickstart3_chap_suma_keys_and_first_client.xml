@@ -54,7 +54,9 @@
         <listitem>
             <para>Modify your bootstrap script</para>
         </listitem>
-        <listitem><para>Create a client tools repository</para></listitem>
+        <listitem>
+            <para>Create a client tools repository</para>
+        </listitem>
         <listitem>
             <para>Connect your clients to &susemgr; Using the Modified bootstrap script</para>
         </listitem>
@@ -294,30 +296,78 @@ ORG_GPG_KEY=
     </sect1>
     <sect1>
         <title>Creating the &susemgr; Tools Repository</title>
-        <para>In the previous section you modified a bootstrap script for automating the
-            connection of a client to the server. In this section you will create a repository on
-            the &susemgr; Server for storing the client tools which will be installed during the
-            bootstrap process. In the following procedure you will create the &sle; 12 SP1
-            tools repository.
-        </para>
+        <para>In the previous section you modified a bootstrap script for automating the connection
+            of a client to the server. In this section you will create a repository on the &susemgr;
+            Server for storing the client tools. These will be installed from the newly created
+            repository during the bootstrap process. In the following procedure you will create the
+            &sle; 12 SP1 tools repository. </para>
         <important>
             <title>Creating a Tools Repository when an SCC Channel has not been Synced</title>
-            <para>Before following the procedure to create the tools repository make sure the &suse; vendor channel you will
-                be using with your client has been completly synced. You can check this by running
-                <replaceable>tail -f /var/log/rhn/reposync/CHANNEL_NAME</replaceable>.log as
-                <systemitem>root</systemitem>. For example: <replaceable>tail -f
+            <para>Before following the procedure to create the tools repository make sure the &suse;
+                vendor channel you will be using with your client has been completly synced. You can
+                check this by running <replaceable>tail -f
+                    /var/log/rhn/reposync/CHANNEL_NAME</replaceable>.log as
+                    <systemitem>root</systemitem>. For example: <replaceable>tail -f
                     /var/log/rhn/reposync/sles12-sp1-pool-x86_64</replaceable>.log </para>
         </important>
         <procedure>
             <title>Generating the Tools Repository for &sle; 12 SP1</title>
-            <step><para>Open a terminal on the server as <systemitem>root</systemitem> and enter the
-            following commands.</para>
-            
+            <step>
+                <para>Open a terminal on the server as <systemitem>root</systemitem> and enter the
+                    following command to list available bootstrap repositories:</para>
+                <screen>
+<prompt>example-server: #</prompt> mgr-create-bootstrap-repo -l
+SLE-12-SP1-x86_64
+</screen>
+            </step>
+            <step>
+                <para>Then invoke the same command using the listed repository:</para>
+                <screen>
+<prompt>example-server: #</prompt> mgr-create-boostrap-repo SLE-12-SP1-x86_64                
+</screen>
+            </step>
+            <step>
+                <para>&susemgr; will create and add the client tools to the newly created
+                        <replaceable>repositories</replaceable> directory located at
+                        <replaceable>/srv/www/htdocs/pub/repositories/</replaceable></para>
             </step>
         </procedure>
+        <para>You are now ready to proceed to the next section and connect your client using the
+            modified bootstrap script.</para>
     </sect1>
     <sect1>
         <title>Connecting Your First Client</title>
-        <para>Connecting the first client.</para>
+        <para>This section covers connecting your clients to manager with the modified bootstrap
+            script.</para>
+
+        <procedure>
+            <title>Running the Bootstrap Script</title>
+            <step>
+                <para>On your &susemgr; Server as <systemitem>root</systemitem> navigate to the
+                    following directory.</para>
+                <screen>
+<prompt>example-server: #</prompt> cd /srv/www/htdocs/pub/bootstrap/
+</screen>
+            </step>
+            <step>
+                <para>Run the following command to execute the bootstrap script on the
+                    client.</para>
+                <screen>
+<prompt>example-server:/srv/www/htdocs/pub/bootstrap #</prompt> cat <emphasis>MODIFIED-SCRIPT.SH</emphasis> | root@example-client.com /bin/bash
+</screen>
+            </step>
+            <step>
+                <para>The script will execute and proceed to download the required dependencies
+                    located in the repositories directory you created earlier. Once the script has
+                    finished running, log in to the WebGUI and select the systems tab to see your
+                    new client listed.</para>
+            </step>
+            <remark>Add: a screen shot of the new client on the WebGUI</remark>
+        </procedure>
+
+<para>This concludes the bootstrap section of this guide. The next section will cover setup and
+    configuration of Saltstack for use with &susemgr; 3. </para>
+
+
     </sect1>
 </chapter>
