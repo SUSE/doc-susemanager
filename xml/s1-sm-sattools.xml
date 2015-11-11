@@ -193,11 +193,25 @@
     limit.
    </para>
    <para>
+    Staging means that clients will download packages in advance.  Then
+    the package installation action will take place immediately, when
+    the schedule is actually executed.  This <quote>pre-fetching</quote>
+    saves maintenance window time, which is good for service uptime.
+   </para>
+   <para>
     For staging contents, edit on the client
     <filename>/etc/sysconfig/rhn/up2date</filename>:
    </para>
    <screen>stagingContent=1
 stagingContentWindow=24</screen>
+   <para>
+    <literal>stagingContentWindow</literal> is a time value expressed in
+    hours that determines when the downloading should start. More
+    exactly it is the number of hours before the scheduled installation
+    or update time.  In this case, 24 hours before the installation
+    time. The exact download start time depends on the contact
+    method&mdash;basically at the next <command>rhn_check</command>.
+   </para>
    <para>
     Next time a package installation, update, or patch application
     action is scheduled, packages will be automatically downloaded but
