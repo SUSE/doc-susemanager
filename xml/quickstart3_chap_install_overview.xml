@@ -17,10 +17,16 @@
             <para>&susemgr; from a birds eye view</para>
         </listitem>
         <listitem>
-            <para>What you need to do before installation</para>
+            <para>Prerequisites for Installation</para>
         </listitem>
         <listitem>
             <para>&susemgr; Server installation requirements</para>
+        </listitem>
+        <listitem>
+            <para>Supported client systems</para>
+        </listitem>
+        <listitem>
+            <para>Additional requirements</para>
         </listitem>
     </itemizedlist>
 
@@ -28,8 +34,19 @@
 
     <sect1 id="quickstart.sect.bird.eye.view">
         <title>Bird's Eye View of &susemgr;</title>
-        <para/>
-        <remark>Need to create overview images. Salt, Bootstrap, etc.</remark>
+        <para>&susemgr; may be integrated into a network in multiple ways. For the purposes of this
+            guide you will be using a single &susemgr; server instance which will connect and
+            register with &scc; to obtain software updates and patch data for the clients you will
+            be connecting later. For more information on &susemgr; integration in common network
+            topologies see also: <link linkend="book.suma.reference.manual">LINK TO REF</link>
+            <remark>Add link here to reference/BP guide</remark></para>
+        <informalfigure>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="singlemanager.png" width="80%"/>
+                </imageobject>
+            </mediaobject>
+        </informalfigure>
     </sect1>
 
     <sect1 id="quickstart.sect.prerequisites.install">
@@ -63,150 +80,189 @@
             </step>
         </procedure>
 
-        <para>This completes &susemgr; installation prerequisites.</para>
-
     </sect1>
 
     <sect1 id="quickstart.sect.software.requirements">
-        <title>&susemgr; 3 Requirements</title>
-        <para>The following section provides information covering &susemgr; hardware, supported
-            clients, and database requirements.</para>
-        <sect2 id="table.manager.requirements.server">
-            <title>Server Requirements</title>
-            <informaltable>
-                <tgroup cols="2">
-                    <colspec colname="c1" colwidth="1*"/>
-                    <colspec colname="c2" colwidth="4*"/>
-                    <thead>
-                        <row>
-                            <entry>
-                                <para> Hardware </para>
-                            </entry>
-                            <entry>
-                                <para> Required/Recommended </para>
-                            </entry>
-                            
-                        </row>
-                    </thead>
-                    <tbody>
-                        <row>
-                            <entry>
-                                <para> CPU </para>
-                            </entry>
-                            <entry>
-                                <para> Required: a multi-core 64bit CPU (x86_64). </para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para> RAM </para>
-                            </entry>
-                            <entry>
-                                <para> Required: 4&nbsp;GB when only managing a few client systems. </para>
-                                <para> Recommended for production use: 16&nbsp;GB. </para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para> Free Disk Space </para>
-                            </entry>
-                            <entry>
-                                <para> Required: 40&nbsp;GB for &sle; 12 SP1 base installation. </para>
-                                <para> Required: 30&nbsp;GB for /var/lib/pgsql (Created by default
-                                    during &sle; 12 Installation </para>
-                                <para>Required: 100&nbsp;GB for /var/spacewalk (Created by default
-                                    during &susemgr; Setup for &suse; channel storage)</para>
+        <title>Hardware Requirements</title>
+        <para>Review the following table for &susemgr; hardware and software requirements.</para>
+        <informaltable>
+            <tgroup cols="2">
+                <colspec colname="c1" colwidth="1*"/>
+                <colspec colname="c2" colwidth="4*"/>
+                <thead>
+                    <row>
+                        <entry>
+                            <para> Hardware </para>
+                        </entry>
+                        <entry>
+                            <para> Required </para>
+                        </entry>
 
-                            </entry>
-                        </row>
-                    </tbody>
-                </tgroup>
-            </informaltable>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>
+                            <para> CPU </para>
+                        </entry>
+                        <entry>
+                            <para> Multi-core 64bit CPU (x86_64). </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> RAM </para>
+                        </entry>
+                        <entry>
+                            <para> 4&nbsp;GB for a basic KVM installation </para>
+                            <para> For production use 16&nbsp;GB+ is recommended</para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> Free Disk Space </para>
+                        </entry>
+                        <entry>
+                            <para> 40&nbsp;GB for &sle; 12 SP1 base installation. </para>
+                            <para> 30&nbsp;GB for /var/lib/pgsql - Created by default during &sle;
+                                12 Installation </para>
+                            <para>100&nbsp;GB for /var/spacewalk - Created by default during
+                                &susemgr; Setup</para>
 
-        </sect2>
-        <sect2 id="table.supported.clients">
-            <title>Supported Client Systems</title>
-            <para> Clients with the following operating systems and architectures are supported for
-                registration at &susemgr;: </para>
-            <informaltable>
-                <tgroup cols="2">
-                    <colspec colname="c1"/>
-                    <colspec colname="c2"/>
-                    <thead>
-                        <row>
-                            <entry>
-                                <para> System </para>
-                            </entry>
-                            <entry>
-                                <para> Supported Architectures </para>
-                            </entry>
-                        </row>
-                    </thead>
-                    <tbody>
-
-                        <row>
-                            <entry>
-                                <para> &sle; 10 SP3 and SP4 </para>
-                            </entry>
-                            <entry>
-                                <para> &x86;, &x86;_64, &ipf;, IBM &ppc;, IBM &zseries; </para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para> &sle; 11 SP1, SP2, SP3, SP4 </para>
-                            </entry>
-                            <entry>
-                                <para> &x86;, &x86;_64, &ipf;, IBM &ppc;, IBM &zseries; </para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para> &sle; 12, SP1 </para>
-                            </entry>
-                            <entry>
-                                <para> &x86;_64, IBM &power; (&ppc64le;), IBM &zseries; </para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para> &rhel; 5 </para>
-                            </entry>
-                            <entry>
-                                <para> &x86;, &x86;_64 </para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para> &rhel; 6 </para>
-                            </entry>
-                            <entry>
-                                <para> &x86;, &x86;_64 </para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-                                <para> &rhel; 7 </para>
-                            </entry>
-                            <entry>
-                                <para> &x86;, &x86;_64 </para>
-                            </entry>
-                        </row>
-                        <row>
-                            <entry>
-
-                                <para> Novell Open Enterprise Server 11, 11 SP1, and 11 SP2 </para>
-                            </entry>
-                            <entry>
-                                <para> &x86;, &x86;_64 </para>
-                            </entry>
-                        </row>
-                    </tbody>
-                </tgroup>
-            </informaltable>
-
-        </sect2>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </informaltable>
     </sect1>
+    <sect1>
+        <title>Supported Client Systems</title>
 
+
+        <para> Clients with the following operating systems are supported for registration with
+            &susemgr;.</para>
+        <informaltable>
+            <tgroup cols="2">
+                <colspec colname="c1"/>
+                <colspec colname="c2"/>
+                <thead>
+                    <row>
+                        <entry>
+                            <para> System </para>
+                        </entry>
+                        <entry>
+                            <para> Supported Architectures </para>
+                        </entry>
+                    </row>
+                </thead>
+                <tbody>
+
+                    <row>
+                        <entry>
+                            <para> &sle; 10 SP3 and SP4 </para>
+                        </entry>
+                        <entry>
+                            <para> &x86;, &x86;_64, &ipf;, IBM &ppc;, IBM &zseries; </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> &sle; 11 SP1, SP2, SP3, SP4 </para>
+                        </entry>
+                        <entry>
+                            <para> &x86;, &x86;_64, &ipf;, IBM &ppc;, IBM &zseries; </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> &sle; 12, SP1 </para>
+                        </entry>
+                        <entry>
+                            <para> &x86;_64, IBM &power; (&ppc64le;), IBM &zseries; </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> &rhel; 5 </para>
+                        </entry>
+                        <entry>
+                            <para> &x86;, &x86;_64 </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> &rhel; 6 </para>
+                        </entry>
+                        <entry>
+                            <para> &x86;, &x86;_64 </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> &rhel; 7 </para>
+                        </entry>
+                        <entry>
+                            <para> &x86;, &x86;_64 </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+
+                            <para> Novell Open Enterprise Server 11, 11 SP1, and 11 SP2 </para>
+                        </entry>
+                        <entry>
+                            <para> &x86;, &x86;_64 </para>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </informaltable>
+
+    </sect1>
+    <sect1>
+        <title>Additional Requirements</title>
+        <para>To successfully complete this guide there are some network requirements that must be
+            met. The following section will walk you through these requirements.</para>
+
+        <formalpara>
+            <title>Fully Qualified Domain Name (FQDN):</title>
+            <para>The &susemgr; server must resolve its FQDN correctly or cookies will not work
+                properly on the WebGUI. For more information on FQDN see also:</para>
+        </formalpara>
+        <itemizedlist>
+            <listitem>
+                <para><ulink
+                        url="https://www.suse.com/documentation/sles-12/book_sle_admin/data/sec_basicnet_yast.html#sec_basicnet_yast_change_host"
+                        >Configuring Host Name and DNS: &sle; 12</ulink></para>
+            </listitem>
+        </itemizedlist>
+        <formalpara>
+            <title>Hostname and IP Address:</title>
+            <para>To ensure that &susemgr;'s domain name can be resolved by its clients, both server
+                and client machines must be connected to a working Domain Name System (DNS) server.
+                This guide assumes the required infrastructure exists within your environment. For
+                more information on setting up a (DNS) server see also:</para>
+        </formalpara>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    <ulink
+                        url="https://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_dns.html"
+                        >The Domain Name System: &sle; 12</ulink></para>
+            </listitem>
+        </itemizedlist>
+        <important>
+            <title>Naming Your Server</title>
+            <para>The hostname of &susemgr; must not contain uppercase letters as this may cause
+                jabberd to fail. Choose the hostname of your &susemgr; server carefully. Although
+                renaming your server is possible it is complex process and unsupported. If you
+                absolutely must rename your server see also:</para>
+            <remark>Add link to advanced topics or reference guide for information on renaming a
+                server.</remark>
+        </important>
+
+
+
+    </sect1>
 
 </chapter>
