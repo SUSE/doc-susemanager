@@ -10,7 +10,7 @@
   %entities;
 ]>
 <chapter id="s1-maintenance-migration">
- <title>Performing an System Upgrade (Offline Migration)</title>
+ <title>Performing a System Upgrade (Offline Migration)</title>
  <para>
   This chapter deals with system upgrade (<emphasis>offline</emphasis>
   migration).  In this case, the machine reboots and performs the
@@ -38,35 +38,64 @@
     tools. This is absolutely necessary, otherwise the system upgrade
     will fail.
    </para>
-   <para>
-    Then, with the &susemgr; Web UI proceed as follows:
-   </para>
   </step>
   <step>
    <para>
-    Create a base channel and, for example, name it <literal>SLES 12 SP1
-    Pool local</literal>: Click the <guimenu>Channels</guimenu> tab,
-    then in the left pane <guimenu>Manage Software Channels</guimenu>,
-    and in the upper right corner <guimenu>Create Channel</guimenu>.
-    Fill the other fields as appropriate.  Select the correct
-    <guimenu>Architecture</guimenu>!
+    With the &susemgr; Web UI, Create a base channel and, for example,
+    name it <literal>SLES 12 SP1 Pool local</literal>
    </para>
+   <substeps>
+    <step>
+     <para>
+      Click the
+      <guimenu>Channels</guimenu> tab, then in the left pane
+      <guimenu>Manage Software Channels</guimenu>, and in the upper right
+      corner <guimenu>Create Channel</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Fill the other fields as appropriate.  Do not forget to select the
+      correct <guimenu>Architecture</guimenu>!
+     </para>
+    </step>
+   </substeps>
   </step>
   <step>
    <para>
-    Create an autoinstallation distribution: <menuchoice>
-    <guimenu>Systems</guimenu>
-    <guimenu>Autoinstallation</guimenu>
-    <guimenu>Distributions</guimenu>
-    </menuchoice>.  There, for example, use as a <guimenu>Distribution
-    Label</guimenu> 
-    <literal>spring2016</literal> and specify the <guimenu>Tree
+    Create an autoinstallation distribution:
+   </para>
+   <para>
+    For all distributions we want to perform a system upgrade, we need
+    to create a SLE 12 SP1 distribution in &susemgr;. Use the following
+    steps to create one:
+   </para>
+   <substeps>
+    <step>
+     <para>Mount the SLES 12 SP1 DVD</para>
+    </step>
+    <step>
+     <para>In the &susemgr; Web interface go to <menuchoice>
+     <guimenu>Systems</guimenu>
+     <guimenu>Autoinstallation</guimenu>
+     <guimenu>Distributions</guimenu>
+    </menuchoice>
+     </para>
+    </step>
+    <step>
+     <para>Enter a <guimenu>Distribution
+     Label</guimenu>  for your distribution (for example, use as a 
+    <literal>spring2016</literal>) and specify the <guimenu>Tree
     Path</guimenu>, which is the root directory of the &sls; 12
     SP1 installation sources.  As the <guimenu>Base Channel</guimenu>
     use the above created base channel <quote>SLES 12 SP1
-    Pool local</quote>.  Confirm with <guimenu>Create
-    Autoinstallable Distribution</guimenu>.
-   </para>
+    Pool local</quote>. *** autoupgrade=1 ***?</para>
+    </step>
+    <step>
+     <para>
+      Confirm with <guimenu>Create Autoinstallable
+      Distribution</guimenu>.
+     </para>
   <!-- 
   <step>
    <para>
@@ -127,37 +156,11 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
           </step>
          </substeps>
          </step>
-         -->
+  -->
+    </step>
+   </substeps>
   </step>
-
   <step>
-            <para>Create an autoinstall distribution.</para><remark role="needinfo">emap: Simply replace SP2 with SP3 here?</remark>
-            <para>For all distributions we want to perform an
-                autoinstallation, we need to create a SLES11 SP2
-                distribution in &susemgr;. Use the
-                following steps to create one:</para>
-            <substeps>
-                <step>
-                    <para>Mount the SLES11 SP2 DVD</para>
-                </step>
-                <step>
-                    <para>In the &susemgr; Web interface go to <menuchoice>
-                        <guimenu>Systems</guimenu>
-                        <guimenu>Autoinstallation</guimenu>
-                        <guimenu>Distributions</guimenu>
-                    </menuchoice> and click <guimenu>create new
-                        distribution</guimenu>.</para>
-                </step>
-                <step>
-                    <para>Enter a label for your distribution and the mount
-                        point.</para>
-                </step>
-                <step>
-                    <para>Select the SP1 base channel.</para>
-                </step>
-            </substeps>
-        </step>
-        <step>
             <para>Create an activation key for your SP2 systems.</para>
             <para>In order to switch from the old SLES10<remark role="needinfo">emap: rather SLES11?</remark> base channel to
                 the new SP2 base channel, we need an activation key.
@@ -216,7 +219,7 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
                  <guimenu>Systems</guimenu>
                  <guimenu>Autoinstallation</guimenu>
                  </menuchoice> and click <guimenu>Upload
-                 Kickstart/Autoyast file</guimenu>.</para>
+                 Kickstart/Autoyast File</guimenu>.</para>
                 </step>
                 <step>
                  <para>Paste the XML content in the text area or select
@@ -247,10 +250,18 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
         </step>
     </procedure>
     
-    <para>After you have successfully finished the previous procedure,
-        everything is prepared for an upgrade. If you want to upgrade a
-        system, do the following:</para>
+    <para>
+     After you have successfully finished the previous procedure,
+     everything is prepared for an upgrade. If you want to upgrade a
+     system, do the following:
+    </para>
     <procedure>
+     <note>
+      <para>
+       Make sure that the target channel (for example, SLES12-SP1-Pool)
+       is completely mirrored to the &susemgr; server.
+      </para>
+     </note>
         <step>
          <para>Go to the system via
          <guimenu>Systems</guimenu> and click the name of the system.
