@@ -23,7 +23,7 @@
    Only perform an offline migration on client systems managed by
    &susemgr; servers.  For upgrading the &susemgr; server itself, see
    <xref linkend="s1-maintenance-update"/>.  This is a viable method for
-   major version upgrades like from &sle; 11 to 12.
+   major version upgrades such as an upgrade from &sle; 11 to 12.
   </para>
  </note>
  <para>
@@ -39,17 +39,35 @@
     will fail.
    </para>
    <para>
-    Then, with the &sumamgr; Web UI proceed as follows:
+    Then, with the &susemgr; Web UI proceed as follows:
    </para>
   </step>
   <step>
    <para>
     Create a base channel and, for example, name it <literal>SLES 12 SP1
-    Pool local</literal>.  Click the <guimenu>Channels</guimenu> tab,
+    Pool local</literal>: Click the <guimenu>Channels</guimenu> tab,
     then in the left pane <guimenu>Manage Software Channels</guimenu>,
-    and in the upper right corner <guimenu>Create Channel</guimenu>. 
+    and in the upper right corner <guimenu>Create Channel</guimenu>.
+    Fill the other fields as appropriate.  Select the correct
+    <guimenu>Architecture</guimenu>!
    </para>
-  </step><!-- 
+  </step>
+  <step>
+   <para>
+    Create an autoinstallation distribution: <menuchoice>
+    <guimenu>Systems</guimenu>
+    <guimenu>Autoinstallation</guimenu>
+    <guimenu>Distributions</guimenu>
+    </menuchoice>.  There, for example, use as a <guimenu>Distribution
+    Label</guimenu> 
+    <literal>spring2016</literal> and specify the <guimenu>Tree
+    Path</guimenu>, which is the root directory of the &sls; 12
+    SP1 installation sources.  As the <guimenu>Base Channel</guimenu>
+    use the above created base channel <quote>SLES 12 SP1
+    Pool local</quote>.  Confirm with <guimenu>Create
+    Autoinstallable Distribution</guimenu>.
+   </para>
+  <!-- 
   <step>
    <para>
     Update the SP2 channels.</para><remark
@@ -110,7 +128,9 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
          </substeps>
          </step>
          -->
-        <step>
+  </step>
+
+  <step>
             <para>Create an autoinstall distribution.</para><remark role="needinfo">emap: Simply replace SP2 with SP3 here?</remark>
             <para>For all distributions we want to perform an
                 autoinstallation, we need to create a SLES11 SP2
@@ -181,41 +201,43 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
                 </step>
             </substeps>
         </step>
+        <!-- ============================================================ -->
         <step id="st.maintenance-migration.upload">
             <para>Upload an &ay; profile.</para>
             <para></para>
             <substeps>
                 <step>
-                    <para>Create an &ay; XML file.</para>
-                    <remark>toms 2012-03-23: This maybe too vague. Where
-                        to link to some content how to create an AutoYaST file? </remark>
+                 <para>Create an &ay; XML file.</para>
+                 <para>For more information about &ay;, see <xref
+                 linkend="s3-sm-system-ay-intro"/>.</para>
                 </step>
                 <step>
-                    <para>Go to <menuchoice>
-                <guimenu>System</guimenu>
-                <guimenu>Profiles</guimenu>
-            </menuchoice> and click <guimenu>upload new
-                kickstart/autoyast file</guimenu>.</para>
+                 <para>Go to <menuchoice>
+                 <guimenu>Systems</guimenu>
+                 <guimenu>Autoinstallation</guimenu>
+                 </menuchoice> and click <guimenu>Upload
+                 Kickstart/Autoyast file</guimenu>.</para>
                 </step>
                 <step>
-                    <para>Paste the XML content in the text area or
-                        select the file to upload. Click
-                        <guimenu>Create</guimenu>.</para>
+                 <para>Paste the XML content in the text area or select
+                 the file to upload. Click
+                 <guimenu>Create</guimenu>.</para>
                 </step>
                 <step>
-                    <para>Add <literal>autoupgrade=1</literal> in the
-                            <guimenu>Kernel parameters</guimenu> of the
-                            <guimenu>Details</guimenu> tab and click
-                            <guimenu>Update</guimenu>.</para>
+                 <para>Add <literal>autoupgrade=1</literal> in the
+                 <guimenu>Kernel Options</guimenu> of the
+                 <guimenu>Details</guimenu> tab and click
+                 <guimenu>Update</guimenu>.</para>
                 </step>
                 <step>
-                    <para>Switch to the <guimenu>Variable</guimenu> tab.
-                        </para>
+                 <para>Switch to the <guimenu>Variable</guimenu> tab.
+                 </para>
                 </step>
                 <step>
-                    <para>Enter in the text field
-                        <literal>registration_key=</literal> and the key
-                    name from <xref linkend="st.maintenance-migration.activationkey"/>.
+                 <para>Enter in the text field
+                 <literal>registration_key=</literal> and the key name
+                 from <xref
+                 linkend="st.maintenance-migration.activationkey"/>.
                     </para>
                 </step>
                 <step>
@@ -230,7 +252,10 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
         system, do the following:</para>
     <procedure>
         <step>
-            <para>Go to <menuchoice>
+         <para>Go to the system via
+         <guimenu>Systems</guimenu> and click the name of the system.
+         Then on the systems details page, click
+         <menuchoice>
             <guimenu>Provisioning</guimenu>
             <guimenu>Autoinstallation</guimenu>
             <guimenu>Schedule</guimenu>
@@ -238,15 +263,12 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
     in <xref linkend="st.maintenance-migration.upload"/>.</para>
         </step>
         <step>
-            <para>Click <guimenu>Schedule Autoinstallation</guimenu>.</para>
-        </step>
-        <step>
-            <para>Click <guimenu>Finish</guimenu> at the bottom of that page.</para>
+            <para>Click <guimenu>Schedule Autoinstallation and Finish</guimenu>.</para>
         </step>
     </procedure>
     
     <para>Next time the machine asks the &susemgr; server for jobs, it
-        will receive a reinstallation job which fetches Kernel and initrd and writes a new <filename>/boot/grub/menu.lst</filename> (contains pointers to the new Kernel and initrd).</para> 
+        will receive a reinstallation job which fetches Kernel and initrd and writes a new <filename>/boot/grub/menu.lst</filename> (contains pointers to the new Kernel and initrd).</para>
     <para>When the machine boots, it will use the &grub; configuration
         and boots the new Kernel with its initrd. No PXE boot is
         required for this process. A shutdown of the machine is
