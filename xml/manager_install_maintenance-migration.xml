@@ -18,7 +18,7 @@
   plain <command>zypper</command> commands.
  </para>
 
- <note>
+ <important>
   <para>
    Only perform an offline migration on client systems managed by
    &susemgr; servers.  For upgrading the &susemgr; server itself, see
@@ -27,25 +27,32 @@
    sure that you have migrated the &susemgr; server to &scc; first; for
    more information, see <xref linkend="ch-user-scc"/>.
   </para>
- </note>
+ </important>
  <para>
   Perform the following steps:
  </para>
 
  <procedure>
-  <step>
+  <title>Preparing System Upgrade</title>
+  <note>
    <para>
     Make sure your &susemgr; and all the clients you want to upgrade
     have installed all available updates, including the &susemgr;
     tools. This is absolutely necessary, otherwise the system upgrade
     will fail.
    </para>
-  </step>
+  </note>
   <step>
    <para>
-    With the &susemgr; Web UI, create a base channel and, for example,
-    name it <literal>SLES 12 SP1 Pool local</literal>.
+    On the &susemgr; server, create a local tree with the SLES 12 SP1
+    installation sources.  This is needed for booting the clients into
+    the installation or upgrade scenario.  For example, download ISO
+    image of the DVD1 with the installation sources and mount it as
+    <filename>/mnt/sles12-sp1</filename>:
    </para>
+   <screen>mkdir /mnt/sles12-sp1
+mount -o loop <replaceable>DVD1</replaceable>.iso /mnt/sles12-sp1</screen>
+   <!--
    <substeps>
     <step>
      <para>
@@ -60,7 +67,8 @@
       correct <guimenu>Architecture</guimenu>!
      </para>
     </step>
-   </substeps>
+    </substeps>
+    -->
   </step>
   <step>
    <para>
@@ -70,9 +78,6 @@
     steps to create one:
    </para>
    <substeps>
-    <!-- <step> -->
-    <!--  <para>Mount the SLES 12 SP1 DVD</para> -->
-    <!-- </step> -->
     <step>
      <para>In the &susemgr; Web interface go to <menuchoice>
      <guimenu>Systems</guimenu>
@@ -86,10 +91,11 @@
       Enter a <guimenu>Distribution Label</guimenu> for your
       distribution (for example, use as a <literal>spring2016</literal>)
       and specify the <guimenu>Tree Path</guimenu>, which is the root
-      directory of the &sls; 12 SP1 installation sources.  As the
-      <guimenu>Base Channel</guimenu> use the above created base channel
-      <quote>SLES 12 SP1 Pool local</quote>. *** autoupgrade=1
-      ***?</para>
+      directory of the &sls; 12 SP1 installation sources (for example,
+      in this case <filename>/mnt/sles12-sp1</filename>).  As the
+      <guimenu>Base Channel</guimenu> use the update target distribution
+      (<quote>SLES12-SP1-Pool for x86_64</quote>. *** autoupgrade=1
+      *** ???</para>
     </step>
     <step>
      <para>
@@ -189,19 +195,20 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
                     </para>
                 </step>
                 <step>
-                    <para>Select the SLES 12 SP1 base channel.</para>
+                 <para>Select the <quote>SLES12-SP1-Pool for
+                 x86_64</quote> base channel.</para>
                 </step>
                 <step>
                     <para>Decide the entitlements.</para>
                 </step>
                 <step>
-                    <para>Click <guimenu>Create Activation
-                        Key</guimenu>.</para>
+                 <para>Click <guimenu>Create Activation
+                 Key</guimenu>.</para>
                 </step>
                 <step>
-                    <para>Click <guimenu>Child Channels</guimenu> and
-                        select the required channels. Finish with
-                        <guimenu>Update key</guimenu>.</para>
+                 <para>Click <guimenu>Child Channels</guimenu> and
+                 select the required channels. Finish with
+                 <guimenu>Update key</guimenu>.</para>
                 </step>
             </substeps>
         </step>
@@ -260,6 +267,7 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
      system, do the following:
     </para>
     <procedure>
+     <title>Running System Upgrade</title>
      <note>
       <para>
        Make sure that the target channel (for example, SLES12-SP1-Pool)
