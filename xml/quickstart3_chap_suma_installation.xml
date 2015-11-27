@@ -10,181 +10,145 @@
   %entities;
 ]>
 <chapter id="sles.installation.within.kvm">
-    <title>Constructing the &susemgr; Playground</title>
+    <title>Constructing the Sandbox</title>
     <sect1>
-        <title>What's Covered Here?</title>
+        <title>Included Topics</title>
 
-        <para>This chapter provides instruction on installation of &sle; 12 SP1 within KVM as the
-            Linux base for a &susemgr; 3 installation within a simple test environment. A kernel
-            virtual machine (KVM) combined with Virt-Manager will be used as a safe testing ground
-            for your first installation. The following sections will guide you through: </para>
+        <para>This chapter provides the required (KVM) settings for installation of &sle; 12 SP1 as
+            the base for the &susemgr; 3. A kernel virtual machine (KVM) combined with Virt-Manager
+            will be used as a sandbox for your first installation. The following sections will
+            provide you with: </para>
 
         <itemizedlist>
             <listitem>
-                <para>Preparing (KVM) for a &sle; 12 installation</para>
+                <para>(KVM) settings for a &sle; 12 SP1 installation</para>
             </listitem>
             <listitem>
-                <para>Booting the &sle; 12 SP1 installation using PXE</para>
+                <para>Starting the &sle; 12 installation within the &suse; network</para>
+            </listitem>
+            <listitem>
+                <para>&susemgr; 3 installation as an Extension</para>
             </listitem>
         </itemizedlist>
 
-        <important>
-            <title>Prerequisites for this Guide</title>
-            <para>This section assumes you have already reviewed the <link
-                    linkend="quickstart.chapt.overview.requirements">&susemgr; Overview and
-                    Requirements</link> section. </para>
-        </important>
     </sect1>
-    <sect1>
-        <title>&sle; 12 SP1 Installation Using KVM and virt-manager</title>
-        <para/>
+    <sect1 id="quickstart.sect.kvm.settings">
+        <title>KVM virt-manager Settings</title>
+        <para>Enter the following settings when creating a new virtual machine using
+            virt-manager.</para>
+        <informaltable>
+            <tgroup cols="2">
+                <colspec colname="c1" colwidth="1*" align="left"/>
+                <colspec colname="c2" colwidth="4*" align="left"/>
+                <thead>
+                    <row>
+                        <entry namest="c1" nameend="c2" align="left">
+                            <para> KVM Settings</para>
+                        </entry>
+                    </row>
+                </thead>
 
-        <procedure>
-            <title>Installation using Virtual Machine Manager</title>
-            <step>
-                <para>Create a new virtual machine with <systemitem>Virtual Machine
-                        Manager</systemitem></para>
-            </step>
-            <step>
-                <para>When presented with the <systemitem>New VM</systemitem> dialog box select
-                        <systemitem>Network Boot (PXE)</systemitem>. </para>
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup1.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
+                <tbody>
 
-            <step>
-                <para>Select <systemitem>Forward</systemitem> to continue.</para>
-            </step>
+                    <row>
+                        <entry>
+                            <para> Installation Method:</para>
+                        </entry>
+                        <entry>
+                            <para>Network Boot (PXE)</para>
+                        </entry>
+                    </row>
 
-            <step>
-                <para>For the operating system and Version choose <command>Linux</command> and
-                        <command>&sle; 12 (or later)</command>. </para>
+                    <row>
+                        <entry>
+                            <para> OS:</para>
+                        </entry>
+                        <entry>
+                            <para>Linux</para>
+                        </entry>
+                    </row>
 
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup2.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
+                    <row>
+                        <entry>
+                            <para>Version:</para>
+                        </entry>
+                        <entry>
+                            <para>SUSE Linux Enterprise Server 12 SP1</para>
+                        </entry>
+                    </row>
 
-            <step>
-                <para>Select <systemitem>Forward</systemitem> to continue.</para>
-            </step>
+                    <row>
+                        <entry>
+                            <para>Memory:</para>
+                        </entry>
+                        <entry>
+                            <para>4096 GB</para>
+                        </entry>
+                    </row>
 
-            <step>
-                <para>Set the virtual machine <systemitem>Memory (RAM):</systemitem> to
-                        <command>4096 MB </command> and <systemitem>CPUs:</systemitem> to<command>4
-                    </command>.</para>
+                    <row>
+                        <entry>
+                            <para>CPU's:</para>
+                        </entry>
+                        <entry>
+                            <para>2</para>
+                        </entry>
+                    </row>
 
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup3.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-            <step>
-                <para>Select <systemitem>Forward</systemitem> to proceed.</para>
-            </step>
-            <step>
-                <para>Select <systemitem>Managed or other existing storage</systemitem> and then
-                    Browse.</para>
+                    <row>
+                        <entry>
+                            <para>Storage Format:</para>
+                        </entry>
+                        <entry>
+                            <para>.qcow2 (Default)</para>
+                        </entry>
+                    </row>
 
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup4.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-            <step>
-                <para>Select the <systemitem>New Volume</systemitem> button.</para>
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup5.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-            <step>
-                <para>For the purposes of this guide you will create a storage device with 200 GB to
-                    fulfil &susemgr; space requirements. Name your storage volume
-                        <emphasis>suma3-testing</emphasis> and accept the default format of
-                        <systemitem>qcow2</systemitem>. Check your local <systemitem>Storage Volume
-                        Quota</systemitem> and ensure your local file system can provide the
-                    required 200 GB of disk space. Change the default value of <command>8.0
-                        GB</command> in the <systemitem>Max Capacity</systemitem> field to
-                        <command>200 GB</command>. </para>
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup6.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
+                    <row>
+                        <entry>
+                            <para>Storage Size:</para>
+                        </entry>
+                        <entry>
+                            <para>200 GB</para>
+                        </entry>
+                    </row>
 
+                    <row>
+                        <entry>
+                            <para>Name:</para>
+                        </entry>
+                        <entry>
+                            <para>suma3-server</para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para>Network</para>
+                        </entry>
+                        <entry>
+                            <para>Bridge br0 (Default)</para>
+                        </entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </informaltable>
 
-            <step>
-                <para>Select <systemitem>Finish</systemitem> to proceed.</para>
-            </step>
-
-            <step>
-                <para>Select <systemitem>Choose Volume</systemitem> to continue.</para>
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup7.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-            <step>
-                <para> Select <systemitem>Forward</systemitem> to continue. </para>
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup8.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-            <step>
-                <para>Name your virtual machine <emphasis>suma3-testing</emphasis>. </para>
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="kvm-setup9.png" width="100%"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
-            </step>
-
-            <step>
-                <para>Finalize your virtual machine setup by selecting
-                        <systemitem>Finish</systemitem> to proceed with pxe boot and installation of
-                    &sle; 12 SP1 RC3</para>
-            </step>
-        </procedure>
-        <para>This completes the construction of your &susemgr; playground. To continue proceed to
-            the next section.</para>
+        <para>After finalizing your machine settings proceed to the next
+            section to begin the network boot procedure.</para>
+        <tip>
+            <title>&suse; Virtualization Guide</title>
+            <para>For more information on virtualization see also: <ulink
+                    url="https://www.suse.com/documentation/sles-12/singlehtml/book_virt/book_virt.html"
+                    >&sle; Server 12 Virtualization Guide</ulink>
+            </para>
+        </tip>
     </sect1>
 
     <sect1>
-        <title>PXE Booting &sle; 12</title>
-        <para>After selecting the <systemitem>Finish</systemitem> button your new VM will
-            automatically boot to the PXE boot menu. The following procedure will guide you through
-            selecting the correct installation image during PXE boot. </para>
+        <title>&sle; 12 Installation</title>
+        <para>After selecting the <systemitem>Finish</systemitem> button from within virt-manager
+            your new VM will automatically boot to the network boot menu. The following procedure
+            will guide you through selecting the correct installation image during PXE boot. </para>
 
         <procedure>
             <title>PXE Boot Procedure</title>
@@ -194,7 +158,7 @@
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pxeboot2.png" width="100%"/>
+                            <imagedata fileref="pxe1.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -205,7 +169,7 @@
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="pxeboot3.png" width="100%"/>
+                            <imagedata fileref="pxe2.png" width="100%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -216,15 +180,29 @@
         <para>Installation of &sle; 12 SP1 will begin. For more information on completing an
             installation of &sle; 12 see also: <ulink
                 url="https://www.suse.com/documentation/sles-12/book_quickstarts/data/sec_sle_installquick.html"
-                >&sle; 12 Quickstart Installation Guide</ulink>
+                >&sle; 12 Quick-start Installation Guide</ulink>
         </para>
-        <important>
+        <tip>
             <title>Internal Registration Keys</title>
-            <para>As this is an internal testing guide for Alpha remember to use the developer
-                registration keys during the &sle; 12 SP1 installation for registration with
-                &scc;.</para>
-        </important>
-        <para>Complete the &sle; 12 SP1 installation and then proceed to the next section.</para>
+            <para>As this document represents an internal development guide for the alpha release
+                you need to use the YaST developer registration key during the &sle; 12 SP1
+                installation for registration with &scc;. This key may be found on the internal wiki
+                under YaST registration keys</para>
+        </tip>
+<sect2>
+    <title>Selecting the &susemgr; 3 Extension </title>
+
+        <para>During the &sle; 12 SP1 installation you will be presented with the following screen.
+            Select the &susemgr; 3 Extension and then complete the &sle; 12 installation. This new
+            option will install &susemgr; 3 and includes Saltstack by default.</para>
+        <informalfigure>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="manager-extension.png"/>
+                </imageobject>
+            </mediaobject>
+        </informalfigure>
+</sect2>
     </sect1>
 
 
