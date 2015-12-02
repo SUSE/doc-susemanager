@@ -16,9 +16,9 @@
 
   <sect1>
     <title>Whats Covered in this Guide?</title>
-    <para>This document describes field recommended best practices for &susemgr;. This information
+    <para>This document describes &suse; recommended best practices for &susemgr;. This information
       has been collected from a large number of successful &susemgr; real world implementations and
-      includes feedback generated from product management, sales and engineering. </para>
+      includes feedback provided by product management, sales and engineering. </para>
 
 
     <para>This chapter will discuss the following topics:</para>
@@ -47,7 +47,7 @@
   </sect1>
 
   <sect1>
-    <title>Requirements</title>
+    <title>Prerequisites</title>
     <formalpara>
       <title>Registration Keys</title>
       <para>During initial setup &susemgr; will request a product <systemitem>Registration
@@ -94,8 +94,10 @@
         </itemizedlist>
         <tip>
           <title>Safe Passwords</title>
-          <para>Please create safe passwords. Use the following guidelines when creating your
-            passwords. <itemizedlist>
+          <para>Maintain security by creating safe passwords. Be cautious when using characters which create
+            confusion as many fonts make it difficult to differentiate between these characters. Use
+            the following guidelines when creating your passwords. 
+            <itemizedlist>
               <listitem>
                 <para>At least 8 characters long</para>
               </listitem>
@@ -104,28 +106,30 @@
                     penguin</command></para>
               </listitem>
               <listitem>
-                <para>Contains Uppercase Characters <command>A B C</command></para>
+                <para>Should contain uppercase characters <command>A B C</command></para>
               </listitem>
               <listitem>
-                <para>Contains Lowercase Characters <command>a b c</command></para>
+                <para>Should contain lowercase characters <command>a b c</command></para>
               </listitem>
               <listitem>
-                <para>Contains Numbers <command>1 2 3</command></para>
+                <para>Should contain numbers <command>1 2 3</command></para>
               </listitem>
               <listitem>
-                <para>Contains Symbols <command>~ ! @ % $</command></para>
+                <para>Should contain symbols <command>~ ! @ % $</command></para>
               </listitem>
-            </itemizedlist> Also be careful when using characters which create confusion as many
-            fonts make it difficult to differentiate between these characters.<example>
-              <title>Confusing Characters</title>
-              <para>0 and O or 1 and l</para>
-            </example></para>
+              <listitem><para>Stay away from confusing characters such as: <command>0 O
+              </command> or <command>1 l</command></para></listitem>
+            </itemizedlist>
+          </para>
         </tip>
       </para>
     </formalpara>
-
+  </sect1>
+  <!-- TODO: Tidy up this section its ugly design -->
+  <sect1>
+    <title>Network Requirements</title>
     <formalpara>
-      <title>Network Requirements</title>
+      <title>Network Infrastructure</title>
       <para>During &susemgr; Setup the following network requirements must be met or in place. <itemizedlist>
           <listitem>
             <para>IP Address, Netmask, and Gateway</para>
@@ -157,140 +161,219 @@
                 </listitem>
               </itemizedlist></para>
           </listitem>
-
-          <listitem>
-            <para>For communication between &susemgr; server and the &susemgr; Proxy servers for
-              inbound and outbound traffic the following ports should be opened.</para>
-            <table xml:id="tab.install.ports.server">
-              <title>&susemgr; Server Required Ports</title>
-              <tgroup cols="4">
-                <colspec colwidth="10*" align="center"/>
-                <colspec colwidth="10*" align="center"/>
-                <colspec colwidth="10" align="center"/>
-                <colspec colwidth="70*" align="left"/>
-                <thead>
-                  <row>
-                    <entry>
-                      <para> Port </para>
-                    </entry>
-                    <entry><para>Out</para></entry>
-                    <entry>
-                      <para>In</para>
-                    </entry>
-                    <entry>
-                      <para>Description</para>
-                    </entry>
-                  </row>
-                </thead>
-                <tbody>
-                  <row>
-                    <entry>
-                      <para> 67 </para>
-                    </entry>
-                    <entry>
-                      <para >UP</para>
-                    </entry>
-                    <entry><para/></entry>
-                    <entry>
-                      <para> Open this port to configure the &susemgr; system as a DHCP server for
-                        systems requesting IP addresses. </para>
-                    </entry>
-                  </row>
-                  <row>
-                    <entry>
-                      <para> 69 </para>
-                    </entry>
-                    <entry>
-                      <para/>
-                    </entry>
-                    <entry><para>UP</para></entry>
-                    <entry>
-                      <para> Open this port to configure &susemgr; as a PXE server and allow
-                        installation and re-installation of PXE-boot enabled systems. </para>
-                    </entry>
-                  </row>
-                  <row>
-                    <entry>
-                      <para> 80 </para>
-                    </entry>
-                    <entry>
-                      <para>UP</para>
-                    </entry>
-                    <entry><para>UP</para></entry>
-                    <entry>
-                      <para> &susemgr; server uses this port to reach &scc;; and WebGUI, client, and
-                        proxy server requests come in via either http or https. </para>
-                    </entry>
-                  </row>
-                  <row>
-                    <entry>
-                      <para> 443 </para>
-                    </entry>
-                    <entry>
-                      <para>UP</para>
-                    </entry>
-                    <entry><para>UP</para></entry>
-                    <entry>
-                      <para> WebGUI, client, and proxy server requests come in via either http or
-                        https and &susemgr; uses this port to reach &scc; in. </para>
-                    </entry>
-                  </row>
-                  <row>
-                    <entry>
-                      <para> 4545 </para>
-                    </entry>
-                    <entry>
-                      <para>UP</para>
-                    </entry>
-                    <entry><para/></entry>
-                    <entry>
-                      <para> &susemgr; Monitoring makes connections to <command>rhnmd</command>
-                        running on client systems if Monitoring is enabled and probes are configured
-                        for registered systems. </para>
-                    </entry>
-                  </row>
-                  <row>
-                    <entry>
-                      <para> 5222 </para>
-                    </entry>
-                    <entry>
-                      <para>UP</para>
-                    </entry>
-                    <entry><para/></entry>
-                    <entry>
-                      <para> Required by <command>osad</command> running on the client systems if
-                        you plan to push actions to client systems. </para>
-                    </entry>
-                  </row>
-                  <row>
-                    <entry>
-                      <para> 5269 </para>
-                    </entry>
-                    <entry>
-                      <para>UP</para>
-                    </entry>
-                    <entry><para>UP</para></entry>
-                    <entry>
-                      <para> Needed if you push actions to or via a &susemgrproxy;. </para>
-                    </entry>
-                  </row>
-                  <!--       <row>
-        <entry>
-         <para/>
-        </entry>
-       </row>
--->
-                </tbody>
-              </tgroup>
-            </table>
-
-            <para>For reference, here are also listings of ports to open on the client systems and
-              the &susemgrproxy; server.</para>
-
-          </listitem>
         </itemizedlist>
       </para>
     </formalpara>
+
+    <formalpara>
+      <title>Required Open Ports</title>
+      <para>The following tables provide the required open ports for every component in a &susemgr;
+        Network</para>
+    </formalpara>
+
+    <table xml:id="tab.install.ports.server">
+      <title>Required Server Ports</title>
+      <tgroup cols="4">
+        <colspec colwidth="10*" align="center" colsep="0" rowsep="0"/>
+        <colspec colwidth="10*" align="center" colsep="0" rowsep="0"/>
+        <colspec colwidth="10" align="center" rowsep="0" colsep="0"/>
+        <colspec colwidth="70*" align="left" colsep="0" rowsep="0"/>
+        <thead>
+          <row>
+            <entry>
+              <para> Port </para>
+            </entry>
+            <entry><para>Outbound</para></entry>
+            <entry>
+              <para>Inbound</para>
+            </entry>
+            <entry>
+              <para>Description</para>
+            </entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>
+              <para> 67 </para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para/></entry>
+            <entry>
+              <para> Open this port to configure the &susemgr; system as a DHCP server for systems
+                requesting IP addresses. </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para> 69 </para>
+            </entry>
+            <entry>
+              <para/>
+            </entry>
+            <entry><para>UP</para></entry>
+            <entry>
+              <para> Open this port to configure &susemgr; as a PXE server and allow installation
+                and re-installation of PXE-boot enabled systems. </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para> 80 </para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para>UP</para></entry>
+            <entry>
+              <para> &susemgr; server uses this port to reach &scc;; and WebGUI, client, and proxy
+                server requests come in via either http or https. </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para> 443 </para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para>UP</para></entry>
+            <entry>
+              <para> WebGUI, client, and proxy server requests come in via either http or https and
+                &susemgr; uses this port to reach &scc; in. </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para> 4545 </para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para/></entry>
+            <entry>
+              <para> &susemgr; Monitoring makes connections to <command>rhnmd</command> running on
+                client systems if Monitoring is enabled and probes are configured for registered
+                systems. </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para> 5222 </para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para/></entry>
+            <entry>
+              <para> Required by <command>osad</command> running on the client systems if you plan
+                to push actions to client systems. </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para> 5269 </para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para>UP</para></entry>
+            <entry>
+              <para> Needed if you push actions to or via a &susemgrproxy;. </para>
+            </entry>
+          </row>
+
+        </tbody>
+      </tgroup>
+    </table>
+
+    <table xml:id="tab.install.ports.client">
+      <title>Required Client Ports</title>
+      <tgroup cols="4">
+        <colspec colwidth="10*" align="center" colsep="0" rowsep="0"/>
+        <colspec colwidth="10*" align="center" colsep="0" rowsep="0"/>
+        <colspec colwidth="10" align="center" rowsep="0" colsep="0"/>
+        <colspec colwidth="70*" align="left" colsep="0" rowsep="0"/>
+        <thead>
+          <row>
+            <entry>
+              <para> Port </para>
+            </entry>
+            <entry><para>Outbound</para></entry>
+            <entry>
+              <para>Inbound</para>
+            </entry>
+            <entry>
+              <para>Description</para>
+            </entry>
+          </row>
+        </thead>
+        <tbody>
+          <row>
+            <entry>
+              <para>80</para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para/></entry>
+            <entry>
+              <para>To reach the SUSE Manager server or SUSE Manager Proxy server.</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>443</para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para/></entry>
+            <entry>
+              <para>To reach the SUSE Manager server or SUSE Manager Proxy server.</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>22</para>
+            </entry>
+            <entry>
+              <para/>
+            </entry>
+            <entry><para>UP</para></entry>
+            <entry>
+              <para>Required when using ssh-push or ssh-push-tunnel contact methods.</para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>4545</para>
+            </entry>
+            <entry>
+              <para/>
+            </entry>
+            <entry><para>UP</para></entry>
+            <entry>
+              <para>For connections from the server or proxy server for monitoring. </para>
+            </entry>
+          </row>
+          <row>
+            <entry>
+              <para>5222</para>
+            </entry>
+            <entry>
+              <para>UP</para>
+            </entry>
+            <entry><para/></entry>
+            <entry>
+              <para>For push actions with the server or proxy server.</para>
+            </entry>
+          </row>
+        </tbody>
+      </tgroup>
+    </table>
 
     <formalpara>
       <title/>
