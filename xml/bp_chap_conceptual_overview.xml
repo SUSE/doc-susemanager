@@ -11,7 +11,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
   xml:id="chapt.bp.suma.conceptual.overview">
 
-  <title>Introduction and Requirements</title>
+  <title>Introduction</title>
 
 
   <sect1>
@@ -23,24 +23,17 @@
 
     <para>This chapter will discuss the following topics:</para>
     <itemizedlist>
-      <listitem>
-        <para>Requirements</para>
-      </listitem>
+
       <listitem>
         <para>Prerequisites</para>
       </listitem>
       <listitem>
-        <para>Installation</para>
+        <para>Network Requirements</para>
       </listitem>
       <listitem>
-        <para>Post Installation Tasks</para>
+        <para>Hardware Requirements</para>
       </listitem>
-      <listitem>
-        <para>Updating from a Previous Version</para>
-      </listitem>
-      <listitem>
-        <para>Keeping &susemgr; Up-to-date</para>
-      </listitem>
+
     </itemizedlist>
 
     <para>This document targets system administrators.</para>
@@ -49,17 +42,22 @@
   <sect1>
     <title>Prerequisites</title>
     <formalpara>
-      <title>Registration Keys</title>
+      <title>Purchased Registration Keys</title>
       <para>During initial setup &susemgr; will request a product <systemitem>Registration
           Key</systemitem>. This key will be provided to you after purchasing the product. You can
         find your key located under your &scc; account. Login with your &scc; credentials or
-        register for a new account. If you wish to run a test system (non-production) a 60 day
-        evaluation key may be obtained. On the &susemgr; product page click <emphasis>TRY SUSE
-          MANAGER</emphasis>. The evaluation key limits the number of systems that may be registered
-        with SUSE Manager to 10.<itemizedlist>
+        register for a new account. <itemizedlist>
           <listitem>
             <para><link xlink:href="https://scc.suse.com">Register/Login to &scc;</link></para>
           </listitem>
+        </itemizedlist>
+      </para>
+    </formalpara>
+    <formalpara>
+      <title>Evaluation Keys</title>
+      <para>If you wish to run a test system (non-production) a 60 day evaluation key may be
+        obtained. On the &susemgr; product page click <emphasis>TRY SUSE MANAGER</emphasis>. The
+        evaluation key limits the number of systems that may be registered with SUSE Manager to 10. <itemizedlist>
           <listitem>
             <para><link xlink:href="https://www.suse.com/products/suse-manager/">&susemgr; 60 Day
                 Evaluation</link></para>
@@ -67,9 +65,8 @@
         </itemizedlist>
       </para>
     </formalpara>
-
     <formalpara>
- <!-- TODO: Add more data here on the procedure for obtaining credentials -->
+      <!-- TODO: Add more data here on the procedure for obtaining credentials -->
       <title>SCC Organization Credentials</title>
       <para>During setup you will also be asked to enter your &scc; <systemitem>Organization
           Credentials</systemitem>. Login to your &scc; account and on the</para>
@@ -80,30 +77,24 @@
       <para>During both the &sle; installation and setup of &susemgr; several users and passwords
         will be created: <itemizedlist>
           <listitem>
-            <para>root (&sle;)</para>
+            <para>&sle; root user account</para>
           </listitem>
           <listitem>
-            <para>PostgreSQL user and password</para>
+            <para>PostgreSQL database user and password</para>
           </listitem>
           <listitem>
             <para>Certificate of Authority password</para>
           </listitem>
           <listitem>
-            <para>&susemgr; Administrator's account</para>
+            <para>&susemgr; administrator user and password</para>
           </listitem>
         </itemizedlist>
         <tip>
           <title>Safe Passwords</title>
-          <para>Maintain security by creating safe passwords. Be cautious when using characters which create
-            confusion as many fonts make it difficult to differentiate between these characters. Use
-            the following guidelines when creating your passwords. 
-            <itemizedlist>
+          <para>Maintain security by creating safe passwords. Store passwords within a secure
+            location. Use the following guidelines when creating your passwords. <itemizedlist>
               <listitem>
                 <para>At least 8 characters long</para>
-              </listitem>
-              <listitem>
-                <para>Does not contain complete words or common terms <command>SUSE johnsmith
-                    penguin</command></para>
               </listitem>
               <listitem>
                 <para>Should contain uppercase characters <command>A B C</command></para>
@@ -117,95 +108,152 @@
               <listitem>
                 <para>Should contain symbols <command>~ ! @ % $</command></para>
               </listitem>
-              <listitem><para>Stay away from confusing characters such as: <command>0 O
-              </command> or <command>1 l</command></para></listitem>
+
             </itemizedlist>
           </para>
         </tip>
+        <warning>
+          <title>Password Pitfalls</title>
+          <para>Avoid common password pitfalls by scanning the following list.</para>
+          <itemizedlist>
+            <listitem>
+              <para>Stay away from confusing characters such as: <command>0 O </command> or
+                  <command>1 l</command></para>
+            </listitem>
+            <listitem>
+              <para>Ensure your password does not contain complete words or common terms such as:
+                  <command>SUSE johnsmith penguin</command></para>
+            </listitem>
+            <listitem>
+              <para>Do not use common data such as birthdates, age and pet names</para>
+            </listitem>
+          </itemizedlist>
+
+        </warning>
       </para>
     </formalpara>
   </sect1>
-  <!-- TODO: Tidy up this section its ugly design -->
+
   <sect1>
     <title>Network Requirements</title>
+    <para>For &susemgr; to function properly it requires the following pre-configured components
+      within your network.</para>
     <formalpara>
-      <title>Network Infrastructure</title>
-      <para>During &susemgr; Setup the following network requirements must be met or in place. <itemizedlist>
+      <title>DHCP Server</title>
+      <para>The purpose of the Dynamic Host Configuration Protocol (DHCP) is to assign network
+        settings centrally (from a server) rather than configuring them locally on each and every
+        workstation. A host configured to use DHCP does not have control over its own static
+        address. It is enabled to configure itself completely and automatically according to
+        directions from the server. A DHCP server supplies not only the IP address and the netmask,
+        but also the host name, domain name, gateway, and name server addresses for the client to
+        use. For more information on configuring DHCP see also: <itemizedlist>
           <listitem>
-            <para>IP Address, Netmask, and Gateway</para>
-          </listitem>
-          <listitem>
-            <para>Fully Qualified Domain Name (FQDN)</para>
-          </listitem>
-          <listitem>
-            <para>DNS server resolvable both via DNS and reverse lookup</para>
-          </listitem>
-          <listitem>
-            <para>A proxy server should be setup to access the external network (when required)
-                <emphasis>NTLM is currently not supported</emphasis> Your firewall should allow
-              access to the following (http and https URLs) <itemizedlist>
-                <listitem>
-                  <para>nu.novell.com</para>
-                </listitem>
-                <listitem>
-                  <para>secure-www.novell.com</para>
-                </listitem>
-                <listitem>
-                  <para>update.novell.com</para>
-                </listitem>
-                <listitem>
-                  <para>scc.suse.com</para>
-                </listitem>
-                <listitem>
-                  <para>updates.suse.com</para>
-                </listitem>
-              </itemizedlist></para>
+            <para>
+              <link
+                xlink:href="https://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_dhcp.html"
+              /></para>
           </listitem>
         </itemizedlist>
       </para>
     </formalpara>
 
     <formalpara>
-      <title>Required Open Ports</title>
-      <para>During setup of &susemgr; all required ports for operation will be opened automatically.
-        The following tables provide you with an overview of
-        ports which have been opened for use by &susemgr;
-        </para>
+      <title>FQDN</title>
+      <para> DNS assists in assigning an IP address to one or more names and assigning a name to an
+        IP address. In Linux, this conversion is usually carried out by a special type of software
+        known as bind. The machine that takes care of this conversion is called a <emphasis>name
+          server</emphasis>. The names make up a hierarchical system in which each name component is
+        separated by a period. The name hierarchy is, however, independent of the IP address
+        hierarchy described above. Consider a complete name, such as jupiter.example.com, written in
+        the format hostname.domain. A full name, referred to as a <emphasis>fully qualified domain
+          name</emphasis> (FQDN), consists of a host name and a domain name (example.com). For more
+        information on configuring a name server see also: <itemizedlist>
+          <listitem>
+            <para>
+              <link
+                xlink:href="https://www.suse.com/documentation/sles-12/book_sle_admin/data/sec_basicnet_nameres.html"
+              /></para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </formalpara>
+
+
+    <formalpara>
+      <title>DNS Server</title>
+      <para> DNS (domain name system) is required for resolving domain names and host names into IP
+        addresses. For example, the IP address 192.168.2.100 could be assigned to the host name
+        jupiter. In the case of &susemgr; the DNS server must be resolvable both via DNS and reverse
+        lookup. For more information on configuring DNS see also: <itemizedlist>
+          <listitem>
+            <para>
+              <link
+                xlink:href="https://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_dns.html"
+              /></para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </formalpara>
+
+
+    <formalpara>
+      <title>Proxy Server</title>
+      <para>When use of a proxy server is necessary it should be configured to access the external
+        network. Your firewall should allow access to the following (http and https URLs) <itemizedlist>
+          <listitem>
+            <para>nu.novell.com</para>
+          </listitem>
+          <listitem>
+            <para>secure-www.novell.com</para>
+          </listitem>
+          <listitem>
+            <para>update.novell.com</para>
+          </listitem>
+          <listitem>
+            <para>scc.suse.com</para>
+          </listitem>
+          <listitem>
+            <para>updates.suse.com</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+    </formalpara>
+    <important>
+      <title>NTLM</title>
+      <para>Microsoft NT Lan Manager (NTLM) is currently not supported</para>
+    </important>
+    <formalpara>
+      <title>Open Port List</title>
+      <para>During the setup process of &susemgr; all required ports will be opened automatically.
+        The following tables provide you with an overview of ports which are used by &susemgr;.
+      </para>
     </formalpara>
 
     <table xml:id="tab.install.ports.server">
       <title>Required Server Ports</title>
-      <tgroup cols="4">
-        <colspec colwidth="10*" align="center" colsep="0" rowsep="0"/>
-        <colspec colwidth="10*" align="center" colsep="0" rowsep="0"/>
-        <colspec colwidth="10" align="center" rowsep="0" colsep="0"/>
-        <colspec colwidth="70*" align="left" colsep="0" rowsep="0"/>
+      <tgroup cols="2">
+        <colspec colwidth="10*"/>
+        <colspec colwidth="90*"/>
         <thead>
           <row>
-            <entry align="center">
+            <entry>
               <para> Port </para>
             </entry>
-            <entry align="center"><para>Outbound</para></entry>
-            <entry align="center">
-              <para>Inbound</para>
-            </entry>
-            <entry align="center">
+            <entry>
               <para>Description</para>
             </entry>
           </row>
         </thead>
         <tbody>
-          <row valign="middle">
+          <row>
             <entry>
               <para> 67 </para>
             </entry>
-            <entry align="center">
-              <para>UP</para>
-            </entry>
-            <entry><para/></entry>
+
+
             <entry>
-              <para> Open this port to configure the &susemgr; system as a DHCP server for systems
-                requesting IP addresses. </para>
+              <para> Required when &susemgr; is configured as a DHCP server for systems requesting
+                IP addresses. </para>
             </entry>
           </row>
           <row>
@@ -213,12 +261,8 @@
               <para> 69 </para>
             </entry>
             <entry>
-              <para/>
-            </entry>
-            <entry align="center"><para>UP</para></entry>
-            <entry>
-              <para> Open this port to configure &susemgr; as a PXE server and allow installation
-                and re-installation of PXE-boot enabled systems. </para>
+              <para> Used when &susemgr; is configured as a PXE server and allows installation and
+                re-installation of PXE-boot enabled systems. </para>
             </entry>
           </row>
           <row>
@@ -226,12 +270,8 @@
               <para> 80 </para>
             </entry>
             <entry>
-              <para>UP</para>
-            </entry>
-            <entry><para>UP</para></entry>
-            <entry>
-              <para> &susemgr; server uses this port to reach &scc;; and WebGUI, client, and proxy
-                server requests come in via either http or https. </para>
+              <para>Used to contact &scc; . All WebGUI, client, and proxy server requests travel via
+                http or https. </para>
             </entry>
           </row>
           <row>
@@ -239,26 +279,8 @@
               <para> 443 </para>
             </entry>
             <entry>
-              <para>UP</para>
-            </entry>
-            <entry><para>UP</para></entry>
-            <entry>
-              <para> WebGUI, client, and proxy server requests come in via either http or https and
-                &susemgr; uses this port to reach &scc; in. </para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para> 4545 </para>
-            </entry>
-            <entry>
-              <para>UP</para>
-            </entry>
-            <entry><para/></entry>
-            <entry>
-              <para> &susemgr; Monitoring makes connections to <command>rhnmd</command> running on
-                client systems if Monitoring is enabled and probes are configured for registered
-                systems. </para>
+              <para> All WebGUI, client, and proxy server requests via http or https and &susemgr;
+                uses this port for &scc; inbound traffic. </para>
             </entry>
           </row>
           <row>
@@ -266,12 +288,8 @@
               <para> 5222 </para>
             </entry>
             <entry>
-              <para>UP</para>
-            </entry>
-            <entry><para/></entry>
-            <entry>
-              <para> Required by <command>osad</command> running on the client systems if you plan
-                to push actions to client systems. </para>
+              <para>When you wish to push actions to clients this port is required by the
+                  <systemitem>osad</systemitem> deamon running on your client systems </para>
             </entry>
           </row>
           <row>
@@ -279,124 +297,128 @@
               <para> 5269 </para>
             </entry>
             <entry>
-              <para>UP</para>
-            </entry>
-            <entry><para>UP</para></entry>
-            <entry>
               <para> Needed if you push actions to or via a &susemgrproxy;. </para>
             </entry>
           </row>
-
-        </tbody>
-      </tgroup>
-    </table>
-
-    <table xml:id="tab.install.ports.client">
-      <title>Required Client Ports</title>
-      <tgroup cols="4">
-        <colspec colwidth="10*" align="center" colsep="0" rowsep="0"/>
-        <colspec colwidth="10*" align="center" colsep="0" rowsep="0"/>
-        <colspec colwidth="10" align="center" rowsep="0" colsep="0"/>
-        <colspec colwidth="70*" align="left" colsep="0" rowsep="0"/>
-        <thead>
           <row>
-            <entry>
-              <para> Port </para>
-            </entry>
-            <entry><para>Outbound</para></entry>
-            <entry>
-              <para>Inbound</para>
-            </entry>
-            <entry>
-              <para>Description</para>
-            </entry>
-          </row>
-        </thead>
-        <tbody>
-          <row>
-            <entry>
-              <para>80</para>
-            </entry>
-            <entry>
-              <para>UP</para>
-            </entry>
-            <entry><para/></entry>
-            <entry>
-              <para>To reach the SUSE Manager server or SUSE Manager Proxy server.</para>
-            </entry>
+            <entry><para>4505</para></entry>
+            <entry><para>Required by the Salt-master for communication via TCP to minions
+              .</para></entry>
           </row>
           <row>
-            <entry>
-              <para>443</para>
-            </entry>
-            <entry>
-              <para>UP</para>
-            </entry>
-            <entry><para/></entry>
-            <entry>
-              <para>To reach the SUSE Manager server or SUSE Manager Proxy server.</para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>22</para>
-            </entry>
-            <entry>
-              <para/>
-            </entry>
-            <entry><para>UP</para></entry>
-            <entry>
-              <para>Required when using ssh-push or ssh-push-tunnel contact methods.</para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>4545</para>
-            </entry>
-            <entry>
-              <para/>
-            </entry>
-            <entry><para>UP</para></entry>
-            <entry>
-              <para>For connections from the server or proxy server for monitoring. </para>
-            </entry>
-          </row>
-          <row>
-            <entry>
-              <para>5222</para>
-            </entry>
-            <entry>
-              <para>UP</para>
-            </entry>
-            <entry><para/></entry>
-            <entry>
-              <para>For push actions with the server or proxy server.</para>
-            </entry>
+            <entry><para>4506</para></entry>
+            <entry><para>Required by the Salt-master for communication via TCP to
+              minions.</para></entry>
           </row>
         </tbody>
       </tgroup>
     </table>
+    <tip>
+      <title>Denying External Network Access</title>
+      <para>When your network requires denying external network access to and from &susemgr;, an SMT
+        Server may be registered against &susemgr;. The SMT server can then be used to synchronize
+        the necessary &suse; repositories. For more information on utilizing an SMT Server see also:
+        <!-- add link
+      here! --></para>
+    </tip>
 
+  </sect1>
+  <sect1>
+    <title>Hardware Recommendations</title>
+    <para>This section provides field tested production recommendations for small to mid size
+      networks that will be managed by &susemgr;.</para>
     <formalpara>
-      <title/>
-      <para/>
+      <title>Advised Number of CPUs</title>
+      <para>Review the following list for CPU recommendations. <itemizedlist>
+          <listitem>
+            <para>Connecting 200 systems or less to &susemgr;: 4 CPUs</para>
+          </listitem>
+          <listitem>
+            <para>Connecting 500 systems or less to &susemgr;: 4-8 CPUs</para>
+          </listitem>
+          <listitem>
+            <para>When implementing RHEL channels: 8 CPUs</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+
     </formalpara>
 
     <formalpara>
-      <title/>
-      <para/>
+      <title> Advised Memory Sizes</title>
+      <para>See the following list for memory sizing requirements. <itemizedlist>
+          <listitem>
+            <para>Less than 100 client systems: 8 GB or more</para>
+          </listitem>
+          <listitem>
+            <para>Less than 200 client systems: 12 GB or more</para>
+          </listitem>
+          <listitem>
+            <para>Above 200 client systems: 16 GB or more</para>
+          </listitem>
+          <listitem>
+            <para>When implementing RHEL channels: 16GB</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+
     </formalpara>
 
     <formalpara>
-      <title/>
-      <para/>
+      <title>Disk Space</title>
+      <para>&susemgr; stores information in several directories. For these directories it is
+        strongly recommend that you create separate file-systems or use an NFS share. During
+        installation one VG will be created that contains all disks selected during installation.
+        Therefore the first disk should be large enough to contain the OS. Normally 20GB - 50GB is
+        sufficient. A 50 GB partition would be the recommended size. The following directories
+        should be created on a separate file-system. <itemizedlist>
+          <listitem>
+            <para><command>/var/spacewalk</command> This directory will contain all rpm's. Each RPM will be stored only
+              once. The need size will depend on the number of channels and type of channels that
+              will be downloaded. The general rule would be that per SUSE support pack (including
+              SUSE RedHat Expanded Support) around 50 Gb should be enough. An extra 50 Gb for
+              non-SUSE repositories should be added on top. If other non-enterprise distributions
+              (eg OpenSUSE, CentOS) will be added, also calculated 50 Gb per distribution. This
+              directory could also be stored on a NFS share.</para>
+          </listitem>
+          <listitem>
+            <para><command>/var/lib/pgsql</command> This directory contains the PostgreSQL database. Recommended is to
+              create a file-system of 50Gb. This volume should be monitored, because a full
+              file-system where the database is running on can cause unexpected errors (and this
+              even months after it happened). If an external Oracle database is used, this directory
+              is not needed.</para>
+          </listitem>
+          <listitem>
+            <para><command>/srv/tftpboot</command> If PXE/cobbler is used, this directory will contain the images
+              (initrd and linux) for all created auto-installation profiles. Each image is around
+              50Mb. Depending on the number of profiles a decision has to be made if it would be
+              useful to move this directory to a separate file-system.</para>
+          </listitem>
+          <listitem>
+            <para><command>/var/log</command> As SUSE Manager is writing many many logs, it is recommended to create a
+              separate file-system for /var/log. The size should be around 20G. The challenge is
+              that currently there are still logs, that are not being rotated with logrotate.</para>
+          </listitem>
+          <listitem>
+            <para><command>/var/spacewalk/db_backup</command>For the backup of the PostgreSQL database, it is recommended the create a separate
+              directory. Later in this document it will be described
+              how a backup from the PostgreSQL database can be created. As this could get rather
+              big, it is advised to have a separate file-system. The size should be around twice the
+              size as for /var/lib/pqsql.</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+
+    </formalpara>
+
+    <formalpara>
+      <title>Supported Databases</title>
+      <para>&susemgr; &productnumber3; no longer provides support for an external Oracle database.
+        The default database will be an embedded PostgreSQL. During &susemgr; setup the database
+        will be created and configured.</para>
     </formalpara>
 
   </sect1>
-
-
-
-
 
 
 
