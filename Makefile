@@ -1,5 +1,11 @@
 
-all: package
+all: html pdf
+
+html:
+	daps -d DC-create-all html
+
+pdf:
+	daps -d DC-create-all pdf
 
 package: package/doc-susemanager-develop.tar.bz2
 
