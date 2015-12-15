@@ -5,12 +5,12 @@
     %entities;
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="preparing.and.registering.clients">
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="preparing.and.registering.clients">
     <title>Preparing and Registering Clients</title>
-    <para>Client registration with SUSE Manager is executed with a bootstrap script
-        on the server which deploys all necessary information to clients. The bootstrap script
-        contains parameters which assigns a client system to its base channel. Two of these
-        important parameters are:</para>
+    <para>Clients register with SUSE Manager via a bootstrap script executed on the the client which
+        deploys all necessary packages to it. The bootstrap script contains parameters which assigns
+        a client system to its base channel. Two of these important parameters are:</para>
     <itemizedlist>
         <listitem>
             <para>Activation Keys</para>
@@ -22,15 +22,12 @@
     </itemizedlist>
     <note>
         <title>GPG Keys</title>
-        <para>GPG Keys will not be covered in this guide. For more information see: <!-- TODO: ADD LINK Best Practice BP-->
-                GPG Keys and
-                Bootstrap: Reference
-            guide</para>
-        
+        <para>GPG Keys will not be covered in this guide. In the future review the Best practice
+            guide for this topic. </para>
+
     </note>
     <formalpara>
-        <title>Activation
-            Keys</title>
+        <title>Activation Keys</title>
         <para>Activation keys define the number of software entitlements, channels and groups a
             client system is allowed to subscribe to. This information is passed on to all systems
             registered with a key. Each activation key is bound to the organization for which it has
@@ -75,7 +72,7 @@
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-activationkeys1.png"/>
+                            <imagedata fileref="quickstart-activationkeys1.png" width="80%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -88,9 +85,9 @@
                     </command>. </para>
                 <warning>
                     <title>Allowed Characters</title>
-                    <para>For all &suse; Products do not use commas within the key string. All other
-                        characters are allowed. Red Hat Products require commas. See: Activation
-                        Keys and rhnreg_ks: Reference Guide </para>
+                    <para>For all &suse; Products do not use commas within the key string. Red Hat
+                        Products require commas. See: Activation Keys and rhnreg_ks: Reference Guide
+                    </para>
                 </warning>
             </step>
             <step>
@@ -116,7 +113,7 @@
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-activationkeys2.png" width="100%"/>
+                            <imagedata fileref="quickstart-activationkeys2.png" width="80%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -128,7 +125,7 @@
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-activationkeys3.png"/>
+                            <imagedata fileref="quickstart-activationkeys3.png" width="80%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -143,12 +140,11 @@
             be copied and modified for both of your clients.</para>
 
         <note>
-            <title>Bootstrap Scripting Best
-                Practices</title>
-            <para>Many of our customers are using unique methods to register clients for use with
-                &susemgr; in mass using bootstrap. Using batch scripts for mass registration of both
-                VM and Bare Metal machines is a possibility. Some of these methods will be covered
-                in the Best Practice Guide and will be added as examples at a later time.</para>
+            <title>Bootstrap Scripting Best Practices</title>
+            <para>It is possible to use various methods to register clients for use with &susemgr;
+                in mass using bootstrap. Using batch scripts for mass registration of both VM and
+                Bare Metal machines is a possibility. Some of these methods will be covered in the
+                Best Practice Guide and will be added as examples at a later time.</para>
         </note>
 
         <para>The following procedure will guide you through generating a bootstrap template
@@ -167,7 +163,7 @@
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="quickstart-bootstrap1.png"/>
+                            <imagedata fileref="quickstart-bootstrap1.png" width="80%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
@@ -184,13 +180,7 @@ bootstrap.sh  client-config-overrides.txt  client_config_update.py  sm-client-to
 
                 <para>The bootstrap script is also available at:
                         <filename>https://example-server.com/pub/bootstrap/</filename>.</para>
-                <informalfigure>
-                    <mediaobject>
-                        <imageobject>
-                            <imagedata fileref="quickstart-bootstrap2.png"/>
-                        </imageobject>
-                    </mediaobject>
-                </informalfigure>
+
             </step>
         </procedure>
         <para>The next section will cover copying and modifying your bootstrap template for use with
@@ -211,7 +201,8 @@ bootstrap.sh  client-config-overrides.txt  client_config_update.py  sm-client-to
         <procedure xml:id="mod.boostrap.script">
             <title>Modifying the Bootstrap Script</title>
             <step>
-                <para>Log in as <systemitem>root</systemitem> to the &susemgr; Server.</para>
+                <para>Log in as <systemitem>root</systemitem> on the command line on your &susemgr;
+                    Server.</para>
             </step>
             <step>
                 <para>Navigate to the bootstrap directory with:</para>
@@ -232,34 +223,7 @@ bootstrap.sh  client-config-overrides.txt  client_config_update.py  sm-client-to
                         1</systemitem> to activate the script and then enter the name of the key for
                     this script in the<systemitem>ACTIVATION_KEYS=</systemitem> field. See the
                     example script below.</para>
-                <screen>
-
-echo
-echo
-echo "MINOR MANUAL EDITING OF THIS FILE MAY BE REQUIRED!"
-echo
-echo "If this bootstrap script was created during the initial installation"
-echo "of a SUSE Manager Server, the ACTIVATION_KEYS, and ORG_GPG_KEY values will"
-echo "probably *not* be set (see below). If this is the case, please do the"
-echo "following:"
-echo "  - copy this file to a name specific to its use."
-echo "    (e.g., to bootstrap-SOME_NAME.sh - like bootstrap-web-servers.sh.)"
-echo "  - on the website create an activation key or keys for the system(s) to"
-echo "    be registered."
-echo "  - edit the values of the VARIABLES below (in this script) as"
-echo "    appropriate:"
-echo "    - ACTIVATION_KEYS needs to reflect the activation key(s) value(s)"
-echo "      from the website. XKEY or XKEY,YKEY"
-echo "    - ORG_GPG_KEY needs to be set to the name(s) of the corporate public"
-echo "      GPG key filename(s) (residing in /srv/www/htdocs/pub) if appropriate. XKEY or XKEY,YKEY"
-echo
-echo "Verify that the script variable settings are correct:"
-echo "    - CLIENT_OVERRIDES should be only set differently if a customized"
-echo "      client-config-overrides-VER.txt file was created with a different"
-echo "      name."
-echo "    - ensure the value of HOSTNAME is correct."
-echo "    - ensure the value of ORG_CA_CERT is correct."
-echo
+<screen>
 echo "Enable this script: comment (with #'s) this block (or, at least just"
 echo "the exit below)"
 echo
@@ -354,14 +318,14 @@ SLE-12-SP1-x86_64
             <step>
                 <para>The script will execute and proceed to download the required dependencies
                     located in the repositories directory you created earlier. Once the script has
-                    finished running, log in to the WebGUI and select the systems tab to see your
-                    new client listed.</para><remark>Add: a screen shot of the new client on the WebGUI</remark>
+                    finished running, log in to the WebUI and select the systems tab to see your new
+                    client listed.</para>
             </step>
-            
+
         </procedure>
 
-<para>This concludes the bootstrap section of this guide. The next section will cover setup and
-    configuration of Saltstack for use with &susemgr; 3. </para>
+        <para>This concludes the bootstrap section of this guide. The next section will cover setup
+            and configuration of Salt for use with &susemgr; 3. </para>
 
 
     </sect1>
