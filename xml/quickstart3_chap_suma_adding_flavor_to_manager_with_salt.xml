@@ -12,13 +12,12 @@
 
     <sect1>
         <title>Introducing Salt</title>
-        <para>The addition of Salt to &susemgr; 3 fulfils customer demands by providing the
-            latest in configuration management and includes a more consistent systems management
-            framework. </para>
+        <para>The addition of Salt to &susemgr; 3 fulfils customer demands by providing the latest
+            in configuration management and includes a more consistent systems management framework. </para>
 
         <para>In this chapter you will learn how to setup and configure your VM's created in the
-            previous sections for use with the new Salt framework. In this section of the guide
-            you will:</para>
+            previous sections for use with the new Salt framework. In this section of the guide you
+            will:</para>
         <itemizedlist>
             <listitem>
                 <para>Configure &susemgr; 3 as the Salt-master</para>
@@ -46,70 +45,14 @@
     </sect1>
 
     <sect1>
-        <title>&susemgr; as the Salt-master</title>
+        <title>Salt-minion Setup and Configuration</title>
         <para>Once &susemgr; has been installed and setup, by default it is configured as a fully
             functional Salt-master. In the rest of this chapter &susemgr; will be referred to the
             Salt-master. </para>
-        <important>
-            <title>Technical Preview Salt-master Modifications</title>
-            <para>
-                <emphasis>When you are testing with the early technical preview a configuration file
-                    change is necessary to ensure your client can connect to the
-                    Salt-master</emphasis></para>
-        </important>
-        <para>The following procedure will walk you through adding the technical preview
-            configuration file change on the Salt-master</para>
-        <procedure>
-            <title>Technical Preview: Required Modification</title>
-            <step>
-                <para>On the Salt-master (&susemgr; Server) as root browse to the
-                        <replaceable>/etc/salt</replaceable> directory and enter the following
-                    commands.</para>
-                <screen>
-<prompt>salt-master:~ #</prompt> cd /etc/salt
-<prompt>salt-master: /etc/salt #</prompt> ls
-master  master.d  pki  roster
-<prompt>salt-master: /etc/salt #</prompt> vi master
-</screen>
-            </step>
-            <step>
-                <para> Search for the <systemitem>#max_event_size:</systemitem> parameter and change
-                    its value to <command>6000000</command>. When you are finished, uncomment the
-                    parameter then save and quit <systemitem>vi</systemitem>. </para>
 
-                <screen>
-# Passing very large events can cause the minion to consume large amounts of
-# memory. This value tunes the maximum size of a message allowed onto the
-# master event bus. The value is expressed in bytes.
-<command>max_event_size: 6000000</command>
-
-</screen>
-                <note>
-                    <title>Why change the max_event_size?</title>
-                    <para>Currently when the Salt-master requests Grains (various information about
-                        a client: hardware, software, etc.) the list size is larger than the default
-                        value so the request times out. Changing this to a higher value enables to
-                        client to connect despite grain size. The number of packages installed
-                        effects this the most currently. </para>
-                </note>
-            </step>
-            <step>
-                <para>Once you have set the <systemitem>max_event_size</systemitem> you need to
-                    restart the Salt-master. </para>
-                <screen>
-<prompt>salt-master: /etc/salt #</prompt> systemctl restart salt-master   
-</screen>
-            </step>
-        </procedure>
-        <para>This concludes configuration of the Salt-master. The next section will guide you
-            through configuration of the salt-minion.</para>
-    </sect1>
-
-    <sect1>
-        <title>Salt-minion Setup and Configuration</title>
-        <para>This section covers setup of Salt on the client. </para>
-        <para>Unlike the Salt-master clients do not have Salt installed by default. Therefore
-            you must install the required packages. In this section you will:</para>
+        <para>This section covers setup of Salt on the client. Unlike the Salt-master, clients do
+            not have Salt installed by default. Therefore you must install the required packages. In
+            this section you will:</para>
         <itemizedlist>
             <listitem>
                 <para>Download the &susemgr; 3 ISO on the client</para>
@@ -119,9 +62,6 @@ master  master.d  pki  roster
             </listitem>
             <listitem>
                 <para>Install the required Salt-minion packages</para>
-            </listitem>
-            <listitem>
-                <para>Change the <systemitem>event_max_size</systemitem> value on the client</para>
             </listitem>
         </itemizedlist>
 
@@ -179,17 +119,7 @@ master: salt-master.com
                     Server FQDN</para>
             </step>
             <step>
-                <para>Adjust the <systemitem>max_event_size</systemitem> to
-                        <command>6000000</command>.</para>
-            </step>
-            <step>
                 <para>Save and exit vi.</para>
-            </step>
-            <step>
-                <para>Restart the salt-minion service with:</para>
-                <screen>
-<prompt>salt-minion: /etc/salt #</prompt> systemctl start salt-minion
-</screen>
             </step>
         </procedure>
         <para>This concludes the salt-minion configuration section. The next part of this guide will
@@ -238,29 +168,21 @@ master: salt-master.com
                 <informalfigure>
                     <mediaobject>
                         <imageobject>
-                            <imagedata fileref="minion3.png" width="100%"/>
+                            <imagedata fileref="minion3.png" width="80%"/>
                         </imageobject>
                     </mediaobject>
                 </informalfigure>
             </step>
         </procedure>
 
-        <important>
-            <title>Minion not Showing Up?</title>
-            <para>If your minion consistently fails to show up under the System listing after
-                refreshing your browser you can perform the following step.</para>
-            <screen>
-<prompt>salt-master: ~ #</prompt> systemctl restart tomcat        
-</screen>
-        </important>
 
-        <para>Congratulations! This concludes setup and configuration of salt. The next section
-            will introduce using salt to manage your new minion. </para>
+        <para>Congratulations! This concludes setup and configuration of salt. The next section will
+            introduce using Salt to manage your new minion. </para>
     </sect1>
     <sect1>
         <title>Configuration and Management with Salt (Under development)</title>
-        <para>This section will introduce some basic command line tools for managing minions using
-            your salt-master.</para>
+        <para>This section introduces basic command line tools for managing minions with your
+            Salt-master.</para>
 
 
     </sect1>
