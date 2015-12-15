@@ -33,6 +33,7 @@ BuildRequires:  jing
 BuildRequires:  suse-xsl-stylesheets >= 2.0.3
 BuildRequires:  update-desktop-files
 BuildRequires:  xerces-j2
+BuildRequires:  java-1_8_0-ibm
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
