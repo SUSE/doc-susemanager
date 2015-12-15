@@ -24,9 +24,7 @@ Version:        3.0
 Release:        0
 Provides:       locale(desktop-data-openSUSE:en)
 
-Source:         doc-susemanager-develop.zip
-
-BuildRequires:  unzip
+Source:         doc-susemanager-develop.tar.bz2
 
 BuildRequires:  daps
 BuildRequires:  docbook5-xsl-stylesheets
