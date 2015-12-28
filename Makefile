@@ -7,6 +7,14 @@ html:
 pdf:
 	daps -d DC-create-all pdf
 
+quick: quick-html quick-pdf
+
+quick-html:
+	daps -d DC-susemanager-quick html
+
+quick-pdf:
+	daps -d DC-susemanager-quick pdf
+
 package: package/doc-susemanager-develop.tar.bz2
 
 package/doc-susemanager-develop.tar.bz2:
