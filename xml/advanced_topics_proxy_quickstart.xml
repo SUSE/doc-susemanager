@@ -21,7 +21,7 @@
 
  <para> This guide explains how to install and set up &susemgrproxy;. </para>
 
- <!-- ==================================================================== -->
+
  <sect1 xml:id="sec.manager.proxy.concepts">
   <title>Conceptual Overview</title>
 
@@ -42,130 +42,99 @@
   <para> A &susemgr; Proxy's primary goal is to improve &susemgr; performance by reducing bandwidth
    requirements and accelerating response time. </para>
  </sect1>
- <!-- ==================================================================== -->
+
  <sect1 xml:id="sec.manager.proxy.requirements">
   <title>System Requirements</title>
-  <para> The following section informs you about the system requirements. For supported clients and
-   their requirements, see: <link linkend="mgr.supported.client.systems">Supported Client
-    Systems</link>
-   
+  <para> The following section provides &susemgrproxy; requirements. For supported clients and their
+   requirements, see: <olink targetdoc="book.suma3.quickstart.3" targetptr="mgr.supported.client.systems">Supported Client Systems</olink>
   </para>
-<sect2 xml:id="sec.manager.proxy.requirements.hardware">
-   <title>Hardware Requirements</title>
-   <para> Hardware requirements highly depend on your usage scenario. When planning proxy
-    environments, consider the amount of data you wamt to cache on your proxy. If your proxy should
-    be a 1:1 mirror of your &susemgr;, the same amount of disk space is required. </para>
+
+  <para> Hardware requirements highly depend on your usage scenario. When planning proxy
+   environments, consider the amount of data you wamt to cache on your proxy. If your proxy should
+   be a 1:1 mirror of your &susemgr;, the same amount of disk space is required. For specific
+   hardware requirements see: <olink targetdoc="book.suma3.quickstart.3" targetptr="quickstart.sect.software.requirements">Hardware
+    Requirements</olink></para>
+
+  <important>
+   <title>Network Setup</title>
+   <para> For correct installation and setup of &susemgrproxy;, make sure the following requirements
+    are fulfilled: </para>
    <variablelist>
+
     <varlistentry>
-     <term>CPU</term>
+     <term>Hostname and IP Address</term>
      <listitem>
-      <para> Required: a multi-core 64bit CPU (x86_64). </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>RAM</term>
-     <listitem>
-      <para> Required: 4 GB when only managing a few client systems. </para>
-      <para> Recommended for production use: 16&nbsp;GB. </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Free Disk Space</term>
-     <listitem>
-      <para> Required: 40&nbsp;GB for base installation. </para>
-      <para> Additionally at least 25&nbsp;GB for caching per distribution or channel; resizable
-       partition strongly recommended. </para>
+      <para> To guarantee that &susemgrproxy;'s domain name can be resolved by its clients, the
+       proxy and the client machines must be connected to a working Domain Name Server (DNS) server
+       in the network. </para>
+      <para> The hostname of the &susemgrproxy; server must not contain uppercase letters as this
+       might cause the <systemitem class="daemon">jabberd</systemitem> messaging daemon to fail.
+      </para>
      </listitem>
     </varlistentry>
    </variablelist>
-
-  </sect2>
-
-  <sect2 xml:id="sec.manager.proxy.requirements.other">
-   <title>Other Requirements</title>
-   <important>
-    <title>Network Setup</title>
-    <para> For correct installation and setup of &susemgrproxy;, make sure the following
-     requirements are fulfilled: </para>
-    <variablelist>
-
-     <varlistentry>
-      <term>Hostname and IP Address</term>
+  </important>
+  <variablelist>
+   <varlistentry>
+    <term>&scc;</term>
+    <listitem>
+     <para> For using &susemgrproxy;, you need an account at the &scc; (SCC) where your purchased
+      products and product subscriptions are registered. Make sure you have the following
+      subscriptions: </para>
+     <itemizedlist>
       <listitem>
-       <para> To guarantee that &susemgrproxy;'s domain name can be resolved by its clients, the
-        proxy and the client machines must be connected to a working Domain Name Server (DNS) server
-        in the network. </para>
-       <para> The hostname of the &susemgrproxy; server must not contain uppercase letters as this
-        might cause the <systemitem class="daemon">jabberd</systemitem> messaging daemon to fail.
-       </para>
+       <para> One or more subscriptions for &susemgrproxy;. </para>
       </listitem>
-     </varlistentry>
-    </variablelist>
-   </important>
-   <variablelist>
-    <varlistentry>
-     <term>&scc;</term>
-     <listitem>
-      <para> For using &susemgrproxy;, you need an account at the &scc; (SCC) where your purchased
-       products and product subscriptions are registered. Make sure you have the following
-       subscriptions: </para>
-      <itemizedlist>
-       <listitem>
-        <para> One or more subscriptions for &susemgrproxy;. </para>
-       </listitem>
-       <listitem>
-        <para> One or more subscriptions for &susemgr;. </para>
-       </listitem>
-       <listitem>
-        <para> Subscriptions for the products on the client systems you want to register with
-         &susemgr; via &susemgrproxy;. </para>
-       </listitem>
-       <listitem>
-        <para> Subscriptions to client entitlements for the client system you want to register with
-         &susemgr; via &susemgrproxy;. </para>
-       </listitem>
-      </itemizedlist>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Network Time Protocol (NTP)</term>
-     <listitem>
-      <para> The connection to the Web server via Secure Sockets Layer (SSL) requires correct time
-       settings on the server, proxy and clients. For this reason, all systems must use NTP. </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry xml:id="vle.manager.proxy.req.virt">
-     <term>Virtual Environments</term>
-     <listitem>
-      <para> For running &susemgrproxy; in virtual environments, use the following settings for the
-       virtual machine (VM): </para>
-      <itemizedlist>
-       <listitem>
-        <para> At least 1 GB of RAM </para>
-       </listitem>
-       <listitem>
-        <para> Bridged network </para>
-       </listitem>
-      </itemizedlist>
-      <para> The following virtual environments are supported: </para>
-      <itemizedlist>
-       <listitem>
-        <para> &kvm; </para>
-       </listitem>
-       <listitem>
-        <para> &vmware; </para>
-       </listitem>
-       <listitem>
-        <para> Hyper-V </para>
-       </listitem>
-      </itemizedlist>
-      <!-- remove xen: bnc#786341 -->
-      <para> For running &susemgrproxy; in &kvm;, &vmware;, or Hyper-V, use the &susemgrproxy; ISO
-       image. </para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-  </sect2>
+      <listitem>
+       <para> One or more subscriptions for &susemgr;. </para>
+      </listitem>
+      <listitem>
+       <para> Subscriptions for the products on the client systems you want to register with
+        &susemgr; via &susemgrproxy;. </para>
+      </listitem>
+      <listitem>
+       <para> Subscriptions to client entitlements for the client system you want to register with
+        &susemgr; via &susemgrproxy;. </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Network Time Protocol (NTP)</term>
+    <listitem>
+     <para> The connection to the Web server via Secure Sockets Layer (SSL) requires correct time
+      settings on the server, proxy and clients. For this reason, all systems must use NTP. </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry xml:id="vle.manager.proxy.req.virt">
+    <term>Virtual Environments</term>
+    <listitem>
+     <para> For running &susemgrproxy; in virtual environments, use the following settings for the
+      virtual machine (VM): </para>
+     <itemizedlist>
+      <listitem>
+       <para> At least 1 GB of RAM </para>
+      </listitem>
+      <listitem>
+       <para> Bridged network </para>
+      </listitem>
+     </itemizedlist>
+     <para> The following virtual environments are supported: </para>
+     <itemizedlist>
+      <listitem>
+       <para> &kvm; </para>
+      </listitem>
+      <listitem>
+       <para> &vmware; </para>
+      </listitem>
+      <listitem>
+       <para> Hyper-V </para>
+      </listitem>
+     </itemizedlist>
+     
+    </listitem>
+   </varlistentry>
+  </variablelist>
  </sect1>
  <sect1 xml:id="sec.manager.proxy.inst">
   <title>Installation and Setup</title>
@@ -176,135 +145,47 @@
   <para> If &susemgrproxy; is registered with a &susemgr; instance, it will receive updates directly
    from the configured &susemgr; channel. </para>
 
-  <para> The &yast; graphical user interface will guide you through the installation and the setup
-   process. It is started in text mode. Use the <keycap function="tab"/> key to navigate among
-   individual elements. To select a value from a list, use the <keycap function="up"/> and <keycap
-    function="down"/> arrow keys and press <keycap function="enter"/>. To activate an option, press
-   the <keycap function="space"/> key. </para>
+
 
   <sect2 xml:id="sec.manager.proxy.inst.installation">
    <title>Installation</title>
-   <para> The following procedure describes the installation on a physical machine. Make sure the
-    machine you intend to use fulfills the <xref linkend="sec.manager.proxy.requirements.hardware"
-     xrefstyle="select:    quotedtitle page"/>. If you want to install the appliance in a virtual
-    machine, additionally check the settings listed in
-    <!-- <xref linkend="vle.manager.req.virt" xrefstyle="select: quotedtitle page"/> ADD LINK! -->. </para>
+   <para> The following procedure describes the installation on a physical machine.</para>
    <procedure xml:id="pro.manager.proxy.installation">
-    <title>Installing the Appliance</title>
+    <title>Installing the &susemgrproxy; &productnumber3; Extension</title>
     <warning>
      <title>Loss of Data</title>
-     <para> Installing &susemgrproxy; on a physical machine will completely erase any data on the
+     <para> Installing &sls; 12 SP1 or &susemgrproxy; on a physical machine will completely erase any data on the
       hard disk used for installation. Before you start the installation process, create a backup of
       your hard disks. </para>
     </warning>
     <step>
-     <para> Boot your future &susemgrproxy; server from the installation medium. Select
-       <guimenu>Install/Restore &susemgrproxy;</guimenu>. </para>
+     <para> Boot from the &sls; 12 SP1 installation medium. Go through the guided installation
+      options until you reach the extensions and modules screen. Select  </para>
+    
     </step>
-    <step>
-     <para> If your machine contains more than one hard disk, you are asked which one to use for the
-      installation of &susemgrproxy;. Navigate with the arrow keys, and use the space key to mark
-      the desired hard disk. You are asked if you want to continue and you are warned that the
-      installation will destroy all data on the disk. </para>
-    </step>
-    <step>
-     <para> To proceed, answer with <guimenu>Yes</guimenu>. The deployment process takes over. This
-      step may take some time as large amounts of data need to be unpacked and verified. After the
-      verification, &yast; firstboot is started. </para>
-    </step>
-    <step>
-     <para> In the first screen, set the system <guimenu>Language</guimenu> and <guimenu>Keyboard
-       Layout</guimenu> for your future &susemgrproxy;. Proceed with <guimenu>Next</guimenu>.
-     </para>
-    </step>
-    <step xml:id="step.manager.proxy.install.root.pwd">
-     <para> In the next screen, set the &rootuser; password for your &susemgrproxy; server and
-      confirm it. </para>
-     <!-- General screen, no proxy customization, thus no new screenshot needed.
-     Reuse SM screenshot
--->
-     <figure>
-      <title>&yast; Firstboot&mdash;Password for the System Administrator</title>
-      <mediaobject>
-       <imageobject role="fo">
-        <imagedata fileref="susemanager_firstboot_root_pwd.png" width="85%"/>
-       </imageobject>
-       <imageobject role="html">
-        <imagedata fileref="susemanager_firstboot_root_pwd.png" width="75%"/>
-       </imageobject>
-      </mediaobject>
-     </figure>
-     <para> Proceed with <guimenu>Next</guimenu>. </para>
-    </step>
-    <step>
-     <para> In the following screen, read the licenses and agree to them. Proceed with
-       <guimenu>Next</guimenu>. The installation routine checks some basic system requirements and
-      depending on the results, lets you decide whether to proceed with the installation or cancel.
-     </para>
-    </step>
-    <step>
-     <para> In the next screen, configure the network settings. Note the network requirements listed
-      in <xref linkend="sec.manager.proxy.requirements.other"/>. Either choose <guimenu>Use
-       Following Configuration</guimenu> or <guimenu>Change</guimenu> to modify the network setup
-      according to your wishes. </para>
-     <!-- General screen.  no special figure with proxy needed -->
-     <figure>
-      <title>&yast; Firstboot&mdash; Network Configuration</title>
-      <mediaobject>
-       <imageobject role="fo">
-        <imagedata fileref="susemanager_firstboot_network.png" width="90%"/>
-       </imageobject>
-       <imageobject role="html">
-        <imagedata fileref="susemanager_firstboot_network.png" width="75%"/>
-       </imageobject>
-      </mediaobject>
-     </figure>
-     <para> Proceed with <guimenu>Next</guimenu>. </para>
-    </step>
-    <step>
-     <para> Configure the <guimenu>Clock and Time Zone</guimenu> to use for your &susemgr; server.
-      Proceed with <guimenu>Next</guimenu>. </para>
-    </step>
-    <step>
-     <para> Configure the NTP settings according to your wishes. For more information about the
-      options, refer to <guimenu>Help</guimenu>. Note the NTP requirements listed in <xref
-       linkend="sec.manager.proxy.requirements.other"/>. Proceed with <guimenu>Next</guimenu>.
-     </para>
-    </step>
-    <step>
-     <para> On the <guimenu>Installation Completed</guimenu> screen, select
-       <guimenu>Finish</guimenu> to close &yast; firstboot. The boot process continues. </para>
-    </step>
-    <step>
-     <para> Wait for the boot process to finish.
-      <!--When the login prompt appears on
-    the console, write down the hostname listed there&mdash;you will need it to
-    access the &susemgr; Web interface later. -->
-     </para>
-     <remark role="needinfo"> 2011-03-11 - ke: Do we need an online update after the installation? </remark>
-     <!-- FIXME: see remark
-    <important>
-     <title>&susemgrproxy; Update Required</title>
-     <para>
-      After installation, update your &susemgrproxy; to apply the latest
-      patches before starting the setup process. To receive updates,
-      registration at NCC (or a connection to an internal update server like
-      &smt;) is required. For details on how to execute the update, refer to
-      <xref linkend="pup-sle"/>.
-     </para>
-    </important>
--->
-    </step>
+    
+    
+    
+   
+    
+    
+   
+   
+   
+    
+  
+   
+   
    </procedure>
   </sect2>
 
-  <!-- FIXME: Enable parts that make sense here -->
+
 
   <sect2 xml:id="sec.manager.proxy.inst.setup">
    <title>Setup</title>
-   <remark role="generic"> 2011-03-10 - ke: This needs close checking. Thus far just copied from QS </remark>
+  
    <para>
-    <!-- updating &susemgrproxy; server also required?  see QS server--> After running &yast;
+   
     firstboot, log in as &rootuser;, register &susemgrproxy; with &susemgr;, then run the
      <command>configure-proxy.sh</command> setup script from the command-line. See the following
     sections for the details of this process: </para>
@@ -467,19 +348,7 @@
       (for example, your organization key, and package signing keys). Then execute the resulting
       script on each proxy system that you want to register with &susemgr; (either centrally from
       the &susemgr; server or decentralized on each system.) </para>
-     <!-- According to Duncan: not required -->
-     <!--
-   <note>
-    <title>Access to Installation Media During Registration</title>
-    <para>
-     The bootstrap process triggers installation of packages on the proxy
-     client machines. Before executing the bootstrap script on a proxy client,
-     make sure the client can access its default installation medium: network
-     access (in case of network repositories) or inserted DVD (in case of
-     physical media).
-    </para>
-   </note>
-     -->
+   
      <step>
       <para> Log in as &rootuser; to the &susemgr; server. </para>
      </step>
@@ -596,7 +465,7 @@ root@<replaceable>client_hostname</replaceable> /bin/bash</screen>
     candidate for this package available in SP2. To remove the package using SUSE Manager, proceed
     as follows: </para>
 
-   <!-- <procedure> does not exist within <note> -->
+ 
    <itemizedlist>
     <listitem>
      <para> Select the proxy system and then click <menuchoice>
@@ -677,74 +546,7 @@ rcjabberd start</screen>
    </menuchoice>, then select the system name). The <guimenu>Connection</guimenu> subtab displays
    the connection path to the client. </para>
 
-  <para> For more information about bootstrapping, refer to
-   <!--<xref linkend="ch-bootstrap"/>   ADD THIS LINK TO BOOTSTRAP SECTION OF QUICKSTART-->
-  </para>
- </sect1>
- <!-- ============================================================ -->
- <sect1 xml:id="ap.proxy.docupdate">
-  <title>Documentation Updates</title>
-  <para>This section contains information about documentation content changes made to the
-    <citetitle>&mgrproxyquick;</citetitle>. <!-- since the initial release of &susemgr; XX.-->
-  </para>
-  <para>This document was updated on the following dates:</para>
-  <itemizedlist role="subtoc">
-   <listitem>
-    <para><xref linkend="ap-proxy.docupdate.2014-04-21" xrefstyle="SectTitleOnPage"/></para>
-   </listitem>
-   <listitem>
-    <para><xref linkend="ap-proxy.docupdate.2013-01-25" xrefstyle="SectTitleOnPage"/></para>
-   </listitem>
-   <listitem>
-    <para><xref linkend="ap-proxy.docupdate.2012-11-28" xrefstyle="SectTitleOnPage"/></para>
-   </listitem>
-  </itemizedlist>
-
-  <sect2 xml:id="ap-proxy.docupdate.2014-04-21">
-   <title>April 21, 2014</title>
-   <para>Updates were made to the following sections. The changes are explained below.</para>
-
-   <variablelist>
-    <varlistentry>
-     <term><xref linkend="sec.manager.proxy.requirements.hardware" xrefstyle="SectTitleOnPage"
-      /></term>
-     <listitem>
-      <para> Adjusted requirements. </para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-  </sect2>
-
-
-  <sect2 xml:id="ap-proxy.docupdate.2013-01-25">
-   <!-- FIXME: enter date -->
-   <title>January 25, 2013</title>
-   <para>Updates were made to the following sections. The changes are explained below.</para>
-
-   <variablelist>
-    <varlistentry>
-     <term><xref linkend="sec.manager.proxy.requirements.other" xrefstyle="SectTitleOnPage"/></term>
-     <listitem>
-      <para> Xen no longer is a supported virtual environment. </para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-  </sect2>
-
-  <sect2 xml:id="ap-proxy.docupdate.2012-11-28">
-   <!-- FIXME: enter date -->
-   <title>November 28, 2012</title>
-   <para>Updates were made to the following sections. The changes are explained below.</para>
-
-   <variablelist>
-    <varlistentry>
-     <term><xref linkend="sec.manager.proxy.migrating" xrefstyle="SectTitleOnPage"/></term>
-     <listitem>
-      <para> This section is new. </para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-  </sect2>
+ 
  </sect1>
 
 </chapter>
