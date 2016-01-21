@@ -27,4 +27,69 @@
     <title>CVE Search</title>
     <para></para>
   </sect1>
+  <sect1 xml:id="bp-chapt-audit-security-pam-auth">
+    <title>Implementing PAM Authentication</title>
+    <indexterm>
+      <primary>PAM authentication</primary>
+      <secondary>implementation</secondary></indexterm>
+     
+    <para> As security measures become increasingly complex, &susemgr; supports network-based
+      authentication systems via Pluggable Authentication Modules (PAM). PAM is a suite of libraries
+      that allows to integrate &susemgr; with a centralized authentication mechanism, thus
+      eliminating the need to remember multiple passwords. </para>
+    
+    <para> &susemgr; supports LDAP, Kerberos, and other network-based authentication systems via
+      PAM. To enable &susemgr; to use PAM in your organization's authentication infrastructure, set
+      up a PAM service file and make &susemgr; use it. Follow the steps below. </para>
+    
+    <procedure>
+      <step>
+        <para> On a &sls; 12 SP1 system, a typical generic PAM service file could look as follows
+          (save it as <filename>/etc/pam.d/susemanager</filename> to make it work with the settings
+          below): </para>
+        
+        <screen>#%PAM-1.0
+auth        required      pam_env.so
+auth        sufficient    pam_krb5.so no_user_check
+auth        required      pam_deny.so
+account     required      pam_krb5.so no_user_check</screen>
+      </step>
+      <step>
+        <para>Make &susemgr; use this service file (<filename>/etc/pam.d/susemanager</filename>) by
+          adding the following line to <filename>/etc/rhn/rhn.conf</filename>: </para>
+        <screen>pam_auth_service = susemanager</screen>
+      </step>
+      <step>
+        <para> To enable a user to authenticate against PAM, on the &susemgr; Web interface go to
+          the <guimenu>Create User</guimenu> page and select the checkbox labeled <guimenu>Pluggable
+            Authentication Modules (PAM)</guimenu> positioned below the password and password
+          confirmation fields. </para>
+      </step>
+      <step>
+        <para> Then finally &yast; can be used to configure PAM when packages such as
+          <systemitem>yast2-ldap-client</systemitem> and
+          <systemitem>yast2-kerberos-client</systemitem> are installed; for detailed information
+          on configuring PAM, see <link
+            xlink:href="https://www.suse.com/documentation/sles-12/book_security/data/cha_pam.html"
+            >&sle; 12 SP1 Security</link> . This example is not limited to Kerberos; it is a generic
+          example and uses the current server configuration. Note that only network-based
+          authentication services are supported. </para>
+      </step>
+    </procedure>
+    
+    <note>
+      <title>Changing Passwords</title>
+      <para> Changing the password on the &susemgr; Web interface changes only the local password on
+        the &susemgr; server. But this password may not be used at all if PAM is enabled for that
+        user. In the above example, for instance, the Kerberos password will not be changed. </para>
+    </note>
+    
+    <para>For more information, see <link
+      xlink:href="http://wiki.novell.com/index.php/SUSE_Manager/Authentication">SUSE Manager
+      Authentication</link></para>
+  </sect1>
+  
+  
+  
+
 </chapter>
