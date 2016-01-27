@@ -9,33 +9,67 @@
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.systems.management">
-    <title>Contact Methods</title>
-    
-    
-    <sect1>
-      <title>Introduction to Contact Methods</title>
-      <para></para>
-    </sect1>
-  
+  <title>Server and Client Contact Methods</title>
+
   <sect1>
-    <title>Choosing a Contact Method </title>
-    <para></para>
+    <title>Selecting a Contact Method</title>
+    <para/>
   </sect1>
-  
-  <sect1>
-    <title> SSH Push and Pull Method</title>
-    <para></para>
+
+  <sect1 xml:id="bp.contact.methods.ssh.push">
+    <title>SSH Push</title>
+    <para>SSH Server Push is intended to be used in environments where clients cannot reach the SUSE
+      Manager server to regularly check in and, for example, fetch package updates. Therefore the
+      server will contact the clients in regular intervals (using SSH) to perform all actions via an
+      encrypted channel.</para>
+
+    <para>This feature enables SUSE Manager within the internal network to manage clients in the
+      DMZ. In such a scenario, for security reasons no system in the DMZ is allowed to open a
+      connection into the internal network. Instead SSH Server Push with tunnel initiates the tunnel
+      from the internal network. Once all actions are performed, the tunnel will be closed
+      again.</para>
+
+    <sect2 xml:id="bp.contact.methods.ssh.push.requirements">
+      <title>Configuring SSH Push</title>
+      <para>For tunneling connections via <abbrev>SSH</abbrev>, two available port numbers are
+        required, one for tunneling <abbrev>HTTP</abbrev> and the second for tunneling via
+          <abbrev>HTTPS</abbrev> (<abbrev>HTTP</abbrev> is only necessary during the registration
+        process). The port numbers used by default are 1232 and 1233. To overwrite these, add two
+        custom port numbers greater than 1024 to <replaceable>/etc/rhn/rhn.conf</replaceable> like
+        this: <screen>ssh_push_port_http = high port 1
+ssh_push_port_https = high port 2</screen>
+      </para>
+
+      <note>
+        <title>Specifying Ports for Tunneling before Registering Clients</title>
+        <para>he ports for tunneling need to be specified before the first client is registered.
+          Clients already registered before changing the port numbers, must be registered again,
+          otherwise the server will not be able to contact them anymore.</para>
+      </note>
+
+      <para>In case the clients should be contacted via their hostnames instead of their IP
+        addresses, set the following option: <screen>ssh_push_use_hostname = true</screen></para>
+
+      <para>It is also possible to adjust the number of threads to use for opening client
+        connections in parallel. By default two parallel threads are used. Set
+        taskomatic.ssh_push_workers in <replaceable>/etc/rhn/rhn.conf</replaceable> like
+        this:<screen>taskomatic.ssh_push_workers = number</screen></para>
+    </sect2>
   </sect1>
-  
-  <sect1>
-    <title>OSAD Contact Method </title>
-    <para></para>
+  <sect1 xml:id="bp.contact.methods.ssh.tunnel.push">
+    <title>SSH Tunnel Push</title>
+    <para/>
   </sect1>
-  
-  <sect1>
-    <title>Salt Method</title>
-    <para></para>
+
+  <sect1 xml:id="bp.contact.methods.osad">
+    <title>OSAD</title>
+    <para/>
   </sect1>
- 
-  
+
+  <sect1 xml:id="bp.contact.methods.salt">
+    <title>Salt</title>
+    <para/>
+  </sect1>
+
+
 </chapter>
