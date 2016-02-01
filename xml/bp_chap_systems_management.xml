@@ -9,33 +9,125 @@
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.systems.management">
-    <title>Contact Methods</title>
-    
-    
-    <sect1>
-      <title>Introduction to Contact Methods</title>
-      <para></para>
-    </sect1>
-  
+  <title>Server and Client Contact Methods</title>
+
   <sect1>
-    <title>Choosing a Contact Method </title>
-    <para></para>
+    <title>Selecting a Contact Method</title>
+    <para>&susemgr; &productnumber3; provides several methods for communication between client and
+      server. These methods allow fetching of packages and for providing updates. Which one you
+      select will be heavily dependant on your network infrastructure. The following section
+      provides a good starting point for selecting a method which best suits your network
+      environment.</para>
   </sect1>
-  
-  <sect1>
-    <title> SSH Push and Pull Method</title>
-    <para></para>
+
+  <sect1 xml:id="bp.contact.methods.ssh.push">
+    <title>SSH Push</title>
+    <para>SSH Server Push is intended to be used in environments where your clients cannot reach the
+      SUSE Manager server directly to regularly check in and, for example, fetch package updates. </para>
+
+    <para>In detail this feature enables a SUSE Manager located within an internal network to manage
+      clients located on a DMZ. Due to security reasons, no system on a DMZ is authorized to open a
+      connection to the internal network and therefore your &susemgr; server. The solution is to
+      configure SSH Server Push which utilizes an encrypted tunnel from your &susemgr; server on the
+      internal network to the clients located on the DMZ. After all actions/events are executed, the
+      tunnel is closed. The server will contact the clients in regular intervals (using SSH) to
+      check in and perform all actions and events.</para>
+
+    <sect2 xml:id="bp.contact.methods.ssh.push.requirements">
+      <title>Configuring the Server for SSH Push</title>
+      <para>For tunneling connections via <abbrev>SSH</abbrev>, two available port numbers are
+        required, one for tunneling <abbrev>HTTP</abbrev> and the second for tunneling via
+          <abbrev>HTTPS</abbrev> (<abbrev>HTTP</abbrev> is only necessary during the registration
+        process). The port numbers used by default are 1232 and 1233. To overwrite these, add two
+        custom port numbers greater than 1024 to <replaceable>/etc/rhn/rhn.conf</replaceable> like
+        this: <screen>ssh_push_port_http = high port 1
+ssh_push_port_https = high port 2</screen>
+      </para>
+
+      
+
+      <para>If you would like your clients to be contacted via their hostnames instead of an IP
+        address, set the following option: <screen>ssh_push_use_hostname = true</screen></para>
+
+      <para>It is also possible to adjust the number of threads to use for opening client
+        connections in parallel. By default two parallel threads are used. Set
+          <systemitem>taskomatic.ssh_push_workers</systemitem> in
+          <replaceable>/etc/rhn/rhn.conf</replaceable> like
+        this:<screen>taskomatic.ssh_push_workers = number</screen></para>
+    </sect2>
+
+    <sect2>
+      <title>Using <abbrev>sudo</abbrev> with SSH Push </title>
+      <para>For security reasons you may desire to use <abbrev>sudo</abbrev> and SSH into a system
+        as a user other than root. The following procedure will guide you through configuring sudo
+        for use with ssh push. <note>
+          <title>sudo Requirements</title>
+          <para>The packages <filename>spacewalk-taskomatic >= 2.1.165.19</filename> and
+              <filename>spacewalk-certs-tools => 2.1.6.7</filename> are required for using sudo with
+            SSH Push.</para>
+        </note>
+      </para>
+
+      <procedure>
+        <title>Configuring sudo</title>
+
+        <step>
+          <para>Set the following parameter on the server located in:
+              <replaceable>/etc/rhn/rhn.conf</replaceable><screen>ssh_push_sudo_user = user</screen>
+            The server will now use sudo to ssh as the configured user.</para>
+        </step>
+
+        <step>
+          <para>You must now create the user specified in step 1 above on each of your clients and
+            the following parameters should be commented out within your clients
+              <filename>/etc/sudoers</filename>
+            file:<screen> #Defaults targetpw   # ask for the password of the target user i.e. root
+ #ALL    ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!</screen></para>
+        </step>
+
+        <step>
+          <para>Now add the following line beneath the <parameter>## User privilege
+              specification</parameter> section of each clients <filename>sudoers</filename>
+            file:<screen>user ALL=(ALL) NOPASSWD:/usr/sbin/rhn_check</screen></para>
+        </step>
+
+        <step>
+          <para>On each client add the following two lines  to the
+              <filename>/home/user/.bashrc</filename>
+            file.<screen> PATH=$PATH:/usr/sbin
+ export PATH</screen></para>
+        </step>
+
+      </procedure>
+
+    </sect2>
+    <sect2>
+      <title>Client Registration</title>
+      <para>As your clients cannot reach the server, you will need to register your clients from the
+        server. A tool for performing registration of clients from the server is included with
+        &susemgr; &productnumber3; called <filename>mgr-ssh-push-init</filename> This tool expects a
+      client's hostname or IP address as well as the path to a valid bootstrap script located in the
+      servers filesystem for registration as parameters.</para>
+      <note>
+        <title>Specifying Ports for Tunneling before Registering Clients</title>
+        <para>The ports for tunneling need to be specified before the first client is registered.
+          Clients already registered before changing the port numbers, must be registered again,
+          otherwise the server will not be able to contact them anymore.</para>
+      </note>
+      <para><screen><prompt>#</prompt> mgr-ssh-push-init --client client --register /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen></para>
+      
+    </sect2>
   </sect1>
-  
-  <sect1>
-    <title>OSAD Contact Method </title>
-    <para></para>
+
+  <sect1 xml:id="bp.contact.methods.osad">
+    <title>OSAD</title>
+    <para/>
   </sect1>
-  
-  <sect1>
-    <title>Salt Method</title>
-    <para></para>
+
+  <sect1 xml:id="bp.contact.methods.salt">
+    <title>Salt</title>
+    <para/>
   </sect1>
- 
-  
+
+
 </chapter>
