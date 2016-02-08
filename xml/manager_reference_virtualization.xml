@@ -589,20 +589,24 @@
      </substeps>
     </step>
     <step>
+     <!--  bsc#964025 -->
      <para>
       Once the registration process is finished and all packages have been
-      installed, replace the <systemitem class="daemon">rhnsd</systemitem>
-      (Spacewalk query daemon) with the
+      installed, <!-- replace the <systemitem class="daemon">rhnsd</systemitem>
+      (Spacewalk query daemon) with -->
+      enable the
       <systemitem class="daemon">osad</systemitem> (Open Source Architecture
       Daemon). On a &sls; system this can be achieved by running the
       following commands as user &rootuser;:
      </para>
-<screen>rcrhnsd stop
-insserv -r rhnsd
-insserv osad
+     <!--
+     <screen>rcrhnsd stop
+     insserv -r rhnsd</screen>
+     -->
+<screen>insserv osad
 rcosad start</screen>
      <important>
-      <title><systemitem class="daemon">osad</systemitem> vs. <systemitem class="daemon">rhnsd</systemitem></title>
+      <title><systemitem class="daemon">osad</systemitem> Together with <systemitem class="daemon">rhnsd</systemitem></title>
       <para>
        The <systemitem class="daemon">rhnsd</systemitem> daemon checks
        for scheduled actions every four hours, so it can take up to
@@ -613,8 +617,9 @@ rcosad start</screen>
       </para>
       <para>
        However, when managing &vmguest;s, you usually want actions like
-       rebooting a &vmguest; to be carried out immediately. Replacing
-       <systemitem class="daemon">rhnsd</systemitem> with
+       rebooting a &vmguest; to be carried out immediately. <!-- Replacing
+       <systemitem class="daemon">rhnsd</systemitem> with -->
+       Adding
        <systemitem class="daemon">osad</systemitem> ensures that. The
        <systemitem class="daemon">osad</systemitem> daemon receives commands
        over the jabber protocol from &susemgr; and commands are instantly
