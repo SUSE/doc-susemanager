@@ -11,14 +11,22 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="suma.choosing.dist.scheme">
     <title>Managing Entitlement Methods</title>
     <para>There are two methods for managing your subscriptions and entitlements. Both management
-        methods access &scc; and provide specialized benefits. Directly connecting to &scc; is the
-        recommended default way of managing your &susemgr; Server. If you have special network
-        security requirements which do not allow access from your internal network the internet then
-        you may use a &sle; 12 SP1 Server running the Subscription Management Tool (SMT) for
-        maintaining your entitlements. This tool will contact &scc; and obtain updates for your
-        clients which you may then mount on your &susemgr; Server  for providing updates. This is
-        the preferred method for managing client systems within a highly secure network
-        infrastructure.</para>
+        methods access &scc; and provide specialized benefits. <itemizedlist>
+            <listitem>
+                <para>Directly connecting to &scc; is the recommended default way of managing your
+                    &susemgr; Server.</para>
+            </listitem>
+            <listitem>
+                <para>If you have special network security requirements which do not allow access
+                    from your internal network to the internet then you may use a &sle; 12 SP1
+                    Server running the Subscription Management Tool (SMT) for maintaining your
+                    entitlements. This tool will contact &scc; from a system connected to the
+                    external network and obtain updates for your clients which you may then mount on
+                    your internal &susemgr; Server. This is the preferred method for managing client
+                    systems within a highly secure network infrastructure.</para>
+            </listitem>
+        </itemizedlist>
+    </para>
     <sect1>
         <title> Overview SUSE Customer Center (SCC) </title>
         <para>SUSE Customer Center (SCC) is the central place to manage your purchased SUSE
@@ -29,19 +37,67 @@
             SUSE Customer Center is also designed to provide a common platform for your support
             requests and feedback. Discover a new way of managing your SUSE account and
             subscriptions via one interface—anytime, anywhere. </para>
-        
+
         <itemizedlist>
-            <listitem><para>For more information on using &scc; see: <link
-                xlink:href="https://scc.suse.com/docs/userguide">&scc; User Guide</link></para></listitem>
+            <listitem>
+                <para>For more information on using &scc; see: <link
+                        xlink:href="https://scc.suse.com/docs/userguide">&scc; User
+                    Guide</link></para>
+            </listitem>
         </itemizedlist>
-        
+
 
     </sect1>
 
     <sect1 xml:id="sub.mgr.tool">
         <title>Subscription Management Tool (SMT) and Disconnected Setup (DMZ)</title>
-        <para></para>
-       
+
+        <para>If it is not possible to connect SUSE Manager directly or via a proxy to the Internet,
+            a disconnected setup in combination with Subscription Management Tool (SMT) is the
+            recommended solution. In this scenario, SMT stays in an “external” network with a
+            connection to &scc; and synchronizes the software channels and repositories on a
+            removable storage medium. Then you separate the storage medium from SMT, and mount it
+            locally on your SUSE Manager server to read the updated data. </para>
+
+        <para>The following procedure will guide you through using (SMT).</para>
+
+        <procedure>
+            <title>SMT: Fetching Repository Data from &scc;</title>
+            <step>
+                <para>Configure SMT in the external network with SUSE Customer Center (SCC). For
+                    details about configuring SMT with &sle; 12 SP1, see: <link
+                        xlink:href="https://www.suse.com/documentation/sles-12/book_smt/data/book_smt.html"
+                        >Subscription Management Tool for SLES 12 SP1</link>
+                </para>
+            </step>
+            <step>
+                <para>Using SMT, mirror all required repositories.</para>
+            </step>
+            <step>
+                <para>Create a "database replacement file" (e.g.,
+                        <filename>/tmp/dbrepl.xml</filename><screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen></para>
+            </step>
+            <step>
+                <para>Mount a removable storage medium such as an external hard disk or USB flash
+                    drive.</para>
+            </step>
+            <step>
+                <para>Export the data to the mounted medium:<screen>smt-sync --todir /media/disk/
+smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
+           --fromlocalsmt -L /var/log/smt/smt-mirror-export.log</screen>
+                    <note>
+                        <title>Keeping A Disconnected Server Up-to-date</title>
+                        <para><command>smt-sync</command> also exports your subscription and
+                            entitlement data. To keep SUSE Manager up-to-date with your
+                            subscriptions and entitlements, you must frequently import and export
+                            this data.</para>
+                    </note></para>
+            </step>
+            <step>
+                <para>Unmount the storage medium and carry it securely to your &susemgr;
+                    &productnumber3; Server.</para>
+            </step>
+        </procedure>
     </sect1>
 
 
