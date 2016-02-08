@@ -11,14 +11,22 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="suma.choosing.dist.scheme">
     <title>Managing Entitlement Methods</title>
     <para>There are two methods for managing your subscriptions and entitlements. Both management
-        methods access &scc; and provide specialized benefits. Directly connecting to &scc; is the
-        recommended default way of managing your &susemgr; Server. If you have special network
-        security requirements which do not allow access from your internal network the internet then
-        you may use a &sle; 12 SP1 Server running the Subscription Management Tool (SMT) for
-        maintaining your entitlements. This tool will contact &scc; and obtain updates for your
-        clients which you may then mount on your &susemgr; Server  for providing updates. This is
-        the preferred method for managing client systems within a highly secure network
-        infrastructure.</para>
+        methods access &scc; and provide specialized benefits. <itemizedlist>
+            <listitem>
+                <para>Directly connecting to &scc; is the recommended default way of managing your
+                    &susemgr; Server.</para>
+            </listitem>
+            <listitem>
+                <para>If you have special network security requirements which do not allow access
+                    from your internal network to the internet then you may use a &sle; 12 SP1
+                    Server running the Subscription Management Tool (SMT) for maintaining your
+                    entitlements. This tool will contact &scc; from a system connected to the
+                    external network and obtain updates for your clients which you may then mount on
+                    your internal &susemgr; Server. This is the preferred method for managing client
+                    systems within a highly secure network infrastructure.</para>
+            </listitem>
+        </itemizedlist>
+    </para>
     <sect1>
         <title> Overview SUSE Customer Center (SCC) </title>
         <para>SUSE Customer Center (SCC) is the central place to manage your purchased SUSE
@@ -30,62 +38,116 @@
             requests and feedback. Discover a new way of managing your SUSE account and
             subscriptions via one interface—anytime, anywhere. </para>
 
+        <itemizedlist>
+            <listitem>
+                <para>For more information on using &scc; see: <link
+                        xlink:href="https://scc.suse.com/docs/userguide">&scc; User
+                    Guide</link></para>
+            </listitem>
+        </itemizedlist>
+
 
     </sect1>
 
     <sect1 xml:id="sub.mgr.tool">
-        <title>Overview Subscription Management Tool and Disconnected Setup (DMZ)</title>
-        <para>Managing server subscriptions and support entitlements is easy with <link
-                xlink:href="https://scc.suse.com/login">SUSE Customer Center</link> (SCC) and the
-            Subscription Management Tool (SMT).</para>
-        <formalpara>
-            <title>Subscription Management Tool</title>
-            <para>SMT for &sle; helps customers manage their &sle; software updates while
-                maintaining corporate firewall policy and regulatory compliance requirements. It
-                establishes a proxy system for &scc; with repository and registration targets. This
-                helps you centrally manage software updates within the firewall on a per-system
-                basis while maintaining your corporate security policies and regulatory compliance.
-                The downloadable Subscription Management Tool is integrated with SUSE Customer
-                Center and provides a repository and synchronized registration target. This is very
-                helpful in tracking entitlements in large deployments. The Subscription Management
-                Tool also maintains all the capabilities of SUSE Customer Center while allowing a
-                more secure centralized deployment. It is included with every SUSE Linux Enterprise
-                subscription and, as a result, is fully supported. The Subscription Management Tool
-                informs your SUSE Linux Enterprise devices of any available software updates. Each
-                device then obtains the required software updates from the Subscription Management
-                Tool. The introduction of the Subscription Management Tool improves the interaction
-                among SUSE Linux Enterprise devices within the network and simplifies how they
-                receive their system updates. </para>
-        </formalpara>
+        <title>Subscription Management Tool (SMT) and Disconnected Setup (DMZ)</title>
 
-        <para>In a nutshell, the Subscription Management Tool for SUSE Linux Enterprise provides you
-            with:</para>
-        <itemizedlist>
-            <listitem>
-                <para>Assurance of firewall and regulatory compliance</para>
-            </listitem>
-            <listitem>
-                <para>Reduced bandwidth use during software updates</para>
-            </listitem>
-            <listitem>
-                <para>Full support under active subscription from SUSE></para>
-            </listitem>
-            <listitem>
-                <para>Maintenance of existing customer interface with SUSE Customer Center</para>
-            </listitem>
-            <listitem>
-                <para> Accurate server entitlement tracking and effective measurement of
-                    subscription usage</para>
-            </listitem>
-            <listitem>
-                <para> Automated process to easily tally entitlement totals (no more
-                    spreadsheets!)</para>
-            </listitem>
-            <listitem>
-                <para>Simple installation process that automatically synchronizes server entitlement
-                    with SUSE Customer Center </para>
-            </listitem>
-        </itemizedlist>
+        <para>If it is not possible to connect SUSE Manager directly or via a proxy to the Internet,
+            a disconnected setup in combination with Subscription Management Tool (SMT) is the
+            recommended solution. In this scenario, SMT stays in an “external” network with a
+            connection to &scc; and synchronizes the software channels and repositories on a
+            removable storage medium. Then you separate the storage medium from SMT, and mount it
+            locally on your SUSE Manager server to read the updated data. </para>
+
+        <para>The following procedure will guide you through using (SMT).</para>
+
+        <procedure>
+            <title>SMT: Fetching Repository Data from &scc;</title>
+            <step>
+                <para>Configure SMT in the external network with SUSE Customer Center (SCC). For
+                    details about configuring SMT with &sle; 12 SP1, see: <link
+                        xlink:href="https://www.suse.com/documentation/sles-12/book_smt/data/book_smt.html"
+                        >Subscription Management Tool for SLES 12 SP1</link>
+                </para>
+            </step>
+            <step>
+                <para>Using SMT, mirror all required repositories.</para>
+            </step>
+            <step>
+                <para>Create a "database replacement file" (e.g.,
+                        <filename>/tmp/dbrepl.xml</filename>.<screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen></para>
+            </step>
+            <step>
+                <para>Mount a removable storage medium such as an external hard disk or USB flash
+                    drive.</para>
+            </step>
+            <step>
+                <para>Export the data to the mounted medium:<screen>smt-sync --todir /media/disk/
+smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
+           --fromlocalsmt -L /var/log/smt/smt-mirror-export.log</screen>
+                    <note>
+                        <title>Keeping A Disconnected Server Up-to-date</title>
+                        <para><command>smt-sync</command> also exports your subscription and
+                            entitlement data. To keep SUSE Manager up-to-date with your
+                            subscriptions and entitlements, you must frequently import and export
+                            this data.</para>
+                    </note></para>
+            </step>
+            <step>
+                <para>Unmount the storage medium and carry it securely to your &susemgr;
+                    &productnumber3; Server.</para>
+            </step>
+        </procedure>
+        <para>The next procedure will show you how to update your server from the (SMT)
+            media.</para>
+
+        <procedure>
+            <title>Updating Your &susemgr; Server from the Storage Medium</title>
+            <step>
+                <para>Mount the storage medium on your SUSE Manager server (e.g., at
+                    /media/disk).</para>
+            </step>
+            <step>
+                <para>Specify the local path on the SUSE Manager server in
+                    /etc/rhn/rhn.conf:<screen>server.susemanager.fromdir = /media/disk</screen> This
+                    setting is mandatory for &scc; and <command>mgr-sync</command></para>
+            </step>
+            <step>
+                <para>Restart Tomcat:<screen>rctomcat6 restart</screen></para>
+            </step>
+            <step>
+                <para>Before performing another operation on the server execute a full
+                    sync:<screen>mgr-sync refresh   # SCC (fromdir in rhn.conf required!)</screen></para>
+            </step>
+            <step>
+                <para><command>mgr-sync</command> can now be executed normally:<screen>mgr-sync list channels
+    mgr-sync add channel channel-label</screen>
+                    <warning>
+                        <title>Data Corruption</title>
+                        <para>The disk must always be available at the same mount point. To avoid
+                            data corruption, do not trigger a sync, if the storage medium is not
+                            mounted. If you have already added a channel from a local repository
+                            path, you will not be able to change its URL to point to a different
+                            path afterwards</para>
+                    </warning></para>
+            </step>
+        </procedure>
+        <para>Up-to-date data is now available on your &susemgr; server and is ready for updating
+            client systems. According to your maintenance windows or update schedule refresh the
+            data on the storage medium with (SMT).</para>
+        
+        <procedure>
+            <title>Refreshing Data on the Storage Medium from (SMT)</title>
+            <step><para>On your &susemgr; server, unmount the storage medium and carry it to your SMT.</para></step>
+            <step><para>On your (SMT) system, continue with Step 4.
+                <warning>
+                    <title>Data Corruption</title>
+                <para>The storage medium must always be available at the same mount point. To avoid
+                    data corruption, do not trigger a <command>sync</command> if the storage medium
+                    is not mounted.</para>
+                </warning></para></step>
+        </procedure>
+        <para>This concludes using (SMT) with &susemgr;&productnumber3;.</para>
     </sect1>
 
 
