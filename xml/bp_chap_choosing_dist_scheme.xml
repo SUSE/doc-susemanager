@@ -75,7 +75,7 @@
             </step>
             <step>
                 <para>Create a "database replacement file" (e.g.,
-                        <filename>/tmp/dbrepl.xml</filename><screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen></para>
+                        <filename>/tmp/dbrepl.xml</filename>.<screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen></para>
             </step>
             <step>
                 <para>Mount a removable storage medium such as an external hard disk or USB flash
@@ -98,6 +98,56 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
                     &productnumber3; Server.</para>
             </step>
         </procedure>
+        <para>The next procedure will show you how to update your server from the (SMT)
+            media.</para>
+
+        <procedure>
+            <title>Updating Your &susemgr; Server from the Storage Medium</title>
+            <step>
+                <para>Mount the storage medium on your SUSE Manager server (e.g., at
+                    /media/disk).</para>
+            </step>
+            <step>
+                <para>Specify the local path on the SUSE Manager server in
+                    /etc/rhn/rhn.conf:<screen>server.susemanager.fromdir = /media/disk</screen> This
+                    setting is mandatory for &scc; and <command>mgr-sync</command></para>
+            </step>
+            <step>
+                <para>Restart Tomcat:<screen>rctomcat6 restart</screen></para>
+            </step>
+            <step>
+                <para>Before performing another operation on the server execute a full
+                    sync:<screen>mgr-sync refresh   # SCC (fromdir in rhn.conf required!)</screen></para>
+            </step>
+            <step>
+                <para><command>mgr-sync</command> can now be executed normally:<screen>mgr-sync list channels
+    mgr-sync add channel channel-label</screen>
+                    <warning>
+                        <title>Data Corruption</title>
+                        <para>The disk must always be available at the same mount point. To avoid
+                            data corruption, do not trigger a sync, if the storage medium is not
+                            mounted. If you have already added a channel from a local repository
+                            path, you will not be able to change its URL to point to a different
+                            path afterwards</para>
+                    </warning></para>
+            </step>
+        </procedure>
+        <para>Up-to-date data is now available on your &susemgr; server and is ready for updating
+            client systems. According to your maintenance windows or update schedule refresh the
+            data on the storage medium with (SMT).</para>
+        
+        <procedure>
+            <title>Refreshing Data on the Storage Medium from (SMT)</title>
+            <step><para>n the &susemgr; server, unmount the storage medium to carry it to your SMT.</para></step>
+            <step><para>On your (SMT) system, continue with Step 4.
+                <warning>
+                    <title>Data Corruption</title>
+                <para>The storage medium must always be available at the same mount point. To avoid
+                    data corruption, do not trigger a <command>sync</command> if the storage medium
+                    is not mounted.</para>
+                </warning></para></step>
+        </procedure>
+        <para>This concludes using (SMT) with &susemgr;&productnumber3;.</para>
     </sect1>
 
 
