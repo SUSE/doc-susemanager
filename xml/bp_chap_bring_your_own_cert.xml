@@ -8,9 +8,76 @@
     %entities;
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.chap.bring.your.own.cert">
-    
-<title>Bring Your Own Certificate</title>
-<para>Using custom certificates</para>
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.chap.bring.your.own.cert">
+
+  <title>Using a Custom SSL Certificate</title>
+  <para>The following section will guide you through using a custom certificate with &susemgr;
+    &productnumber3; and &susemgrproxy; &productnumber3;.</para>
+
+  <sect1>
+    <title>Prerequisites</title>
+    <para>
+      <itemizedlist>
+        <listitem>
+          <para>A Certificate Authority SSL public certificate file</para>
+        </listitem>
+        <listitem>
+          <para>A Web server SSL private key file</para>
+        </listitem>
+        <listitem>
+          <para> A Web server SSL public certificate file</para>
+        </listitem>
+        <listitem>
+          <para>Key and Certificate files must be in PEM format</para>
+        </listitem>
+      </itemizedlist></para>
+    <warning>
+      <title>Hostname and SSL Keys</title>
+      <para>The hostname of the web server's SSL keys and relevant certificate files must match the
+        hostname of the machine which they will be deployed on.</para>
+    </warning>
+
+    <para>After completing the yast firstboot procedures found in the installation guide; See: <link
+        xlink:href="https://www.suse.com/documentation/suse_manager/book_susemanager_install/data/sec_manager_inst_installation.html"
+        >Yast Firstboot Procedure</link>, it will be necessary to export the environment variables
+      and point them to the correct SSL files to be imported. It is important to note, running these
+      commands will obsolete the default certificate during <command>yast2
+        susemanager_setup</command></para>
+    <procedure>
+      <step>
+        <para>Export the environment variables and point to the SSL files to be imported: </para>
+        <screen>export CA_CERT= path to CA certificate file</screen>
+        <screen>export SERVER_KEY= path to web server key</screen>
+        <screen>export SERVER_CERT= path to web server certificate</screen>
+      </step>
+      <step>
+        <para>Execute SUSE Manager setup with <command>yast2 susemanager_setup</command>. Proceed
+          with the default setup. Upon reaching the Certificate Setup window during yast
+          installation, fill in random values, as these will be overridden by the commands executed
+          in step 1. </para>
+        <note>
+          <title>Shell Requirements</title>
+          <para>Execute this command from within the same shell the environment variables were
+            exported from in step 1.</para>
+        </note>
+      </step>
+    </procedure>
+  </sect1>
+
+  <sect1>
+    <title>Using a Custom Certificate with &susemgrproxy; &productnumber3;</title>
+    <para>After completing the yast firstboot procedures found in the installation guide; See: <link
+        xlink:href="https://www.suse.com/documentation/suse_manager/book_susemanager_install/data/sec_manager_inst_installation.html"
+        >Yast Firstboot Procedure</link> Continue with the following procedure.</para>
+    <procedure>
+      <title/>
+      <step>
+        <para>Exectue <command>configure-proxy.sh</command>.</para>
+      </step>
+      <step><para>When prompted with: <screen>Do you want to import existing certificates?</screen>
+      Answer with: <keycap>y</keycap>.</para></step>
+    </procedure>
+  </sect1>
+
 
 </chapter>
