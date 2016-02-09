@@ -44,7 +44,7 @@
 ssh_push_port_https = high port 2</screen>
       </para>
 
-      
+
 
       <para>If you would like your clients to be contacted via their hostnames instead of an IP
         address, set the following option: <screen>ssh_push_use_hostname = true</screen></para>
@@ -92,7 +92,7 @@ ssh_push_port_https = high port 2</screen>
         </step>
 
         <step>
-          <para>On each client add the following two lines  to the
+          <para>On each client add the following two lines to the
               <filename>/home/user/.bashrc</filename>
             file.<screen> PATH=$PATH:/usr/sbin
  export PATH</screen></para>
@@ -106,8 +106,8 @@ ssh_push_port_https = high port 2</screen>
       <para>As your clients cannot reach the server, you will need to register your clients from the
         server. A tool for performing registration of clients from the server is included with
         &susemgr; &productnumber3; called <filename>mgr-ssh-push-init</filename> This tool expects a
-      client's hostname or IP address as well as the path to a valid bootstrap script located in the
-      servers filesystem for registration as parameters.</para>
+        client's hostname or IP address as well as the path to a valid bootstrap script located in
+        the servers filesystem for registration as parameters.</para>
       <note>
         <title>Specifying Ports for Tunneling before Registering Clients</title>
         <para>The ports for tunneling need to be specified before the first client is registered.
@@ -115,13 +115,65 @@ ssh_push_port_https = high port 2</screen>
           otherwise the server will not be able to contact them anymore.</para>
       </note>
       <para><screen><prompt>#</prompt> mgr-ssh-push-init --client client --register /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen></para>
-      
+
     </sect2>
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.osad">
-    <title>OSAD</title>
-    <para/>
+    <title>osad</title>
+    <para><systemitem>osad</systemitem> is one of the available methods for server/client
+      communication. <systemitem>osad</systemitem> allows for real-time updating and patching and consists of three
+      components: </para>
+    <formalpara>
+      <title>osad</title>
+      <para>A client-side service that responds to pings and runs <systemitem>rhn_check</systemitem>
+        when directed by <systemitem>osa-dispatcher</systemitem>.</para>
+    </formalpara>
+    <formalpara>
+      <title>osa-dispatcher</title>
+      <para>A service running on  &susemgr;  that checks the database to determine if a client
+        running <systemitem>osad</systemitem> needs to be pinged or is required to run
+          <systemitem>rhn_check</systemitem>, then sends a message telling the client to do
+        so.</para>
+    </formalpara>
+    <formalpara>
+      <title>jabberd</title>
+      <para>A daemon that runs on &susemgr; and uses the <systemitem>XMPP</systemitem> protocol.
+          <systemitem>osad</systemitem> and <systemitem>osa-dispatcher</systemitem> both connect to
+        this daemon. <systemitem>jabberd</systemitem> also handles authentication when using
+        osad.</para>
+    </formalpara>
+    <para>
+      <itemizedlist>
+        <title>How it Works</title>
+        <listitem>
+          <para>On &susemgr; the <systemitem>osa-dispatcher</systemitem> periodically runs a query which checks to
+            see if there are any clients overdue for a ping.</para>
+        </listitem>
+        <listitem>
+          <para>If an overdue client is found, a message is sent via
+              <systemitem>jabberd</systemitem> to the <systemitem>osad</systemitem> instances
+            running on clients registered with your &susemgr; server. The
+              <systemitem>osad</systemitem> instances respond to the ping through the
+              <systemitem>jabberd</systemitem> deamon running in the background on your &susemgr;
+            Server. <systemitem>osa-dispatcher</systemitem> receives the response, and marks the
+            client as 'online'.</para>
+        </listitem>
+        <listitem>
+          <para>If <systemitem>osa-dispatcher</systemitem> fails to receive a response from an
+            <systemitem>osad</systemitem> instance in a certain
+            amount of time, the client is marked 'offline'. </para>
+        </listitem>
+        <listitem>
+          <para><systemitem>osa-dispatcher</systemitem> also periodically executes a select on the
+            database to check which &susemgr; clients have actions that should be executed. If an
+            action is found, a message is sent through <systemitem>jabberd</systemitem> to
+              <systemitem>osad</systemitem> which then executes <systemitem>rhn_check</systemitem>
+            on the client. <systemitem>rhn_check</systemitem> then takes over performing the actual
+            action.</para>
+        </listitem>
+      </itemizedlist>
+    </para>
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.salt">
