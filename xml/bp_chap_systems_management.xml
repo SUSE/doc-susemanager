@@ -9,15 +9,66 @@
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.systems.management">
-  <title>Server and Client Contact Methods</title>
+  <title>Package Installation Contact Methods</title>
 
   <sect1>
     <title>Selecting a Contact Method</title>
-    <para>&susemgr; &productnumber3; provides several methods for communication between client and
-      server. These methods allow fetching of packages and for providing updates. Which one you
-      select will be heavily dependant on your network infrastructure. The following section
-      provides a good starting point for selecting a method which best suits your network
-      environment.</para>
+    <para>&susemgr; provides several methods for communication between client and server. These
+      methods allow installation of packages and for providing updates. Which one you select will be
+      heavily dependant on your network infrastructure. The following sections provide a good
+      starting point for selecting a method which best suits your network environment.</para>
+  </sect1>
+  <sect1 xml:id="bp.contact.methods.rhnsd">
+    <title>The rhnsd (Default)</title>
+    <para>The SUSE Manager daemon (rhnsd) runs on client systems and periodically connects with SUSE
+      Manager to check for new updates and notifications. The daemon, which runs in the background,
+      is typically started by the <systemitem>rcrhnsd</systemitem> initialization script. By default
+      it will check every 4 hours for new actions, therefore it may take some time for your first
+      clients to begin updates after being scheduled for them.</para>
+
+    <para>To check for updates, <systemitem>rhnsd</systemitem> runs the external
+        <systemitem>mgr_check</systemitem> program located in <replaceable>/usr/sbin/</replaceable>.
+      This is a small application that establishes the network connection to SUSE Manager. The SUSE
+      Manager daemon does not listen on any network ports or talk to the network directly. All
+      network activity is done via the <systemitem>mgr_check</systemitem> utility. </para>
+    <warning>
+      <title>Auto accepting (EULAs)</title>
+      <para> When new packages or updates are installed on the client via SUSE Manager, any licenses
+        (EULAs) requiring agreement before installation are automatically accepted.</para>
+    </warning>
+
+    <para>This figure provides an overview of the default <systemitem>rhnsd</systemitem> process
+      path. All items left of the <systemitem>Python XMLRPC server</systemitem> block represent
+      processes running on a &susemgr; client.</para>
+    <figure>
+      <title>rhnsd Contact Method Figure</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="rhnsd.png" width="80%"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
+
+    <sect2>
+      <title>Configuring &susemgr; rhnsd Daemon</title>
+      <para>The SUSE Manager daemon can be configured by editing the following configuration file:
+        <screen><replaceable>/etc/sysconfig/rhn/rhnsd</replaceable></screen>This is the
+        configuration file the rhnsd initialization script uses. An important parameter for the
+        daemon is its check-in frequency. The default interval time is four hours (240 minutes). If
+        you modify the configuration file, you must as <systemitem>root</systemitem> restart the
+        daemon with the command <command>rcrhnsd restart</command>. </para>
+      <important>
+        <title>Minimum Allowed Check-in Parameter</title>
+        <para>The minimum allowed time interval is one hour (60 minutes). If you set the interval
+          below one hour, it will default back to the default of 4 hours (240 minutes). </para>
+      </important>
+    </sect2>
+    <sect2>
+      <title>Viewing rhnsd Daemon Status</title>
+      <para>You can view the status of rhnsd by typing the command <command>rcrhnsd status</command>
+        as <systemitem>root</systemitem>.</para>
+    </sect2>
+
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.ssh.push">
@@ -32,7 +83,17 @@
       internal network to the clients located on the DMZ. After all actions/events are executed, the
       tunnel is closed. The server will contact the clients in regular intervals (using SSH) to
       check in and perform all actions and events.</para>
-
+    <para>The following figure provides an overview of the ssh push process path. All items left of
+      the <systemitem>Taskomatic</systemitem> block represent processes running on a &susemgr;
+      client.</para>
+    <figure>
+      <title>ssh Push Contact Method Figure</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="sshpush.png" width="80%"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
     <sect2 xml:id="bp.contact.methods.ssh.push.requirements">
       <title>Configuring the Server for SSH Push</title>
       <para>For tunneling connections via <abbrev>SSH</abbrev>, two available port numbers are
@@ -88,7 +149,7 @@ ssh_push_port_https = high port 2</screen>
         <step>
           <para>Now add the following line beneath the <parameter>## User privilege
               specification</parameter> section of each clients <filename>sudoers</filename>
-            file:<screen>user ALL=(ALL) NOPASSWD:/usr/sbin/rhn_check</screen></para>
+            file:<screen>user ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check</screen></para>
         </step>
 
         <step>
@@ -108,32 +169,43 @@ ssh_push_port_https = high port 2</screen>
         &susemgr; &productnumber3; called <filename>mgr-ssh-push-init</filename> This tool expects a
         client's hostname or IP address as well as the path to a valid bootstrap script located in
         the servers filesystem for registration as parameters.</para>
-      <note>
+      <important>
         <title>Specifying Ports for Tunneling before Registering Clients</title>
         <para>The ports for tunneling need to be specified before the first client is registered.
           Clients already registered before changing the port numbers, must be registered again,
           otherwise the server will not be able to contact them anymore.</para>
+      </important>
+      <para>
+        <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen></para>
+      <note>
+        <title>mgr-ssh-push-init Disables rhnsd</title>
+        <para>The <replaceable>mgr-ssh-push-init</replaceable> disables the rhnsd daemon which
+          normally checks clients for updates every 4 hours. Your clients cannot reach the server
+          without using ssh push tunnel therefore the <systemitem>rhnsd</systemitem> daemon is
+          disabled.</para>
       </note>
-      <para><screen><prompt>#</prompt> mgr-ssh-push-init --client client --register /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen></para>
 
     </sect2>
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.osad">
     <title>osad</title>
-    <para><systemitem>osad</systemitem> is one of the available methods for server/client
-      communication. <systemitem>osad</systemitem> allows for real-time updating and patching and consists of three
-      components: </para>
+    <para>The default contact method between &susemgr; and its clients is
+        <systemitem>rhnsd</systemitem>. When using the <systemitem>rhnsd</systemitem> daemon the
+      server will check every 4 hours and then execute a scheduled action on clients. Depending on
+      your network environment <systemitem>rhnsd</systemitem> may not suit your requirements.
+      Alternatively you may configure osad for use with registered client systems enabling immediate
+      execution of scheduled actions. osad consists of three components: </para>
     <formalpara>
       <title>osad</title>
-      <para>A client-side service that responds to pings and runs <systemitem>rhn_check</systemitem>
-        when directed by <systemitem>osa-dispatcher</systemitem>.</para>
+      <para>A client-side service that responds to pings and runs <systemitem>mgr_check</systemitem>
+        when directed by the <systemitem>osa-dispatcher</systemitem> running on &susemgr;.</para>
     </formalpara>
     <formalpara>
       <title>osa-dispatcher</title>
-      <para>A service running on  &susemgr;  that checks the database to determine if a client
-        running <systemitem>osad</systemitem> needs to be pinged or is required to run
-          <systemitem>rhn_check</systemitem>, then sends a message telling the client to do
+      <para>A service running on &susemgr; that checks the database to determine if a client running
+          <systemitem>osad</systemitem> needs to be pinged or is required to run
+          <systemitem>mgr_check</systemitem>, then sends a message telling the client to do
         so.</para>
     </formalpara>
     <formalpara>
@@ -143,17 +215,28 @@ ssh_push_port_https = high port 2</screen>
         this daemon. <systemitem>jabberd</systemitem> also handles authentication when using
         osad.</para>
     </formalpara>
+    <para>The following figure represents the osad contact method. All items left of the
+        <systemitem>osa-dispatcher</systemitem> block represent running processes on the
+      client.</para>
+    <figure>
+      <title>osad Contact Method Figure</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="osad.png" width="80%"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
     <para>
       <itemizedlist>
         <title>How it Works</title>
         <listitem>
-          <para>On &susemgr; the <systemitem>osa-dispatcher</systemitem> periodically runs a query which checks to
-            see if there are any clients overdue for a ping.</para>
+          <para>On &susemgr; the <systemitem>osa-dispatcher</systemitem> periodically runs a query
+            which checks to see if there are any clients overdue for a ping.</para>
         </listitem>
         <listitem>
           <para>If an overdue client is found, a message is sent via
               <systemitem>jabberd</systemitem> to the <systemitem>osad</systemitem> instances
-            running on clients registered with your &susemgr; server. The
+            running on all clients registered with your &susemgr; server. The
               <systemitem>osad</systemitem> instances respond to the ping through the
               <systemitem>jabberd</systemitem> deamon running in the background on your &susemgr;
             Server. <systemitem>osa-dispatcher</systemitem> receives the response, and marks the
@@ -161,25 +244,92 @@ ssh_push_port_https = high port 2</screen>
         </listitem>
         <listitem>
           <para>If <systemitem>osa-dispatcher</systemitem> fails to receive a response from an
-            <systemitem>osad</systemitem> instance in a certain
-            amount of time, the client is marked 'offline'. </para>
+              <systemitem>osad</systemitem> instance in a certain amount of time, the client is
+            marked 'offline'. </para>
         </listitem>
         <listitem>
           <para><systemitem>osa-dispatcher</systemitem> also periodically executes a select on the
-            database to check which &susemgr; clients have actions that should be executed. If an
-            action is found, a message is sent through <systemitem>jabberd</systemitem> to
-              <systemitem>osad</systemitem> which then executes <systemitem>rhn_check</systemitem>
-            on the client. <systemitem>rhn_check</systemitem> then takes over performing the actual
+            database to check all &susemgr; clients which have actions that need to be executed. If
+            an action is found, a message is sent through <systemitem>jabberd</systemitem> to
+              <systemitem>osad</systemitem> which then executes <systemitem>mgr_check</systemitem>
+            on the client. <systemitem>mgr_check</systemitem> then takes over performing the actual
             action.</para>
         </listitem>
       </itemizedlist>
     </para>
+    <sect2>
+      <title>Configuring and Enabling osad</title>
+      <para> The following procedure enables use of osad with &susemgr;.</para>
+      <important>
+        <title>Enabling SSL</title>
+        <para>For this communication method to work SSL is mandatory. If SSL certificates are not
+          available, the daemon on your client systems will fail to connect. Make sure your firewall
+          rules allow for the required ports. See: <xref linkend="tab.install.ports.server"/></para>
+      </important>
+      <procedure>
+        <title>Enabling osa-dispatcher on &susemgr; and osad on Clients</title>
+        <step>
+          <para>On your &susemgr; server use the following command as root to start the
+              <systemitem>osa-dispatcher</systemitem>
+            service:<screen><command>rcosa-dispatcher start</command></screen></para>
+        </step>
+        <step>
+          <para>Install the <systemitem>osad</systemitem> package on all client systems to allow
+            communication to the osa-dispatcher on &susemgr;. The package can be found in the
+              <replaceable>Tools child channel</replaceable>.<warning>
+              <title>osad conflicts with osa-dispatcher</title>
+              <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
+                package on your &susemgr; server. The <systemitem>osad</systemitem> client service
+                conflicts with <systemitem>osa-dispatcher</systemitem> server package.</para>
+            </warning></para>
+        </step>
+        <step>
+          <para>Once osad has been installed, start the service on your client systems as root using
+            the command:<screen><command>rcosad start</command></screen>Like other services,
+            rcosa-dispatcher and rcosad accept stop, restart, and status commands as well.</para>
+        </step>
+      </procedure>
+      <para>This feature depends on the client systems recognizing the fully qualified domain name
+        (FQDN) of SUSE Manager. The client systems use this name and not the IP address of the
+        server when configuring the YaST Online Update.</para>
+      <para>Now when you schedule actions from SUSE Manager on any of the osad enabled systems, the
+        task will be carried out immediately rather than after a client checks in using
+          <systemitem>rhnsd</systemitem>.</para>
+    </sect2>
+    <sect2>
+      <title>osad Configuration and Logging Files</title>
+      <para>Each component of osad is configured via local configuration files. Changing default
+        parameters is not recommended. For reference the configuration files and logs are found in
+        the following locations.</para>
+      <formalpara>
+        <title>osa-dispatcher</title>
+        <para>osa-dispatcher is configured via the <replaceable>rhn.conf</replaceable> file located
+          on the &susemgr; at:<screen><replaceable>/etc/rhn/rhn.conf</replaceable></screen> All
+          parameters for configuring osa-dispatcher are located under the section heading:
+          <screen><replaceable># OSA configuration #</replaceable>.</screen></para>
+      </formalpara>
+      <formalpara>
+        <title>osad</title>
+        <para>osad configuration files are located on all &susemgr; clients at:
+          <screen><replaceable>/etc/sysconfig/rhn/osad.conf
+/etc/syseconfig/rhn/up2date</replaceable></screen>
+          For troubleshooting <systemitem>osad</systemitem> the log file is located in:
+          <screen><replaceable>/var/log/osad</replaceable></screen> The location of this log file is
+          configurable via the <replaceable>osad.conf</replaceable> file.</para>
+      </formalpara>
+      <formalpara>
+        <title>jabberd</title>
+        <para>Configuration of jabberd goes beyond the scope of this document. The jabberd log file
+          is located at:<screen><replaceable>/var/log/messages</replaceable></screen></para>
+      </formalpara>
+      <para>This concludes osad configuration and logging.</para>
+    </sect2>
   </sect1>
 
-  <sect1 xml:id="bp.contact.methods.salt">
+  <!-- TODO: ADD this once team has fully established a working method <sect1 xml:id="bp.contact.methods.salt">
     <title>Salt</title>
     <para/>
-  </sect1>
+  </sect1> -->
 
 
 </chapter>
