@@ -19,6 +19,11 @@
       provides a good starting point for selecting a method which best suits your network
       environment.</para>
   </sect1>
+  <sect1 xml:id="bp.contact.methods.rhnsd">
+    <title>rhnsd</title>
+    <para/>
+
+  </sect1>
 
   <sect1 xml:id="bp.contact.methods.ssh.push">
     <title>SSH Push</title>
@@ -131,9 +136,8 @@ ssh_push_port_https = high port 2</screen>
       scheduled actions and consists of three components: </para>
     <formalpara>
       <title>osad</title>
-      <para>A client-side service that responds to pings and runs
-          <systemitem>rhn_check</systemitem> when directed by the
-          <systemitem>osa-dispatcher</systemitem> running on &susemgr;.</para>
+      <para>A client-side service that responds to pings and runs <systemitem>rhn_check</systemitem>
+        when directed by the <systemitem>osa-dispatcher</systemitem> running on &susemgr;.</para>
     </formalpara>
     <formalpara>
       <title>osa-dispatcher</title>
@@ -172,8 +176,8 @@ ssh_push_port_https = high port 2</screen>
         </listitem>
         <listitem>
           <para><systemitem>osa-dispatcher</systemitem> also periodically executes a select on the
-            database to check which &susemgr; clients have actions that should be executed. If an
-            action is found, a message is sent through <systemitem>jabberd</systemitem> to
+            database to check all &susemgr; clients which have actions that need to be executed. If
+            an action is found, a message is sent through <systemitem>jabberd</systemitem> to
               <systemitem>osad</systemitem> which then executes <systemitem>rhn_check</systemitem>
             on the client. <systemitem>rhn_check</systemitem> then takes over performing the actual
             action.</para>
@@ -200,7 +204,7 @@ ssh_push_port_https = high port 2</screen>
           <para>Install the <systemitem>osad</systemitem> package on all client systems to allow
             communication to the osa-dispatcher on &susemgr;. The package can be found in the
               <replaceable>Tools child channel</replaceable>.<warning>
-              <title>osad and osa-dispatcher conflict</title>
+              <title>osad conflicts with osa-dispatcher</title>
               <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
                 package on your &susemgr; server. The <systemitem>osad</systemitem> client service
                 conflicts with <systemitem>osa-dispatcher</systemitem> server package.</para>
@@ -217,8 +221,34 @@ ssh_push_port_https = high port 2</screen>
         server when configuring the YaST Online Update.</para>
       <para>Now when you schedule actions from SUSE Manager on any of the osad enabled systems, the
         task will be carried out immediately rather than after a client checks in using
-        <systemitem>rhnsd</systemitem>.</para>
+          <systemitem>rhnsd</systemitem>.</para>
     </sect2>
+    <sect2>
+      <title>osad Configuration and Logging Files</title>
+      <para>Each component of osad is configured via local configuration files. Changing default
+        parameters is not recommended. For reference the configuration files and logs are found in
+        the following locations.</para>
+      <formalpara>
+        <title>osa-dispatcher</title>
+        <para>osa-dispatcher is configured via the <replaceable>rhn.conf</replaceable> file located
+          on the &susemgr; at:<screen><replaceable>/etc/rhn/rhn.conf</replaceable></screen> All
+          parameters for configuring osa-dispatcher are located under the section heading:
+          <screen><replaceable># OSA configuration #</replaceable>.</screen></para>
+      </formalpara>
+      <formalpara>
+        <title>osad</title>
+        <para>osad configuration files are located on all &susemgr; clients at:
+          <screen><replaceable>/etc/sysconfig/rhn/osad.conf
+/etc/syseconfig/rhn/up2date</replaceable></screen>
+          For troubleshooting <systemitem>osad</systemitem> the log file is located in:
+          <screen><replaceable>/var/log/osad</replaceable></screen> The location of this log file is
+          configurable via the <replaceable>osad.conf</replaceable> file.</para>
+      </formalpara>
+      <formalpara>
+        <title>jabberd</title>
+        <para>Configuration of jabberd goes beyond the scope of this document. The jabberd log file
+          is located at:<screen><replaceable>/var/log/messages</replaceable></screen></para>
+      </formalpara> <para>This concludes osad configuration and logging.</para></sect2>
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.salt">
