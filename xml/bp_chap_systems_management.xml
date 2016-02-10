@@ -183,8 +183,9 @@ ssh_push_port_https = high port 2</screen>
     <sect2>
       <title>Configuring and Enabling osad</title>
       <para> The following procedure enables use of osad with &susemgr;.</para>
-      <important><title>Enabling SSL</title>
-      <para>For this communication method to work SSL is mandatory. If SSL certificates are not
+      <important>
+        <title>Enabling SSL</title>
+        <para>For this communication method to work SSL is mandatory. If SSL certificates are not
           available, the daemon on your client systems will fail to connect. Make sure your firewall
           rules allow for the required ports. See: <xref linkend="tab.install.ports.server"/></para>
       </important>
@@ -198,14 +199,25 @@ ssh_push_port_https = high port 2</screen>
         <step>
           <para>Install the <systemitem>osad</systemitem> package on all client systems to allow
             communication to the osa-dispatcher on &susemgr;. The package can be found in the
-              <replaceable>Tools child channel</replaceable><warning>
+              <replaceable>Tools child channel</replaceable>.<warning>
               <title>osad and osa-dispatcher conflict</title>
               <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
                 package on your &susemgr; server. The <systemitem>osad</systemitem> client service
                 conflicts with <systemitem>osa-dispatcher</systemitem> server package.</para>
             </warning></para>
         </step>
+        <step>
+          <para>Once osad has been installed, start the service on your client systems as root using
+            the command:<screen><command>rcosad start</command></screen>Like other services,
+            rcosa-dispatcher and rcosad accept stop, restart, and status commands as well.</para>
+        </step>
       </procedure>
+      <para>This feature depends on the client systems recognizing the fully qualified domain name
+        (FQDN) of SUSE Manager. The client systems use this name and not the IP address of the
+        server when configuring the YaST Online Update.</para>
+      <para>Now when you schedule actions from SUSE Manager on any of the osad enabled systems, the
+        task will be carried out immediately rather than after a client checks in using
+        <systemitem>rhnsd</systemitem>.</para>
     </sect2>
   </sect1>
 
