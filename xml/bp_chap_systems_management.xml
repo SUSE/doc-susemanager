@@ -131,8 +131,9 @@ ssh_push_port_https = high port 2</screen>
       scheduled actions and consists of three components: </para>
     <formalpara>
       <title>osad</title>
-      <para>A &susemgr; client-side service that responds to pings and runs <systemitem>rhn_check</systemitem>
-        when directed by <systemitem>osa-dispatcher</systemitem>.</para>
+      <para>A &susemgr; client-side service that responds to pings and runs
+          <systemitem>rhn_check</systemitem> when directed by
+          <systemitem>osa-dispatcher</systemitem>.</para>
     </formalpara>
     <formalpara>
       <title>osa-dispatcher</title>
@@ -182,7 +183,29 @@ ssh_push_port_https = high port 2</screen>
     <sect2>
       <title>Configuring and Enabling osad</title>
       <para> The following procedure enables use of osad with &susemgr;.</para>
-
+      <important><title>Enabling SSL</title>
+      <para>For this communication method to work SSL is mandatory. If SSL certificates are not
+          available, the daemon on your client systems will fail to connect. Make sure your firewall
+          rules allow for the required ports. See: <xref linkend="tab.install.ports.server"/></para>
+      </important>
+      <procedure>
+        <title>Enabling osa-dispatcher on the Server and osad on Clients</title>
+        <step>
+          <para>On your &susemgr; server use the following command as root to start the
+              <systemitem>osa-dispatcher</systemitem>
+            service:<screen><command>rcosa-dispatcher start</command></screen></para>
+        </step>
+        <step>
+          <para>Install the <systemitem>osad</systemitem> package on all client systems to to allow
+            communication via the osa-dispatcher on &susemgr;. The package can be found in the
+              <replaceable>Tools child channel</replaceable><warning>
+              <title>osad and osa-dispatcher conflict</title>
+              <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
+                package on your &susemgr; server. The <systemitem>osad</systemitem> client service
+                conflicts with <systemitem>osa-dispatcher</systemitem> server package.</para>
+            </warning></para>
+        </step>
+      </procedure>
     </sect2>
   </sect1>
 
