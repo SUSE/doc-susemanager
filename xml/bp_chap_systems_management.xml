@@ -20,21 +20,26 @@
   </sect1>
   <sect1 xml:id="bp.contact.methods.rhnsd">
     <title>The rhnsd (Default)</title>
-    <para>The SUSE Manager daemon (rhnsd) runs on the client systems and periodically connects to
-      SUSE Manager to check for updates and notifications. The daemon, which runs in the background,
-      is typically started by the <systemitem>rcrhnsd</systemitem> initialization script. By default it will check every 4
-      hours for new actions, therefore it may take some time for your first clients to begin updates
-    after being scheduled for them.</para>
+    <para>The SUSE Manager daemon (rhnsd) runs on client systems and periodically connects with SUSE
+      Manager to check for new updates and notifications. The daemon, which runs in the background,
+      is typically started by the <systemitem>rcrhnsd</systemitem> initialization script. By default
+      it will check every 4 hours for new actions, therefore it may take some time for your first
+      clients to begin updates after being scheduled for them.</para>
 
     <para>To check for updates, <systemitem>rhnsd</systemitem> runs the external
         <systemitem>mgr_check</systemitem> program located in <replaceable>/usr/sbin/</replaceable>.
       This is a small application that establishes the network connection to SUSE Manager. The SUSE
       Manager daemon does not listen on any network ports or talk to the network directly. All
       network activity is done via the <systemitem>mgr_check</systemitem> utility. </para>
+    <warning>
+      <title>Auto accepting (EULAs)</title>
+      <para> When new packages or updates are installed on the client via SUSE Manager, any licenses
+        (EULAs) requiring agreement before installation are automatically accepted.</para>
+    </warning>
 
-    <para>This figure provides an overview of the default <systemitem>rhnsd</systemitem> process path. All items left of the
-        <systemitem>Python XMLRPC server</systemitem> block represent processes running on a
-      &susemgr; client.</para>
+    <para>This figure provides an overview of the default <systemitem>rhnsd</systemitem> process
+      path. All items left of the <systemitem>Python XMLRPC server</systemitem> block represent
+      processes running on a &susemgr; client.</para>
     <figure>
       <title>rhnsd Contact Method Figure</title>
       <mediaobject>
@@ -43,6 +48,21 @@
         </imageobject>
       </mediaobject>
     </figure>
+
+    <sect2>
+      <title>Configuring &susemgr; rhnsd Daemon</title>
+      <para>The SUSE Manager daemon can be configured by editing the following configuration file:
+        <screen><replaceable>/etc/sysconfig/rhn/rhnsd</replaceable></screen>This is the
+        configuration file the rhnsd initialization script uses. An important parameter for the
+        daemon is its check-in frequency. The default interval time is four hours (240 minutes). If
+        you modify the configuration file, you must as <systemitem>root</systemitem> restart the
+        daemon with the command <command>rcrhnsd restart</command>. </para>
+      <important>
+        <title>Minimum Allowed Check-in Parameter</title>
+        <para>The minimum allowed time interval is one hour (60 minutes). If you set the interval
+          below one hour, it will default back to the default of 4 hours (240 minutes). </para>
+      </important>
+    </sect2>
 
   </sect1>
 
@@ -293,10 +313,10 @@ ssh_push_port_https = high port 2</screen>
     </sect2>
   </sect1>
 
- <!-- TODO: ADD this once team has fully established a working method <sect1 xml:id="bp.contact.methods.salt">
+  <!-- TODO: ADD this once team has fully established a working method <sect1 xml:id="bp.contact.methods.salt">
     <title>Salt</title>
     <para/>
-  </sect1> --> 
+  </sect1> -->
 
 
 </chapter>
