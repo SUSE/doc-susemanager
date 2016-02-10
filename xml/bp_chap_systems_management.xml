@@ -122,17 +122,22 @@ ssh_push_port_https = high port 2</screen>
   <sect1 xml:id="bp.contact.methods.osad">
     <title>osad</title>
     <para><systemitem>osad</systemitem> is one of the available methods for server/client
-      communication. <systemitem>osad</systemitem> allows for real-time updating and patching and consists of three
-      components: </para>
+      communication. The default communication method between &susemgr; and its clients is
+        <systemitem>rhnsd</systemitem>. When using the <systemitem>rhnsd</systemitem> daemon
+      normally you could wait up to 4 hours before your clients execute a scheduled action.
+      Depending on your network environment <systemitem>rhnsd</systemitem> may not suit your needs.
+      You can configure and use osad with SUSE Manager to initiate scheduled actions immediately on
+      registered client systems.<systemitem>osad</systemitem> allows for real-time completion of
+      scheduled actions and consists of three components: </para>
     <formalpara>
       <title>osad</title>
-      <para>A client-side service that responds to pings and runs <systemitem>rhn_check</systemitem>
+      <para>A &susemgr; client-side service that responds to pings and runs <systemitem>rhn_check</systemitem>
         when directed by <systemitem>osa-dispatcher</systemitem>.</para>
     </formalpara>
     <formalpara>
       <title>osa-dispatcher</title>
-      <para>A service running on  &susemgr;  that checks the database to determine if a client
-        running <systemitem>osad</systemitem> needs to be pinged or is required to run
+      <para>A service running on &susemgr; that checks the database to determine if a client running
+          <systemitem>osad</systemitem> needs to be pinged or is required to run
           <systemitem>rhn_check</systemitem>, then sends a message telling the client to do
         so.</para>
     </formalpara>
@@ -147,13 +152,13 @@ ssh_push_port_https = high port 2</screen>
       <itemizedlist>
         <title>How it Works</title>
         <listitem>
-          <para>On &susemgr; the <systemitem>osa-dispatcher</systemitem> periodically runs a query which checks to
-            see if there are any clients overdue for a ping.</para>
+          <para>On &susemgr; the <systemitem>osa-dispatcher</systemitem> periodically runs a query
+            which checks to see if there are any clients overdue for a ping.</para>
         </listitem>
         <listitem>
           <para>If an overdue client is found, a message is sent via
               <systemitem>jabberd</systemitem> to the <systemitem>osad</systemitem> instances
-            running on clients registered with your &susemgr; server. The
+            running on all clients registered with your &susemgr; server. The
               <systemitem>osad</systemitem> instances respond to the ping through the
               <systemitem>jabberd</systemitem> deamon running in the background on your &susemgr;
             Server. <systemitem>osa-dispatcher</systemitem> receives the response, and marks the
@@ -161,8 +166,8 @@ ssh_push_port_https = high port 2</screen>
         </listitem>
         <listitem>
           <para>If <systemitem>osa-dispatcher</systemitem> fails to receive a response from an
-            <systemitem>osad</systemitem> instance in a certain
-            amount of time, the client is marked 'offline'. </para>
+              <systemitem>osad</systemitem> instance in a certain amount of time, the client is
+            marked 'offline'. </para>
         </listitem>
         <listitem>
           <para><systemitem>osa-dispatcher</systemitem> also periodically executes a select on the
@@ -174,6 +179,11 @@ ssh_push_port_https = high port 2</screen>
         </listitem>
       </itemizedlist>
     </para>
+    <sect2>
+      <title>Configuring and Enabling osad</title>
+      <para> The following procedure enables use of osad with &susemgr;.</para>
+
+    </sect2>
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.salt">
