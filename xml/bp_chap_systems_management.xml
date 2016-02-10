@@ -9,19 +9,28 @@
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.systems.management">
-  <title>Server and Client Contact Methods</title>
+  <title>Package Installation Contact Methods</title>
 
   <sect1>
     <title>Selecting a Contact Method</title>
-    <para>&susemgr; &productnumber3; provides several methods for communication between client and
-      server. These methods allow fetching of packages and for providing updates. Which one you
-      select will be heavily dependant on your network infrastructure. The following sections
-      provide a good starting point for selecting a method which best suits your network
-      environment.</para>
+    <para>&susemgr; provides several methods for communication between client and server. These
+      methods allow installation of packages and for providing updates. Which one you select will be
+      heavily dependant on your network infrastructure. The following sections provide a good
+      starting point for selecting a method which best suits your network environment.</para>
   </sect1>
   <sect1 xml:id="bp.contact.methods.rhnsd">
-    <title>rhnsd</title>
-    <para/>
+    <title>The rhnsd Contact Method (Default)</title>
+    <para>The following figure provides an overview of the default rhnsd process path. All items left of the
+        <systemitem>Python XMLRPC server</systemitem> block represent processes running on a
+      &susemgr; client.</para>
+    <figure>
+      <title>rhnsd Contact Method Figure</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="rhnsd.png" width="80%"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
 
   </sect1>
 
@@ -37,7 +46,17 @@
       internal network to the clients located on the DMZ. After all actions/events are executed, the
       tunnel is closed. The server will contact the clients in regular intervals (using SSH) to
       check in and perform all actions and events.</para>
-
+    <para>The following figure provides an overview of the ssh push process path. All items left of the
+      <systemitem>Taskomatic</systemitem> block represent processes running on a
+      &susemgr; client.</para>
+    <figure>
+      <title>ssh Push Contact Method Figure</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="sshpush.png" width="80%"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
     <sect2 xml:id="bp.contact.methods.ssh.push.requirements">
       <title>Configuring the Server for SSH Push</title>
       <para>For tunneling connections via <abbrev>SSH</abbrev>, two available port numbers are
@@ -93,7 +112,7 @@ ssh_push_port_https = high port 2</screen>
         <step>
           <para>Now add the following line beneath the <parameter>## User privilege
               specification</parameter> section of each clients <filename>sudoers</filename>
-            file:<screen>user ALL=(ALL) NOPASSWD:/usr/sbin/rhn_check</screen></para>
+            file:<screen>user ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check</screen></para>
         </step>
 
         <step>
@@ -126,23 +145,22 @@ ssh_push_port_https = high port 2</screen>
 
   <sect1 xml:id="bp.contact.methods.osad">
     <title>osad</title>
-    <para>Osad is one of the available contact methods for server/client communication. The default
-      contact method between &susemgr; and its clients is <systemitem>rhnsd</systemitem>. When using
-      the <systemitem>rhnsd</systemitem> daemon normally you could wait up to 4 hours before your
-      clients execute a scheduled action. Depending on your network environment
-        <systemitem>rhnsd</systemitem> may not suit your needs. You can configure and use osad with
-      registered client systems.<systemitem>osad</systemitem> allows for real-time completion of
-      scheduled actions and consists of three components: </para>
+    <para>The default contact method between &susemgr; and its clients is
+        <systemitem>rhnsd</systemitem>. When using the <systemitem>rhnsd</systemitem> daemon the
+      server will check every 4 hours and then execute a scheduled action on clients. Depending on
+      your network environment <systemitem>rhnsd</systemitem> may not suit your requirements.
+      Alternatively you may configure osad for use with registered client systems enabling immediate
+      execution of scheduled actions. osad consists of three components: </para>
     <formalpara>
       <title>osad</title>
-      <para>A client-side service that responds to pings and runs <systemitem>rhn_check</systemitem>
+      <para>A client-side service that responds to pings and runs <systemitem>mgr_check</systemitem>
         when directed by the <systemitem>osa-dispatcher</systemitem> running on &susemgr;.</para>
     </formalpara>
     <formalpara>
       <title>osa-dispatcher</title>
       <para>A service running on &susemgr; that checks the database to determine if a client running
           <systemitem>osad</systemitem> needs to be pinged or is required to run
-          <systemitem>rhn_check</systemitem>, then sends a message telling the client to do
+          <systemitem>mgr_check</systemitem>, then sends a message telling the client to do
         so.</para>
     </formalpara>
     <formalpara>
@@ -152,6 +170,17 @@ ssh_push_port_https = high port 2</screen>
         this daemon. <systemitem>jabberd</systemitem> also handles authentication when using
         osad.</para>
     </formalpara>
+    <para>The following figure represents the osad contact method. All items left of the
+        <systemitem>osa-dispatcher</systemitem> block represent running processes on the
+      client.</para>
+    <figure>
+      <title>osad Contact Method Figure</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="osad.png" width="80%"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
     <para>
       <itemizedlist>
         <title>How it Works</title>
@@ -177,8 +206,8 @@ ssh_push_port_https = high port 2</screen>
           <para><systemitem>osa-dispatcher</systemitem> also periodically executes a select on the
             database to check all &susemgr; clients which have actions that need to be executed. If
             an action is found, a message is sent through <systemitem>jabberd</systemitem> to
-              <systemitem>osad</systemitem> which then executes <systemitem>rhn_check</systemitem>
-            on the client. <systemitem>rhn_check</systemitem> then takes over performing the actual
+              <systemitem>osad</systemitem> which then executes <systemitem>mgr_check</systemitem>
+            on the client. <systemitem>mgr_check</systemitem> then takes over performing the actual
             action.</para>
         </listitem>
       </itemizedlist>
@@ -247,7 +276,9 @@ ssh_push_port_https = high port 2</screen>
         <title>jabberd</title>
         <para>Configuration of jabberd goes beyond the scope of this document. The jabberd log file
           is located at:<screen><replaceable>/var/log/messages</replaceable></screen></para>
-      </formalpara> <para>This concludes osad configuration and logging.</para></sect2>
+      </formalpara>
+      <para>This concludes osad configuration and logging.</para>
+    </sect2>
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.salt">
