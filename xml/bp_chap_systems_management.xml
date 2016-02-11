@@ -23,8 +23,8 @@
     <para>The SUSE Manager daemon (rhnsd) runs on client systems and periodically connects with SUSE
       Manager to check for new updates and notifications. The daemon, which runs in the background,
       is typically started by the <systemitem>rcrhnsd</systemitem> initialization script. By default
-      it will check every 4 hours for new actions, therefore it may take some time for your first
-      clients to begin updates after being scheduled for them.</para>
+      it will check every 4 hours for new actions, therefore it may take some time for your
+      clients to begin updating after actions have been scheduled for them.</para>
 
     <para>To check for updates, <systemitem>rhnsd</systemitem> runs the external
         <systemitem>mgr_check</systemitem> program located in <replaceable>/usr/sbin/</replaceable>.
@@ -41,7 +41,7 @@
       path. All items left of the <systemitem>Python XMLRPC server</systemitem> block represent
       processes running on a &susemgr; client.</para>
     <figure>
-      <title>rhnsd Contact Method Figure</title>
+      <title>rhnsd Contact Method</title>
       <mediaobject>
         <imageobject>
           <imagedata fileref="rhnsd.png" width="80%"/>
@@ -87,7 +87,7 @@
       the <systemitem>Taskomatic</systemitem> block represent processes running on a &susemgr;
       client.</para>
     <figure>
-      <title>ssh Push Contact Method Figure</title>
+      <title>ssh Push Contact Method</title>
       <mediaobject>
         <imageobject>
           <imagedata fileref="sshpush.png" width="80%"/>
@@ -169,21 +169,32 @@ ssh_push_port_https = high port 2</screen>
         &susemgr; &productnumber3; called <filename>mgr-ssh-push-init</filename> This tool expects a
         client's hostname or IP address as well as the path to a valid bootstrap script located in
         the servers filesystem for registration as parameters.</para>
+
       <important>
         <title>Specifying Ports for Tunneling before Registering Clients</title>
         <para>The ports for tunneling need to be specified before the first client is registered.
           Clients already registered before changing the port numbers, must be registered again,
           otherwise the server will not be able to contact them anymore.</para>
       </important>
-      <para>
-        <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen></para>
+
       <note>
         <title>mgr-ssh-push-init Disables rhnsd</title>
         <para>The <replaceable>mgr-ssh-push-init</replaceable> disables the rhnsd daemon which
           normally checks clients for updates every 4 hours. Your clients cannot reach the server
-          without using ssh push tunnel therefore the <systemitem>rhnsd</systemitem> daemon is
-          disabled.</para>
+          without using ssh push contact method therefore the <systemitem>rhnsd</systemitem> daemon
+          is disabled.</para>
       </note>
+
+      <para>For registration of systems which should be managed via the ssh push tunnel contact
+        method, it is required to use an activation key that is configured to use this method.
+        Normal <systemitem>ssh push</systemitem> is unable to reach the server. For managing
+        activation keys see: <link linkend="bp.key.managment">Activation Key
+        Management</link></para>
+      <para>Run the following command as root on the server to register a client:
+        <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen></para>
+
+
+
 
     </sect2>
   </sect1>
@@ -219,7 +230,7 @@ ssh_push_port_https = high port 2</screen>
         <systemitem>osa-dispatcher</systemitem> block represent running processes on the
       client.</para>
     <figure>
-      <title>osad Contact Method Figure</title>
+      <title>osad Contact Method</title>
       <mediaobject>
         <imageobject>
           <imagedata fileref="osad.png" width="80%"/>
