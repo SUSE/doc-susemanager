@@ -12,7 +12,7 @@
   xml:id="chapt.bp.suma.conceptual.overview">
 
   <title>Introduction</title>
-
+  <para>This document targets system administrators.</para>
 
   <sect1>
     <title>Whats Covered in this Guide?</title>
@@ -36,7 +36,7 @@
 
     </itemizedlist>
 
-    <para>This document targets system administrators.</para>
+    
   </sect1>
 
   <sect1>
@@ -134,8 +134,34 @@
     </formalpara>
   </sect1>
 
-  <sect1>
+  <sect1 xml:id="bp.chapt.intro.network.requires">
     <title>Network Requirements</title>
+
+    <para>&susemgr;  and &susemgrproxy; both contact several external addresses in order to maintain updates and
+      entitlements. Which hostnames are utilized depends on if you are using legacy &ncc; or have
+      migrated to &scc;. It is highly recommended that you migrate to &scc;. The following lists
+      provide the up-to-date hostnames for each service requiring permission when used in
+      combination with corporate firewall and content filters.<itemizedlist>
+        <title>&scc; Hostnames (Recommended)</title>
+        <listitem>
+          <para><link xlink:href="https://scc.suse.com"/></para>
+        </listitem>
+        <listitem>
+          <para><link xlink:href="https://updates.suse.com"/></para>
+        </listitem>
+      </itemizedlist>
+      <itemizedlist>
+        <title>&ncc; Hostnames (Legacy)</title>
+        <listitem>
+          <para><link xlink:href="https://secure-www.novell.com"/></para>
+        </listitem>
+        <listitem>
+          <para><link xlink:href="https://nu.novell.com"/></para>
+        </listitem>
+      </itemizedlist>
+    </para>
+
+
     <para>For &susemgr; to function properly it requires the following pre-configured components
       within your network.</para>
     <formalpara>
@@ -195,20 +221,6 @@
       </para>
     </formalpara>
 
-
-    <formalpara>
-      <title>Proxy Server</title>
-      <para>When use of a proxy server is necessary it should be configured to access the external
-        network. Your firewall should allow access to the following (http and https URLs) <itemizedlist>
-          <listitem>
-            <para>scc.suse.com</para>
-          </listitem>
-          <listitem>
-            <para>updates.suse.com</para>
-          </listitem>
-        </itemizedlist>
-      </para>
-    </formalpara>
     <important>
       <title>NTLM</title>
       <para>Microsoft NT Lan Manager (NTLM) is currently not supported</para>
@@ -309,8 +321,8 @@
       <para>When your network requires denying external network access to and from &susemgr;, an SMT
         Server may be registered against &susemgr;. The SMT server can then be used to synchronize
         the necessary &suse; repositories. For more information on utilizing an SMT Server see also:
-        <link linkend="sub.mgr.tool">Subscription Management Tool for &sle; </link>
-       </para>
+          <link linkend="sub.mgr.tool">Subscription Management Tool for &sle; </link>
+      </para>
     </tip>
 
   </sect1>
@@ -354,7 +366,7 @@
       </para>
 
     </formalpara>
-<!-- Revise this section as it is a direct copy of MB guide draft 1 ##############################-->
+    <!-- Revise this section as it is a direct copy of MB guide draft 1 ##############################-->
     <formalpara>
       <title>Disk Space</title>
       <para>&susemgr; stores information in several directories. For these directories it is
@@ -364,49 +376,50 @@
         sufficient. A 50 GB partition would be the recommended size. The following directories
         should be created on a separate file-system. <itemizedlist>
           <listitem>
-            <para><command>/var/spacewalk</command> This directory will contain all rpm's. Each RPM will be stored only
-              once. The need size will depend on the number of channels and type of channels that
-              will be downloaded. The general rule would be that per SUSE support pack (including
-              SUSE RedHat Expanded Support) around 50 Gb should be enough. An extra 50 Gb for
-              non-SUSE repositories should be added on top. If other non-enterprise distributions
-              (eg OpenSUSE, CentOS) will be added, also calculated 50 Gb per distribution. This
-              directory could also be stored on a NFS share.</para>
+            <para><command>/var/spacewalk</command> This directory will contain all rpm's. Each RPM
+              will be stored only once. The need size will depend on the number of channels and type
+              of channels that will be downloaded. The general rule would be that per SUSE support
+              pack (including SUSE RedHat Expanded Support) around 50 Gb should be enough. An extra
+              50 Gb for non-SUSE repositories should be added on top. If other non-enterprise
+              distributions (eg OpenSUSE, CentOS) will be added, also calculated 50 Gb per
+              distribution. This directory could also be stored on a NFS share.</para>
           </listitem>
           <listitem>
-            <para><command>/var/lib/pgsql</command> This directory contains the PostgreSQL database. Recommended is to
-              create a file-system of 50Gb. This volume should be monitored, because a full
-              file-system where the database is running on can cause unexpected errors (and this
-              even months after it happened). If an external Oracle database is used, this directory
-              is not needed.</para>
+            <para><command>/var/lib/pgsql</command> This directory contains the PostgreSQL database.
+              Recommended is to create a file-system of 50Gb. This volume should be monitored,
+              because a full file-system where the database is running on can cause unexpected
+              errors (and this even months after it happened). If an external Oracle database is
+              used, this directory is not needed.</para>
           </listitem>
           <listitem>
-            <para><command>/srv/tftpboot</command> If PXE/cobbler is used, this directory will contain the images
-              (initrd and linux) for all created auto-installation profiles. Each image is around
-              50Mb. Depending on the number of profiles a decision has to be made if it would be
-              useful to move this directory to a separate file-system.</para>
+            <para><command>/srv/tftpboot</command> If PXE/cobbler is used, this directory will
+              contain the images (initrd and linux) for all created auto-installation profiles. Each
+              image is around 50Mb. Depending on the number of profiles a decision has to be made if
+              it would be useful to move this directory to a separate file-system.</para>
           </listitem>
           <listitem>
-            <para><command>/var/log</command> As SUSE Manager is writing many many logs, it is recommended to create a
-              separate file-system for /var/log. The size should be around 20G. The challenge is
-              that currently there are still logs, that are not being rotated with logrotate.</para>
+            <para><command>/var/log</command> As SUSE Manager is writing many many logs, it is
+              recommended to create a separate file-system for /var/log. The size should be around
+              20G. The challenge is that currently there are still logs, that are not being rotated
+              with logrotate.</para>
           </listitem>
           <listitem>
-            <para><command>/var/spacewalk/db_backup</command>For the backup of the PostgreSQL database, it is recommended the create a separate
-              directory. Later in this document it will be described
-              how a backup from the PostgreSQL database can be created. As this could get rather
-              big, it is advised to have a separate file-system. The size should be around twice the
-              size as for /var/lib/pqsql.</para>
+            <para><command>/var/spacewalk/db_backup</command>For the backup of the PostgreSQL
+              database, it is recommended the create a separate directory. Later in this document it
+              will be described how a backup from the PostgreSQL database can be created. As this
+              could get rather big, it is advised to have a separate file-system. The size should be
+              around twice the size as for /var/lib/pqsql.</para>
           </listitem>
         </itemizedlist>
       </para>
-<!-- Revise ends here: Check to see if we will support Oracle or not. ###################################################################### -->
+      <!-- Revise ends here: Check to see if we will support Oracle or not. ###################################################################### -->
     </formalpara>
 
     <formalpara>
       <title>Supported Databases</title>
       <para>&susemgr; &productnumber3; no longer provides support for an external Oracle database.
-        The default database is an embedded PostgreSQL. During &susemgr; setup the database
-        will be created and configured.</para>
+        The default database is an embedded PostgreSQL. During &susemgr; setup the database will be
+        created and configured.</para>
     </formalpara>
 
   </sect1>
