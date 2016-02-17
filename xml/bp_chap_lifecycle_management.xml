@@ -17,7 +17,36 @@
 
     <sect1 xml:id="bp.chap.adv.patch.life.mgr.overview">
         <title>Patch Lifecycle Management Overview</title>
-
+        <para>This chapter describes how to setup and configure a &susemgr; implementation to enable
+            companies in the delivery of these often requested features: <itemizedlist>
+                <listitem>
+                    <para>Automatic creation and archive of patch sets by quarter (or any other time
+                        period)</para>
+                </listitem>
+                <listitem>
+                    <para>Consistent method of patch promotion and delivery through numerous
+                        landscapes and environments</para>
+                </listitem>
+                <listitem>
+                    <para>Exception process for handling patches that need to be excluded from a
+                        patch cycle</para>
+                </listitem>
+                <listitem>
+                    <para>Environment creation with historical patch sets</para>
+                </listitem>
+                <listitem>
+                    <para>Minimal need for host channel subscription manipulation from
+                        cradle-to-grave</para>
+                </listitem>
+                <listitem>
+                    <para>Support for service-pack migration using custom child channels</para>
+                </listitem>
+                <listitem>
+                    <para>Provides a foundation for using multiple organizations to maintain
+                        systems.</para>
+                </listitem>
+            </itemizedlist>
+        </para>
         <para>Keeping systems patched and secure remains one of the greatest ongoing challenges
             which you will face as an administrator. Both proprietary and open-source companies are
             constantly working to provide updates which fix flaws discovered within their software
@@ -110,81 +139,77 @@
                     organization.</para>
             </formalpara>
         </sect2>
-
-        <sect2>
-            <title>Example Scenario</title>
-            <formalpara>
-                <title>The Chameleon Corporation</title>
-                <para>The world’s largest reptile and amphibian pet store whose headquarters are
-                    located in Yemen. This corporation has more than 1500 stores operating under the
-                    names <emphasis>LizardsRUs</emphasis>, <emphasis>UnVeiledInc</emphasis> and
-                        <emphasis>Chameleo-rama</emphasis> in five different countries. Due to
-                    compliance constraints, their patch lifecycle (both timing and delivery) is
-                    based on their corporate security policies, host environments, landscapes, and
-                    future management needs. The Chameleon Corporation must maintain the following
-                    requirements for managing patch and security updates to their Linux hosts:<itemizedlist>
-                        <title>Requirement Summary</title>
-                        <listitem>
-                            <para>The published Security Policy states: "All Linux systems need to
-                                be up-to-date with the latest available updates, bug-fixes and
-                                enhancements on a quarterly basis."</para>
-                            <para>Quarters are defined as: <itemizedlist>
-                                    <listitem>
-                                        <para>Q1: January 1st through March 31st</para>
-                                    </listitem>
-                                    <listitem>
-                                        <para>Q2: April 1st through June 30th</para>
-                                    </listitem>
-                                    <listitem>
-                                        <para>Q3: July 1st through September 30th</para>
-                                    </listitem>
-                                    <listitem>
-                                        <para>Q4: October 1st through December 31st</para>
-                                    </listitem>
-                                </itemizedlist></para>
-                        </listitem>
-
-                        <listitem>
-                            <para>The published Security Policy also states the need to patch all
-                                Linux systems with “critical” security updates (CVSS score of 7 or
-                                greater) within 1 month of release of the patch. This introduces a
-                                second schedule that may overlap any existing patch roll-out.</para>
-                        </listitem>
-                        <listitem>
-                            <para>The company has 3 different host environments,
-                                    <emphasis>Corporate</emphasis>, <emphasis>Store</emphasis> and
-                                    <emphasis>NPE</emphasis>.These are partitioned using SUSE
-                                Manager Organizations. Each SUSE Manager Organization has visibility
-                                into the default SUSE Manager Organization’s software channels due
-                                to trusts, yet the managed hosts are naturally grouped and managed
-                                by their environment.</para>
-                        </listitem>
-                        <listitem>
-                            <para>There are at least 3 landscapes in each environment,
-                                    <emphasis>PROD</emphasis>,<emphasis>DEV</emphasis>, and
-                                    <emphasis>UAT</emphasis>.</para>
-                        </listitem>
-                        <listitem>
-                            <para>A “patch exceptions" process exists, as there is often a need to
-                                account for the removal of patches (e.g. kernel updates) from a
-                                roll-out. Some hosts may have hardware drivers or third party
-                                software which depend upon specific kernel versions. This exception
-                                process would be handled on a case-by-case basis.</para>
-                        </listitem>
-                    </itemizedlist>
-                </para>
-            </formalpara>
-        </sect2>
-
-
-        <sect2>
-            <title>Requirements for Testing</title>
-            <para/>
-        </sect2>
-
     </sect1>
 
+    <sect1>
+        <title>Example Scenario</title>
+        <formalpara>
+            <title>The Chameleon Corporation</title>
+            <para>The world’s largest reptile and amphibian pet store whose headquarters are located
+                in Yemen. This corporation has more than 1500 stores operating under the names
+                    <emphasis>LizardsRUs</emphasis>, <emphasis>UnVeiledInc</emphasis> and
+                    <emphasis>Chameleo-rama</emphasis> in five different countries. Due to
+                compliance constraints, their patch lifecycle (both timing and delivery) is based on
+                their corporate security policies, host environments, landscapes, and future
+                management needs. The Chameleon Corporation must maintain the following requirements
+                for managing patch and security updates to their Linux hosts:<itemizedlist>
+                    <title>Requirement Summary</title>
+                    <listitem>
+                        <para>The published Security Policy states: "All Linux systems need to be
+                            up-to-date with the latest available updates, bug-fixes and enhancements
+                            on a quarterly basis."</para>
+                        <para>Quarters are defined as: <itemizedlist>
+                                <listitem>
+                                    <para>Q1: January 1st through March 31st</para>
+                                </listitem>
+                                <listitem>
+                                    <para>Q2: April 1st through June 30th</para>
+                                </listitem>
+                                <listitem>
+                                    <para>Q3: July 1st through September 30th</para>
+                                </listitem>
+                                <listitem>
+                                    <para>Q4: October 1st through December 31st</para>
+                                </listitem>
+                            </itemizedlist></para>
+                    </listitem>
 
+                    <listitem>
+                        <para>The published Security Policy also states the need to patch all Linux
+                            systems with “critical” security updates (CVSS score of 7 or greater)
+                            within 1 month of release of the patch. This introduces a second
+                            schedule that may overlap any existing patch roll-out.</para>
+                    </listitem>
+                    <listitem>
+                        <para>The company has 3 different host environments,
+                                <emphasis>Corporate</emphasis>, <emphasis>Store</emphasis> and
+                                <emphasis>NPE</emphasis>.These are partitioned using SUSE Manager
+                            Organizations. Each SUSE Manager Organization has visibility into the
+                            default SUSE Manager Organization’s software channels due to trusts, yet
+                            the managed hosts are naturally grouped and managed by their
+                            environment.</para>
+                    </listitem>
+                    <listitem>
+                        <para>There are at least 3 landscapes in each environment,
+                                <emphasis>PROD</emphasis>,<emphasis>DEV</emphasis>, and
+                                <emphasis>UAT</emphasis>.</para>
+                    </listitem>
+                    <listitem>
+                        <para>A “patch exceptions" process exists, as there is often a need to
+                            account for the removal of patches (e.g. kernel updates) from a
+                            roll-out. Some hosts may have hardware drivers or third party software
+                            which depend upon specific kernel versions. This exception process would
+                            be handled on a case-by-case basis.</para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+        </formalpara>
+    </sect1>
+
+    <sect1>
+        <title>Requirements for Testing</title>
+        <para/>
+    </sect1>
 
     <sect1>
         <title>Implementation</title>
