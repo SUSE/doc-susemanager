@@ -16,8 +16,8 @@
     <sect1 xml:id="bp.chap.adv.life.mgr.covered">
         <title>Whats Covered Here?</title>
 
-        <para>This chapter describes how to setup and configure a &susemgr; implementation to enable
-            companies in the delivery of these often requested features: <itemizedlist>
+        <para>This chapter describes how to setup and configure a &susemgr; testing implementation
+            to enable companies in the delivery of these often requested features: <itemizedlist>
                 <listitem>
                     <para>Automatic creation and archive of patch sets by quarter (or any other time
                         period)</para>
@@ -226,7 +226,8 @@
             </para>
         </formalpara>
     </sect1>
-
+    <!-- The following section needs to be revised. It is wordy, and large amount of content difficult to read
+        through. Goals: Shorten and reorganize. -->
     <sect1>
         <title>Implementation</title>
         <para>To review, you need to configure SUSE Manager, creating a set of procedures, processes
@@ -262,9 +263,203 @@
             setting up to account for SLES 11 SP4 initially would be ideal. We also maintain both
             32-bit and 64-bit Intel/AMD architecture versions of SLES 11 SP3 so we will need to
             account for both of them.</para>
+
+        <para>There are 2 different environments we need to manage, Corporate (CORP) and Store
+            (STORE). We have created separate SUSE Manager Organizations to allow our systems
+            administrators an exclusive view of the hosts they are responsible for. Each SUSE
+            Manager Organization has the 3 landscapes (DEV, QA and PROD) that they use for patch
+            testing/promotion.</para>
+
+        <para>Activation keys and bootstraps should be created for each SUSE Manager Organization
+            (each environment) and each landscape so that hosts can be registered into their
+            appropriate, and most likely, permanent role. For example, a bootstrap script will
+            register a SLES 11 SP3 (64bit) DEV host into the correct organization and will add the
+            appropriate base and child channels that should never have to be manipulated
+            again.</para>
+
+        <para>Automation is preferred. As mentioned, the use of scripts or scheduled jobs would
+            greatly enhance this solution and make it easier for support staff.</para>
+
         <sect2>
-            <title>Architecture</title>
-            <para/>
+            <title>Base Channels and Architecture</title>
+
+            <para>This represents a high-level outline of the architecture and channels:</para>
+
+            <note>
+                <title>Tip: Base Channel Naming</title>
+                <para>Any Base channel listed can also be a clone tree of the SUSE vendor channels
+                    therefore should include a prefix in the name. This can aid the handling of
+                    service pack migrations described during channel creation. See:
+                    <!-- <link
+                        linkend="">Channel Creation</link> -->.</para>
+            </note>
+
+            <para>
+                <itemizedlist>
+                    <listitem>
+                        <para>SUSE Manager Organization <itemizedlist>
+                                <listitem>
+                                    <para>Default(Main) - 1 <itemizedlist>
+                                            <listitem>
+                                                <para>32 Bit Archive Channels (Public) <itemizedlist>
+                                                  <listitem>
+                                                  <para>Q2 - 06-30-2016 - SLES 11 SP3 Updates for
+                                                  i586</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Q3 - 09-30-2016 - SLES 11 SP3 Updates for
+                                                  I586</para>
+                                                  </listitem>
+                                                  </itemizedlist></para>
+                                            </listitem>
+                                            <listitem>
+                                                <para>64 Bit Archive Channels(Public) <itemizedlist>
+                                                  <listitem>
+                                                  <para>Q2 - 06-30-2016 - SLES 11 SP3 Updates for
+                                                  x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Q3 - 09-30-2016 - SLES 11 SP3 Updates for
+                                                  x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Q2 - 06-30-2016 - SLES 12 Updates for
+                                                  x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Q3 - 09-30-2016 - SLES 12 Updates for
+                                                  x86_64</para>
+                                                  </listitem>
+                                                  </itemizedlist></para>
+                                            </listitem>
+                                            <listitem>
+                                                <para>Clone Sets or Child Channels within SUSE Base
+                                                  Channels:</para>
+                                            </listitem>
+                                            <listitem>
+                                                <para>Base : SLES 11 SP3 Pool for i586 <itemizedlist>
+                                                  <listitem>
+                                                  <para>DEV - Current Patch Set - SLES 11 SP3
+                                                  Updates for i586</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>QA - Current Patch Set - SLES 11 SP3 Updates
+                                                  for i586</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>PROD - Current Patch Set - SLES 11 SP3
+                                                  Updates for i586</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES
+                                                  11 SP3 i586</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Security ASAP Exceptions - SLES 11 SP3
+                                                  i586</para>
+                                                  </listitem>
+
+                                                  </itemizedlist></para>
+                                            </listitem>
+                                            <listitem>
+                                                <para>Base : SLES 11 SP3 Pool for x86_64 <itemizedlist>
+                                                  <listitem>
+                                                  <para>DEV - Current Patch Set - SLES 11 SP3
+                                                  Updates for x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>QA - Current Patch Set - SLES 11 SP3 Updates
+                                                  for x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>PROD - Current Patch Set - SLES 12 Updates
+                                                  for x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES
+                                                  12 x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Security ASAP Exceptions - SLES 12
+                                                  x86_64</para>
+                                                  </listitem>
+                                                  </itemizedlist></para>
+                                            </listitem>
+                                            <listitem>
+                                                <para>Base : SLES 12 Pool for x86_64<itemizedlist>
+                                                  <listitem>
+                                                  <para>DEV - Current Patch Set - SLES 12 Updates
+                                                  for x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>QA - Current Patch Set - SLES 12 Updates for
+                                                  x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>PROD - Current Patch Set - SLES 12 Updates
+                                                  for x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES
+                                                  12 x86_64</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Security ASAP Exceptions - SLES 12
+                                                  x86_64</para>
+                                                  </listitem>
+                                                  </itemizedlist></para>
+                                            </listitem>
+                                            <listitem>
+                                                <para>Patch Exceptions Channels (as above)<itemizedlist>
+                                                  <listitem>
+                                                  <para>Per Base Channel - 1 channel for each
+                                                  “Updates” channel:<itemizedlist>
+                                                  <listitem>
+                                                  <para>Examples:<itemizedlist>
+                                                  <listitem>
+                                                  <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES
+                                                  11 SP3 i586</para>
+                                                  </listitem>
+                                                  <listitem>
+                                                  <para>Security ASAP Exceptions - SLES 11 SP3
+                                                  i586</para>
+                                                  </listitem>
+                                                  </itemizedlist></para>
+                                                  </listitem>
+                                                  </itemizedlist></para>
+                                                  </listitem>
+                                                  </itemizedlist></para>
+                                            </listitem>
+                                        </itemizedlist>
+                                    </para>
+                                </listitem>
+                                <listitem>
+                                    <para>Corporate (CORP) - 2<itemizedlist>
+                                            <listitem>
+                                                <para>Any public channel will be visible here</para>
+                                            </listitem>
+                                            <listitem>
+                                                <para>Private channels can be shared
+                                                  per-organization</para>
+                                            </listitem>
+                                        </itemizedlist></para>
+                                </listitem>
+                                <listitem>
+                                    <para>Store (STORE) - 3<itemizedlist>
+                                            <listitem>
+                                                <para>Any public channel will be visible here</para>
+                                            </listitem>
+                                            <listitem>
+                                                <para>Private channels can be shared
+                                                  per-organization</para>
+                                            </listitem>
+                                        </itemizedlist></para>
+                                </listitem>
+                            </itemizedlist>
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </para>
         </sect2>
         <sect2>
             <title>Automation and Process Design</title>
