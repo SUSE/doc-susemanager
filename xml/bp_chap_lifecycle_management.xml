@@ -13,40 +13,58 @@
 
     <title>Advanced Patch Lifecycle Management</title>
 
-<sect1 xml:id="bp.chap.adv.life.mgr.covered">
-    <title>Whats Covered Here?</title>
-    
-    <para>This chapter describes how to setup and configure a &susemgr; implementation to enable
-        companies in the delivery of these often requested features: <itemizedlist>
-            <listitem>
-                <para>Automatic creation and archive of patch sets by quarter (or any other time
-                    period)</para>
-            </listitem>
-            <listitem>
-                <para>Consistent method of patch promotion and delivery through numerous
-                    landscapes and environments</para>
-            </listitem>
-            <listitem>
-                <para>Exception process for handling patches that need to be excluded from a
-                    patch cycle</para>
-            </listitem>
-            <listitem>
-                <para>Environment creation with historical patch sets</para>
-            </listitem>
-            <listitem>
-                <para>Minimal need for host channel subscription manipulation from
-                    cradle-to-grave</para>
-            </listitem>
-            <listitem>
-                <para>Support for service-pack migration using custom child channels</para>
-            </listitem>
-            <listitem>
-                <para>Provides a foundation for using multiple organizations to maintain
-                    systems.</para>
-            </listitem>
-        </itemizedlist>
-    </para>
-</sect1>
+    <sect1 xml:id="bp.chap.adv.life.mgr.covered">
+        <title>Whats Covered Here?</title>
+
+        <para>This chapter describes how to setup and configure a &susemgr; implementation to enable
+            companies in the delivery of these often requested features: <itemizedlist>
+                <listitem>
+                    <para>Automatic creation and archive of patch sets by quarter (or any other time
+                        period)</para>
+                </listitem>
+                <listitem>
+                    <para>Consistent method of patch promotion and delivery through numerous
+                        landscapes and environments</para>
+                </listitem>
+                <listitem>
+                    <para>Exception process for handling patches that need to be excluded from a
+                        patch cycle</para>
+                </listitem>
+                <listitem>
+                    <para>Environment creation with historical patch sets</para>
+                </listitem>
+                <listitem>
+                    <para>Minimal need for host channel subscription manipulation from
+                        cradle-to-grave</para>
+                </listitem>
+                <listitem>
+                    <para>Support for service-pack migration using custom child channels</para>
+                </listitem>
+                <listitem>
+                    <para>Provides a foundation for using multiple organizations to maintain
+                        systems.</para>
+                </listitem>
+            </itemizedlist>
+        </para>
+    </sect1>
+
+    <sect1>
+        <title>Assumptions</title>
+        <para>This guide covers &susemgr; &productnumber3;. A fresh installation is not required but
+            some assumptions are made. You have a working &susemgr; environment, with a few
+            registered clients, and a decent knowledge of &susemgr; terms and capabilities. If you
+            are unfamiliar with these terms or do not have a current working setup, see the: <link
+                linkend="quickstart.chapt.overview.requirements">Getting Started Guide</link></para>
+        <note>
+            <title>spacecmd and XMLRPC Examples</title>
+            <para>Using advanced features such as <systemitem>spacecmd</systemitem> or
+                    <systemitem>XMLRPC</systemitem> API will be explained in some detail, but will
+                not be exhaustive. Code examples will be included at the end of this chapter which
+                may be modified or used as-is. These come with no <emphasis>WARRANTY</emphasis> and
+                should not be expected to run with every implementation. <emphasis>Always</emphasis>
+                test before running any examples in production.</para>
+        </note>
+    </sect1>
 
     <sect1 xml:id="bp.chap.adv.patch.life.mgr.overview">
         <title>Patch Lifecycle Management Overview</title>
@@ -210,13 +228,22 @@
     </sect1>
 
     <sect1>
-        <title>Requirements for Testing</title>
-        <para/>
-    </sect1>
-
-    <sect1>
         <title>Implementation</title>
-        <para/>
+        <subtitle>Review</subtitle>
+        <para>To review, you need to configure SUSE Manager, creating a set of procedures, processes
+            and/or tools (scripts) to help with your patch lifecycle management. This includes the
+            creation (and optimally an “automatic” creation) of patch archive channels from the SUSE
+            provided “updates” channels for the versions of SLES we use. These patch archives will
+            be the sources for your patch promotions, but can also be a source to setup testing
+            environments based on a patch set rolled out in the past. This could be used to
+            troubleshoot an error condition for example, by creating a lab full of hosts patched up
+            to any previous patch set. You may also demonstrate and visualize a clear view of
+            compliance defined by a time-stamped set of patches.</para>
+        
+        <para>You also will create a set of software channels which will be updated when we decide to roll them out. Each
+            landscape needs to receive them from the previous “validated” landscape ONLY. Meaning they will first get put
+            into DEV, tested on the machines there - then move into QA, get tested - and finally get moved into PROD. The
+            whole thing will start over every quarter, and we will handle exceptions if/when they occur.</para>
 
         <sect2>
             <title>Architecture</title>
