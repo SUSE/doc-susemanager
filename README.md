@@ -55,7 +55,10 @@ New work items will be added here. The status of these items will be marked with
 - [x] Quickstart Using Salt (Technical Preview) Status: DONE NOV 2015
 - [x] Updated all documentation from DocBook 4.5 to 5.1 Status: DONE NOV 2015
 - [x] Writethedocs Conference Prague Status: DONE NOV 2015
-- [x] Contact Methods RHNSD, SSH Push, SSH Push Tunnel, osad (BP guide) DONE FEB 2016
+- [x] Updated Book chapter and section ID's to match SUSE Manager WebUI Status: DONE JAN 2016
+- [x] Reference Book updated and maintained by KE Status: IN_PROGRESS FEB 2016
+- [x] Contact Methods rhnsd, ssh push, ssh push tunnel, osad (BP guide) DONE FEB 2016 
+      (Salt to be added IN_DEV)
 - [x] Advanced Patch Lifecycle Management Status: IN_PROGRESS FEB 2016
 
 
