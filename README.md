@@ -60,7 +60,7 @@ New work items will be added here. The status of these items will be marked with
 - [x] Reference Book updated and maintained by KE Status: IN_PROGRESS FEB 2016
 - [x] Contact Methods rhnsd, ssh push, ssh push tunnel, osad (BP guide) DONE FEB 2016 
       (Salt to be added IN_DEV)
-- [x] Advanced Patch Lifecycle Management Status: IN_PROGRESS FEB 2016
+- [x] Advanced Patch Lifecycle Management (BP Guide) Status: IN_PROGRESS FEB 2016
 
 
 ##Planning:##
