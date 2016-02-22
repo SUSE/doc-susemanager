@@ -48,14 +48,14 @@ New work items will be added here. The status of these items will be marked with
 - [x] Channel Management research Status: DONE JULY 2015
 - [x] SUSE Manager and System z Guide in Advanced Topics Status: DONE JULY 2015
 - [x] Began periodic work with help from Kwalter on an internal feedback tool for connecting the                                     Q/A/Engineer/Developer/Documentation smokestack. JULY 2015
-- [x] Internal Feedback tool code-name :DocReview:  Status: DONE NOV 2015
+- [x] Writethedocs Conference Prague Status: DONE AUG 31-SEPT 1 2015
 - [x] SUSE Manager 3 Quickstart Guide Installation Status: DONE SEPT 2015
 - [x] SUSE Manager 3 Quickstart Guide Setup Status: DONE OCT 2015
 - [x] SUSE Manager 3 Quickstart Guide Status: DONE OCT 2015
 - [x] Quickstart Using Salt (Technical Preview) Status: DONE NOV 2015
 - [x] Updated all documentation from DocBook 4.5 to 5.1 Status: DONE NOV 2015
+- [x] Internal Feedback tool code-name :DocReview:  Status: DONE NOV 2015
 - [x] Current work on docs released in SUSE Manager Technical Preview Status: DONE NOV 2015
-- [x] Writethedocs Conference Prague Status: DONE NOV 2015
 - [x] Updated Book chapter/section ID's to match SUSE Manager WebUI KE/MC/Coyote Status: DONE JAN 2016
 - [x] Reference Book updated and maintained by KE Status: IN_PROGRESS FEB 2016
 - [x] Contact Methods rhnsd, ssh push, ssh push tunnel, osad (BP guide) DONE FEB 2016 
