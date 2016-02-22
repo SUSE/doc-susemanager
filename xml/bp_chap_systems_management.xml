@@ -211,6 +211,59 @@ ssh_push_port_https = high port 2</screen>
       </para>
 
     </sect2>
+    <sect2 xml:id="bp.contact.methods.ssh.push.api.support">
+      <title>API Support for SSH Push</title>
+      <para>The contact method to be used for managing a server can also be modified via the API.
+        The following example code (python) shows how to set a system's contact method to
+        'ssh-push'. Available valid values are: <itemizedlist>
+          <listitem>
+            <para>'default' (pull)</para>
+          </listitem>
+          <listitem>
+            <para>'ssh-push'</para>
+          </listitem>
+          <listitem>
+            <para>'ssh-push-tunnel'</para>
+          </listitem>
+        </itemizedlist></para>
+      <screen>client = xmlrpclib.Server(SUMA_HOST + "/rpc/api", verbose=0)
+key = client.auth.login(SUMA_LOGIN, SUMA_PASSWORD)
+client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</screen>
+
+      <note>
+        <title>Migration and Management via SSH Push</title>
+        <para>When a system should be migrated and managed using SSH push, it requires setup using
+          the <systemitem>mgr-ssh-push-init</systemitem> script before the server can connect via
+          SSH. This separate command requires human interaction to install the server's SSH key onto
+          the managed client (root password). The following procedure illustrates how to migrate an
+          already registered system: </para>
+      </note>
+
+      <procedure>
+        <title>Migrate Registered Systems</title>
+        <step>
+          <para>Setup the client using the <systemitem>mgr-ssh-push-init</systemitem> script
+            (without --register)</para>
+        </step>
+        <step>
+          <para> Change the client's contact method to 'ssh-push' or 'ssh-push-tunnel' respectively
+            (via API or web UI)</para>
+        </step>
+      </procedure>
+      <para>Existing activation keys can also be edited via API to use the SSH push contact method
+        for clients registered with these keys: </para>
+      <screen>client.activationkey.setDetails(key, '1-mykey', {'contact_method' : 'ssh-push'})</screen>
+    </sect2>
+    <sect2 xml:id="bp.contact.methods.ssh.push.proxy.support">
+      <title>Proxy Support with SSH Push</title>
+      <para>It is possible to use SSH push to manage systems that are connected to the SUSE Manager
+        server via a proxy. To register a system, run <systemitem>mgr-ssh-push-init</systemitem> on
+        the proxy system for each client you wish to register.  Update your proxy with the latest
+        packages to ensure the registration tool is available. It is necessary to copy the ssh key
+        to your proxy. This can be achieved by executing the following command from the
+        server:</para>
+      <screen><prompt>#</prompt><command> mgr-ssh-push-init --client &lt;proxy&gt;</command></screen>
+    </sect2>
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.osad">
