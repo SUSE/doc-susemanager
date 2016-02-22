@@ -47,7 +47,7 @@ New work items will be added here. The status of these items will be marked with
 - [x] New table of contents for books including customer, engineering & sales feedback Status: DONE JUNE 2015
 - [x] Channel Management research Status: DONE JULY 2015
 - [x] SUSE Manager and System z Guide in Advanced Topics Status: DONE JULY 2015
-- [x] Began periodic work with help from Kwalter on an internal feedback tool for connecting the                                     Q/A/Engineer/Developer/Documentation smokestack. JULY 2015
+- [x] Began periodic work with help from Kwalter on an internal feedback tool for connecting the                                     Q/A/Engineer/Developer/Documentation smokestack. AUG 2015
 - [x] Writethedocs Conference Prague Status: DONE AUG 31-SEPT 1 2015
 - [x] SUSE Manager 3 Quickstart Guide Installation Status: DONE SEPT 2015
 - [x] SUSE Manager 3 Quickstart Guide Setup Status: DONE OCT 2015
