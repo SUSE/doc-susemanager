@@ -66,10 +66,10 @@ New work items will be added here. The status of these items will be marked with
 ##Planning:##
 
 **Four book are currently PLANNED:**
-* SUSE Manager Getting Started
-* SUSE Manager Best Practices Manual
-* SUSE Manager Reference Manual
-* SUSE Manager Advanced Topics Manual
+* Getting Started
+* Best Practices
+* Reference
+* Advanced Topics
 
 
 
