@@ -264,7 +264,7 @@ Text from the rh docs:
      clicking on a channel.
     </para>
     <para>
-     [Mgmt] — In addition, <guimenu>Per-User Subscription
+     In addition, <guimenu>Per-User Subscription
      Restrictions</guimenu> can be set globally by &susemgr;
      administrators and channel administrators. By default, any user can
      subscribe channels to a system. To manage user permissions, select
@@ -276,7 +276,7 @@ Text from the rh docs:
      channels to a system.
     </para>
     <para>
-     [Mgmt] — Only customers with custom base channels can change their
+     Only customers with custom base channels can change their
      systems' base channel assignments via the &susemgr; Web interface in
      two ways:
     </para>
@@ -296,10 +296,12 @@ Text from the rh docs:
     <note>
      <para>
       The assigned base channel must match the installed system. For
-      example, a system running &sle;&nbsp;10 for i586 cannot be
-      registered to a &sle;&nbsp;11 for i586 base channel. Use the
-      file <filename>/etc/SuSE-release</filename> to check your product,
-      architecture, version, and patch level.
+      example, a system running &sle;&nbsp;11 for x86_64 cannot be
+      registered to a &sle;&nbsp;12 for s390x base channel. Use the
+      files <filename>/etc/os-release</filename> or
+      <filename>/etc/SuSE-release</filename> to check your product,
+      architecture (try <command>uname -a</command>), version, and patch
+      level.
      </para>
     </note>
    </sect3>
@@ -350,22 +352,22 @@ Text from the rh docs:
      To search for a specific package or a subset of packages, use the
      package filter at the top of the list. Enter a substring to search for
      package names containing the string. For example, typing
-     <literal>ks</literal> in the filter might return:
-     <systemitem>ksconfig</systemitem>,
-     <systemitem>krb5-workstation</systemitem>, and
-     <systemitem>links</systemitem>. The filter is case-insensitive.
+     <literal>dd</literal> in the filter might return:
+     <systemitem>dd_rescue</systemitem>,
+     <systemitem>ddclient</systemitem>, and
+     <systemitem>uuidd</systemitem>. The filter is case-insensitive.
     </para>
    </sect3>
    <sect3 xml:id="s4-sm-channel-details-subsys">
     <title><guimenu>Software Channel Details</guimenu> &gt; <guimenu>Subscribed Systems</guimenu></title>
     <para>
-     The list displays system names, base channels, and their levels of
-     entitlement. Clicking on a system name takes you to its <guimenu>System
-     Details</guimenu> page. Refer to <xref linkend="s3-sm-system-details"/>
-     for more information.
+     The list displays system names, base channels, and their system
+     type. Clicking on a system name takes you to its <guimenu>System
+     Details</guimenu> page. Refer to <xref
+     linkend="s3-sm-system-details"/> for more information.
     </para>
     <para>
-     [Mgmt] — In case of a child channel, you have the option to
+     In case of a child channel, you have the option to
      unsubscribe systems from this channel. Use the check boxes to select
      the systems, then click the <guimenu>Unsubscribe</guimenu> button.
     </para>
@@ -373,7 +375,7 @@ Text from the rh docs:
    <sect3 xml:id="s4-sm-channel-details-tarsys">
     <title><guimenu>Software Channel Details</guimenu> &gt; <guimenu>Target Systems</guimenu></title>
     <para>
-     List of entitled systems eligible for subscription to the channel. This
+     List of systems eligible for subscription to the channel. This
      tab appears only for child channels. Use the check boxes to select the
      systems, then click the <guimenu>Confirm</guimenu> and
      <guimenu>Subscribe</guimenu> button on the bottom right-hand corner.
@@ -463,7 +465,7 @@ Text from the rh docs:
    following in the <guimenu>Free Form</guimenu> field:
   </para>
 
-<screen>summary:java  and description:java</screen>
+<screen>summary:java and description:java</screen>
 
   <para>
    Other supported field names include:
@@ -501,7 +503,7 @@ Text from the rh docs:
    <listitem>
     <para>
      <literal>arch</literal>: search the packages by their architecture
-     (such as i586, x86_64, or s390).
+     (such as x86_64, ppc64le, or s390).
     </para>
    </listitem>
   </itemizedlist>
@@ -509,7 +511,9 @@ Text from the rh docs:
   <para>
    You can also limit searches to <guimenu>Channels relevant to your
    systems</guimenu> by clicking the check box. Additionally, you can
-   restrict your search by platform or architecture.
+   restrict your search by platform (<guimenu>Specific channel you have
+   access to</guimenu>) or architecture (<guimenu>Packages of a specific
+   architecture ...</guimenu>).
   </para>
  </sect1>
 <!-- z: s2-sm-channel-manage ref.webui.channels.manage -->
@@ -517,10 +521,9 @@ Text from the rh docs:
   <title>Manage Software Channels</title>
   <!-- idx -->
   <indexterm>
-
-  <primary>software channels</primary>
-
-  <secondary>managing</secondary></indexterm>
+   <primary>software channels</primary>
+   <secondary>managing</secondary>
+  </indexterm>
 
   <para>
    This tab allows administrators to create, clone, and delete custom
@@ -536,8 +539,8 @@ Text from the rh docs:
     and child channels.
    </para>
    <para>
-    To clone an existing channel, click the <guimenu>clone
-    channels</guimenu> link. Select the channel to be cloned from the
+    To clone an existing channel, click the <guimenu>Clone
+    Channel</guimenu> link. Select the channel to be cloned from the
     drop-down menu, select whether to clone the current state (including
     patches) or the original state (without patches). You can also select
     specific patches to use for cloning. Then click the <guimenu>Create
@@ -546,7 +549,7 @@ Text from the rh docs:
     Channel</guimenu>.
    </para>
    <para>
-    To create a new channel, click the <guimenu>create new channel</guimenu>
+    To create a new channel, click the <guimenu>Create Channel</guimenu>
     link. Select the appropriate options for the new channel, including base
     architecture and GPG options, then click <guimenu>Create
     Channel</guimenu>. Note that a channel created in this manner is blank,
@@ -557,9 +560,7 @@ Text from the rh docs:
    <sect3 xml:id="s4-chnlmgmt-cdetails-cdetails">
     <title><guimenu>Manage Software Channels </guimenu> &gt; <guimenu>Channel Details</guimenu> &gt; <guimenu>Details</guimenu></title>
     <para>
-     This screen lists the selections made during channel creation and
-     includes the <guimenu>Globally Subscribable</guimenu> check box that
-     permits all users to subscribe systems to the channel.
+     This screen lists the selections made during channel creation.
     </para>
    </sect3>
    <sect3 xml:id="s4-chnlmgmt-cdetails-manage">
@@ -620,11 +621,12 @@ Text from the rh docs:
      </listitem>
     </itemizedlist>
     <para>
-     Clicking on the "Sync Patches" button opens a confirmation page in
-     which a subset of those patches can be selected for synchronization.
-     Clicking on the "Confirm" button in the confirmation page results in
-     such patches being copied over from the original channel to the cloned
-     channel, thus updating corresponding packages.
+     Clicking on the <guimenu>Sync Patches</guimenu> button opens a
+     confirmation page in which a subset of those patches can be
+     selected for synchronization.  Clicking on the
+     <guimenu>Confirm</guimenu> button in the confirmation page results
+     in such patches being copied over from the original channel to the
+     cloned channel, thus updating corresponding packages.
     </para>
    </sect3>
    <sect3 xml:id="s4-cnlmgmt-cdetails-pkgs">
@@ -685,7 +687,7 @@ Text from the rh docs:
      </listitem>
     </itemizedlist>
     <para>
-     The <guimenu>Manage Repositories </guimenu> tab to the left shows all
+     The <guimenu>Manage Repositories</guimenu> tab to the left shows all
      assigned repositories. Click on a name to see details and possibly
      delete a repository.
     </para>
