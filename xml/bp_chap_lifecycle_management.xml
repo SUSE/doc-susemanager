@@ -564,9 +564,56 @@
             </mediaobject>
         </figure>
     </sect1>
+
     <sect1 xml:id="bp.chap.lifecycle.mgr.except.escalation">
         <title>Exception and Escalation Channels</title>
-        <para/>
+        <para>There might be several reasons to delay or remove a patch from a deployment cycle. A
+            patch could be causing issues with the stability of a system or systems, it might not
+            have passed a testing cycle from the current or previous landscape, or there could be
+            some other reason not to deploy it within a patch cycle.</para>
+
+        <para>On the other hand, there might be a reason to deploy a critical patch (one that
+            patches a security vulnerability or a debilitating bug) ahead of schedule. Due to the
+            critical nature of the patch it needs to go through testing and deployment as fast as
+            possible - without waiting for the next quarterly patch cycle.</para>
+
+        <para>In order to handle the periodic removal or addition of these exception patches,
+            processes should be created to track them appropriately. While these exceptions are
+            being tracked, they will be copied into their own channel containers for safe-keeping,
+            accounting and reporting.</para>
+
+        <para>These channels can be created within the Archive base channel or within the cloned
+            base channel for the version of SLES that corresponds to the patch exception
+            (recommended).</para>
+
+        <para>The process for excluding a patch will be to first copy the patch (and associated
+            packages) into the Exception Channel, and then to remove the patch (and associated
+            packages) from the current deployment landscape. Optionally it can be removed from the
+            current quarter’s archive channel but it is important to realize that the patch will be
+            included in the following quarter’s archive as well. It might be tempting to remove it
+            from the SUSE Updates channel, but this can often lead to a mishandling or misreporting
+            of compliance. It is much better to track and resolve the reasons for the exception in
+            the first place. This way, the patch can be reintroduced to the patch deployment
+            workflow and remediate any potential security issues or code flaws that the patch was
+            created to fix.</para>
+
+        <formalpara>
+            <title>Security Escalation Channel and Process</title>
+            <para> The process for adding a security patch is similar to the process of excluding
+                one. The key difference is that the patch needs to be copied into the Security
+                Exception Channel from either the SUSE Updates channel or the latest archive if it
+                has been created but not used for a promotion cycle yet. Assuming that this new
+                critical security patch has been released in the middle of a rollout phase (you have
+                already been promoting the current quarter’s patches and this new one comes out), it
+                is likely that this new patch has not yet appeared in an archive.</para>
+        </formalpara>
+
+        <para>Another assumption is the need to test this new patch by promoting it through the landscapes as any normal patch
+            set, but if necessary it can be copied directly to any stage. Simply copy this security patch into the initial landscape
+            (e.g. DEV - Current) and follow the normal deploy-test-promote cycles to get it into production. Depending on the
+            critical nature of the patch, the normal schedule for testing could be accelerated or in rare cases bypassed
+            altogether assuming acceptable risk.</para>
+        
     </sect1>
     <sect1>
         <title>Components</title>
