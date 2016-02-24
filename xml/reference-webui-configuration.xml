@@ -20,16 +20,13 @@
 <!--status="rfc"-->
  <para>
   Only Configuration Administrators or &susemgr; Administrators see the
-  <guimenu>Configuration</guimenu> tab. In addition, they must have at least
-  one Provisioning entitlement or the tab is not visible.
+  <guimenu>Configuration</guimenu> tab.
  </para>
  <para>
   In this configuration portal, manage your configuration channels and files
   centrally or limited to a single system. Centrally-managed files are
   available to multiple systems; changes to a single file affect all these
-  systems. Each system with a Provisioning entitlement has also a local
-  configuration channel, sometimes referred to as an override channel, and a
-  sandbox channel.
+  systems.
  </para>
 <!-- z: configuration-enable ref.webui.config.preparing -->
  <sect1 xml:id="ref.webui.config.preparing">
@@ -197,7 +194,7 @@
   <orderedlist spacing="normal">
    <listitem>
     <para>
-     Click the <guimenu>create new config channel</guimenu> link in the
+     Click the <guimenu>Create Config Channel</guimenu> link in the
      upper right of this screen.
     </para>
    </listitem>
@@ -210,7 +207,7 @@
     <para>
      Enter a label for the channel. This field must contain only
      alphanumeric characters, &quot;-&quot;, &quot;_&quot;, and
-     &quot;.&quot;
+     &quot;.&quot;.
     </para>
    </listitem>
    <listitem>
@@ -293,14 +290,10 @@
           <guimenu>Permissions</guimenu> of the file when it is deployed.
          </para>
          <para>
-<!-- FIXME: SELinux ref ok? -->
           If the client has SELinux enabled, you can configure
           <guimenu>SELinux contexts</guimenu> to enable the required file
           attributes (such as user, role, and file type) that allow it to be
           used on the system.
-<!-- For more information about configuring SELinux
-          file context, refer to the <citetitle>Red Hat Enterprise Linux
-          Security-Enhanced Linux User Guide</citetitle>.-->
          </para>
          <para>
           If the configuration file includes a macro (a variable in a
@@ -350,15 +343,10 @@
           section, as well as the <guimenu>File Permissions Mode</guimenu>.
          </para>
          <para>
-<!-- FIXME: SELinux ref ok? -->
           If the client has SELinux enabled, you can configure
           <guimenu>SELinux contexts</guimenu> to enable the required file
           attributes (such as user, role, and file type) that allow it to be
           used on the system.
-<!-- For more information about
-          configuring SELinux file context, refer to the <citetitle>Red
-          Hat Enterprise Linux Security-Enhanced Linux User
-          Guide</citetitle>. -->
          </para>
          <para>
           If the configuration file includes a macro, enter the symbol that
@@ -377,13 +365,14 @@
      <term>Deploy Files</term>
      <listitem>
       <para>
-       This subtab only appears when there are files in the channel. Deploy
+       This subtab only appears when there are files in the channel and
+       a system is subscribed to the channel. Deploy
        all files by clicking the <guimenu>Deploy All Files</guimenu> button
        or check selected files and click the <guimenu>Deploy Selected
        Files</guimenu> button. Select to which systems the file(s) should be
        applied. All systems subscribed to this channel are listed. If you
        wish to apply the file to a different system, subscribe it to the
-       channel first. To deploy the files, press <guimenu>Confirm and Deploy
+       channel first. To deploy the files, press <guimenu>Confirm &amp; Deploy
        to Selected Systems</guimenu>.
       </para>
      </listitem>
@@ -534,7 +523,7 @@ web.maximum_config_file_size=262144</screen>
     file separately, even if the distinction is nominal and the number of
     variations is in the hundreds or thousands. &susemgr; addresses this
     by allowing the inclusion of macros, or variables, within the
-    configuration files it manages for Provisioning-entitled systems. In
+    configuration files it manages. In
     addition to variables for custom system information, the following
     standard macros are supported:
    </para>
@@ -545,57 +534,57 @@ web.maximum_config_file_size=262144</screen>
    <itemizedlist mark="bullet" spacing="normal">
     <listitem>
      <para>
-      rhn.system.sid
+      <literal>rhn.system.sid</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.profile_name
+      <literal>rhn.system.profile_name</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.description
+      <literal>rhn.system.description</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.hostname
+      <literal>rhn.system.hostname</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.ip_address
+      <literal>rhn.system.ip_address</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.custom_info(key_name)
+      <literal>rhn.system.custom_info(key_name)</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.net_interface.ip_address(eth_device)
+      <literal>rhn.system.net_interface.ip_address(eth_device)</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.net_interface.netmask(eth_device)
+      <literal>rhn.system.net_interface.netmask(eth_device)</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.net_interface.broadcast(eth_device)
+      <literal>rhn.system.net_interface.broadcast(eth_device)</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.net_interface.hardware_address(eth_device)
+      <literal>rhn.system.net_interface.hardware_address(eth_device)</literal>
      </para>
     </listitem>
     <listitem>
      <para>
-      rhn.system.net_interface.driver_module(eth_device)
+      <literal>rhn.system.net_interface.driver_module(eth_device)</literal>
      </para>
     </listitem>
    </itemizedlist>
@@ -608,7 +597,7 @@ web.maximum_config_file_size=262144</screen>
     Delimiter</guimenu> and <guimenu>Macro End Delimiter</guimenu> fields
     and do not conflict with other characters in the file. We recommend that
     the delimiters be two characters in length and must not contain the
-    percent (%) symbol.
+    percent (<literal>%</literal>) symbol.
    </para>
    <para>
     For example, you may have a file applicable to all of your servers that
@@ -635,10 +624,12 @@ ip_address={| rhn.system.net_interface.ip_address(eth0) |}</screen>
 ip_address=177.18.54.7</screen>
    <para>
     To capture custom system information, insert the key label into the
-    custom information macro (rhn.system.custom_info). For instance, if you
-    developed a key labeled &quot;asset&quot; you can add it to the
-    custom information macro in a configuration file to have the value
-    substituted on any system containing it. The macro would look like this:
+    custom information macro
+    (<literal>rhn.system.custom_info</literal>). For instance, if you
+    developed a key labeled &quot;<literal>asset</literal>&quot; you can
+    add it to the custom information macro in a configuration file to
+    have the value substituted on any system containing it. The macro
+    would look like this:
    </para>
 <screen>asset={@ rhn.system.custom_info(asset) @}</screen>
    <para>
