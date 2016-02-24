@@ -608,20 +608,117 @@
                 is likely that this new patch has not yet appeared in an archive.</para>
         </formalpara>
 
-        <para>Another assumption is the need to test this new patch by promoting it through the landscapes as any normal patch
-            set, but if necessary it can be copied directly to any stage. Simply copy this security patch into the initial landscape
-            (e.g. DEV - Current) and follow the normal deploy-test-promote cycles to get it into production. Depending on the
-            critical nature of the patch, the normal schedule for testing could be accelerated or in rare cases bypassed
-            altogether assuming acceptable risk.</para>
-        
+        <para>Another assumption is the need to test this new patch by promoting it through the
+            landscapes as any normal patch set, but if necessary it can be copied directly to any
+            stage. Simply copy this security patch into the initial landscape (e.g. DEV - Current)
+            and follow the normal deploy-test-promote cycles to get it into production. Depending on
+            the critical nature of the patch, the normal schedule for testing could be accelerated
+            or in rare cases bypassed altogether assuming acceptable risk.</para>
+
     </sect1>
+
     <sect1>
-        <title>Components</title>
-        <para/>
+        <title>Components to be Created</title>
+        <para>The following list provides an overview on what you will be creating to enable
+            Advanced Patch Lifecycle Management:<itemizedlist>
+                <title>Channels</title>
+                <listitem>
+                    <para>Archive channels</para>
+                </listitem>
+                <listitem>
+                    <para>Current updates channels</para>
+                </listitem>
+                <listitem>
+                    <para>Exception channels (patch exclusions or security-ASAP)</para>
+                </listitem>
+                <listitem>
+                    <para>Optional SP-Migration clone set</para>
+                </listitem>
+            </itemizedlist>
+            <itemizedlist>
+                <title>Activation keys and bootstrap scripts</title>
+                <listitem>
+                    <para>Per-Organization, Per-SLES version activation keys</para>
+                </listitem>
+            </itemizedlist>
+            <itemizedlist>
+                <title>Scripts</title>
+                <listitem>
+                    <para>Archive creation script</para>
+                </listitem>
+                <listitem>
+                    <para>Archive sources list control file</para>
+                </listitem>
+                <listitem>
+                    <para>Merge Tool python script</para>
+                </listitem>
+            </itemizedlist>
+            <itemizedlist>
+                <title>Crontab Entries and Automation</title>
+                <listitem>
+                    <para>Quarterly (or any other frequency) archive creation call</para>
+                </listitem>
+            </itemizedlist>
+        </para>
     </sect1>
+
     <sect1>
         <title>Channels</title>
-        <para/>
+        <para>Several custom channels will be created to support the patch promotion process. These
+            channels will store the archives (created as clones of the SUSE Updates channels) and
+            they will also store exception patches. For each landscape a custom channel will be
+            created to hold patches which have been promoted. These channels will grow in size over
+            time as patches are promoted each cycle.</para>
+
+        <para>Each new patch cycle updates the available patches in a given landscape’s “current
+            updates” channel. In this way each subsequent patch promotion adds the new updates and
+            these can be applied to any hosts subscribed to the channel.</para>
+
+        <para>The exception channels will be populated by managing individual patches, copying them
+            from one of the landscape updates channels or from one of the archive channels. Once a
+            patch is copied successfully into an exception channel, it can be removed from an
+            updates channel or an archive.</para>
+
+        <sect2>
+            <title>Creating Archive Channels</title>
+            <para>Custom channels are created in SUSE Manager as “new”, blank and empty channels, or
+                “clones”. Technically, cloned channels can also be created as empty, but in this
+                case we will create the archive channels with content sourced from the SUSE Updates
+                channel, the patches AND the packages they reference.</para>
+
+            <para>Each archive channel will reside within an empty base channel. Base channels will
+                be created for each processor architecture managed by SUSE Manager, for example,
+                IA-32, x86_64, s390x, PPC, etc.. Multiple archives matching the different versions
+                of SLES can exist in the base channel, but they will all be the same processor
+                architecture.</para>
+            <important>
+                <title>Channel Naming</title>
+                <para>Failing to label the following channels appropriately will cause the example
+                    archive script to fail unless modified.</para>
+            </important>
+            <procedure>
+                <title>Create the Base Archive Channels</title>
+                <step>
+                    <para>For each processor architecture used by hosts which are managed by SUSE
+                        Manager, create empty channels named: <replaceable>32 Bit Archives
+                            Channel</replaceable> and <replaceable>64 Bit Archives
+                            Channel</replaceable></para>
+                </step>
+                <step>
+                    <para>In the Web UI click <menuchoice>
+                            <guimenu>Channels</guimenu>
+                            <guimenu>Manage Software Channels</guimenu>
+                        </menuchoice> then click the <guibutton>+Create Channel</guibutton>
+                        button.</para>
+                </step>
+                <step>
+                    <para>The channel label <emphasis>must be</emphasis> in the format of
+                            <replaceable>architecture-patch-archives-channel</replaceable>, for
+                        example the 64-bit channel label should be:
+                        <screen>x86_64-patch-archives-channel</screen></para>
+                </step>
+            </procedure>
+        </sect2>
     </sect1>
     <sect1>
         <title>Activation Keys and Bootstrapping</title>
