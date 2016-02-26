@@ -775,9 +775,82 @@
                             SP3 for x86_64</replaceable>
                     </para>
                 </step>
+                <step>
+                    <para>Create a label using proper syntax - e.g.
+                        “q3-09-30-2015-archive-sles11sp3-x86_64”</para>
+                </step>
+                <step>
+                    <para>Include an appropriate description of the channel in the Summary and
+                        Description fields</para>
+                </step>
+                <step>
+                    <para>Click the <guibutton>Create Channel</guibutton> button when
+                        finished</para>
+                </step>
+                <step>
+                    <para>Scroll down and select the Public radio button and then click the
+                            <guibutton>Update Channel</guibutton> button.</para>
+                </step>
             </procedure>
+            <para>Repeat this process for each version of SLES within architecture.</para>
+            <note>
+                <title>spacewalk-clone-by-date</title>
+                <para>You can Use spacewalk-clone-by-date to create archive channels from the past.
+                    See: <!-- ADD LINK HERE -->for an example source file that can be used with the
+                    spacewalk-clone-by-date utility. This configuration file can be used to create a
+                    clone channel with a certain date range as a filter for the content in the channel:<itemizedlist>
+                        <listitem>
+                            <para>The utility is called with the following syntax:
+                                spacewalk-clone-by-date -c &lt;config file&gt;</para>
+                        </listitem>
+                        <listitem>
+                            <para>Repeat for each archive channel with a past date - modifying the
+                                config files to match the appropriate dates and channel
+                                source/target names.</para>
+                        </listitem>
+                    </itemizedlist></para>
+            </note>
+        </sect2>
+
+        <sect2>
+            <title>Service Pack Migration Support with Update and Exception Channels</title>
+
+            <para>There are a couple of generally accepted methods to managing a set of channels
+                that allows consistent and expected behaviors when leveraging the SP Migration
+                feature. You can find this feature in the Software tab of a particular host - it
+                allows you to update the service pack of a particular host in a one-click
+                fashion.</para>
+
+            <para>When using the patch lifecycle methods described in this document, some challenges
+                arise when using the SP Migration feature. When you select a given host to do an SP
+                Migration, the UI proposes (dictates) a set of mandatory “child” channels that will
+                be subscribed to for a migration action. These mandatory child channels (greyed-out
+                in the UI) will normally include the SUSE provided Updates channel for a given SLES
+                version. See the following image</para>
+            <figure>
+                <title>Service Pack Migration Support with Update and Exception Channels</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="spmigration-channels.png" width="80%"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+            <para>In order to allow usage of the patch lifecycle processes described here AND to use
+                the functionality of SP Migrations, it is best to create a full clone-set of the
+                SLES product versions in use at your company. This is sometimes called a clone-tree,
+                and can be easily created using the spacecmd command of the same name,
+                softwarechannel_clonetree.</para>
+
+            <para>A full clonetree will include the base/parent channel (normally called a pool) and
+                all child channels that currently exist beneath it. For example, using the SLES 11
+                SP3 Pool x86_64 channel as a source, you provide your own prefix to the
+                    <command>clonetree</command> command and it will make a copy of the pool and all
+                children adding the prefix to the beginning of all the channel names and
+                labels.</para>
         </sect2>
     </sect1>
+
     <sect1>
         <title>Activation Keys and Bootstrapping</title>
         <para/>
