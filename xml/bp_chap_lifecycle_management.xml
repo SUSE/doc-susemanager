@@ -854,16 +854,270 @@
                     </imageobject>
                 </mediaobject>
             </figure>
+
+            <para>The command spacecmd softwarechannel_clonetree can be called directly by providing
+                the source and prefix information directly or interactively by calling the command
+                from within the spacecmd shell itself:</para>
+            <screen><command>spacecmd -u SMadmin -- softwarechannel_clonetree sles11-sp3-pool-x86_64 -p “my_company-“</command></screen>
+            <para>This will create a set of SLES 11 SP3 x86_64 channels with a prefix
+                (my_company).</para>
+
+            <para>Repeat this process for each SLES version and then when using the Service Pack
+                migration feature you may select your company version of the target SLES version and
+                choose the child channels appropriate for the landscape the host is in (described
+                below).</para>
+
+            <para>You can then modify the cloned Updates channel by removing all patches/packages -
+                then use the merge script process to merge your “Current Patch Set” into the
+                mandatory updates channel. This way you are able to do Service Pack Migrations and
+                still retain your currently promoted patch set. Otherwise, SP Migrations will always
+                update to whatever is the latest packages in the “mandatory” Updates child
+                channel.</para>
+
+            <para>Consider the following Image that shows the Q3 Patch Archive for SLES 11 SP4 with
+                227 packages, the SUSE Updates channel for SP4 with 234 packages, and the
+                Chameleon_Co version of SP4 Updates with 0 (zero) packages:</para>
+            <figure>
+                <title>Patch Archive and Update Channels</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="patch-channels.png"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+            <para>In the following sections we will describe the creation of custom
+                    <emphasis>Current Updates</emphasis> channels and how to use a Merge script
+                (also detailed below). For SP migrations using your own set of promoted patches, you
+                would merge a <emphasis>Current</emphasis> Patch Archive from a
+                    <emphasis>Production</emphasis> channel into the <emphasis>Updates</emphasis>
+                channel so it will be used for migration efforts or simply leave the Updates channel
+                permanantly <emphasis>empty</emphasis> and add your Current Updates channel to the
+                    <emphasis>Optional Child Channels</emphasis> selection.</para>
+
+            <para>With an empty Updates channel and a populated “Current Updates”, you can be
+                assured of an SP Migration working as expected and not patching the machine to a
+                version of packages more current than whatever is deemed “production.” The custom
+                “updates” channels and the merge script process will be described in detail in the
+                following sections.</para>
+
+        </sect2>
+
+        <sect2>
+            <title> Current-Updates Channels </title>
+            <para>Now create the <emphasis>current updates</emphasis> channels that managed hosts
+                will subscribe to depending on their landscape, for example, <emphasis>DEV - Current
+                    Updates for SLES 11 SP3 x86_64</emphasis>, or <emphasis>PROD - Current Updates -
+                    for SLES 12 x86_64</emphasis>. There will be a full set of landscape channels
+                for each SLES version and they will all be empty to begin with so we will create a
+                “new” and then optionally “clone” that one to reduce the amount of typing
+                needed:</para>
+
+
+            <procedure>
+                <title>Creating the Current Updates Channels</title>
+                <step>
+                    <para>From the <menuchoice>
+                            <guimenu>Channels</guimenu>
+                            <guimenu>Manage Software Channels</guimenu>
+                        </menuchoice> click <emphasis><guibutton>+Create
+                            Channel</guibutton></emphasis>.</para>
+                </step>
+                <step>
+                    <para>Create the channel within one of the SLES Pool Channels or within your own
+                        clone set pool.</para>
+                </step>
+                <step>
+                    <para>Modify the channel to be Public.</para>
+                </step>
+                <step>
+                    <para>Clone this new channel (without updates) into the remaining Landscapes.
+                        Each channel as a <emphasis>Current Updates</emphasis> channel, and each
+                        with the appropriate landscape prefix (e.g. <emphasis>DEV</emphasis>,
+                            <emphasis>TEST</emphasis>, <emphasis>PROD</emphasis> , etc.)</para>
+                </step>
+            </procedure>
+
+            <figure>
+                <title>Updates Channels</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="updates-channels.png"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+
+            <para>This procedure guided you through creating a full set of landscapes for each SLES
+                version to be managed. Keep in mind for the SLES 11 SP1 and SP2 channels this will
+                result in a full set 2x or even 4x with LTSS. However, SP1 and SP2 Update channels
+                are no longer updated so these could be subscribed as static channels.</para>
+        </sect2>
+
+        <sect2>
+            <title>Exeption Channels</title>
+            <para>Now create the 2 exception channels for each SLES version being managed. While it
+                may be possible to create a mixed channel that is unique to architecture (like the
+                archive channel base), tracking which distribution a patch exception has come from
+                can get cumbersome. If you mix patches/packages from different versions of SLES, it
+                is more difficult to track, resolve and then reintroduce these patches back into the
+                patch workflow. It is much easier to place them into an exceptions channel
+                specifically for the version of SLES the patch came from. Create the <emphasis>Patch
+                    Exception</emphasis> and <emphasis>Security ASAP Exception</emphasis> channels
+                as follows: <note>
+                    <title>Exceptions Channel Subscription</title>
+                    <para>It is recommended to add the text <emphasis>DO NOT SUBSCRIBE</emphasis> to
+                        the Patch Exceptions Channel Name field during creation. Keep in mind that
+                        this channel is used only as a bucket to track patches/packages that will
+                        not be installed on a system. If systems subscribe to this channel they will
+                        see available content and therefore potentially apply it during a patch
+                        installation. The <emphasis>DO NOT SUBSCRIBE</emphasis> text acts as a
+                        visual reminder when creating activation keys or manipulating a hosts
+                        channel subscriptions preventing you from adding it to a hosts active
+                        channels.</para>
+                </note>
+            </para>
+            <procedure>
+                <title>Creating Exception Channels</title>
+                <step>
+                    <para>From the <menuchoice>
+                            <guimenu>Channels</guimenu>
+                            <guimenu>Manage Software Channels</guimenu>
+                        </menuchoice> click <emphasis><guibutton>+Create
+                            Channel</guibutton></emphasis>.</para>
+                </step>
+                <step>
+                    <para>Create the “Patch Exceptions - DO NOT SUBSCRIBE” channel within one of the
+                        SLES Pool Channels or if you have your own clone set within that pool. This
+                        channel will reside next to your Landscape channels.</para>
+                </step>
+                <step>
+                    <para>Modify the channel to be Public.</para>
+                </step>
+                <step>
+                    <para>Create the Security ASAP Exception channel as above - it too will reside
+                        next to your Landscape and Patch Exceptions channels.</para>
+                </step>
+            </procedure>
+            <para>Keep in mind for SLES 11 SP1 and SP2 - they reside in the same SP1 Pool base
+                channel, so there will be Exceptions and Security Exceptions Channels for each
+                Service Pack.</para>
+            <figure>
+                <title>Exception channels</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="exception-channels.png"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
         </sect2>
     </sect1>
 
     <sect1>
         <title>Activation Keys and Bootstrapping</title>
-        <para/>
+        <para>Normally you should create a set of Activation Keys each assigned to a specific
+            version of SLES that your hosts are installed with. There may be other characteristics
+            assigned in your keys like System Groups, assorted Child Channels, Software Packages,
+            etc. You may also choose to modify your existing Activation Keys and reuse them, or you
+            can create new keys for this implementation. This example assumes a new key.</para>
+
+        <procedure>
+            <title>Activation Key Setup</title>
+            <step>
+                <para>From the <menuchoice>
+                        <guimenu>Systems</guimenu>
+                        <guimenu>Activation Keys</guimenu>
+                    </menuchoice> click <emphasis><guibutton>+Create
+                    Key</guibutton></emphasis>.</para>
+            </step>
+            <step>
+                <para>Create the Activation Key within this Organization (remember to log into other
+                    Organizations to create keys there if needed). Assign the appropriate
+                    Entitlements and Software Packages and Configuration Channels as
+                    appropriate.</para>
+            </step>
+            <step>
+                <para>Name the Activation Key according to the Landscape host will register to with
+                    this key. For example: <figure>
+                        <title>Create Activation Key</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="activation-key-setup.png"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure></para>
+            </step>
+            <step>
+                <para> Click on the Child Channels Tab and assign the appropriate Current Updates
+                    channel to the Landscape this key will be used for: <figure>
+                        <title>Landscape Key</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="landscape-key.png"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                </para>
+            </step>
+            <step>
+                <para>Select the appropriate SUSE Manager Tools channel as well as the other needed
+                    channels to fill out the requirements for the version of SLES in
+                    question.</para>
+            </step>
+
+        </procedure>
+        <note>
+            <title>Security ASAP Exceptions</title>
+            <para>The Security ASAP Exceptions channel is selected as an active child channel, and
+                the Patch Exceptions (DO NOT SUBSCRIBE) channel is NOT selected. This is important -
+                any patch/package copied into the Patch Exceptions channel should remain invisible
+                to hosts while patches/packages copied to the Security ASAP Exceptions channel
+                should always be immediately visible to a host.</para>
+        </note>
+        <para>The Activation Key is called by a bootstrap script, often there is a one-to-one
+            relationship between a registration bootstrap script and an activation key. Whether new
+            activation keys were created or existing ones were modified to point to the landscape
+            specific “current updates” channels, there should be a bootstrap script that calls that
+            activation key.</para>
+        <para>All new hosts will use these bootstraps to register and become managed by SUSE
+            Manager. One of the key benefits is that they should never need to change their channel
+            assignments as the host will now be assigned to its proper landscape update channels and
+            will receive new updates as they are promoted each patch cycle.</para>
     </sect1>
     <sect1>
         <title>Scripts</title>
-        <para/>
+        <sect2>
+            <title>Patch/Package Merge Script</title>
+            <para>The Patch/Package Merge Script is used to Promote patches (and relevant packages)
+                from one channel to another. It is used at first to merge content from an Archive
+                channel into the first stage (landscape) e.g. DEV. It is then used to promote
+                content from one stage to the next until the content reaches the final stage. This
+                process is then repeated for each version of SLES (like 11 SP1, SP2, etc.) and each
+                corporate environment (like STORE, CORP, etc.).</para>
+            <para>Finally, the entire process is repeated for each patch calendar cycle
+                (quarterly/monthly/etc.).</para>
+        </sect2>
+
+        <sect2>
+            <title>Channel Archive Creation Script / Channel Archive Sources List Config
+                File</title>
+            <para>This script and its associated “sources list” configuration file are called either
+                manually or by a crontab entry. The script uses the sources list file to determine
+                which versions of SLES and which architectures to create archives for. As previously
+                described, the Archive Channels are created as point-in-time clones of the various
+                SLES Updates channels.</para>
+
+            <para>To have the correct archive channels created, simply add lines to the sources
+                file. Each line has 3 fields, the first being the architecture, the second is the
+                source channel, and the third is target channel text. The script parses the source
+                list and constructs the target parent channel for the archives by architecture, and
+                then constructs the target channel and label, etc.</para>
+
+            <para>The script calls the spacecmd functions softwarechannel_clone and
+                softwarechannel_setorgaccess for each entry in the sources list. It calculates the
+                current calendar quarter, creates the archives and makes these archives publicly
+                visible. See the Appendix for the entire script.</para>
+        </sect2>
     </sect1>
     <sect1>
         <title>Crontab Entries and Automation</title>
