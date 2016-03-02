@@ -16,7 +16,7 @@
 <article lang="en">
  <?suse-quickstart color="suse"?>
  <title>&susemgr; in the Public Cloud</title>
- <subtitle>SUSE Manager Server in the Public Cloud</subtitle>
+ <subtitle>SUSE Manager Server and SUSE Manager Proxy in the Public Cloud</subtitle>
  <articleinfo>
   <productnumber>&productnumber;</productnumber><productname>&productname;</productname><date>
   <?dbtimestamp format="B d, Y" ?></date>
@@ -30,10 +30,12 @@
     documentation.
   </para>
   <para>
-    The SUSE Manager images published by SUSE in select Public Cloud
-    environments are provided as Bring Your Own Subscription (BYOS)
-    images and need to be registered with the customer center. After an
-    instance is launched SUSE Manager needs to be set up and configured
+    The SUSE Manager Server and SUSE Manager Proxy images published by SUSE in
+    selected Public Cloud environments are provided as Bring Your Own
+    Subscription (BYOS) images. SUSE Manager Server instances need to be
+    registered with the customer center. Subscriptions of SUSE Manager Proxy
+    instances are handled through their parent SUSE Manager Server. After an
+    instance is launched, SUSE Manager needs to be set up and configured
     following the procedure in the SUSE Manager documentation.
   </para>
  </abstract>
@@ -63,12 +65,12 @@
       </listitem>
       <listitem>
         <para>
-          Minimal free disk space for SUSE Manager 15G. For public cloud
+          Minimal free disk space for SUSE Manager 15G. For Public Cloud
           instances we recommend that the repositories and the SUSE Manager
-          database be located on an external virtual disk. The details of
-          this setup are provided in the
-          <link linkend="using-separate-storage-volume">Using Separate
-          Storage Volume</link> section.
+          Server database, and respectively the SUSE Manager Proxy squid cache,
+          be located on an external virtual disk. The details of this setup are
+          provided in the <link linkend="using-separate-storage-volume">Using
+          Separate Storage Volume</link> section.
         </para>
         <para>
           Storing the database and the repositories on an external
@@ -89,11 +91,12 @@
     <procedure>
       <step>
         <para>
-          Run an instance of the SUSE Manager image as published by SUSE
+          Run an instance of the SUSE Manager Server or SUSE Manager Proxy image
+          as published by SUSE.
         </para>
         <para>
-          The images are identifiable by the suse, manager, server, byos
-          keywords in each public cloud environment.
+          The images are identifiable by the suse, manager, server or proxy,
+          byos keywords in each public cloud environment.
         </para>
         <para>
           The SUSE Manager instance must run in a network access
@@ -166,32 +169,57 @@
         </orderedlist>
       </step>
       <step>
-        <para>
-          Run YaST as follows:
-        </para>
-        <para>
-          After the instance is launched and the external storage is
-          attached and prepared according to
-          <link linkend="using-separate-storage-volume">Using Separate
-          Storage Volume</link>
-          begin with the setup of SUSE Manager. The steps that follow do
-          not differ from the documentation in the
-          <ulink url="https://www.suse.com/documentation/suse_manager">SUSE
-          Manager</ulink> guide.
-        </para>
-        <screen>sudo /sbin/yast2 susemanager_setup</screen>
-        <para>
-          if you are prompted with a message that there is not enough space
-          available for the setup of SUSE Manager, verify that your root
-          volume is at least 20GB and double check that the instructions in
-          <link linkend="using-separate-storage-volume">Using Separate
-          Storage Volume</link>
-          had the desired effects.
-        </para>
+	<para>
+	  Configure SUSE Manager
+	</para>
+	<substeps>
+	  <step>
+	    <para>
+	      If you run a SUSE Manager Server instance
+	    </para>
+            <para>
+              Run YaST as follows:
+            </para>
+            <para>
+              After the instance is launched and the external storage is
+              attached and prepared according to <link
+              linkend="using-separate-storage-volume">Using Separate Storage
+              Volume</link> begin with the setup of SUSE Manager. The steps that
+              follow do not differ from the documentation in the <ulink
+              url="https://www.suse.com/documentation/suse_manager">SUSE
+              Manager</ulink> guide.
+            </para>
+            <screen>sudo /sbin/yast2 susemanager_setup</screen>
+            <para>
+              If you are prompted with a message that there is not enough space
+              available for the setup of SUSE Manager, verify that your root
+              volume is at least 20GB and double check that the instructions in
+              <link linkend="using-separate-storage-volume">Using Separate
+              Storage Volume</link> had the desired effects.
+            </para>
+	  </step>
+	  <step>
+	    <para>
+	      If you run a SUSE Manager Proxy instance
+	    </para>
+	    <para>
+	      Register the instance with the parent SUSE Manager (which could be
+	      a SUSE Manager Server or another SUSE Manager Proxy). See the
+	      <ulink
+	      url="https://www.suse.com/documentation/suse_manager/book_susemanager_proxyquick/data/sec_manager_proxy_inst.html">
+	      SUSE Manager Proxy Setup guide</ulink> for details. Once
+	      registered, run
+	    </para>
+	    <screen>sudo /usr/sbin/configure-proxy.sh</screen>
+	    <para>
+	      to configure your SUSE Manager Proxy instance.
+	    </para>
+	  </step>
+	</substeps>
       </step>
       <step>
         <para>
-          After the completion of the YaST setup for SUSE Manager the
+          After the completion of the YaST setup for SUSE Manager Server the
           application is properly configured and functional. The setup process
           created an administrator user with following user name:
         </para>
@@ -270,10 +298,13 @@
 
 
         <para>
-          After logging in through the SUSE Manager Web UI
+          After logging in through the SUSE Manager Server Web UI,
           <emphasis role="strong">change</emphasis>
           the default password.
         </para>
+	<para>
+	  This step does not apply for SUSE Manager Proxy.
+	</para>
       </step>
     </procedure>
     <sect2 id="using-separate-storage-volume">
@@ -320,12 +351,14 @@
           </para>
           <screen>sudo /usr/bin/suma-storage /dev/sdb</screen>
           <para>
-            After the call all database and repository files used
-            by SUSE Manager are moved to the newly created xfs based
-            storage. The xfs partition is mounted below the path
+            After the call all database and repository files used by SUSE
+            Manager Server are moved to the newly created xfs based storage. In
+            case your instance is a SUSE Manager Proxy, the script will move the
+            Squid cache, which caches the software packages, to the newly
+            created storage.  The xfs partition is mounted below the path
             <filename>/manager_storage</filename>.
           </para>
-        </step>
+	</step>
         <step>
           <para>
             Create an entry in /etc/fstab (optional)
