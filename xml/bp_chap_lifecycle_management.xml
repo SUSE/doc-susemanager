@@ -1069,10 +1069,10 @@
         <note>
             <title>Security ASAP Exceptions</title>
             <para>The Security ASAP Exceptions channel is selected as an active child channel, and
-                the Patch Exceptions (DO NOT SUBSCRIBE) channel is NOT selected. This is important -
-                any patch/package copied into the Patch Exceptions channel should remain invisible
-                to hosts while patches/packages copied to the Security ASAP Exceptions channel
-                should always be immediately visible to a host.</para>
+                the Patch Exceptions (DO NOT SUBSCRIBE) channel is NOT selected. This is important
+                as any patch/package copied into the Patch Exceptions channel should remain
+                invisible to hosts while patches/packages copied to the Security ASAP Exceptions
+                channel should always be immediately visible to a host.</para>
         </note>
         <para>The Activation Key is called by a bootstrap script, often there is a one-to-one
             relationship between a registration bootstrap script and an activation key. Whether new
@@ -1122,7 +1122,27 @@
     </sect1>
     <sect1>
         <title>Crontab Entries and Automation</title>
-        <para/>
+        <subtitle>Schedule-based trigger for Archive Creation Script (Quarter-End)</subtitle>
+        <para>A decision needs to be made whether a calendar quarter is going to be created (looking
+            backwards) at the end of a particular month, or at the beginning of a month (one day
+            past the final day of a quarter). Since the Archive Channels are being created by
+            cloning the SUSE Updates channels of a particular SLES version, the decision can affect
+            the content.</para>
+
+        <para>Either way is fine as it will be consistent from quarter to quarter. For the purposes
+            of explaining the cron syntax, we will opt to show the more difficult of the two how to
+            call the archive script at the end of the quarter. This is more difficult simply because
+            it requires two cron entries to handle both the 30th of the month (for June and
+            September), and the 31st of the month (for March and December).</para>
+
+        <para>The crontab entries will point to the archive creation script and execute in months 3,
+            6, 9 and 12. Here are what the cron entries look like:</para>
+        <screen>0 0 30 6,9 * /path/to/the/archive/script
+0 0 31 3,12 * /path/to/the/archive/script</screen>
+
+        <para>The path will point to the actual archive-channel-create-script.sh (or similar). This
+            could be placed in <replaceable>/usr/sbin/</replaceable> and must be made executable <command>chmod
+                +x</command></para>
     </sect1>
 
 
