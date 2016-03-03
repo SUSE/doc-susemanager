@@ -1143,6 +1143,30 @@
         <para>The path will point to the actual archive-channel-create-script.sh (or similar). This
             could be placed in <replaceable>/usr/sbin/</replaceable> and must be made executable
                 <command>chmod +x</command></para>
+
+        <para>Also it is very important to note that this script in calling spacecmd commands from
+            within a bash shell script. Spacecmd is itself a python-based shell that can be invoked
+            - allowing the use of an extensive set of commands within the shell, or from outside the
+            shell as a mediated command interpreter.</para>
+
+        <para>The invocation of <command>spacecmd</command> stores a
+                <replaceable>.spacecmd</replaceable> directory in the users home directory. Within
+            the <replaceable>.spacecmd</replaceable> directory is a config file which can store
+            credential sets that can be leveraged in order to keep from being prompted at spacecmd
+            execution. This can be used to store credentials so the cron job will execute and not
+            pause waiting for authentication credentials to be passed.</para>
+
+        <para>Edit the <replaceable>/root/.spacecmd/</replaceable> config file and add the
+            appropriate credentials:
+            <screen>[spacecmd]
+server=localhost
+username=admin
+password=suse1234
+nossl=0</screen></para>
+
+        <para>Storing these credentials will allow spacecmd operations from the SUSE Manager’s root
+            user to be executed without the need to pass a username or password allowing the cron
+            job for archive creation to run without failure at the appropriate time.</para>
     </sect1>
 
 
