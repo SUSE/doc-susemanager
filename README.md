@@ -56,6 +56,7 @@ New work items will be added here. The status of these items will be marked with
 - [x] ~~Updated all documentation from DocBook 4.5 to 5.1 Status: DONE NOV 2015~~
 - [x] ~~Internal Feedback tool code-name :DocReview:  Status: DONE NOV 2015~~
 - [x] ~~Current work on docs released in SUSE Manager Technical Preview Status: DONE NOV 2015~~
+- [x] ~~Best Practice Introduction Status: DONE NOV 2015~~
 - [x] ~~Updated Book chapter/section ID's to match SUSE Manager WebUI KE/MC/Coyote Status: DONE JAN 2016~~
 - [x] ~~Contact Methods rhnsd, ssh push, ssh push tunnel, osad (BP guide) DONE FEB 2016
       (Salt to be added IN_DEV)~~
