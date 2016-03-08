@@ -27,9 +27,7 @@
 
   <para>
    Setting up &susemgr; typically requires some extra steps after
-   installation for common configuration tasks. This new feature in
-   &susemgr; 2.1 makes it straightforward to get to a working state by
-   streamlining those tasks.
+   installation for common configuration tasks.
   </para>
 
   <para>
@@ -37,8 +35,8 @@
    &susemgr; Web interface is used for the fist time and can be accessed
    later at any time by clicking on
    <menuchoice><guimenu>Admin</guimenu><guimenu>Setup
-   Wizard</guimenu></menuchoice>. On the two tabs configure the HTTP proxy
-   server and mirror credentials.
+   Wizard</guimenu></menuchoice>. On the three tabs configure the HTTP proxy
+   server, organization credentials, and &suse; products.
   </para>
 
   <variablelist>
@@ -47,7 +45,8 @@
     </term>
     <listitem>
      <para>
-      Configure a proxy server that &susemgr; will use to access NCC and
+      Configure a proxy server that &susemgr; will use to access SCC
+      (&suse; Customer Center) and
       other remote servers here. Use <literal>hostname:port</literal> syntax
       in the <guimenu>Hostname</guimenu> field if the proxy port is not 80.
       Clearing the fields disables proxy.
@@ -55,12 +54,12 @@
     </listitem>
    </varlistentry>
    <varlistentry>
-    <term><guimenu>Mirror Credentials:</guimenu>
+    <term><guimenu>Organization Credentials:</guimenu>
     </term>
     <listitem>
      <para>
-      Click <guimenu>Add a new credential</guimenu> and enter email address,
-      username and password to allow a user to access NCC. After saving, a
+      Click <guimenu>Add a new credential</guimenu> and enter
+      username and password to allow a user to access SCC. After saving, a
       new credential card will be displayed. Buttons below the credential
       card allow you to:
      </para>
@@ -68,7 +67,7 @@
       <listitem>
        <para>
         see the credential validation status (green tick or red cross icon).
-        To re-check the credential with NCC, click on the icon;
+        To re-check the credential with SCC, click on the icon;
        </para>
       </listitem>
       <listitem>
@@ -101,13 +100,13 @@
     <listitem>
      <para>
       On the <guimenu>&suse; Products</guimenu> page, select
-      product-specific channels you are entitled to. The products displayed
-      are directly linked to your mirror credentials as well as your
-      &suse; subscriptions. Add-on products are shown when you select the
-      corresponding base product or click the plus sign to its left. After
-      you have made your selection, click <guimenu>Add products</guimenu>.
-      This equals running the <command>mgr-ncc-sync --add-product</command>
-      command.
+      product-specific channels you are entitled to. The products
+      displayed are directly linked to your organization credentials as
+      well as your &suse; subscriptions. Product extentions and modules
+      are shown when you select the corresponding base product or click
+      the plus sign to its left. After you have made your selection,
+      click <guimenu>Add products</guimenu>.  This equals running the
+      <command>mgr-sync add products</command> command.
      </para>
      <note>
       <para>
@@ -128,9 +127,11 @@
    </varlistentry>
   </variablelist>
 
-  <para>
-   More settings will be configurable from the Wizard in future versions.
-  </para>
+  <!--
+      <para>
+      More settings will be configurable from the Wizard in future versions.
+      </para>
+  -->
  </sect1>
 <!-- z: s2-sattools-org ref.webui.admin.org -->
  <sect1 xml:id="ref.webui.admin.org">
@@ -157,7 +158,6 @@
        Here the following tabs are available:
     Details
     Users
-    Subscriptions
     Trusts
     Configuration
    -->
@@ -182,13 +182,14 @@
    </para>
   </sect2>
 
+  <!--
   <sect2 xml:id="s2-sattools-org-details-subscriptions">
    <title><guimenu>Organization Details</guimenu> &gt; <guimenu>Subscriptions</guimenu></title>
    <para>
     List of all the entitlements of an organization.
    </para>
   </sect2>
-
+  -->
   <sect2 xml:id="s2-sattools-org-details-trust">
    <title><guimenu>Organization Details</guimenu> &gt; <guimenu>Trust</guimenu></title>
    <para></para>
@@ -204,7 +205,7 @@
    <para>
     Staging means that clients will download packages in advance. Then the
     package installation action will take place immediately, when the
-    schedule is actually executed. This <quote>pre-fetching</quote> saves
+    schedule is actually executed.  This <quote>pre-fetching</quote> saves
     maintenance window time, which is good for service uptime.
    </para>
    <para>
@@ -229,7 +230,8 @@ stagingContentWindow=24</screen>
    </para>
   </sect2>
  </sect1>
-<!-- z: s2-sattools-subscriptions ref.webui.admin.subscr -->
+ <!-- z: s2-sattools-subscriptions ref.webui.admin.subscr -->
+ <!--
  <sect1 xml:id="ref.webui.admin.subscr">
   <title><guimenu>Admin</guimenu> &gt; <guimenu>Subscriptions</guimenu></title>
 
@@ -266,13 +268,14 @@ stagingContentWindow=24</screen>
       name for more details. Again, the <guimenu>Organizations</guimenu> tab
       allows you to change allocations in the <guimenu>Proposed
       Total</guimenu> column, then click <guimenu>Update</guimenu> for your
-      changes to take effect. <!-- For more information on entitlements, refer to -->
-      <!-- <xref linkend="s1-admin-orgs-details-subs"/>. -->
+      changes to take effect. <!-\- For more information on entitlements, refer to -\->
+      <!-\- <xref linkend="s1-admin-orgs-details-subs"/>. -\->
      </para>
     </listitem>
    </varlistentry>
   </variablelist>
- </sect1>
+  </sect1>
+  -->
 <!-- z: s2-sattools-users ref.webui.admin.users -->
  <sect1 xml:id="ref.webui.admin.users">
   <title><guimenu>Admin</guimenu> &gt; <guimenu>Users</guimenu></title>
@@ -393,11 +396,11 @@ stagingContentWindow=24</screen>
     The <menuchoice><guimenu>&susemgr;
     Configuration</guimenu><guimenu>Bootstrap Script</guimenu></menuchoice>
     page allows you to generate a bootstrap script for redirecting client
-    systems from the central &ncc; to &susemgr;. This script, to be
+    systems from the central &scc; to &susemgr;. This script, to be
     placed in the <filename>/srv/www/htdocs/pub/bootstrap/</filename>
     directory of &susemgr;, significantly reduces the effort involved in
     reconfiguring all systems, which by default obtain packages from the
-    central &ncc;. The required fields are pre-populated with values
+    central &scc;. The required fields are pre-populated with values
     derived from previous installation steps. Ensure this information is
     accurate.
    </para>
@@ -408,7 +411,7 @@ stagingContentWindow=24</screen>
     management of the systems to be bootstrapped here. Both features are
     useful for completing client configuration. Finally, if you are using an
     HTTP proxy server, fill in the related fields. When finished, click
-    <guimenu>Generate Bootstrap Script</guimenu>.
+    <guimenu>Update</guimenu>.
    </para>
   </sect2>
 
@@ -436,8 +439,6 @@ stagingContentWindow=24</screen>
     finish.
    </para>
   </sect2>
-
-<!-- bnc#828216 -->
 
   <sect2 xml:id="s3-sattools-config-cobbler">
    <title><guimenu>Admin</guimenu> &gt; <guimenu>&susemgr; Configuration</guimenu> &gt; <guimenu>Cobbler</guimenu></title>
@@ -504,17 +505,17 @@ stagingContentWindow=24</screen>
    </para>
   </sect2>
  </sect1>
-<!-- z: s2-sattools-iss ref.webui.admin.iss -->
+ <!-- z: s2-sattools-iss ref.webui.admin.iss -->
  <sect1 xml:id="ref.webui.admin.iss">
   <title><guimenu>Admin</guimenu> &gt; <guimenu>ISS Configuration</guimenu></title>
 
   <para>
    Inter-Server Synchronization (ISS) allows a &susemgr; to synchronize
    content and permissions from another &susemgr; instance in a
-   peer-to-peer relationship. <!-- For detailed information, refer to -->
-   <!-- <xref linkend="s1-sync-iss"/>. -->
+   peer-to-peer relationship.
   </para>
 
+  <!-- FIXME: moving to BP? -->
   <sect2 xml:id="s3-sattools-iss-master">
    <title>Configuring the Master &susemgr; Server</title>
    <para>
@@ -531,14 +532,14 @@ stagingContentWindow=24</screen>
     </listitem>
     <listitem>
      <para>
-      Allow Slave to Sync? - Choosing this field will allow the slave
+      Allow Slave to Sync? &mdash; Choosing this field will allow the slave
       &susemgr; to access this master &susemgr;. Otherwise, contact
       with this slave will be denied.
      </para>
     </listitem>
     <listitem>
      <para>
-      Sync all orgs to Slave? - Checking this field will synchronize all
+      Sync All Orgs to Slave? &mdash; Checking this field will synchronize all
       organizations to the slave &susemgr;.
      </para>
     </listitem>
@@ -662,6 +663,7 @@ stagingContentWindow=24</screen>
    configured:
   </para>
 
+  <!-- FIXME: checkit -->
   <variablelist>
    <varlistentry>
     <term><guimenu>channel-repodata-default:</guimenu>
@@ -829,6 +831,7 @@ stagingContentWindow=24</screen>
      </para>
     </listitem>
    </varlistentry>
+   <!-- seems no longer to exist:
    <varlistentry>
     <term><guimenu>satcert-check-default:</guimenu>
     </term>
@@ -839,6 +842,7 @@ stagingContentWindow=24</screen>
      </para>
     </listitem>
    </varlistentry>
+   -->
    <varlistentry>
     <term><guimenu>session-cleanup-default:</guimenu>
     </term>
@@ -861,16 +865,18 @@ stagingContentWindow=24</screen>
      </para>
     </listitem>
    </varlistentry>
+   <!-- seems no longer to exist:
    <varlistentry>
     <term><guimenu>sync-probe-default:</guimenu>
     </term>
     <listitem>
      <para>
-      synchronizes the state of monitoring probes to &susemgr;. <!-- For more -->
-      <!-- information on probes, see <xref linkend="ap-probes-monitoring"/>. -->
+      synchronizes the state of monitoring probes to &susemgr;. <!-\- For more -\->
+      <!-\- information on probes, see <xref linkend="ap-probes-monitoring"/>. -\->
      </para>
     </listitem>
-   </varlistentry>
+    </varlistentry>
+    -->
   </variablelist>
  </sect1>
 <!-- z: s2-sattools-task-engine ref.webui.admin.status -->
