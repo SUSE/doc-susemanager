@@ -85,3 +85,27 @@ Contributors with direct access to the repository are encouraged to use the git-
 Note:
 	
 Please do not make any commits to the master branch. master is reserved for releases only. 
+
+
+##Updating the SUMA 3 Documentation Package (susemanager-docs_en)##
+
+```
+OBS_USER=keichwa
+
+daps -d DC-create-all package-src --set-date=$(date --iso) \
+     --def-file DEF-susemanager-docs
+
+# save old checkout
+old home:$OBS_USER:branches:Devel:Galaxy:Manager:Head/susemanager-docs_en
+
+osc -A https://api.suse.de bco Devel:Galaxy:Manager:Head susemanager-docs_en
+cd home:$OBS_USER:branches:Devel:Galaxy:Manager:Head/susemanager-docs_en
+cp ../../build/create-all/package/create-all_en_src_set.tar.bz2 .
+osc vc -m "Update text and image files."
+osc ci -m "update"
+
+# check results; e.g. with:
+osc pr
+
+osc sr -m 'update'
+```
