@@ -7,6 +7,18 @@ html:
 pdf:
 	daps -d DC-create-all pdf
 
+advanced:
+	daps -d DC-susemanager-advanced-topics pdf
+
+best-practices:
+	daps -d DC-susemanager-best-practices pdf
+
+getting-started:
+	daps -d DC-susemanager-getting-started pdf
+
+reference:
+	daps -d DC-susemanager-reference pdf
+
 quick: quick-html quick-pdf
 
 quick-html:
