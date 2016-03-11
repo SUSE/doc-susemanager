@@ -14,14 +14,15 @@
     <sect1>
         <title>Subscription Matching</title>
 
-        <para>SUSE Manager 3 automatically generates nightly reports with the matching status of
-            your SUSE subscriptions with all the registered systems. Those reports are stored in
-                <replaceable>/var/lib/spacewalk/subscription-matcher</replaceable> in CSV format and
-            can be opened with any spreadsheet application such as LibreOffice Calc. </para>
+        <para>SUSE Manager 3 automatically generates up-to-date nightly status reports by matching
+            your SUSE subscriptions with all your registered systems. These reports are stored in
+                <replaceable>/var/lib/spacewalk/subscription-matcher</replaceable> and provided in
+            CSV format. These CSV files may be opened with any mainstream spreadsheet application
+            such as LibreOffice Calc. </para>
 
-        <para>If you would like to schedule these reports to be produced at different times, or a
-            certain frequency or schedule a one time completion you can perform this task by editing
-            the Taskomatic settings for the gatherer-matcher located under Schedule name at: <menuchoice>
+        <para>If you would like to schedule these reports to be produced at different times, or a at
+            a certain frequency or schedule a one time completion you can perform this task by
+            editing the Taskomatic settings for the gatherer-matcher located under Schedule name at: <menuchoice>
                 <guimenu>Admin</guimenu>
                 <guimenu>Task Schedules</guimenu>
                 <guimenu>gatherer-matcher-default</guimenu>
@@ -38,8 +39,41 @@
 
     </sect1>
     <sect1>
-        <title>Reporting to SCC</title>
-        <para/>
+        <title>Gathering Information on Foreign Virtual Hosts</title>
+
+        <para>A pre-requirement to match subscriptions to systems is to have complete information
+            about which virtual system runs on which virtual host. SUSE Manager gets this
+            information without any further configuration if the hypervisor is a registered system
+            running on SUSE Linux Enterprise Server or RedHat Enterprise Linux. Third party
+            hypervisors, like VMware or Hyper-V, need configuration described in this page. </para>
+
+        <para>Third party hypervisors and hypervisor managers such as VMWare vCenter are called
+            "Virtual Host Managers" (VHM) in SUSE Manager, as they are able to manage one or
+            multiple virtual hosts, which in turn may contain virtual guests.</para>
+
+        <para>SUSE Manager 3 ships with a tool (virtual-host-gatherer) that can connect to VHMs
+            using their API, request information about virtual hosts. This tool is automatically
+            invoked via Taskomatic every night - you just need to configure your VHMs via XMLRPC
+            APIs. </para>
+
+        <para>virtual-host-gatherer has the concept of optional modules - each module enables a
+            specific Virtual Host Manager "type" to be used (eg. VMware). </para>
     </sect1>
 
+    <sect1>
+        <title>Available virtual-host-gatherer Modules</title>
+        <para><itemizedlist>
+                <listitem>
+                    <para>VMWare: supports VMware products running on the vSphere operating system,
+                        currently VMware ESX, ESXi and vCenter</para>
+                </listitem>
+                <listitem>
+                    <para>File: read data from a plain json file which could be obtained from
+                        another virtual-host-gatherer instance (typically from a different
+                        disconnected network which has direct access to VHMs) or created manually.
+                        See the man page for a specification of the expected json format.</para>
+                </listitem>
+            </itemizedlist>In future more modules might be made available, for example to support
+            Microsoft Hyper-V. </para>
+    </sect1>
 </chapter>
