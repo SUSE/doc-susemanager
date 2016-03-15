@@ -13,7 +13,7 @@
 
     <title>Advanced Patch Lifecycle Management</title>
 
-    <sect1 xml:id="bp.chap.adv.life.mgr.covered">
+    <sect1 xml:id="bp.chapt.life.management.covered">
         <title>Whats Covered Here?</title>
 
         <para>This chapter describes how to setup and configure a &susemgr; testing implementation
@@ -48,7 +48,7 @@
         </para>
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.assumptions">
         <title>Assumptions</title>
         <para>This guide covers &susemgr; &productnumber3;. A fresh installation is not required but
             some assumptions are made. You have a working &susemgr; environment, with a few
@@ -66,7 +66,7 @@
         </note>
     </sect1>
 
-    <sect1 xml:id="bp.chap.adv.patch.life.mgr.overview">
+    <sect1 xml:id="bp.chapt.life.management.patch.life.mgr.overview">
         <title>Patch Lifecycle Management Overview</title>
         <para>Keeping systems patched and secure remains one of the greatest ongoing challenges
             which you will face as an administrator. Both proprietary and open-source companies are
@@ -134,7 +134,7 @@
             validation of applied changes to a system or set of systems. This means that you are
             required to manage, patch and report on at least one more complete set of hosts. </para>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.important.terminology">
             <title>Important Terminology</title>
             <para>The following paragraphs provide an explanation of important terms used throughout
                 this chapter.</para>
@@ -162,7 +162,7 @@
         </sect2>
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.example.scenario">
         <title>Example Scenario</title>
         <formalpara>
             <title>The Chameleon Corporation</title>
@@ -228,7 +228,7 @@
     </sect1>
     <!-- The following section needs to be revised. It is wordy, and large amount of content difficult to read
         through. Goals: Shorten and reorganize. -->
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.implementation">
         <title>Implementation</title>
         <para>To review, you need to configure SUSE Manager, creating a set of procedures, processes
             and/or tools (scripts) to help with your patch lifecycle management. This includes the
@@ -280,7 +280,7 @@
         <para>Automation is preferred. As mentioned, the use of scripts or scheduled jobs would
             greatly enhance this solution and make it easier for support staff.</para>
     </sect1>
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.base.channel.arch">
         <title>Base Channels and Architecture</title>
 
         <para>This represents a high-level outline of the architecture and channels:</para>
@@ -462,7 +462,7 @@
         </para>
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.automation.process.design">
         <title>Automation and Process Design</title>
         <para>Automation will include automatic channel clone creation for the Archive channels. To
             best suit a particular company’s use-cases and product usage, a combination of scripts
@@ -474,15 +474,15 @@
             31 on the 6 th and 12 th months (June and December). This will require 2 crontab entries
             such as (cron syntax):<itemizedlist>
                 <listitem>
-                    <para><screen>0 0 30 6,9 * /path/to/archive-create-script</screen></para>
+                    <para><screen language="bash">0 0 30 6,9 * /path/to/archive-create-script</screen></para>
                 </listitem>
                 <listitem>
-                    <para><screen>0 0 31 3,12 * /path/to/archive-create-script</screen></para>
+                    <para><screen language="bash">0 0 31 3,12 * /path/to/archive-create-script</screen></para>
                 </listitem>
                 <listitem>
                     <para>If the trigger for the quarter is going to happen on the 1 st of a month,
                         then only one crontab entry would be required, for
-                        example:<screen>0 0 1 1,4,7,10 * /path/to/archive-create-script</screen></para>
+                        example:<screen language="bash">0 0 1 1,4,7,10 * /path/to/archive-create-script</screen></para>
                 </listitem>
             </itemizedlist></para>
         <para>The actual “archive-create-script” will also need logic in it to determine the quarter
@@ -520,12 +520,12 @@
             merging the same patch later) will not cause any conflicts with a system that already
             has installed it.</para>
 
-        <para>For more information see also: <link linkend="bp.chap.lifecycle.mgr.except.escalation"
-                >Exception and Escalation Channels</link></para>
+        <para>For more information see also: <xref linkend="bp.chap.life.management.except.escalation"
+                /></para>
 
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.patch.promo.cycle">
         <title>Patch Promotion Cycle</title>
         <para>Understanding how patches (and the packages they include) are obtained from SUSE,
             where they go after download, and how they are arranged within SUSE Manager is key to
@@ -565,7 +565,7 @@
         </figure>
     </sect1>
 
-    <sect1 xml:id="bp.chap.lifecycle.mgr.except.escalation">
+    <sect1 xml:id="bp.chap.life.management.except.escalation">
         <title>Exception and Escalation Channels</title>
         <para>There might be several reasons to delay or remove a patch from a deployment cycle. A
             patch could be causing issues with the stability of a system or systems, it might not
@@ -617,7 +617,7 @@
 
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.components.to.be.created">
         <title>Components to be Created</title>
         <para>The following list provides an overview on what you will be creating to enable
             Advanced Patch Lifecycle Management:<itemizedlist>
@@ -662,7 +662,7 @@
         </para>
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.channels">
         <title>Channels</title>
         <para>Several custom channels will be created to support the patch promotion process. These
             channels will store the archives (created as clones of the SUSE Updates channels) and
@@ -679,7 +679,7 @@
             patch is copied successfully into an exception channel, it can be removed from an
             updates channel or an archive.</para>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.creating.archive.channels">
             <title>Creating Archive Channels</title>
             <para>Custom channels are created in SUSE Manager as “new”, blank and empty channels, or
                 “clones”. Technically, cloned channels can also be created as empty, but in this
@@ -732,7 +732,7 @@
                     <para>The channel label <emphasis>must be</emphasis> in the format of
                             <replaceable>architecture-patch-archives-channel</replaceable>, for
                         example the 64-bit channel label should be:
-                        <screen>x86_64-patch-archives-channel</screen></para>
+                        <screen language="bash">x86_64-patch-archives-channel</screen></para>
                 </step>
                 <step>
                     <para>Select the appropriate architecture for this channel - x86_64 for 64-bit,
@@ -812,7 +812,7 @@
             </note>
         </sect2>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.service.pack.migration.support.update.exception.channels">
             <title>Service Pack Migration Support with Update and Exception Channels</title>
             <para>There are a couple of generally accepted methods to managing a set of channels
                 that allows consistent and expected behaviors when leveraging the SP Migration
@@ -858,7 +858,7 @@
             <para>The command spacecmd softwarechannel_clonetree can be called directly by providing
                 the source and prefix information directly or interactively by calling the command
                 from within the spacecmd shell itself:</para>
-            <screen><command>spacecmd -u SMadmin -- softwarechannel_clonetree sles11-sp3-pool-x86_64 -p “my_company-“</command></screen>
+            <screen language="bash">spacecmd -u SMadmin -- softwarechannel_clonetree sles11-sp3-pool-x86_64 -p “my_company-“</screen>
             <para>This will create a set of SLES 11 SP3 x86_64 channels with a prefix
                 (my_company).</para>
 
@@ -903,7 +903,7 @@
 
         </sect2>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.current.updates.channels">
             <title> Current-Updates Channels </title>
             <para>Now create the <emphasis>current updates</emphasis> channels that managed hosts
                 will subscribe to depending on their landscape, for example, <emphasis>DEV - Current
@@ -954,8 +954,8 @@
                 are no longer updated so these could be subscribed as static channels.</para>
         </sect2>
 
-        <sect2>
-            <title>Exeption Channels</title>
+        <sect2 xml:id="bp.chapt.sect2.exception.channels">
+            <title>Exception Channels</title>
             <para>Now create the 2 exception channels for each SLES version being managed. While it
                 may be possible to create a mixed channel that is unique to architecture (like the
                 archive channel base), tracking which distribution a patch exception has come from
@@ -1013,7 +1013,7 @@
         </sect2>
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.act.keys.bootstrap">
         <title>Activation Keys and Bootstrapping</title>
         <para>Normally you should create a set of Activation Keys each assigned to a specific
             version of SLES that your hosts are installed with. There may be other characteristics
@@ -1084,9 +1084,9 @@
             assignments as the host will now be assigned to its proper landscape update channels and
             will receive new updates as they are promoted each patch cycle.</para>
     </sect1>
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.management.scripts">
         <title>Scripts</title>
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.patch.package.merge.script">
             <title>Patch/Package Merge Script</title>
             <para>The Patch/Package Merge Script is used to Promote patches (and relevant packages)
                 from one channel to another. It is used at first to merge content from an Archive
@@ -1098,7 +1098,7 @@
                 (quarterly/monthly/etc.).</para>
         </sect2>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.channel.archive.creation.script.source.list.conf">
             <title>Channel Archive Creation Script / Channel Archive Sources List Config
                 File</title>
             <para>This script and its associated “sources list” configuration file are called either
@@ -1121,7 +1121,7 @@
         </sect2>
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.managmenet.crontab.entries.and.automation">
         <title>Crontab Entries and Automation</title>
         <para>A decision needs to be made whether a calendar quarter is going to be created (looking
             backwards) at the end of a particular month, or at the beginning of a month (one day
@@ -1137,8 +1137,8 @@
 
         <para>The crontab entries will point to the archive creation script and execute in months 3,
             6, 9 and 12. Here are what the cron entries look like:</para>
-        <screen>0 0 30 6,9 * /path/to/the/archive/script
-0 0 31 3,12 * /path/to/the/archive/script</screen>
+        <screen language="bash">0 0 30 6,9 * /path_to/the/archive/script
+0 0 31 3,12 * /path_to/the/archive/script</screen>
 
         <para>The path will point to the actual archive-channel-create-script.sh (or similar). This
             could be placed in <replaceable>/usr/sbin/</replaceable> and must be made executable
@@ -1158,7 +1158,7 @@
 
         <para>Edit the <replaceable>/root/.spacecmd/</replaceable> config file and add the
             appropriate credentials:
-            <screen>[spacecmd]
+            <screen language="ini">[spacecmd]
 server=localhost
 username=admin
 password=suse1234
@@ -1235,7 +1235,7 @@ nossl=0</screen></para>
             </listitem>
         </itemizedlist>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.workflow1.patch.promo.process">
             <title>Workflow 1: Patch Promotion Process</title>
             <para>The following sections provide some example workflows for the patch promotion and
                 exception processes. Keep in mind that these can be modified to fit more closely to
@@ -1252,7 +1252,7 @@ nossl=0</screen></para>
             </figure>
         </sect2>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.workflow2.patch.exept.process">
             <title>Workflow 2: Patch Exception Process</title>
             <para>Reveiwed the <emphasis>Patch Exception Process</emphasis> in the following table.
                 Again, keep in mind that these can be modified to fit more closely with your
@@ -1268,7 +1268,7 @@ nossl=0</screen></para>
             </figure>
         </sect2>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.workflow3.security.asap.except.process">
             <title>Workflow 3: Security ASAP Exceptions Process</title>
             <para>The Security exception process differs from the previous patch exception process
                 in that a patch is now being added into a patch rollout cycle, likely in the middle
@@ -1310,15 +1310,15 @@ nossl=0</screen></para>
             </figure>
         </sect2>
     </sect1>
-    <sect1>
+    <sect1 xml:id="bp.chapt.life.managment.sample.scripts">
         <title>Sample Scripts</title>
-        <para>This section contains scripts which will be usefull for <emphasis>Advanced Patch
+        <para>This section contains scripts which will be useful for <emphasis>Advanced Patch
                 Lifecycle Management</emphasis>.</para>
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.sample.spacewalk.clone.by.date.config">
             <title>Sample Spacewalk-Clone-By-Date Configuration</title>
             <para>This sample is stored as a text-file. It is used with the spacewalk-clone-by-date
                 utility by using the -c flag to indicate an input config
-                file:<screen><command>spacewalk-clone-by-date -c Q3-2015-sles11sp3-x86_64-archive.conf</command></screen></para>
+                file:<screen language="bash">spacewalk-clone-by-date -c Q3-2015-sles11sp3-x86_64-archive.conf</screen></para>
 
             <para>This sample, below is using the SUSE Manager administrator account name of
                     <emphasis>SMadmin</emphasis> but can be changed to meet the requirements of your
@@ -1351,7 +1351,7 @@ nossl=0</screen></para>
             </note>
             <para>The following is an example from the
                     <replaceable>Q3-2015-sles11sp3-x86_64-archive.conf</replaceable>.</para>
-            <screen>{
+            <screen language="json">{
 "username":"SMadmin",
 "to_date": "2015-09-30",
 "skip_depsolve":false,
@@ -1386,7 +1386,7 @@ Server 11 SP3 x86_64",
             </important>
         </sect2>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.sample.patch.package.merge.script.python">
             <title>Sample Patch/Package Merge Script Using Python</title>
             <para>This script has a defined SUSE Manager server URL set in the “MANAGER_URL”
                 variable. The script prompts for a SUSE Manager Administrator ID and password. It
@@ -1451,7 +1451,7 @@ client.channel.software.mergeErrata(key, MERGE_SOURCE, MERGE_TARGET)
 client.auth.logout(key)                            </screen>
         </sect2>
 
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.sample.crontab.entries.automation.archive.channel">
             <title>Sample Crontab Entries for Automation and Archive Channel Creation</title>
             <para>Below are some sample cron entries that can be used to run the Archive Channel
                 Creation Script resulting in channel creation for each quarter. This example has two
@@ -1463,10 +1463,10 @@ client.auth.logout(key)                            </screen>
                 name the archive created as a 4 th quarter archive.</para>
             <para>Cron entries for end-of-quarter (e.g. 30th of months June and Sept. and 31st of
                 months March and
-                December):<screen>0 0 30 6,9 * /path/to/the/archive/script
-0 0 31 3,12 * /path/to/the/archive/script</screen></para>
+                December):<screen language="Bash">0 0 30 6,9 * /path_to/the/archive/script
+0 0 31 3,12 * /path_to/the/archive/script</screen></para>
         </sect2>
-        <sect2>
+        <sect2 xml:id="bp.chapt.sect2.sample.archive.channel.creation.script">
             <title>Sample Archive Channel Creation Script</title>
             <para>The script below works with the Archive Channel Sources file (next appendix item)
                 to create quarterly archives of the SUSE Updates channels. This example script is
@@ -1570,7 +1570,7 @@ echo "Target Channel Summary and Description: "$target_summary
 done &lt; ./archive-sources.lst</screen>
         </sect2>
 
-        <sect2>
+        <sect2 xml:id="sample.archive.channel.sources.list.file">
             <title>Sample Archive Channel Sources List File</title>
             <para>This file is called/used by the Archive Channel Creation Script located above in
                 the previous section. Since the function “readline” is used, there should only be
@@ -1591,9 +1591,9 @@ done &lt; ./archive-sources.lst</screen>
                         <para><emphasis>Target channel Naming</emphasis> - the text that makes up
                             the channel name and part of the channel summary/description
                             fields.</para>
-                        <screen language="nocode">s390x,sles11-sp3-updates-s390x,SLES11-SP3-Updates for s390x
-x86_64,sles11-sp4-updates-x86_64,SLES11-SP4-Updates for x86_64
-i586,sles11-sp3-updates-x86_64,SLES11-SP3-Updates for x86_64</screen>
+                        <screen language="nocode">s390x, sles11-sp3-updates-s390x,SLES11-SP3-Updates
+x86_64, sles11-sp4-updates-x86_64,SLES11-SP4-Updates
+i586, sles11-sp3-updates-x86_64,SLES11-SP3-Updates</screen>
                     </listitem>
                 </itemizedlist></para>
             <para>This concludes the <emphasis>Advanced Patch Lifecycle Managment</emphasis> chapter
