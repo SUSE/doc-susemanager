@@ -23,7 +23,37 @@
 
   <sect1>
     <title>What are Activation Keys?</title>
-    <para/>
+    <para>An <literal>activation key</literal> in &susemgr; is a group of settings with a label. You
+      can apply all settings associated with an activation key by adding its label as a parameter to
+      a bootstrap script. Under normal operating conditions best practices suggest using an
+      activation key label always in combination with a bootstrap script.</para>
+    <para>An activation key can specify:</para>
+    <para>
+      <itemizedlist>
+        <listitem>
+          <para>Channel Assignment</para>
+        </listitem>
+        <listitem>
+          <para>System Types (Traditionally called Add-on Entitlements)</para>
+        </listitem>
+        <listitem>
+          <para>Contact Method</para>
+        </listitem>
+        <listitem>
+          <para>Configuration Files</para>
+        </listitem>
+        <listitem>
+          <para>Packages to be Installed</para>
+        </listitem>
+        <listitem>
+          <para>System Group Assignment</para>
+        </listitem>
+      </itemizedlist>
+    </para>
+    <para>So what do activation keys do exactly? Activation keys alone do nothing. The are just a
+      collection of settings which have been given a label that is added to a bootstrap script. When
+      the bootstrap script is executed all settings associated with the label are applied to the
+      system the bootstrap script is run on.</para>
   </sect1>
 
   <sect1>
@@ -41,8 +71,50 @@
 
   <sect1>
     <title>Activation Keys Best Practices</title>
-    <para>There are a several things which should be kept in mind when creating activation keys. The
-      following list provides insight on naming and which packages should be included.<itemizedlist>
+    <para>There are a few important concepts which should be kept in mind when creating activation
+      keys. The following sections provide insight when creating and naming your activation
+      keys.</para>
+    <sect2>
+      <title>Key Label Naming</title>
+      <para> One of the most important things to consider during activation key creation is label
+        naming. Creating easy to remember names that are associated with your organization's
+        infrastructure will make it easier for you when performing more complex operations. When
+        naming key labels keep the following in mind:<itemizedlist>
+          <listitem>
+            <para>OS naming(mandatory): Keys should always refer to the OS they provide settings
+              for</para>
+          </listitem>
+          <listitem>
+            <para>Architecture naming(recommended): Unless your company is running on one
+              architecture, for example x86_64, then providing labels with an architecture type is a
+              good idea.</para>
+          </listitem>
+          <listitem>
+            <para>Server type naming: What is, or what will this server be used for?</para>
+          </listitem>
+          <listitem>
+            <para>Location naming: Where is the server located? Room, building or department?
+            </para>
+          </listitem>
+          <listitem>
+            <para>Date naming: Maintenance windows, quarter, etc.</para>
+          </listitem>
+          <listitem>
+            <para>Custom naming: What naming scheme suits your organizations needs?</para>
+          </listitem>
+        </itemizedlist>
+      </para>
+      <para>Example activation key label names:</para>
+      <screen>SLES12-SP1-WEB_SERVER-ROOM_129-x86_64</screen>
+      <screen>SLES12-SP2-TEST_PACKAGES-BLG_502-ROOM_21-i586</screen>
+    </sect2>
+    <sect2>
+
+      <title>Channels to be Included</title>
+      <para>When creating activation keys you also need to keep in mind which channels (software
+        sources) will be associated with it. For example:</para>
+
+      <itemizedlist>
         <listitem>
           <para>Channels to be included:<itemizedlist>
               <listitem>
@@ -68,29 +140,19 @@
               </listitem>
             </itemizedlist></para>
         </listitem>
-        <listitem>
-          <para>Create naming schemes for types of activation keys and combine them<itemizedlist>
-              <listitem>
-                <para>OS naming (mandatory)</para>
-              </listitem>
-              <listitem>
-                <para>Server type naming</para>
-              </listitem>
-              <listitem>
-                <para>Location based naming</para>
-              </listitem>
-              <listitem>
-                <para>Custom naming</para>
-              </listitem>
-            </itemizedlist></para>
-        </listitem>
-      </itemizedlist></para>
-    <note>
-      <title>Specific Base Channel Assignment</title>
-      <para>OS keys must have a specific base channel assigned to it or &susemgr; will be unable to
-        assign specific stages. Also all non-OS keys must have <replaceable>SUSE Manager Default
-        </replaceable> as their base channel.</para>
-    </note>
+      </itemizedlist>
+      <note>
+        <title>Specific Base Channel Assignment</title>
+        <para>OS keys must have a specific base channel assigned to it for example:
+          <screen>SLES12-SP1-Pool-x86_64</screen> If this is not the case &susemgr; will be unable
+          to assign specific stages. All non-OS keys must have the <replaceable>SUSE Manager Default
+          </replaceable> as their base channel. Using the &susemgr; Default Base Channel is not
+          recommended and may cause problems.</para>
+      </note>
+    </sect2>
+
+
+
   </sect1>
 
   <sect1>
