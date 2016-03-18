@@ -14,11 +14,7 @@
   <sect1>
     <title>What's Covered Here?</title>
     <para/>
-    <!-- ADD TO Activation Keys PAGE: 1. We do not support specifying an activation key on the minion on-boarding page
-     2. Act keys used with salt minions are the same as used with a traditional system and may be shared
-     3. Equiv specifying key in traditional bootstrap is to put the key in the grain of the minion
-     4. After accepting minion key all settings specified in the grain and associated with the key will be applied.
-  -->
+
   </sect1>
 
   <sect1>
@@ -113,7 +109,14 @@
       <title>Channels to be Included</title>
       <para>When creating activation keys you also need to keep in mind which channels (software
         sources) will be associated with it. For example:</para>
-
+      <important>
+        <title>Specific Base Channel Assignment</title>
+        <para>OS keys must have a specific base channel assigned to it for example:
+            <literal>SLES12-SP1-Pool-x86_64</literal> If this is not the case &susemgr; will be
+          unable to assign specific stages. All non-OS keys must have the <replaceable>SUSE Manager
+            Default </replaceable> as their base channel. Using the &susemgr; Default Base Channel
+          is not recommended and may cause problems.</para>
+      </important>
       <itemizedlist>
         <listitem>
           <para>Channels to be included:<itemizedlist>
@@ -141,23 +144,23 @@
             </itemizedlist></para>
         </listitem>
       </itemizedlist>
-      <important>
-        <title>Specific Base Channel Assignment</title>
-        <para>OS keys must have a specific base channel assigned to it for example:
-            <literal>SLES12-SP1-Pool-x86_64</literal> If this is not the case &susemgr; will be
-          unable to assign specific stages. All non-OS keys must have the <replaceable>SUSE Manager
-            Default </replaceable> as their base channel. Using the &susemgr; Default Base Channel
-          is not recommended and may cause problems.</para>
-      </important>
+
     </sect2>
-
-
-
   </sect1>
 
   <sect1>
     <title>Combining Activation Keys</title>
-    <para/>
+    <para>You can combine activation keys when executing the bootstrap script on your clients.
+      Combining keys allows for more control on what is installed on your systems and reduces
+      duplication of keys for large complex environments.</para>
+    <figure>
+      <title>Combining Activation Keys</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="combine-keys.png"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
   </sect1>
 
   <sect1>
@@ -173,6 +176,44 @@
   <sect1>
     <title>bootstrap.sh Best Practices</title>
     <para/>
+  </sect1>
+
+  <sect1>
+    <title>Salt and Activation Keys</title>
+    <!-- ADD TO Activation Keys PAGE: 1. We do not support specifying an activation key on the minion on-boarding page
+     2. Act keys used with salt minions are the same as used with a traditional system and may be shared
+     3. Equiv specifying key in traditional bootstrap is to put the key in the grain of the minion
+     4. After accepting minion key all settings specified in the grain and associated with the key will be applied.
+  -->
+    <para> With the addition of salt to &susemgr; &productnumber3; states should now be considered
+      best practice over the more traditional way of combining activation keys. States provide
+      system configuration similar to activation keys and enable higher level of control.</para>
+
+    <para>You should be aware of a few facts when working with salt over traditional activation keys<itemizedlist>
+        <listitem>
+          <para>Currently we do not support specifying an activation key on the minion on-boarding
+            page.</para>
+        </listitem>
+        <listitem>
+          <para>Activation keys used with salt-minions are the same as those used with traditional
+            systems and may be shared.</para>
+        </listitem>
+        <listitem>
+          <para>The equivalent of specifying a key using the traditional bootstrap method is to
+            place the desired key in the grain of a minion.</para>
+        </listitem>
+        <listitem>
+          <para>Once a minion has been accepted either from the <menuchoice>
+              <guimenu>Salt</guimenu>
+              <guimenu>Onboarding</guimenu>
+            </menuchoice> page located in the WebUI or from the command line, all configurations
+            specified by the activation key placed within a salt grain will be applied. </para>
+        </listitem>
+        <listitem>
+          <para>Currently you may only use one activation key when working with salt. You cannot
+            combine them, despite this, salt states allow for even more control.</para>
+        </listitem>
+      </itemizedlist></para>
   </sect1>
 
 
