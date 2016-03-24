@@ -198,16 +198,9 @@
   -->
     <para> With the addition of Salt to &susemgr; &productnumber3; states should now be considered
       best practice over the more traditional way of combining activation keys. Although states
-      allow for even more powerful configuration options you will still need to place the new system
-      within the correct group so the correct states will be applied to the system. Using an
-      activation key will place the system within the correct group automatically. There are two
-      places you can specify an activation key for use by a salt-minion:</para>
-    <para>You may place the activation key within a custom grains file you will need to create
-      located here:</para>
-    <screen><prompt>#</prompt> etc/salt/grains</screen>
-    <para> Or you may alternatively place the activation key grain within the minion configuration
-      file located in:</para>
-    <screen><prompt>#</prompt> etc/salt/minion</screen>
+      allow for more configuration options you need to place the new system within the correct group
+      so the desired states will be applied to the system. Using an activation key on your minions
+      will place the system within the correct group automatically. </para>
 
     <para>You should be aware of a few facts when working with Salt over traditional activation keys<itemizedlist>
         <listitem>
@@ -234,6 +227,30 @@
             combine them, despite this, salt states allow for even more control.</para>
         </listitem>
       </itemizedlist></para>
+    <sect2>
+      <title>Using an Activation Key and Custom Grains File</title>
+      <para>Create a custom grains file and place it on the minion here:</para>
+      <screen><prompt>#</prompt> etc/salt/grains</screen>
+      <para>Then add the following lines to the grains file replacing 1-sles12-sp1 with your
+        activation key label:</para>
+      <screen>susemanager:
+    activation_key: 1-sles12-sp1</screen>
+      <para>Now reboot the minion with:</para>
+      <screen><prompt>#</prompt>systemctl restart salt-minion.service</screen>
+
+    </sect2>
+
+    <sect2>
+      <title>Using an Activation Key in the Minion Configuration File</title>
+
+      <para>You may also place the activation key grain within the minion configuration file located
+        in:</para>
+      <screen><prompt>#</prompt> etc/salt/minion</screen>
+
+    </sect2>
+
+
+
   </sect1>
 
 
