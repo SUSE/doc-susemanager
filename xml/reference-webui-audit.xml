@@ -376,8 +376,8 @@
     </mediaobject>
    </figure>
 
-   <para> Click the <guibutton>+ Add a Pin</guibutton> button to open the <guimenu>Add a
-     Pin</guimenu> window. You may filter systems by name and select a system for the matcher to to
+   <para> Click the <literal>+ Add a Pin</literal> button to open the <guimenu>Available
+     Systems</guimenu> window. You may filter systems by name and select a system for the matcher to
     pin manually. </para>
    <figure>
     <title>Add a Pin</title>
@@ -390,6 +390,11 @@
      </imageobject>
     </mediaobject>
    </figure>
+
+
+   <para>Within the <guimenu>Subscriptions Available for Selected System</guimenu> window click the
+     <literal>Save Pin</literal> button to raise priority for subscription use on the selected
+    system.</para>
   </sect2>
 
   <sect2 xml:id="ref.webui.audit.submatch.submatch.messages">
@@ -399,7 +404,113 @@
 
   <sect2 xml:id="ref.webui.audit.submatch.vhm">
    <title>Virtual Host Managers</title>
-   <para/>
+
+   <para> A pre-requirement to match subscriptions with systems is to have complete information
+    about which virtual system runs on which virtual host. &susemgr; gets this information without
+    any further configuration if the hypervisor is a registered system running on SUSE Linux
+    Enterprise Server or RedHat Enterprise Linux. Third party hypervisors, like VMware or Hyper-V,
+    need further configuration as described in this chapter. Third party hypervisors and hypervisor
+    managers such as VMWare vCenter are called "Virtual Host Managers" (VHM) within &susemgr;, as
+    they are able to manage one or multiple virtual hosts, which in turn may contain virtual guests.
+    &susemgr; &productnumber3; ships with a tool <literal>virtual-host-gatherer</literal> that can
+    connect to VHMs using their API, and request information about virtual hosts. This tool is
+    automatically invoked via Taskomatic nightly, therefore you need to configure your VHMs via
+    XMLRPC APIs. <literal>virtual-host-gatherer</literal> maintains the concept of optional modules,
+    where each module enables a specific Virtual Host Manager.</para>
+   <para>On the <guimenu>Subscription Matching</guimenu> overview select <guimenu>Edit Virtual Host
+     Managers</guimenu>. This will take you to the <menuchoice>
+     <guimenu>Systems</guimenu>
+     <guimenu>Virtual Host Managers</guimenu>
+    </menuchoice> overview. In the upper right you can select either <guimenu>+ Add VMware-based
+     Virtual Host Manager</guimenu> or <guimenu>+ Add File-based Virtual Host Manager</guimenu>.
+    These modules allow you to match subscriptions to machines managed by a virtual host such as
+     <literal>VMware</literal>, <literal>ESX</literal>, <literal>ESXi</literal> and
+     <literal>vCenter</literal>. If using an unsupported virtual host you can also create a custom
+    json file to provide <literal>virtual-host-gatherer</literal> with the required host/guest
+    information.</para>
+
+
+   <sect3>
+    <title>VMware-based Virtual Host Manager</title>
+
+    <para>Select <literal>VMware-based Virtual Host Manager</literal> to enter the location of your
+     VMware-based virtual host. Enter a <literal>Label:</literal>, <literal>Hostname:</literal>,
+      <literal>Port:</literal>, <literal>Username:</literal> and <literal>Password:</literal>.
+     Finally click the <literal>+ Add Virtual Host Manager</literal> button.</para>
+
+    <figure>
+     <title>VMware-based Virtual Host Manager</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="VMware-host-manager.png" width="444"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="VMware-host-manager.png"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </sect3>
+
+
+   <sect3>
+    <title>File Based Virtual Host Manager</title>
+    <para>If you are using an unsupported virtual host manager, you can create and use a file
+     formatted in json containing information about a host and all managed guest machines. Select
+      <literal>+ File Based Virtual Host Manager</literal> then enter a label and URL leading to the
+     location of this file for the virtual-host-gatherer </para>
+
+
+    <para> The following json example describes how this file should look:</para>
+
+    <screen language="json"><prompt>$></prompt> virtual-host-gatherer --infile infile.json
+   {
+             "examplevhost": {
+                 "10.11.12.13": {
+                     "cpuArch": "x86_64",
+                     "cpuDescription": "AMD Opteron(tm) Processor 4386",
+                     "cpuMhz": 3092.212727,
+                     "cpuVendor": "amd",
+                     "hostIdentifier": "'vim.HostSystem:host-182'",
+                     "name": "11.11.12.13",
+                     "os": "VMware ESXi",
+                     "osVersion": "5.5.0",
+                     "ramMb": 65512,
+                     "totalCpuCores": 16,
+                     "totalCpuSockets": 2,
+                     "totalCpuThreads": 16,
+                     "type": "vmware",
+                     "vms": {
+                         "vCenter": "564d6d90-459c-2256-8f39-3cb2bd24b7b0"
+                     }
+                 },
+                 "10.11.12.14": {
+                     "cpuArch": "x86_64",
+                     "cpuDescription": "AMD Opteron(tm) Processor 4386",
+                     "cpuMhz": 3092.212639,
+                     "cpuVendor": "amd",
+                     "hostIdentifier": "'vim.HostSystem:host-183'",
+                     "name": "10.11.12.14",
+                     "os": "VMware ESXi",
+                     "osVersion": "5.5.0",
+                     "ramMb": 65512,
+                     "totalCpuCores": 16,
+                     "totalCpuSockets": 2,
+                     "totalCpuThreads": 16,
+                     "type": "vmware",
+                     "vms": {
+                         "49737e0a-c9e6-4ceb-aef8-6a9452f67cb5": "4230c60f-3f98-2a65-f7c3-600b26b79c22",
+                         "5a2e4e63-a957-426b-bfa8-4169302e4fdb": "42307b15-1618-0595-01f2-427ffcddd88e",
+                         "NSX-gateway": "4230d43e-aafe-38ba-5a9e-3cb67c03a16a",
+                         "NSX-l3gateway": "4230b00f-0b21-0e9d-dfde-6c7b06909d5f",
+                         "NSX-service": "4230e924-b714-198b-348b-25de01482fd9"
+                     }
+                 }
+             }
+           }</screen>
+    <para>For more information see the man page on your &susemgr; server for virtual-host-gatherer:
+     <screen><prompt>#</prompt> man virtual-host-gatherer</screen></para>
+   </sect3>
+
   </sect2>
  </sect1>
  <!-- z: s2-sm-audit-openscap ref.webui.audit.openscap -->
