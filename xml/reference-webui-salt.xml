@@ -60,10 +60,102 @@
                 systems you must always take extra precaution as this may have drastic consequences
                 for your systems.</para>
         </warning>
+
+        <para>From the <literal>Remote Commands</literal> page within located under <menuchoice>
+                <guimenu>Salt</guimenu>
+                <guimenu>Remote Commands</guimenu>
+            </menuchoice> you will see two input fields. The first field is for entering commands.
+            The second field is for targeting minions by name, group or by utilizing
+            wildcards.</para>
+
+        <para>Enter the command you wish to execute, then enter the minion, group or wildcard you
+            wish to execute the command on. Click the <literal>Preview</literal> button to check
+            which machines will be targeted. Finally click the <literal>Run</literal> button to
+            execute the command on the selected Salt managed systems.</para>
+        <para/>
+        <figure>
+            <title>Remote Commands</title>
+            <mediaobject>
+                <imageobject role="fo">
+                    <imagedata fileref="remote-commands.png" width="444"/>
+                </imageobject>
+                <imageobject role="html">
+                    <imagedata fileref="remote-commands.png" width="80%"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+
     </sect1>
 
     <sect1 xml:id="ref.webui.salt.states.catalog">
         <title>States Catalog</title>
-        <para/>
+        <para>Selecting <menuchoice>
+                <guimenu>Salt</guimenu>
+                <guimenu>States Catalog</guimenu>
+            </menuchoice> brings you to the <literal>States Catalog</literal> overview. Use this
+            page to manage your custom Salt states. </para>
+        <figure>
+            <title>States Catalog</title>
+            <mediaobject>
+                <imageobject role="fo">
+                    <imagedata fileref="states-catalog.png" width="444"/>
+                </imageobject>
+                <imageobject role="html">
+                    <imagedata fileref="states-catalog.png" width="80%"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+
+        <para>Click the <literal>+ Create State</literal> button to open the <literal>Create
+                State</literal> page. On this page you can define custom states which will be stored
+            within the <literal>State Catalog</literal>. For example, to create a custom state for
+            installation of the apache webserver you would provide a name:
+                <literal>Webserver</literal> and the state content:</para>
+
+        <screen>apache:
+  pkg.installed: []
+  service.running:
+    - require:
+      - pkg: apache</screen>
+
+        <para>When you have finished entering your custom state definition click the <literal>Create
+                State</literal> button. This will save the state and allow use of this specific
+            state at the minion, group and organization level.</para>
+
+        <para>To add this state at the individual minion level perform the following actions:</para>
+        <procedure>
+            <title>Using a State with a Minion</title>
+            <step>
+                <para>From the <guimenu>Systems</guimenu> overview page, select a salt managed
+                    minion. You will be taken to the <literal>System Details</literal> page.</para>
+            </step>
+            <step>
+                <para> Select <menuchoice>
+                        <guimenu>States</guimenu>
+                        <guimenu>Custom</guimenu>
+                    </menuchoice> from the navigation tabs.</para>
+            </step>
+            <step>
+                <para>Click the search button to look at an overview of all available states, or
+                    enter a custom state name to find it within the <literal>States
+                        Catalog</literal>.</para>
+            </step>
+            <step>
+                <para>Select the <literal>Assign</literal> checkbox to assign the state to this
+                    minion.</para>
+            </step>
+            <step>
+                <para>Click the <literal>Save</literal> button to save this assignment to the
+                    database. Then click the <literal>Apply</literal> button to finalize application
+                    of the state or states which you have selected.</para>
+            </step>
+        </procedure>
+        <note>
+            <title>The Save Button</title>
+            <para>The <literal>Save</literal> button saves your changes but does not apply the
+                state. If you leave the page once clicking the save button your state will be saved
+                to the database but not yet applied. You must apply states for all minions, groups
+                or organizations for states to be finalized.</para>
+        </note>
     </sect1>
 </chapter>
