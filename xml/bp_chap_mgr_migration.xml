@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.chap.mgr.migration">
+    <title>&susemgr; Migration from 2.1 to 3</title>
+
+    <sect1>
+        <title>Introduction</title>
+        <para>The migration from SUSE Manager 2.1 to SUSE Manager 3 works quite the same as a
+            migration from Red Hat Satellite to SUSE Manager. There is NO in-place migration! The
+            migration happens from the original machine to a new one. While this has the drawback
+            that you temporarily need two machines, it also has the advantage that the original
+            machine will remain fully functional in case something goes wrong. The whole process may
+            be tricky, so it is strongly advised that the migration is done by an experienced
+            consultant. Given the complexity of the product, the migration is an "all-or-nothing",
+            this means if something goes wrong you will need to start all over. Error handling is
+            very limited. Nevertheless it should work more or less out of the box if all the steps
+            are carefully executed as documented. Please note that the migration involves dumping
+            the whole database on the source machine and restoring it on the target machine. This is
+            a very time-consuming process! Also all of the channels and packages need to be copied
+            to the new machine, so expect the whole migration to take several hours! </para>
+    </sect1>
+
+    <sect1>
+
+        <title>Prerequisites</title>
+        <para>
+            <warning>
+                <title>Latest Updates</title>
+                <para> The source machine needs to run SUSE Manager 2.1 with all the latest updates
+                    applied! Before trying to migrate, please make sure that the machine is up to
+                    date and all updates have been installed !</para>
+            </warning> Only machines running with the embedded postgresql database may be migrated.
+            For the migration of an Oracle based installation, a two-step migration is required:
+            First the installation needs to get migrated from Oracle to postgresql (by means of a
+            separate tool) and afterwards the migration to SUSE Manager 3 can be performed as
+            documented here. As SUSE Manager 3 does no longer support NCC but only SCC, you can
+            migrate a machine only after it has been switched to SCC. The migration script will
+            check if the installation has already been switched to SCC and will terminate if this is
+            not the case. Switch to SCC on the source machine and repeat the migration. During
+            migration the database from the source machine needs to get dumped and this dump needs
+            to be temporarily stored on the target system. The dump gets compressed with gzip using
+            the default compression options (maximum compression only yields about 10% of space
+            savings but costs a lot of runtime); so check the disk usage of the database with:
+            <screen>du -sch /var/lib/pgsql/data</screen> This will ensure that you have at least 30%
+            of this value available in <replaceable>/var/spacewalk/tmp</replaceable>. </para>
+
+        <para>These values from a test migration should aid in illustrating space
+            requirements:</para>
+        <screen>f204:/var/lib/pgsql # du -sch data
+1,8G    data
+1,8G    total
+f204:/var/spacewalk/packages # l -h /tmp/susemanager.dmp.gz 
+-rw-r--r-- 1 root root 506M Jan 12 14:58 /tmp/susemanager.dmp.gz</screen>
+
+        <para>This is a small test installation; for bigger installations the ratio might be better
+            (space required for the database dump might be less than 30%). The dump will be written
+            to the directory <replaceable>/var/spacewalk/tmp</replaceable>, the directory will be
+            created if it does not exist yet. If you want the dump to be stored somewhere else,
+            change the definition of the variable <replaceable>$TMPDIR</replaceable> on the
+            beginning of the script to suit your needs. </para>
+
+
+    </sect1>
+
+    <sect1>
+        <title>Setup the Target Machine</title>
+        <para>
+            <procedure>
+                <title>Setup Target Machine</title>
+                <step>
+                    <para>After the target system has been installed with SLE12SP1 including the
+                        add-on product "SUSE Manager", run <command>yast2
+                            susemanager_setup</command> as you would normally do for an installation
+                        of &susemgr;.</para>
+                </step>
+                <step>
+                    <para>On the first installation screen, ensure that Migrate a SUSE Manager
+                        compatible server is marked instead of Set up SUSE Manager from
+                        scratch.</para>
+                </step>
+                <step>
+                    <para> On the second screen, enter the name of the source system as Hostname of
+                        source SUSE Manager Server as well as the domain name. Also enter the
+                        database credentials of the source system.</para>
+                </step>
+                <step>
+                    <para> On the next screen, you will need to specify the IP address of the target
+                        system. Normally this value should be pre-set to the correct value and you
+                        only should need to press ENTER. Only in the case of multiple IP addresses
+                        you might need to specify the one that should be used during migration. <important>
+                            <title>Faking the Host Name</title>
+                            <para>During the migration process, the target system will fake its host
+                                name to be the same as the source system, this is necessary as the
+                                host name of a SUSE Manager installation is vital and should not be
+                                changed once set. Therefore do not be confused when logging in to
+                                your systems during migration; they both will present you with the
+                                same hostname!</para>
+                        </important></para>
+                </step>
+                <step>
+                    <para>Continue by following the normal installation steps: Specify the database
+                        parameters <emphasis>using the same database parameters as the source system
+                            is recommended</emphasis>. Enter your SCC credentials. After all the
+                        data has been gathered, YaST2 will terminate. <important>
+                            <title>Migration Must be Manually Triggered</title>
+                            <para>The actual migration will NOT start automatically but needs to be
+                                triggered manually!</para>
+                        </important></para>
+                </step>
+            </procedure>
+        </para>
+    </sect1>
+
+    <sect1>
+        <title>Performing the Migration</title>
+        <para>The actual migration is performed by giving the command
+                <replaceable>/usr/lib/susemanager/bin/mgr-setup -m</replaceable>. This will read the
+            data gathered in the previous step, set up SUSE Manager on the new machine and transfer
+            all of the data from the source machine. As it needs to perform several operations on
+            the source machine via ssh, you will be prompted once for the root password of the
+            source machine. A temporary ssh key named <literal>migration-key</literal> is created
+            and installed on the source machine, so you need to give the root password only once. Of
+            course the temporary ssh key will be deleted after successful migration. Ideally, this
+            is all you will need to do. Depending on the size of the installation, the actual
+            migration will take up to several hours. Once finished, you will be prompted to shutdown
+            the source machine, re-configure the network of the target machine to use the same IP
+            address and host name as the original machine and restart it. It should now be a fully
+            functional replacement for your previous 2.1 installation. The following numbers
+            illustrate the runtime for dumping and importing the database:
+            <screen>14:53:37   Dumping remote database to /var/spacewalk/tmp/susemanager.dmp.gz on target system. Please wait...
+14:58:14   Database successfully dumped. Size is: 506M
+14:58:29   Importing database dump. Please wait...
+15:05:11   Database dump successfully imported.</screen></para>
+        <para>Dumping the database takes about five minutes to complete. The next step, importing
+            the dump onto the target system takes an additional seven minutes. For big installations
+            this may take up to several hours. Additionally you will need to account for the time it
+            takes to copy all the package data to the new machine. Depending on your network
+            infrastructure and hardware, this can also take a significant amount of time. </para>
+
+    </sect1>
+    <sect1>
+        <title>Speeding up the Migration</title>
+        <para>Since a lot of data needs to be copied the whole migration can consume a lot of time.
+            The actual migration can be sped up by doing one of the most time consuming task prior
+            to the actual migration: The copying of all the channels, packages, auto-install images
+            and so on. So the following approach is recommended: Once you gathered all the data via
+            YaST2, run the following command: <command>mgr-setup -r</command></para>
+        <para>This will copy the largest share of the data from the old server to the new one. This
+            command can be run at any time; during which the current server remains fully
+            functional. Once the actual migration has started, only the data changed since running
+            above command needs to be transferred which will significantly reduce downtime. On huge
+            installations, the transfer of the database (which involves dumping of the database on
+            the source machine and importing the dump on the target system) may still take quite
+            some time. This is unavoidable as you can only dump the entire database. During this
+            time no write operations may happen, therefore the migration script needs to shutdown
+            &susemgr; services running on the source machine. </para>
+    </sect1>
+
+    <sect1>
+        <title>Packages on External Storage</title>
+        <para>Some installations might store the package data on external storage (eg. NFS mount on
+                <replaceable>/var/spacewalk/packages</replaceable>). In such a case it is of course
+            pointless to have all this data copied to the new machine. Edit the script locatd in
+                <replaceable>/usr/lib/susemanager/bin/mgr-setup</replaceable> and remove the
+            respective <command>rsync</command> command (located around line 345). Ensure the
+            storage is mounted on the new machine before starting the system for the first time.
+            Analogue handling for <replaceable>/srv/www/htdocs/pub if appropriate</replaceable>.
+        </para>
+    </sect1>
+
+    <sect1>
+        <title>Troubleshooting a Broken UI after Migration</title>
+        <para>Chances are you will notice a broken user interface after migration. This is not a
+            bug, but a browser caching issue. The new machine has the same hostname and the same IP
+            address as the old machine which can confuse some web browsers. If you are experiencing
+            this issue, just do a forced reload of the page (in Firefox this is accomplished by
+            pressing the key combination <keycombo>
+                <keycap>CTRL</keycap>
+                <keycap>F5</keycap>
+            </keycombo> and this should resume normal functionality. </para>
+    </sect1>
+    
+    <sect1>
+        <title>Example Session</title>
+        <para>This is the output of a typical migration: </para>
+        <screen>e50:~ # /usr/lib/susemanager/bin/mgr-setup -m
+  Filesystem type for /var/spacewalk is ext4 - ok.
+  Open needed firewall ports...
+  Migration needs to execute several commands on the remote machine.
+  Please enter the root password of the remote machine.
+Password: 
+  Remote machine is SUSE Manager
+  Remote system is already migrated to SCC. Good.
+  Shutting down remote spacewalk services...
+  Shutting down spacewalk services...
+  Stopping Taskomatic...
+  Stopped Taskomatic.
+  Stopping cobbler daemon: ..done
+  
+  Stopping rhn-search...
+  Stopped rhn-search.
+  Stopping MonitoringScout ...  
+  [ OK ]
+  Stopping Monitoring ...  
+  [ OK ]
+  Shutting down osa-dispatcher: ..done
+  Shutting down httpd2 (waiting for all children to terminate) ..done
+  Shutting down Tomcat (/usr/share/tomcat6)
+  ..done
+  Terminating jabberd processes...
+        Stopping router ..done
+        Stopping sm ..done
+        Stopping c2s ..done
+        Stopping s2s ..done
+  Done.
+  CREATE ROLE
+  * Loading answer file: /root/spacewalk-answers.
+  ** Database: Setting up database connection for PostgreSQL backend.
+  ** Database: Populating database.
+  ** Database: Skipping database population.
+  * Configuring tomcat.
+  * Setting up users and groups.
+  ** GPG: Initializing GPG and importing key.
+  * Performing initial configuration.
+  * Configuring apache SSL virtual host.
+  ** /etc/apache2/vhosts.d/vhost-ssl.conf has been backed up to vhost-ssl.conf-swsave
+  * Configuring jabberd.
+  * Creating SSL certificates.
+  ** Skipping SSL certificate generation.
+  * Deploying configuration files.
+  * Setting up Cobbler..
+  * Setting up Salt Master.
+  11:26:47   Dumping remote database. Please wait...
+  11:26:50   Database successfully dumped.
+  Copy remote database dump to local machine...
+  Delete remote database dump...
+  11:26:50   Importing database dump. Please wait...
+  11:28:55   Database dump successfully imported.
+  Schema upgrade: [susemanager-schema-2.1.50.14-3.2.devel21] -> [susemanager-schema-3.0.5-5.1.develHead]
+  Searching for upgrade path to: [susemanager-schema-3.0.5-5.1]
+  Searching for upgrade path to: [susemanager-schema-3.0.5]
+  Searching for upgrade path to: [susemanager-schema-3.0]
+  Searching for start path:  [susemanager-schema-2.1.50.14-3.2]
+  Searching for start path:  [susemanager-schema-2.1.50.14]
+  The path: [susemanager-schema-2.1.50.14] -> [susemanager-schema-2.1.50.15] -> [susemanager-schema-2.1.51] -> [susemanager-schema-3.0]
+  Planning to run schema upgrade with dir '/var/log/spacewalk/schema-upgrade/schema-from-20160112-112856'
+  Executing spacewalk-sql, the log is in [/var/log/spacewalk/schema-upgrade/schema-from-20160112-112856-to-susemanager-schema-3.0.log].
+(248/248) apply upgrade [schema-from-20160112-112856/99_9999-upgrade-end.sql]        e-suse-channels-to-public-channel-family.sql.postgresql]                         
+  The database schema was upgraded to version [susemanager-schema-3.0.5-5.1.develHead].
+  Copy files from old SUSE Manager...
+  receiving incremental file list
+  ./
+  packages/
+  
+  sent 18 bytes  received 66 bytes  168.00 bytes/sec
+  total size is 0  speedup is 0.00
+  receiving incremental file list
+  ./
+  RHN-ORG-TRUSTED-SSL-CERT
+  res.key
+  rhn-org-trusted-ssl-cert-1.0-1.noarch.rpm
+  suse-307E3D54.key
+  suse-39DB7C82.key
+  suse-9C800ACA.key
+  bootstrap/
+  bootstrap/bootstrap.sh
+  bootstrap/client-config-overrides.txt
+  bootstrap/sm-client-tools.rpm
+  
+  sent 189 bytes  received 66,701 bytes  44,593.33 bytes/sec
+  total size is 72,427  speedup is 1.08
+  receiving incremental file list
+  ./
+  .mtime
+  lock
+  web.ss
+  config/
+  config/distros.d/
+  config/images.d/
+  config/profiles.d/
+  config/repos.d/
+  config/systems.d/
+  kickstarts/
+  kickstarts/autoyast_sample.xml
+  loaders/
+  snippets/
+  triggers/
+  triggers/add/
+  triggers/add/distro/
+  triggers/add/distro/post/
+  triggers/add/distro/pre/
+  triggers/add/profile/
+  triggers/add/profile/post/
+  triggers/add/profile/pre/
+  triggers/add/repo/
+  triggers/add/repo/post/
+  triggers/add/repo/pre/
+  triggers/add/system/
+  triggers/add/system/post/
+  triggers/add/system/pre/
+  triggers/change/
+  triggers/delete/
+  triggers/delete/distro/
+  triggers/delete/distro/post/
+  triggers/delete/distro/pre/
+  triggers/delete/profile/
+  triggers/delete/profile/post/
+  triggers/delete/profile/pre/
+  triggers/delete/repo/
+  triggers/delete/repo/post/
+  triggers/delete/repo/pre/
+  triggers/delete/system/
+  triggers/delete/system/post/
+  triggers/delete/system/pre/
+  triggers/install/
+  triggers/install/post/
+  triggers/install/pre/
+  triggers/sync/
+  triggers/sync/post/
+  triggers/sync/pre/
+  
+  sent 262 bytes  received 3,446 bytes  7,416.00 bytes/sec
+  total size is 70,742  speedup is 19.08
+  receiving incremental file list
+  kickstarts/
+  kickstarts/snippets/
+  kickstarts/snippets/default_motd
+  kickstarts/snippets/keep_system_id
+  kickstarts/snippets/post_delete_system
+  kickstarts/snippets/post_reactivation_key
+  kickstarts/snippets/redhat_register
+  kickstarts/snippets/sles_no_signature_checks
+  kickstarts/snippets/sles_register
+  kickstarts/snippets/sles_register_script
+  kickstarts/snippets/wait_for_networkmanager_script
+  kickstarts/upload/
+  kickstarts/wizard/
+  
+  sent 324 bytes  received 1,063 bytes  2,774.00 bytes/sec
+  total size is 12,133  speedup is 8.75
+  receiving incremental file list
+  ssl-build/
+  ssl-build/RHN-ORG-PRIVATE-SSL-KEY
+  ssl-build/RHN-ORG-TRUSTED-SSL-CERT
+  ssl-build/index.txt
+  ssl-build/index.txt.attr
+  ssl-build/latest.txt
+  ssl-build/rhn-ca-openssl.cnf
+  ssl-build/rhn-ca-openssl.cnf.1
+  ssl-build/rhn-org-trusted-ssl-cert-1.0-1.noarch.rpm
+  ssl-build/rhn-org-trusted-ssl-cert-1.0-1.src.rpm
+  ssl-build/serial
+  ssl-build/d248/
+  ssl-build/d248/latest.txt
+  ssl-build/d248/rhn-org-httpd-ssl-archive-d248-1.0-1.tar
+  ssl-build/d248/rhn-org-httpd-ssl-key-pair-d248-1.0-1.noarch.rpm
+  ssl-build/d248/rhn-org-httpd-ssl-key-pair-d248-1.0-1.src.rpm
+  ssl-build/d248/rhn-server-openssl.cnf
+  ssl-build/d248/server.crt
+  ssl-build/d248/server.csr
+  ssl-build/d248/server.key
+  ssl-build/d248/server.pem
+  
+  sent 380 bytes  received 50,377 bytes  101,514.00 bytes/sec
+  total size is 90,001  speedup is 1.77
+  SUSE Manager Database Control. Version 1.5.2
+  Copyright (c) 2012 by SUSE Linux Products GmbH
+  
+  INFO: Database configuration has been changed.
+  INFO: Wrote new general configuration. Backup as /var/lib/pgsql/data/postgresql.2016-01-12-11-29-42.conf
+  INFO: Wrote new client auth configuration. Backup as /var/lib/pgsql/data/pg_hba.2016-01-12-11-29-42.conf
+  INFO: New configuration has been applied.
+  Database is online
+  System check finished
+e50:~ #   
+  
+  ============================================================================
+  Migration complete.
+  Please shut down the old SUSE Manager server now.
+  Reboot the new server and make sure it uses the same IP address and hostname
+  as the old SUSE Manager server!
+  ============================================================================</screen>
+    </sect1>
+
+
+
+</chapter>
