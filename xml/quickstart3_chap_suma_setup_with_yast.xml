@@ -209,8 +209,30 @@
         <para>After adding your first channel &susemgr; will schedule the channel to be copied and
             begin mirroring it. This can take a long time as &susemgr; must copy all software
             sources from the &suse; Vendor repositories located at &scc; to your servers local
-                <replaceable>/var/spacewalk/</replaceable> directory.</para>
+            <replaceable>/var/spacewalk/</replaceable> directory.
+        </para>
 
+        <tip>
+         <!-- bsc#965684 -->
+         <title>PostgreSQL andTransparant Huge Pages</title>
+         <para>
+          In some environments, Transparent Huge Pages provided by the
+          kernel may slow down PostgreSQL workloads significantly.
+         </para>
+         <para>
+          To disable transparant huge pages set the
+          <literal>transparent_hugepage</literal> kernel parameter to
+          <literal>never</literal>.  This has to be changed in
+          <filename>/etc/default/grub</filename> and added to the line
+          <literal>GRUB_CMDLINE_LINUX_DEFAULT</literal>, for example:
+         </para>
+         <screen>GRUB_CMDLINE_LINUX_DEFAULT="resume=/dev/sda1 splash=silent quiet showopts elevator=noop transparent_hugepage=never"</screen>
+         <para>
+To write the new configuration run <command>grub2-mkconfig -o
+/boot/grub2/grub.cfg</command>.
+To update the grub2 during boot run <command>grub2-install /dev/sda</command>.
+         </para>
+        </tip>
 
         <para>If you wish to monitor the channel synchronization process in realtime you may view progress via the log file with: </para>
 
