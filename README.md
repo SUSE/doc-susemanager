@@ -61,11 +61,13 @@ New work items will be added here. The status of these items will be marked with
 - [x] ~~Contact Methods rhnsd, ssh push, ssh push tunnel, osad (BP guide) DONE FEB 2016
       (Salt to be added IN_DEV)~~
 - [x] ~~Managing Entitlements SCC and SMT (BP Guide) Status: DONE FEB 2016~~
-- [ ] Reference Book updated and maintained by KE Status: IN_PROGRESS FEB 2016
+- [x] ~~Reference Book update Status: DONE FEB 2016~~
 - [x] ~~Advanced Patch Lifecycle Management (BP Guide) Status: DONE FEB 2016~~
-- [ ] Activation Key Use and Guidelines Status: TEMP BLOCK MARCH 2016
-- [ ] Subscription Matching Training and Writeup (BP) Status: IN_PROGRESS MARCH 2016
-
+- [x] ~~Activation Key Use and Guidelines Status: DONE MARCH 2016~~
+- [x] ~~Subscription Matching Training and Writeup (BP) Status: DONE MARCH 2016~~
+- [x] ~~Document New Salt Features (BP/REF) Status: DONE APRIL 2016~~
+- [x] ~~SUSE Manger Migration from 2.1 - 3 Status: DONE April 2016~~
+- [ ] System Details Salt State Components (Packages, Custom, Highstate) Status: IN_PROGRESS APRIL 2016
 
 ##Planning:##
 
