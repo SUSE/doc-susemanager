@@ -111,4 +111,6 @@ osc ci -m "update"
 osc pr
 
 osc sr -m 'update'
+Perform these steps on both head and 3.0
+
 ```
