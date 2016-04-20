@@ -22,16 +22,11 @@
             Managed systems may coexist using both methods, allowing you to become comfortable using
             Salt while keeping existing deployments intact.</para>
 
-
-       
     </sect1>
     <sect1 xml:id="create.act.keys">
         <title>Creating Your Keys</title>
         <para>The following procedure will guide you through creating the activation keys for your
-            test channels. Activation keys can be used for both Salt and traditional clients.
-            Proceed through the following section then if you plan on managing clients with Salt
-            see: If you plan on managing clients traditionally see: ADD LINK TO TRADITIONAL SYSTEMS
-            / SALT SYSTEMS</para>
+            test channels. Activation keys can be used for both Salt and traditional clients. </para>
         <formalpara>
             <title>Activation Keys</title>
             <para>Activation keys define the number of software entitlements, channels and groups a
@@ -337,9 +332,42 @@ ORG_GPG_KEY=
         </sect2>
     </sect1>
 
-<sect1>
-    <title>Registering Salt Clients</title>
-    <para></para>
-</sect1>
+    <sect1>
+        <title>Registering Salt Clients</title>
+        <para>The following section describes registering Salt minions. This section assumes you
+            have created the tools repository.</para>
+        <para>Once you have setup a base channel from the WebUI clients to obtain software sources
+            from, for example: <replaceable>SLES12-SP1-Pool for x86_64</replaceable> Perform the
+            following procedure to register a Salt minion.</para>
+        <procedure>
+            <title>Registering Salt Minions</title>
+            <step>
+                <para>On your minion as root enter the following command:
+                    <screen><prompt>#</prompt> zypper ar http://SUSE.Manager.FQDN.com/pub/repositories/sle/12/1/bootstrap/ sles12-sp1</screen>
+                    It is important that you do not use HTTPS as you will receive errors. Use HTTP
+                    instead.</para>
+            </step>
+            <step>
+                <para>After adding the repository containing the necessary salt packages
+                    execute:<screen><prompt>#</prompt> zypper in salt-minion</screen></para>
+            </step>
+            <step>
+                <para>Modify the minion configuration file to point to the FQDN of the SUSE Manager
+                    Server (Master):<screen><prompt>#</prompt> vi /etc/salt/minion</screen> Find and
+                    change the following line <screen>master: salt</screen> to:
+                    <screen>master: FQDN.SUSE.Manager.com</screen></para>
+            </step>
+            <step>
+                <para>Restart the Salt minion with:
+                    <screen><prompt>#</prompt> systemctl restart salt-minion</screen> or on
+                    non-systemd OS: <screen><prompt>#</prompt> rcsalt-minion restart</screen></para>
+            </step>
+        </procedure>
+
+        <para>Your newly registered minion should now show up within the WebUI under <menuchoice>
+                <guimenu>Salt</guimenu>
+                <guimenu>Onboarding</guimenu>
+            </menuchoice>. Accept its key to begin management.</para>
+    </sect1>
 
 </chapter>
