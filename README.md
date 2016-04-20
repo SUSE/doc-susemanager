@@ -114,3 +114,30 @@ osc sr -m 'update'
 Perform these steps on both head and 3.0
 
 ```
+
+
+
+##Updating SUSE Manager API Documentation and Posting Online##
+
+SUSE Manager 3 (SLE 12 SP1 example):
+
+```
+# rename existing directory
+old binaries
+
+# checkout the official binary packages
+iosc getbinaries SUSE:SLE-12-SP1:Update:Products spacewalk-java standard x86_64
+
+# get the docbook file
+unrpm binaries/spacewalk-java-apidoc-sources*
+# ==>
+# usr/share/doc/packages/spacewalk-java/xml/susemanager_api_doc.xml
+
+# build the PDF with daps:
+daps -m usr/share/doc/packages/spacewalk-java/xml/susemanager_api_doc.xml pdf
+```
+
+Then create a bug (Classification: Doc Tools, Product: Doc Production,
+Component: SUSE Manager) and ask to update
+suse.com/documentation/suse-manager-3 accordingly.  As an example, see
+https://bugzilla.suse.com/show_bug.cgi?id=976225 .
