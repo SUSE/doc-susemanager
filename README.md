@@ -115,6 +115,24 @@ Perform these steps on both head and 3.0
 
 ```
 
+##Preparing and Publishing Online Documentation (suse.com/documentation)##
+
+ATM (2016-04-20), you must you a recent daps checkout from
+git@github.com:openSUSE/daps.git.
+
+Switch to the documentation checkout and call:
+
+```
+.../daps/bin/daps --dapsroot .../daps -d DC-create-all online-docs \
+  --dbtonovdoc
+```
+
+Copy the results to the results to your ~/Exports directory.
+
+Create a bug (Classification: Doc Tools, Product: Doc Production,
+Component: SUSE Manager) and ask to update
+suse.com/documentation/suse-manager-3 accordingly.  As an example, see
+https://bugzilla.suse.com/show_bug.cgi?id=975925 .
 
 
 ##Updating SUSE Manager API Documentation and Posting Online##
