@@ -115,7 +115,9 @@ Perform these steps on both head and 3.0
 
 ```
 
-##Updating SUSE Manager API Documentation
+
+
+##Updating SUSE Manager API Documentation and Posting Online##
 
 SUSE Manager 3 (SLE 12 SP1 example):
 
