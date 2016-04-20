@@ -159,3 +159,10 @@ Then create a bug (Classification: Doc Tools, Product: Doc Production,
 Component: SUSE Manager) and ask to update
 suse.com/documentation/suse-manager-3 accordingly.  As an example, see
 https://bugzilla.suse.com/show_bug.cgi?id=976225 .
+
+##Publishing Release Notes on https://www.suse.com/releasenotes/##
+
+If not already done, ask Rudi or Lars (Vogt) to mirror the release notes
+from the release repo, and then add the new version to
+https://www.suse.com/releasenotes/ .  After publishing the first update,
+you probably ask Rudi or Lars again to the mirror script.
