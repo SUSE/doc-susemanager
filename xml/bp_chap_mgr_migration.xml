@@ -31,13 +31,15 @@
     <sect1>
 
         <title>Prerequisites</title>
-        <para>
+
             <warning>
                 <title>Latest Updates</title>
                 <para> The source machine needs to run SUSE Manager 2.1 with all the latest updates
                     applied! Before trying to migrate, please make sure that the machine is up to
                     date and all updates have been installed !</para>
-            </warning> Only machines running with the embedded postgresql database may be migrated.
+            </warning>
+            <para>
+             Only machines running with the embedded postgresql database may be migrated.
             For the migration of an Oracle based installation, a two-step migration is required:
             First the installation needs to get migrated from Oracle to postgresql (by means of a
             separate tool) and afterwards the migration to SUSE Manager 3 can be performed as
@@ -49,7 +51,10 @@
             to be temporarily stored on the target system. The dump gets compressed with gzip using
             the default compression options (maximum compression only yields about 10% of space
             savings but costs a lot of runtime); so check the disk usage of the database with:
-            <screen>du -sch /var/lib/pgsql/data</screen> This will ensure that you have at least 30%
+            </para>
+            <screen>du -sch /var/lib/pgsql/data</screen>
+            <para>
+             This will ensure that you have at least 30%
             of this value available in <replaceable>/var/spacewalk/tmp</replaceable>. </para>
 
         <para>These values from a test migration should aid in illustrating space
@@ -67,12 +72,11 @@ f204:/var/spacewalk/packages # l -h /tmp/susemanager.dmp.gz
             change the definition of the variable <replaceable>$TMPDIR</replaceable> on the
             beginning of the script to suit your needs. </para>
 
-
     </sect1>
 
     <sect1>
         <title>Setup the Target Machine</title>
-        <para>
+        <para/>
             <procedure>
                 <title>Setup Target Machine</title>
                 <step>
@@ -95,7 +99,9 @@ f204:/var/spacewalk/packages # l -h /tmp/susemanager.dmp.gz
                     <para> On the next screen, you will need to specify the IP address of the target
                         system. Normally this value should be pre-set to the correct value and you
                         only should need to press ENTER. Only in the case of multiple IP addresses
-                        you might need to specify the one that should be used during migration. <important>
+                        you might need to specify the one that should be
+                    used during migration.</para>
+                    <important>
                             <title>Faking the Host Name</title>
                             <para>During the migration process, the target system will fake its host
                                 name to be the same as the source system, this is necessary as the
@@ -103,20 +109,22 @@ f204:/var/spacewalk/packages # l -h /tmp/susemanager.dmp.gz
                                 changed once set. Therefore do not be confused when logging in to
                                 your systems during migration; they both will present you with the
                                 same hostname!</para>
-                        </important></para>
+                        </important>
                 </step>
                 <step>
                     <para>Continue by following the normal installation steps: Specify the database
                         parameters <emphasis>using the same database parameters as the source system
                             is recommended</emphasis>. Enter your SCC credentials. After all the
-                        data has been gathered, YaST2 will terminate. <important>
+                        data has been gathered, YaST2 will
+                    terminate.</para>
+                    <important>
                             <title>Migration Must be Manually Triggered</title>
                             <para>The actual migration will NOT start automatically but needs to be
                                 triggered manually!</para>
-                        </important></para>
+                    </important>
                 </step>
             </procedure>
-        </para>
+
     </sect1>
 
     <sect1>
@@ -134,11 +142,11 @@ f204:/var/spacewalk/packages # l -h /tmp/susemanager.dmp.gz
             the source machine, re-configure the network of the target machine to use the same IP
             address and host name as the original machine and restart it. It should now be a fully
             functional replacement for your previous 2.1 installation. The following numbers
-            illustrate the runtime for dumping and importing the database:
+            illustrate the runtime for dumping and importing the database:</para>
             <screen>14:53:37   Dumping remote database to /var/spacewalk/tmp/susemanager.dmp.gz on target system. Please wait...
 14:58:14   Database successfully dumped. Size is: 506M
 14:58:29   Importing database dump. Please wait...
-15:05:11   Database dump successfully imported.</screen></para>
+15:05:11   Database dump successfully imported.</screen>
         <para>Dumping the database takes about five minutes to complete. The next step, importing
             the dump onto the target system takes an additional seven minutes. For big installations
             this may take up to several hours. Additionally you will need to account for the time it
