@@ -17,11 +17,12 @@
       commands your &susemgr; server sends its clients to do will be routed through one of the
       following configured contact methods. Which one you select will be heavily dependant on your
       network infrastructure. The following sections provide a good starting point for selecting a
-      method which best suits your network environment. <note>
+    method which best suits your network environment.</para>
+    <note>
         <title>Contact Methods and Salt</title>
         <para>This chapter is only relevant for traditional clients as Salt clients (minions)
           utilize a salt specific contact method.</para>
-      </note></para>
+    </note>
   </sect1>
   <sect1 xml:id="bp.contact.methods.rhnsd">
     <title>The rhnsd (Default)</title>
@@ -56,8 +57,10 @@
 
     <sect2>
       <title>Configuring &susemgr; rhnsd Daemon</title>
-      <para>The SUSE Manager daemon can be configured by editing the following configuration file:
-        <screen><replaceable>/etc/sysconfig/rhn/rhnsd</replaceable></screen>This is the
+      <para>The SUSE Manager daemon can be configured by editing the following configuration file:</para>
+        <screen><replaceable>/etc/sysconfig/rhn/rhnsd</replaceable></screen>
+        <para>
+         This is the
         configuration file the rhnsd initialization script uses. An important parameter for the
         daemon is its check-in frequency. The default interval time is four hours (240 minutes). If
         you modify the configuration file, you must as <systemitem>root</systemitem> restart the
@@ -113,62 +116,66 @@
           <abbrev>HTTPS</abbrev> (<abbrev>HTTP</abbrev> is only necessary during the registration
         process). The port numbers used by default are 1232 and 1233. To overwrite these, add two
         custom port numbers greater than 1024 to <replaceable>/etc/rhn/rhn.conf</replaceable> like
-        this: <screen>ssh_push_port_http = high port 1
+      this:</para>
+      <screen>ssh_push_port_http = high port 1
 ssh_push_port_https = high port 2</screen>
-      </para>
-
-
 
       <para>If you would like your clients to be contacted via their hostnames instead of an IP
-        address, set the following option: <screen>ssh_push_use_hostname = true</screen></para>
+      address, set the following option:</para>
+      <screen>ssh_push_use_hostname = true</screen>
 
       <para>It is also possible to adjust the number of threads to use for opening client
         connections in parallel. By default two parallel threads are used. Set
           <systemitem>taskomatic.ssh_push_workers</systemitem> in
           <replaceable>/etc/rhn/rhn.conf</replaceable> like
-        this:<screen>taskomatic.ssh_push_workers = number</screen></para>
+      this:</para>
+      <screen>taskomatic.ssh_push_workers = number</screen>
     </sect2>
 
     <sect2>
       <title>Using <abbrev>sudo</abbrev> with SSH Push </title>
       <para>For security reasons you may desire to use <abbrev>sudo</abbrev> and SSH into a system
         as a user other than root. The following procedure will guide you through configuring sudo
-        for use with ssh push. <note>
+      for use with ssh push.</para>
+      <note>
           <title>sudo Requirements</title>
           <para>The packages <filename>spacewalk-taskomatic >= 2.1.165.19</filename> and
               <filename>spacewalk-certs-tools => 2.1.6.7</filename> are required for using sudo with
             SSH Push.</para>
         </note>
-      </para>
-
       <procedure>
         <title>Configuring sudo</title>
 
         <step>
           <para>Set the following parameter on the server located in:
-              <replaceable>/etc/rhn/rhn.conf</replaceable><screen>ssh_push_sudo_user = user</screen>
-            The server will now use sudo to ssh as the configured user.</para>
+          <replaceable>/etc/rhn/rhn.conf</replaceable></para>
+          <screen>ssh_push_sudo_user = user</screen>
+          <para>
+          The server will now use sudo to ssh as the configured user.</para>
         </step>
 
         <step>
           <para>You must now create the user specified in step 1 above on each of your clients and
             the following parameters should be commented out within your clients
               <filename>/etc/sudoers</filename>
-            file:<screen> #Defaults targetpw   # ask for the password of the target user i.e. root
- #ALL    ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!</screen></para>
+          file:</para>
+          <screen> #Defaults targetpw   # ask for the password of the target user i.e. root
+#ALL    ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!</screen>
         </step>
 
         <step>
           <para>Now add the following line beneath the <parameter>## User privilege
               specification</parameter> section of each clients <filename>sudoers</filename>
-            file:<screen>user ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check</screen></para>
+          file:</para>
+          <screen>user ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check</screen>
         </step>
 
         <step>
           <para>On each client add the following two lines to the
               <filename>/home/user/.bashrc</filename>
-            file.<screen> PATH=$PATH:/usr/sbin
- export PATH</screen></para>
+          file.</para>
+          <screen>PATH=$PATH:/usr/sbin
+export PATH</screen>
         </step>
 
       </procedure>
@@ -201,15 +208,16 @@ ssh_push_port_https = high port 2</screen>
         method, it is required to use an activation key that is configured to use this method.
         Normal <systemitem>ssh push</systemitem> is unable to reach the server. For managing
         activation keys see: <xref linkend="bp.key.managment"/></para>
-      <para>Run the following command as root on the server to register a client:
-        <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen></para>
+      <para>Run the following command as root on the server to register a client:</para>
+      <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register \
+/srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen>
 
 
       <para>To enable a client to be managed using Push via SSH (without tunneling), the same script
         may be used. Registration is optional since it can also be done from within the client in
         this case. Note that <systemitem>mgr-ssh-push-init</systemitem> will also automatically
-        generate the necessary SSH key pair if it does not yet exist on the server:
-        <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register bootstrap_script</screen></para>
+        generate the necessary SSH key pair if it does not yet exist on the server:</para>
+        <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register bootstrap_script</screen>
 
 
       <para>When using the Push via SSH tunnel contact method, please note that the client is
@@ -218,15 +226,16 @@ ssh_push_port_https = high port 2</screen>
         active SSH session with the proper port forwarding options in order to access the SUSE
         Manager API. To verify the Push via SSH tunnel connection manually, you can run e.g. this on
         the SUSE Manager
-        server:<screen><prompt>#</prompt> ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443 client zypper ref</screen>
-      </para>
+        server:</para>
+<screen><prompt>#</prompt> ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443 client zypper ref</screen>
 
     </sect2>
     <sect2 xml:id="bp.contact.methods.ssh.push.api.support">
       <title>API Support for SSH Push</title>
       <para>The contact method to be used for managing a server can also be modified via the API.
         The following example code (python) shows how to set a system's contact method to
-        'ssh-push'. Available valid values are: <itemizedlist>
+      'ssh-push'. Available valid values are:</para>
+      <itemizedlist>
           <listitem>
             <para>'default' (pull)</para>
           </listitem>
@@ -236,7 +245,7 @@ ssh_push_port_https = high port 2</screen>
           <listitem>
             <para>'ssh-push-tunnel'</para>
           </listitem>
-        </itemizedlist></para>
+        </itemizedlist>
       <screen>client = xmlrpclib.Server(SUMA_HOST + "/rpc/api", verbose=0)
 key = client.auth.login(SUMA_LOGIN, SUMA_PASSWORD)
 client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</screen>
@@ -315,7 +324,6 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
         </imageobject>
       </mediaobject>
     </figure>
-    <para>
       <itemizedlist>
         <title>How it Works</title>
         <listitem>
@@ -345,7 +353,7 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
             action.</para>
         </listitem>
       </itemizedlist>
-    </para>
+
     <sect2>
       <title>Configuring and Enabling osad</title>
       <para> The following procedure enables use of osad with &susemgr;.</para>
@@ -360,21 +368,25 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
         <step>
           <para>On your &susemgr; server use the following command as root to start the
               <systemitem>osa-dispatcher</systemitem>
-            service:<screen><command>rcosa-dispatcher start</command></screen></para>
+            service:</para>
+<screen><command>rcosa-dispatcher start</command></screen>
         </step>
         <step>
           <para>Install the <systemitem>osad</systemitem> package on all client systems to allow
             communication to the osa-dispatcher on &susemgr;. The package can be found in the
-              <replaceable>Tools child channel</replaceable>.<warning>
+              <replaceable>Tools child channel</replaceable>.</para>
+<warning>
               <title>osad conflicts with osa-dispatcher</title>
               <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
                 package on your &susemgr; server. The <systemitem>osad</systemitem> client service
                 conflicts with <systemitem>osa-dispatcher</systemitem> server package.</para>
-            </warning></para>
+            </warning>
         </step>
         <step>
           <para>Once osad has been installed, start the service on your client systems as root using
-            the command:<screen><command>rcosad start</command></screen>Like other services,
+          the command:</para>
+          <screen><command>rcosad start</command></screen>
+          <para>Like other services,
             rcosa-dispatcher and rcosad accept stop, restart, and status commands as well.</para>
         </step>
       </procedure>
@@ -393,19 +405,23 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
       <formalpara>
         <title>osa-dispatcher</title>
         <para>osa-dispatcher is configured via the <replaceable>rhn.conf</replaceable> file located
-          on the &susemgr; at:<screen><replaceable>/etc/rhn/rhn.conf</replaceable></screen> All
+          on the &susemgr; at:</para>
+      </formalpara>
+      <screen><replaceable>/etc/rhn/rhn.conf</replaceable></screen>
+      <para>All
           parameters for configuring osa-dispatcher are located under the section heading:
           <screen><replaceable># OSA configuration #</replaceable>.</screen></para>
-      </formalpara>
+
       <formalpara>
         <title>osad</title>
-        <para>osad configuration files are located on all &susemgr; clients at:
+        <para>osad configuration files are located on all &susemgr; clients at:</para>
+      </formalpara>
           <screen><replaceable>/etc/sysconfig/rhn/osad.conf
 /etc/syseconfig/rhn/up2date</replaceable></screen>
-          For troubleshooting <systemitem>osad</systemitem> the log file is located in:
-          <screen><replaceable>/var/log/osad</replaceable></screen> The location of this log file is
+          <para>For troubleshooting <systemitem>osad</systemitem> the log file is located in:</para>
+          <screen><replaceable>/var/log/osad</replaceable></screen>
+          <para>The location of this log file is
           configurable via the <replaceable>osad.conf</replaceable> file.</para>
-      </formalpara>
       <formalpara>
         <title>jabberd</title>
         <para>Configuration of jabberd goes beyond the scope of this document. The jabberd log file
