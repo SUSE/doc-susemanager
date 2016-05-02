@@ -23,8 +23,7 @@
             Salt while keeping existing deployments intact.</para>
 
     </sect1>
-    <sect1 xml:id="create.act.keys">
-        <title>Creating Your Keys</title>
+    <sect1 xml:id="create.act.keys"><title>Creating Your Keys</title>
         <para>The following procedure will guide you through creating the activation keys for your
             test channels. Activation keys can be used for both Salt and traditional clients. </para>
         <formalpara>
@@ -36,7 +35,6 @@
                 organization which includes all software entitlements. Activation keys may be used
                 with traditional clients or with Salt clients. Review the Salt</para>
         </formalpara>
-
         <procedure xml:id="create.activation.keys">
             <title>Creating Activation Keys</title>
             <step>
@@ -104,9 +102,8 @@
                     </mediaobject>
                 </informalfigure>
             </step>
-        </procedure>
-
-
+        </procedure> 
+    
     </sect1>
     <sect1 xml:id="create.tools.repository">
         <title>Creating the &susemgr; Tools Repository</title>
@@ -119,7 +116,7 @@
         <important>
             <title>Creating a Tools Repository when an SCC Channel has not been Synced</title>
             <para>Before following the procedure to create the tools repository make sure the &suse;
-                vendor channel you will be using with your client has been completly synced. You can
+                vendor channel you will be using with your client has been completely synced. You can
                 check this by running <replaceable>tail -f
                     /var/log/rhn/reposync/CHANNEL_NAME</replaceable>.log as
                     <systemitem>root</systemitem>. For example: <replaceable>tail -f
@@ -343,37 +340,28 @@ ORG_GPG_KEY=
             <title>Registering Salt Minions</title>
             <step>
                 <para>On your minion as root enter the following command:</para>
-                    <screen><prompt>#</prompt> zypper ar http://SUSE.Manager.FQDN.com/pub/repositories/sle/12/1/bootstrap/ sles12-sp1</screen>
-                    <para>
-                    It is important that you do not use HTTPS as you will receive errors. Use HTTP
-                    instead.</para>
+                <screen><prompt>#</prompt> zypper ar http://SUSE.Manager.FQDN.com/pub/repositories/sle/12/1/bootstrap/ sles12-sp1</screen>
+                <para> It is important that you do not use HTTPS as you will receive errors. Use
+                    HTTP instead.</para>
             </step>
             <step>
                 <para>After adding the repository containing the necessary salt packages
                     execute:</para>
-<screen><prompt>#</prompt> zypper in salt-minion</screen>
+                <screen><prompt>#</prompt> zypper in salt-minion</screen>
             </step>
             <step>
                 <para>Modify the minion configuration file to point to the FQDN of the SUSE Manager
-                Server (Master):</para>
+                    Server (Master):</para>
                 <screen><prompt>#</prompt> vi /etc/salt/minion</screen>
-                <para>
-                 Find and
-                    change the following line
-                </para>
+                <para> Find and change the following line </para>
                 <screen>master: salt</screen>
-                <para>
-                 to:
-                </para>
+                <para> to: </para>
                 <screen>master: FQDN.SUSE.Manager.com</screen>
             </step>
             <step>
                 <para>Restart the Salt minion with:</para>
                 <screen><prompt>#</prompt> systemctl restart salt-minion</screen>
-                <para>
- or on
-                    non-systemd OS:
-                </para>
+                <para> or on non-systemd OS: </para>
                 <screen><prompt>#</prompt> rcsalt-minion restart</screen>
             </step>
         </procedure>
