@@ -11,11 +11,11 @@
     <title>Preparing for Registering Clients</title>
     <sect1>
         <title>Introduction</title>
-        <para>All releases previous to and including &susemgr; 2.1 implemented and shipped with its
-            own client management framework, which today is still fully supported. In addition to
-            this traditional framework SUSE Manager 3 includes a complete Salt solution. Salt is an
+        <para>All releases previous to and including &susemgr; 2.1 were implemented and shipped with
+            a client management framework, which today is still fully supported. In addition to this
+            traditional framework SUSE Manager 3 includes a complete Salt solution. Salt is an
             end-to-end data-center automation tool which may also be used outside the scope of SUSE
-            Manager to introduce reactive, real-time, orchestration, and configuration management.
+            Manager to introduce reactive, real-time orchestration, and configuration management.
             Two of the greatest advantages of adding the Salt framework to &susemgr;
             &productnumber3; are that it remains a popular open source project with a vibrant
             community and that it continues to be well documented and supported across the web.
@@ -23,8 +23,7 @@
             Salt while keeping existing deployments intact.</para>
 
     </sect1>
-    <sect1 xml:id="create.act.keys">
-        <title>Creating Your Keys</title>
+    <sect1 xml:id="create.act.keys"><title>Creating Your Keys</title>
         <para>The following procedure will guide you through creating the activation keys for your
             test channels. Activation keys can be used for both Salt and traditional clients. </para>
         <formalpara>
@@ -34,9 +33,8 @@
                 systems registered with a key. Each activation key is bound to the organization for
                 which it has been created. For this guide you will be using the default SUSE Manager
                 organization which includes all software entitlements. Activation keys may be used
-                with traditional clients or with Salt clients. Review the Salt</para>
+                with traditional clients or with Salt clients. </para>
         </formalpara>
-
         <procedure xml:id="create.activation.keys">
             <title>Creating Activation Keys</title>
             <step>
@@ -104,9 +102,8 @@
                     </mediaobject>
                 </informalfigure>
             </step>
-        </procedure>
-
-
+        </procedure> 
+    
     </sect1>
     <sect1 xml:id="create.tools.repository">
         <title>Creating the &susemgr; Tools Repository</title>
@@ -119,7 +116,7 @@
         <important>
             <title>Creating a Tools Repository when an SCC Channel has not been Synced</title>
             <para>Before following the procedure to create the tools repository make sure the &suse;
-                vendor channel you will be using with your client has been completly synced. You can
+                vendor channel you will be using with your client has been completely synced. You can
                 check this by running <replaceable>tail -f
                     /var/log/rhn/reposync/CHANNEL_NAME</replaceable>.log as
                     <systemitem>root</systemitem>. For example: <replaceable>tail -f
@@ -335,7 +332,7 @@ ORG_GPG_KEY=
     <sect1>
         <title>Registering Salt Clients</title>
         <para>The following section describes registering Salt minions. This section assumes you
-            have created the tools repository.</para>
+            have created the SUSE Manager tools repository.</para>
         <para>Once you have setup a base channel from the WebUI clients to obtain software sources
             from, for example: <replaceable>SLES12-SP1-Pool for x86_64</replaceable> Perform the
             following procedure to register a Salt minion.</para>
@@ -343,37 +340,28 @@ ORG_GPG_KEY=
             <title>Registering Salt Minions</title>
             <step>
                 <para>On your minion as root enter the following command:</para>
-                    <screen><prompt>#</prompt> zypper ar http://SUSE.Manager.FQDN.com/pub/repositories/sle/12/1/bootstrap/ sles12-sp1</screen>
-                    <para>
-                    It is important that you do not use HTTPS as you will receive errors. Use HTTP
-                    instead.</para>
+                <screen><prompt>#</prompt> zypper ar http://FQDN.SUSE.Manager.com/pub/repositories/sle/12/1/bootstrap/ sles12-sp1</screen>
+                <para> It is important that you do not use HTTPS as you will receive errors. Use
+                    HTTP instead.</para>
             </step>
             <step>
                 <para>After adding the repository containing the necessary salt packages
                     execute:</para>
-<screen><prompt>#</prompt> zypper in salt-minion</screen>
+                <screen><prompt>#</prompt> zypper in salt-minion</screen>
             </step>
             <step>
                 <para>Modify the minion configuration file to point to the FQDN of the SUSE Manager
-                Server (Master):</para>
+                    Server (Master):</para>
                 <screen><prompt>#</prompt> vi /etc/salt/minion</screen>
-                <para>
-                 Find and
-                    change the following line
-                </para>
+                <para> Find and change the following line </para>
                 <screen>master: salt</screen>
-                <para>
-                 to:
-                </para>
+                <para> to: </para>
                 <screen>master: FQDN.SUSE.Manager.com</screen>
             </step>
             <step>
                 <para>Restart the Salt minion with:</para>
                 <screen><prompt>#</prompt> systemctl restart salt-minion</screen>
-                <para>
- or on
-                    non-systemd OS:
-                </para>
+                <para> or on non-systemd OS: </para>
                 <screen><prompt>#</prompt> rcsalt-minion restart</screen>
             </step>
         </procedure>
