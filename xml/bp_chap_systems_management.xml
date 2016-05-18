@@ -17,11 +17,11 @@
       commands your &susemgr; server sends its clients to do will be routed through one of the
       following configured contact methods. Which one you select will be heavily dependant on your
       network infrastructure. The following sections provide a good starting point for selecting a
-    method which best suits your network environment.</para>
+      method which best suits your network environment.</para>
     <note>
-        <title>Contact Methods and Salt</title>
-        <para>This chapter is only relevant for traditional clients as Salt clients (minions)
-          utilize a salt specific contact method.</para>
+      <title>Contact Methods and Salt</title>
+      <para>This chapter is only relevant for traditional clients as Salt clients (minions) utilize
+        a salt specific contact method.</para>
     </note>
   </sect1>
   <sect1 xml:id="bp.contact.methods.rhnsd">
@@ -33,8 +33,8 @@
       to begin updating after actions have been scheduled for them.</para>
 
     <para>To check for updates, <systemitem>rhnsd</systemitem> runs the external
-        <systemitem>mgr_check</systemitem> program located in <filename>/usr/sbin/</filename>.
-      This is a small application that establishes the network connection to SUSE Manager. The SUSE
+        <systemitem>mgr_check</systemitem> program located in <filename>/usr/sbin/</filename>. This
+      is a small application that establishes the network connection to SUSE Manager. The SUSE
       Manager daemon does not listen on any network ports or talk to the network directly. All
       network activity is done via the <systemitem>mgr_check</systemitem> utility. </para>
     <warning>
@@ -57,14 +57,15 @@
 
     <sect2>
       <title>Configuring &susemgr; rhnsd Daemon</title>
-      <para>The SUSE Manager daemon can be configured by editing the following configuration file:</para>
-        <screen>/etc/sysconfig/rhn/rhnsd</screen>
-        <para>
-         This is the
-        configuration file the rhnsd initialization script uses. An important parameter for the
-        daemon is its check-in frequency. The default interval time is four hours (240 minutes). If
-        you modify the configuration file, you must as <systemitem>root</systemitem> restart the
-        daemon with the command <command>rcrhnsd restart</command>. </para>
+      <para>The SUSE Manager daemon can be configured by editing the following configuration
+        file:</para>
+      <screen>/etc/sysconfig/rhn/rhnsd</screen>
+      <para> This is the configuration file the rhnsd initialization script uses. An important
+        parameter for the daemon is its check-in frequency. The default interval time is four hours
+        (240 minutes). If you modify the configuration file, you must as
+          <systemitem>root</systemitem> restart the daemon with the command
+          (systemd)<command>systemctl rhnsd restart</command> or (runcom)<command>rcrhnsd
+          restart</command> . </para>
       <important>
         <title>Minimum Allowed Check-in Parameter</title>
         <para>The minimum allowed time interval is one hour (60 minutes). If you set the interval
@@ -73,8 +74,8 @@
     </sect2>
     <sect2>
       <title>Viewing rhnsd Daemon Status</title>
-      <para>You can view the status of rhnsd by typing the command <command>rcrhnsd status</command>
-        as <systemitem>root</systemitem>.</para>
+      <para>You can view the status of rhnsd by typing the command <command>systemctl status
+          rhnsd</command> or <command>rcrhnsd status</command> as <literal>root</literal>.</para>
     </sect2>
 
   </sect1>
@@ -116,19 +117,18 @@
           <abbrev>HTTPS</abbrev> (<abbrev>HTTP</abbrev> is only necessary during the registration
         process). The port numbers used by default are 1232 and 1233. To overwrite these, add two
         custom port numbers greater than 1024 to <filename>/etc/rhn/rhn.conf</filename> like
-      this:</para>
+        this:</para>
       <screen>ssh_push_port_http = high port 1
 ssh_push_port_https = high port 2</screen>
 
       <para>If you would like your clients to be contacted via their hostnames instead of an IP
-      address, set the following option:</para>
+        address, set the following option:</para>
       <screen>ssh_push_use_hostname = true</screen>
 
       <para>It is also possible to adjust the number of threads to use for opening client
         connections in parallel. By default two parallel threads are used. Set
           <systemitem>taskomatic.ssh_push_workers</systemitem> in
-          <filename>/etc/rhn/rhn.conf</filename> like
-      this:</para>
+          <filename>/etc/rhn/rhn.conf</filename> like this:</para>
       <screen>taskomatic.ssh_push_workers = number</screen>
     </sect2>
 
@@ -136,44 +136,41 @@ ssh_push_port_https = high port 2</screen>
       <title>Using <abbrev>sudo</abbrev> with SSH Push </title>
       <para>For security reasons you may desire to use <abbrev>sudo</abbrev> and SSH into a system
         as a user other than root. The following procedure will guide you through configuring sudo
-      for use with ssh push.</para>
+        for use with ssh push.</para>
       <note>
-          <title>sudo Requirements</title>
-          <para>The packages <filename>spacewalk-taskomatic >= 2.1.165.19</filename> and
-              <filename>spacewalk-certs-tools => 2.1.6.7</filename> are required for using sudo with
-            SSH Push.</para>
-        </note>
+        <title>sudo Requirements</title>
+        <para>The packages <filename>spacewalk-taskomatic >= 2.1.165.19</filename> and
+            <filename>spacewalk-certs-tools => 2.1.6.7</filename> are required for using sudo with
+          SSH Push.</para>
+      </note>
       <procedure>
         <title>Configuring sudo</title>
 
         <step>
           <para>Set the following parameter on the server located in:
-          <filename>/etc/rhn/rhn.conf</filename></para>
+              <filename>/etc/rhn/rhn.conf</filename></para>
           <screen>ssh_push_sudo_user = user</screen>
-          <para>
-          The server will now use sudo to ssh as the configured user.</para>
+          <para> The server will use sudo to ssh as the configured user.</para>
         </step>
 
         <step>
-          <para>You must now create the user specified in step 1 above on each of your clients and
-            the following parameters should be commented out within your clients
-              <filename>/etc/sudoers</filename>
-          file:</para>
-          <screen> #Defaults targetpw   # ask for the password of the target user i.e. root
+          <para>You must create the user specified in step 1 above on each of your clients and the
+            following parameters should be commented out within your clients
+              <filename>/etc/sudoers</filename> file:</para>
+          <screen>#Defaults targetpw   # ask for the password of the target user i.e. root
 #ALL    ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!</screen>
         </step>
 
         <step>
-          <para>Now add the following line beneath the <parameter>## User privilege
-              specification</parameter> section of each clients <filename>sudoers</filename>
-          file:</para>
+          <para>Add the following line beneath the <literal>## User privilege
+              specification</literal> section of each clients <filename>sudoers</filename>
+            file:</para>
           <screen>user ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check</screen>
         </step>
 
         <step>
           <para>On each client add the following two lines to the
-              <filename>/home/user/.bashrc</filename>
-          file.</para>
+              <filename>/home/user/.bashrc</filename> file.</para>
           <screen>PATH=$PATH:/usr/sbin
 export PATH</screen>
         </step>
@@ -185,9 +182,9 @@ export PATH</screen>
       <title>Client Registration</title>
       <para>As your clients cannot reach the server, you will need to register your clients from the
         server. A tool for performing registration of clients from the server is included with
-        &susemgr; &productnumber3; called <filename>mgr-ssh-push-init</filename> This tool expects a
-        client's hostname or IP address as well as the path to a valid bootstrap script located in
-        the servers filesystem for registration as parameters.</para>
+        &susemgr; &productnumber3; called <systemitem>mgr-ssh-push-init</systemitem>. This tool
+        expects a client's hostname or IP address as well as the path to a valid bootstrap script
+        located in the servers filesystem for registration as parameters.</para>
 
       <important>
         <title>Specifying Ports for Tunneling before Registering Clients</title>
@@ -217,35 +214,34 @@ export PATH</screen>
         may be used. Registration is optional since it can also be done from within the client in
         this case. Note that <systemitem>mgr-ssh-push-init</systemitem> will also automatically
         generate the necessary SSH key pair if it does not yet exist on the server:</para>
-        <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register bootstrap_script</screen>
+      <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register bootstrap_script</screen>
 
 
-      <para>When using the Push via SSH tunnel contact method, please note that the client is
-        configured to connect &susemgr; via the high ports mentioned above (see
-        /etc/sysconfig/rhn/up2date). In other words, tools like rhn_check and zypper will need an
-        active SSH session with the proper port forwarding options in order to access the SUSE
-        Manager API. To verify the Push via SSH tunnel connection manually, you can run e.g. this on
-        the SUSE Manager
-        server:</para>
-<screen><prompt>#</prompt> ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443 client zypper ref</screen>
+      <para>When using the Push via SSH tunnel contact method, note that the client is configured to
+        connect &susemgr; via the high ports mentioned above (see
+          <filename>/etc/sysconfig/rhn/up2date</filename>). Tools like <command>rhn_check</command>
+        and <command>zypper</command> will need an active SSH session with the proper port
+        forwarding options in order to access the SUSE Manager API. To verify the Push via SSH
+        tunnel connection manually, you can run this on the SUSE Manager server:</para>
+      <screen><prompt>#</prompt> ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443 client zypper ref</screen>
 
     </sect2>
     <sect2 xml:id="bp.contact.methods.ssh.push.api.support">
       <title>API Support for SSH Push</title>
       <para>The contact method to be used for managing a server can also be modified via the API.
         The following example code (python) shows how to set a system's contact method to
-      'ssh-push'. Available valid values are:</para>
+          <literal>ssh-push</literal>. Available valid values are:</para>
       <itemizedlist>
-          <listitem>
-            <para>'default' (pull)</para>
-          </listitem>
-          <listitem>
-            <para>'ssh-push'</para>
-          </listitem>
-          <listitem>
-            <para>'ssh-push-tunnel'</para>
-          </listitem>
-        </itemizedlist>
+        <listitem>
+          <para>'default' (pull)</para>
+        </listitem>
+        <listitem>
+          <para>'ssh-push'</para>
+        </listitem>
+        <listitem>
+          <para>'ssh-push-tunnel'</para>
+        </listitem>
+      </itemizedlist>
       <screen>client = xmlrpclib.Server(SUMA_HOST + "/rpc/api", verbose=0)
 key = client.auth.login(SUMA_LOGIN, SUMA_PASSWORD)
 client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</screen>
@@ -263,11 +259,11 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
         <title>Migrate Registered Systems</title>
         <step>
           <para>Setup the client using the <systemitem>mgr-ssh-push-init</systemitem> script
-            (without --register)</para>
+            (without --register).</para>
         </step>
         <step>
-          <para> Change the client's contact method to 'ssh-push' or 'ssh-push-tunnel' respectively
-            (via API or web UI)</para>
+          <para> Change the client's contact method to <literal>ssh-push</literal> or
+              <literal>ssh-push-tunnel</literal> respectively (via API or web UI).</para>
         </step>
       </procedure>
       <para>Existing activation keys can also be edited via API to use the SSH push contact method
@@ -324,35 +320,34 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
         </imageobject>
       </mediaobject>
     </figure>
-      <itemizedlist>
-        <title>How it Works</title>
-        <listitem>
-          <para>On &susemgr; the <systemitem>osa-dispatcher</systemitem> periodically runs a query
-            which checks to see if there are any clients overdue for a ping.</para>
-        </listitem>
-        <listitem>
-          <para>If an overdue client is found, a message is sent via
-              <systemitem>jabberd</systemitem> to the <systemitem>osad</systemitem> instances
-            running on all clients registered with your &susemgr; server. The
-              <systemitem>osad</systemitem> instances respond to the ping through the
-              <systemitem>jabberd</systemitem> deamon running in the background on your &susemgr;
-            Server. <systemitem>osa-dispatcher</systemitem> receives the response, and marks the
-            client as 'online'.</para>
-        </listitem>
-        <listitem>
-          <para>If <systemitem>osa-dispatcher</systemitem> fails to receive a response from an
-              <systemitem>osad</systemitem> instance in a certain amount of time, the client is
-            marked 'offline'. </para>
-        </listitem>
-        <listitem>
-          <para><systemitem>osa-dispatcher</systemitem> also periodically executes a select on the
-            database to check all &susemgr; clients which have actions that need to be executed. If
-            an action is found, a message is sent through <systemitem>jabberd</systemitem> to
-              <systemitem>osad</systemitem> which then executes <systemitem>mgr_check</systemitem>
-            on the client. <systemitem>mgr_check</systemitem> then takes over performing the actual
-            action.</para>
-        </listitem>
-      </itemizedlist>
+    <itemizedlist>
+      <title>How it Works</title>
+      <listitem>
+        <para>On &susemgr; the <systemitem>osa-dispatcher</systemitem> periodically runs a query
+          which checks to see if there are any clients overdue for a ping.</para>
+      </listitem>
+      <listitem>
+        <para>If an overdue client is found, a message is sent via <systemitem>jabberd</systemitem>
+          to the <systemitem>osad</systemitem> instances running on all clients registered with your
+          &susemgr; server. The <systemitem>osad</systemitem> instances respond to the ping through
+          the <systemitem>jabberd</systemitem> deamon running in the background on your &susemgr;
+          Server. <systemitem>osa-dispatcher</systemitem> receives the response, and marks the
+          client as 'online'.</para>
+      </listitem>
+      <listitem>
+        <para>If <systemitem>osa-dispatcher</systemitem> fails to receive a response from an
+            <systemitem>osad</systemitem> instance in a certain amount of time, the client is marked
+          'offline'. </para>
+      </listitem>
+      <listitem>
+        <para><systemitem>osa-dispatcher</systemitem> also periodically executes a select on the
+          database to check all &susemgr; clients which have actions that need to be executed. If an
+          action is found, a message is sent through <systemitem>jabberd</systemitem> to
+            <systemitem>osad</systemitem> which then executes <systemitem>mgr_check</systemitem> on
+          the client. <systemitem>mgr_check</systemitem> then takes over performing the actual
+          action.</para>
+      </listitem>
+    </itemizedlist>
 
     <sect2>
       <title>Configuring and Enabling osad</title>
@@ -361,33 +356,33 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
         <title>Enabling SSL</title>
         <para>For this communication method to work SSL is mandatory. If SSL certificates are not
           available, the daemon on your client systems will fail to connect. Make sure your firewall
-          rules allow for the required ports. See: <xref linkend="tab.install.ports.server"/></para>
+          rules allow for the required ports. See:<xref linkend="tab.install.ports.server"/>.</para>
       </important>
       <procedure>
         <title>Enabling osa-dispatcher on &susemgr; and osad on Clients</title>
         <step>
           <para>On your &susemgr; server use the following command as root to start the
-              <systemitem>osa-dispatcher</systemitem>
-            service:</para>
-<screen><command>rcosa-dispatcher start</command></screen>
+              <systemitem>osa-dispatcher</systemitem> service:</para>
+          <screen>rcosa-dispatcher start</screen>
+          <screen>systemctl start osa-dispatcher</screen>
         </step>
         <step>
           <para>Install the <systemitem>osad</systemitem> package on all client systems to allow
             communication to the osa-dispatcher on &susemgr;. The package can be found in the
               <replaceable>Tools child channel</replaceable>.</para>
-<warning>
-              <title>osad conflicts with osa-dispatcher</title>
-              <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
-                package on your &susemgr; server. The <systemitem>osad</systemitem> client service
-                conflicts with <systemitem>osa-dispatcher</systemitem> server package.</para>
-            </warning>
+          <warning>
+            <title>osad conflicts with osa-dispatcher</title>
+            <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
+              package on your &susemgr; server. The <systemitem>osad</systemitem> client service
+              conflicts with <systemitem>osa-dispatcher</systemitem> server package.</para>
+          </warning>
         </step>
         <step>
           <para>Once osad has been installed, start the service on your client systems as root using
-          the command:</para>
+            the command:</para>
           <screen><command>rcosad start</command></screen>
-          <para>Like other services,
-            rcosa-dispatcher and rcosad accept stop, restart, and status commands as well.</para>
+          <para>Like other services, rcosa-dispatcher and rcosad accept stop, restart, and status
+            commands as well.</para>
         </step>
       </procedure>
       <para>This feature depends on the client systems recognizing the fully qualified domain name
@@ -404,39 +399,36 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
         the following locations.</para>
       <formalpara>
         <title>osa-dispatcher</title>
-        <para>osa-dispatcher is configured via the <filename>rhn.conf</filename> file located
-          on the &susemgr; at:</para>
+        <para>osa-dispatcher is configured via the <filename>rhn.conf</filename> file located on the
+          &susemgr; at:</para>
       </formalpara>
       <screen>/etc/rhn/rhn.conf</screen>
-      <para>All
-          parameters for configuring osa-dispatcher are located under the section heading:</para>
-          <screen><replaceable># OSA configuration #</replaceable>.</screen>
+      <para>All parameters for configuring osa-dispatcher are located under the section
+        heading:</para>
+      <screen><replaceable># OSA configuration #</replaceable>.</screen>
 
       <formalpara>
         <title>osad</title>
         <para>osad configuration files are located on all &susemgr; clients at:</para>
       </formalpara>
-          <screen>/etc/sysconfig/rhn/osad.conf
+      <screen>/etc/sysconfig/rhn/osad.conf
 /etc/syseconfig/rhn/up2date</screen>
-          <para>For troubleshooting <systemitem>osad</systemitem> the log file is located in:</para>
-          <screen>/var/log/osad</screen>
-          <para>The location of this log file is
-          configurable via the <filename>osad.conf</filename> file.</para>
+      <para>For troubleshooting <systemitem>osad</systemitem> the log file is located in:</para>
+      <screen>/var/log/osad</screen>
+      <para>The location of this log file is configurable via the <filename>osad.conf</filename>
+        file.</para>
       <formalpara>
         <title>jabberd</title>
         <para>Configuration of jabberd goes beyond the scope of this document. The jabberd log file
           is located at:</para>
       </formalpara>
-<screen>/var/log/messages</screen>
+      <screen>/var/log/messages</screen>
 
       <para>This concludes osad configuration and logging.</para>
     </sect2>
   </sect1>
 
-  <!-- TODO: ADD this once team has fully established a working method <sect1 xml:id="bp.contact.methods.salt">
-    <title>Salt</title>
-    <para/>
-  </sect1> -->
+
 
 
 </chapter>
