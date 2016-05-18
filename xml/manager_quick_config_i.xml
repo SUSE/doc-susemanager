@@ -151,13 +151,50 @@
     <title>Expanded Support</title>
     <para>
      After adding Expanded Support channels to &susemgr;, the parent
-     channel (<systemitem>rhel-x86_64-server-6</systemitem>) needs to be
-     filled with the RHEL DVD contents using the following command:
+     channel
+     (<systemitem><replaceable>rhel-channel</replaceable></systemitem>)
+     needs to be filled with the RHEL DVD contents using the following
+     command:
     </para>
-    <screen>spacewalk-repo-sync -c rhel-x86_64-server-6 -u file:///<replaceable>path/to/mounted/dvd/</replaceable></screen>
+    <itemizedlist>
+     <!-- https://bugzilla.suse.com/show_bug.cgi?id=969401#c3 -->
+     <!-- taken from
+          https://wiki.microfocus.com/index.php?title=SUSE_Manager/Sync_RHEL_media -->
+     <listitem>
+      <para>
+      Copy the ISO of the RHEL DVD to your SUSE Manager server as
+      <filename>/tmp/rdvd.iso</filename>.
+      </para>
+     </listitem>
+     <listitem>
+      <para>Create a directory:</para>
+      <screen>mkdir -p /srv/www/htdocs/pub/rhel</screen>
+     </listitem>
+     <listitem>
+      <para>Mount the ISO:</para>
+      <screen>mount -o loop /tmp/rdvd.iso /srv/www/htdocs/pub/rhel</screen>
+     </listitem>
+     <listitem>
+      <para>Start spacewalk-repo-sync:</para>
+
+<screen>spacewalk-repo-sync -c <replaceable>rhel-channel</replaceable> -u https://127.0.0.1/pub/rhel/Server/
+Repo URL: https://127.0.0.1/pub/rhel/Server/
+Packages in repo:              3690
+Packages already synced:          0
+Packages to sync:              3690
+1/3690 : texlive-latex-2007-57.el6_2-0.x86_64
+2/3690 : boost-filesystem-1.41.0-18.el6-0.i686
+3/3690 : policycoreutils-newrole-2.0.83-19.39.el6-0.x86_64
+[...]</screen>
+     </listitem>
+    </itemizedlist>
     <para>
-     Without that, RHEL servers cannot be managed.
+    After the end of the synchronization, you will be able to manipulate
+    this channel as a regular &susemgr; channel.
     </para>
+    <!-- <para> -->
+    <!--  Without that, RHEL servers cannot be managed. -->
+    <!-- </para> -->
    </note>
    <para>
     To manually import and synchronize specific channel data after
