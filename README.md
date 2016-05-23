@@ -111,7 +111,9 @@ osc ci -m "update"
 osc pr
 
 osc sr -m 'update'
-Perform these steps on both head and 3.0
+
+# the build repo is defined in DEF-susemanager_docs
+# Perform these steps on both head and 3.0
 
 ```
 
@@ -123,8 +125,7 @@ git@github.com:openSUSE/daps.git.
 Switch to the documentation checkout and call:
 
 ```
-.../daps/bin/daps --dapsroot .../daps -d DC-create-all online-docs \
-  --dbtonovdoc
+.../daps/bin/daps --dapsroot .../daps -d DC-create-all online-docs
 ```
 
 Copy the results to the results to your ~/Exports directory.
