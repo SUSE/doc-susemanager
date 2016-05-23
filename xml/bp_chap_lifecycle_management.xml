@@ -14,48 +14,47 @@
     <title>Advanced Patch Lifecycle Management</title>
 
     <sect1 xml:id="bp.chapt.life.management.covered">
-        <title>Whats Covered Here?</title>
+        <title>What's Covered Here?</title>
 
         <para>This chapter describes how to setup and configure a &susemgr; testing implementation
-            to enable companies in the delivery of these often requested
-        features:</para>
+            to enable companies in the delivery of these often requested features:</para>
         <itemizedlist>
-                <listitem>
-                    <para>Automatic creation and archive of patch sets by quarter (or any other time
-                        period)</para>
-                </listitem>
-                <listitem>
-                    <para>Consistent method of patch promotion and delivery through numerous
-                        landscapes and environments</para>
-                </listitem>
-                <listitem>
-                    <para>Exception process for handling patches that need to be excluded from a
-                        patch cycle</para>
-                </listitem>
-                <listitem>
-                    <para>Environment creation with historical patch sets</para>
-                </listitem>
-                <listitem>
-                    <para>Minimal need for host channel subscription manipulation from
-                        cradle-to-grave</para>
-                </listitem>
-                <listitem>
-                    <para>Support for service-pack migration using custom child channels</para>
-                </listitem>
-                <listitem>
-                    <para>Provides a foundation for using multiple organizations to maintain
-                        systems.</para>
-                </listitem>
-            </itemizedlist>
+            <listitem>
+                <para>Automatic creation and archive of patch sets by quarter (or any other time
+                    period)</para>
+            </listitem>
+            <listitem>
+                <para>Consistent method of patch promotion and delivery through numerous landscapes
+                    and environments</para>
+            </listitem>
+            <listitem>
+                <para>Exception process for handling patches that need to be excluded from a patch
+                    cycle</para>
+            </listitem>
+            <listitem>
+                <para>Environment creation with historical patch sets</para>
+            </listitem>
+            <listitem>
+                <para>Minimal need for host channel subscription manipulation from
+                    cradle-to-grave</para>
+            </listitem>
+            <listitem>
+                <para>Support for service-pack migration using custom child channels</para>
+            </listitem>
+            <listitem>
+                <para>Provides a foundation for using multiple organizations to maintain
+                    systems.</para>
+            </listitem>
+        </itemizedlist>
     </sect1>
 
     <sect1 xml:id="bp.chapt.life.management.assumptions">
         <title>Assumptions</title>
-        <para>This guide covers &susemgr; &productnumber3;. A fresh installation is not required but
-            some assumptions are made. You have a working &susemgr; environment, with a few
-            registered clients, and a decent knowledge of &susemgr; terms and capabilities. If you
-            are unfamiliar with these terms or do not have a current working setup, see the: <xref
-                linkend="quickstart.chapt.overview.requirements"/></para>
+        <para>A fresh installation is not required but some assumptions are made. You have a working
+            &susemgr; environment, with a few registered clients, and a decent knowledge of
+            &susemgr; terms and capabilities. If you are unfamiliar with these terms or do not have
+            a current working setup, see the: <xref linkend="quickstart.chapt.overview.requirements"
+            /></para>
         <note>
             <title>spacecmd and XMLRPC Examples</title>
             <para>Using advanced features such as <systemitem>spacecmd</systemitem> or
@@ -74,75 +73,72 @@
             constantly working to provide updates which fix flaws discovered within their software
             products.</para>
 
-        <para>Adding to these pressures are requirements imposed by
-        compliance initiatives such as:</para>
+        <para>Adding to these pressures are requirements imposed by compliance initiatives such
+            as:</para>
         <itemizedlist>
-                <listitem>
-                    <para>PCI-DSS (Payment Card Industry Data Security Standard)</para>
-                </listitem>
-                <listitem>
-                    <para>SOX (Sarbanes-Oxley)</para>
-                </listitem>
-                <listitem>
-                    <para>HIPAA (Health Insurance Portability and Accountability Act)</para>
-                </listitem>
-                <listitem>
-                    <para>FIPS 140 (Federal Information Processing Standard)</para>
-                </listitem>
+            <listitem>
+                <para>PCI-DSS (Payment Card Industry Data Security Standard)</para>
+            </listitem>
+            <listitem>
+                <para>SOX (Sarbanes-Oxley)</para>
+            </listitem>
+            <listitem>
+                <para>HIPAA (Health Insurance Portability and Accountability Act)</para>
+            </listitem>
+            <listitem>
+                <para>FIPS 140 (Federal Information Processing Standard)</para>
+            </listitem>
         </itemizedlist>
-        <para>
-         Included in most of these standards are rules which dictate frequency and
-            time frames required for patching and often these schedules are modified due to the
-            severity level of a specific patch.</para>
+        <para> Included in most of these standards are rules which dictate frequency and time frames
+            required for patching and often these schedules are modified due to the severity level
+            of a specific patch.</para>
 
         <para>Businesses depend upon a changing landscape of applications covering a wide range of
             compute infrastructure. These may include physical and virtual hosts and have
             complicated application stacks. </para>
-            <para>These applications may require the following:</para>
-            <itemizedlist>
-                <listitem>
-                    <para>A specific kernel version</para>
-                </listitem>
-                <listitem>
-                    <para>Strict uptime requirements</para>
-                </listitem>
-                <listitem>
-                    <para>Specific run-time environments, (like Java)</para>
-                </listitem>
-                <listitem>
-                    <para>Specific Linux OS release</para>
-                </listitem>
-                <listitem>
-                    <para>Specific configuration requirements</para>
-                </listitem>
-                <listitem>
-                    <para>Hardening and platform requirements</para>
-                </listitem>
-                <listitem>
-                    <para>Specific software versions</para>
-                </listitem>
-            </itemizedlist>
-
-        <para>Additionally, many companies have created duplicate host
-        environments such as:</para>
+        <para>These applications may require the following:</para>
         <itemizedlist>
-                <listitem>
-                    <para>Production (PROD)</para>
-                </listitem>
-                <listitem>
-                    <para>Development (DEV)</para>
-                </listitem>
-                <listitem>
-                    <para>Quality Assurance (QA)</para>
-                </listitem>
-                <listitem>
-                    <para>User-acceptance/Testing (UAT)</para>
-                </listitem>
+            <listitem>
+                <para>A specific kernel version</para>
+            </listitem>
+            <listitem>
+                <para>Strict uptime requirements</para>
+            </listitem>
+            <listitem>
+                <para>Specific run-time environments, (like Java)</para>
+            </listitem>
+            <listitem>
+                <para>Specific Linux OS release</para>
+            </listitem>
+            <listitem>
+                <para>Specific configuration requirements</para>
+            </listitem>
+            <listitem>
+                <para>Hardening and platform requirements</para>
+            </listitem>
+            <listitem>
+                <para>Specific software versions</para>
+            </listitem>
         </itemizedlist>
-        <para>
-         These landscapes mirror production environments and allow for testing or
-            validation of applied changes to a system or set of systems. This means that you are
-            required to manage, patch and report on at least one more complete set of hosts. </para>
+
+        <para>Additionally, many companies have created duplicate host environments such as:</para>
+        <itemizedlist>
+            <listitem>
+                <para>Production (PROD)</para>
+            </listitem>
+            <listitem>
+                <para>Development (DEV)</para>
+            </listitem>
+            <listitem>
+                <para>Quality Assurance (QA)</para>
+            </listitem>
+            <listitem>
+                <para>User-acceptance/Testing (UAT)</para>
+            </listitem>
+        </itemizedlist>
+        <para> These landscapes mirror production environments and allow for testing or validation
+            of applied changes to a system or set of systems. This means that you are required to
+            manage, patch and report on at least one more complete set of hosts. </para>
 
         <sect2 xml:id="bp.chapt.sect2.important.terminology">
             <title>Important Terminology</title>
@@ -183,60 +179,58 @@
                 compliance constraints, their patch lifecycle (both timing and delivery) is based on
                 their corporate security policies, host environments, landscapes, and future
                 management needs. The Chameleon Corporation must maintain the following requirements
-                for managing patch and security updates to their Linux
-            hosts:</para>
+                for managing patch and security updates to their Linux hosts:</para>
         </formalpara>
         <itemizedlist>
-                    <title>Requirement Summary</title>
+            <title>Requirement Summary</title>
+            <listitem>
+                <para>The published Security Policy states: "All Linux systems need to be up-to-date
+                    with the latest available updates, bug-fixes and enhancements on a quarterly
+                    basis."</para>
+                <para>Quarters are defined as:</para>
+                <itemizedlist>
                     <listitem>
-                        <para>The published Security Policy states: "All Linux systems need to be
-                            up-to-date with the latest available updates, bug-fixes and enhancements
-                            on a quarterly basis."</para>
-                            <para>Quarters are defined as:</para>
-                            <itemizedlist>
-                                <listitem>
-                                    <para>Q1: January 1st through March 31st</para>
-                                </listitem>
-                                <listitem>
-                                    <para>Q2: April 1st through June 30th</para>
-                                </listitem>
-                                <listitem>
-                                    <para>Q3: July 1st through September 30th</para>
-                                </listitem>
-                                <listitem>
-                                    <para>Q4: October 1st through December 31st</para>
-                                </listitem>
-                            </itemizedlist>
-                    </listitem>
-
-                    <listitem>
-                        <para>The published Security Policy also states the need to patch all Linux
-                            systems with “critical” security updates (CVSS score of 7 or greater)
-                            within 1 month of release of the patch. This introduces a second
-                            schedule that may overlap any existing patch roll-out.</para>
+                        <para>Q1: January 1st through March 31st</para>
                     </listitem>
                     <listitem>
-                        <para>The company has 3 different host environments,
-                                <emphasis>Corporate</emphasis>, <emphasis>Store</emphasis> and
-                                <emphasis>NPE</emphasis>.These are partitioned using SUSE Manager
-                            Organizations. Each SUSE Manager Organization has visibility into the
-                            default SUSE Manager Organization’s software channels due to trusts, yet
-                            the managed hosts are naturally grouped and managed by their
-                            environment.</para>
+                        <para>Q2: April 1st through June 30th</para>
                     </listitem>
                     <listitem>
-                        <para>There are at least 3 landscapes in each environment,
-                                <emphasis>PROD</emphasis>,<emphasis>DEV</emphasis>, and
-                                <emphasis>UAT</emphasis>.</para>
+                        <para>Q3: July 1st through September 30th</para>
                     </listitem>
                     <listitem>
-                        <para>A “patch exceptions" process exists, as there is often a need to
-                            account for the removal of patches (e.g. kernel updates) from a
-                            roll-out. Some hosts may have hardware drivers or third party software
-                            which depend upon specific kernel versions. This exception process would
-                            be handled on a case-by-case basis.</para>
+                        <para>Q4: October 1st through December 31st</para>
                     </listitem>
                 </itemizedlist>
+            </listitem>
+
+            <listitem>
+                <para>The published Security Policy also states the need to patch all Linux systems
+                    with “critical” security updates (CVSS score of 7 or greater) within 1 month of
+                    release of the patch. This introduces a second schedule that may overlap any
+                    existing patch roll-out.</para>
+            </listitem>
+            <listitem>
+                <para>The company has 3 different host environments, <emphasis>Corporate</emphasis>,
+                        <emphasis>Store</emphasis> and <emphasis>NPE</emphasis>.These are
+                    partitioned using SUSE Manager Organizations. Each SUSE Manager Organization has
+                    visibility into the default SUSE Manager Organization’s software channels due to
+                    trusts, yet the managed hosts are naturally grouped and managed by their
+                    environment.</para>
+            </listitem>
+            <listitem>
+                <para>There are at least 3 landscapes in each environment,
+                    <emphasis>PROD</emphasis>, <emphasis>DEV</emphasis>, and
+                        <emphasis>UAT</emphasis>.</para>
+            </listitem>
+            <listitem>
+                <para>A “patch exceptions" process exists, as there is often a need to account for
+                    the removal of patches (e.g. kernel updates) from a roll-out. Some hosts may
+                    have hardware drivers or third party software for example which depend upon
+                    specific kernel versions. This exception process would be handled on a
+                    case-by-case basis.</para>
+            </listitem>
+        </itemizedlist>
 
     </sect1>
     <!-- The following section needs to be revised. It is wordy, and large amount of content difficult to read
@@ -244,7 +238,7 @@
     <sect1 xml:id="bp.chapt.life.management.implementation">
         <title>Implementation</title>
         <para>To review, you need to configure SUSE Manager, creating a set of procedures, processes
-            and/or tools (scripts) to help with your patch lifecycle management. This includes the
+            or tools (scripts) to help with your patch lifecycle management. This includes the
             creation (and optimally an “automatic” creation) of patch archive channels from the SUSE
             provided “updates” channels for the versions of SLES you use. These patch archives will
             be the sources for your patch promotions, but can also be a source to setup testing
@@ -257,8 +251,8 @@
             roll them out. Each landscape should receive these updates only from a previously
             “validated” landscape. This means a landscape patch set will first get put into DEV,
             tested, then move to QA, undergo tests and finally be moved into the PROD landscape.
-            This process will begin anew each quarter, and you will handle exceptions if/when they
-            occur.</para>
+            This process will begin anew each quarter, and you will handle exceptions if and when
+            they occur.</para>
 
         <para>Every exception will be tracked by another established process with the constant goal
             of re-mediating any exception and making sure the patch is reintroduced as quickly as
@@ -281,7 +275,7 @@
             (STORE). We have created separate SUSE Manager Organizations to allow our systems
             administrators an exclusive view of the hosts they are responsible for. Each SUSE
             Manager Organization has the 3 landscapes (DEV, QA and PROD) that they use for patch
-            testing/promotion.</para>
+            testing and promotion.</para>
 
         <para>Activation keys and bootstraps should be created for each SUSE Manager Organization
             (each environment) and each landscape so that hosts can be registered into their
@@ -301,75 +295,134 @@
         <note>
             <title>Tip: Base Channel Naming</title>
             <para>Any Base channel listed can also be a clone tree of the SUSE vendor channels
-                therefore should include a prefix in the name. This can aid the handling of service
-                pack migrations described during channel creation. See:
-                <!-- <xref linkend="[Channel Creation]"/> -->.</para>
+                therefore should include a prefix in the name. A good base channel name can aid the
+                handling of service pack migrations described during channel creation.</para>
         </note>
 
 
-            <itemizedlist>
-                <listitem>
-                 <para>SUSE Manager Organization</para>
-                 <itemizedlist>
+        <itemizedlist>
+            <listitem>
+                <para>SUSE Manager Organization</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Default(Main) - 1</para>
+                        <itemizedlist>
                             <listitem>
-                             <para>Default(Main) - 1</para>
-                             <itemizedlist>
-                                        <listitem>
-                                            <para>32 Bit Archive
-                                            Channels (Public)</para>
-                                            <itemizedlist>
-                                                  <listitem>
-                                                  <para>Q2 - 06-30-2016 - SLES 11 SP3 Updates for
-                                                  i586</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Q3 - 09-30-2016 - SLES 11 SP3 Updates for
-                                                  I586</para>
-                                                  </listitem>
-                                            </itemizedlist>
-                                        </listitem>
-                                        <listitem>
-                                         <para>64 Bit Archive
-                                         Channels(Public)</para>
-                                         <itemizedlist>
-                                                  <listitem>
-                                                  <para>Q2 - 06-30-2016 - SLES 11 SP3 Updates for
-                                                  x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Q3 - 09-30-2016 - SLES 11 SP3 Updates for
-                                                  x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Q2 - 06-30-2016 - SLES 12 Updates for
-                                                  x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Q3 - 09-30-2016 - SLES 12 Updates for
-                                                  x86_64</para>
-                                                  </listitem>
-                                                </itemizedlist>
-                                        </listitem>
-                                        <listitem>
-                                            <para>Clone Sets or Child Channels within SUSE Base
-                                                Channels:</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para>Base : SLES 11 SP3
-                                            Pool for i586</para>
-                                            <itemizedlist>
-                                                  <listitem>
-                                                  <para>DEV - Current Patch Set - SLES 11 SP3
-                                                  Updates for i586</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>QA - Current Patch Set - SLES 11 SP3 Updates
-                                                  for i586</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>PROD - Current Patch Set - SLES 11 SP3
-                                                  Updates for i586</para>
-                                                  </listitem>
+                                <para>32 Bit Archive Channels (Public)</para>
+                                <itemizedlist>
+                                    <listitem>
+                                        <para>Q2 - 06-30-2016 - SLES 11 SP3 Updates for i586</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Q3 - 09-30-2016 - SLES 11 SP3 Updates for I586</para>
+                                    </listitem>
+                                </itemizedlist>
+                            </listitem>
+                            <listitem>
+                                <para>64 Bit Archive Channels(Public)</para>
+                                <itemizedlist>
+                                    <listitem>
+                                        <para>Q2 - 06-30-2016 - SLES 11 SP3 Updates for
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Q3 - 09-30-2016 - SLES 11 SP3 Updates for
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Q2 - 06-30-2016 - SLES 12 Updates for x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Q3 - 09-30-2016 - SLES 12 Updates for x86_64</para>
+                                    </listitem>
+                                </itemizedlist>
+                            </listitem>
+                            <listitem>
+                                <para>Clone Sets or Child Channels within SUSE Base Channels:</para>
+                            </listitem>
+                            <listitem>
+                                <para>Base : SLES 11 SP3 Pool for i586</para>
+                                <itemizedlist>
+                                    <listitem>
+                                        <para>DEV - Current Patch Set - SLES 11 SP3 Updates for
+                                            i586</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>QA - Current Patch Set - SLES 11 SP3 Updates for
+                                            i586</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>PROD - Current Patch Set - SLES 11 SP3 Updates for
+                                            i586</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES 11 SP3
+                                            i586</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Security ASAP Exceptions - SLES 11 SP3 i586</para>
+                                    </listitem>
+
+                                </itemizedlist>
+                            </listitem>
+                            <listitem>
+                                <para>Base : SLES 11 SP3 Pool for x86_64</para>
+                                <itemizedlist>
+                                    <listitem>
+                                        <para>DEV - Current Patch Set - SLES 11 SP3 Updates for
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>QA - Current Patch Set - SLES 11 SP3 Updates for
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>PROD - Current Patch Set - SLES 12 Updates for
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES 12
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Security ASAP Exceptions - SLES 12 x86_64</para>
+                                    </listitem>
+                                </itemizedlist>
+                            </listitem>
+                            <listitem>
+                                <para>Base : SLES 12 Pool for x86_64</para>
+                                <itemizedlist>
+                                    <listitem>
+                                        <para>DEV - Current Patch Set - SLES 12 Updates for
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>QA - Current Patch Set - SLES 12 Updates for
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>PROD - Current Patch Set - SLES 12 Updates for
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES 12
+                                            x86_64</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Security ASAP Exceptions - SLES 12 x86_64</para>
+                                    </listitem>
+                                </itemizedlist>
+                            </listitem>
+                            <listitem>
+                                <para>Patch Exceptions Channels (as above)</para>
+                                <itemizedlist>
+                                    <listitem>
+                                        <para>Per Base Channel - 1 channel for each “Updates”
+                                            channel:</para>
+                                        <itemizedlist>
+                                            <listitem>
+                                                <para>Examples:</para>
+                                                <itemizedlist>
                                                   <listitem>
                                                   <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES
                                                   11 SP3 i586</para>
@@ -378,118 +431,41 @@
                                                   <para>Security ASAP Exceptions - SLES 11 SP3
                                                   i586</para>
                                                   </listitem>
-
                                                 </itemizedlist>
-                                        </listitem>
-                                        <listitem>
-                                            <para>Base : SLES 11 SP3
-                                            Pool for x86_64</para>
-                                            <itemizedlist>
-                                                  <listitem>
-                                                  <para>DEV - Current Patch Set - SLES 11 SP3
-                                                  Updates for x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>QA - Current Patch Set - SLES 11 SP3 Updates
-                                                  for x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>PROD - Current Patch Set - SLES 12 Updates
-                                                  for x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES
-                                                  12 x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Security ASAP Exceptions - SLES 12
-                                                  x86_64</para>
-                                                  </listitem>
-                                                </itemizedlist>
-                                        </listitem>
-                                        <listitem>
-                                            <para>Base : SLES 12 Pool
-                                            for x86_64</para>
-                                            <itemizedlist>
-                                                  <listitem>
-                                                  <para>DEV - Current Patch Set - SLES 12 Updates
-                                                  for x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>QA - Current Patch Set - SLES 12 Updates for
-                                                  x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>PROD - Current Patch Set - SLES 12 Updates
-                                                  for x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES
-                                                  12 x86_64</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Security ASAP Exceptions - SLES 12
-                                                  x86_64</para>
-                                                  </listitem>
-                                                </itemizedlist>
-                                        </listitem>
-                                        <listitem>
-                                            <para>Patch Exceptions
-                                            Channels (as above)</para>
-                                            <itemizedlist>
-                                                  <listitem>
-                                                  <para>Per Base Channel - 1 channel for each
-                                                  “Updates”
-                                                  channel:</para>
-                                                  <itemizedlist>
-                                                  <listitem>
-                                                   <para>Examples:</para>
-                                                   <itemizedlist>
-                                                  <listitem>
-                                                  <para>Patch Exceptions (DO NOT SUBSCRIBE) - SLES
-                                                  11 SP3 i586</para>
-                                                  </listitem>
-                                                  <listitem>
-                                                  <para>Security ASAP Exceptions - SLES 11 SP3
-                                                  i586</para>
-                                                  </listitem>
-                                                   </itemizedlist>
-                                                  </listitem>
-                                                  </itemizedlist>
-                                                  </listitem>
-                                                </itemizedlist>
-                                        </listitem>
-                                    </itemizedlist>
-
-                            </listitem>
-                            <listitem>
-                             <para>Corporate (CORP) - 2</para>
-                             <itemizedlist>
-                                        <listitem>
-                                            <para>Any public channel will be visible here</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para>Private channels can be shared
-                                                per-organization</para>
-                                        </listitem>
-                                    </itemizedlist>
-                            </listitem>
-                            <listitem>
-                             <para>Store (STORE) - 3</para>
-                             <itemizedlist>
-                                        <listitem>
-                                            <para>Any public channel will be visible here</para>
-                                        </listitem>
-                                        <listitem>
-                                            <para>Private channels can be shared
-                                                per-organization</para>
-                                        </listitem>
-                             </itemizedlist>
+                                            </listitem>
+                                        </itemizedlist>
+                                    </listitem>
+                                </itemizedlist>
                             </listitem>
                         </itemizedlist>
-                </listitem>
-            </itemizedlist>
-           </sect1>
+
+                    </listitem>
+                    <listitem>
+                        <para>Corporate (CORP) - 2</para>
+                        <itemizedlist>
+                            <listitem>
+                                <para>Any public channel will be visible here</para>
+                            </listitem>
+                            <listitem>
+                                <para>Private channels can be shared per-organization</para>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem>
+                        <para>Store (STORE) - 3</para>
+                        <itemizedlist>
+                            <listitem>
+                                <para>Any public channel will be visible here</para>
+                            </listitem>
+                            <listitem>
+                                <para>Private channels can be shared per-organization</para>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                </itemizedlist>
+            </listitem>
+        </itemizedlist>
+    </sect1>
 
     <sect1 xml:id="bp.chapt.life.management.automation.process.design">
         <title>Automation and Process Design</title>
@@ -499,53 +475,51 @@
             triggered by a custom cron job as follows. Criteria for dates will determine the exact
             setup. For example, a quarterly schedule could be implemented based on the first or last
             day of a given quarter. If the trigger time is the END of a quarter, it would have to
-            consider day 30 on the 3 rd and 9 th months of a calendar (March and September), and day
-            31 on the 6 th and 12 th months (June and December). This will require 2 crontab entries
-        such as (cron syntax):</para>
+            consider day 30 on the 3rd and 9th months of a calendar (March and September), and day
+            31 on the 6th and 12th months (June and December). This will require 2 crontab entries
+            such as (cron syntax):</para>
         <itemizedlist>
-                <listitem>
-                    <screen language="bash">0 0 30 6,9 * /path/to/archive-create-script</screen>
-                </listitem>
-                <listitem>
-                <screen language="bash">0 0 31 3,12 * /path/to/archive-create-script</screen>
-                </listitem>
-                <listitem>
-                    <para>If the trigger for the quarter is going to happen on the 1 st of a month,
-                        then only one crontab entry would be required, for
-                    example:</para>
-                    <screen language="bash">0 0 1 1,4,7,10 * /path/to/archive-create-script</screen>
-                </listitem>
-            </itemizedlist>
+            <listitem>
+                <screen language="bash">0 0 30 6,9 * /path/to/archive-create-script 
+0 0 31 3,12 * /path/to/archive-create-script</screen>
+            </listitem>
+            <listitem>
+                <para>If the trigger for the quarter is going to happen on the 1 st of a month, then
+                    only one crontab entry would be required, for example:</para>
+                <screen language="bash">0 0 1 1,4,7,10 * /path/to/archive-create-script</screen>
+            </listitem>
+        </itemizedlist>
         <para>The actual “archive-create-script” will also need logic in it to determine the quarter
             it was run and formatting logic to provide the correct syntax for SUSE Manager channel
             cloning, etc. The script should also loop through each architecture and SLES version in
             order to make a full set of archives based on the company’s choices.</para>
 
         <para>Processes for patch promotion will be created so that administrators can precisely and
-            explicitly define when a patch set is moved INTO a given landscape, and just as
-            importantly - from WHERE. The easiest method to do this is using a script that leverages
-            the XMLRPC API exposed in SUSE Manager. The API contains a softwareChannel method called
-            mergePackages and mergeErrata. These two methods can be called with a source channel and
-            target channel to quickly take content from one channel and merge the differences into
-            another.</para>
+            explicitly define when a patch set is moved into a given landscape, and just as
+            importantly - from where. The easiest method to do this is using a script that leverages
+            the XMLRPC API exposed in SUSE Manager. The API contains a
+                <literal>softwareChannel</literal> method called <literal>mergePackages</literal>
+            and <literal>mergeErrata</literal>. These two methods can be called with a source
+            channel and target channel to quickly take content from one channel and merge the
+            differences into another.</para>
 
-        <para>The last process will define a workflow for removing a patch from the promotion
-            process - and making sure it is stored to be tracked. These patch exceptions can later
-            be reintroduced to a patch rollout calendar as the reason for the exception is
-            remediated. In addition to the exception process of REMOVING a patch, there is a similar
-            process for ADDING a patch as an emergency dictates.</para>
+        <para>The last process will define a work-flow for removing a patch from the promotion
+            process and make sure it is stored for tracking purposes. These patch exceptions can
+            later be reintroduced to a patch roll-out calendar as the reason for the exception is
+            re-mediated. In addition to the exception process of removing a patch, there is a
+            similar process for adding a patch as an emergency dictates.</para>
 
         <para>Emergency patches will likely always be available in the current SUSE Updates
-            channels, but might not have been introduced into an Archive channel yet. As the
+            channels, but might not have been introduced into an archive channel yet. As the
             quarterly archive channel creation job is triggered, any available patches would be part
-            of an archive set - but for a given point in time, this might have occurred before the
-            patch was released - or it may be up to 3 months until a new archive is created that
+            of an archive set but for a given point in time, this might have occurred before the
+            patch was released or it may be up to 3 months until a new archive is created that
             contains this recent patch. A method for searching and then copying a patch into a
             target channel will need to be created. This will handle those times when a critical
-            patch is released by SUSE but your archive channel won’t get a copy until the quarter is
-            up.</para>
+            patch is released by SUSE but your archive channel will not be provided with a copy
+            until the quarter is up.</para>
 
-        <para>Copying these emergency patches into place doesn’t affect the normal deployments or
+        <para>Copying these emergency patches into place does not affect the normal deployments or
             creation of archive channels. The next archive channel creation will also contain this
             patch, and the use of an emergency patch channel with a duplicate patch (in the case of
             merging the same patch later) will not cause any conflicts with a system that already
@@ -560,9 +534,9 @@
         <title>Patch Promotion Cycle</title>
         <para>Understanding how patches (and the packages they include) are obtained from SUSE,
             where they go after download, and how they are arranged within SUSE Manager is key to
-            setting up the Advanced Patch Lifecycle system. By default, SUSE Manager arranges its
+            proper construction of the Advanced Patch Lifecycle system. By default, SUSE Manager arranges its
             channel sets by a particular version and architecture of SUSE Linux Enterprise Server
-            and its add-ons or extensions.</para>
+            and its extensions.</para>
 
         <para>For example, a base set of channels within SUSE Manager for SLES 11 SP3 x86_64
             includes the parent or base channel called a “pool” channel. This channel contains
@@ -581,7 +555,7 @@
             <title>Long Term Service Pack Support (LTSS)</title>
             <para>Due to SP1 and SP2 both being in their LTSS (Long Term Service and Support) phase,
                 there are no longer any non-LTSS updates being created from SUSE. This means that
-                any SP1 or SP2 hosts a company might have will need to purchase LTSS and use LTSS
+                any SP1 or SP2 hosts a company will need to purchase LTSS and use LTSS
                 Updates channels in order to receive further patches and support. For more
                 information see: <link xlink:href="www.suse.com/lifecycle"/></para>
         </note>
@@ -601,15 +575,14 @@
 
     <sect1 xml:id="bp.chap.life.management.except.escalation">
         <title>Exception and Escalation Channels</title>
-        <para>There might be several reasons to delay or remove a patch from a deployment cycle. A
-            patch could be causing issues with the stability of a system or systems, it might not
-            have passed a testing cycle from the current or previous landscape, or there could be
-            some other reason not to deploy it within a patch cycle.</para>
+        <para>There may be several reasons to delay or remove a patch from a deployment cycle. A
+            patch could cause issues with the stability of a system or systems, or perhaps it has
+            not passed a testing cycle from the current or previous landscape.</para>
 
-        <para>On the other hand, there might be a reason to deploy a critical patch (one that
+        <para>There may also be a reason to deploy a critical patch (one that
             patches a security vulnerability or a debilitating bug) ahead of schedule. Due to the
-            critical nature of the patch it needs to go through testing and deployment as fast as
-            possible - without waiting for the next quarterly patch cycle.</para>
+            critical nature of the patch, it will need to go through testing and deployment as quickly as
+            possible. A critical patch should not applied on the next quarterly patch cycle.</para>
 
         <para>In order to handle the periodic removal or addition of these exception patches,
             processes should be created to track them appropriately. While these exceptions are
@@ -644,7 +617,7 @@
 
         <para>Another assumption is the need to test this new patch by promoting it through the
             landscapes as any normal patch set, but if necessary it can be copied directly to any
-            stage. Simply copy this security patch into the initial landscape (e.g. DEV - Current)
+            stage. Simply copy this security patch into the initial landscape (for example: DEV - Current)
             and follow the normal deploy-test-promote cycles to get it into production. Depending on
             the critical nature of the patch, the normal schedule for testing could be accelerated
             or in rare cases bypassed altogether assuming acceptable risk.</para>
@@ -654,46 +627,46 @@
     <sect1 xml:id="bp.chapt.life.management.components.to.be.created">
         <title>Components to be Created</title>
         <para>The following list provides an overview on what you will be creating to enable
-        Advanced Patch Lifecycle Management:</para>
+            Advanced Patch Lifecycle Management:</para>
         <itemizedlist>
-                <title>Channels</title>
-                <listitem>
-                    <para>Archive channels</para>
-                </listitem>
-                <listitem>
-                    <para>Current updates channels</para>
-                </listitem>
-                <listitem>
-                    <para>Exception channels (patch exclusions or security-ASAP)</para>
-                </listitem>
-                <listitem>
-                    <para>Optional SP-Migration clone set</para>
-                </listitem>
-            </itemizedlist>
-            <itemizedlist>
-                <title>Activation keys and bootstrap scripts</title>
-                <listitem>
-                    <para>Per-Organization, Per-SLES version activation keys</para>
-                </listitem>
-            </itemizedlist>
-            <itemizedlist>
-                <title>Scripts</title>
-                <listitem>
-                    <para>Archive creation script</para>
-                </listitem>
-                <listitem>
-                    <para>Archive sources list control file</para>
-                </listitem>
-                <listitem>
-                    <para>Merge Tool python script</para>
-                </listitem>
-            </itemizedlist>
-            <itemizedlist>
-                <title>Crontab Entries and Automation</title>
-                <listitem>
-                    <para>Quarterly (or any other frequency) archive creation call</para>
-                </listitem>
-            </itemizedlist>
+            <title>Channels</title>
+            <listitem>
+                <para>Archive channels</para>
+            </listitem>
+            <listitem>
+                <para>Current updates channels</para>
+            </listitem>
+            <listitem>
+                <para>Exception channels (patch exclusions or security-ASAP)</para>
+            </listitem>
+            <listitem>
+                <para>Optional SP-Migration clone set</para>
+            </listitem>
+        </itemizedlist>
+        <itemizedlist>
+            <title>Activation keys and bootstrap scripts</title>
+            <listitem>
+                <para>Per-Organization, Per-SLES version activation keys</para>
+            </listitem>
+        </itemizedlist>
+        <itemizedlist>
+            <title>Scripts</title>
+            <listitem>
+                <para>Archive creation script</para>
+            </listitem>
+            <listitem>
+                <para>Archive sources list control file</para>
+            </listitem>
+            <listitem>
+                <para>Merge Tool python script</para>
+            </listitem>
+        </itemizedlist>
+        <itemizedlist>
+            <title>Crontab Entries and Automation</title>
+            <listitem>
+                <para>Quarterly (or any other frequency) archive creation call</para>
+            </listitem>
+        </itemizedlist>
     </sect1>
 
     <sect1 xml:id="bp.chapt.life.management.channels">
@@ -721,25 +694,24 @@
                 channel, the patches and the packages they reference.</para>
 
             <para>Each archive channel will reside within an empty base channel. Base channels will
-                be created for each processor architecture managed by
-            SUSE Manager, for example:</para>
+                be created for each processor architecture managed by SUSE Manager, for
+                example:</para>
             <itemizedlist>
-                    <listitem>
-                        <para>IA-32</para>
-                    </listitem>
-                    <listitem>
-                        <para>x86_64</para>
-                    </listitem>
-                    <listitem>
-                        <para>s390x</para>
-                    </listitem>
-                    <listitem>
-                        <para>PPC</para>
-                    </listitem>
+                <listitem>
+                    <para>IA-32</para>
+                </listitem>
+                <listitem>
+                    <para>x86_64</para>
+                </listitem>
+                <listitem>
+                    <para>s390x</para>
+                </listitem>
+                <listitem>
+                    <para>PPC</para>
+                </listitem>
             </itemizedlist>
-            <para>
-             Multiple archives matching the different versions of SLES may exist
-            in the base channel, but they will all be of the same processor architecture.</para>
+            <para> Multiple archives matching the different versions of SLES may exist in the base
+                channel, but they will all be of the same processor architecture.</para>
 
             <important>
                 <title>Channel Naming</title>
@@ -770,7 +742,7 @@
                     <para>The channel label <emphasis>must be</emphasis> in the format of
                             <replaceable>architecture-patch-archives-channel</replaceable>, for
                         example the 64-bit channel label should be:</para>
-                        <screen language="bash">x86_64-patch-archives-channel</screen>
+                    <screen language="bash">x86_64-patch-archives-channel</screen>
                 </step>
                 <step>
                     <para>Select the appropriate architecture for this channel - x86_64 for 64-bit,
@@ -836,19 +808,19 @@
                 <para>You can Use spacewalk-clone-by-date to create archive channels from the past.
                     See: <!-- ADD LINK HERE -->for an example source file that can be used with the
                     spacewalk-clone-by-date utility. This configuration file can be used to create a
-                    clone channel with a certain date range as a filter
-                for the content in the channel:</para>
+                    clone channel with a certain date range as a filter for the content in the
+                    channel:</para>
                 <itemizedlist>
-                        <listitem>
-                            <para>The utility is called with the following syntax:
-                                spacewalk-clone-by-date -c &lt;config file&gt;</para>
-                        </listitem>
-                        <listitem>
-                            <para>Repeat for each archive channel with a past date modifying the
-                                configuration files to match the appropriate dates and channel
-                                source/target names.</para>
-                        </listitem>
-                    </itemizedlist>
+                    <listitem>
+                        <para>The utility is called with the following syntax:
+                            spacewalk-clone-by-date -c &lt;config file&gt;</para>
+                    </listitem>
+                    <listitem>
+                        <para>Repeat for each archive channel with a past date modifying the
+                            configuration files to match the appropriate dates and channel
+                            source/target names.</para>
+                    </listitem>
+                </itemizedlist>
             </note>
         </sect2>
 
@@ -1016,19 +988,18 @@
                 patch workflow. It is much easier to place them into an exceptions channel
                 specifically for the version of SLES the patch came from. Create the <emphasis>Patch
                     Exception</emphasis> and <emphasis>Security ASAP Exception</emphasis> channels
-            as follows:</para>
+                as follows:</para>
             <note>
-                    <title>Exceptions Channel Subscription</title>
-                    <para>It is recommended to add the text <emphasis>DO NOT SUBSCRIBE</emphasis> to
-                        the Patch Exceptions Channel Name field during creation. Keep in mind that
-                        this channel is used only as a bucket to track patches/packages that will
-                        not be installed on a system. If systems subscribe to this channel they will
-                        see available content and therefore potentially apply it during a patch
-                        installation. The <emphasis>DO NOT SUBSCRIBE</emphasis> text acts as a
-                        visual reminder when creating activation keys or manipulating a hosts
-                        channel subscriptions preventing you from adding it to a hosts active
-                        channels.</para>
-                </note>
+                <title>Exceptions Channel Subscription</title>
+                <para>It is recommended to add the text <emphasis>DO NOT SUBSCRIBE</emphasis> to the
+                    Patch Exceptions Channel Name field during creation. Keep in mind that this
+                    channel is used only as a bucket to track patches/packages that will not be
+                    installed on a system. If systems subscribe to this channel they will see
+                    available content and therefore potentially apply it during a patch
+                    installation. The <emphasis>DO NOT SUBSCRIBE</emphasis> text acts as a visual
+                    reminder when creating activation keys or manipulating a hosts channel
+                    subscriptions preventing you from adding it to a hosts active channels.</para>
+            </note>
 
             <procedure>
                 <title>Creating Exception Channels</title>
@@ -1094,32 +1065,33 @@
             </step>
             <step>
                 <para>Name the Activation Key according to the Landscape host will register to with
-                    this key. For example:</para> <figure>
-                        <title>Create Activation Key</title>
-                        <mediaobject>
-                            <imageobject role="fo">
-                                <imagedata fileref="activation-key-setup.png" width="444"/>
-                            </imageobject>
-                            <imageobject role="html">
-                                <imagedata fileref="activation-key-setup.png" width="80%"/>
-                            </imageobject>
-                        </mediaobject>
-                    </figure>
+                    this key. For example:</para>
+                <figure>
+                    <title>Create Activation Key</title>
+                    <mediaobject>
+                        <imageobject role="fo">
+                            <imagedata fileref="activation-key-setup.png" width="444"/>
+                        </imageobject>
+                        <imageobject role="html">
+                            <imagedata fileref="activation-key-setup.png" width="80%"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
             </step>
             <step>
                 <para> Click on the Child Channels Tab and assign the appropriate Current Updates
                     channel to the Landscape this key will be used for:</para>
-                    <figure>
-                        <title>Landscape Key</title>
-                        <mediaobject>
-                            <imageobject role="fo">
-                                <imagedata fileref="landscape-key.png" width="444"/>
-                            </imageobject>
-                            <imageobject role="html">
-                                <imagedata fileref="landscape-key.png" width="80%"/>
-                            </imageobject>
-                        </mediaobject>
-                    </figure>
+                <figure>
+                    <title>Landscape Key</title>
+                    <mediaobject>
+                        <imageobject role="fo">
+                            <imagedata fileref="landscape-key.png" width="444"/>
+                        </imageobject>
+                        <imageobject role="html">
+                            <imagedata fileref="landscape-key.png" width="80%"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
             </step>
             <step>
                 <para>Select the appropriate SUSE Manager Tools channel as well as the other needed
@@ -1220,7 +1192,7 @@
 
         <para>Edit the <replaceable>/root/.spacecmd/</replaceable> config file and add the
             appropriate credentials:</para>
-            <screen language="ini">[spacecmd]
+        <screen language="ini">[spacecmd]
 server=localhost
 username=admin
 password=suse1234
@@ -1239,67 +1211,64 @@ nossl=0</screen>
 
         <itemizedlist>
             <listitem>
-                <para>Automated creation of Patch Archive
-                Channels</para>
+                <para>Automated creation of Patch Archive Channels</para>
                 <itemizedlist>
-                        <listitem>
-                            <para>These channels can be created on a quarterly (or more frequent)
-                                basis and allows an organization to create test environments based
-                                on a historical set of patches (i.e. creation of a lab using
-                                available patches from 2 calendar quarters ago.)</para>
-                        </listitem>
+                    <listitem>
+                        <para>These channels can be created on a quarterly (or more frequent) basis
+                            and allows an organization to create test environments based on a
+                            historical set of patches (i.e. creation of a lab using available
+                            patches from 2 calendar quarters ago.)</para>
+                    </listitem>
                 </itemizedlist>
             </listitem>
             <listitem>
                 <para>Leverage a static set of “current” update channels so host subscriptions don’t
-                have to change</para>
+                    have to change</para>
                 <itemizedlist>
-                        <listitem>
-                            <para>Using the API/scripts, updates can be merged from a patch
-                                “archive” into a subscribed host channel removing the need to
-                                constantly clone and re-clone channels and modify host
-                                subscriptions</para>
-                        </listitem>
-                        <listitem>
-                            <para>Multi-Landscape environments can use a promotion process to merge
-                                updates through each phase during testing/validation of patch
-                                sets</para>
-                        </listitem>
-                    </itemizedlist>
+                    <listitem>
+                        <para>Using the API/scripts, updates can be merged from a patch “archive”
+                            into a subscribed host channel removing the need to constantly clone and
+                            re-clone channels and modify host subscriptions</para>
+                    </listitem>
+                    <listitem>
+                        <para>Multi-Landscape environments can use a promotion process to merge
+                            updates through each phase during testing/validation of patch
+                            sets</para>
+                    </listitem>
+                </itemizedlist>
             </listitem>
             <listitem>
-                <para>Exception handling for patches that need to be
-                excluded from a patch roll-out</para>
+                <para>Exception handling for patches that need to be excluded from a patch
+                    roll-out</para>
                 <itemizedlist>
-                        <listitem>
-                            <para>Creation of a “patch exceptions” channel and a process for copying
-                                patches/packages into that channel (and then removing them from an
-                                updates channel) allows for tracking of patch exception. This
-                                channel should be excluded from any hosts channel subscriptions,
-                                thereby keeping all patch/package content from being
-                                visible/available for installation.</para>
-                        </listitem>
-                        <listitem>
-                            <para>Patch exceptions “processes” must be developed in order to track
-                                remediation of all exceptions in order to avoid future complications
-                                from managing an ever-growing bucket of patches.</para>
-                        </listitem>
-                    </itemizedlist>
+                    <listitem>
+                        <para>Creation of a “patch exceptions” channel and a process for copying
+                            patches/packages into that channel (and then removing them from an
+                            updates channel) allows for tracking of patch exception. This channel
+                            should be excluded from any hosts channel subscriptions, thereby keeping
+                            all patch/package content from being visible/available for
+                            installation.</para>
+                    </listitem>
+                    <listitem>
+                        <para>Patch exceptions “processes” must be developed in order to track
+                            remediation of all exceptions in order to avoid future complications
+                            from managing an ever-growing bucket of patches.</para>
+                    </listitem>
+                </itemizedlist>
             </listitem>
             <listitem>
                 <para>Security ASAP Exceptions handling for patches that need to roll out with a
-                higher priority</para>
+                    higher priority</para>
                 <itemizedlist>
-                        <listitem>
-                            <para>The security ASAP exception channel should always be subscribed to
-                                (unlike the “patch exceptions channel). Subscription to this channel
-                                allows a host to obtain patches/packages added in an ad-hoc manner,
-                                for example a security patch deemed important enough to deploy
-                                outside of a normal patch schedule. This could be copied from a new
-                                archive or directly from one of the SUSE (vendor) updates
-                                channels.</para>
-                        </listitem>
-                    </itemizedlist>
+                    <listitem>
+                        <para>The security ASAP exception channel should always be subscribed to
+                            (unlike the “patch exceptions channel). Subscription to this channel
+                            allows a host to obtain patches/packages added in an ad-hoc manner, for
+                            example a security patch deemed important enough to deploy outside of a
+                            normal patch schedule. This could be copied from a new archive or
+                            directly from one of the SUSE (vendor) updates channels.</para>
+                    </listitem>
+                </itemizedlist>
             </listitem>
         </itemizedlist>
 
@@ -1400,8 +1369,7 @@ nossl=0</screen>
         <sect2 xml:id="bp.chapt.sect2.sample.spacewalk.clone.by.date.config">
             <title>Sample Spacewalk-Clone-By-Date Configuration</title>
             <para>This sample is stored as a text-file. It is used with the spacewalk-clone-by-date
-                utility by using the -c flag to indicate an input config
-            file:</para>
+                utility by using the -c flag to indicate an input config file:</para>
             <screen language="bash">spacewalk-clone-by-date -c Q3-2015-sles11sp3-x86_64-archive.conf</screen>
 
             <para>This sample, below is using the SUSE Manager administrator account name of
@@ -1415,26 +1383,23 @@ nossl=0</screen>
                 <title>Base Channel Source/Target Channel/ Directive</title>
                 <para>This specifies the following:</para>
                 <itemizedlist>
-                        <listitem>
-                            <para>Base channel source:
-                                    <replaceable>sles11-sp3-pool-x86_64</replaceable>
-                            </para>
-                        </listitem>
-                        <listitem>
-                            <para>The target base channel:
-                                    <replaceable>cc_patch_archives_channel_64bit</replaceable>
-                            </para>
-                        </listitem>
-                        <listitem>
-                            <para>Uses directive: <replaceable>existing-parent-do-not- modify
-                                </replaceable> true</para>
-                        </listitem>
+                    <listitem>
+                        <para>Base channel source: <replaceable>sles11-sp3-pool-x86_64</replaceable>
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>The target base channel:
+                                <replaceable>cc_patch_archives_channel_64bit</replaceable>
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>Uses directive: <replaceable>existing-parent-do-not- modify
+                            </replaceable> true</para>
+                    </listitem>
                 </itemizedlist>
-                <para>
-                 This tells the utility that a child channel from one base will
-                    be cloned into a completely different base channel. Your channel names may
-                    differ therefore this example may need modifications to work in your tests.
-                </para>
+                <para> This tells the utility that a child channel from one base will be cloned into
+                    a completely different base channel. Your channel names may differ therefore
+                    this example may need modifications to work in your tests. </para>
             </note>
             <para>The following is an example from the
                     <replaceable>Q3-2015-sles11sp3-x86_64-archive.conf</replaceable>.</para>
@@ -1549,8 +1514,7 @@ client.auth.logout(key)                            </screen>
                 it is by looking at the current date. Running the script in the 4 th quarter will
                 name the archive created as a 4 th quarter archive.</para>
             <para>Cron entries for end-of-quarter (e.g. 30th of months June and Sept. and 31st of
-                months March and
-            December):</para>
+                months March and December):</para>
             <screen language="Bash">0 0 30 6,9 * /path_to/the/archive/script
 0 0 31 3,12 * /path_to/the/archive/script</screen>
         </sect2>
@@ -1665,26 +1629,25 @@ done &lt; ./archive-sources.lst</screen>
                 lines with data in the file. Any blank lines will be sourced as data and will cause
                 errors with the Archive Channel Creation script above.</para>
 
-                <para>The fields are:</para>
-                <itemizedlist>
-                    <listitem>
-                        <para><emphasis>Architecture</emphasis> - which defines the source parent
-                            archive channel. This is where the new archive will be placed as a child
-                            channel.</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis>Source Channel Label</emphasis> - This defines Where
-                            patches/packages are coming from.</para>
-                    </listitem>
-                    <listitem>
-                        <para><emphasis>Target channel Naming</emphasis> - the text that makes up
-                            the channel name and part of the channel summary/description
-                            fields.</para>
-                        <screen language="nocode">s390x, sles11-sp3-updates-s390x,SLES11-SP3-Updates
+            <para>The fields are:</para>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis>Architecture</emphasis> - which defines the source parent
+                        archive channel. This is where the new archive will be placed as a child
+                        channel.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis>Source Channel Label</emphasis> - This defines Where
+                        patches/packages are coming from.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis>Target channel Naming</emphasis> - the text that makes up the
+                        channel name and part of the channel summary/description fields.</para>
+                    <screen language="nocode">s390x, sles11-sp3-updates-s390x,SLES11-SP3-Updates
 x86_64, sles11-sp4-updates-x86_64,SLES11-SP4-Updates
 i586, sles11-sp3-updates-x86_64,SLES11-SP3-Updates</screen>
-                    </listitem>
-                </itemizedlist>
+                </listitem>
+            </itemizedlist>
             <para>This concludes the <emphasis>Advanced Patch Lifecycle Managment</emphasis> chapter
                 of this guide.</para>
         </sect2>
