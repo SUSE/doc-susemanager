@@ -92,17 +92,22 @@ Please do not make any commits to the master branch. master is reserved for rele
 
 ##Updating the SUMA 3 Documentation Package (susemanager-docs_en)##
 
+* The build repo is defined in DEF-susemanager_docs
+* Perform these steps on both, Head and 3.0 (set the OBS_REPO variable accordingly)
+
+
 ```
 OBS_USER=keichwa
+OBS_REPO=Devel:Galaxy:Manager:Head
 
 daps -d DC-create-all package-src --set-date=$(date --iso) \
      --def-file DEF-susemanager-docs
 
 # save old checkout
-old home:$OBS_USER:branches:Devel:Galaxy:Manager:Head/susemanager-docs_en
+old home:$OBS_USER:branches:$OBS_REPO/susemanager-docs_en
 
-osc -A https://api.suse.de bco Devel:Galaxy:Manager:Head susemanager-docs_en
-cd home:$OBS_USER:branches:Devel:Galaxy:Manager:Head/susemanager-docs_en
+osc -A https://api.suse.de bco $OBS_REPO susemanager-docs_en
+cd home:$OBS_USER:branches:$OBS_REPO/susemanager-docs_en
 cp ../../build/create-all/package/create-all_en_src_set.tar.bz2 .
 osc vc -m "Update text and image files."
 osc ci -m "update"
@@ -111,9 +116,10 @@ osc ci -m "update"
 osc pr
 
 osc sr -m 'update'
-Perform these steps on both head and 3.0
 
 ```
+
+
 
 ##Preparing and Publishing Online Documentation (suse.com/documentation)##
 
@@ -123,8 +129,7 @@ git@github.com:openSUSE/daps.git.
 Switch to the documentation checkout and call:
 
 ```
-.../daps/bin/daps --dapsroot .../daps -d DC-create-all online-docs \
-  --dbtonovdoc
+.../daps/bin/daps --dapsroot .../daps -d DC-create-all online-docs
 ```
 
 Copy the results to the results to your ~/Exports directory.
@@ -132,7 +137,8 @@ Copy the results to the results to your ~/Exports directory.
 Create a bug (Classification: Doc Tools, Product: Doc Production,
 Component: SUSE Manager) and ask to update
 suse.com/documentation/suse-manager-3 accordingly.  As an example, see
-https://bugzilla.suse.com/show_bug.cgi?id=975925 .
+https://bugzilla.suse.com/show_bug.cgi?id=975925 or
+https://bugzilla.suse.com/show_bug.cgi?id=981142 .
 
 
 ##Updating SUSE Manager API Documentation and Posting Online##
