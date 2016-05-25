@@ -477,12 +477,6 @@
 
   <note>
    <title>Maximum Size for Configuration Files</title>
-<!--
-       bnc#824758
-       ke, 2013-07-03: checked it on suma 1.7
-       bnc#910482
-       ke, 2014-12-17: supported up to 1 MB
-   -->
    <para>
     By default, the maximum file size for configuration files is 128KB
     (131072 bytes).  &suse; supports a configuration file size up to 1MB; larger
@@ -495,19 +489,29 @@
      2010-12-21 - ke: will "rhn" stay here?
      2010-12-28 - kkaempf: "rhn" will stay here.
     </remark>
-   You must also check <literal>server.maximum_config_file_size</literal> in
-   the <filename>/usr/share/rhn/config-defaults/rhn_server.conf</filename>
-   file and set it in <filename>/etc/rhn/rhn.conf</filename> to the same
-   value as <literal>web.maximum_config_file_size</literal>.
+    To change the file size limit, edit all the following files on the
+    &susemgr; server and edit or add the following variables:
   </para>
+  <!--
+      bnc#910482
+      ke, 2014-12-17: supported up to 1 MB
 
-  <para>
-   Change the value of both the variables to the desired value in bytes in
-   <filename>/etc/rhn/rhn.conf</filename>, e.g.:
-  </para>
+      ke, 2016-05-24: checked on suma 3
+  -->
+  <screen># /usr/share/rhn/config-defaults/rhn_web.conf
+web.maximum_config_file_size = 262144
 
-<screen>server.maximum_config_file_size=262144
-web.maximum_config_file_size=262144</screen>
+# /usr/share/rhn/config-defaults/rhn_server.conf
+maximum_config_file_size = 262144
+
+# /etc/rhn/rhn.conf
+web.maximum_config_file_size=262144
+server.maximum_config_file_size=262144</screen>
+
+<para>
+ Then restart <systemitem>spacewalk</systemitem>:
+</para>
+<screen><prompt>#</prompt> spacewalk-service restart</screen>
 
 <!-- ================================================================ -->
 
