@@ -257,10 +257,233 @@
 
 
 
- <sect1 xml:id="sec.manager.proxy.migrating">
-  <title>Migrating from &susemgrproxy; 2.1 to &susemgr; &productnumber3; Proxy</title>
-  <para>THIS SECTION IN DEVELOPMENT</para>
+ <sect1 xml:id="advanced.topics.proxy.migration">
+  <title>Migrating &susemgrproxy; 2.1 to &susemgrproxy; Proxy 3</title>
+  <para>The recommended order for migrations is to first migrate the server and then the proxies.
+   Please note that a SUSE Manager proxy 2.1 cooperates just fine with a new SUSE Manager 3.</para>
+
+  <para>For the migration of the proxies there are two possible approaches: Existing SUSE Manager
+   proxies may be auto-upgraded to version 3 by means of YaST auto-installation. Alternatively the
+   proxies may be replaced by new ones. This section documents both approaches.</para>
+
+  <sect2>
+   <title>Replacing a &susemgrproxy;</title>
+   <para>A SUSE Manager Proxy is <literal>dumb</literal> in the sense that it does not contain any
+    information about the clients which are connected to it. A SUSE Manager Proxy can therefore be
+    replaced by a new one. Naturally the replacement proxy must have the same name and IP address as
+    its predecessor.</para>
+   <procedure>
+    <title>Replacing a &susemgrproxy;</title>
+    <step>
+     <para>To replace a SUSE Manager Proxy, delete the system from the SUSE Manager system
+      list.</para>
+    </step>
+    <step>
+     <para>Shutdown the proxy and install the latest version.</para>
+    </step>
+    <step>
+     <para>Complete the registration steps described in this chapter to register your proxy
+      normally. Once you have completed registering the new proxy with the server, utilizing the
+      appropriate channels, and finally having run the <filename>configure-proxy.sh</filename>
+      script, all clients formally connected via the older proxy will continue operating as
+      before.</para>
+    </step>
+   </procedure>
+   <important>
+    <para>During the installation of the proxy, clients will not be able to reach their SUSE Manager
+     server. After a SUSE Manager Proxy system has been deleted from the system list, all clients
+     connected to this proxy will be (incorrectly) listed as <literal>directly connected</literal>
+     to the &susemgr; server. After the first successful operation on a client <emphasis>such as
+      execution of a remote command or installation of a package or patch</emphasis> this
+     information will automatically be corrected. Note that this may take a few hours.</para>
+   </important>
+
+  </sect2>
+
+  <sect2>
+   <title>Upgrading a &susemgrproxy; from 2.1 - 3</title>
+   <para>In most situations upgrading the proxy will be your preferred solution as this retains all
+    cached packages. Selecting this route saves time especially regarding setups with proxies
+    connected to SUSE Manager server via low-bandwith links. This upgrade can be automated by using
+    the YaST auto-installation feature. The following procedure demonstrates this.</para>
+   <procedure>
+    <title>Upgrading &susemgrproxy; from 2.1 - 3</title>
+    <step>
+     <para>Create an auto-installable distribution based on SLES 12 SP1. SUSE Manager Proxy 3 is
+      based on SLES 12 SP1. Refer to the SUSE Manager Documentation on creating and auto-installable
+       distribution.<remark>add link to auto-install section</remark></para>
+    </step>
+
+    <step>
+     <para>To start the auto-installation on a proxy, some additional packages must be installed
+      which are only available in the SUSE Manager Tools channel. These tools are not available for
+      proxies as the system was shipped as an appliance in the past. To gain access to the required
+      packages for use with proxies, the underlying SLES 11 SP3 channel
+      (SLES11-SP3-SUSE-Manager-Tools) needs to be cloned and assigned to the to-be-upgraded proxies.
+      After these steps have been completed, create an auto-installation profile.</para>
+    </step>
+   </procedure>
+
+   <para>In the following example you will see an auto-install profile. The label
+     <literal>Proxy3</literal> is used both for the auto-installable distribution as well as for the
+    auto-install profile. Use the following auto-installation as template and create the
+    auto-installation profile by uploading the edited file: </para>
+   <screen>&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE profile&gt;
+&lt;profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns"&gt;
+  &lt;general&gt;
+  $SNIPPET('spacewalk/sles_no_signature_checks')
+    &lt;mode&gt;
+      &lt;confirm config:type="boolean"&gt;false&lt;/confirm&gt;
+    &lt;/mode&gt;
+  &lt;/general&gt;
+  &lt;add-on&gt;
+    &lt;add_on_products config:type="list"&gt;
+      &lt;listentry&gt;
+        &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/sles12-sp1-updates-x86_64/Proxy3&lt;/media_url&gt;
+        &lt;name&gt;SLES12 SP1 Updates&lt;/name&gt;
+        &lt;product&gt;SLES12-SP1&lt;/product&gt;
+        &lt;product_dir&gt;/&lt;/product_dir&gt;
+      &lt;/listentry&gt;
+      &lt;listentry&gt;
+        &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/sle-manager-tools12-pool-x86_64-sp1/Proxy3&lt;/media_url&gt;
+        &lt;name&gt;SLE12 Manager Tools Pool&lt;/name&gt;
+        &lt;product&gt;SLES12&lt;/product&gt;
+        &lt;product_dir&gt;/&lt;/product_dir&gt;
+      &lt;/listentry&gt;
+      &lt;listentry&gt;
+        &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/sle-manager-tools12-updates-x86_64-sp1/Proxy3&lt;/media_url&gt;
+        &lt;name&gt;SLE12 Manager Tools Updates&lt;/name&gt;
+        &lt;product&gt;SLES12&lt;/product&gt;
+        &lt;product_dir&gt;/&lt;/product_dir&gt;
+      &lt;/listentry&gt;
+      &lt;listentry&gt;
+        &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/suse-manager-proxy-3.0-pool-x86_64/Proxy3&lt;/media_url&gt;
+        &lt;name&gt;SLE12 Proxy 3 Pool&lt;/name&gt;
+        &lt;product&gt;SLES12&lt;/product&gt;
+        &lt;product_dir&gt;/&lt;/product_dir&gt;
+      &lt;/listentry&gt;
+      &lt;listentry&gt;
+        &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/suse-manager-proxy-3.0-updates-x86_64/Proxy3&lt;/media_url&gt;
+        &lt;name&gt;SLE12 Proxy 3 Update&lt;/name&gt;
+        &lt;product&gt;SLES12&lt;/product&gt;
+        &lt;product_dir&gt;/&lt;/product_dir&gt;
+      &lt;/listentry&gt;
+    &lt;/add_on_products&gt;
+  &lt;/add-on&gt;
+  &lt;upgrade&gt;
+    &lt;only_installed_packages config:type="boolean"&gt;false&lt;/only_installed_packages&gt;
+    &lt;stop_on_solver_conflict config:type="boolean"&gt;true&lt;/stop_on_solver_conflict&gt;
+  &lt;/upgrade&gt;
+  &lt;backup&gt;
+    &lt;sysconfig config:type="boolean"&gt;true&lt;/sysconfig&gt;
+    &lt;modified config:type="boolean"&gt;true&lt;/modified&gt;
+    &lt;remove_old config:type="boolean"&gt;false&lt;/remove_old&gt;
+  &lt;/backup&gt;
+  &lt;networking&gt;
+    &lt;keep_install_network config:type="boolean"&gt;true&lt;/keep_install_network&gt;
+    &lt;start_immediately config:type="boolean"&gt;true&lt;/start_immediately&gt;
+  &lt;/networking&gt;
+  &lt;scripts&gt;
+    &lt;pre-scripts config:type="list"&gt;
+      &lt;script&gt;
+        &lt;filename&gt;remove_initrd_koan.sh&lt;/filename&gt;
+        &lt;source&gt;
+        <![CDATA[
+        mount /dev/sda1 /mnt
+        rm -f /mnt/initrd_koan
+        umount /mnt
+        ]]>
+        &lt;/source&gt;
+      &lt;/script&gt;
+    &lt;/pre-scripts&gt;
+    &lt;init-scripts config:type="list"&gt;
+      &lt;script&gt;
+        &lt;filename&gt;sles_register.sh&lt;/filename&gt;
+        &lt;source&gt;
+        <![CDATA[
+         $SNIPPET('spacewalk/sles_register')
+         chmod 640 /etc/sysconfig/rhn/systemid
+         chown root:www /etc/sysconfig/rhn/systemid
+         systemctl enable squid
+         systemctl start squid
+         ]]>
+        &lt;/source>
+      &lt;/script&gt;
+    &lt;/init-scripts&gt;
+  &lt;/scripts&gt;
+&lt;/profile&gt;
+   </screen>
+
+   <para>Ensure all channels referenced in this file are available and fully synced. Replace the
+    label <literal>Proxy3</literal> with the correct reference chosen for your auto-installation
+    profile. It is recommended to create a new activation key, for example:
+     <filename>1-sles12sp1</filename> which has the relevant channels assigned; later this key will
+    be used to subscribe the upgraded proxy with the correct channels. The following base channel
+    should be assigned:</para>
+
+   <screen>SLES12-SP1-Pool</screen>
+
+   <para>Also be sure to include the following child channels:</para>
+
+   <screen>SLE-Manager-Tools12-Pool
+SLE-Manager-Tools12-Updates
+SLES12-SP1-Updates
+SUSE-Manager-Proxy-3.0-Pool
+SUSE-Manager-Proxy-3.0-Updates</screen>
+
+   <para>In <literal>Kernel Options</literal> enter the following value:</para>
+
+   <screen>autoupgrade=1 Y2DEBUG=1</screen>
+
+   <para>The debug setting is not required but can help investigate problems in case something goes
+    wrong; the <parameter class="option">autoupgrade</parameter> parameter is vital! Do not remove
+    it. </para>
+
+   <para>Save your changes then click on "Variables" and enter the following value:</para>
+
+   <screen>registration_key=1-sles12sp1</screen>
+
+   <para>Specify the name of the key which has all respective channels assigned to it. The
+    auto-install file contains a script named "remove_initrd_koan.sh". In this script you should
+    specify the device name of your /boot Partition. </para>
+
+   <note>
+    <title>remove_initrd_koan.sh</title>
+    <para>The purpose of this script is to act as a workaround for the following problem: During
+     installation the initrd of the installation media (SLES12SP1) is in use. This initrd is rather
+     large (around 50 MB), so there is not enough space left when the new kernel is being installed.
+     Therefore this script deletes the initial ramdisk file once it has been booted. The partition
+     of your boot partition might differ, so it should be explicitly specified in the autoinstall
+     file.</para>
+   </note>
+
+   <para>During auto-installation this script attempts to delete the initial ramdisk file once it
+    has booted. Your boot partition may differ, so ensure it is explicitly specified within the
+    auto-install file.</para>
+
+   <para>If this step is bi-passed or mixed up (for example: specifying a wrong value) its fine.
+    During installation of the new kernel, YaST will detect that there is not enough space available
+    and will stop. You may switch to another console (there is a shell running on virtual console 2)
+    and reclaim some disk space by issuing the following command:</para>
+
+   <screen>rm /mnt/boot/initrd_koan</screen>
+
+   <para>One you have completed this step, switch back to the console where YaST is running (console
+    7) and click retry. Installation of the kernel will continue and succeed. The system will
+    reboot, a few automatic init scripts will run and the proxy will be upgraded to the &susemgr; 3
+    base SLES12SP1 and will be fully functional.</para>
+
+  </sect2>
+
  </sect1>
+
+
 
  <sect1 xml:id="at.manager.proxy.register.clients">
   <title>Registering Clients via &susemgrproxy;</title>
