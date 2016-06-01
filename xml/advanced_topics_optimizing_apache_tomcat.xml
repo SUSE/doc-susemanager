@@ -2,21 +2,61 @@
 <?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
                  type="text/xml" 
                  title="Profiling step"?>
+
 <!DOCTYPE chapter
 [
   <!ENTITY % entities SYSTEM "entity-decl.ent">
     %entities;
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="advanced.topics.optimizing.apache.tomcat">
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="advanced.topics.optimizing.apache.tomcat">
+
+
     <title>Optimizing Apache and Tomcat</title>
-    
+
+
+    <warning>
+        <title>Altering Apache and Tomcat Values</title>
+        <para>These values should only be modified with support or consulting as these parameters
+            can have severe and catastrophic performance impacts on your server when improperly
+            adjusted. SUSE will not be able to provide support for catastrophic failure when these
+            advanced parameters are modified without consultation. Tuning values for Apache httpd
+            and Tomcat requires that you align these parameters with your server hardware.
+            Furthermore testing of these altered values should be performed within a test
+            environment.</para>
+    </warning>
+
+
     <sect1>
-        <title></title>
-        <para></para>
+        <title>Apache httpd's MaxClients Parameter</title>
+        <para>The MaxClients setting determines the number of Apache httpd processes, and thus
+            limits the number of client connections that can be made at the same time (SUSE Manager
+            uses the pre-fork MultiProcessing Modules). The default value for MaxClients in SUSE
+            Manager is 150. If you need to set the MaxClients value greater than 150, Apache httpd's
+            ServerLimit setting and Tomcat's maxThreads must also be increased accordingly (see
+            below).</para>
+
+        <caution>
+            <para>The Apache httpd MaxClients parameter must always be less or equal than Tomcat's
+                maxThreads parameter!</para>
+        </caution>
+
+        <para>If the MaxClients value is reached while the software is running, new client
+            connections will be queued and forced to wait, this may result in timeouts. You can
+            check the Apache httpd's error.log for details:</para>
+
+        <screen>[error] Server reached MaxClients setting, consider increasing the MaxClients setting</screen>
+
+        <para>The default MaxClients parameter can be overridden on SUSE Manager by editing the
+            <filename>server-tuning.conf</filename> file located at: <systemitem>/etc/apache2/</systemitem></para>
+
     </sect1>
-    
-    
-    
-    
+
+    <sect1>
+        <title/>
+        <para/>
+    </sect1>
+
+
 </chapter>
