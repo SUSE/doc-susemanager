@@ -254,6 +254,64 @@
    may then register your clients against the proxy using a bootstrap script as if it were a
    &susemgr; Server.</para>
  </sect1>
+ 
+ 
+ 
+ <sect1 xml:id="at.manager.proxy.register.clients">
+  <title>Registering Clients via &susemgrproxy;</title>
+  
+  <para> Registering clients via &susemgrproxy; is done almost the same way as registering clients
+   directly with the &susemgr; server. The difference is that you create a bootstrap script on the
+   &susemgrproxy; with a command-line tool. The bootstrap script then deploys all necessary
+   information to the clients. The bootstrap script refers some parameters (such as activation keys
+   or GPG keys) that depend on your specific setup. For background information, see the
+   &mgrclientconfguide;. </para>
+  
+  <procedure>
+   <step>
+    <para> Create a client activation key on the &susemgr; server using the WebUI. See: <xref
+     linkend="create.act.keys"/>
+    </para>
+   </step>
+   <step>
+    <para> On the proxy, execute the <command>mgr-bootstrap</command> command-line tool as
+     &rootuser;. If needed, either edit the resulting bootstrap script or use additional
+     command-line switches such as <literal>--activation-keys</literal>: </para>
+    <screen>mgr-bootstrap \
+  --activation-keys=<replaceable>key-string</replaceable></screen>
+   </step>
+   <step>
+    <para> Execute the bootstrap script on the clients as described in </para>
+   </step>
+  </procedure>
+  
+  <para> The clients are registered with the &susemgrproxy; specified in the bootstrap
+   script.</para>
+ </sect1>
+ 
+ <sect1>
+  <title>Running configure-proxy.sh</title>
+  <para>The configure-proxy.sh script will finalize setup of your &susemgr; proxy.</para>
+  
+  <para>On the proxy, log in as root and execute the interactive
+   <filename>configure-proxy.sh</filename> script; answer questions about SUSE Manager Parent, CA
+   Chain, Proxy version, Trace back email, Use SSL, HTTP Proxy, and provide input for an SSL
+   certificate. A SUSE Manager Parent can be either another proxy server or a SUSE Manager server.
+   Configuration input for monitoring follows. Next steps are CA password, whether to create and
+   populate the configuration channel, and the credentials of the SUSE Manager server (user name and
+   password).</para>
+  
+  <para>If parts are missing, such as CA key and public certificate, the script prints commands that
+   you must execute to integrate the needed files. When the mandatory files are copied, re-run
+   <filename>configure-proxy.sh</filename>.</para>
+  
+  <para><filename>configure-proxy.sh</filename> activates services required by SUSE Manager Proxy,
+   such as squid, apache2, and jabberd.</para>
+  
+  <para>To check the status of the proxy system and its clients, click the proxy system's details
+   page on the Web interface (Systems+Proxy, then the system name). Connection and Proxy subtabs
+   display the respective status information</para>
+ </sect1>
 
 
 
@@ -484,61 +542,5 @@ SUSE-Manager-Proxy-3.0-Updates</screen>
  </sect1>
 
 
-
- <sect1 xml:id="at.manager.proxy.register.clients">
-  <title>Registering Clients via &susemgrproxy;</title>
-
-  <para> Registering clients via &susemgrproxy; is done almost the same way as registering clients
-   directly with the &susemgr; server. The difference is that you create a bootstrap script on the
-   &susemgrproxy; with a command-line tool. The bootstrap script then deploys all necessary
-   information to the clients. The bootstrap script refers some parameters (such as activation keys
-   or GPG keys) that depend on your specific setup. For background information, see the
-   &mgrclientconfguide;. </para>
-
-  <procedure>
-   <step>
-    <para> Create a client activation key on the &susemgr; server using the WebUI. See: <xref
-      linkend="create.act.keys"/>
-    </para>
-   </step>
-   <step>
-    <para> On the proxy, execute the <command>mgr-bootstrap</command> command-line tool as
-     &rootuser;. If needed, either edit the resulting bootstrap script or use additional
-     command-line switches such as <literal>--activation-keys</literal>: </para>
-    <screen>mgr-bootstrap \
-  --activation-keys=<replaceable>key-string</replaceable></screen>
-   </step>
-   <step>
-    <para> Execute the bootstrap script on the clients as described in </para>
-   </step>
-  </procedure>
-
-  <para> The clients are registered with the &susemgrproxy; specified in the bootstrap
-   script.</para>
- </sect1>
-
- <sect1>
-  <title>Running configure-proxy.sh</title>
-  <para>The configure-proxy.sh script will finalize setup of your &susemgr; proxy.</para>
-
-  <para>On the proxy, log in as root and execute the interactive
-    <filename>configure-proxy.sh</filename> script; answer questions about SUSE Manager Parent, CA
-   Chain, Proxy version, Trace back email, Use SSL, HTTP Proxy, and provide input for an SSL
-   certificate. A SUSE Manager Parent can be either another proxy server or a SUSE Manager server.
-   Configuration input for monitoring follows. Next steps are CA password, whether to create and
-   populate the configuration channel, and the credentials of the SUSE Manager server (user name and
-   password).</para>
-
-  <para>If parts are missing, such as CA key and public certificate, the script prints commands that
-   you must execute to integrate the needed files. When the mandatory files are copied, re-run
-    <filename>configure-proxy.sh</filename>.</para>
-
-  <para><filename>configure-proxy.sh</filename> activates services required by SUSE Manager Proxy,
-   such as squid, apache2, and jabberd.</para>
-
-  <para>To check the status of the proxy system and its clients, click the proxy system's details
-   page on the Web interface (Systems+Proxy, then the system name). Connection and Proxy subtabs
-   display the respective status information</para>
- </sect1>
 
 </chapter>
