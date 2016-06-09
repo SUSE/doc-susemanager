@@ -200,36 +200,45 @@
   <sect2 xml:id="s2-sattools-org-details-conf">
    <title><guimenu>Organization Details</guimenu> &gt; <guimenu>Configuration</guimenu></title>
    <para>
-    Here you configure the organization to use staging contents, set up
-    software crash reporting, and upload of SCAP files.
+    Here you configure the organization to use staged contents
+    (<quote>pre-fetching</quote> packages, etc.), set up software crash
+    reporting, and upload of SCAP files.
     <!-- Crash file and SCAP -->
     <!-- file upload limit is a non negative number, zero means no limit. -->
    </para>
    <para>
-    Staging means that clients will download packages in advance. Then the
-    package installation action will take place immediately, when the
-    schedule is actually executed.  This <quote>pre-fetching</quote> saves
-    maintenance window time, which is good for service uptime.
+    The clients will download packages in advance and stage them. This
+    has the advantage that the package installation action will take
+    place immediately, when the schedule is actually executed.  This
+    <quote>pre-fetching</quote> saves maintenance window time, which is
+    good for service uptime.
    </para>
    <para>
-    For staging contents, edit on the client
+    For staging contents (<quote>pre-fetching</quote>), edit on the client
     <filename>/etc/sysconfig/rhn/up2date</filename>:
    </para>
 <screen>stagingContent=1
 stagingContentWindow=24</screen>
    <para>
     <literal>stagingContentWindow</literal> is a time value expressed in
-    hours that determines when the downloading should start. More exactly it
+    hours and determines when downloading will start. It
     is the number of hours before the scheduled installation or update time.
-    In this case, 24 hours before the installation time. The exact download
-    start time depends on the contact method&mdash;basically at the next
-    <command>rhn_check</command>.
+    In this case, it means <literal>24</literal> hours before the
+    installation time.  The exact download
+    start time depends on the contact method&mdash;when the next
+    <command>rhn_check</command> is performed.
    </para>
    <para>
-    Next time a package installation, update, or patch application action is
-    scheduled, packages will be automatically downloaded but not installed
-    yet. When the scheduled time comes, the action will attempt to use the
-    staged version.
+    Next time an action is scheduled, packages will automatically be
+    downloaded but not installed yet. When the scheduled time comes, the
+    action will use the staged version.
+   </para>
+  </sect2>
+  <sect2 xml:id="s2-sattools-org-details-states">
+   <title><guimenu>Organization Details</guimenu> &gt; <guimenu>States</guimenu></title>
+   <para>
+
+    <!-- FIXME: describe it more detailed -->
    </para>
   </sect2>
  </sect1>
