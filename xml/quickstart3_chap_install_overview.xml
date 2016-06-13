@@ -55,20 +55,12 @@
         <title>Overview</title>
         <para>&susemgr; may be integrated within your network infrastructure in multiple ways. In
             this guide you will be installing &susemgr; 3 as an add-on to &sle; 12 SP1 utilizing
-            either the JeOS (Just Enough Operating System) image or with the full SLES12 SP1 DVD
-            Image within a KVM virtual machine. You will register your &susemgr; server with &scc;
-            then sync or (Mirror) the &sle; 12 SP1 channel(<emphasis>Channels may also be referred
-                to a mirrored repository, containing software updates and patch data.</emphasis>)
-            for a client which will be registered with &susemgr;.</para>
-        <note>
-            <title>Just Enough Operating System (JeOS) or Full Media Download</title>
-            <para>The &sle; 12 SP1 JeOS image provides the quickest route for creating this test
-                environment. The JeOS kvm and xen images total size is around 240MB. The alternative
-                is to use the 3GB &sle; 12 SP1 installation ISO. Both installation media are
-                appropriate, but depend on available bandwidth. You may also use the full SLES 12
-                SP1 installation media located here: <link
-                    xlink:href="https://www.suse.com/products/server/download/"/></para>
-        </note>
+            either the JeOS (Just Enough Operating System) image or alternatively the full SLES12
+            SP1 DVD Image within a KVM virtual machine. You will register your &susemgr; server with
+            &scc; then sync or (Mirror) the &sle; 12 SP1 channel(<emphasis>Channels may also be
+                referred to a mirrored repository, containing software updates and patch
+                data.</emphasis>) for a client which will be registered with &susemgr;.</para>
+
 
     </sect1>
 
@@ -107,14 +99,32 @@
     </sect1>
 
     <sect1>
-        <title>Obtaining the &sle; 12 SP1 Images</title>
-        <para>Once you have registered with &scc; or logged into an existing account, you can find
-            the JeOS KVM image located at: <link
-                xlink:href="https://www.suse.com/products/server/jeos/"/>
-        </para>
+        <title>&sle; 12 SP1 Installation Media</title>
+        <para>Once you have completed registration with &scc; or after logging into your existing
+            account, you can find the installation images provided at the following addresses.
+            Select one and continue reading:</para>
 
-        <para>Alternatively you may use the full installation DVD Image located at:<link
-                xlink:href="https://www.suse.com/products/server/download/"/></para>
+        <note>
+            <title>Just Enough Operating System (JeOS, "Juice") vs. Full Media Image</title>
+            <para>The &sle; 12 SP1 JeOS image provides the quickest route for setup of a test
+                environment. The JeOS image total size is about 240MB. The alternative would be the
+                3GB &sle; 12 SP1 installation ISO. Both installation media are appropriate, but
+                depend upon available bandwidth or your application needs. Both methods of
+                installation will be covered in this guide.</para>
+        </note>
+
+        <itemizedlist>
+            <listitem>
+                <para>Just Enough Operating System (JeOS) 240 MB <link
+                        xlink:href="https://www.suse.com/products/server/jeos/"/>
+                </para>
+            </listitem>
+            <listitem>
+                <para>SLES 12 SP1 ISO DVD Installation Image 3GB <link
+                        xlink:href="https://www.suse.com/products/server/download/"/></para>
+            </listitem>
+        </itemizedlist>
+
     </sect1>
 
     <sect1 xml:id="quickstart.sect.software.requirements">
@@ -350,9 +360,97 @@
 
     <sect1>
         <title>Firewall Rules</title>
-        <para>In a production environment your &susemgr; server and its clients should always
-            utilize firewall rules to protect your network. As this guide is focused on a simple
-            test environment it is recommended to disable firewalls on both the client and server. </para>
+        <para>In a production environment &susemgr; server and its clients should always utilize
+            firewall rules. The following table provides an overview of required ports for use by
+            &susemgr; 3. Alternatively you may wish to disable the firewall during
+            evaluation.</para>
+
+        <table xml:id="tab.install.ports.server">
+            <title>Required Server Ports</title>
+            <tgroup cols="2">
+                <colspec colwidth="10*"/>
+                <colspec colwidth="90*"/>
+                <thead>
+                    <row>
+                        <entry>
+                            <para> Port </para>
+                        </entry>
+                        <entry>
+                            <para>Description</para>
+                        </entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>
+                            <para> 67 </para>
+                        </entry>
+
+
+                        <entry>
+                            <para> Required when &susemgr; is configured as a DHCP server for
+                                systems requesting IP addresses. </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> 69 </para>
+                        </entry>
+                        <entry>
+                            <para> Used when &susemgr; is configured as a PXE server and allows
+                                installation and re-installation of PXE-boot enabled systems.
+                            </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> 80 </para>
+                        </entry>
+                        <entry>
+                            <para>Used to contact &scc;. All WebGUI, client, and proxy server
+                                requests travel via http or https. </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> 443 </para>
+                        </entry>
+                        <entry>
+                            <para> All WebGUI, client, and proxy server requests via http or https
+                                and &susemgr; uses this port for &scc; inbound traffic. </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> 5222 </para>
+                        </entry>
+                        <entry>
+                            <para>When you wish to push actions to clients this port is required by
+                                the <systemitem>osad</systemitem> daemon running on your client
+                                systems </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry>
+                            <para> 5269 </para>
+                        </entry>
+                        <entry>
+                            <para> Needed if you push actions to or via a &susemgrproxy;. </para>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry><para>4505</para></entry>
+                        <entry><para>Required by the Salt-master for communication via TCP to
+                                minions.</para></entry>
+                    </row>
+                    <row>
+                        <entry><para>4506</para></entry>
+                        <entry><para>Required by the Salt-master for communication via TCP to
+                                minions.</para></entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>
 
     </sect1>
 
