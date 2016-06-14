@@ -1,2 +1,358 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.chap.suma.backup">
+    <title>Backup and Restore SUSE Manager</title>
 
+    <para>Backing up SUSE Manager can be done in several ways. Regardless of the method chosen, the
+        associated database also needs to be backed up. For the stand-alone database, consult your
+        organization's database administrator. For the embedded database, refer to Section 8.6,
+        “Configuring SUSE Manager's Database (smdba)” for a complete description of this process and
+        the options available.</para>
+
+    <sect1>
+        <title>Files and Directories Requiring Backup</title>
+        <para>&suse; recommends backing up the following files and directories:</para>
+        <itemizedlist>
+            
+            <listitem>
+                <para>
+                    <filename>/etc/sysconfig/rhn/</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/etc/rhn/</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/etc/sudoers</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/etc/tnsnames.ora</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/srv/www/htdocs/pub/</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/var/spacewalk/packages/1</filename> (custom RPMs) </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/root/.gnupg/</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/root/ssl-build/</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/etc/dhcp.conf</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/tftpboot/</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/var/lib/cobbler/</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/var/lib/rhn/kickstarts/</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/srv/www/cobbler</filename>
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <filename>/var/lib/nocpulse/</filename>
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <para> &suse; recommends to back up the entire <filename>/var/spacewalk/</filename> tree. In
+            case of failure, this will save lengthy download time. Since
+                <filename>/var/spacewalk/</filename> (specifically
+                <filename>/var/spacewalk/packages/NULL/</filename>) is primarily a duplicate of the
+            package repository, it can be regenerated with <filename>mgr-sync</filename>. In the
+            case of disconnected &susemgr;s,
+                <filename>/var/spacewalk/</filename><emphasis>must</emphasis> be backed up. </para>
+
+        <para> Backing up only these files and directories requires reinstalling the &susemgr; RPMs
+            and re-registering &susemgr;. In addition, packages need to be resynchronized using the
+                <filename>mgr-sync</filename> tool. Finally, you have to reinstall the
+                    <filename>/root/ssl-build/rhn-org-httpd-ssl-key-pair-<replaceable>MACHINE_NAME-VER-REL</replaceable>.noarch.rpm</filename>. </para>
+
+        <para> Another method is to back up all the files and directories mentioned above but
+            reinstall the &susemgr; without re-registering it. During the installation, cancel or
+            skip the registration and SSL certificate generation sections. </para>
+
+        <para> The most comprehensive method is to back up the entire machine. This saves time in
+            downloading and reinstalling but requires additional disk space and backup time. </para>
+
+        <note>
+            <para> Regardless of the backup method used, when restoring &susemgr; from a backup, you
+                must run the following command to schedule the recreation of search indexes the next
+                time the <command>rhn-search</command> service is started:</para>
+            <screen>rcrhn-search cleanindex</screen>
+        </note>
+
+    </sect1>
+
+    <sect1 xml:id="config.suma.database.smdba">
+        <title>Administering The SUSE Manager Database with (smdba)</title>
+        <para>&susemgr; provides the <command>smdba</command> command for managing the installed
+            database. </para>
+        <para> The <command>smdba</command> command works on local databases only, not remote. This
+            utility allows you to do several administrative tasks like backing up and restoring the
+            database, everything from creating, verifying, and restoring backups to obtain the
+            database status and restart the database if necessary. The <command>smdba</command>
+            command supports postgres databases. </para>
+
+        <important>
+            <title>Running<command>smdba</command> Relies on <command>sudo</command>
+                Enablement</title>
+
+            <para> Running <command>smdba</command> relies on proper <command>sudo</command>
+                configuration. <command>sudo</command> allows you to invoke <command>smdba</command>
+                as a regular user and thus, you are save from executing unwanted system changes. </para>
+            <para> For example, to allow the user <systemitem class="username">admin</systemitem>
+                (the <quote>administrative UID</quote>) to execute <command>smdba</command>
+                commands, and thus manipulating the underlying database with the <quote>operative
+                    UID</quote>, make sure something as follows is configured in
+                    <filename>/etc/sudoers</filename>: </para>
+            <screen>admin   ALL=(postgres) /usr/bin/smdba</screen>
+            <para> With these settings <systemitem class="username">admin</systemitem> user will be
+                allowed to access the target database account (<literal>oracle</literal> or
+                    <literal>postgres</literal>). </para>
+            <para> For configuring <command>sudo</command> and its security implications, see the
+                    <literal>sudo</literal> and <literal>sudoers</literal> manpages and the
+                extensive comments in the <filename>/etc/sudoers</filename> configuration file.
+            </para>
+        </important>
+
+        <para> Find basic information about <command>smdba</command> in the <literal>smdba</literal>
+            manpage. </para>
+        <note>
+            <title>Restart Spacewalk Services When Connection is Lost</title>
+            <para> If you have stopped or restarted the database, Spacewalk services connections may
+                be interrupted. In such a case, execute the following command: </para>
+            <screen><command>spacewalk-service</command> restart</screen>
+        </note>
+
+    </sect1>
+
+
+    <sect1 xml:id="config-smdb.options">
+        <title>(smdba) Help</title>
+        <para>
+            <command>smdba</command> provides several subcommands.</para>
+
+        <para> For a list of available commands on your installation, call <command>smdba
+                --help</command>. To display the help message for a specific subcommand, call
+                <command>smdba <replaceable>COMMAND</replaceable> --help</command>. </para>
+    </sect1>
+
+    <sect1 xml:id="config-smdb.start-and-stop">
+        <title>Starting and Stopping the Database</title>
+        <para>There are three commands to start, stop, or retrieve the status of the database. These
+            commands work with both databases. Use the following commands:</para>
+        <screen>smdba db-status
+Checking database core...       online</screen>
+        <screen>smdba db-stop
+Stopping the SUSE Manager database...
+Stopping core:         done</screen>
+        <screen>smdba db-status
+Checking database core...       offline</screen>
+        <screen>smdba db-start
+Starting core...       done</screen>
+    </sect1>
+
+    <sect1 xml:id="config-smdb.create-backup">
+        <title>Backing up the Database</title>
+
+        <variablelist>
+            <varlistentry>
+                <term>postgres</term>
+                <listitem>
+                    <para> The <command>smdba</command> command performs a <emphasis>continuous
+                            archiving backup</emphasis>. </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
+        <para>To perform a hot backup for postgresql, do the following:</para>
+
+        <procedure>
+            <step>
+                <para>Allocate permanent space on your remote storage, which you use for general
+                    backups (NAS, iSCSI target, etc.). For example:</para>
+                <screen>/mnt/backup/</screen>
+                <para> This directory should always be the same and never change. It will be a
+                    permanent target to store new backups and restore from it during a disaster
+                    recovery. </para>
+            </step>
+            <step>
+                <para> Create a directory with the correct permissions in your target directory,
+                    e.g., with using <command>sudo</command>: </para>
+                <screen>sudo -u postgres mkdir /mnt/backup/database</screen>
+                <para> Alternatively, as &rootuser;: </para>
+                <screen>install -d -o postgres /mnt/backup/database</screen>
+                <para>Or:</para>
+                <screen>mkdir /mnt/backup/database
+chown postgres:postgres /mnt/backup/database</screen>
+            </step>
+            <step>
+                <para> If you want to create a backup for the first time, run: </para>
+                <screen><command>smdba</command> backup-hot --enable=on --backup-dir=/mnt/backup</screen>
+
+                <para> This command performs a restart of the postgresql database. If you want to
+                    renew the basic backup, use the same command. </para>
+            </step>
+            <step>
+                <para>Perform the hot backup:</para>
+                <screen>smdba backup-hot --backup-dir=/mnt/backup/database
+...</screen>
+                <para> If the command exits without any errors, find the backup files in your
+                        <filename>/mnt/backup/database</filename> directory. </para>
+            </step>
+        </procedure>
+
+    </sect1>
+
+    <sect1 xml:id="config-smdb.restore-backup">
+        <title>Restoring a Database Backup</title>
+        <para>Use <command>smdba backup-restore</command> to restore to an earlier point in time. To
+            restore the backup, proceed as follows: </para>
+
+        <procedure>
+            <step>
+                <para>Shutdown the database:</para>
+                <screen>smdba db-stop</screen>
+            </step>
+            <step>
+                <para>Start the restore process:</para>
+                <screen>smdba backup-restore start</screen>
+            </step>
+            <step>
+                <para>Restart the database:</para>
+                <screen>smdba db-start</screen>
+            </step>
+        </procedure>
+
+        <para> The above steps can be combined with: </para>
+        <screen>smdba backup-restore force</screen>
+        <para> In this case it will select the most recent backup and purge the rest. Every time you
+            create a new backup, it also purges the previous backups. </para>
+
+        <note>
+            <title>Restoring the Most Recent Backup Only</title>
+            <para> Because <command>smdba</command> makes automatic hot backups, it allows to
+                restore only the most recent backup, and merging the current archive logs on top of
+                it. </para>
+        </note>
+    </sect1>
+
+    <sect1 xml:id="config-smdb.archivelog">
+        <title>Archive Log Settings</title>
+        <para> In &susemgr; with an embedded database, archive logging is enabled by default. This
+            feature allows the database management tool <command>smdba</command> to perform hot
+            backups. </para>
+
+        <para> With archive log enabled, far more data is stored on the hard disk: </para>
+        <itemizedlist>
+            <listitem>
+                <para> Postgresql maintains a limited number of archive logs. Using the default
+                    configuration, approx. 64 files with a size of 16 MiB are stored. </para>
+            </listitem>
+        </itemizedlist>
+        <para> Creating a user and syncing the channels: </para>
+        <itemizedlist>
+            <listitem>
+                <para> sles11-sp1-pool-x86_64 </para>
+            </listitem>
+            <listitem>
+                <para> sles11-sp1-updates-x86_64 </para>
+            </listitem>
+            <listitem>
+                <para> sles11-sp2-core-x86_64 </para>
+            </listitem>
+            <listitem>
+                <para> sles11-sp2-updates-x86_64 </para>
+                <remark role="needinfo">emap: drop SP1 and add SP3? Update space info
+                    below?</remark>
+            </listitem>
+        </itemizedlist>
+        <para> Postgresql will generate an additional ~1 GB of data. So it is important to think
+            about a backup strategy and create a backups in a regular way. </para>
+
+        <para> Archive logs are stored at: </para>
+
+        <itemizedlist>
+            <listitem>
+                <para>
+                    <filename>/var/lib/pgsql/data/pg_xlog/</filename> (postgresql) </para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+
+    <sect1 xml:id="config-smdb.spaces">
+        <title>Retrieving an Overview of Occupied Database Space</title>
+        <para>Database administrators may use the subcommand <command>space-overview</command> to
+            get a report about occupied table spaces, for example:</para>
+        <screen>smdba space-overview
+SUSE Manager Database Control. Version 1.5.2
+Copyright (c) 2012 by SUSE Linux Products GmbH
+
+
+Tablespace  | Size (Mb) | Avail (Mb) | Use %
+------------+-----------+------------+------
+postgres    | 7         | 49168      | 0.013
+susemanager | 776       | 48399      | 1.602 
+
+</screen>
+        <para>The following command is available for Postgresql. For a more detailed report, use the
+                <command>space-tables</command> subcommand. It lists the table and its size, for
+            example:</para>
+        <screen>smdba space-tables
+SUSE Manager Database Control. Version 1.5.2
+Copyright (c) 2012 by SUSE Linux Products GmbH
+
+
+Table                                 | Size      
+--------------------------------------+-----------
+public.all_primary_keys               | 0 bytes   
+public.all_tab_columns                | 0 bytes   
+public.allserverkeywordsincereboot    | 0 bytes   
+public.dblink_pkey_results            | 0 bytes   
+public.dual                           | 8192 bytes
+public.evr_t                          | 0 bytes   
+public.log                            | 32 kB     
+
+...</screen>
+    </sect1>
+
+</chapter>
