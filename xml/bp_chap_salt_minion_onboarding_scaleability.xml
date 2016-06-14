@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="bp.chap.salt.minion.onboard.scaleability">
+    <title>Salt Minion Scalability</title>
+
+    <sect1>
+        <title>Salt Minion Onboarding Rate</title>
+        <para>The rate at which SUSE Manager can on-board minions (accept Salt keys) is limited and
+            depends on hardware resources. On-boarding minions at a faster rate than SUSE Manager is
+            configured for will build up a backlog of unprocessed keys slowing the process and
+            potentially exhausting resources. It is recommended to limit the acceptance key rate
+            pro-grammatically. A safe starting point would be to on-board a minion every 15 seconds,
+            which can be implemented via the following command:</para>
+        <screen>for i in `seq 1 1000`; do salt-key -y -a minion$i; sleep 15; done</screen>
+    </sect1>
+
+    <sect1>
+        <title>Minions Running with Unaccepted Salt Keys</title>
+        <para>Minions which have not been on-boarded, (minions running with unaccepted salt keys)
+            consume resources, in particular inbound network bandwidth for ~2.5Kb/s per minion. 1000
+            idle minions will consume around ~2.5Mb/s, and this number will drop to almost 0 once
+            on-boarding has been completed. Limit non-onboarded systems for optimal
+            performance</para>
+
+        <para>Salt's official documentation suggests the maximum number of opened files should be
+            set to at least 2x the minion count. Current default is 16384, which is sufficient for
+            ~8000 minions. For larger installations, this number may be increased by editing the
+            following line in
+            <filename>/usr/lib/systemd/system/salt-master.service</filename>:</para>
+        <screen>LimitNOFILE=16384</screen>
+    </sect1>
+</chapter>

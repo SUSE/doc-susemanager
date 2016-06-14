@@ -6,28 +6,17 @@
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="sles.installation.within.kvm">
-    <title>Constructing the Sandbox</title>
-    <sect1>
-        <title>Included Topics</title>
+    <title>JeOS SLES12 SP1 Installation</title>
 
-        <para>This chapter provides the required (KVM) settings for installation of &sle; 12 SP1 as
-            the base for the &susemgr; 3. A kernel virtual machine (KVM) combined with Virt-Manager
-            will be used as a sandbox for your first installation. The following sections will
-            provide you with: </para>
-
-        <itemizedlist>
-            <listitem>
-                <para>(KVM) settings for a &sle; 12 SP1 installation</para>
-            </listitem>
-            <listitem>
-                <para>Starting the &sle; 12 installation</para>
-            </listitem>
-        </itemizedlist>
-
-
-    </sect1>
     <sect1 xml:id="quickstart.sect.kvm.settings">
         <title>virt-manager Settings</title>
+
+
+        <para>This chapter provides the required (KVM) settings for installation of JeOS &sle; 12
+            SP1 as the base for the &susemgr; 3. A kernel virtual machine (KVM) combined with
+                <package>virt-manager</package> will be used as a sandbox for your first
+            installation.</para>
+
         <para>Enter the following settings when creating a new virtual machine using
             virt-manager.</para>
         <informaltable>
@@ -92,7 +81,7 @@
                             <para>Storage Format:</para>
                         </entry>
                         <entry>
-                            <para>.qcow 24 GB (Default) JeOS Root Partition  </para>
+                            <para>.qcow 24 GB (Default) JeOS Root Partition </para>
                         </entry>
                     </row>
 
@@ -105,7 +94,7 @@
                         </entry>
                         <entry>
                             <para/>
-                            <para>102 GB will be mounted at: /var/spacewalk</para>
+                            <para>103 GB will be mounted at: /var/spacewalk</para>
                             <para>50 GB will be mounted at: /var/lib/pgsql</para>
                             <para>2 GB for swap</para>
                         </entry>
@@ -131,8 +120,6 @@
             </tgroup>
         </informaltable>
 
-        <para>After finalizing your machine settings proceed to the next section to begin the &sle;
-            12 SP1 installation procedure.</para>
         <tip>
             <title>&suse; Virtualization Guide</title>
             <para>For more information on virtualization see: <link
@@ -143,22 +130,108 @@
     </sect1>
 
     <sect1>
-        <title>&sle; 12 Installation</title>
-        <para>Make sure you have created 3 additional virtual disks required for SUSE Manager
-            Partitions. See the table in the previous section if you have not completed this
-            step.</para>
-        <para>Once your disks have been created select <systemitem>Begin Installation</systemitem>
-            and your new VM will automatically boot from the selected JeOS image. </para>
+        <title>JeOS KVM Installation Steps</title>
+        <para>Create 3 additional virtual disks required for the SUSE Manager storage
+            partitions.</para>
 
+        <procedure>
+            <title>Creating the Required Partitions with KVM</title>
+            <step>
+                <para>Create a new virtual machine using the downloaded JeOS kvm image and select
+                        <systemitem>Import existing disk image</systemitem>
+                </para>
+            </step>
+            <step>
+                <para>Configure RAM and number of CPU's. (4 GB RAM 2 CPUs)</para>
+            </step>
+            <step>
+                <para>Name your KVM machine and select the <systemitem>Customize configuration
+                        before install</systemitem> checkbox.</para>
+            </step>
+            <step>
+                <para>Click the <guibutton>Add Hardware</guibutton> button.</para>
+            </step>
+            <step>
+                <para>Create a Storage device with 103 GB space. (Will be used with
+                        <filename>/var/spacewalk/</filename> and 2 GB partitioned later for use as
+                    swap.) select <guibutton>Finish</guibutton></para>
+            </step>
+            <step>
+                <para>Create a storage device for the database partition. (50 GB for
+                        <filename>var/lib/pgsql</filename>).</para>
+            </step>
+            <step>
+                <para>Select <systemitem>Begin Installation</systemitem> and your new VM will boot
+                    from the JeOS image.</para>
+            </step>
+        </procedure>
+
+        <para>Proceed through the basic JeOS installation prompts until you reach the command
+            line.</para>
+
+
+    </sect1>
+
+    <sect1>
+        <title>Preparing JeOS for SUSE Manager</title>
+        <procedure>
+            <title>Preparing JeOS for SUSE Manager Installation</title>
+            <step>
+                <para>Register with SCC:
+                    <screen>SUSEConnect -e email@suse.com -r [SUSE_MANAGER_CODE]</screen></para>
+            </step>
+            <step>
+                <para>Add SUSE Manager repositories:
+                    <screen>SUSEConnect -p SUSE-Manager-Server/3.0/x86_64 -r [SUSE_MANAGER_CODE]</screen></para>
+            </step>
+            <step>
+                <para>Install <package>yast2</package> and <package>yast2-installation</package>
+                    packages, <emphasis>You will need yast2 partitioner to prepare the storage
+                        partitions</emphasis>:<screen>zypper in yast2 yast2-installation</screen></para>
+            </step>
+            <step>
+                <para>Partition the 103 GB disk creating a 2 GB swap then mount the remaining 100 GB
+                    storage as XFS at <filename>var/spacewalk/</filename>.</para>
+            </step>
+            <step>
+                <para>Partition the 50 GB disk as XFS and mount it at
+                        <filename>/var/lib/pgsql/</filename></para>
+            </step>
+            <step>
+                <para>Exit partitioner and install the &susemgr; pattern:
+                    <screen>zypper in -t pattern suma_server</screen></para>
+            </step>
+            <step>
+                <para>Execute &susemgr; setup: <screen>yast2 susemanager_setup</screen></para>
+            </step>
+        </procedure>
+
+        <para>Proceed to SUSE manager Setup. <xref linkend="suma.setup.with.yast"/></para>
+
+
+    </sect1>
+
+    <sect1 xml:id="sles.installation.within.kvm.media">
+        <title>SLES12 SP1 Media Installation</title>
+
+        <para>This section provides guidance on installation of &susemgr; using the full
+            installation media.</para>
+
+        <procedure>
+            <title/>
+            <step>
+                <para/>
+            </step>
+        </procedure>
 
         <para>Installation of &sle; 12 SP1 will begin. For more information on completing an
             installation of &sle; 12 see: <link
                 xlink:href="https://www.suse.com/documentation/sles-12/book_quickstarts/data/sec_sle_installquick.html"
             />
         </para>
-        <!-- TODO: Add sections for SCC credentials and SUSE Manager REG Code Partition Screen importance -->
+
         <sect2>
-            <title>Selecting the &susemgr; 3 Extension </title>
+            <title>Selecting the &susemgr; 3 Extension</title>
 
             <para>During the &sle; 12 SP1 installation you will be presented with the following
                 screen. Select the &susemgr; 3 Extension and then complete the &sle; 12
@@ -173,7 +246,6 @@
             </informalfigure>
         </sect2>
     </sect1>
-
 
 
 
