@@ -354,4 +354,51 @@ public.log                            | 32 kB
 ...</screen>
     </sect1>
 
+    <sect1>
+        <title>Moving the Database</title>
+        <para>It is possible to move the database to another location. For example if your database
+            storage space is running low. The following procedure will guide you through moving the
+            database to a new location for use by SUSE Manager.</para>
+
+        <procedure>
+            <title>Moving the Database</title>
+            <step>
+                <para>The default storage location for &susemgr; is:
+                        <filename>/var/lib/pgsql/</filename>. You would like to move it, for example
+                    to: <filename>/storage/postgres/var/lib/pgsql</filename>. To begin, stop the
+                    running database with:<screen># spacewalk-service stop</screen></para>
+            </step>
+            <step>
+                <para>Copy the current working directory structure with the following syntax:
+                    <screen>cp [OPTION]... SOURCE... DIRECTORY</screen> using the <command>-a,
+                        --archive</command> option. For example:
+                    <screen># cp -a /var/lib/pgsql/  /storage/postgres/</screen>This will copy
+                        <filename>/var/lib/pgsql/</filename> under
+                        <filename>/storage/postgres/var/lib/pgsql</filename>.<important>
+                        <para>The postgres base directory structure needs to remain the same
+                            /var/lib/pgsql or the SUSE Manager database will break. Likewise ensure
+                            you have enough available space.</para>
+                    </important></para>
+            </step>
+
+            <step>
+                <para>Mount the new database directory with:
+                    <screen>mount /storage/postgres/var/lib/pgsql</screen></para>
+            </step>
+            <step>
+                <para>Make sure ownership is postgres:postgres and not root:root by changing to the
+                    new directory and running the following command:
+                    <screen>/var/lib/pgsql/ # cd /storage/postgres/var/lib/pgsql
+/storage/postgres/var/lib/pgsql/ # l
+total 8
+drwxr-x---  4 postgres postgres   47 Jun  2 14:35 ./</screen></para>
+            </step>
+            <step>
+                <para>Start spacwalk-services with:
+                    <screen># spacewalk-service start</screen></para>
+            </step>
+        </procedure>
+
+    </sect1>
+
 </chapter>
