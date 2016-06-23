@@ -10,7 +10,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
   xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.security.management">
   <title>System Auditing and Security Management</title>
-<!--  
+  <!--  
   <sect1>
     <title>Systems Management Compliance</title>
     <para/>
@@ -28,7 +28,7 @@
     <para/>
   </sect1>
   -->
-  
+
   <sect1 xml:id="bp-chapt-audit-security-pam-auth">
     <title>Implementing PAM Authentication</title>
     <indexterm>
@@ -50,16 +50,20 @@
           (save it as <filename>/etc/pam.d/susemanager</filename> to make it work with the settings
           below): </para>
 
-        <screen>#%PAM-1.0
-auth        required      pam_env.so
-auth        sufficient    pam_krb5.so no_user_check
-auth        required      pam_deny.so
-account     required      pam_krb5.so no_user_check</screen>
-      </step>  
+        <screen> #%PAM-1.0
+ auth     include        common-auth
+ account  include        common-account
+ password include        common-password
+ session  include        common-session</screen>
+      </step>
       <step>
         <para>Make &susemgr; use this service file (<filename>/etc/pam.d/susemanager</filename>) by
           adding the following line to <filename>/etc/rhn/rhn.conf</filename>: </para>
         <screen>pam_auth_service = susemanager</screen>
+      </step>
+      <step>
+        <para>Restart Spacewalk services to enable the new configuration with:
+          <screen>spacewalk-service restart</screen></para>
       </step>
       <step>
         <para> To enable a user to authenticate against PAM, on the &susemgr; Web interface go to
