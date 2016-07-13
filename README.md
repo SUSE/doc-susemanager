@@ -141,14 +141,14 @@ Repeat it for all the `pdfsub` packages listed in `DEF-susemanager-docs`:
 .../daps/bin/daps --dapsroot .../daps -d DC-DC-susemanager-advanced-topics online-docs
 ```
 
-Copy the results to the results to your ~/Exports directory.
+Copy the results to the results to your `~/Exports` directory.
 
 Create a bug (Classification: Doc Tools, Product: Doc Production,
 Component: SUSE Manager) and ask to update
-http://www.suse.com/documentation/suse-manager-3 accordingly.
-As an example, see
-[bug 975925](https://bugzilla.suse.com/show_bug.cgi?id=975925) or
-[bug 981142](https://bugzilla.suse.com/show_bug.cgi?id=981142).
+[http://www.suse.com/documentation/suse-manager-3](http://www.suse.com/documentation/suse-manager-3)
+accordingly.  As an example, see [bug
+975925](https://bugzilla.suse.com/show_bug.cgi?id=975925) or [bug
+981142](https://bugzilla.suse.com/show_bug.cgi?id=981142).
 
 
 ##Updating SUSE Manager API Documentation and Posting Online##
