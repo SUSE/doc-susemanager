@@ -124,7 +124,7 @@ osc sr -m 'update'
 ##Preparing and Publishing Online Documentation (suse.com/documentation)##
 
 ATM (2016-07-13), you must you a recent daps checkout from
-git@github.com:openSUSE/daps.git.
+`git@github.com:openSUSE/daps.git`.
 
 Switch to the documentation checkout and call:
 
