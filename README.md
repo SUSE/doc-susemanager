@@ -124,7 +124,7 @@ osc sr -m 'update'
 ##Preparing and Publishing Online Documentation (suse.com/documentation)##
 
 ATM (2016-07-13), you must you a recent daps checkout from
-`git@github.com:openSUSE/daps.git`.
+`git@github.com:openSUSE/daps.git`l.
 
 Switch to the documentation checkout and call:
 
@@ -142,6 +142,11 @@ Repeat it for all the `pdfsub` packages listed in `DEF-susemanager-docs`:
 ```
 
 Copy the results to the results to your `~/Exports` directory.
+
+```
+mkdir ~/Export/susemanager-3
+cp -va build/{create-all,susemanager-advanced-topics,susemanager-best-practices,susemanager-reference,susemanager-getting-started}/online-docs/* ~/Export/susemanager-3
+```
 
 Create a bug (Classification: Doc Tools, Product: Doc Production,
 Component: SUSE Manager) and ask to update
