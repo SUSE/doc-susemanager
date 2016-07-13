@@ -123,7 +123,7 @@ osc sr -m 'update'
 
 ##Preparing and Publishing Online Documentation (suse.com/documentation)##
 
-ATM (2016-04-20), you must you a recent daps checkout from
+ATM (2016-07-13), you must you a recent daps checkout from
 git@github.com:openSUSE/daps.git.
 
 Switch to the documentation checkout and call:
@@ -132,13 +132,23 @@ Switch to the documentation checkout and call:
 .../daps/bin/daps --dapsroot .../daps -d DC-create-all online-docs
 ```
 
+Repeat it for all the `pdfsub` packages listed in `DEF-susemanager-docs`:
+
+```
+.../daps/bin/daps --dapsroot .../daps -d DC-DC-susemanager-getting-started online-docs
+.../daps/bin/daps --dapsroot .../daps -d DC-DC-susemanager-reference online-docs
+.../daps/bin/daps --dapsroot .../daps -d DC-DC-susemanager-best-practices online-docs
+.../daps/bin/daps --dapsroot .../daps -d DC-DC-susemanager-advanced-topics online-docs
+```
+
 Copy the results to the results to your ~/Exports directory.
 
 Create a bug (Classification: Doc Tools, Product: Doc Production,
 Component: SUSE Manager) and ask to update
-suse.com/documentation/suse-manager-3 accordingly.  As an example, see
-https://bugzilla.suse.com/show_bug.cgi?id=975925 or
-https://bugzilla.suse.com/show_bug.cgi?id=981142 .
+http://www.suse.com/documentation/suse-manager-3 accordingly.
+As an example, see
+[bug 975925](https://bugzilla.suse.com/show_bug.cgi?id=975925) or
+[bug 981142](https://bugzilla.suse.com/show_bug.cgi?id=981142).
 
 
 ##Updating SUSE Manager API Documentation and Posting Online##
