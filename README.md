@@ -123,10 +123,10 @@ osc sr -m 'update'
 
 ##Preparing and Publishing Online Documentation (suse.com/documentation)##
 
-ATM (2016-07-13), you must you a recent daps checkout from
-`git@github.com:openSUSE/daps.git`l.
+ATM (2016-07-13), you must use a recent `daps` checkout from
+`git@github.com:openSUSE/daps.git`.
 
-Switch to the documentation checkout and call:
+Switch to the directory of the documentation checkout and enter:
 
 ```
 .../daps/bin/daps --dapsroot .../daps -d DC-create-all online-docs
@@ -145,7 +145,9 @@ Copy the results to the results to your `~/Exports` directory.
 
 ```
 mkdir ~/Export/susemanager-3
-cp -va build/{create-all,susemanager-advanced-topics,susemanager-best-practices,susemanager-reference,susemanager-getting-started}/online-docs/* ~/Export/susemanager-3
+cp -va build/{create-all,susemanager-advanced-topics,\
+susemanager-best-practices,susemanager-reference,\
+susemanager-getting-started}/online-docs/* ~/Export/susemanager-3
 ```
 
 Create a bug (Classification: Doc Tools, Product: Doc Production,
