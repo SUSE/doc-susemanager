@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:novdoc-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!-- <!DOCTYPE set PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.docbook.org/xml/4.5/docbookx.dtd" -->
+
+<!DOCTYPE set PUBLIC
+"-//Novell//DTD NovDoc XML V1.0//EN" "novdocx.dtd"
+[
+  <!ENTITY % NOVDOC.DEACTIVATE.IDREF "INCLUDE">
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+
+<article lang="en">
+ <?suse-quickstart color="suse"?>
+ <title>&susemgr; in the Public Cloud</title>
+ <subtitle>SUSE Manager Server and SUSE Manager Proxy in the Public Cloud</subtitle>
+ <articleinfo>
+  <productnumber>&productnumber;</productnumber><productname>&productname;</productname><date>
+  <?dbtimestamp format="B d, Y" ?></date>
+ </articleinfo>
+ <abstract>
+  <para>
+    SUSE Manager delivers best-in-class Linux server management capabilities.
+    For detailed information about the product please refer to the
+    <ulink url="https://www.suse.com/documentation/suse_manager">SUSE
+    Manager</ulink>
+    documentation.
+  </para>
+  <para>
+    The SUSE Manager Server and SUSE Manager Proxy images published by SUSE in
+    selected Public Cloud environments are provided as Bring Your Own
+    Subscription (BYOS) images. SUSE Manager Server instances need to be
+    registered with the customer center. Subscriptions of SUSE Manager Proxy
+    instances are handled through their parent SUSE Manager Server. After an
+    instance is launched, SUSE Manager needs to be set up and configured
+    following the procedure in the SUSE Manager documentation.
+  </para>
+ </abstract>
+  <sect1 id="instance-requirements">
+    <title>Instance Requirements</title>
+    <para>
+      Select an instance size that meets the system requirements as
+      documented in the SUSE Manager documentation.
+    </para>
+    <itemizedlist>
+      <listitem>
+        <para>
+          Minimal main memory: >12G
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          FQDN (Full Qualified Domain Name) resolution must be provided, such
+          that <literal>hostname -f</literal> works. Especially if instances
+          are planned to run in a VPC (Virtual Private Cloud) environment, the
+          configuration of the DNS (Domain Name Resolution) service is
+          important. In a VPC you have complete control over your virtual
+          networking environment, which on the other hand requires to
+          customize basic services first, refer to the cloud service provider
+          documentation for detailed instructions.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          Minimal free disk space for SUSE Manager 15G. For Public Cloud
+          instances we recommend that the repositories and the SUSE Manager
+          Server database, and respectively the SUSE Manager Proxy squid cache,
+          be located on an external virtual disk. The details of this setup are
+          provided in the <link linkend="using-separate-storage-volume">Using
+          Separate Storage Volume</link> section.
+        </para>
+        <para>
+          Storing the database and the repositories on an external
+          virtual disk ensures that the data is not lost should the
+          instance need to be terminated for some reason.
+        </para>
+      </listitem>
+    </itemizedlist>
+    <para>
+      Please ensure that the selected instance type matches the
+      requirements listed above. Although we recommend that the database
+      and the repositories are stored on a separate device it is still
+      recommended to set the root volume size of the instance to 20G.
+    </para>
+  </sect1>
+  <sect1 id="setup">
+    <title>Setup</title>
+    <procedure>
+      <step>
+        <para>
+          Run an instance of the SUSE Manager Server or SUSE Manager Proxy image
+          as published by SUSE.
+        </para>
+        <para>
+          The images are identifiable by the suse, manager, server or proxy,
+          byos keywords in each public cloud environment.
+        </para>
+        <para>
+          The SUSE Manager instance must run in a network access
+          restricted environment such as the private subnet of a VPC or
+          with an appropriate firewall setting such that it can only be
+          accessed by machines in the IP ranges you use. A generally
+          accessible SUSE Manager instance violates the terms of the
+          SUSE Manager EULA. Access to the web interface of SUSE Manager
+          requires https.
+        </para>
+      </step>
+      <step>
+        <para>
+          Setup the hostname as follows:
+        </para>
+
+        <para>
+          SUSE Manager requires a stable and reliable hostname and does
+          not take kindly to host name changes.
+        </para>
+        <orderedlist>
+          <listitem>
+            <para>
+              Set the hostname to a name of your choice
+            </para>
+            <screen>hostname instance-host-name</screen>
+          </listitem>
+
+          <listitem>
+            <para>
+              Disable hostname setup in the dhcp configuration
+              file: <filename>/etc/sysconfig/network/dhcp</filename>
+            </para>
+            <screen>DHCLIENT_SET_HOSTNAME="no"</screen>
+          </listitem>
+
+          <listitem>
+            <para>
+               Let the hostname resolve to the instance external IP address
+            </para>
+            <screen>echo "IP-address instance-host-name" >> /etc/hosts</screen>
+          </listitem>
+
+          <listitem>
+            <para>
+              The current value for the external IP-address can be obtained from the
+              public cloud Web console or from within a terminal session as follows:
+            </para>
+            <itemizedlist>
+              <listitem>
+                <para>
+                  Obtain external IP-address from within Amazon EC2 instance
+                </para>
+                <screen>nslookup $(ec2metadata --public-hostname)</screen>
+              </listitem>
+              <listitem>
+                <para>
+                  Obtain external IP-address from within Google Compute Engine instance
+                </para>
+                <screen>gcemetadata --query instance --external-ip</screen>
+              </listitem>
+              <listitem>
+                <para>
+                  Obtain external IP-address from within Microsoft Azure instance
+                </para>
+                <screen>azuremetadata --external-ip</screen>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </orderedlist>
+      </step>
+      <step>
+	<para>
+	  Configure SUSE Manager
+	</para>
+	<substeps>
+	  <step>
+	    <para>
+	      If you run a SUSE Manager Server instance
+	    </para>
+            <para>
+              Run YaST as follows:
+            </para>
+            <para>
+              After the instance is launched and the external storage is
+              attached and prepared according to <link
+              linkend="using-separate-storage-volume">Using Separate Storage
+              Volume</link> begin with the setup of SUSE Manager. The steps that
+              follow do not differ from the documentation in the <ulink
+              url="https://www.suse.com/documentation/suse_manager">SUSE
+              Manager</ulink> guide.
+            </para>
+            <screen>sudo /sbin/yast2 susemanager_setup</screen>
+            <para>
+              If you are prompted with a message that there is not enough space
+              available for the setup of SUSE Manager, verify that your root
+              volume is at least 20GB and double check that the instructions in
+              <link linkend="using-separate-storage-volume">Using Separate
+              Storage Volume</link> had the desired effects.
+            </para>
+	  </step>
+	  <step>
+	    <para>
+	      If you run a SUSE Manager Proxy instance
+	    </para>
+	    <para>
+	      Launch the instance, optionally with external storage configured.
+	      If you use external storage (recommended), prepare it according to
+	      <link linkend="using-separate-storage-volume">Using Separate
+	      Storage Volume</link>. It is recommended but not required to
+	      prepare the storage before configuring SUSE Manager proxy, as the
+	      suma-storage script will migrate any existing cached data to the
+	      external storage. After preparing the instance, register the
+	      system with the parent SUSE Manager, which could be a SUSE Manager
+	      Server or another SUSE Manager Proxy. See the
+	      <ulink
+	      url="https://www.suse.com/documentation/suse_manager/book_susemanager_proxyquick/data/sec_manager_proxy_inst.html">
+	      SUSE Manager Proxy Setup guide</ulink> for details. Once
+	      registered, run
+	    </para>
+	    <screen>sudo /usr/sbin/configure-proxy.sh</screen>
+	    <para>
+	      to configure your SUSE Manager Proxy instance.
+	    </para>
+	  </step>
+	</substeps>
+      </step>
+      <step>
+        <para>
+          After the completion of the configuration step, SUSE Manager should
+          be functional and running. For SUSE Manager Server, the setup process
+          created an administrator user with following user name:
+        </para>
+        <simplelist>
+          <member>User name: <literal>admin</literal></member>
+        </simplelist>
+        <table>
+          <title>Account credentials for admin user</title>
+          <tgroup cols="3">
+            <thead>
+              <row>
+                <entry>
+                  <para>
+                    Amazon EC2
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    Google Compute Engine
+                  </para>
+                </entry>
+                <entry>
+                  <para>
+                    Microsoft Azure
+                  </para>
+                </entry>
+              </row>
+            </thead>
+            <tbody>
+              <row>
+                <entry>
+                    <para>
+                      <replaceable>Instance-ID</replaceable>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <replaceable>Instance-ID</replaceable>
+                    </para>
+                  </entry>
+                  <entry>
+                    <para>
+                      <replaceable>Instance-Name</replaceable><emphasis role="strong">-suma</emphasis>
+                    </para>
+                  </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <para>
+          The current value for the <replaceable>Instance-ID</replaceable>
+          or <replaceable>Instance-Name</replaceable> in case of the Azure
+          Cloud, can be obtained from the public cloud Web console or from
+          within a terminal session as follows:
+        </para>
+        <itemizedlist>
+          <listitem>
+            <para>
+              Obtain instance id from within Amazon EC2 instance
+            </para>
+            <screen>ec2metadata --instance-id</screen>
+          </listitem>
+          <listitem>
+            <para>
+              Obtain instance id from within Google Compute Engine instance
+            </para>
+            <screen>gcemetadata --query instance --id</screen>
+          </listitem>
+          <listitem>
+            <para>
+              Obtain instance name from within Microsoft Azure instance
+            </para>
+            <screen>azuremetadata --instance-name</screen>
+          </listitem>
+        </itemizedlist>
+        <para>
+          After logging in through the SUSE Manager Server Web UI,
+          <emphasis role="strong">change</emphasis>
+          the default password.
+        </para>
+	<para>
+	  SUSE Manager Proxy does not have administration Web interface
+	  itself. It can be managed through its parent SUSE Manager Server.
+	</para>
+      </step>
+    </procedure>
+    <sect2 id="using-separate-storage-volume">
+      <title>Using Separate Storage Volume</title>
+      <para>
+        We recommend that the repositories and the database for SUSE Manager
+        be stored on a virtual storage device. This best practice will avoid
+        data loss in cases where the SUSE Manager instance may need to be
+        terminated. These steps
+        <emphasis role="strong">must</emphasis>
+        be performed <emphasis role="strong">prior</emphasis> to running
+        the YaST SUSE Manager setup procedure.
+      </para>
+      <procedure>
+        <step>
+          <para>
+            Provision a disk device in the public cloud environment, refer
+            to the cloud service provider documentation for detailed
+            instructions. The size of the disk is dependent on the number
+            of distributions and channels you intend to manage with SUSE
+            Manager. For sizing information refer to
+            <ulink url="https://www.suse.com/support/kb/doc.php?id=7015050">SUSE
+            Manager sizing examples</ulink>. A rule of thumb is 25 GB per
+            distribution per channel.
+          </para>
+        </step>
+        <step>
+          <para>
+            Once attached the device appears as Unix device node in your
+            instance. For the following command to work this device node
+            name is required. In many cases the attached storage appears
+            as <emphasis role="strong">/dev/sdb</emphasis>. In order to
+            check which disk devices exists on your system, call the
+            following command:
+          </para>
+          <screen>hwinfo --disk | grep -E "Device File:"</screen>
+        </step>
+        <step>
+          <para>
+            With the device name at hand the process of re-linking the
+            directories in the filesystem SUSE Manager uses to store
+            data is handled by the suma-storage script. In the following
+            example we use <filename>/dev/sdb</filename> as the device name.
+          </para>
+          <screen>sudo /usr/bin/suma-storage /dev/sdb</screen>
+          <para>
+            After the call all database and repository files used by SUSE
+            Manager Server are moved to the newly created xfs based storage. In
+            case your instance is a SUSE Manager Proxy, the script will move the
+            Squid cache, which caches the software packages, to the newly
+            created storage.  The xfs partition is mounted below the path
+            <filename>/manager_storage</filename>.
+          </para>
+	</step>
+        <step>
+          <para>
+            Create an entry in /etc/fstab (optional)
+          </para>
+          <para>
+            Different cloud frameworks treat the attachment of external
+            storage devices differently at instance boot time. Please
+            refer to the cloud environment documentation for guidance
+            about the fstab entry.
+          </para>
+          <para>
+            If your cloud framework recommends to add an fstab entry, add
+            the following line to the
+            <emphasis role="strong">/etc/fstab</emphasis> file.
+          </para>
+          <screen>/dev/sdb1 /manager_storage xfs defaults 1 1</screen>
+        </step>
+      </procedure>
+    </sect2>
+  </sect1>
+  <sect1 id="registration-of-cloned-systems">
+    <title>Registration of Cloned Systems</title>
+    <para>
+      Cloud environments generally support the creation of new images
+      from a running instance. Images created using this functionality
+      are clones and contain data that will have the effect that SUSE
+      Manager will treat both systems as if they were only 1 system. In
+      order to let SUSE Manager handle instances of cloned images as a
+      new registration apply the procedure outlined on the following
+      wiki to an instance of the cloned image.
+    </para>
+    <para>
+      <ulink url="http://wiki.novell.com/index.php/SUSE_Manager/Register_Clones"/>
+    </para>
+  </sect1>
+</article>
+
