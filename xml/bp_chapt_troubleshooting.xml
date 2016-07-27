@@ -227,8 +227,152 @@ jabberd/router[31437]: shutting down</screen></para>
  rm -Rf /var/lib/jabberd/db/*
  spacewalk-service start</screen>
             </para>
+            <para> An alternative approach would be to test another database, but SUSE Manager does
+                not deliver drivers for this:
+                <screen> rcosa-dispatcher stop
+ rcjabberd stop
+ cd /var/lib/jabberd/db
+ rm *
+ cp /usr/share/doc/packages/jabberd/db-setup.sqlite .
+ sqlite3 sqlite.db &lt; db-setup.sqlite
+ chown jabber:jabber *
+ rcjabberd start
+ rcosa-dispatcher start</screen>
+            </para>
 
+        </sect2>
 
+        <sect2>
+            <title>Capturing XMPP Network Data for Debugging Purposes</title>
+            <para>If you are experiencing bugs regarding OSAD, it can be useful to dump network
+                messages in order to help with debugging. The following procedures provide
+                information on capturing data from both the client and server side. </para>
+
+            <procedure>
+                <title>Server Side Capture</title>
+                <step>
+                    <para>Install the <package>tcpdump</package> package on the SUSE Manager Server
+                        as root: <command>zypper in tcpdump </command></para>
+                </step>
+                <step>
+                    <para>Stop the OSA dispatcher and Jabber processes with
+                            <command>rcosa-dispatcher stop</command> and <command>rcjabberd
+                            stop.</command></para>
+                </step>
+                <step>
+                    <para>Start data capture on port 5222: <command>tcpdump -s 0 port 5222 -w
+                            server_dump.pcap</command></para>
+                </step>
+                <step>
+                    <para>Start the OSA dispatcher and Jabber processes: <command>rcosa-dispatcher
+                            start</command> and <command>rcjabberd start</command>.</para>
+                </step>
+                <step>
+                    <para>Open a second terminal and execute the following commands:
+                            <command>rcosa-dispatcher start</command> and <command>rcjabberd
+                            start</command>.</para>
+                </step>
+                <step>
+                    <para>Operate the SUSE Manager server and clients so the bug you formerly
+                        experienced is reproduced.</para>
+                </step>
+                <step>
+                    <para>One you have finished your capture re-open terminal 1 and stop the capture
+                        of data with: <keycombo>
+                            <keycap>CTRL</keycap>
+                            <keycap>c</keycap>
+                        </keycombo></para>
+                </step>
+            </procedure>
+
+            <procedure>
+                <title>Client Side Capture</title>
+                <step>
+                    <para>Install the tcpdump package on your client as root: <command>zypper in
+                            tcpdump</command></para>
+                </step>
+                <step>
+                    <para>Stop the OSA process: <command>rcosad stop</command>.</para>
+                </step>
+                <step>
+                    <para>Begin data capture on port 5222: <command>tcpdump -s 0 port 5222 -w
+                            client_client_dump.pcap</command></para>
+                </step>
+                <step>
+                    <para>Open a second terminal and start the OSA process: <command>rcosad
+                            start</command></para>
+                </step>
+                <step>
+                    <para>Operate the SUSE Manager server and clients so the bug you formerly
+                        experienced is reproduced.</para>
+                </step>
+                <step>
+                    <para>Once you have finished your capture re-open terminal 1 and stop the
+                        capture of data with: <keycombo>
+                            <keycap>CTRL</keycap>
+                            <keycap>c</keycap>
+                        </keycombo></para>
+                </step>
+            </procedure>
+        </sect2>
+
+        <sect2>
+            <title>Engineering Notes: Analyzing Captured Data</title>
+            <para>This section provides information on analyzing the previously captured data from
+                client and server.</para>
+            <procedure>
+                <step>
+                    <para>Obtain the certificate file from your SUSE Manager server:
+                        /etc/pki/spacewalk/jabberd/server.pem</para>
+                </step>
+                <step>
+                    <para>Edit the certificate file removing all lines before <literal>----BEGIN RSA PRIVATE
+                        KEY-----</literal>, save it as key.pem</para>
+                </step>
+                <step>
+                    <para>Install Wireshark as root with: <command>zypper in
+                        wireshark</command></para>
+                </step>
+                <step>
+                    <para>Open the captured file in wireshark.</para>
+                </step>
+                <step>
+                    <para>From <guimenu>Eidt</guimenu><guimenu>Preferences</guimenu> select SSL from
+                        the left pane.</para>
+                </step>
+                <step>
+                    <para>Select RSA keys list:
+                            <guibutton>Edit</guibutton><guibutton>New</guibutton>
+                        <itemizedlist>
+                            <listitem>
+                                <para>IP Address any</para>
+                            </listitem>
+                            <listitem>
+                                <para>Port: 5222</para>
+                            </listitem>
+                            <listitem>
+                                <para>Protocol: xmpp</para>
+                            </listitem>
+                            <listitem>
+                                <para>Key File: open the key.pem file previously edited.</para>
+                            </listitem>
+                            <listitem>
+                                <para>Password: leave blank</para>
+                            </listitem>
+                        </itemizedlist>
+                    </para>
+                    <para>For more information see also: <itemizedlist>
+                            <listitem>
+                                <para><link xlink:href="https://wiki.wireshark.org/SSL"/></para>
+                            </listitem>
+                            <listitem>
+                                <para><link
+                                        xlink:href="https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=3444"
+                                    /></para>
+                            </listitem>
+                        </itemizedlist></para>
+                </step>
+            </procedure>
         </sect2>
 
     </sect1>
