@@ -67,7 +67,7 @@ New work items will be added here. The status of these items will be marked with
 - [x] ~~Subscription Matching Training and Writeup (BP) Status: DONE MARCH 2016~~
 - [x] ~~Document New Salt Features (BP/REF) Status: DONE APRIL 2016~~
 - [x] ~~SUSE Manger Migration from 2.1 - 3 Status: DONE April 2016~~
-- [ ] System Details Salt State Components (Packages, Custom, Highstate) Status: IN_PROGRESS APRIL 2016
+- [x] ~~System Details Salt State Components (Packages, Custom, Highstate) Status: DONE APRIL 2016~~
 
 ##Planning:##
 
