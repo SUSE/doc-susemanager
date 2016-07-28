@@ -78,7 +78,11 @@ New work items will be added here. The status of these items will be marked with
 * Advanced Topics
 
 
+##DEVEL Wiki Cleanup
 
+After each update remove obsolete pages from wiki and link to official docs. This is the removal list:
+
+- [ ] https://wiki.microfocus.com/index.php?title=SUSE_Manager%2FOsad_and_jabberd_troubleshooting&type=revision&diff=43882&oldid=43881
 
 ##Contributing##
 
