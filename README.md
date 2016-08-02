@@ -151,7 +151,7 @@ Copy the results to the results to your `~/Exports` directory.
 mkdir ~/Export/susemanager-3
 cp -va build/{create-all,susemanager-advanced-topics,\
 susemanager-best-practices,susemanager-reference,\
-susemanager-getting-started}/online-docs/* ~/Export/susemanager-3
+susemanager-getting-started}/online-docs/* ~/Export/susemanager-3 
 ```
 
 Create a bug (Classification: Doc Tools, Product: Doc Production,
