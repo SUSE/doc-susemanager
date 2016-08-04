@@ -67,7 +67,7 @@ New work items will be added here. The status of these items will be marked with
 - [x] ~~Subscription Matching Training and Writeup (BP) Status: DONE MARCH 2016~~
 - [x] ~~Document New Salt Features (BP/REF) Status: DONE APRIL 2016~~
 - [x] ~~SUSE Manger Migration from 2.1 - 3 Status: DONE April 2016~~
-- [ ] System Details Salt State Components (Packages, Custom, Highstate) Status: IN_PROGRESS APRIL 2016
+- [x] ~~System Details Salt State Components (Packages, Custom, Highstate) Status: DONE APRIL 2016~~
 
 ##Planning:##
 
@@ -78,7 +78,11 @@ New work items will be added here. The status of these items will be marked with
 * Advanced Topics
 
 
+##DEVEL Wiki Cleanup
 
+After each update remove obsolete pages from wiki and link to official docs. This is the removal list:
+
+- [ ] https://wiki.microfocus.com/index.php?title=SUSE_Manager%2FOsad_and_jabberd_troubleshooting&type=revision&diff=43882&oldid=43881
 
 ##Contributing##
 
@@ -147,7 +151,7 @@ Copy the results to the results to your `~/Exports` directory.
 mkdir ~/Export/susemanager-3
 cp -va build/{create-all,susemanager-advanced-topics,\
 susemanager-best-practices,susemanager-reference,\
-susemanager-getting-started}/online-docs/* ~/Export/susemanager-3
+susemanager-getting-started}/online-docs/* ~/Export/susemanager-3 
 ```
 
 Create a bug (Classification: Doc Tools, Product: Doc Production,
