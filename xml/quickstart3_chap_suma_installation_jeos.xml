@@ -5,7 +5,8 @@
     %entities;
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="sles.installation.within.kvm.jeos">
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="sles.installation.within.kvm.jeos">
     <title>JeOS SLES12 SP1 Installation</title>
 
     <sect1 xml:id="quickstart.sect.kvm.settings">
@@ -87,16 +88,16 @@
 
                     <row>
                         <entry>
-                            <para>Additional Disks:</para>
-                            <para>Virtual Disk 1</para>
-                            <para>Virtual Disk 2</para>
-                            <para>Virtual Disk 3</para>
+                            <para>Virtual Disks:</para>
+                            <para>VirtIO Disk 2</para>
+                            <para>VirtIO Disk 3</para>
+                            <para>VirtIO Disk 4</para>
                         </entry>
                         <entry>
                             <para/>
-                            <para>103 GB will be mounted at: /var/spacewalk</para>
-                            <para>50 GB will be mounted at: /var/lib/pgsql</para>
-                            <para>2 GB for swap</para>
+                            <para>101 GB for /var/spacewalk</para>
+                            <para>50 GB for /var/lib/pgsql</para>
+                            <para>4 GB for swap</para>
                         </entry>
                     </row>
 
@@ -135,31 +136,77 @@
             partitions.</para>
 
         <procedure>
-            <title>Creating the Required Partitions with KVM</title>
+            <title>Creating the Required Partitions with kvm</title>
             <step>
-                <para>Create a new virtual machine using the downloaded JeOS kvm image and select
+                <para>Create a new virtual machine using the downloaded JeOS KVM image and select
                         <systemitem>Import existing disk image</systemitem>
                 </para>
             </step>
             <step>
-                <para>Configure RAM and number of CPU's. (4 GB RAM 2 CPUs)</para>
+                <para>Configure RAM and number of CPU's. (At least 4 GB RAM and 2 CPUs)</para>
             </step>
             <step>
                 <para>Name your KVM machine and select the <systemitem>Customize configuration
                         before install</systemitem> checkbox.</para>
             </step>
             <step>
-                <para>Click the <guibutton>Add Hardware</guibutton> button.</para>
+                <para>Select the <guibutton>Add Hardware</guibutton> button and create three new
+                    virtual disks with the following specifications. These disks will be partitioned
+                    and mounted in the following procedure. <informaltable>
+                        <tgroup cols="3">
+                            <colspec colname="c1" colwidth="1*"/>
+                            <colspec colname="c2" colwidth="1*"/>
+                            <colspec colname="c3" colwidth="1*"/>
+                            <thead>
+                                <row>
+                                    <entry namest="c1">
+                                        <para>VirtIO Storage Disks</para>
+                                    </entry>
+                                    <entry namest="c2">
+                                        <para>Name</para>
+                                    </entry>
+                                    <entry namest="c3">
+                                        <para>Sizing</para>
+                                    </entry>
+                                </row>
+                            </thead>
+                            <tbody>
+                                <row>
+                                    <entry>
+                                        <para>VirtIO Disk 2</para>
+                                    </entry>
+                                    <entry>
+                                        <para>spacewalk</para>
+                                    </entry>
+                                    <entry>
+                                        <para>101 GB</para>
+                                    </entry>
+                                </row>
+                                <row>
+                                    <entry>
+                                        <para>VirtIO Disk 3</para>
+                                    </entry>
+                                    <entry>
+                                        <para>pgsql</para>
+                                    </entry>
+                                    <entry>
+                                        <para>50 GB</para>
+                                    </entry>
+                                </row>
+                                <row>
+                                    <entry>
+                                        <para>VirtIO Disk 4</para>
+                                    </entry>
+                                    <entry>swap</entry>
+                                    <entry>
+                                        <para>4 GB</para>
+                                    </entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </informaltable></para>
             </step>
-            <step>
-                <para>Create a Storage device with 103 GB space. (Will be used with
-                        <filename>/var/spacewalk/</filename> and 2 GB partitioned later for use as
-                    swap.) select <guibutton>Finish</guibutton></para>
-            </step>
-            <step>
-                <para>Create a storage device for the database partition. (50 GB for
-                        <filename>var/lib/pgsql</filename>).</para>
-            </step>
+
             <step>
                 <para>Select <systemitem>Begin Installation</systemitem> and your new VM will boot
                     from the JeOS image.</para>
@@ -178,33 +225,109 @@
             <title>Preparing JeOS for SUSE Manager Installation</title>
             <step>
                 <para>Register with SCC:</para>
-                    <screen>SUSEConnect -e email@suse.com -r [SUSE_MANAGER_CODE]</screen>
+                <screen>SUSEConnect -e email@suse.com -r [SUSE_MANAGER_CODE]</screen>
             </step>
             <step>
                 <para>Add SUSE Manager repositories:</para>
-                    <screen>SUSEConnect -p SUSE-Manager-Server/3.0/x86_64 -r [SUSE_MANAGER_CODE]</screen>
+                <screen>SUSEConnect -p SUSE-Manager-Server/3.0/x86_64 -r [SUSE_MANAGER_CODE]</screen>
             </step>
             <step>
                 <para>Install <package>yast2</package> and <package>yast2-installation</package>
                     packages, <emphasis>You will need yast2 partitioner to prepare the storage
-                partitions</emphasis>:</para>
+                        partitions</emphasis>:</para>
                 <screen>zypper in yast2 yast2-installation</screen>
             </step>
             <step>
-                <para>Partition the 103 GB disk creating a 2 GB swap then mount the remaining 100 GB
-                    storage as XFS at <filename>var/spacewalk/</filename>.</para>
+                <para>Partition and mount the virtual disks at the following locations using the
+                        <command>yast2</command> partitioner tool.<informaltable>
+                        <tgroup cols="4">
+                            <colspec colname="c1" colwidth="1*"/>
+                            <colspec colname="c2" colwidth="1*"/>
+                            <colspec colname="c3" colwidth="1*"/>
+                            <colspec colname="c4" colwidth="1*"/>
+                            <thead>
+                                <row>
+                                    <entry namest="c1">
+                                        <para>VirtIO Storage Disks</para>
+                                    </entry>
+                                    <entry namest="c2">
+                                        <para>Name</para>
+                                    </entry>
+                                    <entry namest="c3">
+                                        <para>Storage Size</para>
+                                    </entry>
+                                    <entry namest="c4">
+                                        <para>File System Type</para>
+                                    </entry>
+                                </row>
+                            </thead>
+                            <tbody>
+                                <row>
+                                    <entry>
+                                        <para>VirtIO Disk 2</para>
+                                    </entry>
+                                    <entry>
+                                        <para>/var/spacewalk</para>
+                                    </entry>
+                                    <entry>
+                                        <para>101 GB</para>
+                                    </entry>
+                                    <entry>
+                                        <para>XFS</para>
+                                    </entry>
+                                </row>
+                                <row>
+                                    <entry>
+                                        <para>VirtIO Disk 3</para>
+                                    </entry>
+                                    <entry>
+                                        <para>/var/lib/pgsql</para>
+                                    </entry>
+                                    <entry>
+                                        <para>50 GB</para>
+                                    </entry>
+                                    <entry>
+                                        <para>XFS</para>
+                                    </entry>
+                                </row>
+                                <row>
+                                    <entry>
+                                        <para>VirtIO Disk 4</para>
+                                    </entry>
+                                    <entry>/swap</entry>
+                                    <entry>
+                                        <para>4 GB</para>
+                                    </entry>
+                                    <entry>
+                                        <para>swap</para>
+                                    </entry>
+                                </row>
+                            </tbody>
+                        </tgroup>
+                    </informaltable>
+                </para>
             </step>
             <step>
-                <para>Partition the 50 GB disk as XFS and mount it at
-                        <filename>/var/lib/pgsql/</filename></para>
+                <para>SLES 12 SP1 is installed on the BTRFS file system. A mount point is created
+                    automatically for <filename>/var/lib/pgsql/</filename> (even when not
+                    installed). This must be removed or commented out from the
+                        <filename>/etc/fstab</filename> entries. As root edit
+                        <filename>/etc/fstab</filename> and comment out or remove the following
+                    line: <screen>/var/lib/pgsql btrfs subvol=@/var/lib/pgsql 0 0</screen>
+                    <warning>
+                        <title>Removing the /etc/fstab pgsql Entry</title>
+                        <para>If you do not remove this line from fstab the first time you shutdown
+                            the server you will lose your database. This occurs because you will have
+                            duplicate entries in the fstab.</para>
+                    </warning></para>
             </step>
             <step>
                 <para>Exit partitioner and install the &susemgr; pattern:</para>
-                    <screen>zypper in -t pattern suma_server</screen>
+                <screen>zypper in -t pattern suma_server</screen>
             </step>
             <step>
-             <para>Execute &susemgr; setup:</para>
-             <screen>yast2 susemanager_setup</screen>
+                <para>Execute &susemgr; setup:</para>
+                <screen>yast2 susemanager_setup</screen>
             </step>
         </procedure>
 
