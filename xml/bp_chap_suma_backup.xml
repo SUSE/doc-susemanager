@@ -86,7 +86,7 @@
                 <para><filename>/root/.ssh</filename> (Backup is required when using ssh tunnel or
                     ssh push. Keep in mind if you need to reinstall the server and you do not have a
                     copy of the id-susemanager key saved, you must perform a mgr-ssh-push-init again
-                    for all clients.)</para>
+                    for all clients.lsls)</para>
             </listitem>
             <listitem>
                 <para>Directories containing your custom data (scripts, kickstart profiles,
@@ -202,21 +202,50 @@ Starting core...       done</screen>
 
         <variablelist>
             <varlistentry>
-                <term>postgres</term>
+                <term>smdba</term>
                 <listitem>
                     <para> The <command>smdba</command> command performs a <emphasis>continuous
                             archiving backup</emphasis>. </para>
                 </listitem>
+
+            </varlistentry>
+            <varlistentry>
+                <term>Hot Backup</term>
+                <listitem>
+                    <para>The term hot backup refers to a backup performed when both the database
+                        and SUSE Manager are running.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Cold Backup</term>
+                <listitem>
+                    <para>The term cold backup refers to a backup performed when both the database
+                        and SUSE Manager services are shutdown.</para>
+                </listitem>
             </varlistentry>
         </variablelist>
 
-        <para>To perform a hot backup for postgresql, do the following:</para>
+        <important>
+            <title>Database Backup Space Requirements</title>
+            <para>For both a running/hot database backup or an automated backup of the database
+                using cron you must have at least 3 times the amount of space of the current
+                database. Check current database space usage with <command>df -h</command> on
+                    <filename>/var/spacewalk/</filename>.</para>
+        </important>
+
+        <para>To perform a hot database backup for postgresql, do the following:</para>
 
         <procedure>
+            <title>Performing a Hot Backup</title>
             <step>
                 <para>Allocate permanent space on your remote storage, which you use for general
-                    backups (NAS, iSCSI target, etc.). For example:</para>
-                <screen>/mnt/backup/</screen>
+                    backups (NAS, iSCSI target, etc.). For example: <screen>/var/spacewalk/db-backup</screen>
+                    <note>
+                        <title>Backup on NFS Share</title>
+                        <para>A backup from the SUSE Manager server is not required when the mount
+                            point for <filename>/var/spacewalk</filename> is on an NFS share.</para>
+                    </note></para>
+
                 <para> This directory should always be the same and never change. It will be a
                     permanent target to store new backups and restore from it during a disaster
                     recovery. </para>
@@ -224,29 +253,72 @@ Starting core...       done</screen>
             <step>
                 <para> Create a directory with the correct permissions in your target directory,
                     e.g., with using <command>sudo</command>: </para>
-                <screen>sudo -u postgres mkdir /mnt/backup/database</screen>
+                <screen>sudo -u postgres mkdir /var/spacewalk/db-backup</screen>
                 <para> Alternatively, as &rootuser;: </para>
-                <screen>install -d -o postgres /mnt/backup/database</screen>
+                <screen>install -d -o postgres /var/spacewalk/db-backup</screen>
                 <para>Or:</para>
-                <screen>mkdir /mnt/backup/database
-chown postgres:postgres /mnt/backup/database</screen>
+                <screen>mkdir /var/spacewalk/db-backup
+chown postgres:postgres /var/spacewalk/db-backup</screen>
             </step>
             <step>
                 <para> If you want to create a backup for the first time, run: </para>
-                <screen><command>smdba</command> backup-hot --enable=on --backup-dir=/mnt/backup</screen>
+                <screen><command>smdba</command> backup-hot --enable=on --backup-dir=/var/spacewalk/db-backup</screen>
 
                 <para> This command performs a restart of the postgresql database. If you want to
                     renew the basic backup, use the same command. </para>
             </step>
             <step>
-                <para>Perform the hot backup:</para>
-                <screen>smdba backup-hot --backup-dir=/mnt/backup/database
+                <para>Perform the hot database backup:</para>
+                <screen>smdba backup-hot --backup-dir=/var/spacewalk/db-backup
 ...</screen>
                 <para> If the command exits without any errors, find the backup files in your
                         <filename>/mnt/backup/database</filename> directory. </para>
             </step>
         </procedure>
 
+        <tip>
+            <title>Performing a Cold Backup</title>
+            <para>When using smdba, you should never require a cold backup. You may perform a cold
+                backup once after initial SUSE Manager installation and configuration. &suse;
+                recommends creating a full-backup once a month or weekly and an additional
+                incremental backup for single days. Moving <filename>/var/spacewalk</filename> to an
+                NFS share that is centrally backed-up, will save you alot of time when a restore is
+                required. The NFS share may also be used during the migration from SUSE Manager 2.1
+                to SUSE Manager 3.</para>
+        </tip>
+
+    </sect1>
+
+    <sect1 xml:id="smdba.automatic.backup.with.cron">
+        <title>Automatic Backup with cron</title>
+        <para>It is important to ensure you SUSE Manager database is backed up within a regularly
+            defined schedule. You should do this with a cron job. The following procedure describes
+            this process.</para>
+
+        <important>
+            <title>Database Backup Space Requirements</title>
+            <para>For a hot database backup, an automated backup of the database using cron or a
+                cold database backup, you must have at least 3 times the amount of space of the
+                current database. Check current database space usage with <command>df -h</command>
+                on <filename>/var/spacewalk/</filename>.</para>
+        </important>
+        <procedure>
+            <title>Automatic Backup with cron</title>
+            <step>
+                <para>If you have not created a backup directory do so
+                    now:<screen># mkdir /var/spacewalk/db-backup</screen></para>
+            </step>
+            <step>
+                <para>Set the correct user and rights permissions to the directory:
+                    <screen># chown -R postgres:postgres /var/spacewalk/db-backup</screen><screen># chmod 700 /var/spacewalk/db-backup</screen></para>
+            </step>
+            <step>
+                <para>Add the following line to the cron job at
+                        <filename>/etc/cron.d/db-backup-mgr</filename>:
+                    <screen>0 2 * * * root /usr/bin/smdba backup-hot --enable=on --backup-dir=/var/spacewalk/db-backup</screen>
+                </para>
+            </step>
+        </procedure>
     </sect1>
 
     <sect1 xml:id="config-smdb.restore-backup">
@@ -267,6 +339,10 @@ chown postgres:postgres /mnt/backup/database</screen>
                 <para>Restart the database:</para>
                 <screen>smdba db-start</screen>
             </step>
+            <step>
+                <para>Run <command>spacewalk-data-fsck</command> to check if there are differences
+                    between the RPMs and the database.</para>
+            </step>
         </procedure>
 
         <para> The above steps can be combined with: </para>
@@ -276,9 +352,9 @@ chown postgres:postgres /mnt/backup/database</screen>
 
         <note>
             <title>Restoring the Most Recent Backup Only</title>
-            <para> Because <command>smdba</command> makes automatic hot backups, it allows to
-                restore only the most recent backup, and merging the current archive logs on top of
-                it. </para>
+            <para> Because <command>smdba</command> makes automatic running database backups, it
+                allows restoration of only the most recent backup, which includes merging of current
+                archive logs. </para>
         </note>
     </sect1>
 
@@ -409,6 +485,44 @@ drwxr-x---  4 postgres postgres   47 Jun  2 14:35 ./</screen>
                 <screen># spacewalk-service start</screen>
             </step>
         </procedure>
+
+    </sect1>
+
+    <sect1>
+        <title>Restoring After a Crashed Root Partition</title>
+        <para>This section provides guidance on restoring your server after its root partition has
+            crashed. This section assumes you have setup your server similar to the procedure
+            explained in Getting Started guide with separate partitions for the database and for
+            channels mounted at <filename>/var/lib/pgsql</filename> and
+                <filename>/var/spacewalk/</filename>. </para>
+
+        <procedure>
+            <title>Restoring After a Crashed Root Partition</title>
+            <step>
+                <para>Start by installing SLES12 SP1 and the SUSE Manager Extension. Do not mount
+                    the <filename>/var/spacewalk</filename> and <filename>/var/lib/pgsql</filename>
+                    partitions.</para>
+            </step>
+            <step>
+                <para>Once installation of SUSE Manager has completed shutdown services with
+                        <command>spacewalk-service shutdown</command> and the database with
+                        <command>rcpostgresql stop</command>.</para>
+            </step>
+            <step>
+                <para>Mount your <filename>/var/spacewalk</filename> and
+                        <filename>/var/lib/pgsql</filename> partitions and restore directions
+                    mentioned in section one.</para>
+            </step>
+            <step>
+                <para>Start SUSE Manager services and the database with <command>spacewalk-services
+                        start</command> and <command>rcpostgresql start</command></para>
+            </step>
+            <step>
+                <para>SUSE Manager should now operate normally without loss of your database or
+                    synced channels.</para>
+            </step>
+        </procedure>
+
 
     </sect1>
 
