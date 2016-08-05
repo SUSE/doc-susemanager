@@ -12,10 +12,7 @@
     <title>Backup and Restore SUSE Manager</title>
 
     <para>Backing up SUSE Manager can be done in several ways. Regardless of the method chosen, the
-        associated database also needs to be backed up. For the stand-alone database, consult your
-        organization's database administrator. For the embedded database, refer to Section 8.6,
-        “Configuring SUSE Manager's Database (smdba)” for a complete description of this process and
-        the options available.</para>
+        associated database also needs to be backed up.</para>
 
     <sect1>
         <title>Files and Directories Requiring Backup</title>
@@ -86,16 +83,26 @@
                 </para>
             </listitem>
             <listitem>
-                <para><filename>/root/.ssh</filename> (Backup is required when using ssh tunnel or ssh push)</para>
+                <para><filename>/root/.ssh</filename> (Backup is required when using ssh tunnel or
+                    ssh push)</para>
+            </listitem>
+            <listitem>
+                <para>Directories containing your custom data (scripts, kickstart profiles,
+                    autoyast, custom rpms, etc) should be included in the backup.</para>
+            </listitem>
+            <listitem>
+                <para>If you have mountpoints to ISO's needed for distributions, these ISOs and the
+                        <filename>/etc/fstab</filename> should be part of your backup.</para>
             </listitem>
         </itemizedlist>
 
-        <para> &suse; recommends to back up the entire <filename>/var/spacewalk/</filename> tree. In
-            case of failure, this will save lengthy download time. Since
-                <filename>/var/spacewalk/</filename> (specifically
+        <para> &suse; recommends backing up the entire <filename>/var/spacewalk/</filename> tree. In
+            case of failure, this will save you lengthy download/resync time. Since
+                <filename>/var/spacewalk/</filename> (more specifically
                 <filename>/var/spacewalk/packages/NULL/</filename>) is primarily a duplicate of the
-            package repository, it can be regenerated with <filename>mgr-sync</filename>. In the
-            case of disconnected &susemgr;s,
+            package repository, it can be regenerated with <filename>mgr-sync</filename>.</para>
+
+        <para>In the case of disconnected &susemgr;s,
                 <filename>/var/spacewalk/</filename><emphasis>must</emphasis> be backed up. </para>
 
         <para> Backing up only these files and directories requires reinstalling the &susemgr; RPMs
@@ -279,7 +286,7 @@ chown postgres:postgres /mnt/backup/database</screen>
             feature allows the database management tool <command>smdba</command> to perform hot
             backups. </para>
 
-        <para> With archive log enabled, far more data is stored on the hard disk: </para>
+        <para> With archive log enabled, even more data is stored on the hard disk: </para>
         <itemizedlist>
             <listitem>
                 <para> Postgresql maintains a limited number of archive logs. Using the default
@@ -289,18 +296,16 @@ chown postgres:postgres /mnt/backup/database</screen>
         <para> Creating a user and syncing the channels: </para>
         <itemizedlist>
             <listitem>
-                <para> sles11-sp1-pool-x86_64 </para>
+                <para>SLES12-SP1-Pool-x86_64 </para>
             </listitem>
             <listitem>
-                <para> sles11-sp1-updates-x86_64 </para>
+                <para>SLES12-SP1-Updates-x86_64 </para>
             </listitem>
             <listitem>
-                <para> sles11-sp2-core-x86_64 </para>
+                <para>SLE-Manager-Tools12-Pool-x86_64-SP1</para>
             </listitem>
             <listitem>
-                <para> sles11-sp2-updates-x86_64 </para>
-                <remark role="needinfo">emap: drop SP1 and add SP3? Update space info
-                    below?</remark>
+                <para>SLE-Manager-Tools12-Updates-x86_64-SP1</para>
             </listitem>
         </itemizedlist>
         <para> Postgresql will generate an additional ~1 GB of data. So it is important to think
@@ -363,53 +368,43 @@ public.log                            | 32 kB
                 <para>The default storage location for &susemgr; is:
                         <filename>/var/lib/pgsql/</filename>. You would like to move it, for example
                     to: <filename>/storage/postgres/</filename>. To begin, stop the running database
-                with:</para>
+                    with:</para>
                 <screen># rcpostgresql stop </screen>
-                <para>Shutdown running spacewalk services
-                with:</para>
+                <para>Shutdown running spacewalk services with:</para>
                 <screen># spacewalk-service stop</screen>
             </step>
             <step>
                 <para>Copy the current working directory structure with the following syntax:</para>
                 <screen>cp [OPTION]... SOURCE... DIRECTORY</screen>
-                <para>
-                 using the <option>-a,
-                 --archive</option> option. For example:
-                </para>
+                <para> using the <option>-a, --archive</option> option. For example: </para>
                 <screen># cp -a /var/lib/pgsql/ /storage/postgres/</screen>
-                <para>
-                 This command will
-                 copy the contents of <filename>/var/lib/pgsql/</filename> to
-                 <filename>/storage/postgres/pgsql/</filename>.
-                </para>
+                <para> This command will copy the contents of <filename>/var/lib/pgsql/</filename>
+                    to <filename>/storage/postgres/pgsql/</filename>. </para>
                 <important>
-                 <para>The contents of the /var/lib/pgsql needs to remain the same or the
-                 SUSE Manager database may malfunction. You also should ensure there is
-                 enough available disk space.</para>
+                    <para>The contents of the /var/lib/pgsql needs to remain the same or the SUSE
+                        Manager database may malfunction. You also should ensure there is enough
+                        available disk space.</para>
                 </important>
             </step>
 
             <step>
                 <para>Mount the new database directory with:</para>
-                    <screen># mount /storage/postgres/pgsql</screen>
+                <screen># mount /storage/postgres/pgsql</screen>
             </step>
             <step>
                 <para>Make sure ownership is <literal>postgres:postgres</literal> and not
                         <literal>root:root</literal> by changing to the new directory and running
                     the following command:</para>
-                    <screen>/var/lib/pgsql/ # cd /storage/postgres/pgsql/
+                <screen>/var/lib/pgsql/ # cd /storage/postgres/pgsql/
 /storage/postgres/pgsql/ # l
 total 8
 drwxr-x---  4 postgres postgres   47 Jun  2 14:35 ./</screen>
             </step>
             <step>
-             <para> Start the database with:</para>
-             <screen># rcpostgresql start</screen>
-             <para>
-              Start
-                    spacewalk-services with:
-             </para>
-             <screen># spacewalk-service start</screen>
+                <para> Start the database with:</para>
+                <screen># rcpostgresql start</screen>
+                <para> Start spacewalk-services with: </para>
+                <screen># spacewalk-service start</screen>
             </step>
         </procedure>
 
