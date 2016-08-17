@@ -10,39 +10,83 @@
 
     <sect1 xml:id="salt.gs.guide.intro">
         <title>Introduction</title>
-        <para>This chapter provides a detailed view into the new salt features added in SUSE Manager
-            3. This chapter assumes you have completed all former sections within the Getting
-            Started Guide and have a running SUSE Manager server and an on-boarded salt-minion. If
-            you are stuck at any point it will be of great benefit if you take the time to complete
-            the official Salt getting started guide located at: <link
+        <para>This chapter provides an overview of new salt features added in SUSE Manager 3. This
+            chapter assumes you have completed all former sections within the Getting Started Guide
+            and have a running SUSE Manager server and at least one on-boarded salt-minion. If you
+            find yourself stuck at any point refer to the official Salt getting started guide is
+            located at: <link
                 xlink:href="https://docs.saltstack.com/en/getstarted/fundamentals/index.html"/>
         </para>
 
     </sect1>
 
     <sect1 xml:id="salt.gs.guide.testing.first.minion">
-        <title>Running the First Command</title>
+        <title>Running Commands</title>
         <variablelist>
             <varlistentry>
                 <term>Salt Calls</term>
                 <listitem>
-                    <para>The best place to start would be with Salt calls. Salt calls are defined
-                        by three main components:
+                    <para>A great place to start would be learning basic Salt calls. Salt calls are
+                        defined by three main components:
                         <screen>salt '&lt;target>' &lt;function> [arguments]</screen></para>
                 </listitem>
             </varlistentry>
+
+
             <varlistentry>
                 <term>Targeting</term>
                 <listitem>
-                    <para>Use the second component to define a target machine. In this part of the
-                        salt call you specify the minion or minions you would like to run a function
-                        on. For
-                        example:<screen>salt '*' grains.ls                        #target all salt minions</screen><screen>salt '*example.com' test.ping             #Target all minions within *.de and ping them</screen><screen>salt 'minion*' grains.item oscodename     #Target host d74* and check the oscodename</screen></para>
+                    <para>Use the second component in a Salt call to define a target machine. In
+                        this part of the Salt call you specify the minion or minions you would like
+                        to run a function on.</para>
+                    <para>General
+                        Targeting:<screen>salt '*' grains.ls                           #List available grains on a minion</screen></para>
+                    <para><screen>salt 'web1.example.com' test.ping            #Ping a specific minion</screen></para>
+                    <para>Glob
+                        Targeting:<screen>salt '*.example.com' test.ping                #Ping all minions with .example.com</screen></para>
+                    <para><screen>salt 'webserver*' grains.item oscodename      #Display the OS name of all webserver minions</screen></para>
+                    <para>List
+                        Targeting:<screen>salt -L 'webserver.example.com,db.example.com' test.ping</screen></para>
+                    <para>Regular Expression
+                        Targeting:<screen>salt -E '(?!web)' test.ping</screen></para>
+                    <para>IP Address
+                        Targeting:<screen>salt '*' network.ip_addrs  #List minion ip addresses</screen></para>
+                    <para><screen>salt -S '172.31.60.74' test.ping</screen></para>
+                    <para>List all minions on a specific
+                        subnet:<screen>salt -S 172.31.0.0/16 test.ping</screen></para>
                 </listitem>
             </varlistentry>
+
         </variablelist>
 
 
+    </sect1>
+
+
+    <sect1>
+        <title>Common Administrative Salt Commands</title>
+        <para>The following list provides several of the most useful salt commands.</para>
+        <variablelist>
+            <varlistentry>
+                <term>salt-run</term>
+                <listitem>
+                    <para><screen>salt-run manage.up        #Prints a list of all minions that are up and running</screen>
+                        <screen>salt-run manage.down      #Prints a list of all minions that are down and not running</screen>
+                        <screen>salt-run manage.status    #Prints a list containing the current status of all salt minions</screen>
+                        <screen>salt-run manage.versions  #Check the version of salt on the master and active minions</screen></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>salt-cp</term>
+                <listitem>
+                    <para>Copies a file to a minion or set of minions.
+                        <screen>salt-cp '*' foo.config /root</screen> For more information see:
+                            <link
+                            xlink:href="https://docs.saltstack.com/en/latest/ref/cli/salt-cp.html"
+                        /></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
 
     </sect1>
 
