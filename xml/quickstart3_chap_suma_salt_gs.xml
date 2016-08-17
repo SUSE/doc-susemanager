@@ -36,24 +36,31 @@
             <varlistentry>
                 <term>Targeting</term>
                 <listitem>
-                    <para>Use the second component in a Salt call to define a target machine. In
-                        this part of the Salt call you specify the minion or minions you would like
-                        to run a function on.</para>
-                    <para>General
-                        Targeting:<screen>salt '*' grains.ls                           #List available grains on a minion</screen></para>
-                    <para><screen>salt 'web1.example.com' test.ping            #Ping a specific minion</screen></para>
-                    <para>Glob
-                        Targeting:<screen>salt '*.example.com' test.ping                #Ping all minions with .example.com</screen></para>
-                    <para><screen>salt 'webserver*' grains.item oscodename      #Display the OS name of all webserver minions</screen></para>
-                    <para>List
-                        Targeting:<screen>salt -L 'webserver.example.com,db.example.com' test.ping</screen></para>
-                    <para>Regular Expression
-                        Targeting:<screen>salt -E '(?!web)' test.ping</screen></para>
-                    <para>IP Address
-                        Targeting:<screen>salt '*' network.ip_addrs  #List minion ip addresses</screen></para>
+                    <para>Use the second component in a Salt call to define a target machine.
+                        Specify the minion or group of minions you would like to run a function
+                        on.</para>
+                    <para><emphasis role="bold">General Targeting</emphasis></para><para>List available grains on all minions:<screen>salt '*' grains.ls</screen></para>
+                    <para>Ping a specific minion:</para><para><screen>salt 'web1.example.com' test.ping</screen></para>
+                    <para><emphasis role="bold">Glob Targeting</emphasis></para>
+                    <para>Ping all minions using a domain:</para>
+                    <para>
+                        <screen>salt '*.example.com' test.ping</screen>
+                    </para>
+                    <para>Display the OS name of all  minions with the label webserver:</para>
+                    <para><screen>salt 'webserver*' grains.item oscodename</screen></para>
+                    <para><emphasis role="bold">List
+                        Targeting</emphasis><screen>salt -L 'webserver.example.com,db.example.com' test.ping</screen></para>
+                    <para><emphasis role="bold">Regular Expression
+                        Targeting</emphasis><screen>salt -E '(?!web)' test.ping</screen></para>
+                    <para><emphasis role="bold">IP Address Targeting</emphasis></para>
+                    <para>List minion IP addresses:</para>
+                    <para>
+                        <screen>salt '*' network.ip_addrs</screen>
+                    </para>
+                    <para>Ping a specific minion IP address.</para>
                     <para><screen>salt -S '172.31.60.74' test.ping</screen></para>
-                    <para>List all minions on a specific
-                        subnet:<screen>salt -S 172.31.0.0/16 test.ping</screen></para>
+                    <para><emphasis role="bold">Ping all minions on a
+                        subnet</emphasis><screen>salt -S 172.31.0.0/16 test.ping</screen></para>
                 </listitem>
             </varlistentry>
 
@@ -80,8 +87,7 @@
                 <term>salt-cp</term>
                 <listitem>
                     <para>Copies a file to a minion or set of minions.
-                        <screen>salt-cp '*' foo.config /root</screen> For more information see:
-                            <link
+                        <screen>salt-cp '*' foo.conf /root</screen> For more information see: <link
                             xlink:href="https://docs.saltstack.com/en/latest/ref/cli/salt-cp.html"
                         /></para>
                 </listitem>
@@ -106,8 +112,8 @@
 
     <sect1 xml:id="salt.gs.guide.salt.file.locations">
         <title>Salt File Locations</title>
-        <para>This chapter goes over Salt file locations located your &susemgr; server. You can find
-            a listing of Salt <literal>file_roots</literal>, <literal>pillar_roots</literal> and
+        <para>This section covers Salt file locations located your &susemgr; server. You can find a
+            listing of Salt <literal>file_roots</literal>, <literal>pillar_roots</literal> and
                 <literal>extension_modules</literal> in:
                 <filename>/etc/salt/master.d/susemanager.conf</filename>
             <screen>#Configure different file roots
@@ -135,7 +141,7 @@ master_tops:
   mgr_master_tops: True
 </screen></para>
 
-        <para>There are a few tips you should keep in mind when working with
+        <para>The following tips should be kept in mind when working with
                 <filename>/etc/salt/master.d/susemanager.conf</filename><itemizedlist>
                 <listitem>
                     <para>Files listed are searched in the order they appear.</para>
