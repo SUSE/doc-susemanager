@@ -114,7 +114,7 @@
       <itemizedlist mark="bullet" spacing="normal">
        <listitem>
         <para> Obtain external IP-address from within Amazon EC2 instance </para>
-        <screen>nslookup $(ec2metadata --public-hostname)</screen>
+        <screen>ec2metadata --public-ipv4</screen>
        </listitem>
        <listitem>
         <para> Obtain external IP-address from within Google Compute Engine
@@ -143,6 +143,13 @@
         xlink:href="https://www.suse.com/documentation/suse_manager">SUSE
         Manager Guide</link>. </para>
       <screen>sudo /sbin/yast2 susemanager_setup</screen>
+      <para>The setup procedure is designed as a one shot process. This means there
+       is no rollback or cleanup functionality implemented in the spacewalk scripts
+       called by the yast setup procedure. Therefore, if the setup procedure is interrupted
+       or ends with an error, it can not be easily repeated without experiencing further
+       errors caused by a former setup call. In this case we recommend to start a new
+       instance in order to run a fresh setup procedure on a clean system.
+      </para>
       <para> If you are prompted with a message that there is not enough space
        available for the setup of &susemgr;, verify that your root volume is
        at least 20GB and double check that the instructions in <xref
@@ -272,7 +279,7 @@
       required. In many cases the attached storage appears as <emphasis
        role="strong">/dev/sdb</emphasis>. In order to check which disk devices
       exists on your system, call the following command: </para>
-     <screen>hwinfo --disk | grep -E "Device File:"</screen>
+     <screen>sudo hwinfo --disk | grep -E "Device File:"</screen>
     </step>
     <step>
      <para> With the device name at hand the process of re-linking the
