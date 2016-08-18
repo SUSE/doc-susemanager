@@ -3,7 +3,8 @@
   <!ENTITY % entities SYSTEM "entity-decl.ent">
     %entities;
 ]>
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="salt.gs.guide.introduction">
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="salt.gs.guide.introduction">
     <title>Getting Started with Salt</title>
 
     <sect1 xml:id="salt.gs.guide.intro">
@@ -12,79 +13,133 @@
             chapter assumes you have completed all former sections within the Getting Started Guide
             and have a running SUSE Manager server and at least one on-boarded salt-minion. If you
             find yourself stuck at any point refer to the official Salt getting started guide is
-            located at: <link xlink:href="https://docs.saltstack.com/en/getstarted/fundamentals/index.html"/>
+            located at: <link
+                xlink:href="https://docs.saltstack.com/en/getstarted/fundamentals/index.html"/>
         </para>
 
     </sect1>
 
     <sect1 xml:id="salt.gs.guide.testing.first.minion">
-        <title>Running Commands</title>
+        <title>Understanding Salt Calls</title>
         <variablelist>
             <varlistentry>
                 <term>Salt Calls</term>
                 <listitem>
                     <para>A great place to start would be learning basic Salt calls. Salt calls are
                         defined by three main components:
-                        <screen>salt '&lt;target>' &lt;function> [arguments]</screen></para>
+                        <screen># salt '&lt;target>' &lt;function> [arguments]</screen></para>
+                    <para>
+                        <variablelist>
+                            <varlistentry>
+                                <term>Target</term>
+                                <listitem>
+                                    <para>Use the second component in a Salt call to define a target
+                                        machine. Specify the minion or group of minions you would
+                                        like to run a function on.</para>
+                                    <para>
+                                        <variablelist>
+
+                                            <varlistentry>
+                                                <term>General Targeting</term>
+                                                <listitem>
+                                                  <para>List available grains on all
+                                                  minions:<screen># salt '*' grains.ls</screen></para>
+                                                  <para>Ping a specific minion:</para>
+                                                  <para><screen># salt 'web1.example.com' test.ping</screen></para>
+                                                </listitem>
+                                            </varlistentry>
+
+                                            <varlistentry>
+                                                <term>Glob Targeting</term>
+                                                <listitem>
+                                                  <para>Ping all minions using a domain:</para>
+                                                  <para>
+                                                  <screen># salt '*example.com' test.ping</screen>
+                                                  </para>
+                                                  <para>Display the OS name of all minions with the
+                                                  label <literal>webserver</literal>:</para>
+
+                                                  <para><screen># salt 'webserver*' grains.item oscodename</screen></para>
+                                                </listitem>
+                                            </varlistentry>
+
+                                            <varlistentry>
+                                                <term>List Targeting</term>
+                                                <listitem>
+                                                  <para>
+                                                  <screen># salt -L 'webserver.example.com,db.example.com' test.ping</screen></para>
+                                                </listitem>
+                                            </varlistentry>
+
+                                            <varlistentry>
+                                                <term>Regular Expression Targeting</term>
+                                                <listitem>
+                                                  <para><screen># salt -E '(?!web)' test.ping</screen></para>
+                                                </listitem>
+                                            </varlistentry>
+
+                                            <varlistentry>
+                                                <term>IP Address Targeting</term>
+                                                <listitem>
+                                                  <para>List minion IP addresses:</para>
+                                                  <para>
+                                                  <screen># salt '*' network.ip_addrs</screen>
+                                                  </para>
+                                                  <para>Ping a specific minion IP address:</para>
+                                                  <para><screen># salt -S '172.31.60.74' test.ping</screen></para>
+                                                  <para>Ping all minions on a subnet:<screen># salt -S 172.31.0.0/16 test.ping</screen><tip>
+                                                  <title>Lookup a Subnet Using the ip
+                                                  Command</title>
+                                                  <para>You can use the ip command to find the
+                                                  subnet mask in the format of
+                                                  <literal>192.168.1.1/24</literal>:
+                                                  <screen># ip -o -f inet addr show | awk '/scope global/ {print $4}'</screen></para>
+                                                  </tip></para>
+
+                                                </listitem>
+                                            </varlistentry>
+
+                                        </variablelist></para>
+                                </listitem>
+                            </varlistentry>
+                            <varlistentry>
+                                <term>Function</term>
+                                <listitem>
+                                    <para/>
+                                </listitem>
+                            </varlistentry>
+                        </variablelist></para>
                 </listitem>
             </varlistentry>
 
 
-            <varlistentry>
-                <term>Targeting</term>
-                <listitem>
-                    <para>Use the second component in a Salt call to define a target machine.
-                        Specify the minion or group of minions you would like to run a function
-                        on.</para>
-                    <para><emphasis role="bold">General Targeting</emphasis></para>
 
-                    <para>List available grains on all
-                        minions:<screen>salt '*' grains.ls</screen></para>
-
-                    <para>Ping a specific minion:</para>
-
-                    <para><screen>salt 'web1.example.com' test.ping</screen></para>
-
-                    <para><emphasis role="bold">Glob Targeting</emphasis></para>
-
-                    <para>Ping all minions using a domain:</para>
-
-                    <para>
-                        <screen>salt '*.example.com' test.ping</screen>
-                    </para>
-
-                    <para>Display the OS name of all minions with the label webserver:</para>
-
-                    <para><screen>salt 'webserver*' grains.item oscodename</screen></para>
-
-                    <para><emphasis role="bold">List
-                        Targeting</emphasis><screen>salt -L 'webserver.example.com,db.example.com' test.ping</screen></para>
-
-                    <para><emphasis role="bold">Regular Expression
-                        Targeting</emphasis><screen>salt -E '(?!web)' test.ping</screen></para>
-
-                    <para><emphasis role="bold">IP Address Targeting</emphasis></para>
-
-                    <para>List minion IP addresses:</para>
-
-                    <para>
-                        <screen>salt '*' network.ip_addrs</screen>
-                    </para>
-
-                    <para>Ping a specific minion IP address.</para>
-
-                    <para><screen>salt -S '172.31.60.74' test.ping</screen></para>
-
-                    <para>Ping all minions on a
-                        subnet<screen>salt -S 172.31.0.0/16 test.ping</screen></para>
-                </listitem>
-            </varlistentry>
 
         </variablelist>
 
 
     </sect1>
 
+    <sect1>
+        <title>Salt Terminology Overview</title>
+        <para/>
+
+        <variablelist>
+            <varlistentry>
+                <term>Grains</term>
+                <listitem>
+                    <para>Grains provide information about the underlying components of a minion.
+                        For example: <literal>Operating system, IP addresses, network interfaces and
+                            memory.</literal>. </para>
+                    <para>You can see what grains are available on your minions by listing them
+                        using the <function>grains.ls</function>
+                        module:<screen># salt '*' grains.ls</screen></para>
+                    <para>List collected grain data by using the <function>grains.items</function>
+                        module:<screen>salt '*' grains.items</screen></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </sect1>
 
     <sect1>
         <title>Useful Salt Commands</title>
@@ -95,19 +150,19 @@
                 <listitem>
                     <para>Print a list of all minions that are up:</para>
                     <para>
-                        <screen>salt-run manage.up</screen>
+                        <screen># salt-run manage.up</screen>
                     </para>
                     <para>Print a list of all minions that are down:</para>
                     <para>
-                        <screen>salt-run manage.down</screen>
+                        <screen># salt-run manage.down</screen>
                     </para>
                     <para>Print a list with the current status of all salt minions</para>
                     <para>
-                        <screen>salt-run manage.status</screen>
+                        <screen># salt-run manage.status</screen>
                     </para>
                     <para>Check the version of salt running on the master and active minions</para>
                     <para>
-                        <screen>salt-run manage.versions</screen>
+                        <screen># salt-run manage.versions</screen>
                     </para>
                 </listitem>
             </varlistentry>
@@ -115,7 +170,10 @@
                 <term>salt-cp</term>
                 <listitem>
                     <para>Copies a file to a minion or set of minions.
-                        <screen>salt-cp '*' foo.conf /root</screen> For more information see: <link xlink:href="https://docs.saltstack.com/en/latest/ref/cli/salt-cp.html"/></para>
+                        <screen># salt-cp '*' foo.conf /root</screen> For more information see:
+                            <link
+                            xlink:href="https://docs.saltstack.com/en/latest/ref/cli/salt-cp.html"
+                        /></para>
                 </listitem>
             </varlistentry>
         </variablelist>
