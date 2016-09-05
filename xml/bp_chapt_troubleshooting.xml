@@ -217,16 +217,16 @@
 
             <para><literal>CURE</literal>: Edit the <filename>/etc/security/limits.conf</filename>
                 to something similar to the following:
-                <screen>jabbersoftnofile&lt;#clients + 100&gt;
-jabberhardnofile&lt;#clients + 1000&gt;</screen>
+                <literal>jabbersoftnofile&lt;#clients + 100&gt;
+jabberhardnofile&lt;#clients + 1000&gt;</literal>
             </para>
 
             <para>This will vary according to your setup. For example in the case of 5000 clients:
-                <screen>jabbersoftnofile5100
-jabberhardnofile6000</screen></para>
+                <literal>jabbersoftnofile5100
+jabberhardnofile6000</literal></para>
 
             <para> Ensure you update the <filename>/etc/jabberd/c2s.xml</filename> max_fds parameter
-                as well. For example: <screen>&lt;max_fds&gt;6000&lt;/max_fds&gt;</screen></para>
+                as well. For example: <literal>&lt;max_fds&gt;6000&lt;/max_fds&gt;</literal></para>
 
             <para><literal>EXPLANATION</literal>: The soft file limit is the limit of the maximum
                 number of open files for a single process. In SUSE Manager the highest consuming
@@ -241,28 +241,28 @@ jabberhardnofile6000</screen></para>
             <title>jabberd Database Corruption</title>
             <para><literal>SYMPTOMS</literal>: After a disk is full error or a disk crash event, the
                 jabberd database may have become corrupted. jabberd may then fail to start during
-                spacewalk-service start:
+                spacewalk-service start:</para>
                 <screen>Starting spacewalk services...
    Initializing jabberd processes...
        Starting router                                                                   done
        Starting sm startproc:  exit status of parent of /usr/bin/sm: 2                   failed
-   Terminating jabberd processes...</screen></para>
+   Terminating jabberd processes...</screen>
 
-            <para>/var/log/messages shows more details:
+            <para>/var/log/messages shows more details:</para>
                 <screen>jabberd/sm[31445]: starting up
 jabberd/sm[31445]: process id is 31445, written to /var/lib/jabberd/pid/sm.pid
 jabberd/sm[31445]: loading 'db' storage module
 jabberd/sm[31445]: db: corruption detected! close all jabberd processes and run db_recover
-jabberd/router[31437]: shutting down</screen></para>
+jabberd/router[31437]: shutting down</screen>
 
             <para><literal>CURE</literal>: Remove the jabberd database and restart. Jabberd will
-                automatically re-create the database.
+                automatically re-create the database: </para>
                 <screen> spacewalk-service stop
  rm -Rf /var/lib/jabberd/db/*
  spacewalk-service start</screen>
-            </para>
+            
             <para> An alternative approach would be to test another database, but SUSE Manager does
-                not deliver drivers for this:
+                not deliver drivers for this:</para>
                 <screen> rcosa-dispatcher stop
  rcjabberd stop
  cd /var/lib/jabberd/db
@@ -272,7 +272,7 @@ jabberd/router[31437]: shutting down</screen></para>
  chown jabber:jabber *
  rcjabberd start
  rcosa-dispatcher start</screen>
-            </para>
+            
 
         </sect2>
 
@@ -375,36 +375,36 @@ jabberd/router[31437]: shutting down</screen></para>
                         the left pane.</para>
                 </step>
                 <step>
-                    <para>Select RSA keys list:
-                            <guibutton>Edit</guibutton><guibutton>New</guibutton>
-                        <itemizedlist>
-                            <listitem>
-                                <para>IP Address any</para>
-                            </listitem>
-                            <listitem>
-                                <para>Port: 5222</para>
-                            </listitem>
-                            <listitem>
-                                <para>Protocol: xmpp</para>
-                            </listitem>
-                            <listitem>
-                                <para>Key File: open the key.pem file previously edited.</para>
-                            </listitem>
-                            <listitem>
-                                <para>Password: leave blank</para>
-                            </listitem>
-                        </itemizedlist>
-                    </para>
-                    <para>For more information see also: <itemizedlist>
-                            <listitem>
-                                <para><link xlink:href="https://wiki.wireshark.org/SSL"/></para>
-                            </listitem>
-                            <listitem>
-                                <para><link
-                                        xlink:href="https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=3444"
-                                    /></para>
-                            </listitem>
-                        </itemizedlist></para>
+                    <para>Select RSA keys list: <guimenu>Edit</guimenu><guimenu>New</guimenu></para>
+                    <itemizedlist>
+                        <listitem>
+                            <para>IP Address any</para>
+                        </listitem>
+                        <listitem>
+                            <para>Port: 5222</para>
+                        </listitem>
+                        <listitem>
+                            <para>Protocol: xmpp</para>
+                        </listitem>
+                        <listitem>
+                            <para>Key File: open the key.pem file previously edited.</para>
+                        </listitem>
+                        <listitem>
+                            <para>Password: leave blank</para>
+                        </listitem>
+                    </itemizedlist>
+
+                    <para>For more information see also:</para>
+                    <itemizedlist>
+                        <listitem>
+                            <para><link xlink:href="https://wiki.wireshark.org/SSL"/></para>
+                        </listitem>
+                        <listitem>
+                            <para><link
+                                    xlink:href="https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=3444"
+                                /></para>
+                        </listitem>
+                    </itemizedlist>
                 </step>
             </procedure>
         </sect2>

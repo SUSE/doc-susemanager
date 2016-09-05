@@ -14,16 +14,19 @@
             Getting Started Guide. You should have a running SUSE Manager server and at least one
             on-boarded salt-minion to complete the following sections. If you find yourself stuck at
             any point refer to the official Salt getting started guide located at: <link
-                xlink:href="https://docs.saltstack.com/en/getstarted/fundamentals/index.html"/>
-            <tip>
-                <title>Use More than One Minion</title>
-                <para>Connecting two or more minions during your testing is considered best
-                    practice. This will allow you to target individual minions using Salt and
-                    experiment with the power of its targeting features.</para>
-            </tip> This guide doest not attempt to cover all that Salt has to offer. This guide is a
+                xlink:href="https://docs.saltstack.com/en/getstarted/fundamentals/index.html"
+            /></para>
+
+        <tip>
+            <title>Use More than One Minion</title>
+            <para>Connecting two or more minions during your testing is considered best practice.
+                This will allow you to target individual minions using Salt and experiment with the
+                power of its targeting features.</para>
+        </tip>
+        <para>This guide doest not attempt to cover all that Salt has to offer. This guide is a
             primer for using Salt with SUSE Manager. For comprehensive Salt documentation, see:
-                <link xlink:href="https://docs.saltstack.com/en/latest/contents.html"/>
-        </para>
+                <link xlink:href="https://docs.saltstack.com/en/latest/contents.html"/></para>
+
 
     </sect1>
 
@@ -34,125 +37,125 @@
                 <term>Salt Calls</term>
                 <listitem>
                     <para>A great place to start would be learning basic Salt calls. Salt calls are
-                        defined by three main components:
-                        <screen># salt '&lt;target>' &lt;function> [arguments]</screen></para>
-                    <para>
-                        <variablelist>
-                            <varlistentry>
-                                <term>Target</term>
-                                <listitem>
-                                    <para>Use the second component in a Salt call to define a target
-                                        machine. Specify the minion or group of minions you would
-                                        like to run a function on.</para>
-                                    <para>
-                                        <variablelist>
+                        defined by three main properties:</para>
+                    <screen># salt '&lt;target>' &lt;function> [arguments]</screen>
 
-                                            <varlistentry>
-                                                <term>General Targeting</term>
-                                                <listitem>
-                                                  <para>List available grains on all
-                                                  minions:<screen># salt '*' grains.ls</screen></para>
-                                                  <para>Ping a specific minion:</para>
-                                                  <para><screen># salt 'web1.example.com' test.ping</screen></para>
-                                                </listitem>
-                                            </varlistentry>
+                    <variablelist>
+                        <varlistentry>
+                            <term>Target</term>
+                            <listitem>
+                                <para>Use the second property in a Salt call to define a target
+                                    machine. Specify the minion or group of minions you would like
+                                    to run a function on.</para>
 
-                                            <varlistentry>
-                                                <term>Glob Targeting</term>
-                                                <listitem>
-                                                  <para>Ping all minions using a domain:</para>
-                                                  <para>
-                                                  <screen># salt '*example.com' test.ping</screen>
-                                                  </para>
-                                                  <para>Display the OS name of all minions with the
-                                                  label <literal>webserver</literal>:</para>
+                                <variablelist>
 
-                                                  <para><screen># salt 'webserver*' grains.item oscodename</screen></para>
-                                                </listitem>
-                                            </varlistentry>
+                                    <varlistentry>
+                                        <term>General Targeting</term>
+                                        <listitem>
+                                            <para>List available grains on all minions:</para>
+                                            <screen># salt '*' grains.ls</screen>
+                                            <para>Ping a specific minion:</para>
+                                            <screen># salt 'web1.example.com' test.ping</screen>
+                                        </listitem>
+                                    </varlistentry>
 
-                                            <varlistentry>
-                                                <term>List Targeting</term>
-                                                <listitem>
-                                                  <para>
-                                                  <screen># salt -L 'webserver.example.com,db.example.com' test.ping</screen></para>
-                                                </listitem>
-                                            </varlistentry>
+                                    <varlistentry>
+                                        <term>Glob Targeting</term>
+                                        <listitem>
+                                            <para>Ping all minions using a domain:</para>
 
-                                            <varlistentry>
-                                                <term>Regular Expression Targeting</term>
-                                                <listitem>
-                                                  <para>You may use PCRE-compliant regular
-                                                  expressions:</para>
-                                                  <para>
-                                                  <screen># salt -E '(?!web)' test.ping</screen>
-                                                  </para>
-                                                </listitem>
-                                            </varlistentry>
+                                            <screen># salt '*example.com' test.ping</screen>
 
-                                            <varlistentry>
-                                                <term>IP Address Targeting</term>
-                                                <listitem>
-                                                  <para>List minion IP addresses:</para>
-                                                  <para>
-                                                  <screen># salt '*' network.ip_addrs</screen>
-                                                  </para>
-                                                  <para>Ping a specific minion IP address:</para>
-                                                  <para><screen># salt -S '172.31.60.74' test.ping</screen></para>
-                                                  <para>Ping all minions on a subnet:<screen># salt -S 172.31.0.0/16 test.ping</screen><tip>
-                                                  <title>Lookup a Subnet Using the ip
-                                                  Command</title>
-                                                  <para>You can use the ip command to find the
-                                                  subnet mask in the format of
-                                                  <literal>192.168.1.1/24</literal>:
-                                                  <screen># ip -o -f inet addr show | awk '/scope global/ {print $4}'</screen></para>
-                                                  </tip></para>
+                                            <para>Display the OS name of all minions with the label
+                                                  <literal>webserver</literal>:</para>
 
-                                                </listitem>
-                                            </varlistentry>
+                                            <screen># salt 'webserver*' grains.item oscodename</screen>
+                                        </listitem>
+                                    </varlistentry>
 
-                                        </variablelist></para>
-                                </listitem>
-                            </varlistentry>
+                                    <varlistentry>
+                                        <term>List Targeting</term>
+                                        <listitem>
 
-                            <varlistentry>
-                                <term>Function</term>
-                                <listitem>
-                                    <para>Once you have specified a target, provide the function you
-                                        would like to call. Functions also accept arguments. These
-                                        are space-delimited. For example: <screen>salt '*' cmd.run 'echo "Hello: $FIRST_NAME"' env='{FIRST_NAME: "John"}'</screen>
-                                        <variablelist>
-                                            <varlistentry>
-                                                <term>Locating Additional Minion Functions</term>
-                                                <listitem>
-                                                  <para>Find more functions which can be called on
-                                                  minions by running:
-                                                  <screen>salt '*' sys.doc</screen> A full list of
-                                                  callable functions are located here: <link
+                                            <screen># salt -L 'webserver.example.com,db.example.com' test.ping</screen>
+                                        </listitem>
+                                    </varlistentry>
+
+                                    <varlistentry>
+                                        <term>Regular Expression Targeting</term>
+                                        <listitem>
+                                            <para>You may use PCRE-compliant regular
+                                                expressions:</para>
+
+                                            <screen># salt -E '(?!web)' test.ping</screen>
+
+                                        </listitem>
+                                    </varlistentry>
+
+                                    <varlistentry>
+                                        <term>IP Address Targeting</term>
+                                        <listitem>
+                                            <para>List minion IP addresses:</para>
+
+                                            <screen># salt '*' network.ip_addrs</screen>
+
+                                            <para>Ping a specific minion IP address:</para>
+                                            <screen># salt -S '172.31.60.74' test.ping</screen>
+                                            <para>Ping all minions on a subnet:</para>
+                                            <screen># salt -S 172.31.0.0/16 test.ping</screen>
+                                            <tip>
+                                                <title>Lookup a Subnet Using the ip Command</title>
+                                                <para>You can use the ip command to find the subnet
+                                                  mask in the format of
+                                                  <literal>192.168.1.1/24</literal>:</para>
+                                                <screen># ip -o -f inet addr show | awk '/scope global/ {print $4}'</screen>
+                                            </tip>
+
+                                        </listitem>
+                                    </varlistentry>
+
+                                </variablelist>
+                            </listitem>
+                        </varlistentry>
+
+                        <varlistentry>
+                            <term>Function</term>
+                            <listitem>
+                                <para>Once you have specified a target, provide the function you
+                                    would like to call. Functions also accept arguments. These are
+                                    space-delimited. For example: </para>
+                                <screen>salt '*' cmd.run 'echo "Hello: $FIRST_NAME"' env='{FIRST_NAME: "John"}'</screen>
+                                <variablelist>
+                                    <varlistentry>
+                                        <term>Locating Additional Minion Functions</term>
+                                        <listitem>
+                                            <para>Find more functions which can be called on minions
+                                                by running:</para>
+                                            <screen>salt '*' sys.doc</screen>
+                                            <para>A full list of callable functions are located
+                                                here: <link
                                                   xlink:href="https://docs.saltstack.com/en/2015.8/ref/modules/all/index.html"
-                                                  /></para>
-                                                </listitem>
-                                            </varlistentry>
-                                        </variablelist></para>
-                                </listitem>
-                            </varlistentry>
+                                                /></para>
+                                        </listitem>
+                                    </varlistentry>
+                                </variablelist>
+                            </listitem>
+                        </varlistentry>
 
-                            <varlistentry>
-                                <term>Arguments</term>
-                                <listitem>
-                                    <para>Provides the extra data needed by a function you are
-                                        calling. The command pkg.install requires an argument
-                                        specifying a package to install. Yast2 has been selected for
-                                        installation. For
-                                        example:<screen>salt '*' pkg.install yast2</screen></para>
-                                </listitem>
-                            </varlistentry>
-                        </variablelist></para>
+                        <varlistentry>
+                            <term>Arguments</term>
+                            <listitem>
+                                <para>Provides the extra data needed by a function you are calling.
+                                    The command pkg.install requires an argument specifying a
+                                    package to install. Yast2 has been selected for installation.
+                                    For example:</para>
+                                <screen>salt '*' pkg.install yast2</screen>
+                            </listitem>
+                        </varlistentry>
+                    </variablelist>
                 </listitem>
             </varlistentry>
-
-
-
 
         </variablelist>
 
@@ -170,12 +173,15 @@
                         For example: <literal>Operating system, IP addresses, network interfaces and
                             memory</literal>. </para>
                     <para>You can see what grains are available on your minions by listing them
-                        using the <function>grains.ls</function>
-                        function:<screen># salt '*' grains.ls</screen></para>
-                    <para>List collected grain data by using the <function>grains.items</function>
-                        module:<screen>salt '*' grains.items</screen> For more information on
-                        grains, see:</para>
-                    <para><link xlink:href="https://docs.saltstack.com/en/latest/topics/grains/"
+                        using the <literal>grains.ls</literal> function:</para>
+
+                    <screen># salt '*' grains.ls</screen>
+
+                    <para>List collected grain data by using the <literal>grains.items</literal>
+                        module:</para>
+                    <screen>salt '*' grains.items</screen>
+                    <para>For more information on grains, see: <link
+                            xlink:href="https://docs.saltstack.com/en/latest/topics/grains/"
                         /></para>
                 </listitem>
             </varlistentry>
@@ -220,29 +226,29 @@
                 <term>salt-run</term>
                 <listitem>
                     <para>Print a list of all minions that are up:</para>
-                    <para>
-                        <screen># salt-run manage.up</screen>
-                    </para>
+
+                    <screen># salt-run manage.up</screen>
+
                     <para>Print a list of all minions that are down:</para>
-                    <para>
-                        <screen># salt-run manage.down</screen>
-                    </para>
+
+                    <screen># salt-run manage.down</screen>
+
                     <para>Print a list with the current status of all salt minions</para>
-                    <para>
-                        <screen># salt-run manage.status</screen>
-                    </para>
+
+                    <screen># salt-run manage.status</screen>
+
                     <para>Check the version of salt running on the master and active minions</para>
-                    <para>
-                        <screen># salt-run manage.versions</screen>
-                    </para>
+
+                    <screen># salt-run manage.versions</screen>
+
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>salt-cp</term>
                 <listitem>
-                    <para>Copies a file to a minion or set of minions.
-                        <screen># salt-cp '*' foo.conf /root</screen> For more information see:
-                            <link
+                    <para>Copies a file to a minion or set of minions.</para>
+                    <screen># salt-cp '*' foo.conf /root</screen>
+                    <para>For more information see: <link
                             xlink:href="https://docs.saltstack.com/en/latest/ref/cli/salt-cp.html"
                         /></para>
                 </listitem>
@@ -254,9 +260,9 @@
     <sect1 xml:id="salt.gs.guide.salt.file.locations">
         <title>Salt File Locations and Structure</title>
         <para>The following screen describes Salt file structures and their locations used by the
-            &susemgr; server. These files are listed in:
-                <filename>/etc/salt/master.d/susemanager.conf</filename>
-            <screen>#Configure different file roots
+            &susemgr; server. These files are listed in
+                <filename>/etc/salt/master.d/susemanager.conf</filename>:</para>
+        <screen>#Configure different file roots
 
 file_roots:
   base:
@@ -279,17 +285,19 @@ extension_modules: /usr/share/susemanager/modules
 
 master_tops:
   mgr_master_tops: True
-</screen></para>
+</screen>
 
         <para>The following tips should be kept in mind when working with
-                <filename>/etc/salt/master.d/susemanager.conf</filename><itemizedlist>
-                <listitem>
-                    <para>Files listed are searched in the order they appear.</para>
-                </listitem>
-                <listitem>
-                    <para>The first file found is called.</para>
-                </listitem>
-            </itemizedlist></para>
+                <filename>/etc/salt/master.d/susemanager.conf</filename></para>
+
+        <itemizedlist>
+            <listitem>
+                <para>Files listed are searched in the order they appear.</para>
+            </listitem>
+            <listitem>
+                <para>The first file found is called.</para>
+            </listitem>
+        </itemizedlist>
 
 
 
@@ -303,16 +311,20 @@ master_tops:
                     <term><filename>/usr/share/susemanager/salt</filename></term>
                     <listitem>
                         <para>This directory is created by &susemgr; and its content generated by
-                            the following python module:
-                            <screen>/usr/share/susemanager/modules/tops/mgr_master_tops.py                          </screen>
+                            the following python module:</para>
+
+                        <para><literal>/usr/share/susemanager/modules/tops/mgr_master_tops.py</literal>
                             It is shipped and updated together with &susemgr; and includes
                             certificate setup and common state logic that will be applied to
-                            packages and channels. <warning>
-                                <title>Non-editable directory</title>
-                                <para>You should not edit or add custom Salt data to this
-                                    directory.</para>
-                            </warning></para>
+                            packages and channels.</para>
+
+                        <warning>
+                            <title>Non-editable directory</title>
+                            <para>You should not edit or add custom Salt data to this
+                                directory.</para>
+                        </warning>
                     </listitem>
+
                 </varlistentry>
                 <varlistentry>
                     <term><filename>/srv/susemanager/salt</filename></term>
@@ -320,11 +332,13 @@ master_tops:
                         <para>This directory is created by &susemgr; and contains assigned channels
                             and packages for minions, groups and organizations. This file will be
                             overwritten and regenerated. A good analogy for this directory would be
-                            the &susemgr; database translated into salt directives. <warning>
-                                <title>Non-editable directory</title>
-                                <para>You should not edit or add custom Salt data to this
-                                    directory.</para>
-                            </warning></para>
+                            the &susemgr; database translated into salt directives. </para>
+
+                        <warning>
+                            <title>Non-editable directory</title>
+                            <para>You should not edit or add custom Salt data to this
+                                directory.</para>
+                        </warning>
                     </listitem>
                 </varlistentry>
                 <varlistentry>
@@ -333,10 +347,12 @@ master_tops:
                         <para>The directory <filename>/srv/salt</filename> is for your custom state
                             data, salt modules etc. &susemgr; does not touch or do anything with
                             this directory. However the state data placed here affects the Highstate
-                            of minions and is merged with the result generated by &susemgr;. <tip>
-                                <title>Editable Directory</title>
-                                <para>Place your custom Salt data here.</para>
-                            </tip></para>
+                            of minions and is merged with the result generated by &susemgr;. </para>
+
+                        <tip>
+                            <title>Editable Directory</title>
+                            <para>Place your custom Salt data here.</para>
+                        </tip>
                     </listitem>
                 </varlistentry>
             </variablelist>
@@ -354,11 +370,14 @@ master_tops:
                     <term><filename>/usr/share/susemanager/pillar</filename></term>
                     <listitem>
                         <para>This directory is generated by &susemgr;. It is shipped and updated
-                            together with &susemgr;. <warning>
-                                <title>Non-editable directory</title>
-                                <para>You should not edit or add custom Salt data to this
-                                    directory.</para>
-                            </warning></para>
+                            together with &susemgr;.</para>
+
+                        <warning>
+                            <title>Non-editable directory</title>
+                            <para>You should not edit or add custom Salt data to this
+                                directory.</para>
+                        </warning>
+
                     </listitem>
                 </varlistentry>
                 <varlistentry>
@@ -366,10 +385,12 @@ master_tops:
                     <listitem>
                         <para>&susemgr; by default does not touch or do anything with this
                             directory. However the custom pillar data placed here is merged with the
-                            pillar result created by &susemgr;. <tip>
-                                <title>Editable Directory</title>
-                                <para>Place your custom Salt pillar data here.</para>
-                            </tip></para>
+                            pillar result created by &susemgr;. </para>
+
+                        <tip>
+                            <title>Editable Directory</title>
+                            <para>Place your custom Salt pillar data here.</para>
+                        </tip>
                     </listitem>
                 </varlistentry>
             </variablelist>
