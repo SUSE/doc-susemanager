@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="advanced.topics.monitoring.with.icinga">
+
+
+    <title>Monitoring with Icinga</title>
+
+    <sect1>
+        <title>Introduction</title>
+        <para>This chapter provides a quickstart to setup of an Icinga server using SLES12 SP1. More
+            information may be found within the Official Icinga documentation: <link xlink:href="http://docs.icinga.org/latest/en/"/></para>
+
+    </sect1>
+
+    <sect1>
+        <title>Installation and Basic Configuration</title>
+        <para>Icinga packages are found in the <literal>SLE-Manager-Tools12-Updates
+            x86_64</literal>.</para>
+        <tip>
+            <title>Icinga Location</title>
+            <para>Do not install Icinga on the SUSE Manager server. Install Icinga on a stand-alone
+                SLE client.</para>
+        </tip>
+
+        <procedure>
+            <title>Installation and Basic Configuration</title>
+            <step>
+                <para>Register the monitoring server client with SUSE Manager and add the SUSE
+                    Manager client and update channels. For both SLES12 and SLES12 SP1 these
+                    channels are included by default.</para>
+            </step>
+            <step>
+                <screen>zypper in icinga icinga-idoutils-pgsql postgresql postgresql94-server monitoring-plugins-all apache2 apache2-example-pages</screen>
+            </step>
+            <step>
+                <para>Edit the <literal>/etc/icinga/objects/contacts.cfg</literal> file and add the
+                    email address which you will use for reciving alerts.</para>
+                <screen>define contact{
+        contact_name                    icingaadmin             ; Short name of user
+	use				generic-contact		 ; Inherit default values from generic-contact template (defined above)
+        alias                           Icinga Admin	      ; Full name of user
+
+        email                           icinga@localhost	  ; &lt;&lt;***** CHANGE THIS TO YOUR EMAIL ADDRESS ******
+        }</screen>
+            </step>
+            <step>
+                <para>Enable postgres on boot and start the database:</para>
+                <screen>systemctl enable postgresql.service
+systemctl start postgresql.service</screen>
+            </step>
+            <step>
+                <para>Create the database and user for Icinga:</para>
+                <screen>#su - postgres
+ 
+ >psql
+ postgres=# ALTER USER postgres WITH PASSWORD '&lt;newpassword&gt;';
+ postgres=# CREATE USER icinga;
+ postgres=# ALTER USER icinga WITH PASSWORD 'icinga';
+ postgres=# CREATE DATABASE icinga;
+ postgres=# GRANT ALL ON DATABASE icinga TO icinga;
+ postgres=# \q
+ exit</screen>
+            </step>
+            <step>
+                <para>Adjust client authentication rights located in
+                        <literal>/var/lib/pgsql/data/pg_hba.conf</literal> to match the
+                    following:</para>
+                <screen># TYPE  DATABASE        USER            ADDRESS                 METHOD
+local   icinga         icinga                                  trust
+local   all            postgres                                ident
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+# IPv6 local connections:
+host    all             all             ::1/128                 trust
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+#local   replication     postgres                                peer
+#host    replication     postgres        127.0.0.1/32            ident
+#host    replication     postgres        ::1/128                 ident
+</screen>
+                <important>
+                    <title>Placement of Authentication Settings</title>
+                    <para>Ensure your entry for local icinga authentication settings are placed
+                        above all other local entries or you will get an error when configuring the
+                        database schema. The entries in pg_hba.conf are read from top to
+                        bottom.</para>
+                </important>
+            </step>
+            <step>
+                <para>Reload the Postgres service:</para>
+                <screen>systemctl reload postgresql.service</screen>
+            </step>
+            <step>
+                <para>Configure the database schema:</para>
+                <screen>psql -U icinga -d icinga &lt; pgsql.sql</screen>
+            </step>
+            <step>
+                <para>Edit the following lines in <literal>/etc/icinga/ido2db.cfg</literal> to
+                    switch from the default setting of mysql to postgres:</para>
+                <screen>vi /etc/icinga/ido2db.cfg
+
+ db_servertype=pgsql
+ db_port=5432</screen>
+                <tip>
+                    <title>Open Firewall Port</title>
+                    <para>Allow port <literal>5432</literal> through your firewall or you will be
+                        unable to acces the WebGUI.</para>
+                </tip>
+            </step>
+            <step>
+                <para>Create an icinga admin account for logging into the web interface:</para>
+                <screen>htpasswd -c /etc/icinga/htpasswd.users icingaadmin</screen>
+            </step>
+            <step>
+                <para>Enable and start all required services:</para>
+                <screen># systemctl enable icinga.service
+# systemctl start icinga.service
+# systemctl enable ido2db.service
+# systemctl start ido2db.service
+# systemctl enable apache2.service
+# systemctl start apache2.service</screen>
+            </step>
+            <step>
+                <para>Login to the WebGUI at: <link xlink:href="http://localhost/icinga"/>.</para>
+            </step>
+        </procedure>
+        <para>This concludes setup and initial configuration of Icinga.</para>
+    </sect1>
+
+
+
+</chapter>
