@@ -91,11 +91,6 @@
      take kindly to host name changes. </para>
     <orderedlist>
      <listitem>
-      <para> Set the hostname to a name of your choice </para>
-      <screen>hostname instance-host-name</screen>
-     </listitem>
-
-     <listitem>
       <para> Disable hostname setup in the dhcp configuration file:
         <filename>/etc/sysconfig/network/dhcp</filename>
       </para>
@@ -103,8 +98,22 @@
      </listitem>
 
      <listitem>
+      <para> Set the hostname to a name of your choice. Please note
+       it is important to provide the <replaceable>system name</replaceable>
+       and not the <replaceable>full qualified host plus domain name</replaceable>
+       to the command. The following example illustrates that, given the
+       system name should be <emphasis role="strong">suma</emphasis> and the
+       domain name is set to <emphasis role="strong">cloud.net</emphasis>.
+       </para>
+      <screen>$ hostnamectl set-hostname suma
+$ hostname -f
+
+suma.cloud.net</screen>
+     </listitem>
+
+     <listitem>
       <para> Let the hostname resolve to the instance external IP address </para>
-      <screen>echo "IP-address instance-host-name" &gt;&gt; /etc/hosts</screen>
+      <screen>$ echo "IP-address $(hostname -f) $(hostname)" &gt;&gt; /etc/hosts</screen>
      </listitem>
 
      <listitem>
@@ -114,18 +123,42 @@
       <itemizedlist mark="bullet" spacing="normal">
        <listitem>
         <para> Obtain external IP-address from within Amazon EC2 instance </para>
-        <screen>ec2metadata --public-ipv4</screen>
+        <screen>$ ec2metadata --public-ipv4</screen>
        </listitem>
        <listitem>
         <para> Obtain external IP-address from within Google Compute Engine
          instance </para>
-        <screen>gcemetadata --query instance --external-ip</screen>
+        <screen>$ gcemetadata --query instance --external-ip</screen>
        </listitem>
        <listitem>
         <para> Obtain external IP-address from within Microsoft Azure instance </para>
-        <screen>azuremetadata --external-ip</screen>
+        <screen>$ azuremetadata --external-ip</screen>
        </listitem>
       </itemizedlist>
+     </listitem>
+
+     <listitem>
+      <para>Update the DNS entry for this instance within the DNS service of your
+       VPC (Virtual Private Cloud) environment, refer to the cloud service provider
+       documentation for detailed instructions:
+       <itemizedlist mark="bullet" spacing="normal">
+       <listitem>
+        <para><link
+         xlink:href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-dns.html">
+         DNS setup on Amazon EC2</link></para>
+       </listitem>
+       <listitem>
+        <para><link
+         xlink:href="https://cloud.google.com/compute/docs/storing-retrieving-metadata">
+         DNS setup on Google Compute Engine</link></para>
+       </listitem>
+       <listitem>
+        <para><link
+         xlink:href="https://azure.microsoft.com/en-us/documentation/articles/dns-operations-recordsets">
+         DNS setup on Microsoft Azure</link></para>
+       </listitem>
+      </itemizedlist>
+      </para>
      </listitem>
     </orderedlist>
    </step>
@@ -142,7 +175,7 @@
        in the <link
         xlink:href="https://www.suse.com/documentation/suse_manager">SUSE
         Manager Guide</link>. </para>
-      <screen>sudo /sbin/yast2 susemanager_setup</screen>
+      <screen>$ sudo /sbin/yast2 susemanager_setup</screen>
       <para>The setup procedure is designed as a one shot process. This means there
        is no rollback or cleanup functionality implemented in the spacewalk scripts
        called by the yast setup procedure. Therefore, if the setup procedure is interrupted
@@ -161,7 +194,7 @@
        bootstrap repository you run the mgr-create-bootstrap-repo script like
        this:
       </para>
-      <screen>sudo mgr-create-bootstrap-repo --datamodule=mgr_pubcloud_bootstrap_data -c SLE-12-SP1-x86_64</screen>
+      <screen>$ sudo mgr-create-bootstrap-repo --datamodule=mgr_pubcloud_bootstrap_data -c SLE-12-SP1-x86_64</screen>
       <para> The above example creates a bootstrap repository suitable for SUSE
        Enterprise Server 12 SP1 BYOS instances. See <link
        xlink:href="https://www.suse.com/documentation/suse-manager-3/book_suma3_quickstart_3/data/create_tools_repository.html">
@@ -181,7 +214,7 @@
         xlink:href="https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_proxyquick/book_susemanager_proxyquick.html"
         > &susemgr; Proxy Setup guide</link> for details. Once registered,
        run </para>
-      <screen>sudo /usr/sbin/configure-proxy.sh</screen>
+      <screen>$ sudo /usr/sbin/configure-proxy.sh</screen>
       <para> to configure your &susemgr; Proxy instance. </para>
      </step>
     </substeps>
@@ -238,15 +271,15 @@
     <itemizedlist>
      <listitem>
       <para> Obtain instance id from within Amazon EC2 instance </para>
-      <screen>ec2metadata --instance-id</screen>
+      <screen>$ ec2metadata --instance-id</screen>
      </listitem>
      <listitem>
       <para> Obtain instance id from within Google Compute Engine instance </para>
-      <screen>gcemetadata --query instance --id</screen>
+      <screen>$ gcemetadata --query instance --id</screen>
      </listitem>
      <listitem>
       <para> Obtain instance name from within Microsoft Azure instance </para>
-      <screen>azuremetadata --instance-name</screen>
+      <screen>$ azuremetadata --instance-name</screen>
      </listitem>
     </itemizedlist>
     <para> After logging in through the &susemgr; Server Web UI, <emphasis
@@ -279,14 +312,14 @@
       required. In many cases the attached storage appears as <emphasis
        role="strong">/dev/sdb</emphasis>. In order to check which disk devices
       exists on your system, call the following command: </para>
-     <screen>sudo hwinfo --disk | grep -E "Device File:"</screen>
+     <screen>$ sudo hwinfo --disk | grep -E "Device File:"</screen>
     </step>
     <step>
      <para> With the device name at hand the process of re-linking the
       directories in the filesystem &susemgr; uses to store data is handled
       by the suma-storage script. In the following example we use
        <filename>/dev/sdb</filename> as the device name. </para>
-     <screen>sudo /usr/bin/suma-storage /dev/sdb</screen>
+     <screen>$ sudo /usr/bin/suma-storage /dev/sdb</screen>
      <para> After the call all database and repository files used by SUSE
       Manager Server are moved to the newly created xfs based storage. In case
       your instance is a &susemgr; Proxy, the script will move the Squid
