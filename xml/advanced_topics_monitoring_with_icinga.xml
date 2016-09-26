@@ -244,13 +244,13 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
 
 
     <sect1>
-        <title>Adding Hosts to Icinga</title>
+        <title>Adding a Host to Icinga</title>
         <para>To add a new host to Icinga create a host.cfg file for each host in
                 <filename>/etc/icinga/conf.d/</filename>. For example
-                <literal>examplehost.cfg</literal>: </para>
+                <literal>susemanager.cfg</literal>: </para>
         <screen>define host {
-  host_name           examplehost
-  alias               Example Host
+  host_name           susemanager
+  alias               SUSE Manager
   address             192.168.1.1
   check_period        24x7
   check_interval      1
@@ -291,7 +291,7 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
         <screen>define hostgroup {
   hostgroup_name  ssh_group
   alias           ssh group
-  members         examplehost,examplehost1,examplehost2,examplehost3,examplehost4
+  members         susemanager,mars,jupiter,pluto,examplehost4
 }</screen>
         <para>The <literal>members</literal> variable should contain the
                 <literal>host_name</literal> from within each host.cfg file you created to represent
@@ -396,9 +396,15 @@ fi
 
 echo "OK: service $service is running"
 exit $STATE_OK</screen>
-                <para>The up-to-date version of this script can be found at: <link
+                <para>A current version of this script can be found at: <link
                         xlink:href="https://github.com/melmorabity/nagios-plugin-systemd-service/blob/master/check_systemd_service.sh"
                     /></para>
+                <warning>
+                    <title>Non-supported 3rd Party Plugin</title>
+                    <para>The script used in this example is an external script and is not supported
+                        by SUSE. Always check to ensure scripts are not modified or contain malicous
+                        code before using them on production machines.</para>
+                </warning>
             </step>
             <step>
                 <para>Make the script executable:</para>
@@ -407,7 +413,245 @@ exit $STATE_OK</screen>
             <step>
                 <para>On your SUSE manager server add the following line to the
                         <filename>nrpe.cfg</filename> located at
-                    <filename>/etc/nrpe.cfg</filename></para>
+                    <filename>/etc/nrpe.cfg</filename>:</para>
+                <screen># SUSE Manager Service Checks
+command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</screen>
+                <para>This will allow the Icinga server to call the plugin via nrpe on SUSE
+                    Manager.</para>
+            </step>
+            <step>
+                <para>Provide proper permissions by adding the script to the sudoers file:</para>
+                <screen># visudo</screen>
+                <screen>nagios  ALL=(ALL)       NOPASSWD:/usr/lib/nagios/plugins/check_systemd.sh
+Defaults:nagios !requiretty</screen>
+                <para>You can also add permissions to the entire plugin directory instead of
+                    allowing permissions for individual scripts:</para>
+                <screen>nagios  ALL=(ALL)       NOPASSWD:/usr/lib/nagios/plugins/</screen>
+            </step>
+            <step>
+                <para>On your Icinga server define the following command within
+                        <filename>/etc/icinga/objects/commands.cfg</filename>:</para>
+                <screen>define command{
+        command_name   check-systemd-service
+        command_line   /usr/lib/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c check_systemd.sh -a $ARG1$
+}</screen>
+            </step>
+            <step>
+                <para>Now you will add the following critical services to be montitored to your suse
+                    manager host file: </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>auditlog-keeper.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>jabberd.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>spacewalk-wait-for-jabberd.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>tomcat.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>spacewalk-wait-for-tomcat.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>salt-master.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>salt-api.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>spacewalk-wait-for-salt.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>apache2.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>osa-dispatcher.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>rhn-search.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>cobblerd.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>taskomatic.service</para>
+                    </listitem>
+                    <listitem>
+                        <para>spacewalk-wait-for-taskomatic.service</para>
+                    </listitem>
+                </itemizedlist>
+                <para>On your Icinga server add the following service blocks to your SUSE Manager
+                    host file <filename>susemanager.cfg</filename> file located in
+                        <filename>/etc/icinga/conf.d/</filename>(This configuration file was created
+                    in the previous section <emphasis>Adding a Host to Icinga</emphasis>)</para>
+                <screen># Montior Audit Log Keeper
+define service {
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Audit Log Keeper Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!auditlog-keeper.service
+
+}
+
+# Monitor Jabberd
+define service {
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Jabberd Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!jabberd.service
+
+}
+
+# Monitor Spacewalk Wait for Jabberd
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Spacewalk Wait For Jabberd Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!spacewalk-wait-for-jabberd.service
+}
+
+# Monitor Tomcat
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Tomcat Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!tomcat.service
+}
+
+# Monitor Spacewalk Wait for Tomcat
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Spacewalk Wait For Tomcat Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!spacewalk-wait-for-tomcat.service
+}
+
+# Monitor Salt Master
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Salt Master Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!salt-master.service
+}
+
+# Monitor Salt API
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Salt API Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!salt-api.service
+}
+
+# Monitor Spacewalk Wait for Salt
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Spacewalk Wait For Salt Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!spacewalk-wait-for-salt.service
+}
+
+# Monitor apache2
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Apache2 Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!apache2.service
+}
+
+# Monitor osa dispatcher
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Osa Dispatcher Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!osa-dispatcher.service
+}
+
+# Monitor rhn search
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    RHN Search Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!rhn-search.service
+}
+
+# Monitor Cobblerd
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Cobblerd Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!cobblerd.service
+}
+
+# Monitor taskomatic
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Taskomatic Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!taskomatic.service
+}
+
+# Monitor wait for taskomatic
+define service{
+       use                    generic-service
+       host_name              susemanager
+       check_interval         1
+       active_checks_enabled  1
+       service_description    Spacewalk Wait For Taskomatic Service
+       servicegroups          SUSE Manager Essential Services
+       check_command          check-systemd-service!spacewalk-wait-for-taskomatic.service
+
+</screen>
+                <para>Each of these service blocks will be passed as the
+                    check-systemd-service!$ARG1$ variable to SUSE manager server via nrpe. You
+                    probably noticed the servicegroups parameter was also included. This adds each
+                    service to a servicegroup and has been defined in a servicesgroups.cfg file
+                    located in <filename>/etc/icinga/conf.d/</filename>:</para>
+                <screen>define servicegroup{
+       servicegroup_name     SUSE Manager Essential Services
+       alias                 Essential Services
+}</screen>
             </step>
 
         </procedure>
