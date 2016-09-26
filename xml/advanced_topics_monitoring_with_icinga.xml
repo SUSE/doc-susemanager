@@ -243,21 +243,91 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
 
     <sect1>
         <title>Adding Hosts to Icinga</title>
-        <para/>
+        <para>To add a new host to Icinga create a host.cfg file for each host in
+                <filename>/etc/icinga/conf.d/</filename>. For example
+                <literal>examplehost.cfg</literal>: </para>
+        <screen>define host {
+  host_name           examplehost
+  alias               Example Host
+  address             192.168.1.1
+  check_period        24x7
+  check_interval      1
+  retry_interval      1
+  max_check_attempts  10  
+  check_command       check-host-alive
+}</screen>
+        <para>Place the host IP address you want to add on the <literal>Address</literal>
+            line.</para>
     </sect1>
 
     <sect1>
         <title>Adding Services</title>
-        <para/>
+        <para>To add additional services for monitoring on a specific host define them by adding a
+            service definition to your host.cfg file located in
+                <filename>/etc/icinga/conf.d</filename>. For example you can monitor if a systems
+            SSH service is running with the following service definition.</para>
+        <screen>define service {
+  use                 generic-service
+  service_description SSH
+  check_command       check_ssh
+  check_interval      60
+}</screen>
     </sect1>
 
     <sect1>
         <title>Creating Hostgroups</title>
-        <para/>
+        <para>You can create hostgroups to simplify and visualize hosts logically. Create a
+                <filename>hostgroups.cfg</filename> file located in
+                <filename>/etc/icinga/conf.d/</filename> and add the following lines:</para>
+        <screen>define hostgroup {
+  hostgroup_name  ssh_group
+  alias           ssh group
+  members         examplehost,examplehost1,examplehost2,examplehost3,examplehost4
+}</screen>
+        <para>The <literal>members</literal> variable should contain the
+                <literal>host_name</literal> from within each host.cfg file you created to represent
+            your hosts. Every time you add an additional host by creating a host.cfg ensure you add
+            the host_name to the members list of included hosts if you want it to be included within
+            a logical hostgroup.</para>
     </sect1>
 
     <sect1>
         <title>Creating Servicegroups</title>
+        <para>You can create logical groupings of services as well. For example if you would like to
+            create a group of essential SUSE Manager services which are running define them within a
+                <filename>servicegroups.cfg</filename> file placed in
+                <filename>/etc/icinga/conf.d/</filename></para>
+        <screen>#Servicegroup 1
+define servicegroup {
+  servicegroup_name     SUSE Manager Essential Services
+  alias                 Essential Services
+}
+
+#Servicegroup 2
+define servicegroup {
+  servicegroup_name     Client Patch Status
+  alias                 SUSE Manager 3 Client Patch Status
+}</screen>
+        <para>Within each host.cfg file add a service to the servicegroup with the following
+            variable:</para>
+        <screen>define service {
+  use                 generic-service
+  service_description SSH
+  check_command       check_ssh
+  check_interval      60
+  servicegroups       SUSE Manager Essential Services
+}</screen>
+        <para>All services that include the <literal>servicegroups</literal> variable and the name
+            of the servicegroup will be added to the specified servicegroup.</para>
+    </sect1>
+
+    <sect1>
+        <title>Monitoring SUSE Manager Systemd Services</title>
+        <para/>
+    </sect1>
+
+    <sect1>
+        <title>Monitoring Disk Space</title>
         <para/>
     </sect1>
 
