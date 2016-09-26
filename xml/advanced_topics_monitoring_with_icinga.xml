@@ -41,7 +41,7 @@
             </step>
             <step>
                 <screen>zypper in icinga icinga-idoutils-pgsql postgresql postgresql94-server \
-monitoring-plugins-all apache2 apache2-example-pages</screen>
+monitoring-plugins-all apache2</screen>
             </step>
             <step>
                 <para>Edit the <literal>/etc/icinga/objects/contacts.cfg</literal> file and add the
@@ -143,5 +143,87 @@ host    all             all             ::1/128                 trust
     </sect1>
 
 
+    <sect1>
+        <title>Monitoring SUSE Manager with Icinga</title>
+
+        <para>The following section provides an overview on monitoring your SUSE Manager server
+            using Icinga. You will add SUSE Manager as a host to Icinga and use a nagios
+            script/plugin to monitor running services via <literal>NRPE</literal> (Nagios Remote
+            Plugin Executor). This section does not attempt to cover all monitoring solutions Icinga
+            has to offer but should help you get started.</para>
+
+        <procedure>
+            <title>Adding SUSE Manager to Icinga for Monitoring</title>
+            <step>
+                <para>On your SUSE Manager server install the required packages: </para>
+                <screen>zypper install nagios-nrpe susemanager-nagios-plugin insserv nrpe</screen>
+            </step>
+            <step>
+                <para>Modify the NRPE configuration file located at:</para>
+                <screen>/etc/nrpe.cfg</screen>
+                <para>Edit/add the following lines:</para>
+                <screen>server_port=5666
+nrpe_user=nagios
+nrpe_group=nagios
+allowed_hosts=Icinga.example.com
+dont_blame_nrpe=1
+command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</screen>
+                <para>Variable definitions:</para>
+                <variablelist>
+                    <varlistentry>
+                        <term>server_port</term>
+                        <listitem>
+                            <para>The variable <literal>server_port</literal> defines the port nrpe
+                                will listen on. The default port is 5666. This port must be opened
+                                in your firewall.</para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>nrpe_user</term>
+                        <listitem>
+                            <para>The variables <literal>nrpe_user</literal> and
+                                    <literal>nrpe_group</literal> control the user and group IDs
+                                that nrpe will run under. SUSE Manager probes need access to the
+                                database, therefore nrpe requires access to database credentials
+                                stored in <filename>/etc/rhn/rhn.conf</filename>. There are multiple
+                                ways to achieve this. You may add the user <literal>nagios</literal>
+                                to the group <literal>www</literal> (this is already done for other
+                                IDs such as tomcat); alternatively you can simply have nrpe run with
+                                the effective group ID <literal>www</literal> in
+                                    <filename>/etc/rhn/rhn.conf</filename>.</para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>allowed_hosts</term>
+                        <listitem>
+                            <para>The variable <literal>allowed_hosts</literal> defines which hosts
+                                nrpe will accept connections from. Enter the FQDN or IP address of
+                                your Icinga server here.</para>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>dont_blame_nrpe</term>
+                        <listitem>
+                            <para>The use of variable <literal>dont_blame_nrpe</literal> is
+                                unavoidable in this example. <literal>nrpe</literal> commands by
+                                default will not allow arguments to be passed due to security
+                                reasons. However, in this example you should pass the name of the
+                                host you want information on to nrpe as an argument. This action is
+                                only possible when setting the variable to 1.</para>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+            </step>
+            <step>
+                <para/>
+            </step>
+        </procedure>
+    </sect1>
+
+
+    <sect1>
+        <title>Monitoring Clients with Icinga</title>
+        <para/>
+    </sect1>
 
 </chapter>
