@@ -256,8 +256,13 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
   max_check_attempts  10  
   check_command       check-host-alive
 }</screen>
-        <para>Place the host IP address you want to add on the <literal>Address</literal>
-            line.</para>
+        <note>
+            <para>Place the host IP address you want to add to Icinga on the
+                    <literal>Address</literal> line.</para>
+        </note>
+        <para>After adding a new host restart Icinga and load the new configuation:</para>
+        <screen># systemctl restart icinga</screen>
+
     </sect1>
 
     <sect1>
@@ -272,6 +277,8 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
   check_command       check_ssh
   check_interval      60
 }</screen>
+        <para>After adding any new services restart Icinga to load the new configuration: </para>
+        <screen># systemctl restart icinga</screen>
     </sect1>
 
     <sect1>
@@ -289,6 +296,8 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
             your hosts. Every time you add an additional host by creating a host.cfg ensure you add
             the host_name to the members list of included hosts if you want it to be included within
             a logical hostgroup.</para>
+        <para>After adding hosts to a hostgroup restart Icinga to load the new configuration: </para>
+        <screen># systemctl restart icinga</screen>
     </sect1>
 
     <sect1>
@@ -308,7 +317,7 @@ define servicegroup {
   servicegroup_name     Client Patch Status
   alias                 SUSE Manager 3 Client Patch Status
 }</screen>
-        <para>Within each host.cfg file add a service to the servicegroup with the following
+        <para>Within each hosts host.cfg file add a service to a servicegroup with the following
             variable:</para>
         <screen>define service {
   use                 generic-service
@@ -318,7 +327,9 @@ define servicegroup {
   servicegroups       SUSE Manager Essential Services
 }</screen>
         <para>All services that include the <literal>servicegroups</literal> variable and the name
-            of the servicegroup will be added to the specified servicegroup.</para>
+            of the servicegroup will be added to the specified servicegroup. After adding services
+            to a servicegroup restart Icinga to load the new configuation: </para>
+        <screen># systemctl restart icinga</screen>
     </sect1>
 
     <sect1>
@@ -339,6 +350,15 @@ define servicegroup {
     <sect1>
         <title>Using the SUSE check_suma_lastevent Plugin</title>
         <para/>
+    </sect1>
+
+    <sect1>
+        <title>Additional Resources</title>
+        <para>For additional resources see Icinga's official documentation located at:<link
+                xlink:href="http://docs.icinga.org/latest/en"/></para>
+        <para>For some excellent time saving tips and tricks not covered in this guide check the
+            following section within the official documentation located here:<link
+                xlink:href="http://docs.icinga.org/latest/en/objecttricks.html"/></para>
     </sect1>
 
 
