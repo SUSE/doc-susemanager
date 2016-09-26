@@ -235,7 +235,9 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
                 </variablelist>
             </step>
             <step>
-                <para/>
+                <para>One your configuration is complete load the new nrpe configuration
+                    with:</para>
+                <screen># systemctl start nrpe</screen>
             </step>
         </procedure>
     </sect1>
@@ -334,7 +336,81 @@ define servicegroup {
 
     <sect1>
         <title>Monitoring SUSE Manager Systemd Services</title>
-        <para/>
+        <para>The following section provides information on monitoring uptime of critical SUSE
+            manager services.</para>
+        <procedure>
+            <title>Monitoring Running Systemd Services</title>
+            <step>
+                <para>Create a new plugin file called <filename>check_systemd.sh</filename> in
+                        <filename>/usr/lib/nagios/plugins/</filename> on your SUSE Manager
+                    server:</para>
+                <screen># vi /usr/lib/nagios/plugins/ check_systemd.sh</screen>
+            </step>
+            <step>
+                <para>For this example you will use an opensource community script to monitor
+                    Systemd services. You may also wish to write your own.</para>
+                <screen>#!/bin/bash
+# Copyright (C) 2016 Mohamed El Morabity &lt;melmorabity@fedoraproject.com&gt;
+#
+# This module is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This software is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+
+
+PLUGINDIR=$(dirname $0)
+. $PLUGINDIR/utils.sh
+
+
+if [ $# -ne 1 ]; then
+    echo "Usage: ${0##*/} &lt;service name&gt;" &gt;&amp;2
+    exit $STATE_UNKNOWN
+fi
+
+service=$1
+
+status=$(systemctl is-enabled $service 2&gt;/dev/null)
+r=$?
+if [ -z "$status" ]; then
+    echo "ERROR: service $service doesn't exist"
+    exit $STATE_CRITICAL
+fi
+
+if [ $r -ne 0 ]; then
+    echo "ERROR: service $service is $status"
+    exit $STATE_CRITICAL
+fi
+
+systemctl --quiet is-active $service
+if [ $? -ne 0 ]; then
+    echo "ERROR: service $service is not running"
+    exit $STATE_CRITICAL
+fi
+
+echo "OK: service $service is running"
+exit $STATE_OK</screen>
+                <para>The up-to-date version of this script can be found at: <link
+                        xlink:href="https://github.com/melmorabity/nagios-plugin-systemd-service/blob/master/check_systemd_service.sh"
+                    /></para>
+            </step>
+            <step>
+                <para>Make the script executable:</para>
+                <screen>chmod 755 check_systemd.sh</screen>
+            </step>
+            <step>
+                <para>On your SUSE manager server add the following line to the
+                        <filename>nrpe.cfg</filename> located at
+                    <filename>/etc/nrpe.cfg</filename></para>
+            </step>
+
+        </procedure>
     </sect1>
 
     <sect1>
