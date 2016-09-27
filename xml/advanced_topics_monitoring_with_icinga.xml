@@ -664,11 +664,55 @@ define service{
     <sect1>
         <title>Using the SUSE check_suma_patches Plugin</title>
         <para>You can use the <filename>check_suma_patches</filename> plugin to check if any
-            machines connected to SUSE Manager require a patch or an update. These will be reported
-            as a green <literal>OK</literal><emphasis>System is up to date</emphasis> or a red
-                <literal>Critical</literal><emphasis>Critical patch(es) pending</emphasis>. The
+            machines connected to SUSE Manager as clients require a patch or an update. These will
+            be reported as a green <literal>OK</literal><emphasis>System is up to date</emphasis> or
+            a red <literal>Critical</literal><emphasis>Critical patch(es) pending</emphasis>. The
             following procedure will guide you through the setup of the check_suma_patches
             plugin.</para>
+
+        <procedure>
+            <title>Setup check_suma_patches</title>
+            <step>
+                <para>On your SUSE Manager server open <filename>/etc/nrpe.cfg</filename> and add
+                    the following lines:</para>
+                <screen># SUSE Manager check_patches
+command[check_suma_patches]=sudo /usr/lib/nagios/plugins/check_suma_patches $ARG1$</screen>
+            </step>
+            <step>
+                <para>On your Icinga server open
+                        <filename>/etc/icinga/objects/commands.cfg</filename> and define the
+                    following command:</para>
+                <screen>define command{
+        command_name    check_suma
+        command_line    /usr/lib/nagios/plugins/check_nrpe -H 10.160.64.241 -c $ARG1$ -a $HOSTNAME$
+}</screen>
+            </step>
+            <step>
+                <para>On your Icinga server open any of your SUSE Manager client host configration
+                    files lcoated at <filename>/etc/icinga/conf.d/clients.cfg</filename> and add the
+                    following service definition:</para>
+                <screen>define service{
+        use                             generic-service
+        host_name                       client-hostname
+        service_description             Available Patches for client-host_name 
+        servicegroups                   Client Patch Status
+        check_command                   check_suma!check_suma_patches
+}</screen>
+            </step>
+            <step>
+                <para>In the above service definition notice that this host is included in the
+                    servicegroup labeled <emphasis>Client Patch Status</emphasis> Add the following
+                    servicegroup definition to
+                        <filename>/etc/icinga/conf.d/servicegroups.cfg</filename>:</para>
+                <screen>define servicegroup {
+       servicegroup_name     Client Patch Status
+       alias                 SUSE Manager 3 Client Patch Status
+}
+</screen>
+            </step>
+
+        </procedure>
+        <para>This completes setup of the check_suma_patches plugin.</para>
     </sect1>
 
     <sect1>
