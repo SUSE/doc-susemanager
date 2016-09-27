@@ -144,9 +144,9 @@ host    all             all             ::1/128                 trust
 
 
     <sect1>
-        <title>Monitoring SUSE Manager with Icinga and NRPE</title>
+        <title>Icinga and NRPE Quickstart</title>
 
-        <para>The following section provides an overview on monitoring your SUSE Manager server
+        <para>The following sections provides an overview on monitoring your SUSE Manager server
             using Icinga. You will add SUSE Manager as a host to Icinga and use a nagios
             script/plugin to monitor running services via <literal>NRPE</literal> (Nagios Remote
             Plugin Executor). This section does not attempt to cover all monitoring solutions Icinga
@@ -156,7 +156,7 @@ host    all             all             ::1/128                 trust
             <title>Adding SUSE Manager to Icinga for Monitoring</title>
             <step>
                 <para>On your SUSE Manager server install the required packages: </para>
-                <screen>zypper install nagios-nrpe susemanager-nagios-plugin insserv nrpe</screen>
+                <screen>zypper install nagios-nrpe susemanager-nagios-plugin insserv nrpe monitoring-plugins-nrpe</screen>
             </step>
             <step>
                 <para>Modify the NRPE configuration file located at:</para>
@@ -240,15 +240,14 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
                 <screen># systemctl start nrpe</screen>
             </step>
         </procedure>
-    </sect1>
+        <para>This concludes setup of nrpe.</para>
 
-
-    <sect1>
-        <title>Adding a Host to Icinga</title>
-        <para>To add a new host to Icinga create a host.cfg file for each host in
-                <filename>/etc/icinga/conf.d/</filename>. For example
-                <literal>susemanager.cfg</literal>: </para>
-        <screen>define host {
+        <sect2>
+            <title>Adding a Host to Icinga</title>
+            <para>To add a new host to Icinga create a host.cfg file for each host in
+                    <filename>/etc/icinga/conf.d/</filename>. For example
+                    <literal>susemanager.cfg</literal>: </para>
+            <screen>define host {
   host_name           susemanager
   alias               SUSE Manager
   address             192.168.1.1
@@ -258,57 +257,57 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
   max_check_attempts  10  
   check_command       check-host-alive
 }</screen>
-        <note>
-            <para>Place the host IP address you want to add to Icinga on the
-                    <literal>Address</literal> line.</para>
-        </note>
-        <para>After adding a new host restart Icinga and load the new configuation:</para>
-        <screen># systemctl restart icinga</screen>
+            <note>
+                <para>Place the host IP address you want to add to Icinga on the
+                        <literal>Address</literal> line.</para>
+            </note>
+            <para>After adding a new host restart Icinga and load the new configuation:</para>
+            <screen># systemctl restart icinga</screen>
 
-    </sect1>
+        </sect2>
 
-    <sect1>
-        <title>Adding Services</title>
-        <para>To add additional services for monitoring on a specific host define them by adding a
-            service definition to your host.cfg file located in
-                <filename>/etc/icinga/conf.d</filename>. For example you can monitor if a systems
-            SSH service is running with the following service definition.</para>
-        <screen>define service {
+        <sect2>
+            <title>Adding Services</title>
+            <para>To add additional services for monitoring on a specific host define them by adding
+                a service definition to your host.cfg file located in
+                    <filename>/etc/icinga/conf.d</filename>. For example you can monitor if a
+                systems SSH service is running with the following service definition.</para>
+            <screen>define service {
   use                 generic-service
   service_description SSH
   check_command       check_ssh
   check_interval      60
 }</screen>
-        <para>After adding any new services restart Icinga to load the new configuration: </para>
-        <screen># systemctl restart icinga</screen>
-    </sect1>
+            <para>After adding any new services restart Icinga to load the new configuration: </para>
+            <screen># systemctl restart icinga</screen>
+        </sect2>
 
-    <sect1>
-        <title>Creating Hostgroups</title>
-        <para>You can create hostgroups to simplify and visualize hosts logically. Create a
-                <filename>hostgroups.cfg</filename> file located in
-                <filename>/etc/icinga/conf.d/</filename> and add the following lines:</para>
-        <screen>define hostgroup {
+        <sect2>
+            <title>Creating Hostgroups</title>
+            <para>You can create hostgroups to simplify and visualize hosts logically. Create a
+                    <filename>hostgroups.cfg</filename> file located in
+                    <filename>/etc/icinga/conf.d/</filename> and add the following lines:</para>
+            <screen>define hostgroup {
   hostgroup_name  ssh_group
   alias           ssh group
   members         susemanager,mars,jupiter,pluto,examplehost4
 }</screen>
-        <para>The <literal>members</literal> variable should contain the
-                <literal>host_name</literal> from within each host.cfg file you created to represent
-            your hosts. Every time you add an additional host by creating a host.cfg ensure you add
-            the host_name to the members list of included hosts if you want it to be included within
-            a logical hostgroup.</para>
-        <para>After adding hosts to a hostgroup restart Icinga to load the new configuration: </para>
-        <screen># systemctl restart icinga</screen>
-    </sect1>
+            <para>The <literal>members</literal> variable should contain the
+                    <literal>host_name</literal> from within each host.cfg file you created to
+                represent your hosts. Every time you add an additional host by creating a host.cfg
+                ensure you add the host_name to the members list of included hosts if you want it to
+                be included within a logical hostgroup.</para>
+            <para>After adding hosts to a hostgroup restart Icinga to load the new configuration: </para>
+            <screen># systemctl restart icinga</screen>
+        </sect2>
 
-    <sect1>
-        <title>Creating Servicegroups</title>
-        <para>You can create logical groupings of services as well. For example if you would like to
-            create a group of essential SUSE Manager services which are running define them within a
-                <filename>servicegroups.cfg</filename> file placed in
-                <filename>/etc/icinga/conf.d/</filename></para>
-        <screen>#Servicegroup 1
+        <sect2>
+            <title>Creating Servicegroups</title>
+            <para>You can create logical groupings of services as well. For example if you would
+                like to create a group of essential SUSE Manager services which are running define
+                them within a <filename>servicegroups.cfg</filename> file placed in
+                    <filename>/etc/icinga/conf.d/</filename></para>
+            <screen>#Servicegroup 1
 define servicegroup {
   servicegroup_name     SUSE Manager Essential Services
   alias                 Essential Services
@@ -319,19 +318,21 @@ define servicegroup {
   servicegroup_name     Client Patch Status
   alias                 SUSE Manager 3 Client Patch Status
 }</screen>
-        <para>Within each hosts host.cfg file add a service to a servicegroup with the following
-            variable:</para>
-        <screen>define service {
+            <para>Within each hosts host.cfg file add a service to a servicegroup with the following
+                variable:</para>
+            <screen>define service {
   use                 generic-service
   service_description SSH
   check_command       check_ssh
   check_interval      60
   servicegroups       SUSE Manager Essential Services
 }</screen>
-        <para>All services that include the <literal>servicegroups</literal> variable and the name
-            of the servicegroup will be added to the specified servicegroup. After adding services
-            to a servicegroup restart Icinga to load the new configuation: </para>
-        <screen># systemctl restart icinga</screen>
+            <para>All services that include the <literal>servicegroups</literal> variable and the
+                name of the servicegroup will be added to the specified servicegroup. After adding
+                services to a servicegroup restart Icinga to load the new configuation: </para>
+            <screen># systemctl restart icinga</screen>
+        </sect2>
+
     </sect1>
 
     <sect1>
@@ -656,17 +657,15 @@ define service{
         </procedure>
     </sect1>
 
-    <sect1>
+    <!--    <sect1>
         <title>Monitoring Disk Space</title>
         <para>TESTING COMPLETE COMING SOON</para>
-    </sect1>
+    </sect1> -->
 
     <sect1>
         <title>Using the SUSE check_suma_patches Plugin</title>
         <para>You can use the <filename>check_suma_patches</filename> plugin to check if any
-            machines connected to SUSE Manager as clients require a patch or an update. These will
-            be reported as a green <literal>OK</literal><emphasis>System is up to date</emphasis> or
-            a red <literal>Critical</literal><emphasis>Critical patch(es) pending</emphasis>. The
+            machines connected to SUSE Manager as clients require a patch or an update. The
             following procedure will guide you through the setup of the check_suma_patches
             plugin.</para>
 
@@ -711,14 +710,87 @@ command[check_suma_patches]=sudo /usr/lib/nagios/plugins/check_suma_patches $ARG
 }
 </screen>
             </step>
-
+            <step>
+                <para/>
+                <itemizedlist>
+                    <listitem>
+                        <para><literal>OK:System is up to date</literal></para>
+                    </listitem>
+                    <listitem>
+                        <para><literal>Warning: At least one patch or package update is
+                                available</literal></para>
+                    </listitem>
+                    <listitem>
+                        <para><literal>Critical:At least one security/critical update is
+                                available</literal></para>
+                    </listitem>
+                    <listitem>
+                        <para><literal>Unspecified:The host cannot be found in the SUSE Manager
+                                database or the host name is not unique</literal>
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </step>
         </procedure>
-        <para>This completes setup of the <emphasis>check_suma_patches</emphasis> plugin.</para>
+        <para>This completes setup of the <literal>check_suma_patches</literal> plugin.</para>
     </sect1>
 
     <sect1>
         <title>Using the SUSE check_suma_lastevent Plugin</title>
-        <para>TESTING COMPLETE COMING SOON</para>
+        <para>You can use the <filename>check_suma_lastevent</filename> plugin to display the last
+            action executed on any host. </para>
+
+        <para>The following procedure will guide you through the setup of the check_suma_patches
+            plugin.</para>
+
+        <procedure>
+            <title>Setup check_suma_lastevent</title>
+            <step>
+                <para>On your SUSE Manager server open <filename>/etc/nrpe.cfg</filename> and add
+                    the following lines:</para>
+                <screen># Check SUSE Manager Hosts last events
+command[check_events]=sudo /usr/lib/nagios/plugins/check_suma_lastevent $ARG1$ </screen>
+            </step>
+            <step>
+                <para>On your Icina server open
+                        <filename>/etc/icinga/objects/commands.cfg</filename> and add the following
+                    lines:</para>
+                <screen>define command{
+        command_name    check_events
+        command_line    /usr/lib/nagios/plugins/check_nrpe -H manager.suse.de -c $ARG1$ -a $HOSTNAME$
+}</screen>
+            </step>
+            <step>
+                <para>On your Icinga server add the following line to a host.cfg service
+                    definition:</para>
+                <screen>define service{
+        use                             generic-service
+        host_name                       hostname
+        service_description             Last Events
+        check_command                   check_events!check_suma_lastevent
+        }</screen>
+            </step>
+            <step>
+                <para>Status will be reported as follows:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para><literal>OK:Last action completed successfully</literal></para>
+                    </listitem>
+                    <listitem>
+                        <para><literal>Warning: Action is currently in progress</literal></para>
+                    </listitem>
+                    <listitem>
+                        <para><literal>Critical:Last action failed</literal></para>
+                    </listitem>
+                    <listitem>
+                        <para><literal>Unspecified:The host cannot be found in the SUSE Manager
+                                database or the host name is not unique</literal>
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </step>
+        </procedure>
+        <para>This completes setup of the <literal>check_suma_lastevents</literal> plugin.</para>
     </sect1>
 
     <sect1>
