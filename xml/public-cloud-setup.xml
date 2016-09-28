@@ -54,19 +54,20 @@
     <para>&susemgr; Server and &susemgr; Proxy instances are expected
      to run in a network configuration that provides you control over
      DNS entries and that is shielded from the Internet at large. Within
-     this network configuration FQDN (Full Qualified Domain Name) resolution
-     must be provided, such that <literal>hostname -f</literal>. The DNS
-     (Domain Name Resolution) resolution is not only important for
-     the &susemgr; Server procedure but is also important when clients
-     are configered to be managed via &susemgr;. Configuring DNS is Cloud
-     Framework dependent, please refer to the cloud service provider
-     documentation for detailed instructions. </para>
+     this network configuration DNS (Domain Name Service) resolution
+     must be provided, such that <literal>hostname -f</literal> returns
+     the FQDN (Full Qualified Domain Name). The DNS resolution is not only
+     important for the &susemgr; Server procedure but is also important
+     when clients are configured to be managed via &susemgr;. Configuring
+     DNS is Cloud Framework dependent, please refer to the cloud service
+     provider documentation for detailed instructions.</para>
    </listitem>
    <listitem>
-    <para> Minimal free disk space for &susemgr; 15G. For Public Cloud
-     instances we recommend that the repositories and the &susemgr; Server
-     database, and respectively the &susemgr; Proxy squid cache, be located
-     on an external virtual disk. The details of this setup are provided in
+     <para> Minimal free disk space for &susemgr; 15G.</para>
+     <para>For Public Cloud instances we recommend that the repositories
+     and the &susemgr; Server database, and respectively the &susemgr; Proxy
+     squid cache, be located on an external virtual disk. The details for
+     this setup are provided in
      <xref linkend="using-separate-storage-volume"/>. </para>
     <para> Storing the database and the repositories on an external virtual
      disk ensures that the data is not lost should the instance need to be
@@ -85,7 +86,7 @@
     <para> Run an instance of the &susemgr; Server or &susemgr; Proxy
      image as published by SUSE. </para>
     <para> The images are identifiable by the suse, manager, server or proxy,
-     byos keywords in each public cloud environment. </para>
+     and byos keywords in each public cloud environment. </para>
     <para> The &susemgr; instance must run in a network access restricted
      environment such as the private subnet of a VPC or with an appropriate
      firewall setting such that it can only be accessed by machines in the IP
@@ -110,26 +111,28 @@
       <para> Set the hostname to a name of your choice. Please note
        it is important to provide the <replaceable>system name</replaceable>
        and not the <replaceable>fully qualified host name</replaceable>
-       to the <filename>hostnamectl</filename> command.
+       to the <filename>hostnamectl</filename> command.</para>
 
-       It is expected that the Fully Qualified Domain Name (FQDN) is set
-       by the cloud framework, in this example we use
-       <emphasis role="strong">cloud_instance.cloud.net</emphasis> which
-       would result in <emphasis role="strong">cloud_instance</emphasis>
-       as the system name and <emphasis role="strong">cloud.net</emphasis>
-       defining the domain name.
+       <para>It is expected that the Fully Qualified Domain Name (FQDN) is
+       set by the cloud framework; for example if 
+       <emphasis role="strong">cloud_instance.cloud.net</emphasis> is the
+       fully qualified name than
+       <emphasis role="strong">cloud_instance</emphasis>
+       is the system name and <emphasis role="strong">cloud.net</emphasis>
+       is the domain name.</para>
 
-       In the following example we will change the system name to
+       <para>In the following example we will change the system name to
        <emphasis role="strong">suma</emphasis>
        <screen>$ hostnamectl set-hostname suma</screen>
        The fully qualified host name is now locally set to
-       <emphasis role="strong">suma.cloud.net</emphasis>. In order
-       to complete the hostname change to allow
-       <filename>yast2 susemanager_setup</filename> to work, it is
-       also required to adapt the <filename>/etc/hosts</filename>
+       <emphasis role="strong">suma.cloud.net</emphasis>. Once the hostname
+       is set locally a DNS entry needs to be created in your network
+       environment such that domain name resolution works properly.</para>
+
+       <para>Alternatively to force proper resolution of the name on the
+       &susemgr; system you may alter the <filename>/etc/hosts</filename>
        file as follows:
-       <screen>$ vi /etc/hosts
-$ echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
+       <screen>$ sudo echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
        The current value for the <replaceable>local_address</replaceable>,
        can be obtained from the public cloud Web console or from within
        a terminal session as follows:
@@ -147,17 +150,24 @@ $ echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
         <screen>$ azuremetadata --internal-ip</screen>
        </listitem>
        </itemizedlist>
-       Once the <filename>/etc/hosts</filename> update has been completed it's
-       required to let the DNS service of your network environment
-       properly resolve this name, an update of the DNS record is
-       required as shown in the next paragraph.
        </para>
+
+       <para>Note that forcing the DNS resolution to work via modification
+       of the <filename>/etc/hosts</filename> file will allow the
+       <filename>yast2 susemanager_setup</filename> procedure to work. However,
+       if DNS resolution is not properly configured this also implies that
+       any client that is to be managed via this &susemgr; instance must
+       also receive the same modification to <filename>/etc/hosts</filename>.
+       </para>
+
+       <para>Reference information for the DNS record update is provided
+       below.</para>
      </listitem>
 
      <listitem>
-      <para>Update the DNS entry for this instance within the DNS service
-       of your network environment, refer to the cloud service provider
-       documentation for detailed instructions:
+       <para>For an update of the DNS records for the instance within the
+       DNS service of your network environment, refer to the cloud service
+       provider documentation for detailed instructions:
        <itemizedlist mark="bullet" spacing="normal">
        <listitem>
         <para><link
@@ -183,16 +193,16 @@ $ echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
     <para> Configure &susemgr; </para>
     <substeps performance="required">
      <step>
-      <para> If you run a &susemgr; Server instance </para>
-      <para> Run YaST as follows: </para>
-      <para> After the instance is launched and the external storage is
-       attached and prepared according to <xref
-        linkend="using-separate-storage-volume"/> begin with the setup of
-       &susemgr;. The steps that follow do not differ from the documentation
-       in the <link
+       <para> If you run a &susemgr; Server instance run YaST as shown
+       below after the instance is launched, the external storage is
+       attached and prepared according to
+       <xref linkend="using-separate-storage-volume"/>, and the DNS resolution
+       is set up as described earlier.</para>
+       <screen>$ sudo /sbin/yast2 susemanager_setup</screen>
+       <para>Note that the setup of &susemgr; from this point forward does
+       not differ from the documentation in the <link
         xlink:href="https://www.suse.com/documentation/suse_manager">SUSE
         Manager Guide</link>. </para>
-      <screen>$ sudo /sbin/yast2 susemanager_setup</screen>
       <para>The &susemgr; setup procedure in YaST is designed as a one pass
        process with no rollback or cleanup capability. Therefore, if the
        setup procedure is interrupted or ends with an error, it is not
@@ -203,7 +213,7 @@ $ echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
        fresh setup procedure on a clean system.
       </para>
       <para> If you are prompted with a message that there is not enough space
-       available for the setup of &susemgr;, verify that your root volume is
+       available for the setup of &susemgr; verify that your root volume is
        at least 20GB and double check that the instructions in <xref
         linkend="using-separate-storage-volume"/> had the desired effects. </para>
       <para> &susemgr; Server for the Public Cloud comes with a bootstrap
@@ -215,7 +225,7 @@ $ echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
       </para>
       <screen>$ sudo mgr-create-bootstrap-repo --datamodule=mgr_pubcloud_bootstrap_data -c SLE-12-SP1-x86_64</screen>
       <para> The above example creates a bootstrap repository suitable for SUSE
-       Enterprise Server 12 SP1 instances. See <link
+       Linux Enterprise Server 12 SP1 instances. See <link
        xlink:href="https://www.suse.com/documentation/suse-manager-3/book_suma3_quickstart_3/data/create_tools_repository.html">
        Creating the SUSE Manger Tools Repository</link> for more information on bootstrapping.
       </para>
@@ -246,20 +256,20 @@ $ echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
         between the repositories provided by &susemgr; and the repositories
         provided by the SUSE operated update infrastructure.
       </para>
-      <para>Additionally remove the line from <filename>/etc/hosts</filename>
-        that contains the <emphasis role="strong">susecloud.net</emphasis>
-        reference.</para>
+      <para>Additionally remove the line from the
+      <filename>/etc/hosts</filename> file that contains the
+      <emphasis role="strong">susecloud.net</emphasis> reference.</para>
      </step>
      <step>
       <para> If you run a &susemgr; Proxy instance </para>
       <para> Launch the instance, optionally with external storage configured.
-       If you use external storage (recommended), prepare it according to <xref
-        linkend="using-separate-storage-volume"/>. It is recommended but not required to prepare the
-       storage before configuring &susemgr; proxy, as the suma-storage
-       script will migrate any existing cached data to the external storage.
-       After preparing the instance, register the system with the parent SUSE
-       Manager, which could be a &susemgr; Server or another &susemgr;
-       Proxy. See the <link
+      If you use external storage (recommended), prepare it according to
+      <xref linkend="using-separate-storage-volume"/>. It is recommended but
+      not required to prepare the storage before configuring &susemgr; proxy,
+      as the suma-storage script will migrate any existing cached data to the
+      external storage. After preparing the instance, register the system
+      with the parent SUSE Manager, which could be a &susemgr; Server or
+      another &susemgr; Proxy. See the <link
         xlink:href="https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_proxyquick/book_susemanager_proxyquick.html"
         > &susemgr; Proxy Setup guide</link> for details. Once registered,
        run </para>
