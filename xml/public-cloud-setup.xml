@@ -98,7 +98,8 @@
     <para> Setup the hostname as follows: </para>
 
     <para> &susemgr; requires a stable and reliable hostname and does not
-     take kindly to host name changes. </para>
+     take kindly to hostname changes. All commands provided need to be
+     executed as the <emphasis role="strong">root</emphasis> user.</para>
     <orderedlist>
      <listitem>
       <para> Disable hostname setup in the dhcp configuration file:
@@ -110,7 +111,7 @@
      <listitem>
       <para> Set the hostname to a name of your choice. Please note
        it is important to provide the <replaceable>system name</replaceable>
-       and not the <replaceable>fully qualified host name</replaceable>
+       and not the <replaceable>fully qualified hostname</replaceable>
        to the <filename>hostnamectl</filename> command.</para>
 
        <para>It is expected that the Fully Qualified Domain Name (FQDN) is
@@ -124,16 +125,16 @@
        <para>In the following example we will change the system name to
        <emphasis role="strong">suma</emphasis></para>
        <screen>$ hostnamectl set-hostname suma</screen>
-       <para>The fully qualified host name is now locally set to
+       <para>The fully qualified hostname is now locally set to
        <emphasis role="strong">suma.cloud.net</emphasis>. Once the hostname
        is set locally a DNS entry needs to be created in your network
        environment such that domain name resolution works properly.</para>
 
        <para>Alternatively to force proper resolution of the name on the
        &susemgr; system you may alter the <filename>/etc/hosts</filename>
-       file as follows:</para>
-       <screen>$ sudo echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
-       <para>The current value for the <replaceable>local_address</replaceable>,
+       file as follows:
+       <screen>$ echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
+       The current value for the <replaceable>local_address</replaceable>,
        can be obtained from the public cloud Web console or from within
        a terminal session as follows:</para>
        <itemizedlist>
@@ -157,6 +158,17 @@
        if DNS resolution is not properly configured this also implies that
        any client that is to be managed via this &susemgr; instance must
        also receive the same modification to <filename>/etc/hosts</filename>.
+       </para>
+
+       <para>One more aspect of hostname resolution is the
+       <filename>/etc/resolv.conf</filename> file. Depending on the order of
+       your setup, i.e. if you started the &susemgr; instance prior to setting
+       up DNS services the file may not contain the appropriate
+       <emphasis role="strong">search</emphasis> directive. Double check
+       that the proper search directive exists in
+       <filename>/etc/resolv.conf</filename>. In our example the directive
+       would be <emphasis role="strong">search cloud.net</emphasis>. If the
+       directive is missing add it to the file.
        </para>
 
        <para>Reference information for the DNS record update is provided
@@ -196,7 +208,7 @@
        attached and prepared according to
        <xref linkend="using-separate-storage-volume"/>, and the DNS resolution
        is set up as described earlier.</para>
-       <screen>$ sudo /sbin/yast2 susemanager_setup</screen>
+       <screen>$ /sbin/yast2 susemanager_setup</screen>
        <para>Note that the setup of &susemgr; from this point forward does
        not differ from the documentation in the <link
         xlink:href="https://www.suse.com/documentation/suse_manager">SUSE
@@ -221,7 +233,7 @@
        make sure when creating the bootstrap repository you run the
        mgr-create-bootstrap-repo script as follows:
       </para>
-      <screen>$ sudo mgr-create-bootstrap-repo --datamodule=mgr_pubcloud_bootstrap_data -c SLE-12-SP1-x86_64</screen>
+      <screen>$ mgr-create-bootstrap-repo --datamodule=mgr_pubcloud_bootstrap_data -c SLE-12-SP1-x86_64</screen>
       <para> The above example creates a bootstrap repository suitable for SUSE
        Linux Enterprise Server 12 SP1 instances. See <link
        xlink:href="https://www.suse.com/documentation/suse-manager-3/book_suma3_quickstart_3/data/create_tools_repository.html">
@@ -271,7 +283,7 @@
         xlink:href="https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_proxyquick/book_susemanager_proxyquick.html"
         > &susemgr; Proxy Setup guide</link> for details. Once registered,
        run </para>
-      <screen>$ sudo /usr/sbin/configure-proxy.sh</screen>
+      <screen>$ /usr/sbin/configure-proxy.sh</screen>
       <para> to configure your &susemgr; Proxy instance. </para>
      </step>
     </substeps>
@@ -369,14 +381,14 @@
       required. In many cases the attached storage appears as <emphasis
        role="strong">/dev/sdb</emphasis>. In order to check which disk devices
       exists on your system, call the following command: </para>
-     <screen>$ sudo hwinfo --disk | grep -E "Device File:"</screen>
+     <screen>$ hwinfo --disk | grep -E "Device File:"</screen>
     </step>
     <step>
      <para> With the device name at hand the process of re-linking the
       directories in the filesystem &susemgr; uses to store data is handled
       by the suma-storage script. In the following example we use
        <filename>/dev/sdb</filename> as the device name. </para>
-     <screen>$ sudo /usr/bin/suma-storage /dev/sdb</screen>
+     <screen>$ /usr/bin/suma-storage /dev/sdb</screen>
      <para> After the call all database and repository files used by SUSE
       Manager Server are moved to the newly created xfs based storage. In case
       your instance is a &susemgr; Proxy, the script will move the Squid
