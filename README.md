@@ -102,7 +102,13 @@ Please do not make any commits to the master branch. master is reserved for rele
 
 ```
 OBS_USER=keichwa
+OBS_USER=jcayouette
+
+Add for Head:
 OBS_REPO=Devel:Galaxy:Manager:Head
+
+Add for 3.0
+OBS_REPO=Devel:Galaxy:Manager:3.0
 
 daps -d DC-create-all package-src --set-date=$(date --iso) \
      --def-file DEF-susemanager-docs
