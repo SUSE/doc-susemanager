@@ -13,7 +13,120 @@
     <para/>
 
     <sect1>
-        <title/>
+        <title>Server Requirements and Configuration for RES Channels</title>
+        <para>This section provides guidance on server configuration for RES Channels provided by
+            SUSE.</para>
+        <itemizedlist>
+            <listitem>
+                <para>Minimum of 8GB ram and two CPU/vCPU's. Taskomatic will use 1 of these
+                    CPUs</para>
+            </listitem>
+            <listitem>
+                <para>Taskomatic requires of minimum of 3072MB Ram. This should be set in
+                        <filename>/etc/rhn/rhn.conf</filename>:</para>
+                <screen>taskomatic.maxmemory=3072</screen>
+            </listitem>
+            <listitem>
+                <para>Provision enough disk space. <filename>/var/spacewalk</filename> contains all
+                    mirrored RPMs. E.g. RES 6 x86_64 channels require 90GB+ </para>
+            </listitem>
+            <listitem>
+                <para>LVM or an NFS mount is recommended</para>
+            </listitem>
+        </itemizedlist>
+        <important>
+            <title>Access to RHEL Media/repositories</title>
+            <para>Access to Red Hat base media repositories and RHEL installation media is the
+                responsibility of our customers. Ensure that all your RHEL systems obtain support
+                from RHEL, or alternatively all RHEL systems obtain support from SUSE. If you do not
+                follow these practices you may violate terms with Red Hat.</para>
+        </important>
+    </sect1>
+
+    <sect1>
+        <title>Channel Layout and Management</title>
+        <para>This section provides guidance on channel layout and management.</para>
+        <itemizedlist>
+            <listitem>
+                <para>The base parent distribution/architecture RES channel contains zero packages.
+                    No base media is provided by SUSE. The RHEL media or installation ISOs should be
+                    added as child channels of the RES parent channel.</para>
+            </listitem>
+            <listitem>
+                <para>The RES and tools channels are provided by SUSE Customer Center(SCC) using
+                        <literal>mgr-sync</literal></para>
+            </listitem>
+            <listitem>
+                <para>It can take up to or more than 24 hours for an initial channel sync.</para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+    <sect1>
+        <title>Syncing RES Channels</title>
+        <para>This section provides guidance on syncing SUSE Expanded Support channels in SUSE
+            Manager.</para>
+        <procedure>
+            <title>Syncing RES Channels</title>
+            <step>
+                <para/>
+            </step>
+        </procedure>
+    </sect1>
+    <sect1>
+        <title>Mirroring RHEL Media to a Channel</title>
+        <para>The following procedure guides you through setup of the RHEL media as a SUSE Manager
+            channel. All packages on the RHEL media will be mirrored into a child channel located
+            under RES 5/6/7 distribution/architecture.</para>
+
+        <procedure>
+            <title>Mirroring RHEL Media into a Channel</title>
+            <step>
+                <para>Create a new Channel by logging into the WebUI and selecting
+                        <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software Channels</guimenu>
+                    &gt; <guimenu>Create Channel. </guimenu></para>
+            </step>
+            <step>
+                <para>Fill in basic channel details and add the channel as a child to the
+                    corresponding RES 5/6/7 distribution/architecture channel from Customer Center.
+                    The base parent channel should contain zero packages.</para>
+            </step>
+            <step>
+                <para>Modify the RES 5/6/7 activation key to include this new child channel</para>
+            </step>
+            <step>
+                <para>As root on the SUSE Manager command line copy the ISO to
+                        <filename>/tmp</filename> directory.</para>
+            </step>
+            <step>
+                <para>Create a directory to contain the media content:</para>
+                <screen># mkdir -p /srv/www/htdocs/pub/rhel</screen>
+            </step>
+            <step>
+                <para>Mount the ISO:</para>
+                <screen># mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel</screen>
+            </step>
+            <step>
+                <para>Start spacewalk-repo-sync to sync packages:</para>
+                <screen># spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
+Repo URL: https://127.0.0.1/pub/rhel/Server/
+Packages in repo:              3690
+Packages already synced:          0
+Packages to sync:              3690
+1/3690 : texlive-latex-2007-57.el6_2-0.x86_64
+2/3690 : boost-filesystem-1.41.0-18.el6-0.i686
+3/3690 : policycoreutils-newrole-2.0.83-19.39.el6-0.x86_64
+[...]</screen>
+            </step>
+            <step>
+                <para>Once the channel has completed the sync process you can utilize the channel as
+                    any normal SUSE Manager channel.</para>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Registering RHEL salt-minions with SUSE Manager</title>
+        <para/>
         <para/>
     </sect1>
 
@@ -21,49 +134,127 @@
         <title/>
         <para/>
     </sect1>
-
-    <sect1>
-        <title/>
-        <para/>
-    </sect1>
-
-
-
 
 
     <sect1>
         <title>Managing CentOS with SUSE Manager</title>
-        <para>The following sections will guide you through preparing and adding centOS clients to
-            SUSE Manager.start</para>
+        <para>The following sections will guide you through preparing CentOS channels and
+            repositories for bootstrapping CentOS clients to SUSE Manager.</para>
 
         <sect2>
             <title>Creating Channels and Repositories</title>
-            <para>First you will need to create the required channels and repositories for
-                centOS.</para>
+            <para>Create the repositories for CentOS.</para>
             <procedure>
                 <title>Adding the Base repository</title>
                 <step>
                     <para>Login to your SUSE Manager WebUI and browse to:
                             <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
-                            Channels</guimenu> &gt; <guimenu>Mange Repositories</guimenu> and select
-                            <guimenu>Create New Repository</guimenu></para>
+                            Channels</guimenu> &gt; <guimenu>Manage Repositories</guimenu> and
+                        select <guimenu>Create New Repository</guimenu></para>
                 </step>
                 <step>
-                    <para>Add Base repository details:</para>
+                    <para>Add the Base repository details:</para>
                     <screen>Repository label: CentOS 6 Base x86_64
 Repository URL: http://mirrors.kernel.org/centos/6/os/x86_64/
 
 Has signed metadata? UNCHECKED</screen>
                 </step>
-                <step><para></para></step>
+                <step>
+                    <para>Repeat previous steps and create the updates repository:</para>
+                    <screen>Repository label: CentOS 6 updates x86_64
+Repository URL: http://mirrors.kernel.org/centos/6/updates/x86_64/
+(or your preferred mirror)
+
+Has signed metadata? UNCHECKED</screen>
+                </step>
             </procedure>
-            
-            
+
+
         </sect2>
 
         <sect2>
-            <title>Associate Repositories to Channels</title>
-            <para/>
+            <title>Creating CentOS Channels</title>
+            <para>Create the CentOS channels.</para>
+            <procedure>
+                <title>Creating the CentOS Channels</title>
+                <step>
+                    <para>Login to your SUSE Manager WebUI and browse to:
+                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
+                            Channels</guimenu> &gt; <guimenu>Create New Channel</guimenu></para>
+                </step>
+                <step>
+                    <para>Add the following base channel details:</para>
+                    <screen>Channel Name*: CentOS 6 Base - x86_64
+Channel Label*: centos6-base-x86_64
+Parent Channel: None
+Architecture: x86_64
+Repository Checksum Type: sha1
+
+Channel Summary, etc: fill as desired
+
+GPG key URL: http://mirrors.kernel.org/centos/6/os/x86_64/RPM-GPG-KEY-CentOS-6
+GPG key ID: C105B9DE
+GPG key Fingerprint: C1DA C52D 1664 E8A4 386D BA43 0946 FCA2 C105 B9DE</screen>
+                </step>
+                <step>
+                    <para>Repeat the previous steps and create the updates child channel</para>
+                    <screen>Channel Name*: CentOS 6 Updates - x86_64
+Channel Label*: centos6-updates-x86_64
+Parent Channel: CentOS 6 Base - x86_64
+Architecture: x86_64
+Repository Checksum Type: sha1
+
+Channel Summary, etc: fill as desired
+
+GPG key URL: http://mirrors.kernel.org/centos/6/os/x86_64/RPM-GPG-KEY-CentOS-6
+GPG key ID: C105B9DE
+GPG key Fingerprint: C1DA C52D 1664 E8A4 386D BA43 0946 FCA2 C105 B9DE</screen>
+                </step>
+            </procedure>
+
+        </sect2>
+
+        <sect2>
+            <title>Adding the Repositories to the New Channels</title>
+            <para>Add the repositories to your new channels.</para>
+            <procedure>
+                <title>Add Repositories to Channels</title>
+                <step>
+                    <para>Login to your SUSE Manager WebUI and browse to:
+                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
+                            Channels</guimenu> and click the <guimenu>CentOS Base channel</guimenu>
+                        created previously.</para>
+                </step>
+                <step>
+                    <para/>
+                    <para>Select the <guimenu>Repositories</guimenu> tab and select the CentOS base
+                        repository.</para>
+                </step>
+                <step>
+                    <para>Now add the updates repository to the updates child channel. Browse to
+                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
+                            Channels</guimenu> and select the <guimenu>CentOS Updates
+                            Channel</guimenu> created previously.</para>
+                </step>
+                <step>
+                    <para>Select the <guimenu>Repositories</guimenu> tab and select the CentOS
+                        updates repository.</para>
+                </step>
+                <step>
+                    <para>You may optionally force a sync of channel packages by clicking the
+                            <guimenu>Sync</guimenu>.</para>
+                </step>
+                <step>
+                    <para>Once you have completed syncing the Updates and Base CentOS channels you
+                        should see an estimated 6000+ packages for the base channel and a few
+                        hundred for the updates channel. The next section will cover registering
+                        CentOS clients.</para>
+                </step>
+            </procedure>
+        </sect2>
+
+        <sect2>
+            <title>Registering CentOS salt-minions with SUSE Manager</title>
         </sect2>
 
     </sect1>
