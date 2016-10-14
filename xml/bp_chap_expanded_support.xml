@@ -11,103 +11,118 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="mgr.expanded.support">
     <title>Expanded Support</title>
     <para/>
+    <sect1>
+        <title>Managing RES Clients</title>
+        <para>The following sections provide guidance on managing Red Hat Expanded Support clients,
+            this includes salt-minions and traditional systems. </para>
 
-    <sect1>
-        <title>Server Requirements and Configuration for RES Channels</title>
-        <para>This section provides guidance on server configuration for RES Channels provided by
-            SUSE.</para>
-        <itemizedlist>
-            <listitem>
-                <para>Minimum of 8GB ram and two CPU/vCPU's. Taskomatic will use 1 of these
-                    CPUs</para>
-            </listitem>
-            <listitem>
-                <para>Taskomatic requires of minimum of 3072MB Ram. This should be set in
-                        <filename>/etc/rhn/rhn.conf</filename>:</para>
-                <screen>taskomatic.maxmemory=3072</screen>
-            </listitem>
-            <listitem>
-                <para>Provision enough disk space. <filename>/var/spacewalk</filename> contains all
-                    mirrored RPMs. E.g. RES 6 x86_64 channels require 90GB+ </para>
-            </listitem>
-            <listitem>
-                <para>LVM or an NFS mount is recommended</para>
-            </listitem>
-        </itemizedlist>
-        <important>
-            <title>Access to RHEL Media/repositories</title>
-            <para>Access to Red Hat base media repositories and RHEL installation media is the
-                responsibility of our customers. Ensure that all your RHEL systems obtain support
-                from RHEL, or alternatively all RHEL systems obtain support from SUSE. If you do not
-                follow these practices you may violate terms with Red Hat.</para>
-        </important>
-    </sect1>
+        <sect2>
+            <title>Server Configuration for RES Channels</title>
+            <para>This section provides guidance on server configuration for RES Channels provided
+                by SUSE.</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Minimum of 8GB ram and at least two physical CPU or virtual CPU's.
+                        Taskomatic will use 1 of these CPUs</para>
+                </listitem>
+                <listitem>
+                    <para>Taskomatic requires of minimum of 3072MB Ram. This should be set in
+                            <filename>/etc/rhn/rhn.conf</filename>:</para>
+                    <screen>taskomatic.maxmemory=3072</screen>
+                </listitem>
+                <listitem>
+                    <para>Provision enough disk space. <filename>/var/spacewalk</filename> contains
+                        all mirrored RPMs. For example: RES 6 x86_64 channels require 90GB+ </para>
+                </listitem>
+                <listitem>
+                    <para>LVM or an NFS mount is recommended</para>
+                </listitem>
+                <listitem>
+                    <para>Access to RHEL 5/6/7 Subscription Media</para>
+                </listitem>
+            </itemizedlist>
+            <warning>
+                <title>Access to RHEL Media/repositories</title>
+                <para>Access to Red Hat base media repositories and RHEL installation media is the
+                    responsibility of our customers. Ensure that all your RHEL systems obtain
+                    support from RHEL, or alternatively all your RHEL systems obtain support from
+                    SUSE. If you do not follow these practices you may violate terms with Red
+                    Hat.</para>
+            </warning>
+        </sect2>
 
-    <sect1>
-        <title>Channel Layout and Management</title>
-        <para>This section provides guidance on channel layout and management.</para>
-        <itemizedlist>
-            <listitem>
-                <para>The base parent distribution/architecture RES channel contains zero packages.
-                    No base media is provided by SUSE. The RHEL media or installation ISOs should be
-                    added as child channels of the RES parent channel.</para>
-            </listitem>
-            <listitem>
-                <para>The RES and tools channels are provided by SUSE Customer Center(SCC) using
-                        <literal>mgr-sync</literal></para>
-            </listitem>
-            <listitem>
-                <para>It can take up to or more than 24 hours for an initial channel sync.</para>
-            </listitem>
-        </itemizedlist>
-    </sect1>
-    <sect1>
-        <title>Syncing RES Channels</title>
-        <para>This section provides guidance on syncing SUSE Expanded Support channels in SUSE
-            Manager.</para>
-        <procedure>
+        <sect2>
+            <title>RES Channel Management Tips</title>
+            <para>This section provides tips on RES channel management.</para>
+            <itemizedlist>
+                <listitem>
+                    <para>The base parent distribution/architecture RES channel contains zero
+                        packages. No base media is provided by SUSE. The RHEL media or installation
+                        ISOs should be added as child channels of the RES parent channel.</para>
+                </listitem>
+                <listitem>
+                    <para>The RES and tools channels are provided by SUSE Customer Center(SCC) using
+                            <literal>mgr-sync</literal></para>
+                </listitem>
+                <listitem>
+                    <para>It can take up to or more than 24 hours for an initial channel
+                        sync.</para>
+                </listitem>
+                <listitem>
+                    <para>Once you have completed the initial sync process of any RES channel it is
+                        recommended to clone the channel before working with it. This provides you
+                        with a backup of the original sync.</para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        <sect2>
             <title>Syncing RES Channels</title>
-            <step>
-                <para/>
-            </step>
-        </procedure>
-    </sect1>
-    <sect1>
-        <title>Mirroring RHEL Media to a Channel</title>
-        <para>The following procedure guides you through setup of the RHEL media as a SUSE Manager
-            channel. All packages on the RHEL media will be mirrored into a child channel located
-            under RES 5/6/7 distribution/architecture.</para>
-
-        <procedure>
+            <para>This section provides guidance on syncing SUSE Expanded Support channels in SUSE
+                Manager.</para>
+            <procedure>
+                <title>Syncing RES Channels</title>
+                <step>
+                    <para/>
+                </step>
+            </procedure>
+        </sect2>
+        <sect2>
             <title>Mirroring RHEL Media into a Channel</title>
-            <step>
-                <para>Create a new Channel by logging into the WebUI and selecting
-                        <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software Channels</guimenu>
-                    &gt; <guimenu>Create Channel. </guimenu></para>
-            </step>
-            <step>
-                <para>Fill in basic channel details and add the channel as a child to the
-                    corresponding RES 5/6/7 distribution/architecture channel from Customer Center.
-                    The base parent channel should contain zero packages.</para>
-            </step>
-            <step>
-                <para>Modify the RES 5/6/7 activation key to include this new child channel</para>
-            </step>
-            <step>
-                <para>As root on the SUSE Manager command line copy the ISO to
-                        <filename>/tmp</filename> directory.</para>
-            </step>
-            <step>
-                <para>Create a directory to contain the media content:</para>
-                <screen># mkdir -p /srv/www/htdocs/pub/rhel</screen>
-            </step>
-            <step>
-                <para>Mount the ISO:</para>
-                <screen># mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel</screen>
-            </step>
-            <step>
-                <para>Start spacewalk-repo-sync to sync packages:</para>
-                <screen># spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
+            <para>The following procedure guides you through setup of the RHEL media as a SUSE
+                Manager channel. All packages on the RHEL media will be mirrored into a child
+                channel located under RES 5/6/7 distribution/architecture.</para>
+
+            <procedure>
+                <title>Mirroring RHEL Media into a Channel</title>
+                <step>
+                    <para>Create a new Channel by logging into the WebUI and selecting
+                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
+                            Channels</guimenu> &gt; <guimenu>Create Channel. </guimenu></para>
+                </step>
+                <step>
+                    <para>Fill in basic channel details and add the channel as a child to the
+                        corresponding RES 5/6/7 distribution/architecture channel from Customer
+                        Center. The base parent channel should contain zero packages.</para>
+                </step>
+                <step>
+                    <para>Modify the RES 5/6/7 activation key to include this new child
+                        channel</para>
+                </step>
+                <step>
+                    <para>As root on the SUSE Manager command line copy the ISO to
+                            <filename>/tmp</filename> directory.</para>
+                </step>
+                <step>
+                    <para>Create a directory to contain the media content:</para>
+                    <screen># mkdir -p /srv/www/htdocs/pub/rhel</screen>
+                </step>
+                <step>
+                    <para>Mount the ISO:</para>
+                    <screen># mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel</screen>
+                </step>
+                <step>
+                    <para>Start spacewalk-repo-sync to sync packages:</para>
+                    <screen># spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
 Repo URL: https://127.0.0.1/pub/rhel/Server/
 Packages in repo:              3690
 Packages already synced:          0
@@ -116,28 +131,78 @@ Packages to sync:              3690
 2/3690 : boost-filesystem-1.41.0-18.el6-0.i686
 3/3690 : policycoreutils-newrole-2.0.83-19.39.el6-0.x86_64
 [...]</screen>
-            </step>
-            <step>
-                <para>Once the channel has completed the sync process you can utilize the channel as
-                    any normal SUSE Manager channel.</para>
-            </step>
-        </procedure>
+                </step>
+                <step>
+                    <para>Once the channel has completed the sync process you can utilize the
+                        channel as any normal SUSE Manager channel.</para>
+                </step>
+            </procedure>
+        </sect2>
+
+        <sect2>
+            <title>Registering RES salt-minions with SUSE Manager</title>
+            <para>This section will guide you through registering RHEL minions with SUSE Manager.
+                This section assumes you have updated your server to the latest patch level</para>
+
+            <sect3>
+                <title>RES Products and Channels</title>
+                <para>Ensure you have the corresponding RES product enabled and required channels
+                    have been fully synced:</para>
+
+                <itemizedlist>
+                    <title>RHEL 7.x</title>
+                    <listitem>
+                        <para>- Product: RES 7</para>
+                    </listitem>
+                    <listitem>
+                        <para>- Mandatory channels: rhel-x86_64-server-7,
+                            res7-suse-manager-tools-x86_64, res7-x86_64</para>
+                    </listitem>
+                </itemizedlist>
+
+                <itemizedlist>
+                    <title>RHEL 6.x</title>
+                    <listitem>
+                        <para>- Product: RES 6</para>
+                    </listitem>
+                    <listitem>
+                        <para>- Mandatory channels: rhel-x86_64-server-6,
+                            res6-suse-manager-tools-x86_64, res6-x86_64</para>
+                    </listitem>
+                </itemizedlist>
+                <tip>
+                    <title>Checking Sync Progress</title>
+                    <para>To check if a channel has finished syncing you can do one of the
+                        following:</para>
+                    <itemizedlist>
+                        <listitem>
+                            <para>From the SUSE Manager WebUI browse to <guimenu>Admin</guimenu> >
+                                    <guimenu>Setup Wizard</guimenu> and select the <guimenu>SUSE
+                                    Products</guimenu> tab. Here you will find a percent completion
+                                bar for each product.</para>
+                        </listitem>
+                        <listitem>
+                            <para>Alternatively you may check the sync log file located under
+                                    <filename>/var/log/rhn/reposync/&lt;channel-label&gt;.log</filename>
+                                using cat or the tailf command. Keep in mind that base channels can
+                                contain multiple child channels. Each of these child channels will
+                                generate its own log during the sync progress. Do not assume a
+                                channel has finished syncing until you have checked all relevant log
+                                files including base and child channels.</para>
+                        </listitem>
+                    </itemizedlist>
+                </tip>
+            </sect3>
+            <sect3>
+                <title>Creating a Bootstrap Repository</title>
+
+            </sect3>
+
+        </sect2>
     </sect1>
 
     <sect1>
-        <title>Registering RHEL salt-minions with SUSE Manager</title>
-        <para/>
-        <para/>
-    </sect1>
-
-    <sect1>
-        <title/>
-        <para/>
-    </sect1>
-
-
-    <sect1>
-        <title>Managing CentOS with SUSE Manager</title>
+        <title>Managing CentOS Expanded Support Clients (RES)</title>
         <para>The following sections will guide you through preparing CentOS channels and
             repositories for bootstrapping CentOS clients to SUSE Manager.</para>
 
