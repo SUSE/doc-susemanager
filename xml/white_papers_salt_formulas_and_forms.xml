@@ -131,7 +131,7 @@ install_package_a:
     </sect1>
 
     <sect1>
-        <title>Making Pillar Data Editable from SUSE Manager</title>
+        <title>Making Pillar Data Editable in SUSE Manager</title>
 
         <para>Once you have written a formula, SUSE Manager allows you to generate and edit pillar
             data for system groups and individual systems. Pillar data allows you to define a
@@ -281,15 +281,29 @@ my_pillar:
                         attribute.</para>
                 </listitem>
             </varlistentry>
+
             <varlistentry>
                 <term> $visibleIf</term>
                 <listitem>
                     <para>$visibleIf allows you to show a field or group if a simple condition is
                         met. A condition always looks similar to the following example: </para>
                     <screen>some_group$another_group$my_checkbox == true</screen>
+
+
                     <para>The left part of the above statement is the path to another value, and
-                        groups are separated by <literal>$</literal> signs. A check-box must be
-                        structured similar to the following example:</para>
+                        groups are separated by <literal>$</literal> signs. The middle section of
+                        the command should be either <literal>==</literal> for a value to be equal
+                        or <literal>!=</literal> for values that should be not equal. The last field
+                        in the statement can be any value which a field should have or not
+                        have.</para>
+
+                    <para>The field with this attribute associated with it will now be shown only
+                        when the condition is met. In this example the field will be shown only if
+                            <literal>my_checkbox</literal> is checked. The ability to use
+                        conditional statements i not limited to checkboxes. It may also be used to
+                        check values of select-fields, text-fields etc.</para>
+
+                    <para>A check-box should be structured like the following example:</para>
                     <screen>some_group:
   $type: group
 
@@ -298,6 +312,45 @@ my_pillar:
 
       my_checkbox:
         $type: boolean</screen>
+
+                    <para>By using multiple groups with the attribute, you can allow a user to
+                        select an option and show a completely different form, dependant upon the
+                        selected value.</para>
+
+                    <note>
+                        <title>Hidden Values</title>
+                        <para>Hidden values will still be merged into the pillar data and sent to
+                            the server. The formula must check the condition again and use the
+                            appropriate data. For example:</para>
+                        <screen>show_option:
+  $type: checkbox
+some_text:
+  $visibleIf: show_option == true</screen>
+                        <screen>{% if pillar.show_option %}
+do_something:
+  with: {{ pillar.some_text }}
+{% endif %}</screen>
+
+                    </note>
+
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$values</term>
+                <listitem>
+                    <para>$value can only be used together with $type: select to specify the
+                        different options in the select-field. $values must be a list of possible
+                        values to select. For example:</para>
+                    <screen>select_something:
+  $type: select
+  $values: [“option1”, “option2”]</screen>
+                    <para>Or alternatively:</para>
+                    <screen>select_something:
+  $type: select
+  $values:
+    - option1
+    - option2</screen>
                 </listitem>
             </varlistentry>
         </variablelist>
@@ -308,6 +361,76 @@ my_pillar:
     <sect1>
 
         <title>File Structure Overview</title>
+        <para>Formulas in SUSE Manager are required to have a specific structure and should be
+            located within certain directories to work properly. A formula will always consists of
+            two separate parts: The <literal>state</literal> and the
+            <literal>metadata</literal>.</para>
+
+        <variablelist>
+            <varlistentry>
+                <term>The State</term>
+                <listitem>
+                    <para>The state is everything required for a salt state to work independently.
+                        This includes state files, the map.jinja file and any other files which may
+                        be required.</para>
+                    <note>
+                        <title>More on States Locations</title>
+                        <para>Although unnecessary, it is recommended, to place state files within a
+                            separate folder and use an init.sls file to represent the main state.
+                            You can however place a <filename>my_formula.sls in
+                                /srv/salt/</filename>. The name of the sls-file or the folder
+                            containing the init.sls must match the name of the folder containing the
+                            metadata files.</para>
+                    </note>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>The Metadata</term>
+                <listitem>
+                    <para>The metadata includes the <literal>form.yml</literal> file which defines
+                        the forms for SUSE Manager and an optional metadata.yml file that may
+                        contain additional metadata for a formula.</para>
+                    <note>
+                        <title>More on the metadata.yml File</title>
+                        <para>The metadata.yml file is an optional file, that may contain additional
+                            metadata for a formula which is used by SUSE Manager. metadata.yml is
+                            also written in YAML. Possible values are:</para>
+                        <itemizedlist>
+                            <listitem>
+                                <para>description: A description text for the formula.</para>
+                            </listitem>
+                            <listitem>
+                                <para>group: The name of a group of formulas. May be used when
+                                    working with multiple formulas that should be used together.
+                                    Formulas within the same group will always be grouped together
+                                    within the UI.</para>
+                            </listitem>
+                            <listitem>
+                                <para>after: A list of formulas, which should be executed before
+                                    this formula if present.</para>
+                            </listitem>
+                        </itemizedlist>
+                    </note>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Official Formulas</term>
+                <listitem>
+                    <para>Official formulas installed via RPMs store their state files within:
+                            <filename>/usr/share/susemanager/formulas/states/&lt;formula-name&gt;/</filename>
+                        and their metadata files within:
+                            <filename>/usr/share/susemanager/formulas/metadata/&lt;formula-name&gt;/</filename></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Custom Formulas</term>
+                <listitem>
+                    <para>To use custom formulas place your state files within:
+                            <filename>/srv/salt/</filename> and metadata files in:
+                            <filename>/srv/formula_metadata/&lt;formula-name&gt;/</filename></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
 
         <para>All folders located in the following directories should contain a
                 <literal>form.yml</literal> file. These files are detected as formula recipes and
@@ -392,6 +515,32 @@ my_pillar:
             </listitem>
 
         </itemizedlist>
+    </sect1>
+    <sect1>
+        <title>Example Formulas</title>
+        <para>The following examples should help you get started writing formulas.</para>
+        <variablelist>
+            <varlistentry>
+                <term>Basic Webserver Forumla</term>
+                <listitem>
+                    <para><link xlink:href="https://github.com/benediktwerner/webserver-formula"
+                        /></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Advanced Openstack Cloud Formula</term>
+                <listitem>
+                    <para><link xlink:href="https://github.com/benediktwerner/openstack-formula"
+                        /></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Test Formula For SUSE Manager</term>
+                <listitem>
+                    <para><link xlink:href="https://github.com/benediktwerner/test-formula"/></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
     </sect1>
 
 </chapter>
