@@ -23,11 +23,11 @@
             You can manipulate state files using Jinja. Jinja allows you to access pillar data by
             using the following syntax:</para>
         <screen>pillar.some.value</screen>
-        <para>Alternatively:</para>
+        <para>Alternatively you can use the following syntax:</para>
         <screen>salt['pillar.get']('some:value', 'default value')</screen>
 
-        <para>For example if you replace <literal>pillar</literal> with <literal>grains</literal>
-            (e.g. grains.some.value) you can access grains.</para>
+        <para>You may also replace the <literal>pillar</literal> value with
+                <literal>grains</literal> (e.g. grains.some.value) allowing access to grains.</para>
 
         <para>Using data this way allows you to make a formula configurable. The following code
             snippet will install a package specified in the pillar <literal>package_name</literal>.
@@ -106,7 +106,201 @@ do_something_with_{{ key }}: {{ value }}
 install_package_a:
   pkg.installed:
     - name: {{ data.package }}</screen>
+
+            <para>You can also define multiple variables by copying the <literal>{% set ...
+                    %}</literal> statement with different values and then merge it with other
+                pillars. For example:</para>
+            <screen>{% set server = salt[‘grains.filter_by’]({
+    ‘Suse’: {
+        ‘package’: ‘my-server-pkg’
+    }
+}, merge=salt[‘pillar.get’](‘myFormula:server’)) %}
+{% set client = salt[‘grains.filter_by’]({
+    ‘Suse’: {
+        ‘package’: ‘my-client-pkg’
+    }
+}, merge=salt[‘pillar.get’](‘myFormula:client’)) %}</screen>
+
+            <para>To import multiple variables, separate them with a comma. For Example:</para>
+            <screen>{% from “map.jinja” import server, client with context %}</screen>
+            <para>To learn more about writing Salt Formulas see the official documentation:<link
+                    xlink:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html"
+                /></para>
         </sect2>
+
+    </sect1>
+
+    <sect1>
+        <title>Making Pillar Data Editable from SUSE Manager</title>
+
+        <para>Once you have written a formula, SUSE Manager allows you to generate and edit pillar
+            data for system groups and individual systems. Pillar data allows you to define a
+            configuration specification for these systems. To enable this configuration
+            functionality, a formula requires a file called <filename>form.yml</filename>, that will
+            describe how pillar data will look. <filename>form.yml</filename> is used by SUSE
+            Manager to generate a form, with values editable by a user. These user values are
+            re-generated as new pillar data, when requested, (E.G. when applying the
+                <literal>highstate</literal> to a system). <filename>form.yml</filename> is written
+            in using YAML syntax therefore it’s base structure is the same as the pillar it
+            generates.</para>
+        <para>form.yml example: </para>
+        <screen># form.yml
+
+my_pillar:
+  $type: group
+              
+  valueA:
+    $type: number
+    $default: 5
+  
+  valueB:
+    $type: password
+  
+  valueC:
+    $default: some text</screen>
+
+        <para>The generated pillar:</para>
+        <screen># Generated Pillar
+
+my_pillar:
+  valueA: 5
+  valueB: my_very_bad_password
+  valueC: some text</screen>
+
+        <para><filename>form.yml</filename> contains additional information that describes how the
+            form for a pillar should look for SUSE Manager. This information is contained in
+            attributes and always start with a <literal>$</literal> sign.</para>
+        <important>
+            <title>Ignored Values</title>
+            <para>All values, that start with a <literal>$</literal> sign and are not valid
+                attributes, will be ignored.</para>
+        </important>
+        <para>The following are valid attributes.</para>
+        <variablelist>
+
+            <varlistentry>
+                <term>$type</term>
+                <listitem>
+                    <para>The most important attribute is the $type attribute. It defines the type
+                        of the pillar value and the form-field that is generated. The following
+                        represent the currently supported types:</para>
+                    <itemizedlist>
+                        <listitem>
+                            <para>text</para>
+                        </listitem>
+                        <listitem>
+                            <para>password</para>
+                        </listitem>
+                        <listitem>
+                            <para>number</para>
+                        </listitem>
+                        <listitem>
+                            <para>url</para>
+                        </listitem>
+                        <listitem>
+                            <para>email</para>
+                        </listitem>
+                        <listitem>
+                            <para>date</para>
+                        </listitem>
+                        <listitem>
+                            <para>time</para>
+                        </listitem>
+                        <listitem>
+                            <para>datetime</para>
+                        </listitem>
+                        <listitem>
+                            <para>boolean</para>
+                        </listitem>
+                        <listitem>
+                            <para>color</para>
+                        </listitem>
+                        <listitem>
+                            <para>select</para>
+                        </listitem>
+                        <listitem>
+                            <para>group</para>
+                        </listitem>
+                        <listitem>
+                            <para>hidden-group</para>
+                        </listitem>
+                    </itemizedlist>
+                    <para>Many of these values are self-explanatory. <literal>text</literal> will
+                        generate a simple text field, <literal>password</literal> a password field
+                        etc. The color type will generate a color picker. The group and hidden-group
+                        types do not generate an editable field and are used to structure form and
+                        pillar data. The major difference between group and hidden-group is that
+                            <literal>group</literal> will generate a visible border with a heading,
+                        whereas hidden-group will show nothing visually and is used to structure
+                        pillar data.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$default</term>
+                <listitem>
+                    <para>$default allows you to specify a default value that is displayed and used,
+                        if no other value is entered.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$name</term>
+                <listitem>
+                    <para>$name allows you to specify the name of a value that is shown in the form.
+                        If this value is not set, the pillar name is used and capitalized without
+                        underscores and dashes.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$help and $placeholder</term>
+                <listitem>
+                    <para>The $help and $placeholder attributes are used to give a user a better
+                        understanding of what the value should be. $help defines the message a user
+                        sees when hovering over a field and $placeholder displays a gray placeholder
+                        text in the field. $placeholder may only be used with text fields like text,
+                        password, email or date.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$scope</term>
+                <listitem>
+                    <para>$scope allows you to specify a hierarchy level at which a value may be
+                        edited. Possible values are <literal>system</literal>,
+                            <literal>group</literal> and <literal>readonly</literal>. The first is
+                        the default and allows the value to be edited at group and system levels.
+                        This does implies a value should be entered for each system, but you can
+                        choose to set a default for an entire group that will be used, if no
+                        system-specific value is found. When using $scope: group the value can only
+                        be edited for a complete group. On the system level you will be able to see
+                        the value, but not edit it. The last option makes a field read-only. It can
+                        be used to show the user data, that he should know, but should not be able
+                        to edit. This option only makes sense in combination with the $default
+                        attribute.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term> $visibleIf</term>
+                <listitem>
+                    <para>$visibleIf allows you to show a field or group if a simple condition is
+                        met. A condition always looks similar to the following example: </para>
+                    <screen>some_group$another_group$my_checkbox == true</screen>
+                    <para>The left part of the above statement is the path to another value, and
+                        groups are separated by <literal>$</literal> signs. A check-box must be
+                        structured similar to the following example:</para>
+                    <screen>some_group:
+  $type: group
+
+  another_group:
+    $type: group
+
+      my_checkbox:
+        $type: boolean</screen>
+                </listitem>
+            </varlistentry>
+        </variablelist>
 
     </sect1>
 
