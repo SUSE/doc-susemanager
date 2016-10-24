@@ -509,12 +509,54 @@ do_something:
                     this process is initiated by the <filename>mgr_master_tops.py</filename> script
                     which includes the formulas.sls file located in:</para>
                 <screen>/usr/share/susemanager/formulas/states/</screen>
-                <para>This directory must be a salt file root. Keep in mind file roots are
-                    configured on the salt-master (SUSE Manager) located in:</para>
+                <para>This directory must be a salt file root. File roots are configured on the
+                    salt-master (SUSE Manager) located in:</para>
                 <screen>/etc/salt/master.d/susemanager.conf</screen>
             </listitem>
 
         </itemizedlist>
+    </sect1>
+    <sect1>
+        <title>Using Salt Formulas with SUSE Manager</title>
+        <para>The following procedure provides an overview on using Salt Formulas with SUSE
+            Manager.</para>
+
+        <procedure>
+            <step>
+                <para>Official formulas may be installed as RPMs. If you have written your own
+                    formulas, place the states within /srv/salt/&lt;your-formula-name&gt;/ and the
+                    metadata (form.yml and metadata.yml) in
+                    /srv/formula_metadata/&lt;your-formula-name&gt;/ After installing your formulas
+                    they will appear in the Formula Cataolg, located under the Salt tab on the main
+                    menu.</para>
+            </step>
+            <step>
+                <para>To begin using a formula, apply it to a group or system. Apply a formula to a
+                    group or system by selecting the Formulas tab from the main menu of a system or
+                    system group. From the Formulas page you can select any formulas you wish to
+                    apply to a group or system. Click the save button to save your changes to the
+                    database.</para>
+            </step>
+            <step>
+                <para>After applying one or more formulas to a group or system, additional tabs will
+                    become available from the top menu, one for each formula selected. From these
+                    tabs you may configure your formulas.</para>
+            </step>
+            <step>
+                <para>Once you have finished customizing your formula values you will need to apply
+                    the highstate for them to take effect. Applying the highstate will execute the
+                    state associated with the formula and configure targeted systems. You can use
+                    the <literal>Apply Highstate</literal> button from any formulas page of a group
+                    or systems page or alternatively use the Highstate page under any system’s Salt
+                    tab.</para>
+            </step>
+            <step>
+                <para>When a change to any or your values is required or you need to reapply the
+                    formula state because of a failure or bug, change values located on your formula
+                    pages and re-apply the highstate. Salt will ensure that only modified values are
+                    adjusted and restart or reinstall services only when necessary.</para>
+            </step>
+        </procedure>
     </sect1>
     <sect1>
         <title>Example Formulas</title>
