@@ -146,7 +146,7 @@ Packages to sync:              3690
 
             <sect3>
 
-                <title>RES Products and Channels</title>
+                <title> Syncing Appropriate RES Channels</title>
                 <para>Ensure you have the corresponding RES product enabled and required channels
                     have been fully synced:</para>
 
@@ -193,6 +193,8 @@ Packages to sync:              3690
                         </listitem>
                     </itemizedlist>
                 </tip>
+
+                <para>Create an activation key associated with the RES channel.</para>
             </sect3>
 
             <sect3>
@@ -208,9 +210,97 @@ Packages to sync:              3690
                             enabled:</para>
                         <screen>mgr-bootstrap --salt</screen>
                     </step>
+                    <step>
+                        <para>Rename bootstrap.sh to resversion-boostrap.sh:</para>
+                        <screen># cp bootstrap.sh res7-bootstrap.sh</screen>
+                    </step>
                 </procedure>
 
             </sect3>
+
+
+        </sect2>
+
+        <sect2>
+            <title>Register a Salt Minion via Bootstrap</title>
+            <para>The following procedure will guide you through registering a Salt-minion using the
+                bootstrap script.</para>
+            <procedure>
+                <title> Registration Using the Bootstrap Script </title>
+                <step>
+                    <para>From your new minion download the bootstrap script from the SUSE Manager
+                        server:</para>
+                    <screen>wget --no-check-certificate https://&lt;server&gt;/pub/bootstrap/res7-bootstrap.sh</screen>
+                </step>
+                <step>
+                    <para>Add the appropriate res-gpg-pubkey-#####-#####.key to the
+                            <literal>ORG_GPG_KEY</literal> key parameter, comma delimited in your
+                        res7-bootstrap.sh script. These are located on your SUSE Manager server
+                        at:</para>
+                    <screen>http://(FDQN)/pub/</screen>
+                </step>
+                <step>
+                    <para>Make the bootstrap.sh script executable and run it. This will install
+                        necessary Salt packages from the bootstrap repository and start the
+                        salt-minion service:</para>
+                    <screen># chmod +x res7-bootstrap.sh
+# ./res7-boostrap.sh</screen>
+                </step>
+                <step>
+                    <para>From the SUSE Manager WebUI select the <guimenu>Salt</guimenu> >
+                            <guimenu>Onboarding</guimenu> and accept the new minions key.</para>
+                </step>
+            </procedure>
+
+            <important>
+                <title>Troubleshooting Bootstrap</title>
+                <para>If you have issues bootstrapping a minion its usually due to missing packages.
+                    These missing packages are contained on the RHEL installation media. The RHEL
+                    installation media should be loop mounted and added as a child channel to the
+                    RES channel. See the warning above on access to RHEL Media.</para>
+                <procedure>
+                    <title>Adding RHEL Media as a Child Channel</title>
+                    <step>
+                        <para>Loop mount the RHEL Media (6 or 7) for example to /mnt/RHEL7:</para>
+                        <screen># mount -o loop RHEL7.iso /mnt/RHEL7</screen>
+                    </step>
+                    <step>
+                        <para>Sync the media into the base parent
+                            channel(rhel-x86_64-server-7):</para>
+                        <screen>spacewalk-repo-sync -c rhel-x86_64-server-7 -u file:///mnt/RHEL7</screen>
+                    </step>
+                </procedure>
+            </important>
+        </sect2>
+
+        <sect2>
+            <title>Manual Salt-minion Registration</title>
+            <para>The following procedure will guide you through the registration of a Salt-minion
+                manually.</para>
+            <procedure>
+                <step>
+                    <para>Add the bootstrap repository:</para>
+                    <screen>yum-config-manager --add-repo https://&lt;server&gt;/pub/repositories/res/7/bootstrap</screen>
+                </step>
+                <step>
+                    <para>Install the salt-minion package:</para>
+                    <screen># yum install salt-minion</screen>
+                </step>
+                <step>
+                    <para>Edit the salt-minion configuration file to point to the SUSE manager
+                        server:</para>
+                    <screen># mkdir /etc/salt/minion.d
+# echo "master: &lt;server fqdn&gt;" &gt; /etc/salt/minion.d/susemanager.conf </screen>
+                </step>
+                <step>
+                    <para>Start the minion service:</para>
+                    <screen># systemctl start salt-minion</screen>
+                </step>
+                <step>
+                    <para>From the SUSE Manager WebUI select the <guimenu>Salt</guimenu> >
+                            <guimenu>Onboarding</guimenu> and accept the new minions key.</para>
+                </step>
+            </procedure>
         </sect2>
     </sect1>
 
@@ -329,12 +419,12 @@ GPG key Fingerprint: C1DA C52D 1664 E8A4 386D BA43 0946 FCA2 C105 B9DE</screen>
                         CentOS clients.</para>
                 </step>
             </procedure>
-            
+
         </sect2>
 
         <sect2>
             <title>Registering CentOS salt-minions with SUSE Manager</title>
-            <para></para>
+            <para/>
         </sect2>
 
     </sect1>
