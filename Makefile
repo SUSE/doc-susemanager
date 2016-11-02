@@ -29,7 +29,7 @@ quick-pdf:
 
 # Target for www.suse.com/documentation
 online-docs:
-	daps -d DC-create-all online-docs
+	daps -vvv -d DC-create-all --force online-docs
 
 package: package/doc-susemanager-develop.tar.bz2
 #add origin in front of develop to build for jenkins
