@@ -148,185 +148,112 @@ Description:
         </procedure>
 
     </sect1>
-    <!---->
 
-    <!-- How to use your formulas to change data on groups or individual systems from the webui -->
-    <sect1>
-        <title>Customizing Formula Data Fields in the WebUI</title>
-        <para/>
-    </sect1>
 
     <sect1>
-        <title>Deploying Custom Salt Formulas</title>
-        <para/>
+        <title>File Structure Overview</title>
+        <para>Formulas in SUSE Manager are required to have a specific structure and should be
+            located within certain directories to ensure proper functionality. A formula should
+            always consists of two separate directories: The <literal>state</literal> directory and
+            the <literal>metadata</literal> directory.</para>
+
+        <variablelist>
+            <varlistentry>
+                <term>The Formula State Directory</term>
+                <listitem>
+                    <para>The formula state directory contains anything necessary for a salt state
+                        to work independently. This includes <filename>.sls</filename> files,
+                            a<filename>map.jinja</filename> file and any other required files. The
+                        state directory is located in:</para>
+                    <screen>/usr/share/susemanager/formulas/states</screen>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>The Formula Metadata Directory</term>
+                <listitem>
+                    <para>The metadata directory contains a <literal>form.yml</literal> file which
+                        defines the forms for SUSE Manager and an optional metadata.yml file that
+                        can contain additional information about a formula. These are located in: </para>
+                    <screen>/usr/share/susemanager/formulas/metadata</screen>
+
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Official Formulas</term>
+                <listitem>
+                    <para>Formulas installed from a SUSE provided RPM, for example the
+                            <literal>timezone</literal> formula will store relevant state files
+                        within: </para>
+                    <screen>/usr/share/susemanager/formulas/states/timezone/</screen>
+                    <para>Metadata installed from a SUSE provided RPM, for example the timezone
+                        formula will store relevant metadata files within:</para>
+                    <screen>/usr/share/susemanager/formulas/metadata/timezone/</screen>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>Custom Formulas</term>
+                <listitem>
+                    <para>Custom formula data should be placed in the following directories:</para>
+                    <variablelist>
+                        <varlistentry>
+                            <term>State directory</term>
+                            <listitem>
+                                <para>Custom state formula data should be placed in:</para>
+                                <screen>/srv/salt/states/&lt;custom-formula-name&gt;</screen>
+                            </listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term>Metadata Directory</term>
+                            <listitem>
+                                <para>Custom metadata(information) should be placed in:</para>
+                                <screen>/srv/formula_metadata/&lt;custom-formula-name&gt;</screen>
+                            </listitem>
+                        </varlistentry>
+                    </variablelist>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
+        <para>All custom folders located in the following directories should contain a
+                <literal>form.yml</literal> file. These files are detected as form recipes and may
+            be applied to groups and systems from the WebUI:</para>
+        <screen>/srv/formula_data/&lt;custom-formula-name&gt;/form.yml</screen>
     </sect1>
-
-    <sect1>
-        <title>Example Saltstack Formulas</title>
-        <para/>
-    </sect1>
-
-
-    <!-- This section needs major rework its ugly  Rework and simplify providing more visual examples-->
-    <sect1>
-        <title>Writing Salt Formulas</title>
-
-
-        <para>Salt formulas are pre-written Salt States, which may be configured with pillar data.
-            You can manipulate state files using Jinja. Jinja allows you to access pillar data by
-            using the following syntax:</para>
-        <screen>pillar.some.value</screen>
-        <para>Alternatively you can use the following syntax:</para>
-        <screen>salt['pillar.get']('some:value', 'default value')</screen>
-
-        <para>You may also replace the <literal>pillar</literal> value with
-                <literal>grains</literal> (e.g. grains.some.value) allowing access to grains.</para>
-
-        <para>Using data this way allows you to make a formula configurable. The following code
-            snippet will install a package specified in the pillar <literal>package_name</literal>.
-            For example:</para>
-        <screen>install_a_package:
-  pkg.installed:
-    - name: {{ pillar.package_name }}</screen>
-        <para>You may also use more complex constructs such as <literal>if/else</literal> and
-                <literal>for-loop</literal>'s To provide greater functionality. For Example:</para>
-        <screen>{% if pillar.installSomething %}
-something:
-  pkg.installed
-{% else %}
-anotherPackage:
-  pkg.installed
-{% endif %}</screen>
-        <para>Another example:</para>
-        <screen>{% for service in pillar.services %}
-start_{{ service }}:
-  service.running:
-    - name: {{ service }}
-{% endfor %}</screen>
-
-        <para>Jinja also provides other helpful functions. For example you can iterate over a
-            dictionary:</para>
-        <screen>{% for key, value in some_dictionary.items() %}
-do_something_with_{{ key }}: {{ value }}
-{% endfor %}</screen>
-
-        <para>You may want to have Salt manage your files (E.g. configuration files for a program),
-            and you can change these with pillar data. For example the following snippet shows how
-            you can manage a file using Salt:</para>
-        <screen>/etc/my_program/my_program.conf:
-  file.managed:
-
-    - source: salt://my_state/files/my_program.conf
-    - template: jinja</screen>
-
-
-        <para>Salt will copy the file
-                <filename>&lt;salt-file_roots&gt;/my_state/files/my_program.conf</filename> on the
-            salt master to <filename>/etc/my_program/my_program.conf</filename> on the minion and
-            template it with Jinja. This allows you to use Jinja in the file, exactly like shown
-            above for states:</para>
-        <screen>some_config_option = {{ pillar.config_option_a }}</screen>
-
-        <sect2>
-            <title>Separating Data</title>
-            <para>It is often a good idea to separate data from a state to increase its flexibility
-                and add re-usability value. This is often done by writing values into a separate
-                file named <filename>map.jinja</filename>. This file should be placed within the
-                same directory as your state files.</para>
-            <para>The following example will set <literal>data</literal> to a dictionary with
-                different values, depending on which system the state runs on. It will also merge
-                data with the pillar using the <literal>some.pillar.data</literal> value so you can
-                access <literal>some.pillar.data.value</literal> by just using
-                    <literal>data.value</literal>.</para>
-            <para>You can also choose to override defined values from pillars (e.g. by overriding
-                    <literal>some.pillar.data.package</literal> in the example). </para>
-            <screen>{% set data = salt[‘grains.filter_by’]({
-    ‘Suse’: {
-        ‘package’: ‘packageA’,
-        ‘service’: ‘serviceA’
-    },
-    ‘RedHat’: {
-        ‘package’: ‘package_a’,
-        ‘service’: ‘service_a’
-    }
-}, merge=salt[‘pillar.get’](‘some:pillar:data’)) %}</screen>
-            <para>After creating a map file like the above example, you can easily maintain
-                compatibility with multiple system types while accessing "deep" pillar data in a
-                simpler way. Now you can import and use <literal>data</literal> in any file. For
-                example:</para>
-            <screen>{% from “some_folder/map.jinja” import data with context %}
-
-install_package_a:
-  pkg.installed:
-    - name: {{ data.package }}</screen>
-
-            <para>You can also define multiple variables by copying the <literal>{% set ...
-                    %}</literal> statement with different values and then merge it with other
-                pillars. For example:</para>
-            <screen>{% set server = salt[‘grains.filter_by’]({
-    ‘Suse’: {
-        ‘package’: ‘my-server-pkg’
-    }
-}, merge=salt[‘pillar.get’](‘myFormula:server’)) %}
-{% set client = salt[‘grains.filter_by’]({
-    ‘Suse’: {
-        ‘package’: ‘my-client-pkg’
-    }
-}, merge=salt[‘pillar.get’](‘myFormula:client’)) %}</screen>
-
-            <para>To import multiple variables, separate them with a comma. For Example:</para>
-            <screen>{% from “map.jinja” import server, client with context %}</screen>
-            <para>To learn more about writing Salt Formulas see the official documentation:<link
-                    xlink:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html"
-                /></para>
-        </sect2>
-
-    </sect1>
-
-
-
-
-
-
-
-
 
     <sect1>
         <title>Making Pillar Data Editable in SUSE Manager</title>
 
-        <para>Once you have written a formula, SUSE Manager allows you to generate and edit pillar
-            data for system groups and individual systems. Pillar data allows you to define a
-            configuration specification for these systems. To enable this configuration
-            functionality, a formula requires a file called <filename>form.yml</filename>, that will
-            describe how pillar data will look. <filename>form.yml</filename> is used by SUSE
-            Manager to generate a form, with values editable by a user. These user values are
-            re-generated as new pillar data, when requested, (E.G. when applying the
-                <literal>highstate</literal> to a system). <filename>form.yml</filename> is written
-            in using YAML syntax therefore it’s base structure is the same as the pillar it
-            generates.</para>
-        <para>form.yml example: </para>
-        <screen># form.yml
-
-my_pillar:
-  $type: group
+        <para>SUSE Manager requires a file called <filename>form.yml</filename>, to describe how
+            formula data should look within the WebUI. <filename>form.yml</filename> is used by SUSE
+            Manager to generate the desired form, with values editable by a user.</para>
+        <para>For example the <literal>form.yml</literal> that is included in the timezone formula
+            RPM will be placed in:</para>
+        <screen>/user/share/susemanager/formulas/metadata/timezone</screen>
+        <para>The timezone form.yml file will look similar to the following example:</para>
+        <screen>timezone:
+  $type: hidden-group
               
-  valueA:
-    $type: number
-    $default: 5
+  title:
+    $default: Example Timezone
   
-  valueB:
-    $type: password
+  name:
+    $type: select
+    $values: ["Europe/Berlin", "Europe/Paris", "US/Alaska", "US/Mountain"]
+    $default: Europe/Berlin
   
-  valueC:
-    $default: some text</screen>
+  utc::
+    $type: boolean
+    $default: true</screen>
 
         <para>The generated pillar:</para>
         <screen># Generated Pillar
 
-my_pillar:
-  valueA: 5
-  valueB: my_very_bad_password
-  valueC: some text</screen>
+timezone:
+  title: Example Timezone
+  name: Europe/Berlin
+  utc: true</screen>
 
         <para><filename>form.yml</filename> contains additional information that describes how the
             form for a pillar should look for SUSE Manager. This information is contained in
@@ -518,138 +445,153 @@ do_something:
 
     </sect1>
 
+    <sect1>
+        <title>Writing Salt Formulas</title>
+
+
+        <para>Salt formulas are pre-written Salt States, which may be configured with pillar data.
+            You can manipulate state files using Jinja. Jinja allows you to access pillar data by
+            using the following syntax:</para>
+        <screen>pillar.some.value</screen>
+        <para>Alternatively you can use the following syntax:</para>
+        <screen>salt['pillar.get']('some:value', 'default value')</screen>
+
+        <para>You may also replace the <literal>pillar</literal> value with
+                <literal>grains</literal> (e.g. grains.some.value) allowing access to grains.</para>
+
+        <para>Using data this way allows you to make a formula configurable. The following code
+            snippet will install a package specified in the pillar <literal>package_name</literal>.
+            For example:</para>
+        <screen>install_a_package:
+  pkg.installed:
+    - name: {{ pillar.package_name }}</screen>
+        <para>You may also use more complex constructs such as <literal>if/else</literal> and
+                <literal>for-loop</literal>'s To provide greater functionality. For Example:</para>
+        <screen>{% if pillar.installSomething %}
+something:
+  pkg.installed
+{% else %}
+anotherPackage:
+  pkg.installed
+{% endif %}</screen>
+        <para>Another example:</para>
+        <screen>{% for service in pillar.services %}
+start_{{ service }}:
+  service.running:
+    - name: {{ service }}
+{% endfor %}</screen>
+
+        <para>Jinja also provides other helpful functions. For example you can iterate over a
+            dictionary:</para>
+        <screen>{% for key, value in some_dictionary.items() %}
+do_something_with_{{ key }}: {{ value }}
+{% endfor %}</screen>
+
+        <para>You may want to have Salt manage your files (E.g. configuration files for a program),
+            and you can change these with pillar data. For example the following snippet shows how
+            you can manage a file using Salt:</para>
+        <screen>/etc/my_program/my_program.conf:
+  file.managed:
+
+    - source: salt://my_state/files/my_program.conf
+    - template: jinja</screen>
+
+
+        <para>Salt will copy the file
+                <filename>&lt;salt-file_roots&gt;/my_state/files/my_program.conf</filename> on the
+            salt master to <filename>/etc/my_program/my_program.conf</filename> on the minion and
+            template it with Jinja. This allows you to use Jinja in the file, exactly like shown
+            above for states:</para>
+        <screen>some_config_option = {{ pillar.config_option_a }}</screen>
+
+
+    </sect1>
+
 
     <sect1>
+        <title>Separating Data</title>
+        <para>It is often a good idea to separate data from a state to increase its flexibility and
+            add re-usability value. This is often done by writing values into a separate file named
+                <filename>map.jinja</filename>. This file should be placed within the same directory
+            as your state files.</para>
+        <para>The following example will set <literal>data</literal> to a dictionary with different
+            values, depending on which system the state runs on. It will also merge data with the
+            pillar using the <literal>some.pillar.data</literal> value so you can access
+                <literal>some.pillar.data.value</literal> by just using
+                <literal>data.value</literal>.</para>
+        <para>You can also choose to override defined values from pillars (e.g. by overriding
+                <literal>some.pillar.data.package</literal> in the example). </para>
+        <screen>{% set data = salt[‘grains.filter_by’]({
+    ‘Suse’: {
+        ‘package’: ‘packageA’,
+        ‘service’: ‘serviceA’
+    },
+    ‘RedHat’: {
+        ‘package’: ‘package_a’,
+        ‘service’: ‘service_a’
+    }
+}, merge=salt[‘pillar.get’](‘some:pillar:data’)) %}</screen>
+        <para>After creating a map file like the above example, you can easily maintain
+            compatibility with multiple system types while accessing "deep" pillar data in a simpler
+            way. Now you can import and use <literal>data</literal> in any file. For example:</para>
+        <screen>{% from “some_folder/map.jinja” import data with context %}
 
-        <title>File Structure Overview</title>
-        <para>Formulas in SUSE Manager are required to have a specific structure and should be
-            located within certain directories to work properly. A formula will always consists of
-            two separate parts: The <literal>state</literal> and the
-            <literal>metadata</literal>.</para>
+install_package_a:
+  pkg.installed:
+    - name: {{ data.package }}</screen>
 
-        <variablelist>
-            <varlistentry>
-                <term>The State</term>
-                <listitem>
-                    <para>The state is everything required for a salt state to work independently.
-                        This includes state files, the map.jinja file and any other files which may
-                        be required.</para>
-                    <note>
-                        <title>More on States Locations</title>
-                        <para>Although unnecessary, it is recommended, to place state files within a
-                            separate folder and use an init.sls file to represent the main state.
-                            You can however place a <filename>my_formula.sls in
-                                /srv/salt/</filename>. The name of the sls-file or the folder
-                            containing the init.sls must match the name of the folder containing the
-                            metadata files.</para>
-                    </note>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>The Metadata</term>
-                <listitem>
-                    <para>The metadata includes the <literal>form.yml</literal> file which defines
-                        the forms for SUSE Manager and an optional metadata.yml file that may
-                        contain additional metadata for a formula.</para>
-                    <note>
-                        <title>More on the metadata.yml File</title>
-                        <para>The metadata.yml file is an optional file, that may contain additional
-                            metadata for a formula which is used by SUSE Manager. metadata.yml is
-                            also written in YAML. Possible values are:</para>
-                        <itemizedlist>
-                            <listitem>
-                                <para>description: A description text for the formula.</para>
-                            </listitem>
-                            <listitem>
-                                <para>group: The name of a group of formulas. May be used when
-                                    working with multiple formulas that should be used together.
-                                    Formulas within the same group will always be grouped together
-                                    within the UI.</para>
-                            </listitem>
-                            <listitem>
-                                <para>after: A list of formulas, which should be executed before
-                                    this formula if present.</para>
-                            </listitem>
-                        </itemizedlist>
-                    </note>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>Official Formulas</term>
-                <listitem>
-                    <para>Official formulas installed via RPMs store their state files within:
-                            <filename>/usr/share/susemanager/formulas/states/&lt;formula-name&gt;/</filename>
-                        and their metadata files within:
-                            <filename>/usr/share/susemanager/formulas/metadata/&lt;formula-name&gt;/</filename></para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>Custom Formulas</term>
-                <listitem>
-                    <para>To use custom formulas place your state files within:
-                            <filename>/srv/salt/</filename> and metadata files in:
-                            <filename>/srv/formula_metadata/&lt;formula-name&gt;/</filename></para>
-                </listitem>
-            </varlistentry>
-        </variablelist>
+        <para>You can also define multiple variables by copying the <literal>{% set ... %}</literal>
+            statement with different values and then merge it with other pillars. For
+            example:</para>
+        <screen>{% set server = salt[‘grains.filter_by’]({
+    ‘Suse’: {
+        ‘package’: ‘my-server-pkg’
+    }
+}, merge=salt[‘pillar.get’](‘myFormula:server’)) %}
+{% set client = salt[‘grains.filter_by’]({
+    ‘Suse’: {
+        ‘package’: ‘my-client-pkg’
+    }
+}, merge=salt[‘pillar.get’](‘myFormula:client’)) %}</screen>
 
-        <para>All folders located in the following directories should contain a
-                <literal>form.yml</literal> file. These files are detected as formula recipes and
-            may be applied to groups and systems:</para>
-        <screen>/srv/formula_data/</screen>
-        <screen>/usr/share/susemanager/formulas/metadata/</screen>
+        <para>To import multiple variables, separate them with a comma. For Example:</para>
+        <screen>{% from “map.jinja” import server, client with context %}</screen>
+        <para>To learn more about writing Salt Formulas see the official documentation:<link
+                xlink:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html"
+            /></para>
+    </sect1>
 
-        <para>Each time a page for a formula is requested, the server will load a form.yml file,
-            parse it to JSON and then send it to a client. On the client the form is generated in
-            JavaScript. Edited values entered by a user are sent back to the server and saved. All
-            formula data is saved in:</para>
-        <screen>/srv/susemanager/formula_data/</screen>
-        <itemizedlist>
-            <listitem>
-                <para>Formulas that are applied to groups and servers will be stored in:</para>
-                <screen>group_formulas.json</screen>
-                <screen>server_formulas.json</screen>
-            </listitem>
-            <listitem>
-                <para> Form pillar values for groups are stored in:</para>
-                <screen>group_pillar/&lt;group-id&gt;_&lt;formula-name&gt;.json</screen>
-                <para>Form pillar values for systems are stored in:</para>
-                <screen>pillar/&lt;minion-id&gt;_&lt;formula-name&gt;.json</screen>
-            </listitem>
-        </itemizedlist>
-
-        <sect2>
-            <title> SUSE Manager Generated Pillar Data </title>
-            <para>When pillar data is generated (e.g. after applying the highstate) the following
-                external pillar script generates pillar data for packages, group ids, etc. and
-                includes all pillar data for a system:</para>
-            <screen>/usr/share/susemanager/modules/pillar/suma_minion.py</screen>
-            <para>The process is executed as follows:</para>
-            <procedure>
-                <step>
-                    <para>The suma_minion.py script starts and finds all formulas for a system (by
-                        checking the <literal>group_formulas.json</literal> and
-                            <literal>server_formulas.json</literal> files). </para>
-                </step>
-                <step>
-                    <para>suma_minion.py loads the values for each formula (groups and from the
-                        system) and merges them with the highstate (default: if no values are found,
-                        a group overrides a system if $scope: group etc.).</para>
-                </step>
-                <step>
-                    <para>suma_minion.py also includes a list of formulas applied to the system in a
-                        pillar named formulas. This structure makes it possible to include states.
-                        The top file (in this case specifically generated by the mgr_master_tops.py
-                        script) includes a state called formulas for each system. This includes the
-                            <literal>formulas.sls</literal> file located in:</para>
-                    <screen>/usr/share/susemanager/formulas/states/</screen>
-                    <para>The content looks similar to the following:</para>
-                    <screen>include: {{ pillar["formulas"] }}</screen>
-                    <para>This pillar includes all formulas, that are specified in pillar data
-                        generated from the external pillar script.</para>
-                </step>
-            </procedure>
-        </sect2>
+    <sect1>
+        <title> SUSE Manager Generated Pillar Data </title>
+        <para>When pillar data is generated (e.g. after applying the highstate) the following
+            external pillar script generates pillar data for packages, group ids, etc. and includes
+            all pillar data for a system:</para>
+        <screen>/usr/share/susemanager/modules/pillar/suma_minion.py</screen>
+        <para>The process is executed as follows:</para>
+        <procedure>
+            <step>
+                <para>The suma_minion.py script starts and finds all formulas for a system (by
+                    checking the <literal>group_formulas.json</literal> and
+                        <literal>server_formulas.json</literal> files). </para>
+            </step>
+            <step>
+                <para>suma_minion.py loads the values for each formula (groups and from the system)
+                    and merges them with the highstate (default: if no values are found, a group
+                    overrides a system if $scope: group etc.).</para>
+            </step>
+            <step>
+                <para>suma_minion.py also includes a list of formulas applied to the system in a
+                    pillar named formulas. This structure makes it possible to include states. The
+                    top file (in this case specifically generated by the mgr_master_tops.py script)
+                    includes a state called formulas for each system. This includes the
+                        <literal>formulas.sls</literal> file located in:</para>
+                <screen>/usr/share/susemanager/formulas/states/</screen>
+                <para>The content looks similar to the following:</para>
+                <screen>include: {{ pillar["formulas"] }}</screen>
+                <para>This pillar includes all formulas, that are specified in pillar data generated
+                    from the external pillar script.</para>
+            </step>
+        </procedure>
     </sect1>
 
     <sect1>
