@@ -77,7 +77,7 @@
                 <filename>/tmp/dbrepl.xml</filename>.</para>
                 <screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
             </step>
-            <step>
+            <step xml:id="pro.mgr.tool.mount.storage">
                 <para>Mount a removable storage medium such as an external hard disk or USB flash
                     drive.</para>
             </step>
@@ -113,8 +113,9 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
                 <literal>/etc/rhn/rhn.conf</literal>:</para>
                 <screen>server.susemanager.fromdir = /media/disk</screen>
                 <para>
-                 This
-                    setting is mandatory for &scc; and <command>mgr-sync</command></para>
+                 This setting is mandatory for &scc; and
+                 <command>mgr-sync</command>.
+                </para>
             </step>
             <step>
              <para>Restart Tomcat:</para>
@@ -122,10 +123,12 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
              <!-- <screen>rctomcat6 restart</screen> -->
              <screen>systemctl restart tomcat</screen>
             </step>
-            <step>
-                <para>Before performing another operation on the server execute a full
-                sync:</para>
-                <screen>mgr-sync refresh   # SCC (fromdir in rhn.conf required!)</screen>
+            <step xml:id="pro.mgr.tool.sync">
+             <para>
+              Before performing another operation on the server execute a full
+              sync:
+             </para>
+             <screen>mgr-sync refresh   # SCC (fromdir in rhn.conf required!)</screen>
             </step>
             <step>
                 <para><command>mgr-sync</command> can now be executed normally:</para>
@@ -152,15 +155,20 @@ mgr-sync add channel channel-label</screen>
                     SMT.</para>
             </step>
             <step>
-             <para>On your SMT system, continue with Step 4.</para>
+             <para>
+              On your SMT system, continue with <xref
+              linkend="pro.mgr.tool.sync"/>.
+             </para>
              <warning>
-                        <title>Data Corruption</title>
-                        <para>The storage medium must always be available at the same mount point.
-                            To avoid data corruption, do not trigger a <command>sync</command> if
-                            the storage medium is not mounted.</para>
-                    </warning>
+              <title>Data Corruption</title>
+              <para>
+               The storage medium must always be available at the same
+               mount point.  To avoid data corruption, do not trigger a
+               sync if the storage medium is not mounted.
+              </para>
+             </warning>
             </step>
         </procedure>
-        <para>This concludes using SMT with &susemgr;&productnumber3;.</para>
+        <para>This concludes using SMT with &susemgr; &productnumber3;.</para>
     </sect1>
 </chapter>
