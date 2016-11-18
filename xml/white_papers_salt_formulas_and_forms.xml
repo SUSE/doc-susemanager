@@ -257,11 +257,11 @@ timezone:
 
         <para><filename>form.yml</filename> contains additional information that describes how the
             form for a pillar should look for SUSE Manager. This information is contained in
-            attributes and always start with a <literal>$</literal> sign.</para>
+            attributes that always start with a <literal>$</literal> sign.</para>
         <important>
             <title>Ignored Values</title>
-            <para>All values, that start with a <literal>$</literal> sign and are not valid
-                attributes, will be ignored.</para>
+            <para>All values that start with a <literal>$</literal> sign and are not valid
+                attributes will be ignored.</para>
         </important>
         <para>The following are valid attributes.</para>
         <variablelist>
@@ -313,14 +313,15 @@ timezone:
                             <para>hidden-group</para>
                         </listitem>
                     </itemizedlist>
-                    <para>Many of these values are self-explanatory. <literal>text</literal> will
+                    <para>Many of these values are self-explanatory: <literal>text</literal> will
                         generate a simple text field, <literal>password</literal> a password field
-                        etc. The color type will generate a color picker. The group and hidden-group
-                        types do not generate an editable field and are used to structure form and
-                        pillar data. The major difference between group and hidden-group is that
-                            <literal>group</literal> will generate a visible border with a heading,
-                        whereas hidden-group will show nothing visually and is used to structure
-                        pillar data.</para>
+                        and the <literal>color</literal> type will generate a color picker. </para>
+                    <para>The <literal>group</literal> and <literal>hidden-group</literal> types do
+                        not generate an editable field and are used to structure form and pillar
+                        data. The difference between group and hidden-group is
+                            <literal>group</literal> generates a visible border with a heading, and
+                        hidden-group shows nothing visually(and is only used to structure pillar
+                        data).</para>
                 </listitem>
             </varlistentry>
 
@@ -357,15 +358,17 @@ timezone:
                 <listitem>
                     <para>$scope allows you to specify a hierarchy level at which a value may be
                         edited. Possible values are <literal>system</literal>,
-                            <literal>group</literal> and <literal>readonly</literal>. The first is
-                        the default and allows the value to be edited at group and system levels.
-                        This does implies a value should be entered for each system, but you can
-                        choose to set a default for an entire group that will be used, if no
-                        system-specific value is found. When using $scope: group the value can only
-                        be edited for a complete group. On the system level you will be able to see
-                        the value, but not edit it. The last option makes a field read-only. It can
-                        be used to show the user data, that he should know, but should not be able
-                        to edit. This option only makes sense in combination with the $default
+                            <literal>group</literal> and <literal>readonly</literal>. </para>
+                    <para>The default <literal>$scope: system</literal> allows values to be edited
+                        at group and system levels. This implies a value should be entered for each
+                        system, but you can also choose to set a default for an entire group if a
+                        system-specific value is found. </para>
+                    <para>If using <literal>$scope: group</literal>, a value may only be edited for
+                        a group. On the system level you will be able to see the value, but not edit
+                        it. </para>
+                    <para>The <literal>$scope: readonly</literal> option makes a field read-only. It
+                        can be used to show a user data which should be known, but should not be
+                        editable. This option only makes sense in combination with the $default
                         attribute.</para>
                 </listitem>
             </varlistentry>
@@ -388,7 +391,7 @@ timezone:
                     <para>The field with this attribute associated with it will now be shown only
                         when the condition is met. In this example the field will be shown only if
                             <literal>my_checkbox</literal> is checked. The ability to use
-                        conditional statements i not limited to checkboxes. It may also be used to
+                        conditional statements is not limited to checkboxes. It may also be used to
                         check values of select-fields, text-fields etc.</para>
 
                     <para>A check-box should be structured like the following example:</para>
@@ -408,7 +411,7 @@ timezone:
                     <note>
                         <title>Hidden Values</title>
                         <para>Hidden values will still be merged into the pillar data and sent to
-                            the server. The formula must check the condition again and use the
+                            the minion. The formula must check the condition again and use the
                             appropriate data. For example:</para>
                         <screen>show_option:
   $type: checkbox
@@ -449,11 +452,12 @@ do_something:
         <title>Writing Salt Formulas</title>
 
 
-        <para>Salt formulas are pre-written Salt States, which may be configured with pillar data.
-            You can manipulate state files using Jinja. Jinja allows you to access pillar data by
-            using the following syntax:</para>
+        <para>Salt formulas are pre-written Salt states, which may be configured with pillar data.
+            You can parametrize state files using Jinja. Jinja allows you to access pillar data by
+            using the following syntax(This syntax works best when your uncertain a pillar value
+            exists as it will throw an error):</para>
         <screen>pillar.some.value</screen>
-        <para>Alternatively you can use the following syntax:</para>
+        <para>When you are sure a pillar exists may also use the following syntax:</para>
         <screen>salt['pillar.get']('some:value', 'default value')</screen>
 
         <para>You may also replace the <literal>pillar</literal> value with
@@ -556,7 +560,8 @@ install_package_a:
 
         <para>To import multiple variables, separate them with a comma. For Example:</para>
         <screen>{% from “map.jinja” import server, client with context %}</screen>
-        <para>To learn more about writing Salt Formulas see the official documentation:<link
+        <para>Formulas utilized with SUSE Manager should follow formula conventions listed in the
+            official documentation:<link
                 xlink:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html"
             /></para>
     </sect1>
