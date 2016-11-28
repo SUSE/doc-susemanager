@@ -113,7 +113,7 @@
       <title>SSH Push Unsupported Actions</title>
       <para>
        Certain actions are currently not supported on scheduled clients
-       which are managed via SSH push. This includes re-installation of
+       which are managed via SSH Push. This includes re-installation of
        systems using the provisioning module.  Additionally, image
        deployments using SUSE Studio will work only when the vhost is
        permitted to directly connect to the SUSE Studio image store and
@@ -121,12 +121,12 @@
       </para>
     </important>
     <para>
-     The following figure provides an overview of the ssh push process
+     The following figure provides an overview of the SSH Push process
      path. All items left of the <systemitem>Taskomatic</systemitem>
      block represent processes running on a &susemgr; client.
     </para>
     <figure>
-      <title>ssh Push Contact Method</title>
+      <title>SSH Push Contact Method</title>
       <mediaobject>
         <imageobject>
           <imagedata fileref="sshpush.png" width="80%"/>
@@ -235,13 +235,13 @@ export PATH</screen>
         <title>mgr-ssh-push-init Disables rhnsd</title>
         <para>The <replaceable>mgr-ssh-push-init</replaceable> disables the rhnsd daemon which
           normally checks clients for updates every 4 hours. Your clients cannot reach the server
-          without using ssh push contact method therefore the <systemitem>rhnsd</systemitem> daemon
+          without using SSH Push contact method therefore the <systemitem>rhnsd</systemitem> daemon
           is disabled.</para>
       </note>
 
-      <para>For registration of systems which should be managed via the ssh push tunnel contact
+      <para>For registration of systems which should be managed via the SSH Push tunnel contact
         method, it is required to use an activation key that is configured to use this method.
-        Normal <systemitem>ssh push</systemitem> is unable to reach the server. For managing
+        Normal <systemitem>SSH Push</systemitem> is unable to reach the server. For managing
         activation keys see: <xref linkend="bp.key.managment"/></para>
       <para>Run the following command as root on the server to register a client:</para>
       <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register \
@@ -286,7 +286,7 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
 
       <note>
         <title>Migration and Management via SSH Push</title>
-        <para>When a system should be migrated and managed using SSH push, it requires setup using
+        <para>When a system should be migrated and managed using SSH Push, it requires setup using
           the <systemitem>mgr-ssh-push-init</systemitem> script before the server can connect via
           SSH. This separate command requires human interaction to install the server's SSH key onto
           the managed client (root password). The following procedure illustrates how to migrate an
@@ -304,13 +304,13 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
               <literal>ssh-push-tunnel</literal> respectively (via API or web UI).</para>
         </step>
       </procedure>
-      <para>Existing activation keys can also be edited via API to use the SSH push contact method
+      <para>Existing activation keys can also be edited via API to use the SSH Push contact method
         for clients registered with these keys: </para>
       <screen><command>client.activationkey.setDetails(key, '1-mykey', {'contact_method' : 'ssh-push'})</command></screen>
     </sect2>
     <sect2 xml:id="bp.contact.methods.ssh.push.proxy.support">
       <title>Proxy Support with SSH Push</title>
-      <para>It is possible to use SSH push to manage systems that are connected to the &susemgr;
+      <para>It is possible to use SSH Push to manage systems that are connected to the &susemgr;
         server via a proxy. To register a system, run <systemitem>mgr-ssh-push-init</systemitem> on
         the proxy system for each client you wish to register. Update your proxy with the latest
         packages to ensure the registration tool is available. It is necessary to copy the ssh key
@@ -324,7 +324,7 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     <title>osad</title>
     <para>The default contact method between &susemgr; and its clients is
         <systemitem>rhnsd</systemitem>. When using the <systemitem>rhnsd</systemitem> daemon the
-      server will check every 4 hours and then execute a scheduled action on clients. Depending on
+      server will check every 4 hours and then execute a scheduled action on clients. Depending on
       your network environment <systemitem>rhnsd</systemitem> may not suit your requirements.
       Alternatively you may configure osad for use with registered client systems enabling immediate
       execution of scheduled actions. osad consists of three components: </para>
