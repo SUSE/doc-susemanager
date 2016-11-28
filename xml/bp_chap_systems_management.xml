@@ -83,7 +83,7 @@
       <para>
        You can view the status of rhnsd by typing the command
        <command>systemctl status rhnsd</command> or <command>rcrhnsd
-       status</command> as <literal>root</literal>.
+       status</command> as &rootuser;.
       </para>
     </sect2>
 
@@ -161,7 +161,7 @@ ssh_push_port_https = high port 2</screen>
     <sect2>
       <title>Using sudo with SSH Push </title>
       <para>For security reasons you may desire to use sudo and SSH into a system
-        as a user other than root. The following procedure will guide you through configuring sudo
+        as a user other than &rootuser;. The following procedure will guide you through configuring sudo
         for use with SSH Push.</para>
       <note>
         <title>sudo Requirements</title>
@@ -250,41 +250,46 @@ export PATH</screen>
        server. For managing activation keys, see <xref
        linkend="bp.key.managment"/>.
       </para>
-      <para>Run the following command as root on the server to register a client:</para>
+      <para>Run the following command as &rootuser; on the server to register a client:</para>
       <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register \
 /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen>
 
 
       <para>To enable a client to be managed using Push via SSH (without tunneling), the same script
         may be used. Registration is optional since it can also be done from within the client in
-        this case. Note that <systemitem>mgr-ssh-push-init</systemitem> will also automatically
+        this case. <command>mgr-ssh-push-init</command> will also automatically
         generate the necessary SSH key pair if it does not yet exist on the server:</para>
-      <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register bootstrap_script</screen>
+      <screen><prompt>#</prompt> mgr-ssh-push-init --client <replaceable>client</replaceable> --register bootstrap_script</screen>
 
 
-      <para>When using the Push via SSH tunnel contact method, note that the client is configured to
-        connect &susemgr; via the high ports mentioned above (see
-          <filename>/etc/sysconfig/rhn/up2date</filename>). Tools like <command>rhn_check</command>
-        and <command>zypper</command> will need an active SSH session with the proper port
-        forwarding options in order to access the &susemgr; API. To verify the Push via SSH
-        tunnel connection manually, you can run this on the &susemgr; server:</para>
-      <screen><prompt>#</prompt> ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443 client zypper ref</screen>
+      <para>
+       When using the Push via SSH tunnel contact method, the client is
+       configured to connect &susemgr; via the high ports mentioned
+       above (see
+       <filename>/etc/sysconfig/rhn/up2date</filename>). Tools like
+       <command>rhn_check</command> and <command>zypper</command> will
+       need an active SSH session with the proper port forwarding
+       options in order to access the &susemgr; API. To verify the Push
+       via SSH tunnel connection manually, run the following command on
+       the &susemgr; server:
+      </para>
+      <screen><prompt>#</prompt> ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443 <replaceable>client</replaceable> zypper ref</screen>
 
     </sect2>
     <sect2 xml:id="bp.contact.methods.ssh.push.api.support">
       <title>API Support for SSH Push</title>
       <para>The contact method to be used for managing a server can also be modified via the API.
         The following example code (python) shows how to set a system's contact method to
-          <literal>ssh-push</literal>. Available valid values are:</para>
+          <literal>ssh-push</literal>. Valid values are:</para>
       <itemizedlist>
         <listitem>
-          <para>'default' (pull)</para>
+          <para><literal>default</literal> (pull)</para>
         </listitem>
         <listitem>
-          <para>'ssh-push'</para>
+          <para><literal>ssh-push</literal></para>
         </listitem>
         <listitem>
-          <para>'ssh-push-tunnel'</para>
+          <para><literal>ssh-push-tunnel</literal></para>
         </listitem>
       </itemizedlist>
       <screen>client = xmlrpclib.Server(SUMA_HOST + "/rpc/api", verbose=0)
@@ -293,22 +298,32 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
 
       <note>
         <title>Migration and Management via SSH Push</title>
-        <para>When a system should be migrated and managed using SSH Push, it requires setup using
-          the <systemitem>mgr-ssh-push-init</systemitem> script before the server can connect via
-          SSH. This separate command requires human interaction to install the server's SSH key onto
-          the managed client (root password). The following procedure illustrates how to migrate an
-          already registered system: </para>
+        <para>
+         When a system should be migrated and managed using SSH Push, it
+         requires setup using the
+         <systemitem>mgr-ssh-push-init</systemitem> script before the
+         server can connect via SSH. This separate command requires
+         human interaction to install the server's SSH key onto the
+         managed client (&rootuser; password). The following procedure
+         illustrates how to migrate an already registered system:
+        </para>
       </note>
 
       <procedure>
-        <title>Migrate Registered Systems</title>
+        <title>Migrating Registered Systems</title>
         <step>
-          <para>Setup the client using the <systemitem>mgr-ssh-push-init</systemitem> script
-            (without --register).</para>
+         <para>
+          Setup the client using the <systemitem>mgr-ssh-push-init</systemitem> script
+          (without <option>--register</option>).
+         </para>
         </step>
         <step>
-          <para> Change the client's contact method to <literal>ssh-push</literal> or
-              <literal>ssh-push-tunnel</literal> respectively (via API or web UI).</para>
+         <para>
+          Change the client's contact method to
+          <literal>ssh-push</literal> or
+          <literal>ssh-push-tunnel</literal> respectively (via API or
+          web UI).
+         </para>
         </step>
       </procedure>
       <para>Existing activation keys can also be edited via API to use the SSH Push contact method
