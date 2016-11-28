@@ -66,22 +66,25 @@
        frequency. The default interval time is four hours (240
        minutes). If you modify the configuration file, you must as
        <systemitem>root</systemitem> restart the daemon with the command
-       (systemd)<command>systemctl rhnsd restart</command> or (runcom)
-       <command>rcrhnsd restart</command>.
+       (systemd)<command>systemctl rhnsd restart</command> or
+       (runcom)<command>rcrhnsd restart</command>.
       </para>
       <important>
         <title>Minimum Allowed Check-in Parameter</title>
         <para>
-         The minimum allowed time interval is one hour (60 minutes). If
+         The minimum allowed time interval is one hour (60 minutes). If
          you set the interval below one hour, it will default back to
-         the default of 4 hours (240 minutes).
+         the default of 4 hours (240 minutes).
         </para>
       </important>
     </sect2>
     <sect2>
       <title>Viewing rhnsd Daemon Status</title>
-      <para>You can view the status of rhnsd by typing the command <command>systemctl status
-          rhnsd</command> or <command>rcrhnsd status</command> as <literal>root</literal>.</para>
+      <para>
+       You can view the status of rhnsd by typing the command
+       <command>systemctl status rhnsd</command> or <command>rcrhnsd
+       status</command> as <literal>root</literal>.
+      </para>
     </sect2>
 
   </sect1>
@@ -95,7 +98,7 @@
    </para>
 
    <para>
-    In detail this feature enables a &susemgr; located within an
+    In detail, this feature enables a &susemgr; located within an
     internal network to manage clients located on a DMZ. Due to security
     reasons, no system on a DMZ is authorized to open a connection to
     the internal network and therefore your &susemgr; server. The
@@ -106,16 +109,22 @@
     intervals (using SSH) to check in and perform all actions and
     events.
    </para>
-    <important>
+   <important>
       <title>SSH Push Unsupported Actions</title>
-      <para>Certain actions are currently not supported on scheduled clients which are managed via
-        SSH push. This includes re-installation of systems using the provisioning module.
-        Additionally, image deployments using SUSE Studio will work only when the vhost is permitted
-        to directly connect to the SUSE Studio image store and download the required images. </para>
+      <para>
+       Certain actions are currently not supported on scheduled clients
+       which are managed via SSH push. This includes re-installation of
+       systems using the provisioning module.  Additionally, image
+       deployments using SUSE Studio will work only when the vhost is
+       permitted to directly connect to the SUSE Studio image store and
+       download the required images.
+      </para>
     </important>
-    <para>The following figure provides an overview of the ssh push process path. All items left of
-      the <systemitem>Taskomatic</systemitem> block represent processes running on a &susemgr;
-      client.</para>
+    <para>
+     The following figure provides an overview of the ssh push process
+     path. All items left of the <systemitem>Taskomatic</systemitem>
+     block represent processes running on a &susemgr; client.
+    </para>
     <figure>
       <title>ssh Push Contact Method</title>
       <mediaobject>
@@ -126,12 +135,15 @@
     </figure>
     <sect2 xml:id="bp.contact.methods.ssh.push.requirements">
       <title>Configuring the Server for SSH Push</title>
-      <para>For tunneling connections via SSH, two available port numbers are
-        required, one for tunneling HTTP and the second for tunneling via
-          HTTPS (HTTP is only necessary during the registration
-        process). The port numbers used by default are 1232 and 1233. To overwrite these, add two
-        custom port numbers greater than 1024 to <filename>/etc/rhn/rhn.conf</filename> like
-        this:</para>
+      <para>
+       For tunneling connections via SSH, two available port numbers are
+       required, one for tunneling HTTP and the second for tunneling via
+       HTTPS (HTTP is only necessary during the registration
+       process). The port numbers used by default are
+       <literal>1232</literal> and <literal>1233</literal>. To overwrite
+       these, add two custom port numbers greater than 1024 to
+       <filename>/etc/rhn/rhn.conf</filename> like this:
+      </para>
       <screen>ssh_push_port_http = high port 1
 ssh_push_port_https = high port 2</screen>
 
@@ -150,48 +162,60 @@ ssh_push_port_https = high port 2</screen>
       <title>Using sudo with SSH Push </title>
       <para>For security reasons you may desire to use sudo and SSH into a system
         as a user other than root. The following procedure will guide you through configuring sudo
-        for use with ssh push.</para>
+        for use with SSH Push.</para>
       <note>
         <title>sudo Requirements</title>
         <para>The packages <filename>spacewalk-taskomatic >= 2.1.165.19</filename> and
             <filename>spacewalk-certs-tools => 2.1.6.7</filename> are required for using sudo with
           SSH Push.</para>
       </note>
-      <procedure>
-        <title>Configuring sudo</title>
+      <procedure xml:id="pro.bp.contact.methods.ssh.push.sudo">
+       <title>Configuring sudo</title>
+       
+       <step xml:id="pro.bp.contact.methods.ssh.push.sudo.user">
+        <para>
+         Set the following parameter on the server located in
+         <filename>/etc/rhn/rhn.conf</filename>.
+        </para>
+        <screen>ssh_push_sudo_user = <replaceable>user</replaceable></screen>
+        <para>
+         The server will use sudo to ssh as the configured
+         <replaceable>user</replaceable>.
+        </para>
+       </step>
 
-        <step>
-          <para>Set the following parameter on the server located in:
-              <filename>/etc/rhn/rhn.conf</filename></para>
-          <screen>ssh_push_sudo_user = user</screen>
-          <para> The server will use sudo to ssh as the configured user.</para>
-        </step>
-
-        <step>
-          <para>You must create the user specified in step 1 above on each of your clients and the
-            following parameters should be commented out within your clients
-              <filename>/etc/sudoers</filename> file:</para>
-          <screen>#Defaults targetpw   # ask for the password of the target user i.e. root
+       <step>
+        <para>
+         You must create the user specified in <xref
+         linkend="pro.bp.contact.methods.ssh.push.sudo.user"/> on each of your clients and the
+         following parameters should be commented out within your clients'
+         <filename>/etc/sudoers</filename> file:
+        </para>
+        <screen>#Defaults targetpw   # ask for the password of the target user i.e. root
 #ALL    ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!</screen>
-        </step>
+       </step>
 
-        <step>
-          <para>Add the following line beneath the <literal>## User privilege
-              specification</literal> section of each clients <filename>sudoers</filename>
-            file:</para>
-          <screen>user ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check</screen>
-        </step>
+       <step>
+        <para>
+         Add the following line beneath the <literal>## User privilege
+         specification</literal> section of each clients
+         <filename>/etc/sudoers</filename> file:
+        </para>
+        <screen>user ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check</screen>
+       </step>
 
-        <step>
-          <para>On each client add the following two lines to the
-              <filename>/home/user/.bashrc</filename> file.</para>
-          <screen>PATH=$PATH:/usr/sbin
+       <step>
+        <para>
+         On each client add the following two lines to the
+         <filename>/home/<replaceable>user</replaceable>/.bashrc</filename> file:
+        </para>
+        <screen>PATH=$PATH:/usr/sbin
 export PATH</screen>
-        </step>
+       </step>
 
       </procedure>
-
     </sect2>
+
     <sect2>
       <title>Client Registration</title>
       <para>As your clients cannot reach the server, you will need to register your clients from the
