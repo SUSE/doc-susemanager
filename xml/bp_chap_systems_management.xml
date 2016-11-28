@@ -188,7 +188,7 @@ ssh_push_port_https = high port 2</screen>
         <para>
          You must create the user specified in <xref
          linkend="pro.bp.contact.methods.ssh.push.sudo.user"/> on each of your clients and the
-         following parameters should be commented out within your clients'
+         following parameters should be commented out within each client's
          <filename>/etc/sudoers</filename> file:
         </para>
         <screen>#Defaults targetpw   # ask for the password of the target user i.e. root
@@ -198,7 +198,7 @@ ssh_push_port_https = high port 2</screen>
        <step>
         <para>
          Add the following line beneath the <literal>## User privilege
-         specification</literal> section of each clients
+         specification</literal> section of each client's
          <filename>/etc/sudoers</filename> file:
         </para>
         <screen>user ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check</screen>
@@ -220,29 +220,36 @@ export PATH</screen>
       <title>Client Registration</title>
       <para>As your clients cannot reach the server, you will need to register your clients from the
         server. A tool for performing registration of clients from the server is included with
-        &susemgr; &productnumber3; called <systemitem>mgr-ssh-push-init</systemitem>. This tool
+        &susemgr; &productnumber3; called <command>mgr-ssh-push-init</command>. This tool
         expects a client's hostname or IP address as well as the path to a valid bootstrap script
-        located in the servers filesystem for registration as parameters.</para>
+        located in the server's filesystem for registration as parameters.</para>
 
       <important>
         <title>Specifying Ports for Tunneling before Registering Clients</title>
         <para>The ports for tunneling need to be specified before the first client is registered.
-          Clients already registered before changing the port numbers, must be registered again,
+          Clients already registered before changing the port numbers must be registered again,
           otherwise the server will not be able to contact them anymore.</para>
       </important>
 
       <note>
-        <title>mgr-ssh-push-init Disables rhnsd</title>
-        <para>The <replaceable>mgr-ssh-push-init</replaceable> disables the rhnsd daemon which
-          normally checks clients for updates every 4 hours. Your clients cannot reach the server
-          without using SSH Push contact method therefore the <systemitem>rhnsd</systemitem> daemon
-          is disabled.</para>
+       <title><command>mgr-ssh-push-init</command> Disables rhnsd</title>
+       <para>
+        The <command>mgr-ssh-push-init</command> command disables
+        the <systemitem>rhnsd</systemitem> daemon which normally checks
+        clients for updates every 4 hours. Your clients cannot reach the
+        server without using SSH Push contact method therefore the
+        <systemitem>rhnsd</systemitem> daemon is disabled.
+       </para>
       </note>
 
-      <para>For registration of systems which should be managed via the SSH Push tunnel contact
-        method, it is required to use an activation key that is configured to use this method.
-        Normal <systemitem>SSH Push</systemitem> is unable to reach the server. For managing
-        activation keys see: <xref linkend="bp.key.managment"/></para>
+      <para>
+       For registration of systems which should be managed via the SSH
+       Push tunnel contact method, it is required to use an activation
+       key that is configured to use this method.  Normal
+       <systemitem>SSH Push</systemitem> is unable to reach the
+       server. For managing activation keys, see <xref
+       linkend="bp.key.managment"/>.
+      </para>
       <para>Run the following command as root on the server to register a client:</para>
       <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register \
 /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen>
