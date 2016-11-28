@@ -34,12 +34,12 @@
 
     <para>To check for updates, <systemitem>rhnsd</systemitem> runs the external
         <systemitem>mgr_check</systemitem> program located in <filename>/usr/sbin/</filename>. This
-      is a small application that establishes the network connection to SUSE Manager. The SUSE
+      is a small application that establishes the network connection to &susemgr;. The SUSE
       Manager daemon does not listen on any network ports or talk to the network directly. All
       network activity is done via the <systemitem>mgr_check</systemitem> utility. </para>
     <warning>
       <title>Auto accepting (EULAs)</title>
-      <para> When new packages or updates are installed on the client via SUSE Manager, any licenses
+      <para> When new packages or updates are installed on the client via &susemgr;, any licenses
         (EULAs) requiring agreement before installation are automatically accepted.</para>
     </warning>
 
@@ -57,19 +57,25 @@
 
     <sect2>
       <title>Configuring &susemgr; rhnsd Daemon</title>
-      <para>The SUSE Manager daemon can be configured by editing the following configuration
+      <para>The &susemgr; daemon can be configured by editing the following configuration
         file:</para>
       <screen>/etc/sysconfig/rhn/rhnsd</screen>
-      <para> This is the configuration file the rhnsd initialization script uses. An important
-        parameter for the daemon is its check-in frequency. The default interval time is four hours
-        (240 minutes). If you modify the configuration file, you must as
-          <systemitem>root</systemitem> restart the daemon with the command
-          (systemd)<command>systemctl rhnsd restart</command> or (runcom)<command>rcrhnsd
-          restart</command> . </para>
+      <para>
+       This is the configuration file the rhnsd initialization script
+       uses. An important parameter for the daemon is its check-in
+       frequency. The default interval time is four hours (240
+       minutes). If you modify the configuration file, you must as
+       <systemitem>root</systemitem> restart the daemon with the command
+       (systemd)<command>systemctl rhnsd restart</command> or (runcom)
+       <command>rcrhnsd restart</command>.
+      </para>
       <important>
         <title>Minimum Allowed Check-in Parameter</title>
-        <para>The minimum allowed time interval is one hour (60 minutes). If you set the interval
-          below one hour, it will default back to the default of 4 hours (240 minutes). </para>
+        <para>
+         The minimum allowed time interval is one hour (60 minutes). If
+         you set the interval below one hour, it will default back to
+         the default of 4 hours (240 minutes).
+        </para>
       </important>
     </sect2>
     <sect2>
@@ -81,17 +87,25 @@
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.ssh.push">
-    <title>SSH Push</title>
-    <para>SSH Server Push is intended to be used in environments where your clients cannot reach the
-      SUSE Manager server directly to regularly check in and, for example, fetch package updates. </para>
+   <title>SSH Push</title>
+   <para>
+    SSH Server Push is intended to be used in environments where your
+    clients cannot reach the &susemgr; server directly to regularly
+    check in and, for example, fetch package updates.
+   </para>
 
-    <para>In detail this feature enables a SUSE Manager located within an internal network to manage
-      clients located on a DMZ. Due to security reasons, no system on a DMZ is authorized to open a
-      connection to the internal network and therefore your &susemgr; server. The solution is to
-      configure SSH Server Push which utilizes an encrypted tunnel from your &susemgr; server on the
-      internal network to the clients located on the DMZ. After all actions/events are executed, the
-      tunnel is closed. The server will contact the clients in regular intervals (using SSH) to
-      check in and perform all actions and events.</para>
+   <para>
+    In detail this feature enables a &susemgr; located within an
+    internal network to manage clients located on a DMZ. Due to security
+    reasons, no system on a DMZ is authorized to open a connection to
+    the internal network and therefore your &susemgr; server. The
+    solution is to configure SSH Server Push which utilizes an encrypted
+    tunnel from your &susemgr; server on the internal network to the
+    clients located on the DMZ. After all actions/events are executed,
+    the tunnel is closed. The server will contact the clients in regular
+    intervals (using SSH) to check in and perform all actions and
+    events.
+   </para>
     <important>
       <title>SSH Push Unsupported Actions</title>
       <para>Certain actions are currently not supported on scheduled clients which are managed via
@@ -221,8 +235,8 @@ export PATH</screen>
         connect &susemgr; via the high ports mentioned above (see
           <filename>/etc/sysconfig/rhn/up2date</filename>). Tools like <command>rhn_check</command>
         and <command>zypper</command> will need an active SSH session with the proper port
-        forwarding options in order to access the SUSE Manager API. To verify the Push via SSH
-        tunnel connection manually, you can run this on the SUSE Manager server:</para>
+        forwarding options in order to access the &susemgr; API. To verify the Push via SSH
+        tunnel connection manually, you can run this on the &susemgr; server:</para>
       <screen><prompt>#</prompt> ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443 client zypper ref</screen>
 
     </sect2>
@@ -272,7 +286,7 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     </sect2>
     <sect2 xml:id="bp.contact.methods.ssh.push.proxy.support">
       <title>Proxy Support with SSH Push</title>
-      <para>It is possible to use SSH push to manage systems that are connected to the SUSE Manager
+      <para>It is possible to use SSH push to manage systems that are connected to the &susemgr;
         server via a proxy. To register a system, run <systemitem>mgr-ssh-push-init</systemitem> on
         the proxy system for each client you wish to register. Update your proxy with the latest
         packages to ensure the registration tool is available. It is necessary to copy the ssh key
@@ -387,9 +401,9 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
         </step>
       </procedure>
       <para>This feature depends on the client systems recognizing the fully qualified domain name
-        (FQDN) of SUSE Manager. The client systems use this name and not the IP address of the
+        (FQDN) of &susemgr;. The client systems use this name and not the IP address of the
         server when configuring the YaST Online Update.</para>
-      <para>Now when you schedule actions from SUSE Manager on any of the osad enabled systems, the
+      <para>Now when you schedule actions from &susemgr; on any of the osad enabled systems, the
         task will be carried out immediately rather than after a client checks in using
           <systemitem>rhnsd</systemitem>.</para>
     </sect2>
