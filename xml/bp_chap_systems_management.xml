@@ -90,7 +90,7 @@
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.ssh.push">
-   <title>SSH Push</title>
+   <title>Push via SSH</title>
    <para>
     SSH Server Push is intended to be used in environments where your
     clients cannot reach the &susemgr; server directly to regularly
@@ -110,10 +110,10 @@
     events.
    </para>
    <important>
-      <title>SSH Push Unsupported Actions</title>
+      <title>Push via SSH Unsupported Actions</title>
       <para>
        Certain actions are currently not supported on scheduled clients
-       which are managed via SSH Push. This includes re-installation of
+       which are managed via Push via SSH. This includes re-installation of
        systems using the provisioning module.  Additionally, image
        deployments using SUSE Studio will work only when the vhost is
        permitted to directly connect to the SUSE Studio image store and
@@ -121,12 +121,12 @@
       </para>
     </important>
     <para>
-     The following figure provides an overview of the SSH Push process
+     The following figure provides an overview of the Push via SSH process
      path. All items left of the <systemitem>Taskomatic</systemitem>
      block represent processes running on a &susemgr; client.
     </para>
     <figure>
-      <title>SSH Push Contact Method</title>
+      <title>Push via SSH Contact Method</title>
       <mediaobject>
         <imageobject>
           <imagedata fileref="sshpush.png" width="80%"/>
@@ -134,7 +134,7 @@
       </mediaobject>
     </figure>
     <sect2 xml:id="bp.contact.methods.ssh.push.requirements">
-      <title>Configuring the Server for SSH Push</title>
+      <title>Configuring the Server for Push via SSH</title>
       <para>
        For tunneling connections via SSH, two available port numbers are
        required, one for tunneling HTTP and the second for tunneling via
@@ -159,15 +159,15 @@ ssh_push_port_https = high port 2</screen>
     </sect2>
 
     <sect2>
-      <title>Using sudo with SSH Push </title>
+      <title>Using sudo with Push via SSH </title>
       <para>For security reasons you may desire to use sudo and SSH into a system
         as a user other than &rootuser;. The following procedure will guide you through configuring sudo
-        for use with SSH Push.</para>
+        for use with Push via SSH.</para>
       <note>
         <title>sudo Requirements</title>
         <para>The packages <filename>spacewalk-taskomatic >= 2.1.165.19</filename> and
             <filename>spacewalk-certs-tools => 2.1.6.7</filename> are required for using sudo with
-          SSH Push.</para>
+          Push via SSH.</para>
       </note>
       <procedure xml:id="pro.bp.contact.methods.ssh.push.sudo">
        <title>Configuring sudo</title>
@@ -221,7 +221,7 @@ export PATH</screen>
       <para>As your clients cannot reach the server, you will need to register your clients from the
         server. A tool for performing registration of clients from the server is included with
         &susemgr; &productnumber3; called <command>mgr-ssh-push-init</command>. This tool
-        expects a client's hostname or IP address as well as the path to a valid bootstrap script
+        expects a client's hostname or IP address and the path to a valid bootstrap script
         located in the server's filesystem for registration as parameters.</para>
 
       <important>
@@ -237,7 +237,7 @@ export PATH</screen>
         The <command>mgr-ssh-push-init</command> command disables
         the <systemitem>rhnsd</systemitem> daemon which normally checks
         clients for updates every 4 hours. Your clients cannot reach the
-        server without using SSH Push contact method therefore the
+        server without using Push via SSH contact method therefore the
         <systemitem>rhnsd</systemitem> daemon is disabled.
        </para>
       </note>
@@ -246,19 +246,26 @@ export PATH</screen>
        For registration of systems which should be managed via the SSH
        Push tunnel contact method, it is required to use an activation
        key that is configured to use this method.  Normal
-       <systemitem>SSH Push</systemitem> is unable to reach the
+       <systemitem>Push via SSH</systemitem> is unable to reach the
        server. For managing activation keys, see <xref
        linkend="bp.key.managment"/>.
       </para>
-      <para>Run the following command as &rootuser; on the server to register a client:</para>
+      <para>
+       Run the following command as &rootuser; on the server to register
+       a client:
+      </para>
       <screen><prompt>#</prompt> mgr-ssh-push-init --client client --register \
 /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel</screen>
 
 
-      <para>To enable a client to be managed using Push via SSH (without tunneling), the same script
-        may be used. Registration is optional since it can also be done from within the client in
-        this case. <command>mgr-ssh-push-init</command> will also automatically
-        generate the necessary SSH key pair if it does not yet exist on the server:</para>
+      <para>
+       To enable a client to be managed using Push via SSH (without
+       tunneling), the same script may be used. Registration is optional
+       since it can also be done from within the client in this
+       case. <command>mgr-ssh-push-init</command> will also
+       automatically generate the necessary SSH key pair if it does not
+       yet exist on the server:
+      </para>
       <screen><prompt>#</prompt> mgr-ssh-push-init --client <replaceable>client</replaceable> --register bootstrap_script</screen>
 
 
@@ -277,7 +284,7 @@ export PATH</screen>
 
     </sect2>
     <sect2 xml:id="bp.contact.methods.ssh.push.api.support">
-      <title>API Support for SSH Push</title>
+      <title>API Support for Push via SSH</title>
       <para>The contact method to be used for managing a server can also be modified via the API.
         The following example code (python) shows how to set a system's contact method to
           <literal>ssh-push</literal>. Valid values are:</para>
@@ -297,9 +304,9 @@ key = client.auth.login(SUMA_LOGIN, SUMA_PASSWORD)
 client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</screen>
 
       <note>
-        <title>Migration and Management via SSH Push</title>
+        <title>Migration and Management via Push via SSH</title>
         <para>
-         When a system should be migrated and managed using SSH Push, it
+         When a system should be migrated and managed using Push via SSH, it
          requires setup using the
          <systemitem>mgr-ssh-push-init</systemitem> script before the
          server can connect via SSH. This separate command requires
@@ -322,23 +329,23 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
           Change the client's contact method to
           <literal>ssh-push</literal> or
           <literal>ssh-push-tunnel</literal> respectively (via API or
-          web UI).
+          Web UI).
          </para>
         </step>
       </procedure>
-      <para>Existing activation keys can also be edited via API to use the SSH Push contact method
+      <para>Existing activation keys can also be edited via API to use the Push via SSH contact method
         for clients registered with these keys: </para>
-      <screen><command>client.activationkey.setDetails(key, '1-mykey', {'contact_method' : 'ssh-push'})</command></screen>
+      <screen>client.activationkey.setDetails(key, '1-mykey', {'contact_method' : 'ssh-push'})</screen>
     </sect2>
     <sect2 xml:id="bp.contact.methods.ssh.push.proxy.support">
-      <title>Proxy Support with SSH Push</title>
-      <para>It is possible to use SSH Push to manage systems that are connected to the &susemgr;
+      <title>Proxy Support with Push via SSH</title>
+      <para>It is possible to use Push via SSH to manage systems that are connected to the &susemgr;
         server via a proxy. To register a system, run <systemitem>mgr-ssh-push-init</systemitem> on
         the proxy system for each client you wish to register. Update your proxy with the latest
         packages to ensure the registration tool is available. It is necessary to copy the ssh key
         to your proxy. This can be achieved by executing the following command from the
         server:</para>
-      <screen><prompt>#</prompt><command> mgr-ssh-push-init --client &lt;proxy&gt;</command></screen>
+      <screen><prompt>#</prompt>mgr-ssh-push-init --client <replaceable>proxy</replaceable></screen>
     </sect2>
   </sect1>
 
