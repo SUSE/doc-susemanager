@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en"
+    xml:id="at.mgr.spacecmd.command.guide">
+
+    <title>Spacecmd Command Reference</title>
+
+    <sect1>
+        <title>Introduction</title>
+        <para>The following chapter will help you become more familiar with the
+                <command>spacecmd</command> command-line interface. This interface is available for
+            SUSE Manager, Satellite and Spacewalk servers.</para>
+
+        <itemizedlist>
+            <title>What can spacecmd do for me?</title>
+            <listitem>
+                <para>Manage almost all aspects of SUSE Manager from the command line</para>
+            </listitem>
+            <listitem>
+                <para>Tab completion is available for all commands</para>
+            </listitem>
+            <listitem>
+                <para>Single commands can be passed to spacecmd without entering the interactive
+                    shell (this is great for shell scripts)</para>
+            </listitem>
+            <listitem>
+                <para>May also be accessed and used as an interactive shell</para>
+            </listitem>
+            <listitem>
+                <para>Advanced search methods are available for finding specific systems, thus
+                    removing the need to create system groups (nevertheless groups are still
+                    recommended)</para>
+            </listitem>
+            <listitem>
+                <para>Complete functionality through the Spacewalk API. Almost all commands that can
+                    be executed from the WebUI can be performed via the spacecmd command-line</para>
+            </listitem>
+
+        </itemizedlist>
+
+        <sect2>
+            <title>Setup Spacecmd Credentials</title>
+            <para>Normally when using spacecmd you are prompted for a username and password each
+                time you login to the interactive shell. You may choose to configure spacecmd with a
+                credentials file to avoid this behavior.</para>
+            <procedure>
+                <title>Creating a spacecmd Credentials File</title>
+                <step>
+                    <para>Create a hidden spacecmd directory in your home directory and set
+                        permissions:</para>
+                    <screen>mkdir ~/.spacecmd
+chmod 700 ~/.spacecmd</screen>
+                </step>
+                <step>
+                    <para>Create a <literal>config</literal> file in
+                            <filename>~/.spacecmd/</filename> and provide proper permissions:</para>
+                    <screen>touch ~/.spacecmd/config
+chmod 600 ~/.spacecmd/config</screen>
+                </step>
+                <step>
+                    <para>Edit the <literal>config</literal> file and add the following
+                        configuration lines. (You can use either localhost or the FQDN of your SUSE
+                        Manager server):</para>
+                    <screen>[spacecmd]
+
+server=FQDN-here
+
+username=username-here
+password=password-here</screen>
+                </step>
+                <step>
+                    <para>Check connectivity by entering <command>spacecmd</command> as root:</para>
+                    <screen># spacecmd</screen>
+                </step>
+            </procedure>
+        </sect2>
+        <sect2>
+            <title>spacecmd Quiet Mode</title>
+            <para>By default spacecmd prints server status messages during connection attempts.
+                These messages can cause a lot of clutter when parsing system lists. The following
+                alias will force spacecmd to use quiet mode thus preventing this behavior. Add the
+                following line to your <literal>~/.bashrc</literal> file:</para>
+            <screen>alias spacecmd='spacecmd -q'</screen>
+        </sect2>
+
+    </sect1>
+
+
+
+</chapter>
