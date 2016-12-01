@@ -50,9 +50,9 @@
 
         <sect2>
             <title>Setup Spacecmd Credentials</title>
-            <para>Normally when using spacecmd you are prompted for a username and password each
-                time you login to the interactive shell. You may choose to configure spacecmd with a
-                credentials file to avoid this behavior.</para>
+            <para>Normally spacecmd prompts you for a username and password each time you attempt to
+                login to the interactive shell. Alternatively you can configure spacecmd with a
+                credentials file to avoid this requirement.</para>
             <procedure>
                 <title>Creating a spacecmd Credentials File</title>
                 <step>
@@ -93,6 +93,396 @@ password=password-here</screen>
             <screen>alias spacecmd='spacecmd -q'</screen>
         </sect2>
 
+    </sect1>
+
+    <sect1>
+        <title>Documented spacecmd Commands</title>
+        <para>The following section provides descriptions for all documented spacecmd commands. Keep
+            in mind that all commands may also be called using scripts and passed to spacecmd as
+            stand-alone commands. Each command is grouped by the function prefix.</para>
+
+        <sect2>
+            <title>Activation Key Commands</title>
+            <para>The following commands are available for use with activation keys.</para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>activationkey_addchildchannels</term>
+                    <listitem>
+                        <para>Add child channels to an activation key.</para>
+                        <screen>usage: activationkey_addchildchannels KEY &lt;CHANNEL ...&gt;</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_addconfigchannels</term>
+                    <listitem>
+                        <para>Add configuration channels to an activation key.</para>
+                        <screen>usage: activationkey_addconfigchannels KEY &lt;CHANNEL ...&gt; [options]
+
+options:
+  -t add channels to the top of the list
+  -b add channels to the bottom of the list</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>activationkey_addentitlements</term>
+                    <listitem>
+                        <para>Add available entitlements to an activation key.</para>
+                        <note>
+                            <title>WebUI Name Change</title>
+                            <para>In the WebUI entitlements are known as System Types. Nevertheless
+                                the spacecmd backend still utilizes the entitlements term. Therefore
+                                any scripts you may be using can remain unchanged.</para>
+                        </note>
+                        <screen>usage: activationkey_addentitlements KEY &lt;ENTITLEMENT ...&gt;</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_addgroups</term>
+                    <listitem>
+                        <para>Add existing groups to an activation key.</para>
+                        <screen>usage: activationkey_addgroups KEY &lt;GROUP ...&gt;</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_addpackages</term>
+                    <listitem>
+                        <para>Add packages to an activation key.</para>
+                        <screen>usage: activationkey_addpackages KEY &lt;PACKAGE ...&gt;</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_clone</term>
+                    <listitem>
+                        <para>Clone an existing activation key.</para>
+                        <screen>usage examples:
+                 activationkey_clone foo_key -c bar_key
+                 activationkey_clone foo_key1 foo_key2 -c prefix
+                 activationkey_clone foo_key -x "s/foo/bar"
+                 activationkey_clone foo_key1 foo_key2 -x "s/foo/bar"
+
+options:
+  -c CLONE_NAME  : Name of the resulting key, treated as a prefix for multiple
+                   keys
+  -x "s/foo/bar" : Optional regex replacement, replaces foo with bar in the
+                   clone description, base-channel label, child-channel
+                   labels, config-channel names </screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_create</term>
+                    <listitem>
+                        <para>Create a new activation key.</para>
+                        <screen>usage: activationkey_create [options]
+
+options:
+  -n NAME
+  -d DESCRIPTION
+  -b BASE_CHANNEL
+  -u set key as universal default
+  -e [enterprise_entitled,virtualization_host]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_delete</term>
+                    <listitem>
+                        <para>Delete an existing activation key.</para>
+                        <screen>usage: activationkey_delete KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_details</term>
+                    <listitem>
+                        <para>Show details of an existing activation key.</para>
+                        <screen>usage: activationkey_details KEY ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_diff</term>
+                    <listitem>
+                        <para>Check the difference between two activation keys.</para>
+                        <screen>usage: activationkey_diff SOURCE_ACTIVATIONKEY TARGET_ACTIVATIONKEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_disable</term>
+                    <listitem>
+                        <para>Disable an existing activation key.</para>
+                        <screen>usage: activationkey_disable KEY [KEY ...]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term/>
+                    <listitem>
+                        <para>Disable configuration channel deployment for an existing activation
+                            key.</para>
+                        <screen>usage: activationkey_disableconfigdeployment KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_enable</term>
+                    <listitem>
+                        <para>Enable an existing activation key.</para>
+                        <screen>usage: activationkey_enable KEY [KEY ...]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_enableconfigdeployment</term>
+                    <listitem>
+                        <para>Enable configuration channel deployment for an existing activation
+                            key.</para>
+                        <screen>usage: activationkey_enableconfigdeployment KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_export</term>
+                    <listitem>
+                        <para>Export activation key(s) to a JSON formatted file.</para>
+                        <screen>usage: activationkey_export [options] [&lt;KEY&gt; ...]
+
+options:
+    -f outfile.json : specify an output filename, defaults to &lt;KEY&gt;.json
+                      if exporting a single key, akeys.json for multiple keys,
+                      or akey_all.json if no KEY specified (export ALL)
+
+Note : KEY list is optional, default is to export ALL keys </screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_import</term>
+                    <listitem>
+                        <para>Import activation key(s) from JSON file(s)</para>
+                        <screen>usage: activationkey_import &lt;JSONFILE ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_list</term>
+                    <listitem>
+                        <para>List all existing activation keys.</para>
+                        <screen>usage: activationkey_list</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listbasechannel</term>
+                    <listitem>
+                        <para>List the base channel associated with an activation key.</para>
+                        <screen>usage: activationkey_listbasechannel KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listchildchannels</term>
+                    <listitem>
+                        <para>List child channels associated with an activation key.</para>
+                        <screen>usage: activationkey_listchildchannels KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listconfigchannels</term>
+                    <listitem>
+                        <para>List configuration channels associated with an activation key.</para>
+                        <screen>usage: activationkey_listconfigchannels KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listentitlements</term>
+                    <listitem>
+                        <para>List entitlements associated with an activation key.</para>
+                        <screen>usage: activationkey_listentitlements KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listgroups</term>
+                    <listitem>
+                        <para>List groups associated with an activation key</para>
+                        <screen>usage: activationkey_listgroups KEY
+</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listpackages</term>
+                    <listitem>
+                        <para>List packages associated with an activation key.</para>
+                        <screen>usage: activationkey_listpackages KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listsystems</term>
+                    <listitem>
+                        <para>List systems registered with an activation key.</para>
+                        <screen>usage: activationkey_listsystems KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removechildchannels</term>
+                    <listitem>
+                        <para>Remove child channels from an activation key.</para>
+                        <screen>usage: activationkey_removechildchannels KEY &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removeconfigchannels</term>
+                    <listitem>
+                        <para>Remove configuration channels from an activation key.</para>
+                        <screen>usage: activationkey_removeconfigchannels KEY &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removeentitlements</term>
+                    <listitem>
+                        <para>Remove entitlements from an activation key.</para>
+                        <screen>usage: activationkey_removeentitlements KEY &lt;ENTITLEMENT ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removegroups</term>
+                    <listitem>
+                        <para> Remove groups from an activation key.</para>
+                        <screen>usage: activationkey_removegroups KEY &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removepackages</term>
+                    <listitem>
+                        <para>Remove packages from an activation key.</para>
+                        <screen>usage: activationkey_removepackages KEY &lt;PACKAGE ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setbasechannel</term>
+                    <listitem>
+                        <para>Set the base channel for an activation key.</para>
+                        <screen>usage: activationkey_setbasechannel KEY CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setconfigchannelorder</term>
+                    <listitem>
+                        <para>Set the ranked order of configuration channels.</para>
+                        <screen>usage: activationkey_setconfigchannelorder KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setcontactmethod</term>
+                    <listitem>
+                        <para>Set the contact method to use for systems registered with a specific
+                            key. (Use the XML-RPC API to access the latest contact methods.) The
+                            following contact methods are available for use with traditional
+                            spacecmd: ['default', 'ssh-push', 'ssh-push-tunnel']</para>
+                        <screen>usage: activationkey_setcontactmethod KEY CONTACT_METHOD</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setdescription</term>
+                    <listitem>
+                        <para>Add a description for an activation key.</para>
+                        <screen>usage: activationkey_setdescription KEY DESCRIPTION</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setuniversaldefault</term>
+                    <listitem>
+                        <para>Set a specific key as the universal default. </para>
+                        <screen>usage: activationkey_setuniversaldefault KEY</screen>
+                        <warning>
+                            <title>Universal Default Key</title>
+                            <para>Using a universal default key is not a Best Practice
+                                recommendation.</para>
+                        </warning>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setusagelimit</term>
+                    <listitem>
+                        <para>Set the usage limit of an activation key, can be a number or
+                            "unlimited".</para>
+                        <screen>usage: activationkey_setbasechannel KEY &lt;usage limit>
+usage: activationkey_setbasechannel KEY unlimited</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+            <tip>
+                <title>Usage Limits</title>
+                <para>Usage limits are only applicable to traditionally managed systems. Currently
+                    usuage limits do not apply to Salt or foreign managed systems.</para>
+            </tip>
+        </sect2>
+
+        <sect2>
+            <title>The API Command</title>
+            <para>The following API command and its options are available for calling the XML-RPC
+                API directly. Calling the API directly allows you to use the latest features in SUSE
+                Manager from the command-line using spacecmd as stand-alone commands or used within
+                scripts. </para>
+            <note>
+                <title>Use the api Command for Access to Latest Features</title>
+                <para>spacecmd is the traditional tool for spacewalk. It functions out of the box
+                    with SUSE Manager but you should know that latest features (eg. Salt) are often
+                    excluded from traditional spacecmd command-line tool. To gain access to the
+                    latest feature additions call <command>api api.getApiCallList</command> from
+                    within spacecmd to list all currently available API commands formatted in json.
+                    You can then call these commands directly.</para>
+            </note>
+            <variablelist>
+                <varlistentry>
+                    <term>api</term>
+                    <listitem>
+                        <para>Call XML-RPC API with arguments directly.</para>
+                        <screen>usage: api [options] API_STRING
+
+options:
+  -A, --args  Arguments for the API other than session id in comma separated
+              strings or JSON expression
+  -F, --format   Output format
+  -o, --output   Output file
+
+examples:
+  api api.getApiCallList
+  api --args "sysgroup_A" systemgroup.listSystems
+  api -A "rhel-i386-server-5,2011-04-01,2011-05-01" -F "%(name)s" \
+      channel.software.listAllPackages</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+
+        </sect2>
+
+        <sect2>
+            <title>Clear Commands</title>
+            <para/>
+        </sect2>
     </sect1>
 
 
