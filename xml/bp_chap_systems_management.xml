@@ -361,15 +361,103 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
    <para>
     Push via Salt SSH is intended to be used in environments where your
     Salt clients cannot reach the &susemgr; server directly to regularly
-    check in and, for example, fetch package updates.
+    checking in and, for example, fetch package updates.
    </para>
-   <para>
+   <note>
+    <title>Push via SSH</title>
+    <para>
+     This feature is not related to Push via SSH for the
+     traditional clients. For Push via SSH, see <xref
+     linkend="bp.contact.methods.ssh.push"/>.
+    </para>
+   </note>
+   <sect2>
+    <title>Overview</title>
+    <para>
+     Salt provides <quote>Salt SSH</quote>
+     (<command>salt-ssh</command>), a feature to manage clients from a
+     server. It works without installing Salt related software on
+     clients. Using Salt SSH there is no need to have minions connected
+     to the Salt master. Using this as a &susemgr; connect method, this
+     feature provides similar functionality for Salt clients as the
+     traditional Push via SSH feature for traditional clients.
+    </para>
+    <para>
+     This feature allows:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       Managing Salt entitled systems with the Push via Salt SSH contact
+       method using <command>salt-ssh</command>.  This is only partially
+       supported at the moment (we only support registering a basic
+       system profile, almost no actions can be done on such a system).
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Bootstrapping such systems.
+    </para>
+     </listitem>
+    </itemizedlist>
+   </sect2>
+   <sect2>
+    <title>Bootstrapping</title>
+    <para>
+     To bootstrap a Salt SSH system, proceed as follows:
+    </para>
+    <procedure>
+     <step>
+      <para>
+       Open the <guimenu>Bootstrapping</guimenu> dialog in the Web UI
+       (<menuchoice><guimenu>Salt</guimenu><guimenu>Bootstrapping</guimenu></menuchoice>).
+      </para>
+      <figure xml:id="bp.contact.methods.saltssh.push.webui">
+       <title>Bootstrap Minion with Salt SSH Enabled</title>
+       <mediaobject>
+        <imageobject role="fo">
+         <imagedata fileref="webui-salt-bootstrapping-salt-ssh.png" width="400"/>
+        </imageobject>
+        <imageobject role="html">
+         <imagedata fileref="webui-salt-bootstrapping-salt-ssh.png" width="444"/>
+        </imageobject>
+       </mediaobject>
+      </figure>
+
+     </step>
+     <step>
+      <para>
+      Fill out the required fields.
+      </para>
+     </step>
+     <step>
+      <para>
+       Check the <guimenu>Manage system completely via SSH</guimenu>
+       option.
+      </para>
+     </step>
+     <step>
+      <para>
+       Confirm with clicking the <guimenu>Bootstrap</guimenu> button.
+      </para>
+     </step>
+    </procedure>
+    <para>
+     Now the system will be bootstrapped and registered in &susemgr;.
+     In the end, it will appear in the <guimenu>Systems</guimenu> list.
+    </para>
+
+   </sect2>
+   <sect2>
+    <title>For More Information</title>
+    <para>
     For more information, see
     https://wiki.microfocus.com/index.php/SUSE_Manager/SaltSSHServerPush
     https://docs.saltstack.com/en/latest/topics/ssh/
    </para>
+  </sect2>
   </sect1>
-  
+
   <sect1 xml:id="bp.contact.methods.osad">
     <title>osad</title>
     <para>The default contact method between &susemgr; and its clients is
