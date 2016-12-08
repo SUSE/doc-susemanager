@@ -162,7 +162,7 @@ ssh_push_port_https = high port 2</screen>
       <screen>taskomatic.ssh_push_workers = number</screen>
     </sect2>
 
-    <sect2>
+    <sect2 xml:id="bp.contact.methods.ssh.push.sudo">
       <title>Using sudo with Push via SSH </title>
       <para>For security reasons you may desire to use sudo and SSH into a system
         as a user other than &rootuser;. The following procedure will guide you through configuring sudo
@@ -402,6 +402,32 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     </itemizedlist>
    </sect2>
    <sect2>
+    <title>Requirements</title>
+    <itemizedlist>
+     <listitem>
+      <para>
+       SSH daemon must be running on the remote system and reachable by
+       the <systemitem>salt-api</systemitem> daemon (typically running
+       on the &susemgr; server)
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Python must be available on the remote system (Python must be
+       supported by the installed salt). Currently: python 2.6.
+      </para>
+    </listitem>
+    </itemizedlist>
+    <note>
+     <title>Unsupported Systems</title>
+     <para>
+      &rhel; and CentOS versions &lt;= 5 are not supported because they
+      do not have Python 2.6 by default.
+     </para>
+    </note>
+   </sect2>
+   
+    <sect2>
     <title>Bootstrapping</title>
     <para>
      To bootstrap a Salt SSH system, proceed as follows:
@@ -444,18 +470,75 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     </procedure>
     <para>
      Now the system will be bootstrapped and registered in &susemgr;.
-     In the end, it will appear in the <guimenu>Systems</guimenu> list.
+     If done successfully, it will appear in the <guimenu>Systems</guimenu> list.
     </para>
 
    </sect2>
    <sect2>
+    <title>Configuration</title>
+    <para>
+     There are 2 kinds of parameters for Salt SSH:
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       Bootstrap-time parameters &mdash; configured in the
+       <guimenu>Bootstrapping</guimenu> page:
+       <!-- FIXME: in Reference Guide, create proper menu
+       description and link to it -->
+      </para>
+      <itemizedlist>
+       <listitem>
+        <para>
+         Host
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Activation keys
+        </para>
+       </listitem>
+       <listitem>
+        <para>
+         Password &mdash; used only for bootstrapping, not to be saved
+         anywhere; all future SSH sessions are authorized via a
+         key/certificate pair
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+     <listitem>
+      <para>
+       Persistent parameters &mdash; configured &susemgr;-wide:
+      </para>
+      <itemizedlist>
+       <listitem>
+        <para>
+         sudo user &mdash; same as in <xref linkend="bp.contact.methods.ssh.push.sudo"/>.
+        </para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </itemizedlist>
+   </sect2>
+
+   
+   <sect2>
     <title>For More Information</title>
     <para>
-    For more information, see
-    https://wiki.microfocus.com/index.php/SUSE_Manager/SaltSSHServerPush
-    https://docs.saltstack.com/en/latest/topics/ssh/
-   </para>
-  </sect2>
+     For more information, see
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>https://wiki.microfocus.com/index.php/SUSE_Manager/SaltSSHServerPush</para>
+     </listitem>
+     <listitem>
+      <para>
+       https://docs.saltstack.com/en/latest/topics/ssh/
+      </para>
+     </listitem>
+    </itemizedlist>
+   </sect2>
   </sect1>
 
   <sect1 xml:id="bp.contact.methods.osad">
