@@ -2462,69 +2462,1312 @@ options:
         <!-- softwarechannel_ -->
         <sect2 xml:id="at.spacecmd.softwarechannel">
             <title>softwarechannel_</title>
-            <para/>
+            <para>The following spacecmd functions are available for working with software
+                channels.</para>
+            
+            <variablelist>
+                <varlistentry>
+                    <term>softwarechannel_adderrata</term>
+                    <listitem>
+                        <para>Add patches from one channel into another channel.</para><screen>usage: softwarechannel_adderrata SOURCE DEST &lt;ERRATA|search:XXX ...>
+Options:
+    -q/--quick : Don't display list of packages (slightly faster)
+    -s/--skip :  Skip errata which appear to exist already in DEST</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_adderratabydate</term>
+                    <listitem>
+                        <para>Add errata from one channel into another channel based on a date
+                            range.</para><screen>usage: softwarechannel_adderratabydate [options] SOURCE DEST BEGINDATE ENDDATE
+Date format : YYYYMMDD
+Options:
+        -p/--publish : Publish errata to the channel (don't clone)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_addpackages</term>
+                    <listitem>
+                        <para>Add packages to a software channel.</para><screen>usage: softwarechannel_addpackages CHANNEL &lt;PACKAGE ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_addrepo</term>
+                    <listitem>
+                        <para>Add a repo to a software channel.</para><screen>usage: softwarechannel_addrepo CHANNEL REPO</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_clone</term>
+                    <listitem>
+                        <para>Clone a software channel.</para><screen>usage: softwarechannel_clone [options]
+
+options:
+  -s SOURCE_CHANNEL
+  -n NAME
+  -l LABEL
+  -p PARENT_CHANNEL
+  --gpg-copy/-g (copy SOURCE_CHANNEL GPG details)
+  --gpg-url GPG_URL
+  --gpg-id GPG_ID
+  --gpg-fingerprint GPG_FINGERPRINT
+  -o do not clone any patches
+  --regex/-x "s/foo/bar" : Optional regex replacement,
+        replaces foo with bar in the clone name and label</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_clonetree</term>
+                    <listitem>
+                        <para>Clone a software channel and its child channels.</para><screen>usage: softwarechannel_clonetree [options]A
+             e.g    softwarechannel_clonetree foobasechannel -p "my_"
+                    softwarechannel_clonetree foobasechannel -x "s/foo/bar"
+                    softwarechannel_clonetree foobasechannel -x "s/^/my_"
+
+options:
+  -s/--source-channel SOURCE_CHANNEL
+  -p/--prefix PREFIX (is prepended to the label and name of all channels)
+  --gpg-copy/-g (copy GPG details for correspondoing source channel))
+  --gpg-url GPG_URL (applied to all channels)
+  --gpg-id GPG_ID (applied to all channels)
+  --gpg-fingerprint GPG_FINGERPRINT (applied to all channels)
+  -o do not clone any errata
+  --regex/-x "s/foo/bar" : Optional regex replacement,
+        replaces foo with bar in the clone name, label and description</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_create</term>
+                    <listitem>
+                        <para>Create a software channel.</para><screen>usage: softwarechannel_create [options]
+
+options:
+  -n NAME
+  -l LABEL
+  -p PARENT_CHANNEL
+  -a ARCHITECTURE ['ia32', 'ia64', 'x86_64', 'ppc',
+                  'i386-sun-solaris', 'sparc-sun-solaris']
+  -c CHECKSUM ['sha1', 'sha256', 'sha384', 'sha512']
+  -u GPG_URL
+  -i GPG_ID
+  -f GPG_FINGERPRINT</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_delete</term>
+                    <listitem>
+                        <para>Delete a software channel.</para><screen>usage: softwarechannel_delete &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_details</term>
+                    <listitem>
+                        <para>Show the details of a software channel.</para><screen>usage: softwarechannel_details &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_diff</term>
+                    <listitem>
+                        <para>Check the difference between software channels.</para><screen>usage: softwarechannel_diff SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_errata_diff</term>
+                    <listitem>
+                        <para>Check the difference between software channel files.</para><screen>usage: softwarechannel_errata_diff SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_errata_sync</term>
+                    <listitem>
+                        <para>Sync errata of two software channels.</para><screen>usage: softwarechannel_errata_sync SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_getorgaccess</term>
+                    <listitem>
+                        <para>Get the org-access for the software channel.</para><screen>usage : softwarechannel_getorgaccess : get org access for all channels
+usage : softwarechannel_getorgaccess &lt;channel_label(s)> : get org access for specific channel(s)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_list</term>
+                    <listitem>
+                        <para>List all available software channels.</para><screen>usage: softwarechannel_list [options]'
+options:
+  -v verbose (display label and summary)
+  -t tree view (pretty-print child-channels)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listallpackages</term>
+                    <listitem>
+                        <para>List all packages in a channel.</para><screen>usage: softwarechannel_listallpackages CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listbasechannels</term>
+                    <listitem>
+                        <para>List all base software channels.</para><screen>usage: softwarechannel_listbasechannels [options]
+options:
+  -v verbose (display label and summary)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listchildchannels</term>
+                    <listitem>
+                        <para>List child software channels.</para><screen>usage:
+softwarechannel_listchildchannels [options]
+softwarechannel_listchildchannels : List all child channels
+softwarechannel_listchildchannels CHANNEL : List children for a specific base channel
+options:
+ -v verbose (display label and summary)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listerrata</term>
+                    <listitem>
+                        <para>List the errata associated with a software channel.</para><screen>usage: softwarechannel_listerrata &lt;CHANNEL ...> [from=yyyymmdd [to=yyyymmdd]]</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listerratabydate</term>
+                    <listitem>
+                        <para>List errata from channelbased on a date range.</para><screen>usage: softwarechannel_listerratabydate CHANNEL BEGINDATE ENDDATE
+Date format : YYYYMMDD</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listlatestpackages</term>
+                    <listitem>
+                        <para>List the newest version of all packages in a channel.</para><screen>usage: softwarechannel_listlatestpackages CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listpackages</term>
+                    <listitem>
+                        <para>List the most recent packages available from a software
+                            channel.</para><screen>usage: softwarechannel_listpackages CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listrepos</term>
+                    <listitem>
+                        <para>List the repos for a software channel.</para><screen>usage: softwarechannel_listrepos CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listsyncschedule</term>
+                    <listitem>
+                        <para>List sync schedules for all software channels.</para><screen>usage: softwarechannel_listsyncschedule : List all channels</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listsystems</term>
+                    <listitem>
+                        <para>List all systems subscribed to a software channel.</para><screen>usage: softwarechannel_listsystems CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_mirrorpackages</term>
+                    <listitem>
+                        <para>Download packages of a given channel.</para><screen>usage: softwarechannel_mirrorpackages CHANNEL
+Options:
+    -l/--latest : Only mirror latest package version</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_regenerateneededcache</term>
+                    <listitem>
+                        <para>Regenerate the needed errata and package cache for all systems.</para><screen>usage: softwarechannel_regenerateneededcache</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_regenerateyumcache</term>
+                    <listitem>
+                        <para>Regenerate the YUM cache for a software channel.</para><screen>usage: softwarechannel_regenerateyumcache &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_removeerrata</term>
+                    <listitem>
+                        <para>Remove patches from a software channel.</para><screen>usage: softwarechannel_removeerrata CHANNEL &lt;ERRATA:search:XXX ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_removepackages</term>
+                    <listitem>
+                        <para>Remove packages from a software channel.</para><screen>usage: softwarechannel_removepackages CHANNEL &lt;PACKAGE ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_removerepo</term>
+                    <listitem>
+                        <para>Remove a repo from a software channel.</para><screen>usage: softwarechannel_removerepo CHANNEL REPO</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_removesyncschedule</term>
+                    <listitem>
+                        <para>Removes the repo sync schedule for a software channel.</para><screen>usage: softwarechannel_setsyncschedule &lt;CHANNEL></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_setorgaccess</term>
+                    <listitem>
+                        <para>Set the org-access for the software channel.</para><screen>usage : softwarechannel_setorgaccess &lt;channel_label> [options]
+-d,--disable : disable org access (private, no org sharing)
+-e,--enable : enable org access (public access to all trusted orgs)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_setsyncschedule</term>
+                    <listitem>
+                        <para>Sets the repo sync schedule for a software channel.</para><screen>usage: softwarechannel_setsyncschedule &lt;CHANNEL> &lt;SCHEDULE>
+
+The schedule is specified in Quartz CronTrigger format without enclosing quotes.
+For example, to set a schedule of every day at 1am, &lt;SCHEDULE> would be 0 0 1 * * ?</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_sync</term>
+                    <listitem>
+                        <para>Sync the packages of two software channels.</para><screen>usage: softwarechannel_sync SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_syncrepos</term>
+                    <listitem>
+                        <para>Sync users repos for a software channel.</para><screen>usage: softwarechannel_syncrepos &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </sect2>
 
         <!-- ssm_ -->
         <sect2 xml:id="at.spacecmd.ssm">
             <title>ssm_</title>
-            <para/>
+            <para>The following spacecmd functions are available for use with System Set
+                Manager.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>ssm_add</term>
+                    <listitem>
+                        <para>Add systems to the SSM.</para><screen>usage: ssm_add &lt;SYSTEMS>
+
+see 'help ssm' for more details
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ssm_clear</term>
+                    <listitem>
+                        <para>Remove all systems from the SSM.</para><screen>usage: ssm_clear</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ssm_intersect</term>
+                    <listitem>
+                        <para>Replace the current SSM with the intersection of the current list of
+                            systems and the list of systems passed as arguments.</para><screen>usage: ssm_intersect &lt;SYSTEMS>
+
+see 'help ssm' for more details
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ssm_list</term>
+                    <listitem>
+                        <para>List the systems currently in the SSM.</para><screen>usage: ssm_list
+
+see 'help ssm' for more details</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ssm_remove</term>
+                    <listitem>
+                        <para>Remove systems from the SSM.</para><screen>usage: ssm_remove &lt;SYSTEMS>
+
+see 'help ssm' for more details
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </sect2>
 
         <!-- system_ -->
         <sect2 xml:id="at.spacecmd.system">
             <title>system_</title>
-            <para/>
+            <para>The following spacecmd functions are available for use with systems.</para>
+            
+            <variablelist>
+                <varlistentry>
+                    <term>system_addchildchannels</term>
+                    <listitem>
+                        <para>Add child channels to a system.</para><screen>usage: system_addchildchannels &lt;SYSTEMS> &lt;CHANNEL ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>system_addconfigchannels</term>
+                    <listitem>
+                        <para>Add config channels to a system.</para><screen>usage: system_addconfigchannels &lt;SYSTEMS> &lt;CHANNEL ...> [options]
+
+options:
+  -t add channels to the top of the list
+  -b add channels to the bottom of the list
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>system_addconfigfile</term>
+                    <listitem>
+                        <para>Create a configuration file.</para><screen>Note this is only for system sandbox or locally-managed files
+Centrally managed files should be created via configchannel_addfile
+usage: system_addconfigfile [SYSTEM] [options]
+
+options:
+  -S/--sandbox : list only system-sandbox files
+  -L/--local   : list only locally managed files
+  -p PATH
+  -r REVISION
+  -o OWNER [default: root]
+  -g GROUP [default: root]
+  -m MODE [defualt: 0644]
+  -x SELINUX_CONTEXT
+  -d path is a directory
+  -s path is a symlink
+  -b path is a binary (or other file which needs base64 encoding)
+  -t SYMLINK_TARGET
+  -f local path to file contents
+
+  Note re binary/base64: Some text files, notably those containing trailing
+  newlines, those containing ASCII escape characters (or other charaters not
+  allowed in XML) need to be sent as binary (-b).  Some effort is made to auto-
+  detect files which require this, but you may need to explicitly specify.</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>system_addcustomvalue</term>
+                    <listitem>
+                        <para>Set a custom value for a system.</para><screen>usage: system_addcustomvalue KEY VALUE &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_addentitlements</term>
+                    <listitem>
+                        <para>Add entitlements to a system.</para><screen>usage: system_addentitlements &lt;SYSTEMS> ENTITLEMENT
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_addnote</term>
+                    <listitem>
+                        <para>Set a note for a system.</para><screen>usage: system_addnote &lt;SYSTEM> [options]
+
+options:
+  -s SUBJECT
+  -b BODY
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_applyerrata</term>
+                    <listitem>
+                        <para>Apply errata to a system.</para><screen>usage: system_applyerrata &lt;SYSTEMS> [ERRATA|search:XXX ...]
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_comparepackageprofile</term>
+                    <listitem>
+                        <para>Compare a system against a package profile.</para><screen>usage: system_comparepackageprofile &lt;SYSTEMS> PROFILE
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_comparepackages</term>
+                    <listitem>
+                        <para>Compare the packages between two systems.</para><screen>usage: system_comparepackages SOME_SYSTEM ANOTHER_SYSTEM</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_comparewithchannel</term>
+                    <listitem>
+                        <para>Compare the installed packages on a system with those in the channels
+                            it is registered to, or optionally some other channel.</para><screen>usage: system_comparewithchannel &lt;SYSTEMS> [options]
+options:
+         -c/--channel : Specific channel to compare against,
+                        default is those subscribed to, including
+                        child channels
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_createpackageprofile</term>
+                    <listitem>
+                        <para>Create a package profile.</para><screen>usage: system_createpackageprofile SYSTEM [options]
+
+options:
+  -n NAME
+  -d DESCRIPTION</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_delete</term>
+                    <listitem>
+                        <para>Delete a system profile.</para><screen>usage: system_delete &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_deletecrashes</term>
+                    <listitem>
+                        <para>Delete crashes reported by spacewalk-abrt.</para><screen>usage: Delete all crashes for all systems    : system_deletecrashes [--verbose]
+usage: Delete all crashes for a single system: system_deletecrashes -i sys_id [--verbose]
+usage: Delete a single crash record          : system_deletecrashes -c crash_id [--verbose]</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_deletenotes</term>
+                    <listitem>
+                        <para>Delete notes from a system.</para><screen>usage: system_deletenotes &lt;SYSTEM> &lt;ID|*>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_deletepackageprofile</term>
+                    <listitem>
+                        <para>Delete a package profile.</para><screen>usage: system_deletepackageprofile PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_deployconfigfiles</term>
+                    <listitem>
+                        <para>Deploy all configuration files for a system.</para><screen>usage: system_deployconfigfiles &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_details</term>
+                    <listitem>
+                        <para>Show the details of a system profile.</para><screen>usage: system_details &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_getcrashfiles</term>
+                    <listitem>
+                        <para>Download all files for a crash record.</para><screen>usage: system_getcrashfiles -c crash_id [--verbose]
+usage: system_getcrashfiles -c crash_id [--dest_folder=/tmp/crash_files] [--verbose]</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_installpackage</term>
+                    <listitem>
+                        <para>Install a package on a system.</para><screen>usage: system_installpackage &lt;SYSTEMS> &lt;PACKAGE ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_list</term>
+                    <listitem>
+                        <para>List all system profiles.</para><screen>usage: system_list</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listbasechannel</term>
+                    <listitem>
+                        <para>List the base channel for a system.</para><screen>usage: system_listbasechannel &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listchildchannels</term>
+                    <listitem>
+                        <para>List the child channels for a system.</para><screen>usage: system_listchildchannels &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listconfigchannels</term>
+                    <listitem>
+                        <para>List the config channels of a system.</para><screen>usage: system_listconfigchannels &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listconfigfiles</term>
+                    <listitem>
+                        <para>List the managed config files of a system.</para><screen>usage: system_listconfigfiles &lt;SYSTEMS>'
+options:
+  -s/--sandbox : list only system-sandbox files
+  -l/--local   : list only locally managed files
+  -c/--central : list only centrally managed files
+  -q/--quiet   : quiet mode (omits the header)
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listcrashedsystems</term>
+                    <listitem>
+                        <para>List all systems that have experienced a crash and reported by
+                            spacewalk-abrt.</para><screen>usage: system_listcrashedsystems</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listcrashesbysystem</term>
+                    <listitem>
+                        <para>List all reported crashes for a system.</para><screen>usage: system_listcrashesbysystem -i sys_id</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listcustomvalues</term>
+                    <listitem>
+                        <para>List the custom values for a system.</para><screen>usage: system_listcustomvalues &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listentitlements</term>
+                    <listitem>
+                        <para>List the entitlements for a system.</para><screen>usage: system_listentitlements &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listerrata</term>
+                    <listitem>
+                        <para>List available errata for a system.</para><screen>usage: system_listerrata &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listevents</term>
+                    <listitem>
+                        <para>List the event history for a system.</para><screen>usage: system_listevents &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listhardware</term>
+                    <listitem>
+                        <para>List the hardware details of a system.</para><screen>usage: system_listhardware &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listinstalledpackages</term>
+                    <listitem>
+                        <para>List the installed packages on a system.</para><screen>usage: system_listinstalledpackages &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listnotes</term>
+                    <listitem>
+                        <para>List the available notes for a system.</para><screen>usage: system_listnotes &lt;SYSTEM>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listpackageprofiles</term>
+                    <listitem>
+                        <para>List all package profiles.</para><screen>usage: system_listpackageprofiles</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listupgrades</term>
+                    <listitem>
+                        <para>List the available upgrades for a system.</para><screen>usage: system_listupgrades &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_lock</term>
+                    <listitem>
+                        <para>Lock a system.</para><screen>usage: system_lock &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_reboot</term>
+                    <listitem>
+                        <para>Reboot a system.</para><screen>usage: system_reboot &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removechildchannels</term>
+                    <listitem>
+                        <para>Remove child channels from a system.</para><screen>usage: system_removechildchannels &lt;SYSTEMS> &lt;CHANNEL ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removeconfigchannels</term>
+                    <listitem>
+                        <para>Remove config channels from a system.</para><screen>usage: system_removeconfigchannels &lt;SYSTEMS> &lt;CHANNEL ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removecustomvalues</term>
+                    <listitem>
+                        <para>Remove a custom value for a system.</para><screen>usage: system_removecustomvalues &lt;SYSTEMS> &lt;KEY ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removeentitlement</term>
+                    <listitem>
+                        <para>Remove an entitlement from a system.</para><screen>usage: system_removeentitlement &lt;SYSTEMS> ENTITLEMENT
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removepackage</term>
+                    <listitem>
+                        <para>Remove a package from a system.</para><screen>usage: system_removepackage &lt;SYSTEMS> &lt;PACKAGE ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_rename</term>
+                    <listitem>
+                        <para>Rename a system profile.</para><screen>usage: system_rename OLDNAME NEWNAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_runscript</term>
+                    <listitem>
+                        <para>Schedule a script to run on the list of systems provided.</para><screen>usage: system_runscript &lt;SYSTEMS> [options]
+
+options:
+  -u USER
+  -g GROUP
+  -t TIMEOUT
+  -s START_TIME
+  -l LABEL
+  -f FILE
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL
+
+
+Dates can be any of the following:
+Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
+
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
+
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_schedulehardwarerefresh</term>
+                    <listitem>
+                        <para>Schedule a hardware refresh for a system.</para><screen>usage: system_schedulehardwarerefresh &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_schedulepackagerefresh</term>
+                    <listitem>
+                        <para>Schedule a software package refresh for a system.</para><screen>usage: system_schedulepackagerefresh &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_search</term>
+                    <listitem>
+                        <para>List systems that match the given criteria.</para><screen>usage: system_search QUERY
+
+Available Fields:
+id
+name
+ip
+hostname
+device
+vendor
+driver
+uuid
+
+Examples:
+> system_search device:vmware
+> system_search ip:192.168.82</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_setbasechannel</term>
+                    <listitem>
+                        <para>Set a system's base software channel.</para><screen>usage: system_setbasechannel &lt;SYSTEMS> CHANNEL
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_setconfigchannelorder</term>
+                    <listitem>
+                        <para>Set the ranked order of configuration channels.</para><screen>usage: system_setconfigchannelorder &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_setcontactmethod</term>
+                    <listitem>
+                        <para>Set the contact method for given system(s).</para><screen>Available contact methods: ['default', 'ssh-push', 'ssh-push-tunnel']
+usage: system_setcontactmethod &lt;SYSTEMS> &lt;CONTACT_METHOD>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_show_packageversion</term>
+                    <listitem>
+                        <para>Shows version of installed package on given system(s).</para><screen>usage: system_show_packageversion &lt;SYSTEM> &lt;PACKAGE>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_syncpackages</term>
+                    <listitem>
+                        <para>Sync packages between two systems.</para><screen>usage: system_syncpackages SOURCE TARGET</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_unlock</term>
+                    <listitem>
+                        <para>Unlock a system.</para><screen>usage: system_unlock &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_updatecustomvalue</term>
+                    <listitem>
+                        <para>Update a custom value for a system.</para><screen>usage: system_updatecustomvalue KEY VALUE &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_upgradepackage</term>
+                    <listitem>
+                        <para>Upgrade a package on a system.</para><screen>usage: system_upgradepackage &lt;SYSTEMS> &lt;PACKAGE ...>|*
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                
+            </variablelist>
         </sect2>
 
         <!-- toggle_ -->
         <sect2 xml:id="at.spacecmd.toggle">
             <title>toggle_</title>
             <para/>
+            <variablelist>
+                <varlistentry>
+                    <term>toggle_confirmations</term>
+                    <listitem>
+                        <para>Toggle confirmation messages on/off.</para><screen>usage: toggle_confirmations</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </sect2>
 
         <!-- user_ -->
         <sect2 xml:id="at.spacecmd.user">
             <title>user_</title>
             <para/>
+            <variablelist>
+                <varlistentry>
+                    <term>user_adddefaultgroup</term>
+                    <listitem>
+                        <para>Add a default group to an user account.</para><screen>usage: user_adddefaultgroup USER &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_addgroup</term>
+                    <listitem>
+                        <para>Add a group to an user account.</para><screen>usage: user_addgroup USER &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_addrole</term>
+                    <listitem>
+                        <para>Add a role to an user account.</para><screen>usage: user_addrole USER ROLE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_create</term>
+                    <listitem>
+                        <para>Create an user.</para><screen>usage: user_create [options]
+
+options:
+  -u USERNAME
+  -f FIRST_NAME
+  -l LAST_NAME
+  -e EMAIL
+  -p PASSWORD
+  --pam enable PAM authentication</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_delete</term>
+                    <listitem>
+                        <para>Delete an user.</para><screen>usage: user_delete NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_details</term>
+                    <listitem>
+                        <para>Show the details of an user.</para><screen>usage: user_details USER ...</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_disable</term>
+                    <listitem>
+                        <para>Disable an user account.</para><screen>usage: user_disable NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_enable</term>
+                    <listitem>
+                        <para>Enable an user account.</para><screen>usage: user_enable NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_list</term>
+                    <listitem>
+                        <para>List all users.</para><screen>usage: user_list</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_listavailableroles</term>
+                    <listitem>
+                        <para>List all available roles for users.</para><screen>usage: user_listavailableroles</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_removedefaultgroup</term>
+                    <listitem>
+                        <para>Remove a default group from an user account.</para><screen>usage: user_removedefaultgroup USER &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_removegroup</term>
+                    <listitem>
+                        <para>Remove a group to an user account.</para><screen>usage: user_removegroup USER &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_removerole</term>
+                    <listitem>
+                        <para>Remove a role from an user account.</para><screen>usage: user_removerole USER ROLE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setemail</term>
+                    <listitem>
+                        <para>Set an user accounts email field.</para><screen>usage: user_setemail USER EMAIL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setfirstname</term>
+                    <listitem>
+                        <para>Set an user accounts first name field.</para><screen>usage: user_setfirstname USER FIRST_NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setlastname</term>
+                    <listitem>
+                        <para>Set an user accounts last name field.</para><screen>usage: user_setlastname USER LAST_NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setpassword</term>
+                    <listitem>
+                        <para>Set an user accounts name prefix field.</para><screen>usage: user_setpassword USER PASSWORD</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setprefix</term>
+                    <listitem>
+                        <para>Set an user accounts name prefix field.</para><screen>usage: user_setprefix USER PREFIX</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </sect2>
 
         <!-- whoami -->
         <sect2 xml:id="at.spacecmd.whoami">
             <title>whoami</title>
-            <para/>
+            <para>The following command is available for returning the currently logged spacecmd
+                username.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>whoami</term>
+                    <listitem>
+                        <para>Print the currently logged spacecmd user.</para><screen>spacecmd {SSM:0}> whoami
+admin</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </sect2>
 
         <!-- whoamitalkingto -->
         <sect2 xml:id="at.spacecmd.whoamitalkingto">
             <title>whoamitalkingto</title>
-            <para/>
+            <para>The following spacecmd function is available for returning the server
+                hostname.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>whoamitalkingto</term>
+                    <listitem>
+                        <para>Return the server hostname that spacecmd is connected with.</para><screen>spacecmd {SSM:0}> whoamitalkingto
+MGR_SERVER_HOSTNAME</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
         </sect2>
 
         <!-- miscellaneous help topics -->
 
         <sect2 xml:id="at.spacecmd.misc.help.topics">
             <title>Miscellaneous Help Topics</title>
-            <para/>
+            <para>The following help topics are printed with all functions requiring the relevant
+                information.</para>
+                <variablelist>
+                    <varlistentry>
+                        <term>time</term>
+                        <listitem>
+                            <para>Dates can be any of the following:</para><screen>Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
 
-            <!-- time -->
-            <sect3 xml:id="at.spacecmd.misc.time">
-                <title>time</title>
-                <para/>
-            </sect3>
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
 
-            <!-- systems -->
-            <sect3 xml:id="at.spacecmd.misc.systems">
-                <title>systems</title>
-                <para/>
-            </sect3>
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>systems</term>
+                        <listitem>
+                            <para>&lt;SYSTEMS> can be any of the following:</para><screen>name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>ssm</term>
+                        <listitem>
+                        <para>The System Set Manager (SSM) is a group of systems that you </para>
+                        <para>can perform tasks on as a group.</para><screen>Adding Systems:
+> ssm_add group:rhel5-x86_64
+> ssm_add channel:rhel-x86_64-server-5
+> ssm_add search:device:vmware
+> ssm_add host.example.com
 
-            <!-- ssm -->
-            <sect3 xml:id="at.spacecmd.misc.ssm">
-                <title>ssm</title>
-                <para/>
-            </sect3>
+Intersections:
+> ssm_add group:rhel5-x86_64
+> ssm_intersect group:web-servers
 
+Using the SSM:
+> system_installpackage ssm zsh
+> system_runscript ssm</screen>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
         </sect2>
 
     </sect1>
