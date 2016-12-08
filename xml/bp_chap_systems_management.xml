@@ -495,12 +495,12 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
        </listitem>
        <listitem>
         <para>
-         Activation keys
+         Activation key
         </para>
        </listitem>
        <listitem>
         <para>
-         Password &mdash; used only for bootstrapping, not to be saved
+         Password &mdash; used only for bootstrapping, not saved
          anywhere; all future SSH sessions are authorized via a
          key/certificate pair
         </para>
@@ -522,7 +522,56 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     </itemizedlist>
    </sect2>
 
-   
+   <sect2>
+    <title>Action Execution</title>
+    <para>
+     The Push via Salt SSH feature uses a taskomatic job to execute
+     scheduled actions using <command>salt-ssh</command>. The taskomatic
+     job periodically checks for scheduled actions and executes them.
+     While on traditional clients with SSH push configured only
+     <command>rhn_check</command> is executed via SSH, the Salt SSH push
+     job executes a complete <command>salt-ssh</command> call based on
+     the scheduled action.
+    </para>
+
+    <!-- Remark: we probably do not need this background info here -->
+    <!-- Action execution progress -->
+    <!--
+    <para>
+     The framework for running actions is partially shared with the
+     traditional SSH push. The only difference is how a single minion is
+     handled. The process is as follows:
+    </para>
+    <para>
+    Pending actions for a minion are retrieved (sorted by date) from the DB, for each action we check:
+        If an action is already completed or failed -> skip it
+        If a prerequisite action for this action is still queued for the minion -> skip it
+        If a prerequisite action for this action has failed for the minion -> fail this action too
+        If remaining tries for this action is < 1 -> fail this action
+    Otherwise
+        Decrease the number of remaining tries for this action
+        Execute the action using salt-ssh, check:
+            If we get an empty result from salt, or salt throws an
+            exception, we log a warning (action will be retried in the
+            next job run)
+            If we get a valid result, we update the action according to it
+    If some of the executed actions required a package list refresh (we
+    determine that from the result), execute package list refresh action
+    If there was NO action executed, perform a check-in for the system
+    </para>
+    -->
+   </sect2>
+
+   <sect2>
+    <title>Known Limitation</title>
+    <itemizedlist>
+     <listitem>
+      <para>
+       Salt SSH Push via tunnel is not yet implemented.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </sect2>
    <sect2>
     <title>For More Information</title>
     <para>
@@ -530,11 +579,14 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     </para>
     <itemizedlist>
      <listitem>
-      <para>https://wiki.microfocus.com/index.php/SUSE_Manager/SaltSSHServerPush</para>
+      <para>
+      <link
+          xlink:href="https://wiki.microfocus.com/index.php/SUSE_Manager/SaltSSHServerPush"/>
+      </para>
      </listitem>
      <listitem>
       <para>
-       https://docs.saltstack.com/en/latest/topics/ssh/
+       <link xlink:href="https://docs.saltstack.com/en/latest/topics/ssh/"/>
       </para>
      </listitem>
     </itemizedlist>
