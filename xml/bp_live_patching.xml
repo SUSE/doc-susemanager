@@ -13,12 +13,17 @@
 
     <sect1>
         <title>Introduction</title>
-        <para/>
+        <para>Utilizing the new Live Patching feature you can update kernel patches without the need
+            to reboot your systems. The following section will introduce you to creating cloned
+            channels for working with vendor channels and then guide you through selecting and
+            testing kernel Live Patches with a <literal>dev</literal>, <literal>test</literal>, and
+                <literal>prod</literal> environment using the
+                <command>spacewalk-manage-channel-lifecycle</command> tool.</para>
     </sect1>
 
     <sect1>
         <title>Requirements</title>
-        <para/>
+        <para>Ensure your test setup fullfils the following requirements.</para>
         <itemizedlist>
             <listitem>
                 <para>SUSE Manager 3.0 or greater fully updated</para>
@@ -37,10 +42,47 @@
             </listitem>
         </itemizedlist>
     </sect1>
+    <sect1>
+        <title>Checking for Available Live Patches</title>
+        <para>The following procedure will introduce you to listing available Live Patches.</para>
+        <procedure>
+            <step>
+                <para>From the SUSE Manager WebUI select any system from the
+                        <guimenu>Systems</guimenu> page. This will bring up the <guimenu>Systems
+                        Details</guimenu> page.</para>
+            </step>
+            <step>
+                <para>Select <guimenu>Critical</guimenu> to see a list of available critical
+                    patches.</para>
+            </step>
+        </procedure>
+    </sect1>
 
     <sect1>
-        <title/>
-        <para/>
+        <title>Cloning Channels</title>
+        <para>In the following procedure you will use the
+                <command>spacewalk-manage-channel-lifecycle</command> tool to clone and prepare live
+            patching channels.</para>
+
+        <procedure>
+            <step>
+                <para>As root from your SUSE Manager server:</para>
+                <screen># spacewalk-manage-channel-lifecycle --list-channels</screen>
+            </step>
+            <step>
+                <para>Select and initialize a cloned <literal>dev</literal> channel from the channel
+                    you wish to clone using the following command:</para>
+                <screen>spacewalk-manage-channel-lifecycle --init -c sles12-sp1-pool-x86_64</screen>
+                <para>This will automatically clone and add the <literal>dev</literal>prefix to the
+                    clone name.</para>
+                <screen>dev-sles12-sp1-pool-x86_64
+      \__ dev-sle-live-patching12-pool-x86_64-sp1
+      \__ dev-sle-live-patching12-updates-x86_64-sp1
+      \__ dev-sle-manager-tools12-pool-x86_64-sp1
+      \__ dev-sle-manager-tools12-updates-x86_64-sp1
+      \__ dev-sles12-sp1-updates-x86_64</screen>
+            </step>
+        </procedure>
     </sect1>
 
 
