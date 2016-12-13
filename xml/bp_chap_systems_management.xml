@@ -63,15 +63,17 @@
 
     <sect2>
       <title>Configuring &susemgr; rhnsd Daemon</title>
-      <para>The &susemgr; daemon can be configured by editing the following configuration
-        file:</para>
+      <para>
+       The &susemgr; daemon can be configured by editing the file on the
+       client:
+      </para>
       <screen>/etc/sysconfig/rhn/rhnsd</screen>
       <para>
        This is the configuration file the rhnsd initialization script
        uses. An important parameter for the daemon is its check-in
        frequency. The default interval time is four hours (240
        minutes). If you modify the configuration file, you must as
-       <systemitem>root</systemitem> restart the daemon with the command
+       &rootuser; restart the daemon with the command
        (systemd)<command>systemctl rhnsd restart</command> or
        (runcom)<command>rcrhnsd restart</command>.
       </para>
@@ -682,15 +684,18 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
       <procedure>
         <title>Enabling osa-dispatcher on &susemgr; and osad on Clients</title>
         <step>
-          <para>On your &susemgr; server use the following command as root to start the
+          <para>On your &susemgr; server use the following command as &rootuser; to start the
               <systemitem>osa-dispatcher</systemitem> service:</para>
           <screen>rcosa-dispatcher start</screen>
           <screen>systemctl start osa-dispatcher</screen>
         </step>
         <step>
-          <para>Install the <systemitem>osad</systemitem> package on all client systems to allow
-            communication to the osa-dispatcher on &susemgr;. The package can be found in the
-              <replaceable>Tools child channel</replaceable>.</para>
+         <para>
+          Install the <systemitem>osad</systemitem> package on all
+          client systems to allow communication to the osa-dispatcher on
+          &susemgr;. The package can be found in the Tools child
+          channel.
+         </para>
           <warning>
             <title>osad conflicts with osa-dispatcher</title>
             <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
@@ -699,10 +704,10 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
           </warning>
         </step>
         <step>
-          <para>Once osad has been installed, start the service on your client systems as root using
+          <para>Once osad has been installed, start the service on your client systems as &rootuser; using
             the command:</para>
-          <screen>rcosad start</screen>
-          <screen>systemctl start osad</screen>
+          <screen>rcosad start
+systemctl start osad</screen>
           <para>Like other services, rcosa-dispatcher and rcosad accept stop, restart, and status
             commands as well.</para>
         </step>
