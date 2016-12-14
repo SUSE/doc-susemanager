@@ -13,12 +13,27 @@
 
     <sect1>
         <title>Introduction</title>
-        <para/>
+        <para>Under normal circumstances a system needs to be rebooted after a Kernel update. Live
+            patching allows you skip rebooting once a new kernel update has been applied by applying
+            a subset of Linux kernel releases injected via kGraft. (Supported for up to one
+            year)</para>
+        <para>The following chapter will guide you through selecting the appropriate patches from a
+            list of available CVE patches, cloning vendor channels using the
+                <command>spacewalk-manage-channel-lifecycle</command> tool into
+                <literal>testing</literal>, <literal>dev</literal> and <literal>prod</literal>
+            channels and you will learn how to use live patching to avoid the typical reboot
+            requirement for an updated system kernel. This chapter also provides a good example for
+            maintaining environments using the <command>spacewalk-manage-channel-lifecycle</command>
+            tool.</para>
+
+        <para>For more information on using kGraft see: <link
+                xlink:href="https://www.suse.com/documentation/sles-12/singlehtml/book_sle_admin/book_sle_admin.html#cha.kgraft"
+            /></para>
     </sect1>
 
     <sect1>
-        <title>Requirements</title>
-        <para/>
+        <title>Initial Setup Requirements</title>
+        <para>To work with Live Patching the following expectations should be met:</para>
         <itemizedlist>
             <listitem>
                 <para>SUSE Manager 3.0 or greater fully updated</para>
@@ -28,8 +43,8 @@
                     manager</para>
             </listitem>
             <listitem>
-                <para>Vendor channels for SLES12-SP1 including the Live Patching child channel fully
-                    synced.</para>
+                <para>The vendor channel for SLES12-SP1 including the Live Patching child channel
+                    fully synced.</para>
             </listitem>
             <listitem>
                 <para>spacewalk-utils package installed on SUSE Manager Server. </para>
@@ -39,10 +54,84 @@
     </sect1>
 
     <sect1>
-        <title/>
-        <para/>
+        <title>Viewing Available CVE's</title>
+        <para>The following procedure will guide you through selecting and viewing available CVE
+            Patches (Common Vulnerabilities and Exposures) then applying these kernel updates using
+            the new Live Patching feature. In this example you will use the
+                <command>spacewalk-manage-channel-lifecycle</command> tool to maintain specific
+            channel states for testing, development and production.</para>
+
+        <procedure>
+            <step>
+                <para>Select your SLES12 SP1 minion from the <guimenu>Systems</guimenu> page to view
+                    its <guimenu>System Details</guimenu>. If you have added and synced the SLES12
+                    SP1 Updates vendor channel then you should see several
+                        <literal>Critical</literal> software updates available. Click on
+                        <literal>Critical</literal> to see a list of available patches. Select any
+                    of these patches listed with the following synopsis: <emphasis>Important:
+                        Security update for the Linux Kernel</emphasis>. All fixed security bugs
+                    will be listed along with their number. For example:(CVE-2016-8666)</para>
+                <important>
+                    <title>Reboot Icon</title>
+                    <para>Normal or non-live Kernel patches always require a reboot. In SUSE Manager
+                        these are represented by a <literal>Reboot Required</literal> icon located
+                        next to the <literal>Security</literal> shield icon.</para>
+                </important>
+            </step>
+            <step>
+                <para>You can search for individual CVE's by selecting the <guimenu>Audit</guimenu>
+                    tab from the navigation menu. Try searching for
+                    <literal>CVE-2016-8666</literal>. You will see that the patch is available in
+                    the vendor update channel and the systems it applies to will be listed. </para>
+            </step>
+        </procedure>
     </sect1>
 
+    <sect1>
+        <title>Cloning Channels</title>
+        <para>It is considered best practice to clone a vendor channel that should be modified into
+            a new channel with one of the following prefix names: (dev, testing, and prod). In the
+            following procedure you will clone the default vendor channel into a new channel named
+                <filename>dev-sles12-sp1-pool-x86_64</filename> using the command line.</para>
+
+        <procedure>
+            <step>
+                <para>Open a terminal and as root enter:</para>
+                <screen># spacewalk-manage-channel-lifecycle --list-channels
+Spacewalk Username: admin
+Spacewalk Password: 
+Channel tree:
+
+ 1. sles12-sp1-pool-x86_64
+      \__ sle-live-patching12-pool-x86_64-sp1
+      \__ sle-live-patching12-updates-x86_64-sp1
+      \__ sle-manager-tools12-pool-x86_64-sp1
+      \__ sle-manager-tools12-updates-x86_64-sp1
+      \__ sles12-sp1-updates-x86_64  </screen>
+            </step>
+            <step>
+                <para>Now use the <emphasis>--init</emphasis> argument to automatically create a new
+                    development clone of the original vendor channel:</para>
+                <screen>spacewalk-manage-channel-lifecycle --init -c sles12-sp1-pool-x86_64</screen>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Removing Normal Kernel Patches</title>
+        <para>In the following procedure you will remove the undesired normal Kernel patches that
+            would require a reboot from your dev channel to prevent these patches from being applied
+            to your machines.</para>
+
+        <procedure>
+            <step>
+                <para/>
+            </step>
+            <step>
+                <para/>
+            </step>
+        </procedure>
+    </sect1>
 
 
 </chapter>
