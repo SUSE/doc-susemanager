@@ -12,25 +12,35 @@
   <title>Contact Methods</title>
 
   <sect1>
-    <title>Selecting a Contact Method</title>
-    <para>&susemgr; provides several methods for communication between client and server. All
-      commands your &susemgr; server sends its clients to do will be routed through one of the
-      following configured contact methods. Which one you select will be heavily dependant on your
-      network infrastructure. The following sections provide a good starting point for selecting a
-      method which best suits your network environment.</para>
+   <title>Selecting a Contact Method</title>
+   <para>
+    &susemgr; provides several methods for communication between client
+    and server. All commands your &susemgr; server sends its clients to
+    do will be routed through one of them.  Which one you select will
+    depend on your network infrastructure. The following sections
+    provide a starting point for selecting a method which best suits
+    your network environment.
+   </para>
     <note>
       <title>Contact Methods and Salt</title>
-      <para>This chapter is only relevant for traditional clients as Salt clients (minions) utilize
-        a salt specific contact method.</para>
+      <para>
+       This chapter is only relevant for traditional clients as Salt
+       clients (minions) utilize a Salt specific contact method.  For
+       general information about Salt clients, see <xref
+       linkend="salt.gs.guide.intro"/>.
+      </para>
     </note>
   </sect1>
   <sect1 xml:id="bp.contact.methods.rhnsd">
-    <title>The rhnsd (Default)</title>
-    <para>The &susemgr; daemon (<command>rhnsd</command>) runs on client systems and periodically connects with SUSE
-      Manager to check for new updates and notifications. The daemon, which runs in the background,
-      is typically started by the <systemitem>rcrhnsd</systemitem> initialization script. By default
-      it will check every 4 hours for new actions, therefore it may take some time for your clients
-      to begin updating after actions have been scheduled for them.</para>
+    <title>Default (the &susemgr; Daemon rhnsd)</title>
+    <para>The &susemgr; daemon (<command>rhnsd</command>) runs on client
+    systems and periodically connects with &susemgr; to check for new
+    updates and notifications. The daemon, which runs in the background,
+    is started by <systemitem>rhnsd.service</systemitem> or the
+    <systemitem>rcrhnsd</systemitem> initialization script. By default,
+    it will check every 4 hours for new actions, therefore it may take
+    some time for your clients to begin updating after actions have been
+    scheduled for them.</para>
 
     <para>To check for updates, <systemitem>rhnsd</systemitem> runs the external
         <systemitem>mgr_check</systemitem> program located in <filename>/usr/sbin/</filename>. This
@@ -57,15 +67,17 @@
 
     <sect2>
       <title>Configuring &susemgr; rhnsd Daemon</title>
-      <para>The &susemgr; daemon can be configured by editing the following configuration
-        file:</para>
+      <para>
+       The &susemgr; daemon can be configured by editing the file on the
+       client:
+      </para>
       <screen>/etc/sysconfig/rhn/rhnsd</screen>
       <para>
        This is the configuration file the rhnsd initialization script
        uses. An important parameter for the daemon is its check-in
        frequency. The default interval time is four hours (240
        minutes). If you modify the configuration file, you must as
-       <systemitem>root</systemitem> restart the daemon with the command
+       &rootuser; restart the daemon with the command
        (systemd)<command>systemctl rhnsd restart</command> or
        (runcom)<command>rcrhnsd restart</command>.
       </para>
@@ -385,10 +397,13 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     <itemizedlist>
      <listitem>
       <para>
-       Managing Salt entitled systems with the Push via Salt SSH contact
-       method using <command>salt-ssh</command>.  This is only partially
-       supported at the moment (we only support registering a basic
-       system profile, almost no actions can be done on such a system).
+       Managing Salt entitled systems with the Push via SSH contact
+       method using Salt SSH.
+       <!--
+           This is only partially supported at the moment (we only
+           support registering a basic system profile, almost no actions
+           can be done on such a system).
+       -->
       </para>
      </listitem>
      <listitem>
@@ -405,13 +420,13 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
       <para>
        SSH daemon must be running on the remote system and reachable by
        the <systemitem>salt-api</systemitem> daemon (typically running
-       on the &susemgr; server)
+       on the &susemgr; server).
       </para>
      </listitem>
      <listitem>
       <para>
        Python must be available on the remote system (Python must be
-       supported by the installed salt). Currently: python 2.6.
+       supported by the installed Salt). Currently: python 2.6.
       </para>
     </listitem>
     </itemizedlist>
@@ -450,7 +465,10 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
      </step>
      <step>
       <para>
-      Fill out the required fields.
+       Fill out the required fields.  Select an <guimenu>Activation
+       Key</guimenu> with the <guimenu>Push via SSH</guimenu> contact
+       method configured.  For more information about activation keys,
+       see <xref linkend="ref.webui.systems.activ-keys"/>.
       </para>
      </step>
      <step>
@@ -467,7 +485,8 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     </procedure>
     <para>
      Now the system will be bootstrapped and registered in &susemgr;.
-     If done successfully, it will appear in the <guimenu>Systems</guimenu> list.
+     If done successfully, it will appear in the
+     <guimenu>Systems</guimenu> list.
     </para>
 
    </sect2>
@@ -548,7 +567,7 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     Otherwise
         Decrease the number of remaining tries for this action
         Execute the action using salt-ssh, check:
-            If we get an empty result from salt, or salt throws an
+            If we get an empty result from Salt, or Salt throws an
             exception, we log a warning (action will be retried in the
             next job run)
             If we get a valid result, we update the action according to it
@@ -669,15 +688,19 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
       <procedure>
         <title>Enabling osa-dispatcher on &susemgr; and osad on Clients</title>
         <step>
-          <para>On your &susemgr; server use the following command as root to start the
+          <para>On your &susemgr; server use the following command as &rootuser; to start the
               <systemitem>osa-dispatcher</systemitem> service:</para>
           <screen>rcosa-dispatcher start</screen>
           <screen>systemctl start osa-dispatcher</screen>
         </step>
         <step>
-          <para>Install the <systemitem>osad</systemitem> package on all client systems to allow
-            communication to the osa-dispatcher on &susemgr;. The package can be found in the
-              <replaceable>Tools child channel</replaceable>.</para>
+         <para>
+          Install the <systemitem>osad</systemitem> package on all
+          client systems to allow communication to the osa-dispatcher on
+          &susemgr;. The package can be found in the Tools child
+          channel.  For more information about child channels, see <xref
+          linkend="s3-sm-channel-list-child"/>.
+         </para>
           <warning>
             <title>osad conflicts with osa-dispatcher</title>
             <para>Do <emphasis>not</emphasis> install the <systemitem>osad</systemitem> client
@@ -686,10 +709,10 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
           </warning>
         </step>
         <step>
-          <para>Once osad has been installed, start the service on your client systems as root using
+          <para>Once osad has been installed, start the service on your client systems as &rootuser; using
             the command:</para>
-          <screen>rcosad start</screen>
-          <screen>systemctl start osad</screen>
+          <screen>rcosad start
+systemctl start osad</screen>
           <para>Like other services, rcosa-dispatcher and rcosad accept stop, restart, and status
             commands as well.</para>
         </step>

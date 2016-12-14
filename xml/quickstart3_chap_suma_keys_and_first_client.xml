@@ -101,13 +101,13 @@
                 vendor channel you will be using with your client has been completely synced. You
                 can check this by running <command>tail -f
                         /var/log/rhn/reposync/<replaceable>CHANNEL_NAME</replaceable>.log</command>
-                as <systemitem>root</systemitem>. For example: <command>tail -f
-                    /var/log/rhn/reposync/sles12-sp1-pool-x86_64.log</command></para>
+            as <systemitem>root</systemitem>. For example:</para>
+            <screen>tail -f /var/log/rhn/reposync/sles12-sp1-pool-x86_64.log</screen>
         </important>
         <procedure>
             <title>Generating the Tools Repository for &sle; 12 SP1</title>
             <step>
-                <para>Open a terminal on the server as <systemitem>root</systemitem> and enter the
+                <para>Open a terminal on the server as &rootuser; and enter the
                     following command to list available bootstrap repositories:</para>
                 <screen>
 <prompt>example-server: #</prompt> <command>mgr-create-bootstrap-repo -l</command>
@@ -301,7 +301,7 @@ ORG_GPG_KEY=
                 <step>
                     <para>The script will execute and proceed to download the required dependencies
                         located in the repositories directory you created earlier. Once the script
-                        has finished running, log in to the WebUI and select the systems tab to see
+                        has finished running, log in to the &webui; and select the systems tab to see
                         your new client listed.</para>
                 </step>
 
@@ -323,10 +323,10 @@ ORG_GPG_KEY=
       repository. The second method is to create a bootstrap script
       using <command>mgr-bootstrap</command> and include the optional
       <option>--salt</option> parameter. Keep in mind, bootstrapping
-      salt minions with <command>mgr-bootstrap --salt</command>is
+      salt minions with <command>mgr-bootstrap --salt</command> is
       performed in the same manner as bootstrapping traditional
       clients. The third method and perhaps the simplest is performed
-      from the &susemgr; Web UI. You can find this method located in
+      from the &susemgr; &webui;. Find this method located in
       <xref linkend="ref.webui.bootstrapping.salt.minions"/>.
      </para>
 
@@ -335,30 +335,35 @@ ORG_GPG_KEY=
       tools repository. You can review creating a tools repository in
       <xref linkend="create.tools.repository"/>.
      </para>
-        <para>Once you have setup a base channel from the WebUI clients to obtain software sources
-            from, for example: <replaceable>SLES12-SP1-Pool for x86_64</replaceable> Perform the
+        <para>Once you have setup a base channel from the &webui; clients to obtain software sources
+            from, for example: <replaceable>SLES12-SP1-Pool for x86_64</replaceable> perform the
             following procedure to register a Salt minion.</para>
         <procedure>
             <title>Registering Salt Minions</title>
             <step>
-                <para>On your minion as root enter the following command:</para>
-                <screen><prompt>#</prompt> zypper ar http://FQDN.SUSE.Manager.com/pub/repositories/sle/12/1/bootstrap/ sles12-sp1</screen>
-                <para> It is important that you do not use HTTPS as you will receive errors. Use
-                    HTTP instead.</para>
+             <para>On your minion as &rootuser; enter the following command:</para>
+             <screen><prompt>#</prompt> zypper ar http://<replaceable>FQDN.SUSE.Manager.com</replaceable>/pub/repositories/sle/12/1/bootstrap/ sles12-sp1</screen>
+             <para>
+              It is important that you do not use
+              <literal>HTTPS</literal> as you will receive errors. Use
+              <literal>HTTP</literal> instead.
+             </para>
             </step>
             <step>
-                <para>After adding the repository containing the necessary salt packages
+                <para>After adding the repository containing the necessary Salt packages
                     execute:</para>
                 <screen><prompt>#</prompt> zypper in salt-minion</screen>
             </step>
             <step>
-                <para>Modify the minion configuration file to point to the FQDN of the SUSE Manager
-                    Server (Master):</para>
+                <para>Modify the minion configuration file to point to
+                the fully qualified domain name
+                (<replaceable>FQDN</replaceable>) of the &susemgr;
+                Server (Master):</para>
                 <screen><prompt>#</prompt> vi /etc/salt/minion</screen>
                 <para> Find and change the following line </para>
                 <screen>master: salt</screen>
                 <para> to: </para>
-                <screen>master: FQDN.SUSE.Manager.com</screen>
+                <screen>master: <replaceable>FQDN.SUSE.Manager.com</replaceable></screen>
             </step>
             <step>
                 <para>Restart the Salt minion with:</para>
@@ -368,7 +373,7 @@ ORG_GPG_KEY=
             </step>
         </procedure>
 
-        <para>Your newly registered minion should now show up within the WebUI under <menuchoice>
+        <para>Your newly registered minion should now show up within the &webui; under <menuchoice>
                 <guimenu>Salt</guimenu>
                 <guimenu>Onboarding</guimenu>
             </menuchoice>. Accept its key to begin management.</para>
