@@ -32,16 +32,17 @@
         <para>The following procedure will guide you through creating
         the activation keys for your test channels. Activation keys can
         be used for both Salt and traditional clients. </para>
-        <formalpara>
-         <title>Activation Keys</title> <para>Activation keys define the
+        <para>
+         Activation keys define the
          number of software entitlements, channels and groups a client
          system is allowed to subscribe to. This information is passed
          on to all systems registered with a key. Each activation key is
          bound to the organization for which it has been created. For
          this guide you will be using the default &susemgr; organization
          which includes all software entitlements. Activation keys may
-         be used with traditional clients or with Salt clients. </para>
-        </formalpara>
+         be used with traditional clients or with Salt clients.
+        </para>
+
         <procedure xml:id="create.activation.keys">
             <title>Creating Activation Keys</title>
             <step>
@@ -101,8 +102,11 @@
              default.</para>
             </step>
             <step>
-                <para>Leave Universal Default unchecked. Click <literal>Create Activation
-                        Key</literal> to finish creating the key for the first channel.</para>
+             <para>
+              Leave <guimenu>Universal Default</guimenu>
+              unchecked. Click <guimenu>Create Activation Key</guimenu>
+              to finish creating the key for the first channel.
+             </para>
             </step>
         </procedure>
 
@@ -117,29 +121,26 @@
             will create the &sle; 12 SP1 tools repository. </para>
         <important>
             <title>Creating a Tools Repository when an SCC Channel has not been Synced</title>
-            <para>Before following the procedure to create the tools repository make sure the &suse;
-                vendor channel you will be using with your client has been completely synced. You
-                can check this by running <command>tail -f
-                        /var/log/rhn/reposync/<replaceable>CHANNEL_NAME</replaceable>.log</command>
-            as <systemitem>root</systemitem>. For example:</para>
-            <screen>tail -f /var/log/rhn/reposync/sles12-sp1-pool-x86_64.log</screen>
+            <para>Before following the procedure to create the tools
+            repository make sure the &suse; vendor channel you will be
+            using with your client has been completely synced. You can
+            check this by running <command>tail -f
+            /var/log/rhn/reposync/<replaceable>CHANNEL_NAME</replaceable>.log</command>
+            as &rootuser;.  For example:</para>
+            <screen><prompt># </prompt>tail -f /var/log/rhn/reposync/sles12-sp1-pool-x86_64.log</screen>
         </important>
         <procedure>
             <title>Generating the Tools Repository for &sle; 12 SP1</title>
             <step>
                 <para>Open a terminal on the server as &rootuser; and enter the
                     following command to list available bootstrap repositories:</para>
-                <screen>
-<prompt>example-server: #</prompt> <command>mgr-create-bootstrap-repo -l</command>
-SLE-12-SP1-x86_64
-</screen>
+                <screen><prompt># </prompt><command>mgr-create-bootstrap-repo -l</command>
+SLE-12-SP1-x86_64</screen>
             </step>
             <step>
                 <para>Then invoke the same command using the listed repository as the product label
                     to actually create the bootstrap repository:</para>
-                <screen>
-<prompt>example-server: #</prompt> <command>mgr-create-bootstrap-repo -c SLE-12-SP1-x86_64</command>
-</screen>
+                <screen><prompt># </prompt><command>mgr-create-bootstrap-repo -c SLE-12-SP1-x86_64</command></screen>
             </step>
             <step>
                 <para> &susemgr; will create and add the client tools to the newly created
@@ -151,11 +152,11 @@ SLE-12-SP1-x86_64
 
     </sect1>
     <sect1>
-        <title>Registering Traditional Clients</title>
+        <title>Registering <quote>Traditional</quote> Clients</title>
         <sect2 xml:id="generate.bootstrap.script">
             <title>Generating a Bootstrap Script</title>
             <para>This section goes over generating a template bootstrap script which will be copied
-                and modified for use with your traditional clients.</para>
+                and modified for use with your <quote>traditional</quote> clients.</para>
 
             <para>Traditional clients register with SUSE Manager via a bootstrap script executed on
                 the client which deploys all necessary packages to it. The bootstrap script contains
@@ -191,15 +192,17 @@ SLE-12-SP1-x86_64
             <procedure xml:id="create.boot.script">
                 <title>Creating a Bootstrap Script</title>
                 <step>
-                    <para>On the SUSE Manager Web interface, switch to the <guimenu>Admin</guimenu>
+                    <para>On the SUSE Manager &webui;, switch to the <guimenu>Admin</guimenu>
                         tab and select <menuchoice>
                             <guimenu>SUSE Manager Configuration</guimenu>
-                            <guimenu>Bootstrap Script.</guimenu>
-                        </menuchoice></para>
+                            <guimenu>Bootstrap Script</guimenu>
+                        </menuchoice>.</para>
                 </step>
                 <step>
-                    <para>Leave the defaults settings and click the <guimenu>Update</guimenu>
-                        button. </para>
+                 <para>
+                  Leave the default settings and click the
+                  <guimenu>Update</guimenu> button.
+                 </para>
                     <informalfigure>
                         <mediaobject>
                             <imageobject>
@@ -210,22 +213,28 @@ SLE-12-SP1-x86_64
                 </step>
 
                 <step>
-                    <para>A template bootstrap script is generated and stored on the server's file
-                        system in the <filename>/srv/www/htdocs/pub/bootstrap</filename> directory. </para>
-                    <screen><prompt>example-server: /srv/www/htdocs/pub/bootstrap#</prompt> <command>ls</command>
+                 <para>
+                  A template bootstrap script is generated and stored on
+                  the server's file system in the
+                  <filename>/srv/www/htdocs/pub/bootstrap</filename>
+                  directory.
+                 </para>
+                 <screen><prompt># </prompt><command>cd /srv/www/htdocs/pub/bootstrap</command>
+<prompt># </prompt><command>ls</command>
 bootstrap.sh                  client_config_update.py
-client-config-overrides.txt   sm-client-tools.rpm
-<prompt>example-server: /srv/www/htdocs/pub/bootstrap#</prompt>
- 
- </screen>
+client-config-overrides.txt   sm-client-tools.rpm</screen>
 
-                    <para>The bootstrap script is also available at:
-                            <filename>https://example-server.com/pub/bootstrap/</filename>.</para>
+                  <para>
+                   The bootstrap script is also available at
+                  <filename>https://example.com/pub/bootstrap/bootstrap.sh</filename>.</para>
 
                 </step>
             </procedure>
-            <para>The next section will cover copying and modifying your bootstrap template for use
-                with each client.</para>
+            <para>
+             <xref linkend="modify.bootstrap.script"/> will cover
+             copying and modifying your bootstrap template for use with
+             each client.
+            </para>
         </sect2>
 
         <sect2 xml:id="modify.bootstrap.script">
