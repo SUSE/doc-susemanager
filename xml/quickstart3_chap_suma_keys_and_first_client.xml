@@ -255,91 +255,105 @@ client-config-overrides.txt   sm-client-tools.rpm</screen>
             <procedure xml:id="mod.bootstrap.script">
                 <title>Modifying the Bootstrap Script</title>
                 <step>
-                    <para>Log in as <systemitem>root</systemitem> on the command line on your
-                        &susemgr; Server.</para>
+                 <para>
+                  Log in as &rootuser; on the command line on your
+                  &susemgr; server.
+                 </para>
                 </step>
                 <step>
-                    <para>Navigate to the bootstrap directory with:</para>
-                    <screen>
-<prompt>example-server:# </prompt><command>cd /srv/www/htdocs/pub/bootstrap/</command>
-</screen>
+                 <para>Navigate to the bootstrap directory with:</para>
+                 <screen><prompt># </prompt><command>cd /srv/www/htdocs/pub/bootstrap/</command></screen>
                 </step>
                 <step>
                     <para>Create and rename two copies of the template bootstrap script for use with
                         each of your clients.</para>
-                    <screen><prompt>example-server:/srv/www/htdocs/pub/bootstrap# </prompt><command>cp bootstrap.sh bootstrap-sles11-sp4.sh</command>
-<prompt>example-server:/srv/www/htdocs/pub/bootstrap# </prompt><command>cp bootstrap.sh bootstrap-sles12-sp1.sh</command>
-</screen>
+                    <screen><prompt># </prompt><command>cp bootstrap.sh bootstrap-sles11-sp4.sh</command>
+<prompt># </prompt><command>cp bootstrap.sh bootstrap-sles12-sp1.sh</command></screen>
                 </step>
                 <step>
-                    <para>Open <systemitem>sles12-sp1.sh</systemitem> for modification. Scroll down
-                        and modify both lines marked in green. You must comment out
-                            <systemitem>#exit 1</systemitem> to activate the script and then enter
-                        the name of the key for this script in
-                            the<systemitem>ACTIVATION_KEYS=</systemitem> field. See the example
-                        script below.</para>
-                    <screen>
-echo "Enable this script: comment (with #'s) this block (or, at least just"
+                 <para>
+                  Open <filename>sles12-sp1.sh</filename> for modification. Scroll down
+                  and modify both lines marked in green. You must comment out
+                  <literal>exit 1</literal> with a hash mark
+                  (<literal>#</literal>) to activate the script and then enter
+                  the name of the key for this script in
+                  the <literal>ACTIVATION_KEYS=</literal> field as follows:
+                 </para>
+                    <screen>echo "Enable this script: comment (with #'s) this block (or, at least just"
 echo "the exit below)"
 echo
-<command>#exit 1</command>
+#exit 1
 
 # can be edited, but probably correct (unless created during initial install):
 # NOTE: ACTIVATION_KEYS *must* be used to bootstrap a client machine.
-<command>ACTIVATION_KEYS=1-sles12-sp1</command>
-ORG_GPG_KEY=
-    
-</screen>
+ACTIVATION_KEYS=1-sles12-sp1
+ORG_GPG_KEY=</screen>
                 </step>
                 <step>
-                    <para>When you have finished your modifications save the file and repeat this
-                        procedure for the second bootstrap script. Then proceed to the next
-                        section.</para>
+                 <para>
+                  When you have finished your modifications save the
+                  file and repeat this procedure for the second
+                  bootstrap script. Then proceed to <xref
+                  linkend="connect.first.client"/>.
+                 </para>
                 </step>
             </procedure>
             <note>
                 <title>Finding Your Keys</title>
-                <para>To find key names you have created: Select the <guimenu>Overview</guimenu> tab
-                    from the Web-GUI and then <menuchoice>
-                        <guimenu>Manage Activation keys</guimenu>
-                        <guimenu>Key Field</guimenu>
-                    </menuchoice>. All keys created for channels are listed here. You must enter the
-                    full name of the key you wish to use in the bootstrap script exactly as
-                    presented in the key field.</para>
+                <para>
+                 To find key names you have created: Select the <guimenu>Overview</guimenu> tab
+                 from the &webui; and then click <menuchoice>
+                 <guimenu>Manage Activation keys</guimenu>
+                 <guimenu>Key Field</guimenu>
+                 </menuchoice>. All keys created for channels are listed here. You must enter the
+                 full name of the key you wish to use in the bootstrap script exactly as
+                 presented in the key field.
+                </para>
             </note>
         </sect2>
 
         <sect2 xml:id="connect.first.client">
             <title>Connecting Your First Client</title>
-            <para>This section covers connecting your clients to manager with the modified bootstrap
-                script.</para>
+            <para>
+             This section covers connecting your clients to &susemgr;
+             with the modified bootstrap script.
+            </para>
 
             <procedure xml:id="run.bootstrap.script">
                 <title>Running the Bootstrap Script</title>
                 <step>
-                    <para>On your &susemgr; Server as <systemitem>root</systemitem> navigate to the
-                        following directory.</para>
-                    <screen><prompt>example-server: #</prompt> <command>cd /srv/www/htdocs/pub/bootstrap/</command></screen>
+                 <para>
+                  On your &susemgr; Server as &rootuser; navigate to the
+                  following directory:
+                 </para>
+                 <screen><prompt># </prompt><command>cd /srv/www/htdocs/pub/bootstrap/</command></screen>
                 </step>
                 <step>
-                    <para>Run the following command to execute the bootstrap script on the
-                        client.</para>
-                    <screen>
-<prompt>example-server:/srv/www/htdocs/pub/bootstrap #</prompt> <command>cat <replaceable>MODIFIED-SCRIPT.SH</replaceable> \
-  | ssh root@example-client.com /bin/bash</command>
+                 <para>
+                  Run the following command to execute the bootstrap script on the
+                  client:
+                 </para>
+                    <screen><prompt># </prompt><command>cat <replaceable>MODIFIED-SCRIPT.SH</replaceable> \
+  | ssh root@example.com /bin/bash</command>
 </screen>
                 </step>
                 <step>
-                    <para>The script will execute and proceed to download the required dependencies
-                        located in the repositories directory you created earlier. Once the script
-                        has finished running, log in to the &webui; and select the systems tab to see
-                        your new client listed.</para>
+                 <para>
+                  The script will execute and proceed to download the
+                  required dependencies located in the repositories
+                  directory you created earlier. Once the script has
+                  finished running, log in to the &webui; and select the
+                  <guimenu>Systems</guimenu> tab to see your new client
+                  listed.
+                 </para>
                 </step>
 
             </procedure>
 
-            <para>This concludes the bootstrap section of this guide. The next section will go over
-            registering Salt minions for use with &susemgr; 3.
+            <para>
+             This concludes the bootstrap section of this guide. <xref
+             linkend="preparing.and.registering.clients.salt"/> will go
+             over registering Salt minions for use with &susemgr; 3.
             </para>
 
         </sect2>
@@ -348,16 +362,16 @@ ORG_GPG_KEY=
     <sect1 xml:id="preparing.and.registering.clients.salt">
      <title>Registering Salt Clients</title>
      <para>
-      The following section describes registering Salt minions. There
-      are currently three methods for registering Salt minions. The
-      following section describes the first method and uses a bootstrap
-      repository. The second method is to create a bootstrap script
-      using <command>mgr-bootstrap</command> and include the optional
-      <option>--salt</option> parameter. Keep in mind, bootstrapping
-      salt minions with <command>mgr-bootstrap --salt</command> is
-      performed in the same manner as bootstrapping traditional
-      clients. The third method and perhaps the simplest is performed
-      from the &susemgr; &webui;. Find this method located in
+      There are currently three methods for registering Salt
+      minions. The following section describes the first method and uses
+      a bootstrap repository. The second method is to create a bootstrap
+      script using <command>mgr-bootstrap</command> and include the
+      optional <option>--salt</option> parameter.  Bootstrapping Salt
+      minions with <command>mgr-bootstrap --salt</command> is performed
+      in the same manner as bootstrapping traditional clients; for more
+      information, see <xref
+      linkend="registering.clients.traditional"/>.  The third method is
+      performed from the &susemgr; &webui;; find this method located in
       <xref linkend="ref.webui.bootstrapping.salt.minions"/>.
      </para>
 
@@ -366,24 +380,31 @@ ORG_GPG_KEY=
       tools repository. You can review creating a tools repository in
       <xref linkend="create.tools.repository"/>.
      </para>
-        <para>Once you have setup a base channel from the &webui; clients to obtain software sources
-            from, for example: <replaceable>SLES12-SP1-Pool for x86_64</replaceable> perform the
-            following procedure to register a Salt minion.</para>
+     <para>
+      When you have setup a base channel from the &webui; clients to
+      obtain software sources from, for example:
+      <literal>SLES12-SP1-Pool for x86_64</literal> perform the
+      following procedure to register a Salt minion.
+     </para>
         <procedure>
             <title>Registering Salt Minions</title>
             <step>
              <para>On your minion as &rootuser; enter the following command:</para>
-             <screen><prompt>#</prompt> zypper ar http://<replaceable>FQDN.SUSE.Manager.com</replaceable>/pub/repositories/sle/12/1/bootstrap/ sles12-sp1</screen>
+             <screen><prompt># </prompt>zypper ar http://<replaceable>FQDN.SUSE.Manager.com</replaceable>/pub/repositories/sle/12/1/bootstrap/ \
+   sles12-sp1</screen>
+   <note>
              <para>
-              It is important that you do not use
-              <literal>HTTPS</literal> as you will receive errors. Use
-              <literal>HTTP</literal> instead.
+              Do not use <literal>HTTPS</literal>. Use
+              <literal>HTTP</literal> instead to avoid errors.
              </para>
+   </note>
             </step>
             <step>
-                <para>After adding the repository containing the necessary Salt packages
-                    execute:</para>
-                <screen><prompt>#</prompt> zypper in salt-minion</screen>
+             <para>
+              After adding the repository containing the necessary Salt packages
+              execute:
+             </para>
+             <screen><prompt># </prompt>zypper in salt-minion</screen>
             </step>
             <step>
                 <para>Modify the minion configuration file to point to
