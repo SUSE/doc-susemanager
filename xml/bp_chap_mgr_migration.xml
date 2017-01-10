@@ -40,54 +40,70 @@
      <note>
       <title>Time-Consuming Operation</title>
       <para>
-      The migration involves dumping the whole database on the source
-      machine and restoring it on the target machine. Also all of the
-      channels and packages need to be copied to the new machine, so
-      expect the whole migration to take several hours,
+       The migration involves dumping the whole database on the source
+       machine and restoring it on the target machine. Also all of the
+       channels and packages need to be copied to the new machine, so
+       expect the whole migration to take several hours,
       </para>
      </note>
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.sec.mgr.migration.prereq">
+     <title>Prerequisites</title>
 
-        <title>Prerequisites</title>
-
-        <warning>
-            <title>Latest Updates</title>
-            <para> The source machine needs to run SUSE Manager 2.1 with all the latest updates
-                applied! Before trying to migrate, please make sure that the machine is up to date
-                and all updates have been installed !</para>
-        </warning>
-        <para> Only machines running with the embedded postgresql database may be migrated. For the
-            migration of an Oracle based installation, a two-step migration is required: First the
-            installation needs to get migrated from Oracle to postgresql (by means of a separate
-            tool) and afterwards the migration to SUSE Manager 3 can be performed as documented
-            here. As SUSE Manager 3 does no longer support NCC but only SCC, you can migrate a
-            machine only after it has been switched to SCC. The migration script will check if the
-            installation has already been switched to SCC and will terminate if this is not the
-            case. Switch to SCC on the source machine and repeat the migration. During migration the
-            database from the source machine needs to get dumped and this dump needs to be
-            temporarily stored on the target system. The dump gets compressed with gzip using the
-            default compression options (maximum compression only yields about 10% of space savings
-            but costs a lot of runtime); so check the disk usage of the database with: </para>
-        <screen>du -sch /var/lib/pgsql/data</screen>
-        <para> This will ensure that you have at least 30% of this value available in
-                <replaceable>/var/spacewalk/tmp</replaceable>. </para>
-
-        <para>These values from a test migration should aid in illustrating space
-            requirements:</para>
-        <screen>f204:/var/lib/pgsql # du -sch data
+     <warning>
+      <title>Latest Updates</title>
+      <para>
+       The source machine needs to run &susemgr; 2.1 with all the latest
+       updates applied.  Before starting the migration process, make
+       sure that the machine is up to date and all updates have been
+       installed sucessfully.
+      </para>
+     </warning>
+     <para>
+      Only machines running with the embedded PostgreSQL database may be
+      migrated. For the migration of an Oracle based installation, a
+      two-step migration is required: First the installation needs to
+      get migrated from Oracle to PostgreSQL (by means of a separate
+      tool) and afterwards the migration to &susemgr; 3 can be performed
+      as documented here. As &susemgr; 3 does no longer support &ncc;
+      but only SCC (&scc;), you can migrate a machine only after it has
+      been switched to SCC. The migration script will check if the
+      installation has already been switched to SCC and will terminate
+      if this is not the case. Switch to SCC on the source machine and
+      repeat the migration. During migration the database from the
+      source machine needs to get dumped and this dump needs to be
+      temporarily stored on the target system. The dump gets compressed
+      with <command>gzip</command> using the default compression options
+      (maximum compression only yields about 10% of space savings but
+      costs a lot of runtime); so check the disk usage of the database
+      with:
+     </para>
+     <screen>du -sch /var/lib/pgsql/data</screen>
+     <para>
+      This will ensure that you have at least 30% of this value available in
+      <filename>/var/spacewalk/tmp</filename>.
+     </para>
+     <para>
+      These values from a test migration should aid in illustrating space
+      requirements:
+     </para>
+     <screen><prompt>suma21:/var/lib/pgsql# </prompt>du -sch data
 1,8G    data
 1,8G    total
-f204:/var/spacewalk/packages # l -h /tmp/susemanager.dmp.gz 
--rw-r--r-- 1 root root 506M Jan 12 14:58 /tmp/susemanager.dmp.gz</screen>
+<prompt>suma21:/var/spacewalk/tmp# </prompt>ls -lh susemanager.dmp.gz
+-rw-r--r-- 1 root root 506M Jan 12 14:58 susemanager.dmp.gz</screen>
 
-        <para>This is a small test installation; for bigger installations the ratio might be better
-            (space required for the database dump might be less than 30%). The dump will be written
-            to the directory <replaceable>/var/spacewalk/tmp</replaceable>, the directory will be
-            created if it does not exist yet. If you want the dump to be stored somewhere else,
-            change the definition of the variable <replaceable>$TMPDIR</replaceable> on the
-            beginning of the script to suit your needs. </para>
+      <para>
+       This is a small test installation; for bigger installations the
+       ratio might be better (space required for the database dump might
+       be less than 30%). The dump will be written to the directory
+       <filename>/var/spacewalk/tmp</filename>, the directory will be
+       created if it does not exist yet. If you want the dump to be
+       stored somewhere else, change the definition of the variable
+       <envar>$TMPDIR</envar> on the beginning of the script to suit
+       your needs.
+      </para>
 
     </sect1>
 
