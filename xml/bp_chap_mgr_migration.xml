@@ -79,7 +79,7 @@
       costs a lot of runtime); so check the disk usage of the database
       with:
      </para>
-     <screen>du -sch /var/lib/pgsql/data</screen>
+     <screen><prompt># </prompt>du -sch /var/lib/pgsql/data</screen>
      <para>
       This will ensure that you have at least 30% of this value available in
       <filename>/var/spacewalk/tmp</filename>.
@@ -107,130 +107,181 @@
 
     </sect1>
 
-    <sect1>
-        <title>Setup the Target Machine</title>
-        <para/>
-        <procedure>
-            <title>Setup Target Machine</title>
-            <step>
-                <para>After the target system has been installed with SLE12SP1 including the add-on
-                    product "SUSE Manager", run <command>yast2 susemanager_setup</command> as you
-                    would normally do for an installation of &susemgr;.</para>
-            </step>
-            <step>
-                <para>On the first installation screen, ensure that Migrate a SUSE Manager
-                    compatible server is marked instead of Set up SUSE Manager from scratch.</para>
-            </step>
-            <step>
-                <para> On the second screen, enter the name of the source system as Hostname of
-                    source SUSE Manager Server as well as the domain name. Also enter the database
-                    credentials of the source system.</para>
-            </step>
-            <step>
-                <para> On the next screen, you will need to specify the IP address of the target
-                    system. Normally this value should be pre-set to the correct value and you only
-                    should need to press ENTER. Only in the case of multiple IP addresses you might
-                    need to specify the one that should be used during migration.</para>
-                <important>
-                    <title>Faking the Host Name</title>
-                    <para>During the migration process, the target system will fake its host name to
-                        be the same as the source system, this is necessary as the host name of a
-                        SUSE Manager installation is vital and should not be changed once set.
-                        Therefore do not be confused when logging in to your systems during
-                        migration; they both will present you with the same hostname!</para>
-                </important>
-            </step>
-            <step>
-                <para>Continue by following the normal installation steps: Specify the database
-                    parameters <emphasis>using the same database parameters as the source system is
-                        recommended</emphasis>. Enter your SCC credentials. After all the data has
-                    been gathered, YaST2 will terminate.</para>
-                <important>
-                    <title>Migration Must be Manually Triggered</title>
-                    <para>The actual migration will NOT start automatically but needs to be
-                        triggered manually!</para>
-                </important>
-            </step>
-        </procedure>
+    <sect1 xml:id="bp.sec.mgr.migration.setupṫarget">
+     <title>Setup the Target Machine</title>
+     <para>
+      To prepare the target machine (with the example host name
+      <literal>suma30</literal> proceed as follows:
+     </para>
+     <procedure>
+      <title>Setup Target Machine</title>
+      <step>
+       <para>
+        After the target machine has been installed with &sls; 12 SP2
+        including the extension product <quote>&susemgr;</quote>, run
+        <command>yast2 susemanager_setup</command> as you would normally
+        do for an installation of &susemgr;.
+       </para>
+       <para>
+        For more information about installing &susemgr;, see <xref
+        linkend="sles.installation.within.kvm.jeos"/>.
+       </para>
+      </step>
+      <step>
+       <para>
+        On the first installation screen, ensure that <guimenu>Migrate a
+        SUSE Manager compatible server</guimenu> is marked instead of
+        <guimenu>Set up SUSE Manager from scratch</guimenu>.
+       </para>
+      </step>
+      <step>
+       <para>
+        On the second screen, enter the name of the source system as
+        <guimenu>Hostname of source SUSE Manager Server</guimenu> as
+        well as the domain name. Also enter the database credentials of
+        the source system.
+       </para>
+      </step>
+      <step>
+       <para>
+        On the next screen, you will need to specify the IP address of
+        the &susemgr; 3 target system. Normally this value should be
+        pre-set to the correct value and you only should need to press
+        <keycap>Enter</keycap>. Only in the case of multiple IP
+        addresses you might need to specify the one that should be used
+        during migration.
+       </para>
+       <important>
+        <title>Faking the Host Name</title>
+        <para>
+         During the migration process, the target system will fake its
+         host name to be the same as the source system, this is
+         necessary as the host name of a &susemgr; installation is vital
+         and should not be changed once set.  Therefore do not be
+         confused when logging in to your systems during migration; they
+         both will present you with the same host name.
+        </para>
+       </important>
+      </step>
+      <step>
+       <para>
+        Continue by following the normal installation steps: Specify the
+        database parameters <emphasis>using the same database parameters
+        as the source system is recommended</emphasis>. Enter your SCC
+        credentials. After all the data has been gathered, &yast; will
+        terminate.
+       </para>
+       <important>
+        <title>Migration Must be Manually Triggered</title>
+        <para>The actual migration will not start automatically but needs to be
+        triggered manually.</para>
+       </important>
+      </step>
+     </procedure>
 
     </sect1>
 
-    <sect1>
-        <title>Performing the Migration</title>
-        <para>A migration is performed by excecuting the following command:
-                <replaceable>/usr/lib/susemanager/bin/mgr-setup -m</replaceable>. This command reads
-            the data gathered in the previous step, sets up SUSE Manager onto a new target machine
-            and transfers all of the data from the source machine. As several operations need to be
-            performed on the source machine via ssh, you will be prompted once for the root password
-            of the source machine. A temporary ssh key named <literal>migration-key</literal> is
-            created and installed on the source machine, so you need to give the root password only
-            once. Of course the temporary ssh key will be deleted after successful migration.
-            Ideally, this is all you will need to do. </para>
+    <sect1 xml:id="bp.sec.mgr.migration.performing">
+     <title>Performing the Migration</title>
+     <para>
+      A migration is performed by excecuting the following command:
+     </para>
+     <screen>/usr/lib/susemanager/bin/mgr-setup -m</screen>
+     <para>
+      This command reads the data gathered in the previous step, sets up
+      &susemgr; onto a new target machine and transfers all of the data
+      from the source machine. As several operations need to be
+      performed on the source machine via SSH, you will be prompted once
+      for the root password of the source machine. A temporary SSH key
+      named <literal>migration-key</literal> is created and installed on
+      the source machine, so you need to give the &rootuser; password
+      only once. The temporary SSH key will be deleted after successful
+      migration.  Ideally, this is all you will need to do.
+     </para>
 
-        <para>Depending on the size of the installation, the actual migration will take up to
-            several hours. Once finished, you will be prompted to shutdown the source machine,
-            re-configure the network of the target machine to use the same IP address and host name
-            as the original machine and restart it. It should now be a fully functional replacement
-            for your previous 2.1 installation. The following numbers illustrate the runtime for
-            dumping and importing the database:</para>
-        <screen>14:53:37   Dumping remote database to /var/spacewalk/tmp/susemanager.dmp.gz on target system. Please wait...
+     <para>
+      Depending on the size of the installation, the actual migration
+      will take up to several hours. Once finished, you will be prompted
+      to shutdown the source machine, re-configure the network of the
+      target machine to use the same IP address and host name as the
+      original machine and restart it. It should now be a fully
+      functional replacement for your previous &susemgr; 2.1
+      installation. The following numbers illustrate the runtime for
+      dumping and importing a small database:
+     </para>
+     <screen>14:53:37   Dumping remote database to /var/spacewalk/tmp/susemanager.dmp.gz on target system. Please wait...
 14:58:14   Database successfully dumped. Size is: 506M
 14:58:29   Importing database dump. Please wait...
 15:05:11   Database dump successfully imported.</screen>
-        <para>For this example dumping the database takes around five minutes to complete. Importing
-            the dump onto the target system will take an additional seven minutes. For big
-            installations this can take up to several hours. You should also account for the time it
-            takes to copy all the package data to the new machine. Depending on your network
-            infrastructure and hardware, this can also take a significant amount of time. </para>
+     <para>
+      For this example dumping the database takes around five minutes to
+      complete. Importing the dump onto the target system will take an
+      additional seven minutes. For big installations this can take up
+      to several hours. You should also account for the time it takes to
+      copy all the package data to the new machine. Depending on your
+      network infrastructure and hardware, this can also take a
+      significant amount of time.
+     </para>
 
     </sect1>
-    <sect1>
-        <title>Speeding up the Migration</title>
-        <para>A complete migration can consume a lot of time. This is caused by the ammount of data
-            that must be copied. Total migration time can be greatly decreased by elminiating the
-            need to copy data prior to performing the migration (eg. Channels, packages,
-            auto-install images and any additional data). You can gather all data via YaST2 by
-            running the following command: <command>mgr-setup -r</command></para>
-        <para>Executing <command>mgr-setup -r</command> will copy the data from the old server to
+    <sect1 xml:id="bp.sec.mgr.migration.speedup">
+     <title>Speeding up the Migration</title>
+     <para>
+      A complete migration can consume a lot of time. This is caused by
+      the ammount of data that must be copied. Total migration time can
+      be greatly decreased by elminiating the need to copy data prior to
+      performing the migration (for example, channels, packages,
+      auto-install images, and any additional data). You can gather all
+      data via &yast; by running the command <command>mgr-setup
+      -r</command>.
+     </para>
+     <para>
+      Executing <command>mgr-setup -r</command> will copy the data from the old server to
             the new one. This command may be run at any time and your current server will remain
             fully functional. Once the migration has been initiated only data changed since running
                 <command>mgr-setup -r</command> will need to be transferred which will significantly
-            reduces downtime.</para>
-
-        <para> On large installations transfering the database (which involves dumping the database
+                reduces downtime.
+     </para>
+     <para> On large installations transfering the database (which involves dumping the database
             onto the source machine and then importing the dump onto the target system) will still
             take some time. During the database transfer no write operations should occurr therefore
             the migration script will shutdown running &susemgr; database services running on the
             source machine. </para>
     </sect1>
 
-    <sect1>
-        <title>Packages on External Storage</title>
-        <para>Some installations may store the package data on external storage (eg. NFS mount on
-                <replaceable>/var/spacewalk/packages</replaceable>). Of course you do not need to
-            copy this data to the new machine. Edit the script located in
-                <replaceable>/usr/lib/susemanager/bin/mgr-setup</replaceable> and remove the
-            respective <command>rsync</command> command (located around line 345). Make sure your
-            external storage is mounted on the new machine before starting the system for the first
-            time. Analogue handling for <replaceable>/srv/www/htdocs/pub if
-                appropriate</replaceable>. </para>
+    <sect1 xml:id="bp.sec.mgr.migration.pkg.extern">
+     <title>Packages on External Storage</title>
+     <para>
+      Some installations may store the package data on external storage
+      (for example, NFS mount on
+      <filename>/var/spacewalk/packages</filename>). You do not need to
+      copy this data to the new machine. Edit the script located in
+      <filename>/usr/lib/susemanager/bin/mgr-setup</filename> and remove
+      the respective <command>rsync</command> command (located around
+      line 345). Make sure your external storage is mounted on the new
+      machine before starting the system for the first time. Analogue
+      handling for <filename>/srv/www/htdocs/pub if
+      appropriate</filename>.
+     </para>
     </sect1>
 
-    <sect1>
-        <title>Troubleshooting a Broken UI after Migration</title>
-        <para>It is possible that the UI may break during migration. This behavior is not a bug, but
-            a browser caching issue. The new machine has the same hostname and IP address as the old
-            machine. This duplication can confuse some web browsers. If you experience this issue
-            reload the page. For example: In Firefox pressing the key combination <keycombo>
-                <keycap>CTRL</keycap>
+    <sect1 xml:id="bp.sec.mgr.migration.trouble">
+     <title>Troubleshooting a Broken &webui; after Migration</title>
+     <para>
+      It is possible that the &webui; may break during migration. This behavior is not a bug, but
+            a browser caching issue. The new machine has the same host name and IP address as the old
+            machine. This duplication can confuse some Web browsers. If you experience this issue
+            reload the page. For example, in Firefox pressing the key combination <keycombo>
+                <keycap>Ctrl</keycap>
                 <keycap>F5</keycap>
-            </keycombo> should resume normal functionality. </para>
+                </keycombo> should resume normal functionality.
+     </para>
     </sect1>
 
-    <sect1>
+    <sect1 xml:id="bp.sec.mgr.migration.example">
         <title>Example Session</title>
         <para>This is the output of a typical migration: </para>
-        <screen>target_mgr3:~ # /usr/lib/susemanager/bin/mgr-setup -m
+        <screen><prompt>suma30# </prompt>/usr/lib/susemanager/bin/mgr-setup -m
   Filesystem type for /var/spacewalk is ext4 - ok.
   Open needed firewall ports...
   Migration needs to execute several commands on the remote machine.
@@ -419,7 +470,6 @@ Password:
   INFO: New configuration has been applied.
   Database is online
   System check finished
-target_mgr3:~ #   
   
   ============================================================================
   Migration complete.
@@ -428,7 +478,5 @@ target_mgr3:~ #
   as the old SUSE Manager server!
   ============================================================================</screen>
     </sect1>
-
-
 
 </chapter>
