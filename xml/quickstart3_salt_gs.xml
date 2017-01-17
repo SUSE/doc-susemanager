@@ -180,7 +180,7 @@ minion_name:
                         following command:</para>
                     <screen>salt minion_name sys.doc test</screen>
                     <para>You can also look up information for any function in a module:</para>
-                    <screen language="yaml">salt minion_name sys.doc test.versions
+                    <screen>salt minion_name sys.doc test.versions
 test.versions:
 
 This function is an alias of ``versions_report``.
@@ -193,6 +193,84 @@ This function is an alias of ``versions_report``.
                 </step>
             </procedure>
         </sect2>
+
+        <sect2>
+            <title>Master-less Salt</title>
+
+            <para>Up to this point you have run all salt commands from the master with a minion as a
+                target. It is also possible to run the same functions locally from a minion. The
+                following procedure will guide you through using master-less mode locally on a
+                minion.</para>
+
+            <procedure>
+                <step>
+                    <para>From an open terminal session on any of your minions as root run:</para>
+                    <screen># salt-call test.versions</screen>
+                    <para>The Salt command does not work locally on minions. Use
+                            <command>salt-call</command> to run salt commands locally on any
+                        minion.</para>
+                </step>
+                <step>
+                    <para>Try running <command>salt-call test.ping</command>. Salt looks like it is
+                        running without a master.</para>
+                </step>
+                <step>
+                    <para>In a terminal session on the salt master, stop the salt-master
+                        service.</para>
+                    <screen># systemctl stop salt-master</screen>
+                </step>
+                <step>
+                    <para>On one of your minions run a local ping again:</para>
+                    <screen>salt-call test.ping</screen>
+                    <para>Notice the command is taking some time to execute. The minion is
+                        attempting to contact the master to check if there is any content that needs
+                        to be downloaded. Eventually the command will time out. </para>
+                    <para>To run a minion in true master-less mode you will need to make a change to
+                        the minion configuration file located in
+                            <filename>/etc/salt/minion</filename>. Open the minion configuration
+                        file and change the <emphasis>file_client</emphasis> value to
+                            <emphasis>local</emphasis>:</para>
+                    <screen>file_client: local</screen>
+                </step>
+                <step>
+                    <para>Save the configuration change and restart the minion:</para>
+                    <screen># systemctl restart salt-minion</screen>
+                    <para>Test the command on the minion again to see it run locally:</para>
+                    <screen># salt-call test.ping</screen>
+                </step>
+                <step>
+                    <para>Once you have finished testing local commands, set the
+                            <emphasis>file_client: local</emphasis> value back to the default and
+                        restart the salt minion.</para>
+                </step>
+                <step>
+                    <para>On your master start the <command>salt-master</command> service:</para>
+                    <screen># systemctl start salt-master</screen>
+                </step>
+            </procedure>
+
+
+        </sect2>
+        <sect2>
+            <title>Chapter Review</title>
+            <para>In this chapter you performed the following:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Learned how to run <command>salt &lt;target> test.ping</command> to check
+                        connectivity between the master and a minion</para>
+                </listitem>
+                <listitem>
+                    <para>Learned out how to view/list available functions</para>
+                </listitem>
+                <listitem>
+                    <para>Learned how to access help on modules and their sub functions</para>
+                </listitem>
+                <listitem>
+                    <para>Learned how to use Salt in master-less mode</para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+
     </sect1>
 
 
