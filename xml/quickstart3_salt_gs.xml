@@ -47,7 +47,7 @@
         </tip>
 
         <sect2>
-            <title>Salt test.ping</title>
+            <title>Running a Salt Test Ping</title>
             <procedure>
                 <step>
                     <para>In a terminal on the Salt master run the following command as root:</para>
@@ -174,11 +174,11 @@ minion_name:
             <procedure>
                 <step>
                     <para>To get help, enter the following command:</para>
-                    <screen>salt minion_name sys.doc</screen>
+                    <screen># salt minion_name sys.doc</screen>
                     <para><command>sys.doc </command>displays far to much information in most cases.
                         It is better to be more specific. Target a specific module with the
                         following command:</para>
-                    <screen>salt minion_name sys.doc test</screen>
+                    <screen># salt minion_name sys.doc test</screen>
                     <para>You can also look up information for any function in a module:</para>
                     <screen>salt minion_name sys.doc test.versions
 test.versions:
@@ -221,7 +221,7 @@ This function is an alias of ``versions_report``.
                 </step>
                 <step>
                     <para>On one of your minions run a local ping again:</para>
-                    <screen>salt-call test.ping</screen>
+                    <screen># salt-call test.ping</screen>
                     <para>Notice the command is taking some time to execute. The minion is
                         attempting to contact the master to check if there is any content that needs
                         to be downloaded. Eventually the command will time out. </para>
@@ -260,7 +260,8 @@ This function is an alias of ``versions_report``.
                         connectivity between the master and a minion</para>
                 </listitem>
                 <listitem>
-                    <para>Learned out how to view/list available functions</para>
+                    <para>Learned out how to view/list available functions with
+                            <command>sys.list_functions</command></para>
                 </listitem>
                 <listitem>
                     <para>Learned how to access help on modules and their sub functions</para>
@@ -270,13 +271,73 @@ This function is an alias of ``versions_report``.
                 </listitem>
             </itemizedlist>
         </sect2>
-
     </sect1>
 
+    <sect1>
+        <title>Getting Information from Salt with Grains</title>
+        <para>In this chapter you will learn the following concepts:</para>
+        <itemizedlist>
+            <listitem>
+                <para>View system information stored in Salt grains</para>
+            </listitem>
+            <listitem>
+                <para>Query packages which are install on a minion</para>
+            </listitem>
+            <listitem>
+                <para>Install Apache2 and start the service</para>
+            </listitem>
+        </itemizedlist>
 
+        <sect2>
+            <title>Using Salt Hardware Grains</title>
+            <procedure>
+                <step>
+                    <para>On your Salt master enter the following command:</para>
+                    <screen># salt minion_name grains.items</screen>
+                    <para>This returns a long list of available grains on a system. </para>
+                </step>
+                <step>
+                    <para>Narrow down the search by entering a specific grain by name:</para>
+                    <screen># salt minion_name grains.item cpu_model</screen>
+                </step>
+            </procedure>
+        </sect2>
 
-
-
+        <sect2>
+            <title>Exploring Package Related Functions</title>
+            <procedure>
+                <step>
+                    <para>View a list package management related modules with
+                            <command>sys.list_modules</command>:</para>
+                    <screen># salt minion_name sys.list_modules | grep pkg</screen>
+                </step>
+                <step>
+                    <para>List all packages installed on a minion with
+                            <command>pkg.list_pkgs</command>:</para>
+                    <screen># salt minion_name pkg.list_pkgs</screen>
+                    <para>This list is too long to be useful. Try being more specific with
+                            <command>grep</command>:</para>
+                    <screen># salt minion_name pkg.list_pkgs | grep apache2</screen>
+                </step>
+                <step>
+                    <para>Install <filename>apache2</filename> on a minion with
+                            <command>pkg.install</command>:</para>
+                    <screen># salt minion_name pkg.install apache2</screen>
+                </step>
+                <step>
+                    <para>Check the service status of the <filename>apache2</filename>:</para>
+                    <screen># salt minion_name service.status apache2</screen>
+                </step>
+                <step>
+                    <para>If the service is not running, start it now:</para>
+                    <screen># salt minion_name service.start apache2</screen>
+                    <para>After running the command you should see <emphasis>True</emphasis>
+                        returned. Check the status again with <command>salt minion_name
+                            service.status apache2</command>.</para>
+                </step>
+            </procedure>
+        </sect2>
+    </sect1>
 
 
 
