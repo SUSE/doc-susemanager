@@ -7,7 +7,7 @@
 This is the source for the official SUSE Manager documentation update.
 During the SUSE Manager 3 update we successfully condensed and reworked the six original SUSE Manager documentation books into four shiny new manuals. 
 
-*As this is a broad work, many smaller topics to be updated will not be included in this list and topics are subject to change. We will attempt to keep this list up-to-date as documentation develops.*
+*As this represents a large body of work, many smaller topics/bugs and revisions will not be included. Keep in mind topics are subject to change depending on development priorities. We will attempt to keep this list up-to-date as documentation develops. A new Documetnation updates book is in the works and should be released with 3.1. This document will provide links to all new section content added within a single maintenence update.*
 
 ## TODO:
 * rhn.conf parameters (MB Best Practices contains most of these options)
@@ -24,7 +24,7 @@ During the SUSE Manager 3 update we successfully condensed and reworked the six 
 ## Current work list:
 New work items will be added here. The status of these items will be marked with:
 
-* IN_PROGRESS
+* IN_PROG
 * DONE
 * NEXT
 
