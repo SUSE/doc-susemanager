@@ -105,7 +105,22 @@
                 or more database connections. If the RDBMS is not able to serve an adequate amount
                 of connections, issues will arise. Please see the following equation for a rough
                 calculation of the needed amount of database connections:</para>
-            <screen language="python">((3*$javamax) + $apachemax + 60)</screen>
+            <screen language="python">((3 * java_max) +  apache_max + 60)</screen>
+            <para>Where:</para>
+              <itemizedlist>
+                <listitem>
+                  <para>3 is the number of Java processes the server runs with pooled connections (Tomcat, Taskomatic and Search);</para>
+                </listitem>
+                <listitem>
+                  <para>java_max is the maximum number of connections per Java pool (20 by default, changeable in /etc/rhn/rhn.conf via the hibernate.c3p0.max_size parameter);</para>
+                </listitem>
+                <listitem>
+                  <para>apache_max is Apache httpd's <parameter class="option">MaxClients</parameter>;</para>
+                </listitem>
+                <listitem>
+                  <para>60 is the maximum expected number of extra connections for local processes and other uses.</para>
+                </listitem>
+              </itemizedlist>
         </note>
     </sect1>
 
