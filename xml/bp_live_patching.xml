@@ -40,11 +40,11 @@
                 <para>SUSE Manager 3.0 or greater fully updated</para>
             </listitem>
             <listitem>
-                <para>At least 1 Salt Minion running SLES12-SP1 and registered with SUSE
+                <para>At least 1 Salt Minion running SLES12-SP2 and registered with SUSE
                     manager</para>
             </listitem>
             <listitem>
-                <para>The vendor channel for SLES12-SP1 including the Live Patching child channel
+                <para>The vendor channel for SLES12-SP2 including the Live Patching child channel
                     fully synced.</para>
             </listitem>
             <listitem>
@@ -65,8 +65,8 @@
 
         <procedure>
             <step>
-                <para>Select your SLES12 SP1 minion from the <guimenu>Systems</guimenu> page to view
-                    its <guimenu>System Details</guimenu>. Once you have added the SLES12 SP1
+                <para>Select your SLES12 SP2 minion from the <guimenu>Systems</guimenu> page to view
+                    its <guimenu>System Details</guimenu>. Once you have added the SLES12 SP2
                     Updates vendor child channel to your client, you should see several
                         <literal>Critical</literal> software updates available. Click on
                         <literal>Critical</literal> to see a list of available patches. Select any
@@ -94,7 +94,7 @@
         <para>It is considered best practice to clone a vendor channel that will be modified into a
             new channel with one of the following prefix names: (dev, testing, and prod). In the
             following procedure you will clone the default vendor channel into a new channel named
-                <filename>dev-sles12-sp1-pool-x86_64</filename> using the command line.</para>
+                <filename>dev-sles12-sp2-pool-x86_64</filename> using the command line.</para>
 
         <procedure>
             <step>
@@ -104,18 +104,18 @@ Spacewalk Username: admin
 Spacewalk Password: 
 Channel tree:
 
- 1. sles12-sp1-pool-x86_64
-      \__ sle-live-patching12-pool-x86_64-sp1
-      \__ sle-live-patching12-updates-x86_64-sp1
-      \__ sle-manager-tools12-pool-x86_64-sp1
-      \__ sle-manager-tools12-updates-x86_64-sp1
-      \__ sles12-sp1-updates-x86_64  </screen>
+ 1. sles12-sp2-pool-x86_64
+      \__ sle-live-patching12-pool-x86_64-sp2
+      \__ sle-live-patching12-updates-x86_64-sp2
+      \__ sle-manager-tools12-pool-x86_64-sp2
+      \__ sle-manager-tools12-updates-x86_64-sp2
+      \__ sles12-sp2-updates-x86_64  </screen>
             </step>
 
             <step>
                 <para>Now use the <emphasis>--init</emphasis> argument to automatically create a new
                     development clone of the original vendor channel:</para>
-                <screen>spacewalk-manage-channel-lifecycle --init -c sles12-sp1-pool-x86_64</screen>
+                <screen>spacewalk-manage-channel-lifecycle --init -c sles12-sp2-pool-x86_64</screen>
             </step>
         </procedure>
     </sect1>
@@ -123,7 +123,7 @@ Channel tree:
     <sect1>
         <title>Removing Kernel Patches</title>
         <para>In the following procedure you will remove all Kernel patch updates located in the
-            dev-sles12-sp1-updates-x86_64 channel that require a reboot. </para>
+            dev-sles12-sp2-updates-x86_64 channel that require a reboot. </para>
 
         <procedure>
             <step>
@@ -134,11 +134,10 @@ Channel tree:
             <step>
                 <para>From the SUSE Manager WebUI select <guimenu>Channels</guimenu>
                     <guimenu>Manage Software Channels</guimenu>
-                    <guimenu>dev-sles12-sp1-updates-x86_64</guimenu>
+                    <guimenu>dev-sles12-sp2-updates-x86_64</guimenu>
                     <guimenu>Patches</guimenu>
                     <guimenu>List/Remove</guimenu>. Type <literal>Kernel</literal> in the search
-                    field. Find the Kernel version that matches the Kernel in use on your minion.
-                </para>
+                    field. Find the Kernel version that matches the Kernel in use on your minion. </para>
             </step>
             <step>
                 <para>Remove all kernel update versions that are later than the current Kernel.
@@ -157,9 +156,9 @@ Channel tree:
             Patching child channels to your client.</para>
         <procedure>
             <step>
-                <para>Promote and clone the <literal>dev-sles12-sp1-pool-x86_64</literal> to a new
+                <para>Promote and clone the <literal>dev-sles12-sp2-pool-x86_64</literal> to a new
                     testing channel:</para>
-                <screen># spacewalk-manage-channel-lifecycle --promote -c dev-sles12-sp1-pool-x86_64</screen>
+                <screen># spacewalk-manage-channel-lifecycle --promote -c dev-sles12-sp2-pool-x86_64</screen>
             </step>
             <step>
                 <para>From the SUSE Manager WebUI under the <guimenu>Systems</guimenu> tab select
@@ -168,7 +167,7 @@ Channel tree:
                     <guimenu>Software Channels</guimenu>. From the Software Channels page you can
                     edit which channels a system is subscribed to. Select the new base software
                     channel, in this case it should be
-                        <literal>test-sles12-sp1-pool-x86_64</literal>. Click the
+                        <literal>test-sles12-sp2-pool-x86_64</literal>. Click the
                         <guimenu>Confirm</guimenu> button to switch the Base Software Channel and
                     finalize it by clicking the <guimenu>Modify Base Software Channel</guimenu>
                     button.</para>
@@ -200,9 +199,9 @@ Channel tree:
                 <screen># zypper ref
 # zypper se -s kgraft-patch-3.12.62-60.64.8-default
 ...
-| kgraft-patch-3_12_62-60_64_8-default  | package | 3-2.1   | x86_64 | test-sle-live-patching12-updates-x86_64-sp1
-| kgraft-patch-3_12_62-60_64_8-default  | package | 2-2.1   | x86_64 | test-sle-live-patching12-updates-x86_64-sp1
-| kgraft-patch-3_12_62-60_64_8-default  | package | 1-2.2   | x86_64 | test-sle-live-patching12-updates-x86_64-sp1
+| kgraft-patch-3_12_62-60_64_8-default  | package | 3-2.1   | x86_64 | test-sle-live-patching12-updates-x86_64-sp2
+| kgraft-patch-3_12_62-60_64_8-default  | package | 2-2.1   | x86_64 | test-sle-live-patching12-updates-x86_64-sp2
+| kgraft-patch-3_12_62-60_64_8-default  | package | 1-2.2   | x86_64 | test-sle-live-patching12-updates-x86_64-sp2
 ...</screen>
             </step>
             <step>
