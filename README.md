@@ -21,7 +21,7 @@ During the SUSE Manager 3 update we successfully condensed and reworked the six 
 
 
  
-## Current work list:
+# Current work list:
 New work items will be added here. The status of these items will be marked with:
 
 * IN_PROG
