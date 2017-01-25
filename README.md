@@ -41,6 +41,8 @@ New work items will be added here. The status of these items will be marked with
 - [x] DocBook version 4.5 to 5.1 migration: DONE
 - [x] DocReview in production: DONE
 - [x] Best Practice Draft 1: DONE
+- [x] Advanced Topics Book Draft 1: DONE
+- [x] Optimizing Apache Tomcat Parameters: DONE
 - [x] Book / chapter and section ID's updated to reflect SUSE Manager WebUI KE/MC/Coyote: DONE
 - [x] Contact Methods (rhnsd, ssh push, ssh push tunnel, osad, salt): DONE
 - [x] Managing Entitlements SCC and SMT: DONE
@@ -50,13 +52,32 @@ New work items will be added here. The status of these items will be marked with
 - [x] Subscription Matching: DONE
 - [x] System Details: Salt State Components Draft 1 (Packages, Custom, Highstate): DONE
 - [x] 2.1 - 3 Comparison Chart and Supported Features: Maintained : DONE
+- [x] SUSE Manager 3 Proxy: DONE
+- [x] Licenses for AT and BP: DONE
+- [x] Icinga Guide: DONE
+- [x] Adding a VMware ESXi Host to SUSE Manager: DONE 
+- [x] Using Salt Proxies: DONE
+- [x] Expanded Support Draft 1: DONE
+- [x] Config Management with Salt Draft 1: DONE
+- [x] Salt Minion Scalability Draft 1: Will be revised later with Moio's work: DONE
+- [x] Common Administration Tasks: Done
+- [x] Database Backup and Restoration Draft 1: DONE
+- [x] System Audititing and Security Management: DONE
+- [x] Troubleshooting Draft 1: Ongoing : DONE
+- [x] Additional Resources (YAML, JINJA, Salt BP): Ongoing: DONE
+- [x] Using Custom SSL Certificates: DONE
 - [x] Documentation Updates Book Draft 1: DONE
-- [x] White Papers Book (Internal for ENG, QA, Testing) May release specific docs to .com
+- [x] White Papers Book (Internal for ENG, QA, Testing) May release specific docs to .com: DONE
+- [x] Writing Custome Salt Grains Draft 1: (White Papers): DONE
+- [x] Creating Custom Execution Modules Draft 1: DONE
+- [x] Creating a Machinery Renderer Draft 1: DONE
+- [x] Writing a Salt Execution Module for the Raspberry Pi 3 and a SenseHat Module: DONE
+- [x] Salt Formulas and Forms Draft 1: DONE
 - [x] Live Patching: DONE
-- [x] spacecmd: DONE
+- [x] spacecmd Reference: DONE
 - [x] Service Pack Migration: DONE
 - [x] Salt Getting Started Draft 1 : DONE
-- [x] Update 2.1 - 3 Migration
+- [x] Update 2.1 - 3 Migration: DONE
 - [ ] Update Refs SP1 - SP2: IN_PROG
 - [ ] Using a proxy during SLES Setup (Manager installation): NEXT
 - [ ] Connecting minions to trusted master only: NEXT
