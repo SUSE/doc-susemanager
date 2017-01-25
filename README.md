@@ -27,6 +27,7 @@ New work items will be added here. The status of these items will be marked with
 * IN_PROG
 * DONE
 * NEXT
+* DEVEL
 
 ## Galaxy/Devel/suse-manager/ (3.0):
 - [x] Migration from svn to Github new repo: DONE
