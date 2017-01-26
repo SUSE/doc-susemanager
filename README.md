@@ -1,6 +1,6 @@
 
 
-# SUSE Manager Documentation Repository ![](http://i560.photobucket.com/albums/ss45/joecayouette/suse-manager-logo-mobile-app1.png)
+![](http://i560.photobucket.com/albums/ss45/joecayouette/suse-manager-logo-mobile-app1.png) # SUSE Manager Documentation Repository 
 
 **This readme is currently under development**
 
