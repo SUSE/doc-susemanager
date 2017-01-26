@@ -1,6 +1,6 @@
-# doc-susemanager-new
 
-#SUSE Manager Documentation Repository#
+
+# SUSE Manager Documentation Repository
 ![](https://www.ccpsoft.de/fileadmin/images/de/software/suse/susemanager/suse-manager-logo-mobile-app.png)
 **This readme is currently under development**
 
