@@ -1,6 +1,6 @@
 # doc-susemanager-new
 
-#The SUSE Manager Documentation Update Repository#
+#SUSE Manager Documentation Repository#
 ![](http://i560.photobucket.com/albums/ss45/joecayouette/docuimage_2.png)
 **This readme is currently under development**
 
