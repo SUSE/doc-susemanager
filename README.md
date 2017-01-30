@@ -81,8 +81,8 @@ New work items will be added here. The status of these items will be marked with
 - [x] Salt Getting Started Draft 1 : DONE
 - [x] Update 2.1 - 3 Migration: DONE
 - [x] Update Refs SP1 - SP2: DONE
-- [ ] Using a proxy during SLES Setup (Manager installation): IN_PROG
-- [ ] Connecting minions to trusted master only: NEXT
+- [x] Using a proxy during SLES Setup (Manager installation): IN_PROG
+- [x] Connecting minions to trusted master only: NEXT
 - [ ] Live Patching Cleanup: NEXT
 
 ## Galaxy/Devel/Head/ (3.1)
