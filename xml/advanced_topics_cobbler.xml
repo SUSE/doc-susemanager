@@ -74,14 +74,14 @@
    <listitem>
     <para>
      <!-- bnc#847514 -->
-     To use Cobbler for system installation with PXE, you must have
+     For system installation with PXE, you must have
      a TFTP server installed and configured.  By default, &susemgr;
      installs such a TFTP server.
     </para>
    </listitem>
    <listitem>
     <para>
-     To use Cobbler to PXE boot systems for installation, you
+     To PXE boot systems for installation, you
      must either set up a DHCP server for Cobbler PXE booting or have access
      to your network's DHCP server. Edit <filename>/etc/dhcp.conf</filename> to
      change <option>next-server</option> to the hostname or IP address of
@@ -109,12 +109,12 @@
    <title>Configuring Cobbler with /etc/cobbler/settings</title>
    <para>
     Cobbler configuration is mainly done in the
-    <filename>/etc/cobbler/settings</filename> file. With the default settings
-    unchanged, Cobbler should run as intended. Still, all configurable
+    <filename>/etc/cobbler/settings</filename> file. With the default
+    settings unchanged, Cobbler runs as intended.  All configurable
     settings are explained in detail in the
-    <filename>/etc/cobbler/settings</filename> file with regard to how they
-    affect functionality of Cobbler and whether it is recommended for users to
-    adjust values to their environment.
+    <filename>/etc/cobbler/settings</filename> file with regard to how
+    they affect functionality of Cobbler and whether it is recommended
+    for users to adjust values to their environment.
    </para>
   </sect2>
 
@@ -187,7 +187,7 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
     &susemgr; uses the <systemitem class="daemon">atftpd</systemitem>
     daemon, but it can also operate with Xinetd/TFTP. The
     <systemitem class="daemon">atftpd</systemitem> is installed by default
-    as the recommended method for providing PXE services. Usually you do
+    as the recommended method for providing PXE services. Usually, you do
     not have to change its configuration, but if you have to, use the &yast;
     Sysconfig Editor.
    </para>
@@ -196,15 +196,17 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
     FTP server used for transferring the boot image to a PXE client.
    </para>
    <para>
-    To configure TFTP, you must first enable the service via Xinetd. To do
-    this, edit the <filename>/etc/xinetd.d/tftp</filename> file as root and
-    change the <option>disable = yes</option> line to <literal>disable =
-    no</literal>.
+    To configure TFTP, you must first enable the service via Xinetd. To
+    do this, edit the <filename>/etc/xinetd.d/tftp</filename> file as
+    &rootuser; and change the <option>disable = yes</option> line to
+    <literal>disable = no</literal>.
    </para>
    <para>
     Before TFTP can serve the <filename>pxelinux.0</filename> boot
     image, you must start the Xinetd service. Start &yast; and use
-    <menuchoice><guimenu>System</guimenu><guimenu>System Services (Runlevel)</guimenu></menuchoice> to configure the Xinetd daemon.
+    <menuchoice><guimenu>System</guimenu><guimenu>Services
+    Manager</guimenu></menuchoice> to configure the <systemitem
+    class="daemon">Xinetd</systemitem> daemon.
    </para>
 <!--<screen>chkconfig &#x2d;&#x2d;level 345 xinetd on
 /sbin/service xinetd start</screen>
@@ -224,7 +226,7 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
         http://wiki.novell.com/index.php/SUSE_Manager/SSHServerPush#TFTP_Sync
    -->
    <para>
-    With &susemgr; 1.7 and later it is possible to sync cobbler generated TFTP
+    It is possible to sync cobbler generated TFTP
     contents to &susemgr; Proxies to perform PXE booting via
     these proxies.
    </para>
@@ -236,13 +238,13 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
      On the &susemgr; Server, install the package
      <systemitem>susemanager-tftpsync</systemitem>:
     </para>
-     <screen>zypper install susemanager-tftpsync</screen>
+     <screen>&prompt.root;zypper install susemanager-tftpsync</screen>
 
      <para>
       On the &susemgrproxy; systems, install the package
       <systemitem>susemanager-tftpsync-recv</systemitem>:
      </para>
-     <screen>zypper install susemanager-tftpsync-recv</screen>
+     <screen>&prompt.root;zypper install susemanager-tftpsync-recv</screen>
    </sect3>
    <sect3>
     <title>Configuring &susemgrproxy;</title>
@@ -265,7 +267,7 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
      Execute <filename>configure-tftpsync.sh</filename> on &susemgr; Server:
     </para>
 
-    <screen>configure-tftpsync.sh proxy1.example.com proxy2.example.com</screen>
+    <screen>&prompt.root;configure-tftpsync.sh proxy1.example.com proxy2.example.com</screen>
 
     <para>
      Execute <command>cobbler sync</command> to initially push
@@ -396,7 +398,7 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
    <para>
     If content, start the &susemgr; server with the following command:
    </para>
-<screen>/usr/sbin/spacewalk-service start</screen>
+<screen>&prompt.root;/usr/sbin/spacewalk-service start</screen>
    <warning>
     <para>
      Do not start or stop the <command>cobblerd</command> service
@@ -432,14 +434,14 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
    <command>cobbler</command> as follows:
   </para>
 
-<screen>cobbler distro add --name=<replaceable>string</replaceable><!--
+<screen>&prompt.root;cobbler distro add --name=<replaceable>string</replaceable><!--
 --> --kernel=<replaceable>path</replaceable><!--
 --> --initrd=<replaceable>path</replaceable></screen>
 
   <para>
    The <option>--name=<replaceable>string</replaceable></option> option is a
    label used to differentiate one distribution choice from another (for
-   example, <literal>sles11server</literal>).
+   example, <literal>sles12server</literal>).
   </para>
 
   <para>
@@ -463,7 +465,7 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
    Cobbler profiles associate a distribution with additional options like &ay;
    or Kickstart files. Profiles are the core unit of provisioning and there
    must be at least one Cobbler profile for every distribution added.  For
-   example, two profiles might be created for a web server and a desktop
+   example, two profiles might be created for a Web server and a desktop
    configuration. While both profiles use the same distribution, the profiles
    are for different installation types.
   </para>
@@ -476,19 +478,19 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
    Use <command>cobbler</command> to create profiles on the command line:
   </para>
 <screen
->cobbler profile add --name=string --distro=string [--kickstart=url] \
+>&prompt.root;cobbler profile add --name=string --distro=string [--kickstart=url] \
   [--virt-file-size=gigabytes] [--virt-ram=megabytes]</screen>
 
   <para>
    The <option>--name=<replaceable>string</replaceable></option> is the
-   unique label for the profile, such as <literal>sles11webserver</literal>
-   or <literal>sles11workstation</literal>.
+   unique label for the profile, such as <literal>sles12webserver</literal>
+   or <literal>sles12workstation</literal>.
   </para>
 
   <para>
    The <option>--distro=<replaceable>string</replaceable></option> option
    specifies the distribution that will be used for this particular profile.
-   Distributions were added in <xref
+   For adding distributions, see <xref
    linkend="advanced.topics.cobbler.adddistro"/>.
   </para>
 
@@ -540,7 +542,8 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
    The following command adds a system to the Cobbler configuration:
   </para>
 
-<screen>cobbler system add --name=string --profile=string --mac-address=AA:BB:CC:DD:EE:FF</screen>
+<screen>&prompt.root;cobbler system add --name=string --profile=string \
+  --mac-address=AA:BB:CC:DD:EE:FF</screen>
 
   <para>
    The <option>--name=<replaceable>string</replaceable></option> is the
@@ -623,19 +626,19 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
     For example, a standard Kickstart file may have a networking section
     similar to the following:
    </para>
-<screen>network --device=eth0 --bootproto=static --ip=192.168.100.24 \
+<screen>&prompt.root;network --device=eth0 --bootproto=static --ip=192.168.100.24 \
   --netmask=255.255.255.0 --gateway=192.168.100.1 --nameserver=192.168.100.2</screen>
    <para>
     In a Kickstart template file, the networking section would rather look
     like this:
    </para>
-<screen>network --device=$net_dev --bootproto=static --ip=$ip_addr \
+<screen>&prompt.root;network --device=$net_dev --bootproto=static --ip=$ip_addr \
   --netmask=255.255.255.0 --gateway=$my_gateway --nameserver=$my_nameserver</screen>
    <para>
     These variables will be substituted with the values set in your Kickstart
     profile variables or in your system detail variables. If the same
     variables are defined in both the profile and the system detail, then the
-    system variable takes precedence.
+    system detail variable takes precedence.
    </para>
    <note>
     <para>
@@ -750,19 +753,19 @@ logvol /var --name=var vgname=vg00 --fstype ext3 --size=5000</screen>
     on a system.
    </para>
    <para>
-    For example,  create a Cobbler profile with the  following command:
+    For example, create a Cobbler profile with the following command:
    </para>
-<screen>cobbler add profile --name=virtualfileserver \
-  --distro=sless11-x86_64-server --virt-file-size=20 --virt-ram=1000</screen>
+<screen>&prompt.root;cobbler add profile --name=virtualfileserver \
+  --distro=sles12-x86_64-server --virt-file-size=20 --virt-ram=1000</screen>
    <para>
-    This profile is for a fileserver running &sls;&nbsp;11 with a 20GB guest
-    image size and allocated 1GB of system RAM.
+    This profile is for a fileserver running &sls;&nbsp;12 with a 20 GB guest
+    image size and allocated 1 GB of system RAM.
    </para>
    <para>
     To find the name of the virtual guest system profile, run the following
     <command>koan</command> command:
    </para>
-<screen>koan --server=hostname --list-profiles</screen>
+<screen>&prompt.root;koan --server=hostname --list-profiles</screen>
    <para>
     This command lists all the available profiles created with
     <command>cobbler profile add</command>.
@@ -771,7 +774,7 @@ logvol /var --name=var vgname=vg00 --fstype ext3 --size=5000</screen>
     Start creating the image file and the installation of the virtual guest
     system:
    </para>
-<screen>koan --virt --server=cobbler-server.example.com \
+<screen>&prompt.root;koan --virt --server=cobbler-server.example.com \
   --profile=virtualfileserver --virtname=marketingfileserver</screen>
    <para>
     The command specifies that a virtual guest system be created from the
@@ -794,7 +797,7 @@ logvol /var --name=var vgname=vg00 --fstype ext3 --size=5000</screen>
     installation from the available Cobbler profiles by executing the following
     command <emphasis>on the system to be reinstalled</emphasis>:
    </para>
-<screen>koan --replace-self --server=hostname --profile=name</screen>
+<screen>&prompt.root;koan --replace-self --server=hostname --profile=name</screen>
    <para>
     This command, running on the system to be replaced, will start the
     provisioning process and replace its own system using the profile in
@@ -812,9 +815,7 @@ logvol /var --name=var vgname=vg00 --fstype ext3 --size=5000</screen>
    to PXE network installations. Define the name and output location
    of the boot ISO using the <option>--iso</option> option.
   </para>
-   <screen>
-    cobbler buildiso --iso=/path/to/boot.iso
-   </screen>
+   <screen>&prompt.root;cobbler buildiso --iso=/path/to/boot.iso</screen>
   <para>
    The boot ISO includes all profiles and systems by default. Limit
    these profiles and systems using the <option>--profiles</option>
