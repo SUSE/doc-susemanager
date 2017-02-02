@@ -29,58 +29,18 @@
 
     <sect1>
         <title>What are Salt Formulas?</title>
-        <para>Formulas are a collections of Salt States that have been pre-written by other Salt
-            users and contain generic parameter fields. Formulas allow for reliable reproduction of
-            any configuration again and again. Formulas also allow you to create and reuse custom
-            states. These collections of states may be installed from RPM binaries or an external
-            git repository. The difference between using a state and a formula perhaps could be
-            introduced best with the following Apache web server analogy.</para>
-        <variablelist>
-            <varlistentry>
-                <term>Configuration via a Salt State</term>
-                <listitem>
-                    <para>Penguin the administrator decides to configure Apache using a regular salt
-                        state for his server. His server requires many special parameters (ports,
-                        file configurations etc.). The state file he is writing will be very
-                        specific to the infrastructure of his company's internal network.
-                        Additionally the state will be written for a specific system and will likely
-                        not function on another server or machine within the same network. He also
-                        will start by writing his state from scratch and therefore will require a
-                        moderate time investment.</para>
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>Configuration via a Salt Formula</term>
-                <listitem>
-                    <para>Dr. Chameleon decides to use a Salt Formula. Using a Salt Formula allows
-                        him to place his infrastructure specific parameters into a generic
-                        pre-written Apache formula (which contains many of Apache's default
-                        configuration options) and deploy the configuration to a minion. He can then
-                        duplicate this process, by changing the available pre-written parameters(or
-                        by adding more of his own) and deploy these changes to each additional
-                        server. This means that he is not required to write a custom state from
-                        scratch for each additional system and simply needs to edit basic
-                        parameters. Formula changes will always be sent to minions like states by
-                        applying the highstate.</para>
-                </listitem>
-            </varlistentry>
-        </variablelist>
-
-        <note>
-            <title>What is a Highstate?</title>
-            <para>The highstate could also be referred to as a configuration change. When you apply
-                a highstate you are simply pushing any new configuration changes stored on the
-                master(SUSE Manager) to a minion. All minions targeted by these changes will receive
-                the new configuration updates.</para>
-        </note>
+        <para>Formulas are collections of Salt States that have been pre-written by other Salt users
+            and contain generic parameter fields. Formulas allow for reliable reproduction of a
+            specific configuration again and again. Formulas can be installed from RPM binaries or
+            an external git repository. </para>
 
         <para>The following list should help you in making the decision to use a state or a
             formula.</para>
         <itemizedlist>
             <title>Formula Tips</title>
             <listitem>
-                <para>When writing states for trivial tasks formulas are probably not worth the time
-                    investment</para>
+                <para>When writing states for trivial tasks, formulas are probably not worth the
+                    time investment</para>
             </listitem>
             <listitem>
                 <para>For large, non-trivial configurations use formulas</para>
@@ -120,7 +80,7 @@
             <title>Installing Salt Formulas via an RPM</title>
             <step>
                 <para>To see what formulas are available, execute the following command:</para>
-                <screen># zypper se formulas</screen>
+                <screen># zypper se formula</screen>
                 <para>You will be presented with a list of available Salt Formulas:</para>
                 <screen>S | Name              | Summary                                                    | Type      
 --+-------------------+------------------------------------------------------------+-----------
@@ -159,20 +119,22 @@ Description:
 
     <sect1>
         <title>File Structure Overview</title>
-        <para>Formulas in SUSE Manager are required to have a specific structure and should be
-            located within certain directories to ensure proper functionality. A formula should
-            always consists of two separate directories: The <literal>state</literal> directory and
-            the <literal>metadata</literal> directory.</para>
+        <para>RPM-based formulas need to be placed within a specific directory structure to ensure
+            proper functionality. A formula always consists of two separate directories: The
+                <literal>state</literal> directory and the <literal>metadata</literal> directory.
+            Folders in these directories need to have an exactly matching name, for example:
+            (timezone).</para>
 
         <variablelist>
             <varlistentry>
                 <term>The Formula State Directory</term>
                 <listitem>
-                    <para>The formula state directory contains anything necessary for a salt state
+                    <para>The formula state directory contains anything necessary for a Salt state
                         to work independently. This includes <filename>.sls</filename> files,
-                            a<filename>map.jinja</filename> file and any other required files. The
-                        state directory is located in:</para>
-                    <screen>/usr/share/susemanager/formulas/states</screen>
+                            a<filename>map.jinja</filename> file and any other required files. This
+                        directory should only be modified by RPMs and should not be edited manually.
+                        For example the timezone RPM formula state directory is located in:</para>
+                    <screen>/usr/share/susemanager/formulas/states/timezone/</screen>
                 </listitem>
             </varlistentry>
 
@@ -181,21 +143,10 @@ Description:
                 <listitem>
                     <para>The metadata directory contains a <literal>form.yml</literal> file which
                         defines the forms for SUSE Manager and an optional metadata.yml file that
-                        can contain additional information about a formula. These are located in: </para>
-                    <screen>/usr/share/susemanager/formulas/metadata</screen>
-
-                </listitem>
-            </varlistentry>
-            <varlistentry>
-                <term>Official Formulas</term>
-                <listitem>
-                    <para>Formulas installed from a SUSE provided RPM, for example the
-                            <literal>timezone</literal> formula will store relevant state files
-                        within: </para>
-                    <screen>/usr/share/susemanager/formulas/states/timezone/</screen>
-                    <para>Metadata installed from a SUSE provided RPM, for example the timezone
-                        formula will store relevant metadata files within:</para>
+                        can contain additional information about a formula. For example the timezone
+                        RPM formula meta directory is located in: </para>
                     <screen>/usr/share/susemanager/formulas/metadata/timezone/</screen>
+
                 </listitem>
             </varlistentry>
 
@@ -208,14 +159,14 @@ Description:
                             <term>State directory</term>
                             <listitem>
                                 <para>Custom state formula data should be placed in:</para>
-                                <screen>/srv/salt/states/&lt;custom-formula-name&gt;</screen>
+                                <screen>/srv/salt/custom-timezone/</screen>
                             </listitem>
                         </varlistentry>
                         <varlistentry>
                             <term>Metadata Directory</term>
                             <listitem>
                                 <para>Custom metadata(information) should be placed in:</para>
-                                <screen>/srv/formula_metadata/&lt;custom-formula-name&gt;</screen>
+                                <screen>/srv/salt/formula_metadata/custom-timezone/</screen>
                             </listitem>
                         </varlistentry>
                     </variablelist>
