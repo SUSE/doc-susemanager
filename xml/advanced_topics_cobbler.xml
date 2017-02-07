@@ -12,11 +12,14 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
     xml:id="advanced.topics.cobbler">
 
- <title>Cobbler</title><indexterm>
+ <title>Cobbler</title>
+ <!--idx-->
+ <indexterm>
  <primary>Cobbler</primary></indexterm><indexterm>
  <primary>cobbler</primary></indexterm><indexterm>
  <primary>Koan</primary></indexterm><indexterm>
- <primary>koan</primary></indexterm>
+ <primary>koan</primary>
+ </indexterm>
  <para>
   &susemgr; features the Cobbler server that allows administrators to
   centralize their system installation and provisioning infrastructure.
@@ -201,6 +204,82 @@ filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader
         </para>
      </callout>
     </calloutlist>
+   </sect3>
+   <sect3 xml:id="advanced.topics.cobbler.reqs.dhcp.kvm">
+    <title>Setting up PXE Boot in KVM</title>
+    <para>
+     Not necessarily for production, but for lab or demo environments
+     you can alternativly set up PXE boot in KVM.  Such a configuration
+     can replace the <literal>next-server</literal> setting on a DHCP
+     server explained in <xref
+     linkend="advanced.topics.cobbler.reqs.dhcp.notmanaged"/>.  To edit
+     the network XML description with <command>virsh</command>, proceed
+     as follow:
+    </para>
+ 
+    <procedure>
+     <!--        net-edit network -->
+     <step>
+      <para>Produse an XML dump of the current description:</para>
+       <screen>&prompt.root;virsh net-dumpxml --inactive network > network.xml</screen>
+     </step>
+     <step>
+      <para>
+       Open the XML dump file (here <filename>network.xml</filename>)
+       with a text editor and add a <literal>bootp</literal> statement
+       within the <literal>&lt;dhcp></literal> element:
+      </para>
+      <screen><![CDATA[<bootp file='/pxelinux.0' server='192.168.100.153'/>]]></screen>
+
+     </step>
+     <step>
+      <para>
+       Install the edited description:
+      </para>
+      <screen>&prompt.root;virsh net-define network.xml</screen>
+     </step>
+    </procedure>
+    <para>
+     Or try the <literal>net-edit</literal> subcommand that does some
+     error checking.
+    </para>
+
+    <example xml:id="at.cobbler.bootp.kvm">
+     <title>Minimal Network XML Description for KVM</title>
+     <screen><![CDATA[<network>
+  <name>default</name>
+  <uuid>1da84185-31b5-4c8b-9ee2-a7f5ba39a7ee</uuid>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='virbr0' stp='on' delay='0'/>
+  <mac address='52:54:00:29:59:18'/>
+  <domain name='default'/>
+  <ip address='192.168.100.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.100.128' end='192.168.100.254'/>
+      <bootp file='/pxelinux.0' server='192.168.100.153'/>]]><co
+      xml:id="at.cobbler.bootp.kvm.bootp"/><![CDATA[
+    </dhcp>
+  </ip>
+</network>]]></screen>
+     <!--
+         <para>
+         Step by step explanation:
+         </para>
+     -->
+     <calloutlist>
+     <callout arearefs="at.cobbler.bootp.kvm.bootp">
+      <para>
+       <literal>bootp</literal> statement that directs to the PXE
+       server.
+      </para>
+     </callout>
+     </calloutlist>
+    </example>
+
    </sect3>
   </sect2>
 
