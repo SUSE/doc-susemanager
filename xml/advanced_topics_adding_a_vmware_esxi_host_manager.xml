@@ -41,7 +41,8 @@
     </sect1>
     <sect1>
         <title>Requirements</title>
-        <para/>
+        <para>The following table displays the default API communication port and required access
+            rights for inventorying objects and resources.</para>
         <informaltable>
             <tgroup cols="2">
                 <colspec colname="c1" colwidth="1*"/>
@@ -71,6 +72,32 @@
         </informaltable>
     </sect1>
     <sect1>
+        <title>Permissions and Roles Overview</title>
+        <para>The following section will guide you through assigning user permissions and roles in
+            vCenter/ESXi.</para>
+        <para>A user is someone who has been authorized access to an ESXi host. The Virtual Host
+            Manager (located on the SUSE Manager server) will inventory ESXi data defined by
+            assigned roles and permissions on a user account. </para>
+        <para>For example: The user John has been assigned the <emphasis>read-only</emphasis> access
+            role to all servers and datacenters in his company with one exception. Johns account has
+            been assigned the <emphasis>no-access</emphasis> role on the company's
+                <emphasis>Financial Database server </emphasis>. You decide to use Johns user
+            account and add the ESXi host to SUSE Manager. During the inventory the<emphasis>
+                Financial Database server</emphasis> will be excluded.</para>
+        <para>Keep user access roles in mind when planning to add ESXi hosts to SUSE manager. It is
+            important to understand that SUSE Manager will not inventory any objects or resources
+            assigned with the no-access role on any user account.</para>
+        <tip>
+            <title>User and Host Roles/Permissions</title>
+            <para>When planning to add new ESXi hosts to SUSE Manager, ask yourself the following
+                question:</para>
+            <para><emphasis>Have users associated to a host been provided with the required roles
+                    and permissions for objects and resources that I need inventoried by SUSE
+                    Manager?</emphasis></para>
+        </tip>
+
+    </sect1>
+    <sect1>
         <title>Adding New Users to vSphere ESXi/vCenter</title>
         <para>See the official vSphere documentation on adding new users.</para>
         <itemizedlist>
@@ -81,33 +108,6 @@
             </listitem>
         </itemizedlist>
     </sect1>
-    <sect1>
-        <title>Permissions and Roles Overview</title>
-        <para>The following section will guide you through assigning user permissions and roles in
-            vCenter/ESXi.</para>
-        <para>A user is someone who has been authorized access to an ESXi host. The Virtual Host
-            Manager (located on the SUSE Manager server) will inventory ESXi data defined by
-            assigned roles and permissions on a user account. </para>
-        <para>For example: The user John has been assigned the <emphasis>read-only</emphasis> access
-            role to all servers and datacenters in his company with one exception. Johns account has
-            been assigned the <emphasis>no-access</emphasis> role on the company's
-                <emphasis>Financial Database server </emphasis>.  You decide to use Johns user
-            account and add the ESXi host to SUSE Manager. During the inventory the<emphasis>
-                Financial Database server</emphasis> will be excluded.</para>
-        <para>Keep user access roles in mind when planning to add ESXi hosts to SUSE manager. It is
-            important to understand that SUSE Manager will not inventory any objects or resources
-            assigned with the no-access role on any user account.</para>
-        <tip>
-            <title>User and Host Roles/Permissions</title>
-            <para>When planning to add new ESXi hosts to SUSE Manager, ask yourself the following
-                question:</para>
-            <para><emphasis>Have users associated to a hosts been provided with the required roles
-                    and permissions for objects and resources that I need inventoried by SUSE
-                    Manager?</emphasis></para>
-        </tip>
-
-    </sect1>
-
     <sect1>
         <title>Add a vCenter Server/vSphere ESXi Host to SUSE Manager</title>
         <para>The following procedure will guide you through adding a VSphere ESXi host to
@@ -124,8 +124,34 @@
             </step>
             <step>
                 <para>From the <guimenu>Add a VMware-based Virtual Host Manager</guimenu> page fill
-                    in the fields with your ESXi host data and select <guimenu>Add Virtual Host
-                        Manager</guimenu>. </para>
+                    the following fields with your ESXi host data:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Label: Custom name for your Virtual Host Manager</para>
+                    </listitem>
+                    <listitem>
+                        <para>Hostname: FQDN or host IP address</para>
+                    </listitem>
+                    <listitem>
+                        <para>Port: Default ESXi API port</para>
+                    </listitem>
+                    <listitem>
+                        <para>Username: ESXi user</para>
+                        <important>
+                            <para>Remember that only objects and resources which match a users
+                                defined role will be inventoried. Set the users role on objects and
+                                resources you want inventoried to
+                                <emphasis>read-only</emphasis></para>
+                        </important>
+                    </listitem>
+                    <listitem>
+                        <para>Password: ESXi users password</para>
+                    </listitem>
+
+                </itemizedlist>
+
+
+
                 <informalfigure>
                     <mediaobject>
                         <imageobject role="fo">
@@ -138,15 +164,22 @@
                 </informalfigure>
             </step>
             <step>
-                <para>To view your new ESXi host and its clients select <menuchoice>
+                <para>Click the <guimenu>Add Virtual Host Manager</guimenu> button.</para>
+            </step>
+            <step>
+                <para>From the <guimenu>Virtual Host Managers</guimenu> page select the newly added
+                    Virtual Host manager.</para>
+            </step>
+            <step>
+                <para>From the Virtual Host Managers <guimenu>Properties</guimenu> page select
+                        <guimenu>Refresh data from this Virtual Host Manager.</guimenu></para>
+            </step>
+            <step>
+                <para>View inventoried ESXi host objects and resources by selecting <menuchoice>
                         <guimenu>Systems</guimenu>
                         <guimenu>Virtual Systems</guimenu>
                     </menuchoice>.</para>
             </step>
         </procedure>
-    </sect1>
-    <sect1>
-        <title/>
-        <para/>
     </sect1>
 </chapter>
