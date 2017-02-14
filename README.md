@@ -1,6 +1,6 @@
 
 
-![](http://www.hte-engineering.com/wp-content/uploads/2014/12/cloud-words2.png) 
+![](https://www.google.de/search?q=documentation+banner&espv=2&biw=1920&bih=1014&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiv1PXggJDSAhUTHGMKHUEwDwoQ_AUIBigB#tbs=isz:lt%2Cislt:xga&tbm=isch&q=technical+words&imgdii=t79l-KAUdGcHNM:&imgrc=CBAoiCmczNbE0M:) 
 # SUSE Manager Documentation Repository 
 
 **This readme is currently under development**
