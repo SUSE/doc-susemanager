@@ -1,6 +1,6 @@
 
 
-![](https://www.google.de/search?q=documentation+banner&espv=2&biw=1920&bih=1014&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiv1PXggJDSAhUTHGMKHUEwDwoQ_AUIBigB#tbs=isz:lt%2Cislt:xga&tbm=isch&q=technical+words&imgdii=t79l-KAUdGcHNM:&imgrc=CBAoiCmczNbE0M) 
+![](http://www.cs.virginia.edu/~jmc7tp/images/wordles/605.401.png) 
 # SUSE Manager Documentation Repository 
 
 **This readme is currently under development**
