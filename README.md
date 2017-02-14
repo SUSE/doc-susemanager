@@ -1,6 +1,6 @@
 # SUSE Manager Documentation Repository 
 
-![](https://www.google.de/url?sa=i&rct=j&q=&esrc=s&source=images&cd=&cad=rja&uact=8&ved=0ahUKEwiwrIvpiZDSAhVBWxoKHXG0BfwQjRwIBw&url=http%3A%2F%2Fdcad.com.pl%2Fprzemysl%2F&bvm=bv.146786187,d.ZGg&psig=AFQjCNEFOq0rSlcFUC8iFpmed5s3GMUi0g&ust=1487178450830200) 
+![](http://dcad.com.pl/wp-content/uploads/2011/01/energy.jpg) 
 
 --
 
