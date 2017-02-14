@@ -2,7 +2,6 @@
 
 ![](http://dcad.com.pl/wp-content/uploads/2011/01/energy.jpg) 
 
---
 
 ### Introduction
 This is the source for the official SUSE Manager documentation update.
@@ -25,4 +24,4 @@ Note:
 	
 Please do not make any commits to the master branch. master is reserved for releases only. 
 
---
+
