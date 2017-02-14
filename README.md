@@ -26,4 +26,3 @@ Note:
 Please do not make any commits to the master branch. master is reserved for releases only. 
 
 --
-*As this represents a large body of work, many smaller topics/bugs and revisions will not be included. Keep in mind topics are subject to change depending on development priorities. We will attempt to keep this list up-to-date as documentation develops. A new Documetnation updates book is in the works and should be released with 3.1. This document will provide links to all new section content added within a single maintenence update.*
