@@ -1,6 +1,6 @@
 
 
-![](http://i560.photobucket.com/albums/ss45/joecayouette/suse-manager-logo-mobile-app1.png) 
+![](http://www.hte-engineering.com/wp-content/uploads/2014/12/cloud-words2.png) 
 # SUSE Manager Documentation Repository 
 
 **This readme is currently under development**
