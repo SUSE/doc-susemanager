@@ -1,7 +1,7 @@
-
+# SUSE Manager Documentation Repository 
 
 ![](http://www.cs.virginia.edu/~jmc7tp/images/wordles/605.401.png) 
-# SUSE Manager Documentation Repository 
+
 
 **This readme is currently under development**
 
