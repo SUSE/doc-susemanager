@@ -15,7 +15,7 @@ During the SUSE Manager 3 update we successfully condensed and reworked the six 
 
 For more details on SUSE Manager documentation please visit our wiki: [SUSE Manager Documentation Wiki](https://github.com/SUSE/doc-susemanager/wiki)
 
-
+--
 ### Contributing
 
 If you would like to contribute, please fork this repository and send pull requests.
