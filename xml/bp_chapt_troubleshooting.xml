@@ -12,13 +12,14 @@
     <title>Troubleshooting</title>
 
     <sect1 xml:id="bp.chapt.suma3.troubleshooting.registering.cloned.salt.systems">
-        <title>Registering Cloned Salt Systems (minions)</title>
+        <title>Registering Cloned Salt Minions</title>
 
         <para>This chapter provides guidance on registering cloned systems with SUSE Manager. This
-            includes both Salt and Traditional clients.</para>
+            includes both Salt and Traditional clients. For more information see:<link
+                xlink:href="https://www.novell.com/support/kb/doc.php?id=7012170"/></para>
 
         <procedure>
-            <title>Registering a Cloned System with SUSE Manager (Salt)</title>
+            <title>Registering a Cloned Salt Minion with SUSE Manager</title>
             <step>
                 <para> Clone your system (for example using the existing cloning mechanism of your
                     favorite Hypervisor)</para>
@@ -40,7 +41,7 @@
             <step>
                 <para>Stop rhnsd daemon with:</para>
                 <screen># /etc/init.d/rhnsd stop </screen>
-                <para>or alternativly:</para>
+                <para>or alternatively:</para>
                 <screen># rcrhnsd stop</screen>
             </step>
             <step>
@@ -58,29 +59,29 @@
         </procedure>
 
         <para>The next step you take will depend on the Operating System of the clone.</para>
-        <para>In case the following scenario occurs: If you see only one of your cloned Salt minions
-            on the System Overview page after having accepted all minions keys from the Salt
-            Onboarding page, then this is likely due to these machines being clones of the original
-            and utilizing a duplicate machine-id. Perform the following steps to resolve this
-            conflict.</para>
+        <para>The following scenario can occur after on-boarding cloned Salt minions. If after
+            accepting all cloned minion keys from the onboarding page and you see only one minion on
+            the System Overview page, this is likely due to these machines being clones of the
+            original and using a duplicate machine-id. Perform the following steps to resolve this
+            conflict based on OS.</para>
 
         <procedure>
-            <title>Registering Salt Clones: SLES 12</title>
+            <title> SLES 12 Registering Salt Clones:</title>
             <step>
                 <para>SLES 12: If your machines have the same machine ids then delete the file on
                     each minion and recreate it:</para>
-                <screen># cat /etc/machine-id
-# rm /etc/machine-id
+                <screen># rm /etc/machine-id
+# rm /var/lib/dbus/machine-id
+# dbus-uuidgen --ensure
 # systemd-machine-id-setup</screen>
             </step>
         </procedure>
 
         <procedure>
-            <title>Registering Salt Clones: SLES 11</title>
+            <title>SLES 11 Registering Salt Clones: </title>
             <step>
                 <para>SLES 11: As there is no systemd machine id, generate one from dbus:</para>
-                <screen># cat /var/lib/dbus/machine-id
-# rm /var/lib/dbus/machine-id
+                <screen># rm /var/lib/dbus/machine-id
 # dbus-uuidgen --ensure</screen>
             </step>
         </procedure>
@@ -139,7 +140,7 @@
         </procedure>
         <para>The next step you take will depend on the Operating System of the clone.</para>
         <procedure>
-            <title>Registering A Cloned Traditional System: SLES 12</title>
+            <title>SLES 12 Registering A Cloned Traditional System: </title>
             <step>
                 <para>Remove the following credential files:</para>
                 <screen># rm  -f /etc/zypp/credentials.d/{SCCcredentials,NCCcredentials}</screen>
@@ -152,7 +153,7 @@
         </procedure>
 
         <procedure>
-            <title>Registering A Cloned Traditional System: SLES 11</title>
+            <title>SLES 11 Registering A Cloned Traditional System: </title>
             <step>
                 <para>Continued from section 1 step 5:</para>
                 <screen># suse_register -E</screen>
@@ -167,7 +168,7 @@
         </procedure>
 
         <procedure>
-            <title>Registering A Cloned Traditional System: SLES 10</title>
+            <title>SLES 10 Registering A Cloned Traditional System: </title>
             <step>
                 <para>Continued from section 1 step 5:</para>
                 <screen># rm -rf /etc/{zmd,zypp}</screen>
@@ -216,14 +217,12 @@
                 jabberd begins to queue and refuse connections.</para>
 
             <para><literal>CURE</literal>: Edit the <filename>/etc/security/limits.conf</filename>
-                to something similar to the following:
-                <literal>jabbersoftnofile&lt;#clients + 100&gt;
-jabberhardnofile&lt;#clients + 1000&gt;</literal>
+                to something similar to the following: <literal>jabbersoftnofile&lt;#clients +
+                    100&gt; jabberhardnofile&lt;#clients + 1000&gt;</literal>
             </para>
 
             <para>This will vary according to your setup. For example in the case of 5000 clients:
-                <literal>jabbersoftnofile5100
-jabberhardnofile6000</literal></para>
+                    <literal>jabbersoftnofile5100 jabberhardnofile6000</literal></para>
 
             <para> Ensure you update the <filename>/etc/jabberd/c2s.xml</filename> max_fds parameter
                 as well. For example: <literal>&lt;max_fds&gt;6000&lt;/max_fds&gt;</literal></para>
@@ -242,14 +241,14 @@ jabberhardnofile6000</literal></para>
             <para><literal>SYMPTOMS</literal>: After a disk is full error or a disk crash event, the
                 jabberd database may have become corrupted. jabberd may then fail to start during
                 spacewalk-service start:</para>
-                <screen>Starting spacewalk services...
+            <screen>Starting spacewalk services...
    Initializing jabberd processes...
        Starting router                                                                   done
        Starting sm startproc:  exit status of parent of /usr/bin/sm: 2                   failed
    Terminating jabberd processes...</screen>
 
             <para>/var/log/messages shows more details:</para>
-                <screen>jabberd/sm[31445]: starting up
+            <screen>jabberd/sm[31445]: starting up
 jabberd/sm[31445]: process id is 31445, written to /var/lib/jabberd/pid/sm.pid
 jabberd/sm[31445]: loading 'db' storage module
 jabberd/sm[31445]: db: corruption detected! close all jabberd processes and run db_recover
@@ -257,13 +256,13 @@ jabberd/router[31437]: shutting down</screen>
 
             <para><literal>CURE</literal>: Remove the jabberd database and restart. Jabberd will
                 automatically re-create the database: </para>
-                <screen> spacewalk-service stop
+            <screen> spacewalk-service stop
  rm -Rf /var/lib/jabberd/db/*
  spacewalk-service start</screen>
-            
+
             <para> An alternative approach would be to test another database, but SUSE Manager does
                 not deliver drivers for this:</para>
-                <screen> rcosa-dispatcher stop
+            <screen> rcosa-dispatcher stop
  rcjabberd stop
  cd /var/lib/jabberd/db
  rm *
@@ -272,7 +271,7 @@ jabberd/router[31437]: shutting down</screen>
  chown jabber:jabber *
  rcjabberd start
  rcosa-dispatcher start</screen>
-            
+
 
         </sect2>
 
