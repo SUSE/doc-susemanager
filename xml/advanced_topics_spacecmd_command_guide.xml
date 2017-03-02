@@ -143,8 +143,51 @@ activationkey_disableconfigdeployment  repo_create
 
 ...</screen>
         </sect2>
+        
     </sect1>
 
+<sect1>
+    <title>Troubleshooting</title>
+    <para>This section provides troubleshooting solutions when working with spacecmd</para>
+    
+    <sect2>
+        <title>Creating a Distribution With spacecmd Sets Localhost Instead of FQDN</title>
+        <para>The support article associated with this issue may be located at:<link xlink:href="https://www.suse.com/support/kb/doc/?id=7018627"/></para>
+        <variablelist>
+            <varlistentry>
+                <term>Situation</term>
+                <listitem>
+                    <para>When creating a distribution with spacecmd it will  automatically set
+                            localhost as the server name instead of the FQDN of SUSE Manager. This
+                            will result in the following kernel option being written:</para><screen>install=http://localhost/ks/dist/&lt;distributionname></screen>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Resolution</term>
+                <listitem>
+                    <para>Set the FQDN in <filename>$HOME/.spacecmd/config</filename> like the following:
+                    </para>
+                    <screen>test:~/.spacecmd # cat config
+[spacecmd]
+server=test.mytest.env
+username=admin
+password=password
+nossl=0</screen>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Cause</term>
+                <listitem>
+                    <para>This problem may be experienced if <filename>$HOME/.spacecmd/config</filename> has been created and the server name option was set to localhost.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        
+       
+        
+    </sect2>
+        
+</sect1>
 
 
     <!-- spacecmd Command Reference -->
