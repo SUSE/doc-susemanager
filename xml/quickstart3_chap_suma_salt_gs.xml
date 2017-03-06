@@ -397,6 +397,84 @@ master_tops:
         </sect2>
     </sect1>
 
+    <sect1>
+        <title>Install the SUSE Manager Local Formula</title>
+        <para>The following section provides guidance on installing and using SUSE provided Salt
+            formulas.</para>
+
+        <procedure>
+            <title>Installing the Local Formula</title>
+            <step>
+                <para>Install the formula with:</para>
+                <screen>zypper install locale-formula</screen>
+                <note>
+                    <para>This installs the package contents to
+                            <filename>/usr/share/susemanager/formulas/{metadata,states}</filename></para>
+                </note>
+            </step>
+            <step>
+                <para>After installing the rpm, Login to the SUSE Manager WebUI.</para>
+            </step>
+            <step>
+                <para>Browse to the <guimenu>System Details</guimenu> page of any minion you would
+                    like to apply the formula to.</para>
+            </step>
+            <step>
+                <para>On the <guimenu>System Details</guimenu> page of the minion you will see a new
+                    formula tab. Select it to view a list of installed formulas.</para>
+            </step>
+            <step>
+                <para>Select the locale-formula and click save.</para>
+            </step>
+            <step>
+                <para>A new tab will appear next to the formula tab. Select the new locale
+                    tab</para>
+            </step>
+            <step>
+                <para>The locale tab contains options for setting the language, keyboard layout,
+                    timezone and if the hardware clock is set to UTC. Select the desired options and
+                    click save.</para>
+            </step>
+            <step>
+                <para>Run the following command to verify pillar settings. The output has been
+                    truncated.</para>
+                <screen>salt '$your_minion' pillar.items</screen>
+                <screen> ...
+   keyboard_and_language:
+       ----------
+       keyboard_layout:
+           English (US)
+       language:
+           English (US)
+   machine_password:
+       foobar
+   mgr_server:
+       manager_server
+   org_id:alt '$your_minion_here'
+       1
+   timezone:
+       ----------
+       hardware_clock_set_to_utc:
+           True
+       name:
+           CET
+    ...</screen>
+            </step>
+            <step>
+                <para>Apply this state to your minion by applying the highstate from the command
+                    line with:</para>
+                <screen>salt '$your_minion' state.highstate</screen>
+                <note>
+                    <para>You can also apply the highstate from the previous formula tab from the
+                        SUSE Manager WebUI by clicking <guimenu>Apply Highstate</guimenu></para>
+                </note>
+            </step>
+        </procedure>
+
+    </sect1>
+
+
+
     <!--    <sect1 xml:id="salt.gs.guide.creating.targeting.applying.states">
         <title>Working with States</title>
         <para>IN DEVEL</para>
