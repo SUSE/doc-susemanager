@@ -372,6 +372,76 @@
       script.</para>
   </sect1>
 
+  <sect1 xml:id="advanced.topics.proxy.pxe">
+   <title>Enabling PXE Boot via &susemgrproxy;</title>
+   <sect2 xml:id="advanced.topics.proxy.pxe.sync">
+    <title>Synchronizing Profiles and System Information</title>
+    <para>
+     To enable PXE boot via a proxy server, additional software must be installed and configured on both the &susemgr; server and the &susemgrproxy; server.
+    </para>
+    <procedure>
+     <step>
+      <para>
+       On the &susemgr; server install <package>susemanager-tftpsync</package>:
+      </para>
+      <screen><prompt># </prompt><command>zypper in susemanager-tftpsync</command></screen>
+     </step>
+     <step>
+      <para>
+       On the &susemgrproxy; server install
+       <package>susemanager-tftpsync-recv</package>:
+      </para>
+      <screen><prompt># </prompt><command>zypper in susemanager-tftpsync-recv</command></screen>
+     </step>
+     <step>
+      <para>
+       Run the <command>configure-tftpsync.sh</command> setup script and
+       enter the requested information:
+      </para>
+      <screen><prompt># </prompt><command>configure-tftpsync.sh</command></screen>
+      <para>
+       It asks for hostname and IP address of the &susemgr; server and
+       of the proxy itself. Additionally, it asks for the tftpboot
+       directory on the proxy.
+      </para>
+     </step>
+     <step>
+      <para>
+       On the &susemgr; server, run
+       <command>configure-tftpsync.sh</command> to configure the upload
+       to the &susemgrproxy; server:
+      </para>
+      <screen><prompt># </prompt><command>configure-tftpsync.sh <replaceable>FQDN_of_Proxy_Server</replaceable></command></screen>
+     </step>
+     <step>
+      <para>
+       To initiate an initial synchronization on the SUSE Manager Server
+       run:
+      </para>
+      <screen><prompt># </prompt><command>cobbler sync</command></screen>
+      <para>
+       Also can also be done after each a change within Cobbler that
+       needs to be synchronized immediately.  Otherwise Cobbler
+       synchronization will also run automatically when needed.  For
+       more information about Cobbler, see <xref
+       linkend="advanced.topics.cobbler"/>.
+      </para>
+     </step>
+    </procedure>
+  </sect2>
+  <sect2 xml:id="advanced.topics.proxy.pxe.dhcp">
+    <title>Configuring DHCP for PXE via &susemgrproxy;</title>
+    <para>
+     &susemgr; is using Cobbler to provide provisioning.  PXE (tftp) is
+     installed and activated by default.  To enable systems to find the
+     PXE boot on the &susemgrproxy; server add the following to the DHCP
+     configuration for the zone containing the systems to be provisioned:
+    </para>
+<screen>next-server: <replaceable>IP_Address_of_SUSE_Manager_Proxy_Server</replaceable>
+filename: "pxelinux.0"</screen>
+
+   </sect2>
+  </sect1>
 
   <sect1 xml:id="advanced.topics.proxy.migration">
     <title>Migrating &susemgrproxy; 2.1 to &susemgrproxy; 3</title>
