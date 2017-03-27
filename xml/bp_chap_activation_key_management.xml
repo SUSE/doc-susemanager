@@ -46,10 +46,13 @@
         </listitem>
       </itemizedlist>
 
-    <para>So what do activation keys do exactly? Activation keys alone do nothing. The are just a
-      collection of configuration settings which have been given a label name and then added to a
-      bootstrap script. When the bootstrap script is executed all configuration settings associated
-      with the label are applied to the system the script is run on.</para>
+      <para>
+       Activation keys are just a collection of configuration settings
+       which have been given a label name and then added to a bootstrap
+       script. When the bootstrap script is executed all configuration
+       settings associated with the label are applied to the system the
+       script is run on.
+      </para>
   </sect1>
 
   <sect1>
@@ -76,24 +79,24 @@
     <sect2>
       <title>Key Label Naming</title>
       <para> One of the most important things to consider during activation key creation is label
-        naming. Creating simple names which are associated with your organization's infrastructure
+        naming. Creating names which are associated with your organization's infrastructure
         will make it easier for you when performing more complex operations. When naming key labels
       keep the following in mind:</para>
       <itemizedlist>
           <listitem>
-            <para>OS naming(mandatory): Keys should always refer to the OS they provide settings
+            <para>OS naming (mandatory): Keys should always refer to the OS they provide settings
               for</para>
           </listitem>
           <listitem>
-            <para>Architecture naming(recommended): Unless your company is running on one
-              architecture, for example x86_64, then providing labels with an architecture type is a
+            <para>Architecture naming (recommended): Unless your company is running on one
+              architecture only, for example x86_64, then providing labels with an architecture type is a
               good idea.</para>
           </listitem>
           <listitem>
             <para>Server type naming: What is, or what will this server be used for?</para>
           </listitem>
           <listitem>
-            <para>Location naming: Where is the server located? Room, building or department?
+            <para>Location naming: Where is the server located? Room, building, or department?
             </para>
           </listitem>
           <listitem>
@@ -106,7 +109,7 @@
 
       <para>Example activation key label names:</para>
       <screen>sles12-sp2-web_server-room_129-x86_64</screen>
-      <screen>sles12-sp2-test_packages-blg_502-room_21-i586</screen>
+      <screen>sles12-sp2-test_packages-blg_502-room_21-ppc64le</screen>
     </sect2>
     <sect2>
 
@@ -115,8 +118,8 @@
         sources) will be associated with it. </para>
       <important>
         <title>Default Base Channel</title>
-        <para>Keys should have a specific base channel assigned to it for example:
-            <literal>SLES12-SP2-Pool-x86_64</literal> If this is not the case &susemgr; will be
+        <para>Keys should have a specific base channel assigned to it, for example
+            <literal>SLES12-SP2-Pool-x86_64</literal>. If this is not the case &susemgr; will be
           unable to utilize specific stages. Using the default base channel is not recommended and
           may cause problems.</para>
       </important>
@@ -136,15 +139,16 @@
                <para>osad (pushing tasks)</para>
                <itemizedlist>
                     <listitem>
-                      <para>Installs <systemitem>python-jabberpy</systemitem> and <systemitem>pyxml</systemitem> as dependencies</para>
+                      <para>Installs <package>python-jabberpy</package> and <package>pyxml</package> as dependencies</para>
                     </listitem>
                   </itemizedlist>
               </listitem>
               <listitem>
-                <para> rhncfg-actions (Remote Command, Configuration Managment)</para>
+               <para>
+                <package>rhncfg-actions</package> (Remote Command, Configuration Managment)</para>
  <itemizedlist>
                     <listitem>
-                      <para>Installs rhncfg and rhncfg-client as dependencies</para>
+                      <para>Installs <package>rhncfg</package> and <package>rhncfg-client</package> as dependencies</para>
                     </listitem>
                   </itemizedlist>
               </listitem>
@@ -188,20 +192,25 @@
     <title>Using Activation Keys and Bootstrap with Traditional Clients (Non-Salt) </title>
     <para>Create the initial bootstrap script template from the command line on the &susemgr; server
     with:</para>
-    <screen language="bash"><prompt>#</prompt> mgr-bootstrap</screen>
-    <para>This command will
-      generate the bootstrap script and place them in
-        <filename>/srv/www/htdocs/pub/bootstrap</filename>.</para>
+    <screen language="bash"><prompt># </prompt>mgr-bootstrap</screen>
+    <para>
+     This command will generate the bootstrap script and place them in
+     <filename>/srv/www/htdocs/pub/bootstrap</filename>.
+    </para>
 
-    <para> Alternatively you may use the WebUI to create your bootstrap script template. </para>
+    <para>
+     Alternatively you may use the &webui; to create your bootstrap
+     script template.
+    </para>
 
     <para>Create the activation keys you need from command line with: </para>
-
-    <para>Alternatively use the WebUI to create your keys. From the WebUI proceed to:<menuchoice>
+    <!-- FIXME: command missing! -->
+    <para>Alternatively use the &webui; to create your keys. From the
+    WebUI proceed to <menuchoice>
         <guimenu>Overview</guimenu>
         <guimenu>Tasks</guimenu>
         <guimenu>Manage Activation Keys</guimenu>
-      </menuchoice></para>
+      </menuchoice>.</para>
   </sect1>
 
   <sect1 xml:id="bp.chapt.act.keys.with.salt.minions">
@@ -211,7 +220,7 @@
      3. Equiv specifying key in traditional bootstrap is to put the key in the grain of the minion
      4. After accepting minion key all settings specified in the grain and associated with the key will be applied.
   -->
-    <para> With the addition of Salt to &susemgr; &productnumber3; states should now be considered
+    <para> With the addition of Salt to &susemgr; 3 states should now be considered
       best practice over the more traditional way of combining activation keys. Although states
       allow for more configuration options you need to place the new system within the correct group
       so the desired states will be applied to the system. Using an activation key on your minions

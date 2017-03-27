@@ -7,20 +7,173 @@
   <!ENTITY % entities SYSTEM "entity-decl.ent">
     %entities;
 ]>
-<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.sp.migration">
-    <title>Performing a Service pack Migration</title>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         version="5.0"
+         xml:id="bp.sp.migration">
+ <title>Performing a System Migration</title>
 
-    <sect1>
-        <title>Service Pack Migration</title>
-        <para>SUSE Manager utilizes SLES12 SP2 as its underlying OS. Therefore Service Pack
-            Migrations may be performed in the same way as a typical SLES Migration. </para>
-        <para>SUSE offers a graphical and command line tool for upgrading to a new service pack.
-            Comprehensive documentation for executing service pack migration scenarios located in
-            the following SUSE Linux Enterprise Server Documentation chapter: <link
-                xlink:href="https://www.suse.com/documentation/sles-12/book_sle_deployment/data/cha_update_spmigration.html"
-            /></para>
+ <info>
+  <abstract>
+   <para>
+    Remarks how to upgrade the underlying operating system and migrate
+    &susemgr; server from one patch level to the other or from one
+    version to the next.  This works for migrating from version 3.0 to
+    3.1.
+   </para>
+   <para>
+    For migrating from version 2.1 to 3.0, see <xref
+    linkend="bp.chap.mgr.migration"/>.
+   </para>
+  </abstract>
+ </info>
+ <sect1>
+  <title>Service Pack Migration</title>
+  <para>
+   SUSE Manager utilizes &sls; 12 as its underlying operating system.
+   Therefore Service Pack migration (for example, from version 12 SP1 to
+   12 SP2) may be performed in the same way as a typical SLES migration.
+  </para>
+  <para>
+   &suse; offers a graphical and command line tool for upgrading to a
+   new service pack.  Comprehensive documentation for executing service
+   pack migration scenarios is located in the &sls; documentation chapter
+   <link
+   xlink:href="https://www.suse.com/documentation/sles-12/book_sle_deployment/data/cha_update_spmigration.html"
+   />.
+  </para>
+ </sect1>
+ <sect1>
+  <title>Migrating &susemgr; version 3.0 to 3.1</title>
+  <para>
+   The migration can either be done with the Online Migration tool
+   (&yast;) or with the Zypper command line tool.
+  </para>
 
-    </sect1>
+  <sect2>
+   <title>Using &yast;</title>
+   <para>
+    To perform the migration with &yast;, use the <guimenu>Online
+    Migration</guimenu> tool.
+    <!--
+        By default, &yast; does not install any packages from a
+        third-party repository. If a package was installed from a
+        third-party repository, &yast; prevents packages from being
+        replaced with the same package coming from &suse;.
+    -->
+  </para>
+  <note>
+   <title>Reduce Installation Size</title>
+   <para>
+    When performing the migration, &yast; will install all recommended
+    packages. Especially in the case of custom minimal installations,
+    this may increase the installation size of the system significantly.
+   </para>
+   <para>
+    To change this default behavior and allow only required packages, adjust
+    <filename>/etc/zypp/zypp.conf</filename> and set the following variable:
+   </para>
+<screen>solver.onlyRequires = true
+installRecommends=false # or commented</screen>
+<para>
+ This changes the behavior of all package operations, such as the
+ installation of patches or new packages.
+</para>
+  </note>
+  <para>
+   To start the migration, do the following:
+  </para>
+  <procedure>
+   <title>Migrating using &yast;</title>
+   <step>
+    <para>
+     If you are logged into a GNOME session running on the machine you
+     are going to update, switch to a text console. Running the update
+     from within a GNOME session is not recommended. This does not apply
+     when being logged in from a remote machine (unless you are running
+     a VNC session with GNOME).
+    </para>
+   </step>
+   <step>
+    <para>
+     Start in &yast; <menuchoice> <guimenu>System</guimenu> <guimenu>Online
+     Migration</guimenu> </menuchoice>. &yast; will show possible migration
+     targets and a summary.
+    </para>
+    <para>
+     In case of trouble, resolve the following issues first:
+    </para>
+    <substeps>
+     <step>
+      <para>
+       If the <guimenu>Online Migration</guimenu> is not available,
+       install the <package>yast2-migration</package> package and its
+       dependencies.  Restart &yast;, otherwise the newly installed
+       module will not be shown in the control center.
+      </para>
+     </step>
+     <step>
+      <para>
+       If there are <quote>old</quote> online updates available for
+       installation, the migration tool will warn and ask to install
+       them now before starting the actual migration.  It is recommended
+       to install all updates before proceeding.
+      </para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>
+     If more than one migration target is available for your system,
+     select one from the list.  In case you are still on SLES 12 SP1,
+     SLES 12 will be upgraded to SP2, while you select SUSE Manager
+     Server 3.1.
+    </para>
+    <figure xml:id="fig-migration-summary">
+     <title>&yast;: Select the Migration Target</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="yast_migration_target31.png" width="80%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="yast_migration_target31.png"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
 
+   </step>
+  </procedure>
+
+  <para>
+   SUSE Linux Enterprise Server 12 SP1 will be upgraded to SUSE Linux Enterprise Server 12 SP2 x86_64.
+  </para>
+  <screen>
+sumas:~ # zypper migration
+
+Executing 'zypper  refresh'
+
+Repository 'SLES12-SP1-Pool' is up to date.                                                                                                                                                 
+Repository 'SLES12-SP1-Updates' is up to date.                                                                                                                                              
+Repository 'SUSE-Manager-Server-3.0-Pool' is up to date.                                                                                                                                    
+Repository 'SUSE-Manager-Server-3.0-Updates' is up to date.                                                                                                                                 
+All repositories have been refreshed.
+
+Executing 'zypper  --no-refresh patch-check --updatestack-only'
+
+Loading repository data...
+Reading installed packages...
+0 patches needed (0 security patches)
+
+Available migrations:
+
+    1 | SUSE Linux Enterprise Server 12 SP2 x86_64
+        SUSE Manager Server 3.1 x86_64
+       
+    2 | SUSE Linux Enterprise Server 12 SP2 x86_64
+        SUSE Manager Server 3.0 x86_64 (already installed)
+  </screen>
+ </sect2>
+</sect1>
+ 
 </chapter>
