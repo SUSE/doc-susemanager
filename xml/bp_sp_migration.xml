@@ -162,15 +162,33 @@ installRecommends=false # or commented</screen>
   </sect2>
   <sect2 xml:id="bp.sp.migration.version.zypper">
    <title>Using zypper</title>
-   <screen>
-sumas:~ # zypper migration
-
+   <para>
+    To perform the migration with &zypper; on the command-line, use the
+    <command>zypper migration</command> subcommand tool:
+  </para>
+  <procedure>
+   <title>Migrating using <command>zypper migration</command></title>
+   <step>
+    <para>
+     If you are logged into a GNOME session running on the machine you
+     are going to update, switch to a text console. Running the update
+     from within a GNOME session is not recommended. This does not apply
+     when being logged in from a remote machine (unless you are running
+     a VNC session with GNOME).
+    </para>
+   </step>
+   <step>
+    <para>
+     The <command>zypper migration</command> subcommand show possible
+     migration targets and a summary:
+    </para>
+   <screen><prompt># </prompt>zypper migration
 Executing 'zypper  refresh'
 
-Repository 'SLES12-SP1-Pool' is up to date.                                                                                                                                                 
-Repository 'SLES12-SP1-Updates' is up to date.                                                                                                                                              
-Repository 'SUSE-Manager-Server-3.0-Pool' is up to date.                                                                                                                                    
-Repository 'SUSE-Manager-Server-3.0-Updates' is up to date.                                                                                                                                 
+Repository 'SLES12-SP1-Pool' is up to date.
+Repository 'SLES12-SP1-Updates' is up to date.
+Repository 'SUSE-Manager-Server-3.0-Pool' is up to date.
+Repository 'SUSE-Manager-Server-3.0-Updates' is up to date.
 All repositories have been refreshed.
 
 Executing 'zypper  --no-refresh patch-check --updatestack-only'
@@ -183,10 +201,56 @@ Available migrations:
 
     1 | SUSE Linux Enterprise Server 12 SP2 x86_64
         SUSE Manager Server 3.1 x86_64
-       
+
     2 | SUSE Linux Enterprise Server 12 SP2 x86_64
-        SUSE Manager Server 3.0 x86_64 (already installed)
-   </screen>
+        SUSE Manager Server 3.0 x86_64 (already installed)</screen>
+    <para>
+     In case of trouble, resolve the following issues first:
+    </para>
+    <substeps>
+     <step>
+      <para>
+       If the <command>migration</command> subcommand is not available
+       install the <package>zypper-migration-plugin</package> package
+       and its dependencies.
+      </para>
+     </step>
+     <step>
+      <para>
+       If there are <quote>old</quote> online updates available for
+       installation, the migration tool will warn and ask to install
+       them now before starting the actual migration.  It is recommended
+       to install all updates before proceeding.
+      </para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>
+     If more than one migration target is available for your system,
+     select one from the list (specify the number).  In case you are
+     still on &sls; 12 SP1, SLES 12 will be upgraded to SP2, while
+     selecting <guimenu>&susemgr; Server 3.1</guimenu> as a migration
+     target.
+    </para>
+   </step>
+   <step>
+    <para>
+     Read the notification and update the &susemgr; database schema as
+     described (<command>spacewalk-schema-upgrade</command>).
+    </para>
+   </step>
+   <step>
+    <para>
+     Make sure &susemgr; is up and running (<command>spacewalk-service
+     start</command>).
+    </para>
+   </step>
+  </procedure>
+  <para>
+   After finishing the migration procedure &susemgr; 3.1 on &sls; 12 SP2
+   is available to be used.
+  </para>
   </sect2>
  </sect1>
  
