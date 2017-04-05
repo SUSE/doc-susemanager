@@ -445,6 +445,83 @@ filename: "pxelinux.0"</screen>
 
    </sect2>
   </sect1>
+  <sect1 xml:id="advanced.topics.proxy.migration3">
+   <title>Migrating &susemgr; 3 Proxy to Version 3.1</title>
+   <para>
+    The recommended order for migrations is to first migrate the server
+    and then the proxies.  Note that a &susemgr; 3 Proxy cooperates just
+    fine with &susemgr; 3.1.
+   </para>
+
+   <para>
+    For the migration of the proxies there are two possible approaches:
+    Existing &susemgr; proxies may be upgraded to version 3.1 with
+    &yast; or <command>zypper</command> migration. Alternatively, the
+    proxies may be replaced by new ones. This section documents both
+    approaches.
+   </para>
+
+   <sect2>
+    <title>Replacing a &susemgrproxy;</title>
+    <para>
+     A &susemgrproxy; is <literal>dumb</literal> in the sense that it
+     does not contain any information about the clients which are
+     connected to it. A &susemgrproxy; can therefore be replaced by a
+     new one. Naturally, the replacement proxy must have the same name
+     and IP address as its predecessor.
+    </para>
+
+    <procedure>
+     <title>Replacing a &susemgrproxy;</title>
+     <step>
+      <para>
+       To replace a &susemgrproxy;, delete the system from the &susemgr;
+       <guimenu>Systems</guimenu> list.  For more information, see <xref
+       linkend="s3-sm-system-details"/>.
+      </para>
+     </step>
+     <step>
+      <para>Shutdown the proxy and install the latest version.</para>
+     </step>
+     <step>
+      <para>
+       Complete the registration steps described in this chapter to
+       register your proxy normally. Once you have completed registering
+       the new proxy with the server, utilizing the appropriate
+       channels, and finally having run the
+       <command>configure-proxy.sh</command> script, all clients
+       formally connected via the older proxy will continue operating as
+       before.
+      </para>
+     </step>
+    </procedure>
+    <important>
+     <title>Proxy Installation and Client Connections</title>
+     <para>
+      During the installation of the proxy, clients will not be able to
+      reach the &susemgr; server. After a &susemgrproxy; system has been
+      deleted from the systems list, all clients connected to this proxy
+      will be (incorrectly) listed as <literal>directly
+      connected</literal> to the &susemgr; server. After the first
+      successful operation on a client <emphasis>such as execution of a
+      remote command or installation of a package or patch</emphasis>
+      this information will automatically be corrected. This may take a
+      few hours.
+     </para>
+    </important>
+   </sect2>
+   <sect2>
+    <title>Upgrading a &susemgrproxy; from 3 to 3.1</title>
+    <para>
+     In most situations upgrading the proxy will be your preferred
+     solution as this retains all cached packages. Selecting this route
+     saves time especially regarding setups with proxies connected to
+     &susemgr; server via low-bandwith links. This upgrade can be done
+     with one of the migration tools (&yast; or zypper) like standard
+     clients. The following procedures demonstrate this.
+    </para>
+   </sect2>
+  </sect1>
 
   <sect1 xml:id="advanced.topics.proxy.migration">
     <title>Migrating &susemgr; 2.1 Proxy to Version 3</title>
