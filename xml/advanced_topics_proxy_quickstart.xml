@@ -109,9 +109,11 @@
               <para> Free Disk Space </para>
             </entry>
             <entry>
-              <para>Minimum 100&nbsp;GB for base installation and at least 50 GB for caching per
-                SUSE product and +100 GB per Red Hat product; a resizeable partition strongly
-                recommended.</para>
+             <para>
+              Minimum 100&nbsp;GB for base installation and at least
+              50 GB for caching per SUSE product and +100 GB per Red Hat
+              product; a resizeable partition strongly recommended.
+             </para>
             </entry>
           </row>
         </tbody>
@@ -209,10 +211,9 @@
       <title>Creating Your First Proxy</title>
       <step>
        <para>
-        Create an activation key based on the &sle; 12 SP2 base channel
-        and ensure you have selected the child SUSE Manager Proxy
-        channel which is required for providing the proxy packages. See
-        <xref linkend="create.act.keys"/>.
+        Create an activation key based on the &sle; 12 SP2 base channel. For
+        more information about activation keys, see <xref
+        linkend="create.act.keys"/>.
        </para>
         <figure>
           <title>Proxy Activation Key</title>
@@ -222,6 +223,16 @@
             </imageobject>
           </mediaobject>
         </figure>
+      </step>
+      <step>
+       <para>
+        Click the <guimenu>Child Channels</guimenu> subtab and select
+        the &susemgr; 3.1 Proxy child channel with the matching update
+        channel (<systemitem>SUSE Manager Proxy-3.1-Pool</systemitem>
+        and <systemitem>SUSE-Manager-Proxy-3.1-Updates</systemitem>).
+        These child channels are required for providing the proxy
+        packages and updates.
+       </para>
         <figure>
           <title>Base and Child Proxy Channel</title>
           <mediaobject>
@@ -233,25 +244,39 @@
 
       </step>
       <step>
-        <para>Modify a bootstrap script for the proxy and register it with &susemgr; using the new
-          activation key. See <xref linkend="modify.bootstrap.script"/>.
-        </para>
-      </step>
-
-      <step>
        <para>
-        Once you have registered your client, direct your browser to the
-        &susemgr; &webui; and login.
+        Modify a bootstrap script for the proxy.  Ensure unchecking
+        <guimenu>Bootstrap using Salt</guimenu>, because in this case
+        the proxy must be bootstrapped as a so-called traditional
+        client.  For more information about bootstrap scripts, see <xref
+        linkend="modify.bootstrap.script"/>.
        </para>
       </step>
-
       <step>
        <para>
-        Select the <guimenu>Systems</guimenu> tab and click on your
-        newly registered &sle; 12 SP2 client system from the
-        <guimenu>Systems Overview</guimenu> table.
+        Register the client with &susemgr; using the new activation key.
        </para>
-      </step>
+       <para>
+        On &susemgr; 3.1 and later, no further action is required.  The
+        bootstrap process will install and activate the proxy software
+        automatically.  On the previous version 3.0 the following
+        substeps are required:
+       </para>
+       <substeps>
+        <step>
+         <para>
+          Once you have registered your client, direct your browser to the
+          &susemgr; &webui; and login.
+         </para>
+        </step>
+
+        <step>
+         <para>
+          Select the <guimenu>Systems</guimenu> tab and click on your
+          newly registered &sle; client system from the <guimenu>Systems
+          Overview</guimenu> table.
+         </para>
+        </step>
 
       <step>
        <para>
@@ -269,7 +294,7 @@
         and <systemitem>SUSE-Manager-Proxy-3.0-Updates</systemitem>,
         then select <guimenu>Change Subscriptions</guimenu> to
         continue. This will provide the required repositories for the
-        proxy packages from the &susemgr; Server to the client.
+        proxy packages from the &susemgr; server to the client.
        </para>
       </step>
 
@@ -279,21 +304,27 @@
       </step>
 
       <step>
-        <para>Type <filename>patterns</filename> within the search field on the <guimenu>Installable
-            Packages</guimenu> page. Select the Proxy pattern and then select <guimenu>Install
-            Selected Packages</guimenu>.</para>
+        <para>Type <guimenu>patterns</guimenu> within the search field
+        on the <guimenu>Installable Packages</guimenu> page. Select the
+        Proxy pattern and then select <guimenu>Install Selected
+        Packages</guimenu>.</para>
       </step>
       <step>
-        <para>On the <guimenu>Confirm Package Install</guimenu> page select confirm to schedule the
-          installation.</para>
+       <para>
+        On the <guimenu>Confirm Package Install</guimenu> page select
+        confirm to schedule the installation.
+       </para>
       </step>
-
+       </substeps>
+      </step>
     </procedure>
     <para>
      The Proxy pattern will be installed and the client will be upgraded
-     to a &susemgrproxy;.  You may then register your clients against
-     the proxy using a bootstrap script as if it were a &susemgr;
-     Server.  For more information, see <xref
+     to a &susemgrproxy;.  Finalize the installation with running
+     <command>configure-proxy.sh</command> (see <xref
+     linkend="at.manager.proxy.run.confproxy"/>. Then register your
+     clients against the proxy using a bootstrap script as if it were a
+     &susemgr; server.  For more information, see <xref
      linkend="at.manager.proxy.register.clients"/>.
     </para>
   </sect1>
@@ -516,11 +547,25 @@ filename: "pxelinux.0"</screen>
      In most situations upgrading the proxy will be your preferred
      solution as this retains all cached packages. Selecting this route
      saves time especially regarding setups with proxies connected to
-     &susemgr; server via low-bandwith links. This upgrade can be done
-     with one of the migration tools (&yast; or zypper) like standard
-     clients. The following procedures demonstrate this.
+     &susemgr; server via low-bandwith links. This upgrade is similar to
+     a standard client migration.  The following procedures demonstrate
+     this.
     </para>
+
+    <warning>
+     <title>Synchronizing Target Channels</title>
+     <para>
+      Before successfully initializing the product migration, you first
+      must make sure that the migration target channels are completely
+      mirrored.  For the upgrade to &susemgrproxy; 3.1, at least the
+      <systemitem>SUSE Linux Enterprise Server 12 SP2</systemitem> base
+      channel with the <systemitem>SUSE Manager Proxy 3.1</systemitem>
+      for your architecture is required.
+     </para>
+    </warning>
+
    </sect2>
+
   </sect1>
 
   <sect1 xml:id="advanced.topics.proxy.migration">
