@@ -13,6 +13,17 @@
     <title>Salt Minion Scalability</title>
 
     <sect1>
+        <title>Salt Minion Onboarding Rate</title>
+        <para>The rate at which SUSE Manager can on-board minions (accept Salt keys) is limited and
+            depends on hardware resources. On-boarding minions at a faster rate than SUSE Manager is
+            configured for will build up a backlog of unprocessed keys slowing the process and
+            potentially exhausting resources. It is recommended to limit the acceptance key rate
+            pro-grammatically. A safe starting point would be to on-board a minion every 15 seconds,
+            which can be implemented via the following command:</para>
+        <screen>for k in $(salt-key -l un|grep -v Unaccepted); do salt-key -y -a $k; sleep 15; done </screen>
+    </sect1>
+
+    <sect1>
         <title>Minions Running with Unaccepted Salt Keys</title>
         <para>Minions which have not been on-boarded, (minions running with unaccepted salt keys)
             consume resources, in particular inbound network bandwidth for ~2.5Kb/s per minion. 1000
