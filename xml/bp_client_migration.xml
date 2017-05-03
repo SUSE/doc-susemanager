@@ -23,21 +23,16 @@
     Upgrading from SLE 11 SPx to SLE 12 SP2 or later (when available)
     requires some additional steps, but can be automated.
    </para>
-<!--
-   <para>
-    For migrating from version 2.1 to 3.0, see <xref
-    linkend="bp.chap.mgr.migration"/>.
-   </para>
--->
   </abstract>
  </info>
 
  <sect1 xml:id="bp.client.migration.sle12">
-  <title>Migrating &sle; 12 or later to version 12 SP2</title>
+  <title>Migrating &sls; 12 or later to version 12 SP2</title>
   
   <para>
-   Existing &sle; 12 clients (SLE) may be upgraded to SP2 with
+   Existing &sls; 12 clients (SLE) may be upgraded to SP2 with the
    <guimenu>SP Migration</guimenu> procedure provided by the &webui;.
+   The same is applies for other supported products based on &sle; 12.
   </para>
 
   <warning>
@@ -54,7 +49,7 @@
    </para>
   </warning>
   <procedure>
-   <title>Migrating &sle; 12 Client to SP2</title>
+   <title>Migrating &sle; 12 Client to SP2</title>
    <step>
     <para>
      Direct your browser to the &susemgr; &webui; where your client is
@@ -186,10 +181,356 @@
    Finally consider to schedule a reboot.
   </para>
  </sect1>
- <sect1 xml:id="bp.client.migration.sle121">
-  <title>Migrating &sle; 11 SP3 to version 12 SP2</title>
+ <!-- FIXME: check this! -->
+ <sect1 xml:id="bp.client.migration.sle11">
+  <title>Migrating &sle; 11 SP3 to version 12 SP2</title>
 
-  <para/>
+  <para>
+   &sle; 11 SP3 clients may be auto-upgraded to version 12 SP2 by means
+   of &yast; auto-installation.
+   The same is applies for other supported products based on &sle; 11.
+  </para>
+
+  <para>
+   During the procedure, the machine reboots and performs the system
+   upgrade.  The process is controlled by &yast; and &ay; and not by
+   plain <command>zypper</command> commands.
+  </para>
+  <important>
+   <para>
+    Only perform this migration on client systems managed by &susemgr;
+    servers. For upgrading the &susemgr; server itself, see <xref
+    linkend="bp.sp.migration"/>. This is a viable method for major
+    version upgrades such as an upgrade from &sle; 11 to 12.
+   </para>
+  </important>
+
+  <para>
+   Perform the following steps:
+  </para>
+  <procedure>
+   <title>System Upgrade Preparation</title>
+   <note>
+   <para>
+    Make sure your &susemgr; and all the clients you want to upgrade have
+    installed all available updates, including the &susemgr; tools. This
+    is absolutely necessary, otherwise the system upgrade will fail.
+   </para>
+  </note>
+  <step>
+   <para>
+    On the &susemgr; server, create a local tree with the SLES 12 SP2
+    installation sources. This is needed for booting the clients into
+    the installation or upgrade scenario. For example, download the ISO
+    image of the DVD1 with the installation sources and mount it as
+    <filename>/mnt/sles12-sp2</filename>:
+   </para>
+<screen>mkdir /mnt/sles12-sp2
+mount -o loop <replaceable>DVD1</replaceable>.iso /mnt/sles12-sp2</screen>
+  </step>
+  <step>
+   <para>
+    Create an auto-installation distribution: For all distributions you want
+    to perform a system upgrade, you need to create a SLE 12 SP2 distribution
+    in &susemgr;. Use the following steps to create one:
+   </para>
+   <substeps performance="required">
+    <step>
+     <para>
+      In the &susemgr; Web interface go to <menuchoice>
+      <guimenu>Systems</guimenu> <guimenu>Autoinstallation</guimenu>
+      <guimenu>Distributions</guimenu> </menuchoice>
+     </para>
+    </step>
+    <step>
+     <para>
+      Enter a <guimenu>Distribution Label</guimenu> for your distribution
+      (for example, use <literal>sommer2017</literal>) as a label and specify the
+      <guimenu>Tree Path</guimenu>, which is the root directory of the
+      &sls; 12 SP2 installation sources (for example, in this case
+      <filename>/mnt/sles12-sp2</filename>). As the <guimenu>Base
+      Channel</guimenu> use the update target distribution
+      (<quote>SLES12-SP2-Pool for x86_64</quote>.
+      <!-- FIXME: needed?
+           *** autoupgrade=1 *** ??? -->
+     </para>
+    </step>
+    <step>
+     <para>
+      Confirm with <guimenu>Create Autoinstallable Distribution</guimenu>.
+     </para>
+<!-- 
+  <step>
+   <para>
+    Update the SP2 channels.</para><remark
+    role="needinfo">emap: Do we simply replace all sp1 with sp2 and
+    sp2 with sp3? Otherwise same channel names? Or will sp1 stay
+    the base channel with new sp3 child channels? Any other
+    necessary changes?</remark>
+   <para>
+          SP2 is not an extra base-channel, but the SLES11 SP1
+          base-channel will be enhanced by two new child channels SLES11
+          SP2 core and SLES11 SP2 updates. Use the following steps to
+          integrate them:
+         </para>
+
+         <substeps>
+          <step>
+           <para>Open a shell and list your channels:</para>
+           <screen>mgr-ncc-sync -l -\-all-childs</screen>
+           <para>The result will look similar to this:</para>
+           <screen>[P] sles11-sp1-pool-i586
+    [.] sle11-hae-sp1-pool-i586
+    [.] sle11-hae-sp1-updates-i586
+    [.] sle11-hae-sp2-pool-i586
+    [.] sle11-hae-sp2-updates-i586
+    [.] sle11-sdk-sp1-pool-i586
+    [.] sle11-sdk-sp1-updates-i586
+    [X] sle11-sdk-sp2-core-i586
+    [.] sle11-sdk-sp2-updates-i586
+    [.] sle11-smt-updates-i586
+    [.] sle11-sp1-debuginfo-pool-i586
+    [.] sle11-sp1-debuginfo-updates-i586
+    [.] sle11-webyast-sp1-pool-i586
+    [.] sle11-webyast-sp1-updates-i586
+    [.] sles11-extras-i586
+    [P] sles11-sp1-suse-manager-tools-i586
+    [P] sles11-sp1-updates-i586
+    [.] sles11-sp2-core-i586
+    [.] sles11-sp2-updates-i586</screen>
+          </step>
+          <step>
+           <para>Subscribe to the core and update channels with
+           <command>mgr-ncc-sync</command>:</para>
+           <screen>mgr-ncc-sync -c sles11-sp2-core-i586
+mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
+          </step>
+          <step>
+           <para>Check the status again with
+           <command>mgr-ncc-sync -l -\-all-childs</command>. You should
+           see a <literal>P</literal> this time.</para>
+           <para>In your &susemgr; Web interface, go to
+           <menuchoice>
+            <guimenu>Channels</guimenu>
+            <guimenu>All Channels</guimenu>
+            </menuchoice> and click <guimenu>Show All Child
+            Channels</guimenu> to see the parent/child
+           relationship of your channels.</para>
+          </step>
+         </substeps>
+         </step>
+  -->
+    </step>
+   </substeps>
+  </step>
+  <step>
+   <para>
+    Create an activation key for your SLE 12 SP2 systems.
+   </para>
+   <para>
+    In order to switch from the old SLES 11 base channel to the new SLE 12
+    SP2 base channel, we need an activation key. Use the following steps to
+    create one:
+   </para>
+   <substeps performance="required">
+    <step>
+     <para>
+      Go to <menuchoice> <guimenu>Systems</guimenu> <guimenu>Activation
+      Keys</guimenu> </menuchoice> and click <guimenu>Create
+      Key</guimenu>.
+     </para>
+    </step>
+    <step xml:id="st.maintenance-migration.activationkey">
+     <para>
+      Enter a description for your key.
+     </para>
+    </step>
+    <step>
+     <para>
+      Enter a key or leave it blank to generate an automatic key.
+     </para>
+    </step>
+    <step>
+     <para>
+      If you limit the usage, enter your value in the
+      <guimenu>Usage</guimenu> text field.
+     </para>
+    </step>
+    <step>
+     <para>
+      Select the <quote>SLES12-SP2-Pool for x86_64</quote> base channel.
+     </para>
+    </step>
+    <step>
+     <para>
+      Decide about <guimenu>Add-On System Types</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click <guimenu>Create Activation Key</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click <guimenu>Child Channels</guimenu> and select the required
+      channels. Finish with <guimenu>Update Key</guimenu>.
+     </para>
+    </step>
+   </substeps>
+  </step>
+<!-- ============================================================ -->
+  <step xml:id="st.maintenance-migration.upload">
+   <para>
+    Upload an &ay; profile.
+   </para>
+   <para/>
+   <substeps performance="required">
+    <step>
+     <para>
+      <!-- FIXME -->
+      Create an &ay; XML file according to
+      <xref linkend="ap-sample-autoinst-system-upgrade"/>.
+     </para>
+     <para>
+      For more information about &ay;, see
+      <xref linkend="ref.webui.systems.autoinst.ay-intro"/>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Go to <menuchoice> <guimenu>Systems</guimenu>
+      <guimenu>Autoinstallation</guimenu> </menuchoice> and click
+      <guimenu>Upload Kickstart/Autoyast File</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Paste the XML content in the text area or select the file to upload.
+      Click <guimenu>Create</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Add <literal>autoupgrade=1</literal> in the <guimenu>Kernel
+      Options</guimenu> of the <guimenu>Details</guimenu> tab and click
+      <guimenu>Update</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Switch to the <guimenu>Variable</guimenu> tab.
+     </para>
+    </step>
+    <step>
+     <para>
+      Enter in the text field <literal>registration_key=</literal> and the
+      key from <xref linkend="st.maintenance-migration.activationkey"/>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click <guimenu>Update Variables</guimenu>.
+     </para>
+    </step>
+   </substeps>
+  </step>
+ </procedure>
+
+ <para>
+  After you have successfully finished the previous procedure, everything is
+  prepared for an upgrade. If you want to upgrade a system, do the
+  following:
+ </para>
+
+  <procedure>
+   <title>Upgrading &sls; 11 SP3 to version 12 SP2</title>
+
+  <warning>
+   <title>Synchronizing Target Channels</title>
+   <para>
+    Before successfully initializing the product migration,
+    make sure that the migration target channels are completely
+    mirrored.  For the upgrade to &sle; 12 SP2, at least the
+    <systemitem>SLES12-SP2-Pool</systemitem> base channel with the
+    <systemitem>SLE-Manager-Tools12-Pool</systemitem> child channel for
+    your architecture is required.  The matching update channels such as
+    <systemitem>SLE-Manager-Tools12-Updates</systemitem> and
+    <systemitem>SLES12-SP2-Updates</systemitem> are recommended.
+   </para>
+    <para>
+     For example, watch progress in
+     <filename>/var/log/rhn/reposync/sles12-sp2-pool-x86_64.log</filename>.
+    </para>
+  </warning>
+
+   <step>
+    <para>
+     Create an auto-installable distribution based on SLES 12 SP2. Refer
+     to the <xref linkend="ref.webui.systems.autoinst"/> on creating and
+     auto-installable distribution.
+    </para>
+   </step>
+
+  <step>
+   <para>
+    Go to the system via <guimenu>Systems</guimenu> and click the name of
+    the system. Then on the systems details page, click <menuchoice>
+    <guimenu>Provisioning</guimenu> <guimenu>Autoinstallation</guimenu>
+    <guimenu>Schedule</guimenu> </menuchoice>, and choose the &ay; XML
+    profile you have uploaded in
+    <xref linkend="st.maintenance-migration.upload"/>.
+   </para>
+  </step>
+  <step>
+   <para>
+    Click <guimenu>Schedule Autoinstallation and Finish</guimenu>.
+   </para>
+<!-- ; see -->
+    <!-- <xref linkend="fig.maint.migration.autoinst.schedule"/>. -->
+    <!-- <figure xml:id="fig.maint.migration.autoinst.schedule">
+  <title>Schedule Autoinstallation (System Upgrade, Offline Migration)</title>
+  <mediaobject>
+   <imageobject role="fo">
+    <imagedata fileref="susemanager_maint_migration_autoinst_schedule.png" width="85%"/>
+   </imageobject>
+   <imageobject role="html">
+    <imagedata fileref="susemanager_maint_migration_autoinst_schedule.png" width="75%"/>
+   </imageobject>
+  </mediaobject>
+ </figure>
+-->
+    <para>
+     Next time the machine asks the &susemgr; server for jobs, it will
+     receive a reinstallation job which fetches Kernel and initrd and
+     writes a new <filename>/boot/grub/menu.lst</filename> (containing
+     pointers to the new kernel and initrd).
+    </para>
+    <para>
+     When the machine boots, it will use the &grub; configuration and
+     boots the new kernel with its initrd. No PXE boot is required for
+     this process.  A shutdown of the machine is initiated as well,
+     effectively 3 minutes after the job was fetched.
+    </para>
+  </step>
+
+        <step>
+         <para>
+          To start the auto-installation on a proxy, some additional
+          packages must be installed which are only available in the
+          &susemgr; Tools channel. These tools are not available for
+          proxies as the system was shipped as an appliance in the
+          past. To gain access to the required packages for use with
+          proxies, the underlying SLES 11 SP3 channel
+          (<systemitem>SLES11-SP3-SUSE-Manager-Tools</systemitem>) needs
+          to be cloned and assigned to the to-be-upgraded proxies. After
+          these steps have been completed, create an auto-installation
+          profile.
+         </para>
+        </step>
+  </procedure>
+  
  </sect1>
- 
+ <!-- FIXME -->
+   <xi:include href="2.1-manager_clientconfig_ex_autoinst_system-upgrade.xml"/>
 </chapter>
