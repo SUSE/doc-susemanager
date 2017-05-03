@@ -31,176 +31,165 @@
 -->
   </abstract>
  </info>
-<!--
- <sect1 xml:id="bp.client.migration.sp">
-  <title>Service Pack Migration</title>
+
+ <sect1 xml:id="bp.client.migration.sle12">
+  <title>Migrating &sle; 12 or later to version 12 SP2</title>
+  
   <para>
-   SUSE Manager utilizes &sls; 12 as its underlying operating system.
-   Therefore Service Pack migration (for example, from version 12 SP1 to
-   12 SP2) may be performed in the same way as a typical SLES migration.
+   Existing &sle; 12 clients (SLE) may be upgraded to SP2 with
+   <guimenu>SP Migration</guimenu> procedure provided by the &webui;.
+  </para>
+
+  <warning>
+   <title>Synchronizing Target Channels</title>
+   <para>
+    Before successfully initializing the product migration, you first
+    must make sure that the migration target channels are completely
+    mirrored.  For the upgrade to &sle; 12 SP2, at least the
+    <systemitem>SLES12-SP2-Pool</systemitem> base channel with the
+    <systemitem>SLE-Manager-Tools12-Pool</systemitem> child channel for
+    your architecture is required.  The matching update channels such as
+    <systemitem>SLE-Manager-Tools12-Updates</systemitem> and
+    <systemitem>SLES12-SP2-Updates</systemitem> are recommended.
+   </para>
+  </warning>
+  <procedure>
+   <title>Migrating &sle; 12 Client to SP2</title>
+   <step>
+    <para>
+     Direct your browser to the &susemgr; &webui; where your client is
+     registered, and login.
+    </para>
+   </step>
+   <step>
+    <para>
+     On the
+     <menuchoice><guimenu>Systems</guimenu><guimenu>All</guimenu></menuchoice>
+     page select your client system from the table.
+    </para>
+    <figure xml:id="fig-sles-old-details">
+     <title>Client System Details Page</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_old_details_page.png" width="80%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_old_details_page.png"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+      
+    <para>
+     If there are <guimenu>Software Updates Available</guimenu> in the
+     <guimenu>System Status</guimenu> notification install these updates
+     first to avoid trouble during the migration process.
+    </para>
+   </step>
+     
+   <step>
+    <para>
+     On the system's detail page (<xref
+     linkend="fig-sles-old-details"/>) select the
+     <guimenu>Software</guimenu> tab, then the <guimenu>SP
+     Migration</guimenu> tab (<xref linkend="fig-sles-old-spmigr"/>).
+    </para>
+    <figure xml:id="fig-sles-old-spmigr">
+     <title>SP Migration Page</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_old_details_spmigration.png" width="80%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_old_details_spmigration.png"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+
+   </step>
+   
+   <step>
+    <para>
+     On <xref linkend="fig-sles-old-spmigr"/> you will see the installed
+     products listed on your client. Select the wanted <guimenu>Target
+     Products</guimenu> (if there is more than one), which is
+     <systemitem>&sls; 12 SP2</systemitem>.
+    </para>
+    <figure xml:id="fig-sles-migration-target">
+     <title>SP Migration Target</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_migration_target.png" width="80%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_migration_target.png"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+    <para>
+     Then confirm with <guimenu>Select Channels</guimenu>.
+    </para>
+    <figure xml:id="fig-sles-migration-channels">
+     <title>SP Migration Channels</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_migration_channels.png" width="80%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_migration_channels.png"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </step>
+   <step>
+    <para>
+     On <xref linkend="fig-sles-migration-channels"/>, <guimenu>Schedule
+     Migration</guimenu>, and on <xref
+     linkend="fig-sles-migration-schedule"/>,
+     <guimenu>Confirm</guimenu>.
+    </para>
+    <figure xml:id="fig-sles-migration-schedule">
+     <title>Schedule Client System Migration</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_migration_schedule.png" width="80%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_migration_schedule.png"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </step>
+  </procedure>
+  <!-- <result> -->
+  <para>
+   Check the <guimenu>System Status</guimenu> on the system's details
+   when the migration is done.
+  </para>
+  <figure xml:id="fig-sles-migrated">
+   <title>Migrated Client System</title>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="sles_migrated.png" width="80%"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="sles_migrated.png"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+  <!-- </result> -->
+  <para>
+   If the <guimenu>System Status</guimenu> notification does not report
+   a successful migration but lists <guimenu>Software Updates
+   Available</guimenu>, install the update now and then check again.
   </para>
   <para>
-   &suse; offers a graphical and command line tool for upgrading to a
-   new service pack.  Comprehensive documentation for executing service
-   pack migration scenarios is located in the &sls; documentation chapter
-   <link
-   xlink:href="https://www.suse.com/documentation/sles-12/book_sle_deployment/data/cha_update_spmigration.html"
-   />.
+   Finally consider to schedule a reboot.
   </para>
  </sect1>
--->
-  <sect1 xml:id="bp.client.migration.sle12">
-   <title>Migrating &sle; 12 or later to version 12 SP2</title>
+ <sect1 xml:id="bp.client.migration.sle121">
+  <title>Migrating &sle; 11 SP3 to version 12 SP2</title>
 
-   <para>
-    Existing sle clients may be upgraded to SP2 with
-    &yast; or <command>zypper</command> migration.
-   </para>
-
-    <warning>
-     <title>Synchronizing Target Channels</title>
-     <para>
-      Before successfully initializing the product migration, you first
-      must make sure that the migration target channels are completely
-      mirrored.  For the upgrade to xxx, at least the
-      <systemitem>SUSE Linux Enterprise Server 12 SP2</systemitem> base
-      channel with the <systemitem>xxx</systemitem>
-      child channel for your architecture is required.
-     </para>
-    </warning>
-    <procedure>
-     <title>Migrating Client to SP2</title>
-     <step>
-      <para>
-       Direct your browser to the &susemgr; &webui; where your client is
-       registered, and login.
-      </para>
-     </step>
-     <step>
-      <para>
-       On the
-       <menuchoice><guimenu>Systems</guimenu><guimenu>All</guimenu></menuchoice>
-       page select your client system from the table.
-      </para>
-      <figure xml:id="fig-sles-old-details">
-       <title>Client System Details Page</title>
-       <mediaobject>
-        <imageobject role="fo">
-         <imagedata fileref="sles_old_details_page.png" width="80%"/>
-        </imageobject>
-        <imageobject role="html">
-         <imagedata fileref="sles_old_details_page.png"/>
-        </imageobject>
-       </mediaobject>
-      </figure>
-
-      <para>
-       If there are <guimenu>Software Updates Available</guimenu> in the
-       <guimenu>System Status</guimenu> notification install these
-       updates first to avoid trouble during the migration process.
-      </para>
-     </step>
-
-     <step>
-      <para>
-       On the system's detail page (<xref
-       linkend="fig-sles-old-details"/>) select the
-       <guimenu>Software</guimenu> tab, then the <guimenu>SP
-       Migration</guimenu> tab (<xref linkend="fig-sles-old-spmigr"/>).
-      </para>
-      <figure xml:id="fig-sles-old-spmigr">
-       <title>SP Migration Page</title>
-       <mediaobject>
-        <imageobject role="fo">
-         <imagedata fileref="sles_old_details_spmigration.png" width="80%"/>
-        </imageobject>
-        <imageobject role="html">
-         <imagedata fileref="sles_old_details_spmigration.png"/>
-        </imageobject>
-       </mediaobject>
-      </figure>
-
-      </step>
-
-      <step>
-       <para>
-        On <xref linkend="fig-sles-old-spmigr"/> you will see the
-        installed products listed on your client. Select the wanted
-        <guimenu>Target Products</guimenu> (if there is more than one),
-        which is <systemitem>&sls; 12 SP2</systemitem>.
-       </para>
-       <figure xml:id="fig-sles-migration-target">
-        <title>SP Migration Target</title>
-       <mediaobject>
-        <imageobject role="fo">
-         <imagedata fileref="sles_migration_target.png" width="80%"/>
-        </imageobject>
-        <imageobject role="html">
-         <imagedata fileref="sles_migration_target.png"/>
-        </imageobject>
-       </mediaobject>
-      </figure>
-       <para>
-        Then confirm with <guimenu>Select Channels</guimenu>.
-       </para>
-       <figure xml:id="fig-sles-migration-channels">
-        <title>SP Migration Channels</title>
-       <mediaobject>
-        <imageobject role="fo">
-         <imagedata fileref="sles_migration_channels.png" width="80%"/>
-        </imageobject>
-        <imageobject role="html">
-         <imagedata fileref="sles_migration_channels.png"/>
-        </imageobject>
-       </mediaobject>
-      </figure>
-      </step>
-      <step>
-       <para>
-        On <xref linkend="fig-sles-migration-channels"/>,
-        <guimenu>Schedule Migration</guimenu>, and on <xref
-        linkend="fig-sles-migration-schedule"/>,
-        <guimenu>Confirm</guimenu>.
-       </para>
-       <figure xml:id="fig-sles-migration-schedule">
-        <title>Schedule Client System Migration</title>
-       <mediaobject>
-        <imageobject role="fo">
-         <imagedata fileref="sles_migration_schedule.png" width="80%"/>
-        </imageobject>
-        <imageobject role="html">
-         <imagedata fileref="sles_migration_schedule.png"/>
-        </imageobject>
-       </mediaobject>
-      </figure>
-      </step>
-    </procedure>
-    <!-- <result> -->
-       <para>
-        Check the <guimenu>System Status</guimenu> on the system's
-        details when the migration is done.
-       </para>
-       <figure xml:id="fig-sles-migrated">
-        <title>Migrated Client System</title>
-       <mediaobject>
-        <imageobject role="fo">
-         <imagedata fileref="sles_migrated.png" width="80%"/>
-        </imageobject>
-        <imageobject role="html">
-         <imagedata fileref="sles_migrated.png"/>
-        </imageobject>
-       </mediaobject>
-      </figure>
-      <!-- </result> -->
-      <para>
-       If the <guimenu>System Status</guimenu> notification does not
-       report a successful migration but lists
-       <guimenu>Software Updates Available</guimenu>, install the update
-       now and then check again.
-      </para>
-      <para>
-       Finally consider to schedule a reboot.
-      </para>
-  </sect1>
-
+  <para/>
+ </sect1>
+ 
 </chapter>
