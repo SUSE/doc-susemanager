@@ -188,7 +188,7 @@
   <para>
    &sle; 11 SP3 clients may be auto-upgraded to version 12 SP2 by means
    of &yast; auto-installation.
-   The same is applies for other supported products based on &sle; 11.
+   The same applies for other supported products based on &sle; 11.
   </para>
 
   <para>
@@ -208,7 +208,7 @@
   <para>
    Perform the following steps:
   </para>
-  <procedure>
+  <procedure xml:id="bp.proc.client.migration.sle11.prep">
    <title>System Upgrade Preparation</title>
    <note>
    <para>
@@ -222,8 +222,8 @@
     On the &susemgr; server, create a local tree with the SLES 12 SP2
     installation sources. This is needed for booting the clients into
     the installation or upgrade scenario. For example, download the ISO
-    image of the DVD1 with the installation sources and mount it as
-    <filename>/mnt/sles12-sp2</filename>:
+    image of the DVD1 with the installation sources and mount the ISO
+    image as <filename>/mnt/sles12-sp2</filename>:
    </para>
 <screen>mkdir /mnt/sles12-sp2
 mount -o loop <replaceable>DVD1</replaceable>.iso /mnt/sles12-sp2</screen>
@@ -237,9 +237,9 @@ mount -o loop <replaceable>DVD1</replaceable>.iso /mnt/sles12-sp2</screen>
    <substeps performance="required">
     <step>
      <para>
-      In the &susemgr; Web interface go to <menuchoice>
+      In the &susemgr; Web interface, click <menuchoice>
       <guimenu>Systems</guimenu> <guimenu>Autoinstallation</guimenu>
-      <guimenu>Distributions</guimenu> </menuchoice>
+      <guimenu>Distributions</guimenu> </menuchoice>.
      </para>
     </step>
     <step>
@@ -250,7 +250,7 @@ mount -o loop <replaceable>DVD1</replaceable>.iso /mnt/sles12-sp2</screen>
       &sls; 12 SP2 installation sources (for example, in this case
       <filename>/mnt/sles12-sp2</filename>). As the <guimenu>Base
       Channel</guimenu> use the update target distribution
-      (<quote>SLES12-SP2-Pool for x86_64</quote>.
+      <quote>SLES12-SP2-Pool for x86_64</quote>.
       <!-- FIXME: needed?
            *** autoupgrade=1 *** ??? -->
      </para>
@@ -259,78 +259,21 @@ mount -o loop <replaceable>DVD1</replaceable>.iso /mnt/sles12-sp2</screen>
      <para>
       Confirm with <guimenu>Create Autoinstallable Distribution</guimenu>.
      </para>
-<!-- 
-  <step>
-   <para>
-    Update the SP2 channels.</para><remark
-    role="needinfo">emap: Do we simply replace all sp1 with sp2 and
-    sp2 with sp3? Otherwise same channel names? Or will sp1 stay
-    the base channel with new sp3 child channels? Any other
-    necessary changes?</remark>
-   <para>
-          SP2 is not an extra base-channel, but the SLES11 SP1
-          base-channel will be enhanced by two new child channels SLES11
-          SP2 core and SLES11 SP2 updates. Use the following steps to
-          integrate them:
-         </para>
-
-         <substeps>
-          <step>
-           <para>Open a shell and list your channels:</para>
-           <screen>mgr-ncc-sync -l -\-all-childs</screen>
-           <para>The result will look similar to this:</para>
-           <screen>[P] sles11-sp1-pool-i586
-    [.] sle11-hae-sp1-pool-i586
-    [.] sle11-hae-sp1-updates-i586
-    [.] sle11-hae-sp2-pool-i586
-    [.] sle11-hae-sp2-updates-i586
-    [.] sle11-sdk-sp1-pool-i586
-    [.] sle11-sdk-sp1-updates-i586
-    [X] sle11-sdk-sp2-core-i586
-    [.] sle11-sdk-sp2-updates-i586
-    [.] sle11-smt-updates-i586
-    [.] sle11-sp1-debuginfo-pool-i586
-    [.] sle11-sp1-debuginfo-updates-i586
-    [.] sle11-webyast-sp1-pool-i586
-    [.] sle11-webyast-sp1-updates-i586
-    [.] sles11-extras-i586
-    [P] sles11-sp1-suse-manager-tools-i586
-    [P] sles11-sp1-updates-i586
-    [.] sles11-sp2-core-i586
-    [.] sles11-sp2-updates-i586</screen>
-          </step>
-          <step>
-           <para>Subscribe to the core and update channels with
-           <command>mgr-ncc-sync</command>:</para>
-           <screen>mgr-ncc-sync -c sles11-sp2-core-i586
-mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
-          </step>
-          <step>
-           <para>Check the status again with
-           <command>mgr-ncc-sync -l -\-all-childs</command>. You should
-           see a <literal>P</literal> this time.</para>
-           <para>In your &susemgr; Web interface, go to
-           <menuchoice>
-            <guimenu>Channels</guimenu>
-            <guimenu>All Channels</guimenu>
-            </menuchoice> and click <guimenu>Show All Child
-            Channels</guimenu> to see the parent/child
-           relationship of your channels.</para>
-          </step>
-         </substeps>
-         </step>
-  -->
     </step>
    </substeps>
+   <para>
+    For more information about Autoinstallation, see <xref
+    linkend="ref.webui.systems.autoinst"/>.
+   </para>
   </step>
   <step>
    <para>
-    Create an activation key for your SLE 12 SP2 systems.
+    Create an activation key for your SLE 12 SP2 systems.
    </para>
    <para>
-    In order to switch from the old SLES 11 base channel to the new SLE 12
-    SP2 base channel, we need an activation key. Use the following steps to
-    create one:
+    In order to switch from the old SLES 11 base channel to the new SLE 12
+    SP2 base channel, you need an activation key. Use the following steps to
+    create it:
    </para>
    <substeps performance="required">
     <step>
@@ -352,7 +295,7 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
     </step>
     <step>
      <para>
-      If you limit the usage, enter your value in the
+      If you want to limit the usage, enter your value in the
       <guimenu>Usage</guimenu> text field.
      </para>
     </step>
@@ -373,8 +316,8 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
     </step>
     <step>
      <para>
-      Click <guimenu>Child Channels</guimenu> and select the required
-      channels. Finish with <guimenu>Update Key</guimenu>.
+      Click the <guimenu>Child Channels</guimenu> tab and select the
+      required channels. Finish with <guimenu>Update Key</guimenu>.
      </para>
     </step>
    </substeps>
@@ -438,12 +381,12 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
  </procedure>
 
  <para>
-  After you have successfully finished the previous procedure, everything is
-  prepared for an upgrade. If you want to upgrade a system, do the
-  following:
+  After you have successfully finished the previous procedure,
+  everything is prepared for an upgrade. To upgrade a system, continue
+  with <xref linkend="bp.proc.client.migration.sle11.upgrade"/>.
  </para>
 
-  <procedure>
+  <procedure xml:id="bp.proc.client.migration.sle11.upgrade">
    <title>Upgrading &sls; 11 SP3 to version 12 SP2</title>
 
   <warning>
@@ -464,22 +407,15 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
     </para>
   </warning>
 
-   <step>
-    <para>
-     Create an auto-installable distribution based on SLES 12 SP2. Refer
-     to the <xref linkend="ref.webui.systems.autoinst"/> on creating and
-     auto-installable distribution.
-    </para>
-   </step>
-
   <step>
    <para>
     Go to the system via <guimenu>Systems</guimenu> and click the name of
     the system. Then on the systems details page, click <menuchoice>
     <guimenu>Provisioning</guimenu> <guimenu>Autoinstallation</guimenu>
     <guimenu>Schedule</guimenu> </menuchoice>, and choose the &ay; XML
-    profile you have uploaded in
-    <xref linkend="st.maintenance-migration.upload"/>.
+    profile you have uploaded in <xref
+    linkend="bp.proc.client.migration.sle11.prep"/>, <xref
+    linkend="st.maintenance-migration.upload"/>.
    </para>
   </step>
   <step>
@@ -502,7 +438,7 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
 -->
     <para>
      Next time the machine asks the &susemgr; server for jobs, it will
-     receive a reinstallation job which fetches Kernel and initrd and
+     receive a reinstallation job which fetches kernel and initrd and
      writes a new <filename>/boot/grub/menu.lst</filename> (containing
      pointers to the new kernel and initrd).
     </para>
@@ -510,24 +446,9 @@ mgr-ncc-sync -c sles11-sp2-updates-i586</screen>
      When the machine boots, it will use the &grub; configuration and
      boots the new kernel with its initrd. No PXE boot is required for
      this process.  A shutdown of the machine is initiated as well,
-     effectively 3 minutes after the job was fetched.
+     effectively 3 minutes after the job was fetched.
     </para>
   </step>
-
-        <step>
-         <para>
-          To start the auto-installation on a proxy, some additional
-          packages must be installed which are only available in the
-          &susemgr; Tools channel. These tools are not available for
-          proxies as the system was shipped as an appliance in the
-          past. To gain access to the required packages for use with
-          proxies, the underlying SLES 11 SP3 channel
-          (<systemitem>SLES11-SP3-SUSE-Manager-Tools</systemitem>) needs
-          to be cloned and assigned to the to-be-upgraded proxies. After
-          these steps have been completed, create an auto-installation
-          profile.
-         </para>
-        </step>
   </procedure>
   
  </sect1>
