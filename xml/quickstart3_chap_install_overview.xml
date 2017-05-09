@@ -10,465 +10,800 @@
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
     xml:id="quickstart.chapt.overview.requirements">
+ <title>What is Covered?</title>
+ <para>
+  Get started with &susemgr; 3 by setting up a KVM learning environment. This
+  quick-start guide will provide you with introductory guidance on setting up
+  &susemgr; server. You will learn the basics of managing both traditional
+  &susemgr; clients and Salt clients. This guide is intended for system
+  administrators.
+ </para>
+ <sect1 xml:id="quickstart.sect.introduction">
+  <title>Introducing &susemgr;</title>
 
-    <title>What is Covered?</title>
-    <para> Get started with &susemgr; 3 by setting up a KVM learning environment. This quick-start
-        guide will provide you with introductory guidance on setting up &susemgr; server. You will
-        learn the basics of managing both traditional &susemgr; clients and Salt clients. This guide
-        is intended for system administrators. </para>
+  <para>
+   &susemgr; lets you efficiently manage large sets of Linux systems and keep
+   them up to date. It provides automated and cost-effective software
+   management, asset management, and system provisioning. &susemgr; provides a
+   best in class solution for organizations requiring absolute control of
+   maintenance and package deployment on their servers. It allows customers the
+   highest level of flexibility and power ensuring their servers remain secure
+   while facilitating and advancing an organizations system life-cycle
+   requirements.
+  </para>
 
-    <sect1 xml:id="quickstart.sect.introduction">
-        <title>Introducing &susemgr;</title>
+  <formalpara>
+   <title>Salt</title>
+   <para>
+    The inclusion of <systemitem>Salt</systemitem> in &susemgr; 3 provides
+    powerful event-driven configuration and management capabilities for fine
+    grained control of any modern infrastructure.
+   </para>
+  </formalpara>
 
-        <para>&susemgr; lets you efficiently manage large sets of Linux systems and keep them up to
-            date. It provides automated and cost-effective software management, asset management,
-            and system provisioning. &susemgr; provides a best in class solution for organizations
-            requiring absolute control of maintenance and package deployment on their servers. It
-            allows customers the highest level of flexibility and power ensuring their servers
-            remain secure while facilitating and advancing an organizations system life-cycle
-            requirements.</para>
+  <formalpara>
+   <title>Salt-master</title>
+   <para>
+    &susemgr; &productnumber; takes a commanding role as a Salt-master capable
+    of orchestrating thousands of Salt-minions (&susemgr; Clients) via remote
+    execution.
+   </para>
+  </formalpara>
 
-        <formalpara>
-            <title>Salt</title>
-            <para>The inclusion of <systemitem>Salt</systemitem> in &susemgr; 3
-                provides powerful event-driven configuration and management capabilities for fine
-                grained control of any modern infrastructure.</para>
-        </formalpara>
+  <formalpara>
+   <title>Distribution Management</title>
+   <para>
+    &susemgr; &productnumber; is also fully compatible with Red Hat Satellite
+    Server and offers seamless management of both &sle; and &rhel; client
+    systems.
+   </para>
+  </formalpara>
+ </sect1>
+ <sect1 xml:id="quickstart.sect.bird.eye.view">
+  <title>Overview</title>
 
-        <formalpara>
-            <title>Salt-master</title>
-            <para> &susemgr; &productnumber; takes a commanding role as a Salt-master capable of
-                orchestrating thousands of Salt-minions (&susemgr; Clients) via remote execution.
-            </para>
-        </formalpara>
-        <formalpara>
-            <title>Distribution Management</title>
-            <para>&susemgr; &productnumber; is also fully compatible with Red Hat Satellite Server
-                and offers seamless management of both &sle; and &rhel; client systems.</para>
-        </formalpara>
+  <para>
+   &susemgr; may be integrated within your network infrastructure in multiple
+   ways. In this guide you will perform the following steps for an initial test
+   setup.
+  </para>
 
+  <itemizedlist>
+   <listitem>
+    <para>
+     Install SLES12 and SUSE Manager as an extension
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Register SUSE Manager server with SCC (SUSE Customer Center)
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Synchronize a repository channel for use with both traditional clients and
+     salt-minions
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Create an authentication key to act as an ID for the synced repository
+     channel
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Add the new authentication key to a bootstrap template script and connect
+     a traditional client
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Register a salt-minion with SUSE Manager (salt-master) and assign it a
+     channel with an authentication key
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <sect1 xml:id="quickstart.sect.prerequisites.install">
+  <title>Prerequisites for Installation</title>
 
-
-    </sect1>
-
-    <sect1 xml:id="quickstart.sect.bird.eye.view">
-        <title>Overview</title>
-        <para>&susemgr; may be integrated within your network infrastructure in multiple ways. In
-            this guide you will perform the following steps for an initial test setup.</para>
-        <itemizedlist>
-            <listitem>
-                <para>Install SLES12  and SUSE Manager as an extension</para>
-            </listitem>
-            <listitem>
-                <para>Register SUSE Manager server with SCC (SUSE Customer Center)</para>
-            </listitem>
-            <listitem>
-                <para>Synchronize a repository channel for use with both traditional clients and
-                    salt-minions</para>
-            </listitem>
-            <listitem>
-                <para>Create an authentication key to act as an ID for the synced repository channel </para>
-            </listitem>
-            <listitem>
-                <para>Add the new authentication key to a bootstrap template script and connect a traditional client</para>
-            </listitem>
-            <listitem>
-                <para>Register a salt-minion with SUSE Manager (salt-master) and assign it a channel
-                    with an authentication key</para>
-            </listitem>
-        </itemizedlist>
-       
-    </sect1>
-
-    <sect1 xml:id="quickstart.sect.prerequisites.install">
-        <title>Prerequisites for Installation</title>
-        <!-- 2016-12-14, ke: When an abbrev is introduced, use it
+<!-- 2016-12-14, ke: When an abbrev is introduced, use it
           throughout the section!
      -->
-        <para> This guide requires that you have created an account with SCC (&scc;). During
-            installation of both &sls; 12 and &susemgr; &productnumber;, &scc; credentials will be
-            requested and you must enter them to receive the latest packages and updates. The
-            following procedure will guide you through obtaining your SCC <systemitem>Organizational
-                Credentials</systemitem>. </para>
 
-        <procedure xml:id="creating.scc.account.mgr">
-            <title>Obtaining Your SCC Organization Credentials</title>
-            <step>
-                <para>Open a browser and direct it to <link xlink:href="https://scc.suse.com/login"
-                    />.</para>
-            </step>
-            <step>
-                <para>If you have not done so, create an account now.</para>
-            </step>
-            <step>
-                <para>Log in to your new SCC account.</para>
-            </step>
-            <step>
-                <para>Under the <systemitem>Management tools</systemitem> widget select
-                        <systemitem>Manage Users</systemitem>.</para>
-            </step>
-            <step>
-                <para> Click the <systemitem>Organization Credentials</systemitem> tab. </para>
-            </step>
-            <step>
-                <para>Keep this information handy during &susemgr; 3 setup.</para>
-            </step>
-        </procedure>
+  <para>
+   This guide requires that you have created an account with SCC (&scc;).
+   During installation of both &sls; 12 and &susemgr; &productnumber;, &scc;
+   credentials will be requested and you must enter them to receive the latest
+   packages and updates. The following procedure will guide you through
+   obtaining your SCC <systemitem>Organizational Credentials</systemitem>.
+  </para>
 
-    </sect1>
+  <procedure xml:id="creating.scc.account.mgr">
+   <title>Obtaining Your SCC Organization Credentials</title>
+   <step>
+    <para>
+     Open a browser and direct it to
+     <link xlink:href="https://scc.suse.com/login"
+                    />.
+    </para>
+   </step>
+   <step>
+    <para>
+     If you have not done so, create an account now.
+    </para>
+   </step>
+   <step>
+    <para>
+     Log in to your new SCC account.
+    </para>
+   </step>
+   <step>
+    <para>
+     Under the <systemitem>Management tools</systemitem> widget select
+     <systemitem>Manage Users</systemitem>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click the <systemitem>Organization Credentials</systemitem> tab.
+    </para>
+   </step>
+   <step>
+    <para>
+     Keep this information handy during &susemgr; 3 setup.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
+ <sect1>
+  <title>Obtaining Installation Media</title>
 
-    <sect1>
-        <title>Obtaining Installation Media</title>
-        <para> After logging into your SCC account, you can find the installation images provided at
-            the following addresses. Select one and continue reading: </para>
+  <para>
+   After logging into your SCC account, you can find the installation images
+   provided at the following addresses. Select one and continue reading:
+  </para>
 
-        <note>
-            <title>Just Enough Operating System (JeOS) vs. Full Media Image</title>
-            <para> The SLES 12 JeOS image provides the quickest route for setup of a test
-                environment. The JeOS image total size is about 240 MB. The alternative would be the
-                3 GB &sls; 12 DVD image. Both installation media are appropriate, but depend upon
-                available bandwidth or your application needs. Both methods of installation will be
-                covered in this guide. </para>
-        </note>
+  <note>
+   <title>Just Enough Operating System (JeOS) vs. Full Media Image</title>
+   <para>
+    The SLES 12 JeOS image provides the quickest route for setup of a test
+    environment. The JeOS image total size is about 240 MB. The alternative
+    would be the 3 GB &sls; 12 DVD image. Both installation media are
+    appropriate, but depend upon available bandwidth or your application needs.
+    Both methods of installation will be covered in this guide.
+   </para>
+  </note>
 
-        <itemizedlist>
-            <listitem>
-                <para>Just Enough Operating System (JeOS) 240 MB <link
+  <itemizedlist>
+   <listitem>
+    <para>
+     Just Enough Operating System (JeOS) 240 MB
+     <link
                         xlink:href="https://www.suse.com/products/server/jeos/"/>
-                </para>
-            </listitem>
-            <listitem>
-                <para>SLES 12 DVD image 3 GB <link
-                        xlink:href="https://www.suse.com/products/server/download/"/></para>
-            </listitem>
-        </itemizedlist>
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     SLES 12 DVD image 3 GB
+     <link
+                        xlink:href="https://www.suse.com/products/server/download/"/>
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <sect1 xml:id="quickstart.sect.software.requirements">
+  <title>Hardware Requirements</title>
 
-    </sect1>
+  <para>
+   Review the following table for &susemgr; hardware and software requirements.
+   For installation on &zsystems;, see
+   <xref linkend="art.suma.install.zsystems"/>.
+  </para>
 
-    <sect1 xml:id="quickstart.sect.software.requirements">
-        <title>Hardware Requirements</title>
-        <para>Review the following table for &susemgr; hardware and software requirements. For
-            installation on &zsystems;, see <xref linkend="art.suma.install.zsystems"/>. </para>
-        <informaltable>
-            <tgroup cols="2">
-                <colspec colname="c1" colwidth="1*"/>
-                <colspec colname="c2" colwidth="4*"/>
-                <thead>
-                    <row>
-                        <entry>
-                            <para>Hardware</para>
-                        </entry>
-                        <entry>
-                            <para>Recommended</para>
-                        </entry>
+  <informaltable>
+   <tgroup cols="2">
+    <colspec colname="c1" colwidth="1*"/>
+    <colspec colname="c2" colwidth="4*"/>
+    <thead>
+     <row>
+      <entry>
+       <para>
+        Hardware
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Recommended
+       </para>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        CPU
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Multi-core 64-bit CPU (x86_64)
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        RAM
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Minimum 4&nbsp;GB+ for test server
+       </para>
+       <para>
+        Minimum 16&nbsp;GB+ for base installation
+       </para>
+       <para>
+        Minimum 32&nbsp;GB+ for a production server
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Free Disk Space
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Minimum 100&nbsp;GB for root partition
+       </para>
+       <para>
+        <emphasis>For the purposes of this guide the default JeOS root
+        partition size of 24 GB will be sufficient</emphasis>
+       </para>
+       <para>
+        Minimum 50&nbsp;GB for <filename>/var/lib/pgsql</filename>
+       </para>
+       <para>
+        Minimum 50&nbsp;GB per SUSE product + 100 GB per Red Hat product
+        <filename>/var/spacewalk</filename>
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </informaltable>
+ </sect1>
+ <sect1 xml:id="mgr.supported.client.systems">
+  <title>Supported Client Systems</title>
 
-                    </row>
-                </thead>
-                <tbody>
-                    <row>
-                        <entry>
-                            <para> CPU </para>
-                        </entry>
-                        <entry>
-                            <para> Multi-core 64-bit CPU (x86_64)</para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> RAM </para>
-                        </entry>
-                        <entry>
-                            <para>Minimum 4&nbsp;GB+ for test server</para>
-                            <para>Minimum 16&nbsp;GB+ for base installation </para>
-                            <para>Minimum 32&nbsp;GB+ for a production server</para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> Free Disk Space </para>
-                        </entry>
-                        <entry>
-                            <para>Minimum 100&nbsp;GB for root partition</para>
-                            <para><emphasis>For the purposes of this guide the default JeOS root
-                                    partition size of 24 GB will be sufficient</emphasis></para>
-                            <para>Minimum 50&nbsp;GB for <filename>/var/lib/pgsql</filename></para>
-                            <para>Minimum 50&nbsp;GB per SUSE product + 100 GB per Red Hat product
-                                    <filename>/var/spacewalk</filename></para>
-                        </entry>
-                    </row>
-                </tbody>
-            </tgroup>
-        </informaltable>
-    </sect1>
-    <sect1 xml:id="mgr.supported.client.systems">
-        <title>Supported Client Systems</title>
+  <para>
+   Clients with the following operating systems are supported for registration
+   with &susemgr;. If you plan on using the new Salt features, ensure your
+   clients are supported.
+  </para>
 
+  <note>
+   <title>&sle; 11 Support</title>
+   <para>
+    &sle; 11 clients supported only with LTSS, unless using &sle; 11 SP4
+    which is still provided with general support.
+   </para>
+  </note>
 
-        <para> Clients with the following operating systems are supported for registration with
-            &susemgr;. If you plan on using the new Salt features, ensure your clients are
-            supported.</para>
-        <note>
-            <title>&sle; 11 Support</title>
-            <para>&sle; 11 clients supported only with LTSS, unless using &sle; 11 SP4 which is
-                still provided with general support.</para>
-        </note>
-        <informaltable>
-            <tgroup cols="4">
-                <colspec colname="c1"/>
-                <colspec colname="c2"/>
-                <colspec colname="c3"/>
-                <colspec colname="c4"/>
-                <thead>
-                    <row>
-                        <entry>
-                            <para>Operating Systems</para>
-                        </entry>
-                        <entry>
-                            <para>Architecture</para>
-                        </entry>
-                        <entry>
-                            <para>Traditional Clients</para>
-                        </entry>
-                        <entry>
-                            <para>Salt Clients</para>
-                        </entry>
-                    </row>
-                </thead>
-                <tbody>
+  <informaltable>
+   <tgroup cols="4">
+    <colspec colname="c1"/>
+    <colspec colname="c2"/>
+    <colspec colname="c3"/>
+    <colspec colname="c4"/>
+    <thead>
+     <row>
+      <entry>
+       <para>
+        Operating Systems
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Architecture
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Traditional Clients
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Salt Clients
+       </para>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        &sle; 11 SP4 LTSS
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64, &ipf;, IBM &ppc;, &zseries;
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &sle; 12 SP1, SP2
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;_64, IBM &power; (&ppc64le;), &zseries;
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &rhel; 5
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Unsupported
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &rhel; 6
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        &rhel; 7
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Novell Open Enterprise Server 11, SP1, SP2, SP3 LTSS
+       </para>
+      </entry>
+      <entry>
+       <para>
+        &x86;, &x86;_64
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Supported
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Coming Soon
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </informaltable>
+ </sect1>
+ <sect1 xml:id="mgr.additional.requirements">
+  <title>Additional Requirements</title>
 
-                    <row>
-                        <entry>
-                            <para> &sle; 11 SP4 LTSS </para>
-                        </entry>
-                        <entry>
-                            <para> &x86;, &x86;_64, &ipf;, IBM &ppc;, &zseries; </para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> &sle; 12 SP1, SP2 </para>
-                        </entry>
-                        <entry>
-                            <para> &x86;_64, IBM &power; (&ppc64le;), &zseries; </para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> &rhel; 5 </para>
-                        </entry>
-                        <entry>
-                            <para> &x86;, &x86;_64 </para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                        <entry>
-                            <para>Unsupported</para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> &rhel; 6 </para>
-                        </entry>
-                        <entry>
-                            <para> &x86;, &x86;_64 </para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> &rhel; 7 </para>
-                        </entry>
-                        <entry>
-                            <para> &x86;, &x86;_64 </para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                        <entry>
-                            <para>Supported</para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> Novell Open Enterprise Server 11, SP1, SP2, SP3 LTSS </para>
-                        </entry>
-                        <entry>
-                            <para> &x86;, &x86;_64 </para>
-                        </entry>
-                        <entry><para>Supported</para></entry>
-                        <entry><para>Coming Soon</para></entry>
-                    </row>
-                </tbody>
-            </tgroup>
-        </informaltable>
+  <para>
+   To successfully complete this guide some network requirements must be met.
+   The following section will walk you through these requirements.
+  </para>
 
-    </sect1>
-    <sect1 xml:id="mgr.additional.requirements">
-        <title>Additional Requirements</title>
-        <para>To successfully complete this guide some network requirements must be met. The
-            following section will walk you through these requirements.</para>
+  <formalpara>
+   <title>Fully Qualified Domain Name (FQDN):</title>
+   <para>
+    The &susemgr; server must resolve its FQDN correctly or cookies will not
+    work properly on the &webui;. For more information on FQDN, see:
+   </para>
+  </formalpara>
 
-        <formalpara>
-            <title>Fully Qualified Domain Name (FQDN):</title>
-            <para>The &susemgr; server must resolve its FQDN correctly or cookies will not work
-                properly on the &webui;. For more information on FQDN, see:</para>
-        </formalpara>
-        <itemizedlist>
-            <listitem>
-                <para><link
+  <itemizedlist>
+   <listitem>
+    <para>
+     <link
                         xlink:href="https://www.suse.com/documentation/sles-12/book_sle_admin/data/sec_basicnet_yast.html#sec_basicnet_yast_change_host"
-                    /></para>
-            </listitem>
-        </itemizedlist>
-        <formalpara>
-            <title>Hostname and IP Address:</title>
-            <para>To ensure that &susemgr;'s domain name can be resolved by its clients, both server
-                and client machines must be connected to a working Domain Name System (DNS) server.
-                This guide assumes the required infrastructure exists within your environment. For
-                more information on setting up a (DNS) server, see:</para>
-        </formalpara>
+                    />
+    </para>
+   </listitem>
+  </itemizedlist>
 
-        <formalpara>
-            <title>Using a Proxy When Installing from &sle; Media</title>
-            <para>If you are on an internal network and do not have access to &scc;, you can setup
-                and use a proxy during a &sle; installation. For more information on configuring a
-                proxy for access to &scc; during a &sle; installation see:<link
+  <formalpara>
+   <title>Hostname and IP Address:</title>
+   <para>
+    To ensure that &susemgr;'s domain name can be resolved by its clients, both
+    server and client machines must be connected to a working Domain Name
+    System (DNS) server. This guide assumes the required infrastructure exists
+    within your environment. For more information on setting up a (DNS) server,
+    see:
+   </para>
+  </formalpara>
+
+  <formalpara>
+   <title>Using a Proxy When Installing from &sle; Media</title>
+   <para>
+    If you are on an internal network and do not have access to &scc;, you can
+    setup and use a proxy during a &sle; installation. For more information on
+    configuring a proxy for access to &scc; during a &sle; installation
+    see:<link
                     xlink:href="https://www.suse.com/documentation/sled-12/singlehtml/book_sle_deployment/book_sle_deployment.html#sec.i.yast2.start.parameters.proxy"
-                /></para>
-        </formalpara>
-        <itemizedlist>
-            <listitem>
-                <para>
-                    <link
+                />
+   </para>
+  </formalpara>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     <link
                         xlink:href="https://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_dns.html"
-                    /></para>
-            </listitem>
-        </itemizedlist>
-        <important>
-            <title>Naming Your Server</title>
-            <para>The hostname of &susemgr; must not contain uppercase letters as this may cause
-                    <systemitem>jabberd</systemitem> to fail. Choose the hostname of your &susemgr;
-                server carefully. Although changing the server name is possible, it is a complex
-                process and unsupported.</para>
-        </important>
+                    />
+    </para>
+   </listitem>
+  </itemizedlist>
 
-        <para>For a more complete overview on &susemgr; requirements not covered in this guide, see
-                <xref linkend="mgr.conceptual.overview"/>.</para>
+  <important>
+   <title>Naming Your Server</title>
+   <para>
+    The hostname of &susemgr; must not contain uppercase letters as this may
+    cause <systemitem>jabberd</systemitem> to fail. Choose the hostname of your
+    &susemgr; server carefully. Although changing the server name is possible,
+    it is a complex process and unsupported.
+   </para>
+  </important>
 
-    </sect1>
+  <para>
+   For a more complete overview on &susemgr; requirements not covered in this
+   guide, see <xref linkend="mgr.conceptual.overview"/>.
+  </para>
+ </sect1>
+ <sect1>
+  <title>Firewall Rules</title>
 
-    <sect1>
-        <title>Firewall Rules</title>
-        <para>In a production environment &susemgr; server and its clients should always utilize
-            firewall rules. The following table provides an overview of required ports for use by
-            &susemgr; 3. Alternatively you may wish to disable the firewall during
-            evaluation.</para>
+  <para>
+   In a production environment &susemgr; server and its clients should always
+   utilize firewall rules. The following table provides an overview of required
+   ports for use by &susemgr; 3.1.
+  </para>
 
-        <table xml:id="tab.install.ports.server1">
-            <title>Required Server Ports</title>
-            <tgroup cols="2">
-                <colspec colwidth="10*"/>
-                <colspec colwidth="90*"/>
-                <thead>
-                    <row>
-                        <entry>
-                            <para> Port </para>
-                        </entry>
-                        <entry>
-                            <para>Description</para>
-                        </entry>
-                    </row>
-                </thead>
-                <tbody>
-                    <row>
-                        <entry>
-                            <para> 67 </para>
-                        </entry>
+  <para>
+   Traditional client systems connect to &susemgr; via port 443.
+<!-- , and 4545 (if monitoring is enabled). -->
+   In addition, enabling push actions from &susemgr; to client systems,
+<!-- as described in
+           <xref linkend="s1-maintenance-push-clients"/>, -->
+   requires inbound connections on port 5222. If &susemgr; will also push to a
+   &susemgr; proxy, you must allow inbound connections on port 5269.
+  </para>
 
-
-                        <entry>
-                            <para> Required when &susemgr; is configured as a DHCP server for
-                                systems requesting IP addresses. </para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> 69 </para>
-                        </entry>
-                        <entry>
-                            <para> Used when &susemgr; is configured as a PXE server and allows
-                                installation and re-installation of PXE-boot enabled systems.
-                            </para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> 80 </para>
-                        </entry>
-                        <entry>
-                            <para>Used to contact &scc;. All &webui;, client, and proxy server
-                                requests travel via http or https. </para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> 443 </para>
-                        </entry>
-                        <entry>
-                            <para> All &webui;, client, and proxy server requests via http or https
-                                and &susemgr; uses this port for &scc; inbound traffic. </para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> 5222 </para>
-                        </entry>
-                        <entry>
-                            <para>When you wish to push actions to clients this port is required by
-                                the <systemitem>osad</systemitem> daemon running on your client
-                                systems. </para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry>
-                            <para> 5269 </para>
-                        </entry>
-                        <entry>
-                            <para> Needed if you push actions to or via a &susemgrproxy;. </para>
-                        </entry>
-                    </row>
-                    <row>
-                        <entry><para>4505</para></entry>
-                        <entry><para>Required by the Salt-master for communication via TCP to
-                                minions.</para></entry>
-                    </row>
-                    <row>
-                        <entry><para>4506</para></entry>
-                        <entry><para>Required by the Salt-master for communication via TCP to
-                                minions.</para></entry>
-                    </row>
-                </tbody>
-            </tgroup>
-        </table>
-
-    </sect1>
-
+  <table xml:id="tab.install.ports.server1">
+   <title>Required Ports on &susemgr; Server</title>
+   <tgroup cols="3">
+    <colspec colwidth="20*"/>
+    <colspec colwidth="20*"/>
+    <colspec colwidth="60*"/>
+    <thead>
+     <row>
+      <entry>
+       <para>
+        Port
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Direction
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Reason
+       </para>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        67
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Inbound
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Required when configured as a DHCP server for systems requesting IP
+        addresses.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        69
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Inbound
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Used when configured as a PXE server and allows installation and
+        re-installation of PXE-boot enabled systems.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        80
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Outbound
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Used to contact &scc;.
+       </para>
+<!--
+          <para>
+           &susemgr; server uses this port to reach &ncc;
+           <remark role="footnote">FIXME:
+          RHN's list of hosts are as follows:rhn.redhat.com, xmlrpc.rhn.redhat.com, satellite.rhn.redhat.com, content-xmlrpc.rhn.redhat.com, content-web.rhn.redhat.com, and content-satellite.rhn.redhat.com</remark>
+          </para>
+          -->
+      </entry>
+     </row>
+<!--
+            <row>
+         <entry>
+          <para>
+           80
+          </para>
+         </entry>
+         <entry>
+          <para>
+           Inbound
+          </para>
+         </entry>
+         <entry>
+          <para>
+           WebUI, client, and proxy server requests come in via either http
+           or https.
+          </para>
+         </entry>
+         </row>
+         -->
+     <row>
+      <entry>
+       <para>
+        443
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Inbound
+       </para>
+      </entry>
+      <entry>
+       <para>
+        All &webui;, traditional client, and proxy server requests and
+        &susemgr; uses this port for &scc; inbound traffic.
+       </para>
+      </entry>
+     </row>
+<!--
+        <row>
+         <entry>
+          <para>
+           443
+          </para>
+         </entry>
+         <entry>
+          <para>
+           Outbound
+          </para>
+         </entry>
+         <entry>
+          <para>
+           &susemgr; uses this port to reach &ncc;
+           <remark role="footnote">FIXME:
+          RHN's list of hosts are as follows:rhn.redhat.com, xmlrpc.rhn.redhat.com, satellite.rhn.redhat.com, content-xmlrpc.rhn.redhat.com, content-web.rhn.redhat.com, and content-satellite.rhn.redhat.com</remark>
+          (unless running in a disconnected mode with &smt;).
+          <!-\- &mdash;as
+           described in <xref linkend="s1-disconnected-setup"/>). -\->
+          </para>
+         </entry>
+        </row>
+        -->
+     <row>
+      <entry>
+       <para>
+        4505
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Inbound
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Required by the Salt-master for communication via TCP to minions.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        4506
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Inbound
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Required by the Salt-master for communication via TCP to minions.
+       </para>
+      </entry>
+     </row>
+<!--
+        <row>
+         <entry>
+          <para>
+           4545
+          </para>
+         </entry>
+         <entry>
+          <para>
+           Outbound
+          </para>
+         </entry>
+         <entry>
+          <para>
+           &susemgr; Monitoring makes connections to
+           <command>rhnmd</command> running on client systems if Monitoring
+           is enabled and probes are configured for registered systems.
+          </para>
+         </entry>
+         </row>
+                    -->
+     <row>
+      <entry>
+       <para>
+        5222
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Inbound
+       </para>
+      </entry>
+      <entry>
+       <para>
+        When you wish to push actions to clients this port is required by the
+        <systemitem>osad</systemitem> daemon running on the client systems.
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        5269
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Inbound/Outbound
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Needed if you push actions to or via a &susemgrproxy;.
+       </para>
+       <para>
+        Needed if you push actions to or via a &susemgrproxy;.
+       </para>
+      </entry>
+     </row>
+<!--       <row>
+        <entry>
+         <para/>
+        </entry>
+       </row>
+-->
+    </tbody>
+   </tgroup>
+  </table>
+ </sect1>
 </chapter>
