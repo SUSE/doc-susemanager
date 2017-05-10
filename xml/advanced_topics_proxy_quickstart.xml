@@ -416,9 +416,13 @@
   </para>
 
 <screen>&prompt.root;cd /root/ssl-build
-&prompt.root;scp root@$RHN_PARENT:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .
-&prompt.root;scp root@$RHN_PARENT:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .
-&prompt.root;scp root@$RHN_PARENT:/root/ssl-build/rhn-ca-openssl.cnf .</screen>
+&prompt.root;scp root@<replaceable>PARENT</replaceable>:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .
+&prompt.root;scp root@<replaceable>PARENT</replaceable>:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .
+&prompt.root;scp root@<replaceable>PARENT</replaceable>:/root/ssl-build/rhn-ca-openssl.cnf .</screen>
+
+  <para>
+    using your &susemgr; server or chained proxy named as <replaceable>PARENT</replaceable>. 
+  </para>
 
   <para>
    Now execute the interactive <command>configure-proxy.sh</command>
@@ -477,7 +481,7 @@
     <listitem>
      <para>
       Answer <literal>N</literal>.  This ensures using the new
-      certificates theat were copied previously from the &susemgr;
+      certificates that were copied previously from the &susemgr;
       server.
      </para>
     </listitem>
@@ -593,13 +597,34 @@
    <guimenu>Proxy</guimenu> subtabs display the respective status information.
   </para>
  </sect1>
- <sect1 xml:id="at.manager.proxy.register.clients">
-  <title>Registering Clients via &susemgrproxy;</title>
+ <sect1 xml:id="at.manager.proxy.register.saltclients">
+  <title>Registering Salt Clients via &susemgrproxy; from web UI</title>
 
   <para>
-   Registering clients via &susemgrproxy; is done almost the same way as
-   registering clients directly with the &susemgr; server. The difference is
-   that you create a bootstrap script on the &susemgrproxy; with a command-line
+    Registering Salt clients via &susemgrproxy; from the web UI is done almost
+    the same way as registering clients directly with the &susemgr; server.
+    The difference is that you specify the name of the proxy in the
+    <guilabel>Proxy</guilabel> drop-box on
+    <menuchoice><guimenu>Salt</guimenu><guimenu>Bootstrapping</guimenu></menuchoice>
+    page.
+  </para>
+
+  <figure>
+   <title>Bootstrapping a Salt Client With a Proxy</title>
+   <mediaobject>
+    <imageobject>
+     <imagedata fileref="proxy-saltbootstrap.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+ </sect1>
+ <sect1 xml:id="at.manager.proxy.register.clients">
+  <title>Registering Clients via &susemgrproxy; with a script</title>
+
+  <para>
+   Registering clients via &susemgrproxy; with a script is done almost the same way
+   as registering clients directly with the &susemgr; server. The difference is
+   that you create the bootstrap script on the &susemgrproxy; with a command-line
    tool. The bootstrap script then deploys all necessary information to the
    clients. The bootstrap script refers some parameters (such as activation
    keys or GPG keys) that depend on your specific setup.
