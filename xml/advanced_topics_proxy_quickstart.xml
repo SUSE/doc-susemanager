@@ -361,30 +361,146 @@
    <title>Running <command>configure-proxy.sh</command></title>
    <para>
     The <command>configure-proxy.sh</command> script will finalize the
-    setup of your &susemgr; proxy.
+    setup of your &susemgrproxy;. The proxy will share some SSL information
+    with the &susemgr; server, so the first step is to copy the
+    certificate and its key from the &susemgr; server. Log in as root
+    on the proxy and enter the following commands:
+    <screen># cd /root/ssl-build
+# scp root@$RHN_PARENT:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .
+# scp root@$RHN_PARENT:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .
+# scp root@$RHN_PARENT:/root/ssl-build/rhn-ca-openssl.cnf .</screen>
    </para>
 
    <para>
-    On the proxy, log in as root and execute the interactive
-    <command>configure-proxy.sh</command> script; answer questions about
-    &susemgr; Parent, CA Chain, Proxy version, Trace back email, Use
-    SSL, HTTP Proxy, and provide input for an SSL certificate. A
-    &susemgr; Parent can be either another proxy server or a &susemgr;
-    server. Configuration input for monitoring follows. Next steps are
-    CA password, whether to create and populate the configuration
-    channel, and the credentials of the &susemgr; server (user name and
-    password).
+    Now execute the interactive <command>configure-proxy.sh</command> script.
+    Pressing Enter key without further input will make the script use the
+    default values between brackets []. Here is some information about
+    the requested values:
+    <variablelist>
+      <varlistentry>
+        <term>SUSE Manager Parent</term>
+        <listitem><para>
+          A &susemgr; parent can be either another proxy server or a
+          &susemgr; server.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>HTTP Proxy</term>
+        <listitem><para>
+          A HTTP proxy enables your &susemgr; proxy to access the web
+          for example in cases where direct access is prohibited by
+          a firewall.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Proxy version to activate</term>
+        <listitem><para>
+          Normally, the correct value (3.0 or 3.1) should be
+          offered as a default.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Traceback email</term>
+        <listitem><para>
+          An email address where to report problems.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Use SSL</term>
+        <listitem><para>
+          For safety reasons, you should answer <userinput>Y</userinput>
+          here.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Do you want to import existing certificates?</term>
+        <listitem><para>
+          Answer <usezrinput>N</userinput> here to pick the new
+          certificates copied previously from the &susemgr; server.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Organization</term>
+        <listitem><para>
+          The next questions are about the characteristics to use
+          for the SSL certificate of the proxy. The organization
+          might be the same organization that was used on the server,
+          unless of course your proxy is not in the same organization
+          as your main server.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Organization Unit</term>
+        <listitem><para>
+          The default value here is the proxy's hostname.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>City</term>
+        <term>State</term>
+        <term>Country code</term>
+        <term>Email</term>
+        <listitem><para>
+          Further information attached to the proxy's certificate.
+          Beware the country code must be made of two upper case
+          letters. For further information on country codes, refer to the online
+          <ulink url="https://www.iso.org/obp/ui/#search">list of alpha-2 codes</ulink>.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Cname aliases (separated by space)</term>
+        <listitem><para>
+          Use this if your proxy server can be accessed through various DNS
+          CNAME aliases. Otherwise it can be left empty.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>CA password</term>
+        <listitem><para>
+          Enter the password that was used for the certificate of your
+          &susemgr; server.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Do you want to use an existing ssh key for proxying ssh-push Salt minions ?</term>
+        <listitem><para>
+          Use this option if you want to reuse a SSH key that was used
+          for ssh-push salt minions on the server.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Create and populate configuration channel rhn_proxy_config_1000010001?</term>
+        <listitem><para>
+          Accept default <userinput>Y</userinput> here.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>SUSE Manager username</term>
+        <term>Password</term>
+        <listitem><para>
+          Use same user name and password as on the &susemgr; server.
+        </para></listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>Activate advertising proxy via SLP?</term>
+        <listitem><para>
+          SLP stands for Service Location Protocol.
+        </para></listitem>
+      </varlistentry>
+     </variablelist>
    </para>
 
     <para>If parts are missing, such as CA key and public certificate, the script prints commands
       that you must execute to integrate the needed files. When the mandatory files are copied,
-      re-run <command>configure-proxy.sh</command>. </para>
+      re-run <command>configure-proxy.sh</command>. Restart the script too if an HTTP error
+      was met during script execution.
+    </para>
 
     <para>
      <command>configure-proxy.sh</command> activates services required
      by &susemgr; Proxy, such as <systemitem>squid</systemitem>,
-     <systemitem>apache2</systemitem>, and
-     <systemitem>jabberd</systemitem>.
+     <systemitem>apache2</systemitem>, <systemitem>salt-broker</systemitem>,
+     and <systemitem>jabberd</systemitem>.
     </para>
 
     <para>
