@@ -283,7 +283,7 @@
   </important>
 
   <procedure xml:id="at.manager.proxy.install.prep">
-   <title>Creating Your First Proxy</title>
+   <title>Registering the Proxy</title>
    <step>
     <para>
      Create an activation key based on the &sle; 12 SP2 base channel. For more
@@ -331,95 +331,125 @@
     <para>
      Register the client with &susemgr; using the new activation key.
     </para>
+   </step>
+   <step>
     <para>
-     On &susemgr; 3.1 and later, no further action is required. The bootstrap
-     process will install and activate the proxy software automatically.
+      Once you have registered your client, direct your browser to the
+      &susemgr; &webui; and login.
     </para>
-    <para>
-     On the previous version 3.0 the following substeps are required:
-    </para>
-    <substeps>
-     <step>
-      <para>
-       Once you have registered your client, direct your browser to the
-       &susemgr; &webui; and login.
-      </para>
-     </step>
-     <step>
-      <para>
+   </step>
+   <step>
+     <para>
        Select the <guimenu>Systems</guimenu> tab and click on your newly
        registered &sle; client system from the <guimenu>Systems
        Overview</guimenu> table.
-      </para>
-     </step>
-     <step>
+     </para>
+    </step>
+    <step>
       <para>
-       On the system's detail page select the <guimenu>Software</guimenu> tab,
-       then <guimenu>Software Channels</guimenu> tab.
+        On the system's detail page select the <guimenu>Software</guimenu> tab,
+        then <guimenu>Software Channels</guimenu> tab.
       </para>
-     </step>
-     <step>
+    </step>
+    <step>
       <para>
        You will see a list of channels to which your client is already
        subscribed to. Select the two unchecked proxy channels which include the
-       <systemitem>SUSE Manager Proxy-3.0-Pool</systemitem> and
-       <systemitem>SUSE-Manager-Proxy-3.0-Updates</systemitem>, then select
+       <systemitem>SUSE Manager Proxy-3.1-Pool</systemitem> and
+       <systemitem>SUSE-Manager-Proxy-3.1-Updates</systemitem>, then select
        <guimenu>Change Subscriptions</guimenu> to continue. This will provide
        the required repositories for the proxy packages from the &susemgr;
        server to the client.
       </para>
-     </step>
-     <step>
-      <para>
-       Select the <guimenu>Software</guimenu>, <guimenu>Packages</guimenu> tab
-       and then <guimenu>Install New Packages</guimenu>.
-      </para>
-     </step>
-     <step>
-      <para>
-       Type <guimenu>patterns</guimenu> within the search field on the
-       <guimenu>Installable Packages</guimenu> page. Select the Proxy pattern
-       and then select <guimenu>Install Selected Packages</guimenu>.
-      </para>
-     </step>
-     <step>
-      <para>
-       On the <guimenu>Confirm Package Install</guimenu> page confirm
-       scheduling the installation.
-      </para>
-     </step>
-    </substeps>
-   </step>
+    </step>
   </procedure>
 
   <para>
-   The Proxy pattern will be installed and the client will be upgraded to a
-   &susemgrproxy;. Finalize the installation with running
-   <command>configure-proxy.sh</command> (see
-   <xref
-     linkend="at.manager.proxy.run.confproxy"/>. Then register your
-   clients against the proxy using a bootstrap script as if it were a &susemgr;
-   server. For more information, see
-   <xref
-     linkend="at.manager.proxy.register.clients"/>.
+   A few more steps are still needed:
+   <itemizedlist>
+     <listitem><para>
+       install <filename>suma_proxy</filename> pattern (see <xref
+       linkend="at.manager.proxy.run.pattern"/>);
+     </para></listitem>
+     <listitem><para>
+       copy SSL certificate and key from server (see <xref
+       linkend="at.manager.proxy.run.copycert"/>);
+     </para></listitem>
+     <listitem><para>
+       run <command>configure-proxy.sh</command> (see <xref
+       linkend="at.manager.proxy.run.confproxy"/>);
+     </para></listitem>
+   </itemizedlist>
+   You will then be able to register your clients against the proxy using
+   the &webui; or a bootstrap script as if it were a &susemgr; server.
+   For more information, see
+   <xref linkend="at.manager.proxy.register.pattern"/>.
   </para>
  </sect1>
- <sect1 xml:id="at.manager.proxy.run.confproxy">
-  <title>Running <command>configure-proxy.sh</command></title>
+ <sect1>
+  <title>Install <filename>suma_proxy</filename> pattern</title>
+
+   <para>
+     Make sure the <filename>suma_proxy</filename> pattern version 2.5.1.3 or
+     later is installed using the following command on the proxy:
+   </para>
+
+<screen>&prompt.root;zypper in -t pattern suma_proxy</screen>
+
+   <para>
+     The new salt-broker service will be automatically started at the end of
+     the package installation. This service forwards the Salt interactions
+     to the SUSE Manager server.
+   </para>
+
+  <note>
+    <title>Proxy Chains</title>
+    <para>It is possible to arrange Salt proxies in a chain. In such a case,
+      the upstream proxy is named <quote>parent</quote>.
+    </para>
+  </note>
+
+  <para>Make sure the proxie's TCP ports <literal>4505</literal> and
+    <literal>4506</literal> are open and that the proxy can reach the SUSE
+    Manager server (or another upstream proxy) on these ports.
+  </para>
+ </sect1>
+ <sect1 xml:id="at.manager.proxy.run.copycert">
+  <title>Copy server certificate and key</title>
 
   <para>
-   The <command>configure-proxy.sh</command> script will finalize the
-   setup of your &susemgrproxy;. The proxy will share some SSL
-   information with the &susemgr; server, so the first step is to copy
-   the certificate and its key from the &susemgr; server. As &rootuser;
-   enter the following commands on the proxy using your &susemgr; server
-   or chained proxy named as <replaceable>PARENT</replaceable>):
+   The proxy will share some SSL information with the &susemgr; server,
+   so the next step is to copy the certificate and its key from the
+   &susemgr; server or the upstream proxy.
+  </para>
+
+  <para>
+   As &rootuser;, enter the following commands
+   on the proxy using your &susemgr; server or chained proxy named
+   as <replaceable>PARENT</replaceable>:
   </para>
 
 <screen>&prompt.root;cd /root/ssl-build
 &prompt.root;scp root@<replaceable>PARENT</replaceable>:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .
 &prompt.root;scp root@<replaceable>PARENT</replaceable>:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .
 &prompt.root;scp root@<replaceable>PARENT</replaceable>:/root/ssl-build/rhn-ca-openssl.cnf .</screen>
+
+  <note>
+    <title>Known Limitation</title>
+    <para>The SUSE Manager Proxy functionality is only supported
+      if the same SSL certificate generated for SUSE Manager Server
+      was used when setting up the Proxy. Using different certificates
+      for Proxies and Server is at the moment not supported.
+    </para>
+   </note>
+ </sect1>
+ <sect1 xml:id="at.manager.proxy.run.confproxy">
+  <title>Running <command>configure-proxy.sh</command></title>
+
+  <para>
+   The <command>configure-proxy.sh</command> script will finalize the
+   setup of your &susemgrproxy;.
+  </para>
 
   <para>
    Now execute the interactive <command>configure-proxy.sh</command>
@@ -595,7 +625,13 @@
   </para>
  </sect1>
  <sect1 xml:id="at.manager.proxy.register.saltclients">
-  <title>Registering Salt Clients via &susemgrproxy; from &webui;</title>
+  <title>Registering Salt Clients via &susemgrproxy;</title>
+
+  <para>
+    Proxy servers may now act as a broker and package cache for Salt minions.
+    These minions can be registered with a bootstrap script like
+    the traditional clients, or directly from the &webui; or the command line.
+  </para>
 
   <para>
     Registering Salt clients via &susemgrproxy; from the &webui; is done almost
@@ -613,15 +649,40 @@
      <imagedata fileref="proxy-saltbootstrap.png" width="80%"/>
     </imageobject>
    </mediaobject>
+
+   <procedure>
+     <title>Register a Salt client through a proxy from command line</title>
+     <step>
+        <para>Instead of the &webui;, you may use the command line to register
+          a minion through a proxy. To do so, add the proxy FQDN as the master
+          in the minions configuration file located at:</para>
+<screen>/etc/salt/minion</screen>
+        <para>or alternatively:</para>
+<screen>/etc/salt/minion.d/&lt;name&gt;.conf</screen>
+     </step>
+     <step>
+        <para>Add the FQDN to the minion file:</para>
+<screen>master: proxy123.example.com</screen>
+        <para>Save and restart the salt-minion service with:</para>
+<screen>systemctl restart salt-minion</screen>
+      </step>
+      <step>
+         <para>On the proxy, accept the new minion key with:</para>
+<screen># salt-key -a 'minion'</screen>
+         <para>The minion will now connect to the proxy exclusively for Salt operations and
+           normal HTTP package downloads.</para>
+      </step>
+    </procedure>
   </figure>
  </sect1>
  <sect1 xml:id="at.manager.proxy.register.clients">
   <title>Registering Clients via &susemgrproxy; with a Script</title>
 
   <para>
-   Registering clients via &susemgrproxy; with a script is done almost the same way
-   as registering clients directly with the &susemgr; server. The difference is
-   that you create the bootstrap script on the &susemgrproxy; with a command-line
+   Registering clients (either traditional or Salt) via &susemgrproxy; with a
+   script is done almost the same way as registering clients directly with
+   the &susemgr; server. The difference is that you create the bootstrap script
+   on the &susemgrproxy; with a command-line
    tool. The bootstrap script then deploys all necessary information to the
    clients. The bootstrap script refers some parameters (such as activation
    keys or GPG keys) that depend on your specific setup.
@@ -637,15 +698,21 @@
    <step>
     <para>
      On the proxy, execute the <command>mgr-bootstrap</command> command-line
-     tool as &rootuser;. If needed, edit the resulting bootstrap script or
-     optionally use the additional command-line switches to add data to your
-     bootstrap script. To view available options type <command>mgr-bootstrap
+     tool as &rootuser;.
+     If needed, use the additional command-line switches to tune your
+     bootstrap script. An important option is <command>--traditional</command>
+     that enables to opt for a traditional client instead of a salt minion.
+    </para>
+
+    <para>
+     To view available options type <command>mgr-bootstrap
      --help</command> from the command line:
     </para>
 <screen><prompt># </prompt><command>mgr-bootstrap --activation-keys=<replaceable>key-string</replaceable></command></screen>
    </step>
    <step>
     <para>
+     Optionally edit the resulting bootstrap script.
      Execute the bootstrap script on the clients as described in
      <xref linkend="connect.first.client"/>.
     </para>
@@ -656,6 +723,23 @@
    The clients are registered with the &susemgrproxy; specified in the
    bootstrap script.
   </para>
+ </sect1>
+ <sect1>
+   <title>Additional Information about Client Registration on Proxies</title>
+
+   <para>Within the &webui;, standard proxy pages will show information
+     about client, no matter whether minions or traditional clients. </para>
+
+   <para>A list of clients connected to a proxy can be located under
+     <guimenu>Systems</guimenu> &lt;proxy name&gt; <guimenu>Details</guimenu>
+     <guimenu>Proxy</guimenu>. </para>
+
+   <para>A list of chained proxies for a minion can be located under
+     <guimenu>Systems</guimenu> &lt;minion name&gt; <guimenu>Details</guimenu>
+     <guimenu>Connection</guimenu></para>
+
+   <para>If you decide to move any of your clients between proxies or the
+     server you will need to repeat the registration process from scratch.</para>
  </sect1>
  <sect1 xml:id="advanced.topics.proxy.pxe">
   <title>Enabling PXE Boot via &susemgrproxy;</title>
