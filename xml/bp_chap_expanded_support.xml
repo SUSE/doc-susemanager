@@ -402,7 +402,52 @@ GPG key Fingerprint: C1DA C52D 1664 E8A4 386D BA43 0946 FCA2 C105 B9DE</screen>
 
         <sect2>
             <title>Registering CentOS salt-minions with SUSE Manager</title>
-            <para/>
+            <para>The following procedure will guide you through registering a CentOS Minion.</para>
+            <warning>
+                <title>Support for CentOS Patches</title>
+                <para>Warning: CentOS utilizing patches originating from CentOS is not officially
+                    supported by SUSE. Please reference the matrix of SUMA clients on the main page
+                    of the SUSE Manager wiki.<link
+                        xlink:href="https://wiki.microfocus.com/images/e/eb/SUMA3-client-matrix-20170509.png"
+                    /></para>
+            </warning>
+            <procedure>
+                <title>Register a CentOS 7 Minion</title>
+                <step>
+                    <para>Add the Open Build Service repo for Salt:</para>
+                    <screen>yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/</screen>
+                </step>
+                <step>
+                    <para>Import the repo key:</para>
+                    <screen>rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key</screen>
+                </step>
+                <step>
+                    <para>Check if there's any other repo that contains Salt. If there's only one
+                        repo listed then you're fine. If not disable any other repo that contains
+                        Salt apart from the OBS one.</para>
+                    <screen>yum list --showduplicates salt</screen>
+                </step>
+                <step>
+                    <para>Install the Salt minion:</para>
+                    <screen>yum install salt salt-minion</screen>
+                </step>
+                <step>
+                    <para>Change the Salt configuration to point to the Suse Manager server:</para>
+                    <screen>mkdir -p /etc/salt/minion.d
+echo "master: &lt;server fqdn&gt;" &gt; /etc/salt/minion.d/susemanager.conf</screen>
+                </step>
+                <step>
+                    <para>Restart the minion</para>
+                    <screen>systemctl restart salt-minion</screen>
+                </step>
+                <step>
+                    <para>Proceed to <menuchoice>
+                            <guimenu>Salt</guimenu>
+                            <guimenu>Onboarding</guimenu>
+                        </menuchoice> from the WebUI and accept the minion key.</para>
+                </step>
+            </procedure>
+
         </sect2>
 
     </sect1>

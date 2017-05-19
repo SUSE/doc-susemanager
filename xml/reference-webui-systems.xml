@@ -4054,8 +4054,8 @@ will not be removed.
     </imageobject>
    </mediaobject>
   </informalfigure>
-  <para>All elements of the network tree are selectable.  Clicking on any element in the tree opens
-   a detailed box containing information about the selected system/systems and will be displayed in
+  <para>All elements of the network tree are selectable. Clicking on any element in the tree opens a
+   detailed box containing information about the selected system/systems and will be displayed in
    the top-right of the visualization area. </para>
   <informalfigure>
    <mediaobject>
@@ -4794,16 +4794,167 @@ will not be removed.
    -->
  </sect1>
  <xi:include href="reference-webui-systems-autoinstallation.xml" parse="xml"/>
- <!-- z: ==  ref.webui.systems.crashes -->
+ <!-- z: ==  ref.webui.systems.crashes
+  Currently this page is non functional and not supported by suse. Software only works with packages shipped by RHN and would require porting.
  <sect1 xml:id="ref.webui.systems.crashes">
   <title>Software Crashes</title>
   <para/>
  </sect1>
+-->
  <!-- z: ==  ref.webui.systems.virt-host-managers -->
  <sect1 xml:id="ref.webui.systems.virt-host-managers">
   <title>Virtual Host Managers</title>
-  <para> Listing of Virtual Host Managers. </para>
-  <para> Click <guimenu>Add VMware-based Virtual Host Manager</guimenu> or <guimenu>Add File-based
-    Virtual Host Manager</guimenu> to add a Virtual Host Manager. </para>
+
+  <para>Third party hypervisors and hypervisor managers such as VMWare vCenter are called
+    <quote>Virtual Host Managers</quote> (VHM) within &susemgr;. These managers are able to manage
+   one or multiple virtual hosts, which in turn may contain virtual guests. &susemgr; ships with a
+   tool called <command>virtual-host-gatherer</command> that can connect to VHMs using their API,
+   and request information about virtual hosts. This tool is automatically invoked via Taskomatic
+   nightly, therefore you need to configure your VHMs via XMLRPC APIs.
+    <command>virtual-host-gatherer</command> maintains the concept of optional modules, where each
+   module enables a specific Virtual Host Manager.</para>
+
+  <para>Proceed to <menuchoice>
+    <guimenu>Systems</guimenu>
+    <guimenu>Virtual Host Managers</guimenu>
+   </menuchoice> page in the WebUI to begin working with a Virtual Host Manager. In the upper right
+   you can select either <guimenu>Add VMware-based Virtual Host Manager</guimenu> or <guimenu>Add
+    File-based Virtual Host Manager</guimenu>.</para>
+
+
+  <sect2>
+   <title>VMware-based Virtual Host Manager</title>
+   <para> Click <guimenu>Add VMware-based Virtual Host Manager</guimenu> or <guimenu>Add File-based
+     Virtual Host Manager</guimenu> to add a Virtual Host Manager.</para>
+   <para>Select <guimenu>VMware-based Virtual Host Manager</guimenu> to enter the location of your
+    VMware-based virtual host. Enter a <guimenu>Label</guimenu>, <guimenu>Hostname</guimenu>,
+     <guimenu>Port</guimenu>, <guimenu>Username</guimenu> and <guimenu>Password</guimenu>. Finally
+    click the <guimenu>Add Virtual Host Manager</guimenu> button. For detailed information on
+    working with a VMware based Virtual Host Manager see: <xref
+     linkend="advanced.topics.adding.vmware.esxi.host"/></para>
+
+
+   <informalfigure>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="systems_virtual_host_managers_vmware.png" width="96%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="systems_virtual_host_managers_vmware.png"/>
+     </imageobject>
+    </mediaobject>
+   </informalfigure>
+  </sect2>
+
+
+  <sect2>
+   <title>File Based Virtual Host Manager</title>
+   <para> If you are using an unsupported virtual host manager, you can create and use a file
+    formatted in json containing information about a host and all managed guest machines. Select
+     <guimenu>File Based Virtual Host Manager</guimenu>, then enter a label and URL leading to the
+    location of this file for the <command>virtual-host-gatherer</command>. </para>
+   <informalfigure>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="systems_virtual_host_managers_file.png" width="96%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="systems_virtual_host_managers_file.png"/>
+     </imageobject>
+    </mediaobject>
+   </informalfigure>
+
+
+   <para> The following json example describes how this file should look:</para>
+
+   <screen language="json"><prompt>> </prompt>virtual-host-gatherer --infile infile.json
+{
+    "examplevhost": {
+        "10.11.12.13": {
+            "cpuArch": "x86_64",
+            "cpuDescription": "AMD Opteron(tm) Processor 4386",
+            "cpuMhz": 3092.212727,
+            "cpuVendor": "amd",
+            "hostIdentifier": "'vim.HostSystem:host-182'",
+            "name": "11.11.12.13",
+            "os": "VMware ESXi",
+            "osVersion": "5.5.0",
+            "ramMb": 65512,
+            "totalCpuCores": 16,
+            "totalCpuSockets": 2,
+            "totalCpuThreads": 16,
+            "type": "vmware",
+            "vms": {
+                "vCenter": "564d6d90-459c-2256-8f39-3cb2bd24b7b0"
+            }
+        },
+        "10.11.12.14": {
+            "cpuArch": "x86_64",
+            "cpuDescription": "AMD Opteron(tm) Processor 4386",
+            "cpuMhz": 3092.212639,
+            "cpuVendor": "amd",
+            "hostIdentifier": "'vim.HostSystem:host-183'",
+            "name": "10.11.12.14",
+            "os": "VMware ESXi",
+            "osVersion": "5.5.0",
+            "ramMb": 65512,
+            "totalCpuCores": 16,
+            "totalCpuSockets": 2,
+            "totalCpuThreads": 16,
+            "type": "vmware",
+            "vms": {
+                "49737e0a-c9e6-4ceb-aef8-6a9452f67cb5": "4230c60f-3f98-2a65-f7c3-600b26b79c22",
+                "5a2e4e63-a957-426b-bfa8-4169302e4fdb": "42307b15-1618-0595-01f2-427ffcddd88e",
+                "NSX-gateway": "4230d43e-aafe-38ba-5a9e-3cb67c03a16a",
+                "NSX-l3gateway": "4230b00f-0b21-0e9d-dfde-6c7b06909d5f",
+                "NSX-service": "4230e924-b714-198b-348b-25de01482fd9"
+            }
+        }
+    }
+}</screen>
+   <para> For more information, see the man page on your &susemgr; server for
+     <command>virtual-host-gatherer</command>: </para>
+   <screen><prompt> ></prompt>man virtual-host-gatherer</screen>
+  </sect2>
+
+
+  <sect2>
+   <title>Configuring Virtual Host Managers via XMLRPC API</title>
+   <para> The following APIs allow you to get a list of available
+     <command>virtual-host-manager</command> modules and the parameters they require: </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      <literal>virtualhostmanager.listAvailableVirtualHostGathererModules(session)</literal>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <literal>virtualhostmanager.getModuleParameters(session, moduleName)</literal>
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>The following APIs allow you to create and delete VHMs. Take care that the module parameter
+    map must match the map returned by <literal>virtualhostmanager.getModuleParameters</literal> to
+    work correctly:</para>
+   <itemizedlist>
+    <listitem>
+     <para><literal>virtualhostmanager.create(session, label, moduleName,
+      parameters)</literal></para>
+    </listitem>
+    <listitem>
+     <para><literal>virtualhostmanager.delete(session, label)</literal></para>
+    </listitem>
+   </itemizedlist>
+   <para> The following APIs return information about configured VHMs:</para>
+   <itemizedlist>
+    <listitem>
+     <para><literal>virtualhostmanager.listVirtualHostManagers(session)</literal></para>
+    </listitem>
+    <listitem>
+     <para><literal>virtualhostmanager.getDetail(session, label)</literal></para>
+    </listitem>
+   </itemizedlist>
+  </sect2>
  </sect1>
 </chapter>

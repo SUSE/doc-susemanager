@@ -11,22 +11,22 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="suma.choosing.dist.scheme">
     <title>Managing Your Entitlements</title>
     <para>There are two methods for managing your subscriptions and entitlements. Both methods
-    access &scc; and provide specialized benefits.</para>
+        access &scc; and provide specialized benefits.</para>
     <itemizedlist>
-            <listitem>
-                <para>Directly connecting to &scc; is the recommended default way of managing your
-                    &susemgr; Server.</para>
-            </listitem>
-            <listitem>
-                <para>If you have special network security requirements which do not allow access
-                from your internal network to the internet then you may use a &sle; 12 Server
-                running the Subscription Management Tool (SMT) for maintaining your entitlements.
-                This tool will contact &scc; from a system connected to the external network and
-                obtain updates for your clients which you may then mount on your internal &susemgr;
-                Server. This is the preferred method for managing client systems within a highly
-                secure network infrastructure.</para>
-            </listitem>
-        </itemizedlist>
+        <listitem>
+            <para>Directly connecting to &scc; is the recommended default way of managing your
+                &susemgr; Server.</para>
+        </listitem>
+        <listitem>
+            <para>If you have special network security requirements which do not allow access from
+                your internal network to the internet then you may use a &sle; 12 Server running the
+                Subscription Management Tool (SMT) for maintaining your entitlements. This tool will
+                contact &scc; from a system connected to the external network and obtain updates for
+                your clients which you may then mount on your internal &susemgr; Server. This is the
+                preferred method for managing client systems within a highly secure network
+                infrastructure.</para>
+        </listitem>
+    </itemizedlist>
     <sect1>
         <title> Overview SUSE Customer Center (SCC) </title>
         <para>SUSE Customer Center (SCC) is the central place to manage your purchased SUSE
@@ -74,7 +74,7 @@
             </step>
             <step>
                 <para>Create a "database replacement file" (for example,
-                <filename>/tmp/dbrepl.xml</filename>.</para>
+                        <filename>/tmp/dbrepl.xml</filename>.</para>
                 <screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
             </step>
             <step xml:id="pro.mgr.tool.mount.storage">
@@ -83,16 +83,23 @@
             </step>
             <step>
                 <para>Export the data to the mounted medium:</para>
-<screen>smt-sync --todir /media/disk/
+                <screen>smt-sync --todir /media/disk/
 smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
            --fromlocalsmt -L /var/log/smt/smt-mirror-export.log</screen>
-           <note>
-                        <title>Keeping A Disconnected Server Up-to-date</title>
-                        <para><command>smt-sync</command> also exports your subscription and
-                            entitlement data. To keep SUSE Manager up-to-date with your
-                            subscriptions and entitlements, you must frequently import and export
-                            this data.</para>
-           </note>
+                <important>
+                    <title>Write Permissions for SMT User</title>
+                    <para>The directory being written too must be writeable for the same user as the
+                        smt daemon (user=smt). The smt user setting is defined in
+                            <filename>/etc/smt.conf</filename>. You can check if the correct user is
+                        specified via the following command:</para>
+                    <screen># egrep '^smtUser' /etc/smt.conf</screen>
+                </important>
+                <note>
+                    <title>Keeping A Disconnected Server Up-to-date</title>
+                    <para><command>smt-sync</command> also exports your subscription and entitlement
+                        data. To keep SUSE Manager up-to-date with your subscriptions and
+                        entitlements, you must frequently import and export this data.</para>
+                </note>
             </step>
             <step>
                 <para>Unmount the storage medium and carry it securely to your &susemgr;
@@ -104,44 +111,36 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
         <procedure>
             <title>Updating Your &susemgr; Server from the Storage Medium</title>
             <step>
-                <para>Mount the storage medium on your &susemgr;
-                server (for example, at
-                    <filename>/media/disk</filename>).</para>
+                <para>Mount the storage medium on your &susemgr; server (for example, at
+                        <filename>/media/disk</filename>).</para>
             </step>
             <step>
                 <para>Specify the local path on the &susemgr; server in
-                <literal>/etc/rhn/rhn.conf</literal>:</para>
+                        <literal>/etc/rhn/rhn.conf</literal>:</para>
                 <screen>server.susemanager.fromdir = /media/disk</screen>
-                <para>
-                 This setting is mandatory for &scc; and
-                 <command>mgr-sync</command>.
-                </para>
+                <para> This setting is mandatory for &scc; and <command>mgr-sync</command>. </para>
             </step>
             <step>
-             <para>Restart Tomcat:</para>
-             <!-- bsc#977196 -->
-             <!-- <screen>rctomcat6 restart</screen> -->
-             <screen>systemctl restart tomcat</screen>
+                <para>Restart Tomcat:</para>
+                <!-- bsc#977196 -->
+                <!-- <screen>rctomcat6 restart</screen> -->
+                <screen>systemctl restart tomcat</screen>
             </step>
             <step xml:id="pro.mgr.tool.sync">
-             <para>
-              Before performing another operation on the server execute a full
-              sync:
-             </para>
-             <screen>mgr-sync refresh   # SCC (fromdir in rhn.conf required!)</screen>
+                <para> Before performing another operation on the server execute a full sync: </para>
+                <screen>mgr-sync refresh   # SCC (fromdir in rhn.conf required!)</screen>
             </step>
             <step>
                 <para><command>mgr-sync</command> can now be executed normally:</para>
-<screen>mgr-sync list channels
+                <screen>mgr-sync list channels
 mgr-sync add channel channel-label</screen>
-                    <warning>
-                        <title>Data Corruption</title>
-                        <para>The disk must always be available at the same mount point. To avoid
-                            data corruption, do not trigger a sync, if the storage medium is not
-                            mounted. If you have already added a channel from a local repository
-                            path, you will not be able to change its URL to point to a different
-                            path afterwards.</para>
-                    </warning>
+                <warning>
+                    <title>Data Corruption</title>
+                    <para>The disk must always be available at the same mount point. To avoid data
+                        corruption, do not trigger a sync, if the storage medium is not mounted. If
+                        you have already added a channel from a local repository path, you will not
+                        be able to change its URL to point to a different path afterwards.</para>
+                </warning>
             </step>
         </procedure>
         <para>Up-to-date data is now available on your &susemgr; server and is ready for updating
@@ -155,18 +154,13 @@ mgr-sync add channel channel-label</screen>
                     SMT.</para>
             </step>
             <step>
-             <para>
-              On your SMT system, continue with <xref
-              linkend="pro.mgr.tool.sync"/>.
-             </para>
-             <warning>
-              <title>Data Corruption</title>
-              <para>
-               The storage medium must always be available at the same
-               mount point.  To avoid data corruption, do not trigger a
-               sync if the storage medium is not mounted.
-              </para>
-             </warning>
+                <para> On your SMT system, continue with <xref linkend="pro.mgr.tool.sync"/>. </para>
+                <warning>
+                    <title>Data Corruption</title>
+                    <para> The storage medium must always be available at the same mount point. To
+                        avoid data corruption, do not trigger a sync if the storage medium is not
+                        mounted. </para>
+                </warning>
             </step>
         </procedure>
         <para>This concludes using SMT with &susemgr; &productnumber;.</para>
