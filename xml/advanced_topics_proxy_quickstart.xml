@@ -166,7 +166,15 @@
   </tip>
 
   <formalpara>
-   <title>Additional Requirements</title>
+   <title>SSL Certificate Password</title>
+   <para>
+    For installing the proxy, you need the SSL certificate password
+    entered during the initial installation of &susemgr;.
+   </para>
+  </formalpara>
+
+  <formalpara>
+   <title>Network Requirements</title>
    <para>
     For additional network requirements, see
     <xref
@@ -284,6 +292,14 @@
 
   <procedure xml:id="at.manager.proxy.install.prep">
    <title>Registering the Proxy</title>
+
+   <important>
+    <para>
+     First completly download the channels (&sle; 12 SP2) and then create the
+     activationkey. Only then you can select the correct child channels.
+    </para>
+   </important>
+   
    <step>
     <para>
      Create an activation key based on the &sle; 12 SP2 base channel. For more
@@ -329,9 +345,11 @@
    </step>
    <step>
     <para>
-     Register the client with &susemgr; using the new activation key.
+     Bootstrap the client with the bootstrap script.
     </para>
    </step>
+   <!-- according to MB, the following is now superfluous -->
+   <!--
    <step>
     <para>
       Once you have registered your client, direct your browser to the
@@ -351,6 +369,7 @@
         then <guimenu>Software Channels</guimenu> tab.
       </para>
     </step>
+   -->
     <step>
       <para>
        You will see a list of channels to which your client is already
@@ -368,18 +387,24 @@
    A few more steps are still needed:
   </para>
    <itemizedlist>
-     <listitem><para>
-       install <filename>suma_proxy</filename> pattern (see <xref
-       linkend="at.manager.proxy.run.pattern"/>);
-     </para></listitem>
-     <listitem><para>
-       copy SSL certificate and key from server (see <xref
-       linkend="at.manager.proxy.run.copycert"/>);
-     </para></listitem>
-     <listitem><para>
-       run <command>configure-proxy.sh</command> (see <xref
-       linkend="at.manager.proxy.run.confproxy"/>);
-     </para></listitem>
+    <listitem>
+     <para>
+      install the <filename>suma_proxy</filename> pattern (see <xref
+      linkend="at.manager.proxy.run.pattern"/>);
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      copy the SSL certificate and key from the server (see <xref
+      linkend="at.manager.proxy.run.copycert"/>);
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      run <command>configure-proxy.sh</command> (see <xref
+      linkend="at.manager.proxy.run.confproxy"/>);
+     </para>
+    </listitem>
    </itemizedlist>
    <para>
    You will then be able to register your clients against the proxy using
@@ -389,7 +414,7 @@
   </para>
  </sect1>
  <sect1 xml:id="at.manager.proxy.run.pattern">
-  <title>Install <filename>suma_proxy</filename> pattern</title>
+  <title>Install the <filename>suma_proxy</filename> pattern</title>
 
    <para>
      Make sure the <filename>suma_proxy</filename> pattern version 2.5.1.3 or
@@ -547,6 +572,14 @@
       <link xlink:href="https://www.iso.org/obp/ui/#search">list of alpha-2
       codes</link>.
      </para>
+     <tip>
+      <title>Country Code</title>
+      <para>
+       As the country code enter the country code set during the SUSE
+       Manager installation. For example, if your proxy is in US and
+       your &susemgr; in DE, you must enter DE for the proxy.
+      </para>
+     </tip>
     </listitem>
    </varlistentry>
    <varlistentry>
