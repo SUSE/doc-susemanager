@@ -63,7 +63,9 @@
    reducing bandwidth requirements and accelerating response time.
   </para>
  </sect1>
- <sect1 xml:id="at.manager.proxy.requirements">
+ <sect1 xml:id="at.manager.proxy.inst_and_clients">
+  <title>Proxy Installation and Connecting Clients</title>
+  <sect2 xml:id="at.manager.proxy.requirements">
   <title>Requirements</title>
 
   <para>
@@ -272,8 +274,8 @@
     </para>
    </listitem>
   </itemizedlist>
- </sect1>
- <sect1 xml:id="at.manager.proxy.inst">
+ </sect2>
+ <sect2 xml:id="at.manager.proxy.inst">
   <title>Installation and Setup</title>
 
   <para>
@@ -412,8 +414,8 @@
    For more information, see
    <xref linkend="at.manager.proxy.register.saltclients"/>.
   </para>
- </sect1>
- <sect1 xml:id="at.manager.proxy.run.pattern">
+ </sect2>
+ <sect2 xml:id="at.manager.proxy.run.pattern">
   <title>Install the <filename>suma_proxy</filename> pattern</title>
 
    <para>
@@ -440,9 +442,9 @@
     <literal>4506</literal> are open and that the proxy can reach the SUSE
     Manager server (or another upstream proxy) on these ports.
   </para>
- </sect1>
- <sect1 xml:id="at.manager.proxy.run.copycert">
-  <title>Copy server certificate and key</title>
+ </sect2>
+ <sect2 xml:id="at.manager.proxy.run.copycert">
+  <title>Copy Server Certificate and Key</title>
 
   <para>
    The proxy will share some SSL information with the &susemgr; server,
@@ -469,8 +471,8 @@
       for Proxies and Server is at the moment not supported.
     </para>
    </note>
- </sect1>
- <sect1 xml:id="at.manager.proxy.run.confproxy">
+ </sect2>
+ <sect2 xml:id="at.manager.proxy.run.confproxy">
   <title>Running <command>configure-proxy.sh</command></title>
 
   <para>
@@ -659,8 +661,8 @@
    then the system name). <guimenu>Connection</guimenu> and
    <guimenu>Proxy</guimenu> subtabs display the respective status information.
   </para>
- </sect1>
- <sect1 xml:id="at.manager.proxy.register.saltclients">
+ </sect2>
+ <sect2 xml:id="at.manager.proxy.register.saltclients">
   <title>Registering Salt Clients via &susemgrproxy;</title>
 
   <para>
@@ -710,8 +712,8 @@
       </step>
     </procedure>
 
- </sect1>
- <sect1 xml:id="at.manager.proxy.register.clients">
+ </sect2>
+ <sect2 xml:id="at.manager.proxy.register.clients">
   <title>Registering Clients via &susemgrproxy; with a Script</title>
 
   <para>
@@ -759,8 +761,8 @@
    The clients are registered with the &susemgrproxy; specified in the
    bootstrap script.
   </para>
- </sect1>
- <sect1>
+ </sect2>
+ <sect2>
    <title>Additional Information about Client Registration on Proxies</title>
 
    <para>Within the &webui;, standard proxy pages will show information
@@ -776,6 +778,7 @@
 
    <para>If you decide to move any of your clients between proxies or the
      server you will need to repeat the registration process from scratch.</para>
+ </sect2>
  </sect1>
  <sect1 xml:id="advanced.topics.proxy.pxe">
   <title>Enabling PXE Boot via &susemgrproxy;</title>
@@ -1068,7 +1071,8 @@ filename: "pxelinux.0"</screen>
   <itemizedlist>
    <listitem>
     <para>
-     Existing &susemgr; proxies may be replaced by new ones, see
+     Existing &susemgr; proxies may be replaced by newly installed and
+     reconfigured proxies, see
      <xref
        linkend="advanced.topics.proxy.migration.replace"/>.
     </para>
@@ -1094,23 +1098,70 @@ filename: "pxelinux.0"</screen>
 
    <para>
     In order to replace a &susemgrproxy; and keeping the clients
-    registered to the proxy leave the old proxy in &susemgr;.  You must
-    create a re-activation key for this system and register the new
-    proxy using the re-activation key.  When you remove the old proxy
-    from SUSE Manager, all clients connecting to this proxy, need to be
-    re-registered against the new proxy. This can be prevented and will
-    be discussed in the installation steps.
+    registered to the proxy leave the old proxy in &susemgr;.  Create a
+    reactivation key for this system and then register the new proxy
+    using the reactivation key.  If you do not use the reactivation
+    key, you will need to re-registered all the clients against the new
+    proxy.
    </para>
    
-  <procedure>
-    <title>Replacing a &susemgrproxy;</title>
+  <procedure xml:id="proc.advanced.topics.proxy.migration.replace">
+    <title>Replacing a &susemgrproxy; and Keeping the Clients
+    Registered</title>
+    <!--
+    <step xml:id="step.at.proxy.migration.replace.react">
+     <para>
+      In the &webui;, create a reactivation key for the old proxy
+      system.  For more information, see <xref
+      linkend="s5-sm-system-details-react"/>.
+     </para>
+     </step>
+
+    In the SUSE Manager Server GUI select the new SUSE Manager Proxy Server and delete this system.
+    In the SUSE Manager Server GUI select the previous SUSE Manager Proxy Server and select the tab "Reactivation".
+    Click on "Generate New Key" and write down (or copy in clipboard) the new key.
+    On the new SUSE Manager Proxy enter the following to re-register this system:
+
+rhnreg_ks -\-activationkey=<re-activation key> -\-force
+
+Now all clients behind the previous SUSE Manager Proxy Server can access
+SUSE Manager Server again.
+
+    -->
+    <step>
+     <para>
+      Install a new &susemgr; 3.1 Proxy, see <xref
+      linkend="at.manager.proxy.inst_and_clients"/>.
+     </para>
+    </step>
+
+    <step>
+     <para>
+      In the SUSE Manager &webui; select the newly installed
+      &susemgrproxy; and delete it from the systems list.
+     </para>
+    </step>
+    
+    <step xml:id="step.at.proxy.migration.replace.react">
+     <para>
+      In the &webui;, create a reactivation key for the old proxy
+      system: On the System Details of the old proxy click
+      <guimenu>Reactivation</guimenu>.  Then click <guimenu>Generate New
+      Key</guimenu>, and remember it (write it on a piece of paper or
+      copy it to the clipboard).  For more information about
+      reactivation keys, see <xref
+      linkend="s5-sm-system-details-react"/>.
+     </para>
+    </step>
+    <!--
     <step>
      <para>
       To replace a &susemgrproxy;, delete the system from the &susemgr;
       <guimenu>Systems</guimenu> list. For more information, see
       <xref linkend="s3-sm-system-details"/>.
      </para>
-    </step>
+     </step>
+     -->
     <step>
      <para>
       Shutdown the proxy and install the latest version, see
