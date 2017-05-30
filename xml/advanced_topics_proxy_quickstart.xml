@@ -879,37 +879,136 @@ filename: "pxelinux.0"</screen>
     replacement proxy must have the same name and IP address as its
     predecessor.
    </para>
-   <procedure>
-    <title>Replacing a &susemgrproxy;</title>
+   <para>
+    In order to replace a &susemgrproxy; and keeping the clients
+    registered to the proxy leave the old proxy in &susemgr;.  Create a
+    reactivation key for this system and then register the new proxy
+    using the reactivation key.  If you do not use the reactivation
+    key, you will need to re-registered all the clients against the new
+    proxy.
+   </para>
+
+  <procedure xml:id="proc.advanced.topics.proxy.migration3.replace">
+    <title>Replacing a &susemgrproxy; and Keeping the Clients
+    Registered</title>
+    <step>
+     <para>
+      Before starting the actual migration procedure, save the data from
+      the old proxy, if needed.  Consider copying some information to a central place that can also be accessed by the new server:
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Copy scripts needed.
+        Copy the activation keys from the previous server. Of course it is always better to re-create the keys.
+    Shutdown the server
+       </para>
+      </listitem>
+     </itemizedlist>
+    </step>
+
+    <!--
+    <step xml:id="step.at.proxy.migration3.replace.react">
+     <para>
+      In the &webui;, create a reactivation key for the old proxy
+      system.  For more information, see <xref
+      linkend="s5-sm-system-details-react"/>.
+     </para>
+     </step>
+
+    In the SUSE Manager Server GUI select the new SUSE Manager Proxy Server and delete this system.
+    In the SUSE Manager Server GUI select the previous SUSE Manager Proxy Server and select the tab "Reactivation".
+    Click on "Generate New Key" and write down (or copy in clipboard) the new key.
+    On the new SUSE Manager Proxy enter the following to re-register this system:
+
+rhnreg_ks -\-activationkey=<re-activation key> -\-force
+
+Now all clients behind the previous SUSE Manager Proxy Server can access
+SUSE Manager Server again.
+
+    -->
+    <step>
+     <para>
+      Install a new &susemgr; 3.1 Proxy, see <xref
+      linkend="at.manager.proxy.inst_and_clients"/>.
+     </para>
+    </step>
+
+    <step>
+     <para>
+      In the SUSE Manager &webui; select the newly installed
+      &susemgrproxy; and delete it from the systems list.
+     </para>
+    </step>
+    
+    <step xml:id="step.at.proxy.migration3.replace.react">
+     <para>
+      In the &webui;, create a reactivation key for the old proxy
+      system: On the System Details of the old proxy click
+      <guimenu>Reactivation</guimenu>.  Then click <guimenu>Generate New
+      Key</guimenu>, and remember it (write it on a piece of paper or
+      copy it to the clipboard).  For more information about
+      reactivation keys, see <xref
+      linkend="s5-sm-system-details-react"/>.
+     </para>
+    </step>
+    <!--
     <step>
      <para>
       To replace a &susemgrproxy;, delete the system from the &susemgr;
       <guimenu>Systems</guimenu> list. For more information, see
-      <xref
-       linkend="s3-sm-system-details"/>.
+      <xref linkend="s3-sm-system-details"/>.
      </para>
-    </step>
+     </step>
+    -->
+    <!--
     <step>
      <para>
       Shutdown the proxy and install the latest version, see
-      <xref
-      linkend="at.manager.proxy.inst"/>.
+      <xref linkend="at.manager.proxy.inst"/>.
      </para>
-    </step>
+     </step>
+    -->
+    <!--
     <step>
      <para>
       Complete the registration steps described in
       <xref
-       linkend="at.manager.proxy.install.prep"/>,
+          linkend="at.manager.proxy.install.prep"/>,
       <xref
-       linkend="at.manager.proxy.install.prep.bss"/>. Once you have
-      completed registering the new proxy with the server, utilizing the
+          linkend="at.manager.proxy.install.prep.bss"/>. Once you
+      have completed registering the new proxy with the server, utilizing the
       appropriate channels, and finally having run the
       <command>configure-proxy.sh</command> script, all clients formally
       connected via the older proxy will continue operating as before.
      </para>
+     </step>
+    -->
+    <step>
+    <para>
+     After the installation of the new proxy, perform the following actions (if needed):
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       Copy the centrally saved data to the new proxy system.
+      </para>
+     </listitem>
+    <listitem>
+      <para>
+       Install any other needed software.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+       If the proxy is also used for autoinstallation, do nt forget to
+       setup TFTP synchronization.
+      </para>
+    </listitem>
+    </itemizedlist>
     </step>
-   </procedure>
+  </procedure>
+
    <important>
     <title>Proxy Installation and Client Connections</title>
     <para>
@@ -1105,7 +1204,7 @@ filename: "pxelinux.0"</screen>
     proxy.
    </para>
    
-  <procedure xml:id="proc.advanced.topics.proxy.migration.replace">
+  <procedure xml:id="proc.advanced.topics.proxy.migration21.replace">
     <title>Replacing a &susemgrproxy; and Keeping the Clients
     Registered</title>
     <step>
