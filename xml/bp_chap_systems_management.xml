@@ -38,8 +38,7 @@
    The &susemgr; daemon (<command>rhnsd</command>) runs on client systems and
    periodically connects with &susemgr; to check for new updates and
    notifications. The daemon, which runs in the background, is started by
-   <systemitem>rhnsd.service</systemitem> or the
-   <systemitem>rcrhnsd</systemitem> initialization script. By default, it will
+   <systemitem>rhnsd.service</systemitem>. By default, it will
    check every 4 hours for new actions, therefore it may take some time for
    your clients to begin updating after actions have been scheduled for them.
   </para>
@@ -91,15 +90,14 @@
     This is the configuration file the rhnsd initialization script uses. An
     important parameter for the daemon is its check-in frequency. The default
     interval time is four hours (240 minutes). If you modify the configuration
-    file, you must as &rootuser; restart the daemon with the command
-    <command>systemctl rhnsd restart</command> or
-    <command>rcrhnsd restart</command>.
+    file, you must as &rootuser; restart the daemon with 
+    <command>systemctl rhnsd restart</command>.
    </para>
    <important>
     <title>Minimum Allowed Check-in Parameter</title>
     <para>
      The minimum allowed time interval is one hour (60 minutes). If you set
-     the interval below one hour, it will default back to the default of
+     the interval below one hour, it will change back to the default of
      4 hours (240 minutes).
     </para>
    </important>
@@ -109,7 +107,7 @@
    <title>Viewing rhnsd Daemon Status</title>
    <para>
     You can view the status of rhnsd by typing the command <command>systemctl
-    status rhnsd</command> or <command>rcrhnsd status</command> as &rootuser;.
+    status rhnsd</command> as &rootuser;.
    </para>
   </sect2>
  </sect1>
@@ -384,7 +382,7 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     key to your proxy. This can be achieved by executing the following command
     from the server:
    </para>
-<screen><prompt>#</prompt>mgr-ssh-push-init --client <replaceable>proxy</replaceable></screen>
+<screen>&prompt.root;mgr-ssh-push-init --client <replaceable>proxy</replaceable></screen>
   </sect2>
  </sect1>
  <sect1 xml:id="bp.contact.methods.saltssh.push">
@@ -636,19 +634,20 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
   <para>
    The default contact method between &susemgr; and its clients is
    <systemitem>rhnsd</systemitem>. When using the
-   <systemitem>rhnsd</systemitem> daemon the server will check every 4 hours
-   and then execute a scheduled action on clients. Depending on your network
-   environment <systemitem>rhnsd</systemitem> may not suit your requirements.
-   Alternatively you may configure osad for use with registered client systems
-   enabling immediate execution of scheduled actions. osad consists of three
-   components:
+   <systemitem>rhnsd</systemitem> daemon the server will check every
+   4 hours and then execute a scheduled action on clients. Depending on
+   your network environment <systemitem>rhnsd</systemitem> may not suit
+   your requirements.  Alternatively you may configure
+   <systemitem>osad</systemitem> for use with registered client systems
+   enabling immediate execution of scheduled
+   actions. <systemitem>osad</systemitem> consists of three components:
   </para>
 
   <formalpara>
    <title>osad</title>
    <para>
     A client-side service that responds to pings and runs
-    <systemitem>mgr_check</systemitem> when directed by the
+    <command>mgr_check</command> when directed by the
     <systemitem>osa-dispatcher</systemitem> running on &susemgr;.
    </para>
   </formalpara>
@@ -658,7 +657,7 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
    <para>
     A service running on &susemgr; that checks the database to determine if a
     client running <systemitem>osad</systemitem> needs to be pinged or is
-    required to run <systemitem>mgr_check</systemitem>, then sends a message
+    required to run <command>mgr_check</command>, then sends a message
     telling the client to do so.
    </para>
   </formalpara>
@@ -670,7 +669,7 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     protocol. <systemitem>osad</systemitem> and
     <systemitem>osa-dispatcher</systemitem> both connect to this daemon.
     <systemitem>jabberd</systemitem> also handles authentication when using
-    osad.
+    <systemitem>osad</systemitem>.
    </para>
   </formalpara>
 
@@ -721,8 +720,8 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
      select on the database to check all &susemgr; clients which have actions
      that need to be executed. If an action is found, a message is sent through
      <systemitem>jabberd</systemitem> to <systemitem>osad</systemitem> which
-     then executes <systemitem>mgr_check</systemitem> on the client.
-     <systemitem>mgr_check</systemitem> then takes over performing the actual
+     then executes <command>mgr_check</command> on the client.
+     <command>mgr_check</command> then takes over performing the actual
      action.
     </para>
    </listitem>
@@ -731,15 +730,17 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
   <sect2>
    <title>Configuring and Enabling osad</title>
    <para>
-    The following procedure enables use of osad with &susemgr;.
+    The following procedure enables use of <systemitem>osad</systemitem>
+    with &susemgr;.
    </para>
    <important>
     <title>Enabling SSL</title>
     <para>
      For this communication method to work SSL is mandatory. If SSL
-     certificates are not available, the daemon on your client systems will
-     fail to connect. Make sure your firewall rules allow for the required
-     ports. See:<xref linkend="tab.install.ports.server"/>.
+     certificates are not available, the daemon on your client systems
+     will fail to connect. Make sure your firewall rules allow for the
+     required ports. For more information, see <xref
+     linkend="tab.install.ports.server"/>.
     </para>
    </important>
    <procedure>
@@ -749,7 +750,6 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
       On your &susemgr; server use the following command as &rootuser; to start
       the <systemitem>osa-dispatcher</systemitem> service:
      </para>
-<screen>rcosa-dispatcher start</screen>
 <screen>systemctl start osa-dispatcher</screen>
     </step>
     <step>
@@ -772,17 +772,14 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
     </step>
     <step>
      <para>
-      When osad has been installed, start the service on your client systems. As
-      &rootuser; either enter:
-     </para>
-     <screen>rcosad start</screen>
-     <para>
-      Or:
+      When <systemitem>osad</systemitem> has been installed, start the
+      service on your client systems. As &rootuser; enter:
      </para>
 <screen>systemctl start osad</screen>
      <para>
-      Like other services, rcosa-dispatcher and rcosad accept stop, restart,
-      and status commands as well.
+      Like other services, osa-dispatcher and osad accept
+      <literal>stop</literal>, <literal>restart</literal>, and
+      <literal>status</literal> commands as well.
      </para>
     </step>
    </procedure>
@@ -809,16 +806,16 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
    <formalpara>
     <title>osa-dispatcher</title>
     <para>
-     osa-dispatcher is configured via the <filename>rhn.conf</filename> file
-     located on the &susemgr; at:
+     <systemitem>osa-dispatcher</systemitem> is configured via the
+     <filename>rhn.conf</filename> file located on the &susemgr; at:
     </para>
    </formalpara>
 <screen>/etc/rhn/rhn.conf</screen>
    <para>
-    All parameters for configuring osa-dispatcher are located under the section
+    All parameters for configuring osa-dispatcher are located under this section
     heading:
    </para>
-<screen><replaceable># OSA configuration #</replaceable>.</screen>
+<screen># OSA configuration #</screen>
    <formalpara>
     <title>osad</title>
     <para>
@@ -840,14 +837,12 @@ client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})</scre
    <formalpara>
     <title>jabberd</title>
     <para>
-     Configuration of jabberd goes beyond the scope of this document. The
-     jabberd log file is located at:
+     Configuration of <systemitem>jabberd</systemitem> goes beyond the
+     scope of this document. The <systemitem>jabberd</systemitem> log
+     file is located at:
     </para>
    </formalpara>
 <screen>/var/log/messages</screen>
-   <para>
-    This concludes <systemitem>osad</systemitem> configuration and logging.
-   </para>
   </sect2>
  </sect1>
 </chapter>
