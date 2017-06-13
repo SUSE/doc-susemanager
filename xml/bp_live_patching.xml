@@ -8,112 +8,76 @@
     %entities;
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.live.patching">
- <title>SLE Live Patching</title>
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.live.patching">
+ <title>Live Patching with SUSE Manager</title>
  <sect1>
   <title>Introduction</title>
 
-  <para>
-   Under normal circumstances a system needs to be rebooted after a
-   kernel update. SLE Live Patching allows you skipping the reboot by
-   applying a subset of Linux kernel releases injected via
-   kGraft live patching technology.
-  </para>
+  <para> Under normal circumstances a system needs to be rebooted after a kernel update. SLE Live
+   Patching allows you skipping the reboot by applying a subset of Linux kernel releases injected
+   via kGraft live patching technology. </para>
 
-  <para>
-   The following chapter will guide you through selecting the
-   appropriate patches from a list of available CVE patches and cloning
-   vendor channels using the
-   <command>spacewalk-manage-channel-lifecycle</command> tool into
-   <literal>testing</literal>, <literal>dev</literal>, and
-   <literal>prod</literal> channels. You will learn how to use SLE Live
-   Patching to avoid the typical reboot requirement after updating a
-   system kernel. This chapter provides a good example for maintaining
-   environments using the
-   <command>spacewalk-manage-channel-lifecycle</command> tool.
-  </para>
+  <para> In the following sections you will learn how to use SLE Live Patching to avoid the typical
+   reboot requirement after updating a system kernel.</para>
 
-  <para>
-   For more information about using kGraft, see
-   <link
-       xlink:href="https://www.suse.com/documentation/sles-12/singlehtml/book_sle_admin/book_sle_admin.html#cha.kgraft"
-       />.
-  </para>
+  <para> For in depth information covering kGraft use, see: <link
+    xlink:href="https://www.suse.com/documentation/sles-12/singlehtml/book_sle_admin/book_sle_admin.html#cha.kgraft"
+   />. </para>
  </sect1>
  <sect1>
   <title>Initial Setup Requirements</title>
 
-  <para>
-   To work with SLE Live Patching the following expectations are assumed:
-  </para>
+  <para> To work with SLE Live Patching the following expectations are assumed: </para>
 
   <itemizedlist>
    <listitem>
-    <para>
-     &susemgr; 3.0 or later fully updated.
+    <para> &susemgr; 3.0 or later fully updated. </para>
+   </listitem>
+   <listitem>
+    <para> At least 1 Salt Minion running SLES 12 SP2 and registered with &susemgr;. </para>
+   </listitem>
+   <listitem>
+    <para> The SLES 12 SP2 channel including the SLE Live Patching child channels fully synced.
     </para>
    </listitem>
    <listitem>
-    <para>
-     At least 1 Salt Minion running SLES 12 SP2 and registered with &susemgr;.
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     The SLES 12 SP2 channel including the SLE Live Patching child
-     channel fully synced.
-    </para>
-   </listitem>
-   <listitem>
-    <para>
-     spacewalk-utils package installed on the &susemgr; server:
-    </para>
-<screen>&prompt.root;zypper in spacewalk-utils</screen>
+    <para> spacewalk-utils package installed on the &susemgr; server: </para>
+    <screen>&prompt.root;zypper in spacewalk-utils</screen>
    </listitem>
   </itemizedlist>
  </sect1>
  <sect1>
   <title>Viewing Available CVE's</title>
 
-  <para>
-   The following procedure will guide you through selecting and viewing
-   available CVE Patches (Common Vulnerabilities and Exposures) then applying
-   these kernel updates using the new SLE Live Patching feature. In this example
-   you will use the <command>spacewalk-manage-channel-lifecycle</command> tool
-   to maintain specific channel states for testing, development and production.
-  </para>
+  <para> The following procedure will guide you through selecting and viewing available CVE Patches
+   (Common Vulnerabilities and Exposures) then applying these kernel updates using the new SLE Live
+   Patching feature.</para>
 
   <procedure>
    <step>
-    <para>
-     Select your SLES 12 SP2 minion from the <guimenu>Systems</guimenu> page to
-     view its <guimenu>System Details</guimenu>. Once you have added the SLES 12
-     SP2 Updates vendor child channel to your client, you should see several
-     <literal>Critical</literal> software updates available. Click on
-     <literal>Critical</literal> to see a list of available patches. Select any
-     of these patches listed with the following synopsis: <emphasis>Important:
-     Security update for the Linux kernel</emphasis>. All fixed security bugs
-     will be listed along with their number. For example:(CVE-2016-8666)
-    </para>
+    <para>Select your SLES 12 SP2 minion from the <guimenu>Systems</guimenu> page to view its
+      <guimenu>System Details</guimenu>. Once you have added the SLES 12 SP2 Updates child channel
+     to your client, you should see several <literal>Critical</literal> software updates available.
+     Click on <literal>Critical</literal> to see a list of available patches. Select any of these
+     patches listed with the following synopsis: <emphasis>Important: Security update for the Linux
+      kernel</emphasis>. All fixed security bugs will be listed along with their number. For
+     example:(CVE-2016-8666) </para>
     <important>
      <title>Reboot Icon</title>
-     <para>
-      Normal or non-live kernel patches always require a reboot. In SUSE
-      Manager these are represented by a <literal>Reboot Required</literal>
-      icon located next to the <literal>Security</literal> shield icon.
-     </para>
+     <para> Normal or non-live kernel patches always require a reboot. In SUSE Manager these are
+      represented by a <literal>Reboot Required</literal> icon located next to the
+       <literal>Security</literal> shield icon. </para>
     </important>
    </step>
    <step>
-    <para>
-     You can search for individual CVE's by selecting the
-     <guimenu>Audit</guimenu> tab from the navigation menu. Try searching for
-     <literal>CVE-2016-8666</literal>. You will see that the patch is available
-     in the vendor update channel and the systems it applies to will be listed.
+    <para> You can search for individual CVE's by selecting the <guimenu>Audit</guimenu> tab from
+     the navigation menu. Try searching for <literal>CVE-2016-8666</literal>. You will see that the
+     patch is available in the vendor update channel and the systems it applies to will be listed.
     </para>
    </step>
   </procedure>
- </sect1>
+
+  <!--
  <sect1>
   <title>Cloning Channels</title>
 
@@ -130,7 +94,7 @@
     <para>
      Open a terminal and as root enter:
     </para>
-<screen># spacewalk-manage-channel-lifecycle --list-channels
+<screen># spacewalk-manage-channel-lifecycle -list-channels
 Spacewalk Username: admin
 Spacewalk Password: 
 Channel tree:
@@ -144,13 +108,14 @@ Channel tree:
    </step>
    <step>
     <para>
-     Now use the <emphasis>--init</emphasis> argument to automatically create a
+     Now use the <emphasis>-init</emphasis> argument to automatically create a
      new development clone of the original vendor channel:
     </para>
-<screen>spacewalk-manage-channel-lifecycle --init -c sles12-sp2-pool-x86_64</screen>
+<screen>spacewalk-manage-channel-lifecycle -init -c sles12-sp2-pool-x86_64</screen>
    </step>
   </procedure>
  </sect1>
+ 
  <sect1>
   <title>Removing Kernel Patches</title>
 
@@ -206,7 +171,7 @@ Channel tree:
      Promote and clone the <literal>dev-sles12-sp2-pool-x86_64</literal> to a
      new testing channel:
     </para>
-<screen>&prompt.root;spacewalk-manage-channel-lifecycle --promote -c dev-sles12-sp2-pool-x86_64</screen>
+<screen>&prompt.root;spacewalk-manage-channel-lifecycle -promote -c dev-sles12-sp2-pool-x86_64</screen>
    </step>
    <step>
     <para>
@@ -321,6 +286,9 @@ Channel tree:
     patches are always a subset of the full kernel patches.
    </para>
   </important>
-
+-->
  </sect1>
+
+
+
 </chapter>
