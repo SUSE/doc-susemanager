@@ -149,21 +149,21 @@ Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
             <varlistentry>
                 <term>Custom Formulas</term>
                 <listitem>
-                    <para>Custom formula data or (non-RPM) formulas should be placed in the
-                        following directories:</para>
+                    <para>Custom formula data or (non-RPM) formulas need to be placed into any state
+                        directory configured as a Salt file root:</para>
                     <variablelist>
                         <varlistentry>
                             <term>State directory</term>
                             <listitem>
-                                <para>Custom state formula data should be placed in:</para>
-                                <screen>/srv/salt/custom-locale/</screen>
+                                <para>Custom state formula data need to be placed in:</para>
+                                <screen>/srv/salt/custom/</screen>
                             </listitem>
                         </varlistentry>
                         <varlistentry>
                             <term>Metadata Directory</term>
                             <listitem>
-                                <para>Custom metadata(information) should be placed in:</para>
-                                <screen>/srv/salt/formula_metadata/custom-locale/</screen>
+                                <para>Custom metadata(information) need to be placed in:</para>
+                                <screen>/srv/salt/formula_metadata/custom/</screen>
                             </listitem>
                         </varlistentry>
                     </variablelist>
@@ -171,7 +171,7 @@ Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
             </varlistentry>
         </variablelist>
 
-        <para>All custom folders located in the following directories should contain a
+        <para>All custom folders located in the following directories needs to contain a
                 <literal>form.yml</literal> file. These files are detected as form recipes and may
             be applied to groups and systems from the WebUI:</para>
         <screen>/srv/formula_data/&lt;custom-formula-name&gt;/form.yml</screen>
@@ -186,7 +186,7 @@ Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
         <para>For example the <literal>form.yml</literal> that is included with the locale formula
             is placed in:</para>
         <screen>/usr/share/susemanager/formulas/metadata/locale/form.yml</screen>
-        <para>See the following locale-formula example:</para>
+        <para>See part of the following locale-formula example:</para>
         <screen># This file is part of locale-formula.
 #
 # Foobar is free software: you can redistribute it and/or modify
@@ -272,24 +272,6 @@ timezone:
   hardware_clock_set_to_utc:
     $type: boolean
     $default: True
-
-keyboard_and_language:
-  $type: group
-
-  language:
-    $type: select
-    $values: ["Afrikaans",
-              "Arabic",
-              "Asturian",
-              "Bulgarian",
-              "Bengali",
-              "Bosnian",
-              "Catalan",
-              "Czech",
-              "Welsh",
-              "Danish",
-              "German",
-              "Greek",
 ...</screen>
 
 
@@ -298,8 +280,9 @@ keyboard_and_language:
             attributes that always start with a <literal>$</literal> sign.</para>
         <important>
             <title>Ignored Values</title>
-            <para>All values that start with a <literal>$</literal> sign and are not valid
-                attributes will be ignored.</para>
+            <para>All values that start with a <literal>$</literal> sign are annotations used to
+                display the UI that users interact with. These annotations are not part of pillar
+                data itself and are handled as metadata.</para>
         </important>
         <para>The following are valid attributes.</para>
         <variablelist>
@@ -363,7 +346,7 @@ keyboard_and_language:
                         not generate an editable field and are used to structure form and pillar
                         data. The difference between group and hidden-group is
                             <literal>group</literal> generates a visible border with a heading, and
-                        hidden-group shows nothing visually(and is only used to structure pillar
+                        hidden-group shows nothing visually (and is only used to structure pillar
                         data).</para>
                 </listitem>
             </varlistentry>
@@ -377,7 +360,7 @@ keyboard_and_language:
             </varlistentry>
 
             <varlistentry>
-                <term>$name</term>
+                <term>$label</term>
                 <listitem>
                     <para>$name allows you to specify the name of a value that is shown in the form.
                         If this value is not set, the pillar name is used and capitalized without
@@ -392,7 +375,9 @@ keyboard_and_language:
                         understanding of what the value should be. $help defines the message a user
                         sees when hovering over a field and $placeholder displays a gray placeholder
                         text in the field. $placeholder may only be used with text fields like text,
-                        password, email or date.</para>
+                        password, email or date. It doesnt make sense to add a placeholder if you
+                        also use <literal>$default</literal> as this will hide the
+                        placeholder.</para>
                 </listitem>
             </varlistentry>
 
@@ -403,9 +388,8 @@ keyboard_and_language:
                         edited. Possible values are <literal>system</literal>,
                             <literal>group</literal> and <literal>readonly</literal>. </para>
                     <para>The default <literal>$scope: system</literal> allows values to be edited
-                        at group and system levels. This implies a value should be entered for each
-                        system, but you can also choose to set a default for an entire group if a
-                        system-specific value is found. </para>
+                        at group and system levels. A value can be entered for each system but if no
+                        value is entered the system will fall back to the group default.</para>
                     <para>If using <literal>$scope: group</literal>, a value may only be edited for
                         a group. On the system level you will be able to see the value, but not edit
                         it. </para>
@@ -453,8 +437,8 @@ keyboard_and_language:
 
                     <note>
                         <title>Hidden Values</title>
-                        <para>Hidden values will still be merged into the pillar data and sent to
-                            the minion. The formula must check the condition again and use the
+                        <para>Values from hidden fields may be merged into the pillar data and sent
+                            to the minion. A formula must check the condition again and use the
                             appropriate data. For example:</para>
                         <screen>show_option:
   $type: checkbox
@@ -513,7 +497,7 @@ do_something:
   pkg.installed:
     - name: {{ pillar.package_name }}</screen>
         <para>You may also use more complex constructs such as <literal>if/else</literal> and
-                <literal>for-loop</literal>'s To provide greater functionality. For Example:</para>
+                <literal>for-loops</literal> To provide greater functionality. For Example:</para>
         <screen>{% if pillar.installSomething %}
 something:
   pkg.installed
@@ -539,7 +523,6 @@ do_something_with_{{ key }}: {{ value }}
             you can manage a file using Salt:</para>
         <screen>/etc/my_program/my_program.conf:
   file.managed:
-
     - source: salt://my_state/files/my_program.conf
     - template: jinja</screen>
 
