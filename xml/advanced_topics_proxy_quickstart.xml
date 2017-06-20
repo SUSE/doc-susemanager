@@ -894,17 +894,27 @@ filename: "pxelinux.0"</screen>
     <step>
      <para>
       Before starting the actual migration procedure, save the data from
-      the old proxy, if needed.  Consider copying some information to a central place that can also be accessed by the new server:
+      the old proxy, if needed.  Consider copying important data to a
+      central place that can also be accessed by the new server:
      </para>
      <itemizedlist>
       <listitem>
        <para>
-        Copy scripts needed.
-        Copy the activation keys from the previous server. Of course it is always better to re-create the keys.
-    Shutdown the server
+        Copy the scripts that are still needed.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Copy the activation keys from the previous server. Of course, it
+        is always better to re-create the keys.
        </para>
       </listitem>
      </itemizedlist>
+    </step>
+    <step>
+     <para>
+      Shutdown the server.
+     </para>
     </step>
 
     <!--
@@ -1165,9 +1175,9 @@ SUSE Manager Server again.
    <listitem>
     <para>
      Existing &susemgr; proxies may be replaced by newly installed and
-     reconfigured proxies, see
-     <xref
-       linkend="advanced.topics.proxy.migration.replace"/>.
+     reconfigured proxies, see <xref
+     linkend="advanced.topics.proxy.migration.replace"/>. This is the
+     recommended method.
     </para>
    </listitem>
    <listitem>
@@ -1211,18 +1221,28 @@ SUSE Manager Server again.
     Registered</title>
     <step>
      <para>
-      Before starting the actual migration procedure, save the data from
-      the old proxy, if needed.  Consider copying some information to a central place that can also be accessed by the new server:
+      Before starting the actual migration procedure, save the important
+      data from the old proxy.  Copy the data to a central place that
+      also the new server can access:
      </para>
      <itemizedlist>
       <listitem>
        <para>
-        Copy scripts needed.
-        Copy the activation keys from the previous server. Of course it is always better to re-create the keys.
-    Shutdown the server
+        Copy the scripts that are still needed.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Copy the activation keys from the existing server. Of course, it
+        is always better to re-create the keys.
        </para>
       </listitem>
      </itemizedlist>
+    </step>
+    <step>
+     <para>
+      Shutdown the server.
+     </para>
     </step>
 
     <!--
@@ -1250,6 +1270,20 @@ SUSE Manager Server again.
       Install a new &susemgr; 3.1 Proxy, see <xref
       linkend="at.manager.proxy.inst_and_clients"/>.
      </para>
+     <important>
+      <title>Proxy Installation and Client Connections</title>
+      <para>
+       During the installation of the proxy, clients will not be able to
+       reach the &susemgr; server. After a &susemgrproxy; system has
+       been deleted from the systems list, all clients connected to this
+       proxy will be (incorrectly) listed as <literal>directly
+       connected</literal> to the &susemgr; server. After the first
+       successful operation on a client <emphasis>such as execution of a
+       remote command or installation of a package or patch</emphasis>
+       this information will automatically be corrected. This may take a
+       few hours.
+      </para>
+     </important>
     </step>
 
     <step>
@@ -1309,7 +1343,7 @@ SUSE Manager Server again.
     <itemizedlist>
      <listitem>
       <para>
-       Copy the centrally saved data to the new proxy system.
+       Copy the centrally saved data back to the new proxy system.
       </para>
      </listitem>
     <listitem>
@@ -1319,32 +1353,19 @@ SUSE Manager Server again.
     </listitem>
     <listitem>
       <para>
-       If the proxy is also used for autoinstallation, do nt forget to
+       If the proxy is also used for autoinstallation, do not forget to
        setup TFTP synchronization.
       </para>
     </listitem>
     </itemizedlist>
     </step>
   </procedure>
-   <important>
-    <title>Proxy Installation and Client Connections</title>
-    <para>
-     During the installation of the proxy, clients will not be able to reach
-     the &susemgr; server. After a &susemgrproxy; system has been deleted from
-     the systems list, all clients connected to this proxy will be
-     (incorrectly) listed as <literal>directly connected</literal> to the
-     &susemgr; server. After the first successful operation on a client
-     <emphasis>such as execution of a remote command or installation of a
-     package or patch</emphasis> this information will automatically be
-     corrected. This may take a few hours.
-    </para>
-   </important>
   </sect2>
 
   <sect2 xml:id="advanced.topics.proxy.migration.upgrade">
    <title>Upgrading a &susemgrproxy; from 2.1 to 3.1</title>
    <para>
-    In most situations upgrading the proxy will be your preferred solution as
+    In most situations upgrading the proxy will be the preferred solution as
     this retains all cached packages. Selecting this route saves time
     especially regarding setups with proxies connected to &susemgr; server via
     low-bandwith links. This upgrade can be automated by using the &yast;
