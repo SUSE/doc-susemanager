@@ -10,26 +10,40 @@
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
     xml:id="white.papers.building.containers">
-    
-    <title>Building Containers</title>
-    
+
+    <title>Image Building and Management</title>
+
     <sect1>
         <title>Introduction</title>
         <para>SUSE Manager enables system administrators to build containers, create Image stores,
-            and profiles. The following sections provide guidance on using these new
-            features.</para>
-        
+            and profiles. The following section targets administrators with former experience using
+            Docker and Kubernetes.</para>
+        <para>For additional resources on Docker or Kubernetes see:</para>
+        <itemizedlist>
+            <listitem>
+                <para><link
+                        xlink:href="https://www.suse.com/documentation/sles-12/book_sles_docker/data/book_sles_docker.html"
+                    /></para>
+            </listitem>
+            <listitem>
+                <para><link xlink:href="https://docs.docker.com/"/></para>
+            </listitem>
+            <listitem>
+                <para><link xlink:href="https://kubernetes.io/docs/home/"/></para>
+            </listitem>
+        </itemizedlist>
+
     </sect1>
-    
+
     <sect1>
         <title>Requirements</title>
-        <para>This feature is only available for SALT minions running on SLES12.</para>
-        
+        <para>This image feature is only available for SALT minions running on SLES12.</para>
+
     </sect1>
-    
+
     <sect1>
         <title>Creating a Build Host</title>
-        
+
         <para>To build container images with SUSE Manager, you will need to create a build host.
             Build hosts must be a Salt minion running SLES12.</para>
         <informalfigure>
@@ -42,23 +56,11 @@
                 </imageobject>
             </mediaobject>
         </informalfigure>
-        <note>
-            <para>During Beta phase you need to create a custom repository with the new client
-                tools.</para>
-        </note>
-        
         <para>From the SUSE Manager WebUI perform the following steps to create a build host.</para>
         <procedure>
             <step>
-                <para>Select the desired minion from the <guimenu>Systems Overview</guimenu>
-                    page.</para>
-            </step>
-            <step>
-                <para>From the <guimenu>System Details</guimenu> page assign the betatest client
-                    tools channel to the minion by going to: <menuchoice>
-                        <guimenu>Software</guimenu>
-                        <guimenu>Software Channels</guimenu>
-                    </menuchoice></para>
+                <para>Select the desired build host minion from the <guimenu>Systems
+                        Overview</guimenu> page.</para>
             </step>
             <step>
                 <para>From the <guimenu>System Details</guimenu> page assign the containers modules
@@ -77,18 +79,18 @@
             </step>
             <step>
                 <para>From the <menuchoice>
-                    <guimenu>System Details</guimenu>
-                    <guimenu>Properties</guimenu>
-                </menuchoice> page, enable the Add-on System Type: <filename>Docker Build
-                    Host</filename> then select <guimenu>Update Properties</guimenu></para>
+                        <guimenu>System Details</guimenu>
+                        <guimenu>Properties</guimenu>
+                    </menuchoice> page, enable the Add-on System Type: <filename>Docker Build
+                        Host</filename> then select <guimenu>Update Properties</guimenu></para>
             </step>
             <step>
                 <para>A state will be applied that installs the required packages.</para>
             </step>
-            
+
         </procedure>
     </sect1>
-    
+
     <sect1>
         <title>Define Container Build Channels with an Activation Key</title>
         <para>Create an <literal>Activation Key</literal> associated with the channel that should be
@@ -106,7 +108,7 @@
         <procedure>
             <step>
                 <para>From the left navigation menu select
-                    <guimenu>Systems</guimenu><guimenu>Activation Keys</guimenu></para>
+                        <guimenu>Systems</guimenu><guimenu>Activation Keys</guimenu></para>
             </step>
             <step>
                 <para>Select <guimenu>Create Key</guimenu>.</para>
@@ -121,7 +123,7 @@
             </step>
         </procedure>
     </sect1>
-    
+
     <sect1>
         <title>Creating an Image Store</title>
         <para>When working with images you will need a place to store them. </para>
@@ -138,7 +140,7 @@
         <procedure>
             <step>
                 <para>From the left navigation menu select <guimenu>Images</guimenu> and
-                    <guimenu>Stores</guimenu>.</para>
+                        <guimenu>Stores</guimenu>.</para>
             </step>
             <step>
                 <para>Click <guimenu>Create</guimenu> to create a new store.</para>
@@ -154,9 +156,10 @@
                 </informalfigure>
             </step>
             <step>
-                <para>Define the <literal>Store Type</literal>, currently this should be set to
-                    registry. Define a <literal>Label</literal> and a <literal>URI</literal>(For
-                    containers the FQDN is sufficient in most cases).</para>
+                <para>Currently SUSE Manager only supports registry for the <literal>Store
+                        Type</literal>. Define a <literal>Label</literal> for the image store and
+                    provide a <literal>URI</literal>(For containers the FQDN of the host containing
+                    the registry is sufficient in most cases).</para>
             </step>
             <step>
                 <para>Click <guimenu>Create</guimenu> to add the new <literal>Image
@@ -164,8 +167,8 @@
             </step>
         </procedure>
     </sect1>
-    
-    
+
+
     <sect1>
         <title>Creating an Image Profile</title>
         <para>You can create an image profile for your images. You can define an image type, a
@@ -184,9 +187,9 @@
             <title>Create Image Profile</title>
             <step>
                 <para>To create an image profile select <menuchoice>
-                    <guimenu>Image</guimenu>
-                    <guimenu>Profiles</guimenu>
-                </menuchoice> and click the <guimenu>Create</guimenu> button.</para>
+                        <guimenu>Image</guimenu>
+                        <guimenu>Profiles</guimenu>
+                    </menuchoice> and click the <guimenu>Create</guimenu> button.</para>
                 <informalfigure>
                     <mediaobject>
                         <imageobject role="fo">
@@ -200,15 +203,15 @@
             </step>
             <step>
                 <para>Fill in the <guimenu>Label</guimenu>,<guimenu>Image Type</guimenu>,
-                    <guimenu>Target Image Store</guimenu>,<guimenu>Path</guimenu> , and
-                    <guimenu>Activation Key</guimenu> fields.</para>
+                        <guimenu>Target Image Store</guimenu>,<guimenu>Path</guimenu> , and
+                        <guimenu>Activation Key</guimenu> fields.</para>
                 <note>
-                    <para>For the <guimenu>Path</guimenu> field you may also use a git url
+                    <para>For the <guimenu>Path</guimenu> field you should use a git url
                         (http/https) with the following format:</para>
                     <screen> https://git.domain.top/path/my.git#branchname:folder</screen>
                     <para>If a branchname is not specified the <literal>Master</literal> branch will
                         be used by default. If a <literal>folder</literal> is not specified a
-                        <literal>Dockerfile</literal> is expected to be in the root directory of
+                            <literal>Dockerfile</literal> is expected to be in the root directory of
                         the checkout.</para>
                 </note>
             </step>
@@ -216,12 +219,13 @@
                 <para>Click the <guimenu>Create</guimenu> button.</para>
             </step>
         </procedure>
-        
+
         <sect2>
             <title>Example Dockerfile</title>
-            <para>See the following example Dockerfile:</para>
+            <para>See the following example Dockerfile. A docker file is specified when creating an
+                image profile and stored in a git repository:</para>
             <screen>   FROM registry.mgr.suse.de/sles12sp2
-   MAINTAINER SUSE Manager Team "manager-beta@suse.de"
+   MAINTAINER Tux Administrator "tux@suse.de"
    
    ARG repo
    ARG cert
@@ -236,23 +240,23 @@
             <important>
                 <para>If you would like to inspect an image and provide the package/product list of
                     a container to the SUSE Manager WebUI you are required to install
-                    <filename>python</filename> and <filename>python-xml</filename> in your
+                        <filename>python</filename> and <filename>python-xml</filename> in your
                     container. If these packages remain uninstalled, images will still build, but
                     the package and product list will not be read and the package/product list
                     information will not be available from the WebUI.</para>
             </important>
         </sect2>
     </sect1>
-    
+
     <sect1>
         <title>Building an Image</title>
         <para>There are two ways to build an image. You can select <menuchoice>
-            <guimenu>Images</guimenu>
-            <guimenu>Build</guimenu>
-        </menuchoice> from the left navigation bar, or click the build icon in the <menuchoice>
-            <guimenu>Images</guimenu>
-            <guimenu>Profiles</guimenu>
-        </menuchoice> list.</para>
+                <guimenu>Images</guimenu>
+                <guimenu>Build</guimenu>
+            </menuchoice> from the left navigation bar, or click the build icon in the <menuchoice>
+                <guimenu>Images</guimenu>
+                <guimenu>Profiles</guimenu>
+            </menuchoice> list.</para>
         <informalfigure>
             <mediaobject>
                 <imageobject role="fo">
@@ -267,17 +271,17 @@
             <title>Build an Image</title>
             <step>
                 <para>For this example select <menuchoice>
-                    <guimenu>Images</guimenu>
-                    <guimenu>Build</guimenu>
-                </menuchoice>.</para>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Build</guimenu>
+                    </menuchoice>.</para>
             </step>
             <step>
                 <para>Add a different tag name if you want a version other than the default
-                    <literal>Latest</literal>.</para>
+                        <literal>Latest</literal>.</para>
             </step>
             <step>
                 <para>Select the <guimenu>Build Profile</guimenu> and a <guimenu>Build
-                    Host</guimenu></para>
+                        Host</guimenu></para>
                 <note>
                     <para>Notice the <guimenu>Profile Summary</guimenu> to the right of the build
                         fields. Once you have selected an build profile detailed information about
@@ -289,13 +293,13 @@
             </step>
         </procedure>
     </sect1>
-    
+
     <sect1>
         <title>Listing Available Build Images</title>
         <para>To list available build images select <menuchoice>
-            <guimenu>Images</guimenu>
-            <guimenu>Images</guimenu>
-        </menuchoice>. A list of all build images will be displayed.</para>
+                <guimenu>Images</guimenu>
+                <guimenu>Images</guimenu>
+            </menuchoice>. A list of all build images will be displayed.</para>
         <informalfigure>
             <mediaobject>
                 <imageobject role="fo">
@@ -307,7 +311,7 @@
             </mediaobject>
         </informalfigure>
         <para> Displayed data about images includes an image <guimenu>Name</guimenu>, its
-            <guimenu>Version</guimenu> and the build <guimenu>Status</guimenu>. You will also
+                <guimenu>Version</guimenu> and the build <guimenu>Status</guimenu>. You will also
             see an images Update status with a listing of possible patch/package updates that are
             available for the image.</para>
         <para>Clicking the <guimenu>Details</guimenu> button on an image will provide a detailed
@@ -318,7 +322,7 @@
                 was successful.</para>
         </important>
     </sect1>
-    
+
     <sect1>
         <title>Troubleshooting</title>
         <para>The following are some known pitfalls when working with Images.</para>
@@ -337,5 +341,5 @@
             </listitem>
         </itemizedlist>
     </sect1>
-    
+
 </chapter>
