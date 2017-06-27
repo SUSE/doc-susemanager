@@ -403,6 +403,55 @@ stagingContentWindow=24</screen>
    <para> Next time an action is scheduled, packages will automatically be downloaded but not
     installed yet. When the scheduled time comes, the action will use the staged version. </para>
 
+   <formalpara>
+    <title>Minion Content Staging</title>
+    <para>Every Organization administrator can enable Content Staging from the Organization
+     configuration page <menuchoice>
+      <guimenu>Admin</guimenu>
+      <guimenu>Organization</guimenu>
+      <guimenu>OrgName</guimenu>
+      <guimenu>Configuration</guimenu>
+      <guimenu>Enable Staging Contents</guimenu>
+     </menuchoice>. Prior to SUSE Manager 3.1, this option was read only by traditional clients for
+     staging content (packages and patches) before an installation, to help reduce the time required
+     for installing and updating packages and patches. Beginning with SUSE Manager 3.1, Enable
+     Staging Contents also targets Salt minions for the selected Organization.</para>
+   </formalpara>
+   <para>Staging content for minions is affected by two parameters.</para>
+   <itemizedlist>
+    <listitem>
+     <para><filename>salt_content_staging_advance:</filename> expresses the advance time, in hours,
+      for the content staging window to open with respect to the scheduled installation/upgrade
+      time.</para>
+    </listitem>
+    <listitem>
+     <para><filename>salt_content_staging_window:</filename> expresses the duration, in hours, of
+      the time window for Salt minions to stage packages in advance of scheduled installations or
+      upgrades.</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>A value of <emphasis role="bold">salt_content_staging_advance</emphasis> equal to <emphasis
+     role="bold">salt_content_staging_window</emphasis> results in the content staging window
+    closing exactly when the installation/upgrade is scheduled to be executed, a larger value allows
+    to separate the download time from the installation time.</para>
+   <para>These options are configured in
+     <filename>/usr/share/rhn/config-defaults/rhn_java.conf</filename> and by default assume the
+    following values: </para>
+
+   <itemizedlist>
+    <listitem>
+     <para><filename>salt_content_staging_advance: 8 hours</filename></para>
+    </listitem>
+    <listitem>
+     <para><filename>salt_content_staging_window: 8 hours</filename></para>
+    </listitem>
+   </itemizedlist>
+   <note>
+    <para>These parameters will only have an effect when Content Staging is enabled for the targeted
+     Organization.</para>
+   </note>
+
   </sect2>
   <sect2 xml:id="s2-sattools-org-details-states">
    <title><guimenu>Organization Details</guimenu> &gt; <guimenu>States</guimenu></title>
@@ -915,7 +964,8 @@ stagingContentWindow=24</screen>
     </listitem>
     <listitem>
      <para> Filename of this Master's CA Certificate: use the full path to the CA Certificate. For
-      example:</para><screen> /etc/pki/trust/anchors</screen>
+      example:</para>
+     <screen> /etc/pki/trust/anchors</screen>
     </listitem>
    </itemizedlist>
    <para> Click <guimenu>Add New Master</guimenu>. </para>
