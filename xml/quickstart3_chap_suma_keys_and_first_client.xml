@@ -13,10 +13,10 @@
   <para>
    All releases previous to and including &susemgr; 2.1 were implemented and
    shipped with a client management framework, which today is still fully
-   supported. Since version 3, SUSE Manager includes a complete Salt solution
+   supported. Since version 3, &susemgr; includes a complete Salt solution
    in addition to the <quote>traditional</quote> framework. Salt is an
    end-to-end data-center automation tool which may also be used outside the
-   scope of SUSE Manager to introduce reactive, real-time orchestration, and
+   scope of &susemgr; to introduce reactive, real-time orchestration, and
    configuration management. Managed systems may coexist using both methods,
    allowing you to become comfortable using Salt while keeping existing
    deployments intact.
@@ -78,7 +78,7 @@
    <step>
     <para>
      Enter a human readable <guimenu>Key</guimenu> string value such as
-     <literal>SLES12-SP2</literal> to represent the distribution and service
+     <literal>SLES12-SP3</literal> to represent the distribution and service
      pack associated with the key.
     </para>
     <warning>
@@ -101,7 +101,7 @@
    </step>
    <step>
     <para>
-     Select the &sle; 12 SP2 channel you added earlier from the <guimenu>Base
+     Select the &sle; 12 SP3 channel you added earlier from the <guimenu>Base
      Channels</guimenu> drop down.
     </para>
    </step>
@@ -129,7 +129,7 @@
    registering traditional clients during the bootstrapping procedure. These
    packages will be installed from the newly generated repository during the
    registration process. In the following procedure you will create the &sle;
-   12 SP2 tools repository.
+   12 SP3 tools repository.
   </para>
 
   <important>
@@ -141,25 +141,25 @@
     /var/log/rhn/reposync/<replaceable>CHANNEL_NAME</replaceable>.log</command>
     as &rootuser;. For example:
    </para>
-<screen><prompt># </prompt>tail -f /var/log/rhn/reposync/sles12-sp2-pool-x86_64.log</screen>
+<screen><prompt># </prompt>tail -f /var/log/rhn/reposync/sles12-sp3-pool-x86_64.log</screen>
   </important>
 
   <procedure>
-   <title>Generating the Tools Repository for &sle; 12 SP2</title>
+   <title>Generating the Tools Repository for &sle; 12 SP3</title>
    <step>
     <para>
      Open a terminal on the server as &rootuser; and enter the following
      command to list available bootstrap repositories:
     </para>
 <screen><prompt># </prompt><command>mgr-create-bootstrap-repo -l</command>
-SLE-12-SP2-x86_64</screen>
+SLE-12-SP3-x86_64</screen>
    </step>
    <step>
     <para>
      Then invoke the same command using the listed repository as the product
      label to actually create the bootstrap repository:
     </para>
-<screen><prompt># </prompt><command>mgr-create-bootstrap-repo -c SLE-12-SP2-x86_64</command></screen>
+<screen><prompt># </prompt><command>mgr-create-bootstrap-repo -c SLE-12-SP3-x86_64</command></screen>
    </step>
    <step>
     <para>
@@ -300,11 +300,11 @@ client-config-overrides.txt   sm-client-tools.rpm</screen>
       with each of your clients.
      </para>
 <screen><prompt># </prompt><command>cp bootstrap.sh bootstrap-sles11-sp4.sh</command>
-<prompt># </prompt><command>cp bootstrap.sh bootstrap-sles12-sp2.sh</command></screen>
+<prompt># </prompt><command>cp bootstrap.sh bootstrap-sles12-sp3.sh</command></screen>
     </step>
     <step>
      <para>
-      Open <filename>sles12-sp2.sh</filename> for modification. Scroll down and
+      Open <filename>sles12-sp3.sh</filename> for modification. Scroll down and
       modify both lines marked in green. You must comment out <literal>exit
       1</literal> with a hash mark (<literal>#</literal>) to activate the
       script and then enter the name of the key for this script in the
@@ -317,7 +317,7 @@ echo
 
 # can be edited, but probably correct (unless created during initial install):
 # NOTE: ACTIVATION_KEYS *must* be used to bootstrap a client machine.
-ACTIVATION_KEYS=1-sles12-sp2
+ACTIVATION_KEYS=1-sles12-sp3
 ORG_GPG_KEY=</screen>
     </step>
     <step>
@@ -450,7 +450,7 @@ ORG_GPG_KEY=</screen>
   <para>
    Once you have fully synced a base channel from the &webui; for clients to
    obtain software sources from, for example:
-   <literal>SLES12-SP2-Pool_for_x86_64</literal> perform the following
+   <literal>SLES12-SP3-Pool_for_x86_64</literal> perform the following
    procedure to register a Salt minion.
   </para>
 
@@ -460,8 +460,8 @@ ORG_GPG_KEY=</screen>
     <para>
      On your minion as &rootuser; enter the following command:
     </para>
-<screen><prompt># </prompt>zypper ar http://<replaceable>FQDN.SUSE.Manager.com</replaceable>/pub/repositories/sle/12/1/bootstrap/ \
-   sles12-sp2</screen>
+<screen><prompt># </prompt>zypper ar http://<replaceable>FQDN.SUSE.Manager.com</replaceable>/pub/repositories/sle/12/3/bootstrap/ \
+   sles12-sp3</screen>
     <note>
      <para>
       Do not use <literal>HTTPS</literal>. Use <literal>HTTP</literal> instead
