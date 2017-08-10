@@ -10,86 +10,127 @@
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.sp.migration">
  <title>&susemgr; Server Migration</title>
-
  <info>
   <abstract>
-   <para> You can upgrade the underlying operating system and also migrate &susemgr; server from one
-    patch level to the other (SP migration) or from one version to the next. This works for
-    migrating &susemgr; server 3.0 to version 3.1. </para>
-   <para> For migrating from version 2.1 to 3.0, see <xref linkend="bp.chap.mgr.migration"/>.
+   <para>
+    You can upgrade the underlying operating system and also migrate &susemgr;
+    server from one patch level to the other (SP migration) or from one version
+    to the next. This works for migrating &susemgr; server 3.0 to
+    version 3.1.
+   </para>
+
+   <para>
+    For migrating from version 2.1 to 3.0, see
+    <xref linkend="bp.chap.mgr.migration"/>.
    </para>
   </abstract>
  </info>
  <sect1 xml:id="bp.sp.migration.sp">
   <title>Service Pack Migration</title>
-  <para> SUSE Manager utilizes &sls; 12 as its underlying operating system. Therefore Service Pack
-   migration (for example, from version 12 SP1 to 12 SP2) may be performed in the same way as a
-   typical SLES migration. </para>
-  <para> &suse; offers a graphical and command line tool for upgrading to a new service pack.
-   Comprehensive documentation for executing service pack migration scenarios is located in the
-   &sls; documentation chapter <link
+
+  <para>
+   SUSE Manager utilizes &sls; 12 as its underlying operating system.
+   Therefore Service Pack migration (for example, from version 12 SP1 to
+   12 SP3) may be performed in the same way as a typical SLES migration.
+  </para>
+
+  <para>
+   &suse; offers a graphical and command line tool for upgrading to a new
+   service pack. Comprehensive documentation for executing service pack
+   migration scenarios is located in the &sls; documentation chapter
+   <link
     xlink:href="https://www.suse.com/documentation/sles-12/book_sle_deployment/data/cha_update_spmigration.html"
-   />. </para>
+   />.
+  </para>
  </sect1>
  <sect1 xml:id="update.suse.manager">
   <title>Updating &susemgr;</title>
-  <para> This section provides information on performing regular updates and running a
-    <command>spacewalk-schema-upgrade</command> on your postgresql database. </para>
+
+  <para>
+   This section provides information on performing regular updates and running
+   a <command>spacewalk-schema-upgrade</command> on your postgresql database.
+  </para>
 
   <procedure>
    <title>Updating &susemgr;</title>
    <step>
-    <para>As the &rootuser; user stop Spacewalk services:</para>
-    <screen>spacewalk-service stop</screen>
+    <para>
+     As the &rootuser; user stop Spacewalk services:
+    </para>
+<screen>spacewalk-service stop</screen>
    </step>
    <step>
-    <para>Apply latest patches with:</para>
-    <screen>zypper patch</screen>
+    <para>
+     Apply latest patches with:
+    </para>
+<screen>zypper patch</screen>
    </step>
    <step>
-    <para>You will be informed if a new database schema was included in the latest patch. Ensure the
-          database is started with:</para>
-    <screen>rcpostgresql start</screen>
+    <para>
+     You will be informed if a new database schema was included in the latest
+     patch. Ensure the database is started with:
+    </para>
+<screen>rcpostgresql start</screen>
    </step>
    <step>
-    <para>Perform the upgrade with:</para>
-    <screen>spacewalk-schema-upgrade</screen>
+    <para>
+     Perform the upgrade with:
+    </para>
+<screen>spacewalk-schema-upgrade</screen>
    </step>
    <step>
-    <para>Start Spacewalk services again with:</para>
-    <screen>spacewalk-service start</screen>
+    <para>
+     Start Spacewalk services again with:
+    </para>
+<screen>spacewalk-service start</screen>
     <important>
      <title>Restart of Services and Applications</title>
-     <para>Services affected by a package update are not automatically restarted after an update.
-      You need to restart these services manually to avoid potential failures. </para>
-     <para>You may use <command>zypper ps</command> to check for any applications which may be using
-      old code. Restart these applications.</para>
+     <para>
+      Services affected by a package update are not automatically restarted
+      after an update. You need to restart these services manually to avoid
+      potential failures.
+     </para>
+     <para>
+      You may use <command>zypper ps</command> to check for any applications
+      which may be using old code. Restart these applications.
+     </para>
     </important>
    </step>
   </procedure>
  </sect1>
-
  <sect1 xml:id="bp.sp.migration.version">
   <title>Migrating &susemgr; version 3.0 to 3.1</title>
-  <para> The migration can either be done with the Online Migration tool (&yast;) or with the Zypper
-   command line tool. </para>
+
+  <para>
+   The migration can either be done with the Online Migration tool (&yast;) or
+   with the Zypper command line tool.
+  </para>
 
   <note>
    <title>Reduce Installation Size</title>
-   <para> When performing the migration, &yast; will install all recommended packages. Especially in
-    the case of custom minimal installations, this may increase the installation size of the system
-    significantly. </para>
-   <para> To change this default behavior and allow only required packages, adjust
-     <filename>/etc/zypp/zypp.conf</filename> and set the following variable: </para>
-   <screen>solver.onlyRequires = true
+   <para>
+    When performing the migration, &yast; will install all recommended
+    packages. Especially in the case of custom minimal installations, this may
+    increase the installation size of the system significantly.
+   </para>
+   <para>
+    To change this default behavior and allow only required packages, adjust
+    <filename>/etc/zypp/zypp.conf</filename> and set the following variable:
+   </para>
+<screen>solver.onlyRequires = true
 installRecommends=false # or commented</screen>
-   <para> This changes the behavior of all package operations, such as the installation of patches
-    or new packages. </para>
+   <para>
+    This changes the behavior of all package operations, such as the
+    installation of patches or new packages.
+   </para>
   </note>
+
   <sect2 xml:id="bp.sp.migration.version.yast">
    <title>Using &yast;</title>
-   <para> To perform the migration with &yast;, use the <guimenu>Online Migration</guimenu> tool:
-    <!--
+   <para>
+    To perform the migration with &yast;, use the <guimenu>Online
+    Migration</guimenu> tool:
+<!--
         By default, &yast; does not install any packages from a
         third-party repository. If a package was installed from a
         third-party repository, &yast; prevents packages from being
@@ -99,34 +140,49 @@ installRecommends=false # or commented</screen>
    <procedure>
     <title>Migrating using &yast;</title>
     <step>
-     <para> If you are logged into a GNOME session running on the machine you are going to update,
-      switch to a text console. Running the update from within a GNOME session is not recommended.
-      This does not apply when being logged in from a remote machine (unless you are running a VNC
-      session with GNOME). </para>
+     <para>
+      If you are logged into a GNOME session running on the machine you are
+      going to update, switch to a text console. Running the update from within
+      a GNOME session is not recommended. This does not apply when being logged
+      in from a remote machine (unless you are running a VNC session with
+      GNOME).
+     </para>
     </step>
     <step>
-     <para> Start in &yast; <menuchoice>
-       <guimenu>System</guimenu>
-       <guimenu>Online Migration</guimenu>
-      </menuchoice>. &yast; will show possible migration targets and a summary. </para>
-     <para> In case of trouble, resolve the following issues first: </para>
+     <para>
+      Start in &yast; <menuchoice> <guimenu>System</guimenu> <guimenu>Online
+      Migration</guimenu> </menuchoice>. &yast; will show possible migration
+      targets and a summary.
+     </para>
+     <para>
+      In case of trouble, resolve the following issues first:
+     </para>
      <substeps>
       <step>
-       <para> If the <guimenu>Online Migration</guimenu> is not available, install the
-         <package>yast2-migration</package> package and its dependencies. Restart &yast;, otherwise
-        the newly installed module will not be shown in the control center. </para>
+       <para>
+        If the <guimenu>Online Migration</guimenu> is not available, install
+        the <package>yast2-migration</package> package and its dependencies.
+        Restart &yast;, otherwise the newly installed module will not be shown
+        in the control center.
+       </para>
       </step>
       <step>
-       <para> If there are <quote>old</quote> online updates available for installation, the
-        migration tool will warn and ask to install them now before starting the actual migration.
-        It is recommended to install all updates before proceeding. </para>
+       <para>
+        If there are <quote>old</quote> online updates available for
+        installation, the migration tool will warn and ask to install them now
+        before starting the actual migration. It is recommended to install all
+        updates before proceeding.
+       </para>
       </step>
      </substeps>
     </step>
     <step>
-     <para> If more than one migration target is available for your system, select one from the
-      list. In case you are still on &sls; 12 SP1, SLES 12 will be upgraded to SP2, while selecting
-       <guimenu>&susemgr; Server 3.1</guimenu> as a migration target. </para>
+     <para>
+      If more than one migration target is available for your system,
+      select one from the list. In case you are still on &sls; 12 SP1 or
+      SP2, SLES 12 will be upgraded to SP3, while selecting
+      <guimenu>&susemgr; Server 3.1</guimenu> as a migration target.
+     </para>
      <figure xml:id="fig-migration-summary">
       <title>&yast;: Select the Migration Target</title>
       <mediaobject>
@@ -138,38 +194,50 @@ installRecommends=false # or commented</screen>
        </imageobject>
       </mediaobject>
      </figure>
-
     </step>
     <step>
-     <para> Update the &susemgr; database schema (<command>spacewalk-schema-upgrade</command>).
+     <para>
+      Update the &susemgr; database schema
+      (<command>spacewalk-schema-upgrade</command>).
      </para>
     </step>
     <step>
-     <para> Make sure &susemgr; is up and running (<command>spacewalk-service start</command>).
+     <para>
+      Make sure &susemgr; is up and running (<command>spacewalk-service
+      start</command>).
      </para>
     </step>
-
    </procedure>
-
-   <para> After finishing the migration procedure &susemgr; 3.1 on &sls; 12 SP2 is available to be
-    used. </para>
+   <para>
+    After finishing the migration procedure &susemgr; 3.1 on &sls; 12 SP3 is
+    available to be used.
+   </para>
   </sect2>
+
   <sect2 xml:id="bp.sp.migration.version.zypper">
    <title>Using zypper</title>
-   <para> To perform the migration with Zypper on the command-line, use the <command>zypper
-     migration</command> subcommand tool: </para>
+   <para>
+    To perform the migration with Zypper on the command-line, use the
+    <command>zypper migration</command> subcommand tool:
+   </para>
    <procedure>
     <title>Migrating using <command>zypper migration</command></title>
     <step>
-     <para> If you are logged into a GNOME session running on the machine you are going to update,
-      switch to a text console. Running the update from within a GNOME session is not recommended.
-      This does not apply when being logged in from a remote machine (unless you are running a VNC
-      session with GNOME). </para>
+     <para>
+      If you are logged into a GNOME session running on the machine you are
+      going to update, switch to a text console. Running the update from within
+      a GNOME session is not recommended. This does not apply when being logged
+      in from a remote machine (unless you are running a VNC session with
+      GNOME).
+     </para>
     </step>
     <step>
-     <para> The <command>zypper migration</command> subcommand show possible migration targets and a
-      summary: </para>
-     <screen><prompt># </prompt>zypper migration
+     <para>
+      The <command>zypper migration</command> subcommand show possible
+      migration targets and a summary:
+     </para>
+     <!-- FIXME: update for 3.1 on SLE 12 SP3! -->
+<screen><prompt># </prompt>zypper migration
 Executing 'zypper  refresh'
 
 Repository 'SLES12-SP1-Pool' is up to date.
@@ -191,39 +259,55 @@ Available migrations:
 
     2 | SUSE Linux Enterprise Server 12 SP2 x86_64
         SUSE Manager Server 3.0 x86_64 (already installed)</screen>
-     <para> In case of trouble, resolve the following issues first: </para>
+     <para>
+      In case of trouble, resolve the following issues first:
+     </para>
      <substeps>
       <step>
-       <para> If the <command>migration</command> subcommand is not available install the
-         <package>zypper-migration-plugin</package> package and its dependencies. </para>
+       <para>
+        If the <command>migration</command> subcommand is not available install
+        the <package>zypper-migration-plugin</package> package and its
+        dependencies.
+       </para>
       </step>
       <step>
-       <para> If there are <quote>old</quote> online updates available for installation, the
-        migration tool will warn and ask to install them now before starting the actual migration.
-        It is recommended to install all updates before proceeding. </para>
+       <para>
+        If there are <quote>old</quote> online updates available for
+        installation, the migration tool will warn and ask to install them now
+        before starting the actual migration. It is recommended to install all
+        updates before proceeding.
+       </para>
       </step>
      </substeps>
     </step>
     <step>
-     <para> If more than one migration target is available for your system, select one from the list
-      (specify the number). In case you are still on &sls; 12 SP1, SLES 12 will be upgraded to SP2,
-      while selecting <guimenu>&susemgr; Server 3.1</guimenu> as a migration target. </para>
+     <para>
+      If more than one migration target is available for your system,
+      select one from the list (specify the number). In case you are
+      still on &sls; 12 SP1 or SP2, SLES 12 will be upgraded to SP3,
+      while selecting <guimenu>&susemgr; Server 3.1</guimenu> as a
+      migration target.
+     </para>
     </step>
     <step>
-     <para> Read the notification and update the &susemgr; database schema as described
-       (<command>spacewalk-schema-upgrade</command>). </para>
+     <para>
+      Read the notification and update the &susemgr; database schema as
+      described (<command>spacewalk-schema-upgrade</command>).
+     </para>
     </step>
     <step>
-     <para> Make sure &susemgr; is up and running (<command>spacewalk-service start</command>).
+     <para>
+      Make sure &susemgr; is up and running (<command>spacewalk-service
+      start</command>).
      </para>
     </step>
    </procedure>
-   <para> After finishing the migration procedure &susemgr; 3.1 on &sls; 12 SP2 is available to be
-    used. </para>
+   <para>
+    After finishing the migration procedure &susemgr; 3.1 on &sls; 12 SP3 is
+    available to be used.
+   </para>
   </sect2>
  </sect1>
-
- <!-- SUSE Manager Migration from 2.1 - 3 -->
+<!-- SUSE Manager Migration from 2.1 - 3 -->
  <xi:include href="bp_sec_mgr_21_migration.xml"/>
-
 </chapter>
