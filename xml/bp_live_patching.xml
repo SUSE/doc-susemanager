@@ -41,9 +41,7 @@
 
   <itemizedlist>
    <listitem>
-    <para>
-     &susemgr; 3.0 or later fully updated.
-    </para>
+    <para> &susemgr; 3.0 or later fully updated. </para>
    </listitem>
    <listitem>
     <para>
@@ -147,13 +145,130 @@
      </mediaobject>
     </informalfigure>
    </step>
+  </procedure>
+ </sect1>
+ 
+ <sect1>
+  <title>Cloning Channels</title>
+  
+  <para>
+   It is considered best practice to clone a vendor channel that will be
+   modified into a new channel with one of the following prefix names: (dev,
+   testing, and prod). In the following procedure you will clone the default
+   vendor channel into a new channel named
+   <filename>dev-sles12-sp3-pool-x86_64</filename> using the command line.
+  </para>
+  
+  <procedure>
    <step>
-    <para/>
+    <para>
+     Open a terminal and as root enter:
+    </para>
+    <screen># spacewalk-manage-channel-lifecycle -list-channels
+Spacewalk Username: admin
+Spacewalk Password: 
+Channel tree:
+
+ 1. sles12-sp3-pool-x86_64
+      \__ sle-live-patching12-pool-x86_64-sp3
+      \__ sle-live-patching12-updates-x86_64-sp3
+      \__ sle-manager-tools12-pool-x86_64-sp3
+      \__ sle-manager-tools12-updates-x86_64-sp3
+      \__ sles12-sp3-updates-x86_64  </screen>
+   </step>
+   <step>
+    <para>
+     Now use the <emphasis>-init</emphasis> argument to automatically create a
+     new development clone of the original vendor channel:
+    </para>
+    <screen>spacewalk-manage-channel-lifecycle -init -c sles12-sp3-pool-x86_64</screen>
    </step>
   </procedure>
  </sect1>
+ 
  <sect1>
-  <title>Viewing Available CVE's</title>
+  <title>Removing Non-live Kernel Patches from the Cloned Channels</title>
+  
+  <para>
+   In the following procedure you will remove all kernel patch updates located
+   in the dev-sles12-sp3-updates-x86_64 channel that require a reboot.
+  </para>
+  
+  <procedure>
+   <step>
+    <para>
+     Check the current kernel version in use on your client:
+    </para>
+    <screen># uname -r
+3.12.62-60.64.8-default</screen>
+   </step>
+   <step>
+    <para>
+     From the SUSE Manager WebUI select <guimenu>Channels</guimenu>
+     <guimenu>Manage Software Channels</guimenu>
+     <guimenu>dev-sles12-sp3-updates-x86_64</guimenu>
+     <guimenu>Patches</guimenu> <guimenu>List/Remove</guimenu>. Type
+     <literal>kernel</literal> in the search field. Find the kernel version
+     that matches the kernel in use on your minion.
+    </para>
+   </step>
+   <step>
+    <para>
+     Remove all kernel update versions that are later than the current kernel.
+    </para>
+   </step>
+   <step>
+    <para>
+     Your channel is now ready to promote for testing SLE Live Patching.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
+ 
+ <sect1>
+  <title>Promoting Channels</title>
+  
+  <para>
+   The following procedure will guide you through promoting and cloning
+   a development channel to a testing channel. You will change the
+   subscription from the dev repositories on your client to the new
+   testing channel repositories. You will also add the SLE Live Patching
+   child channels to your client.
+  </para>
+  
+  <procedure>
+   <step>
+    <para>
+     Promote and clone the <literal>dev-sles12-sp3-pool-x86_64</literal> to a
+     new testing channel:
+    </para>
+    <screen>&prompt.root;spacewalk-manage-channel-lifecycle -promote -c dev-sles12-sp3-pool-x86_64</screen>
+   </step>
+   <step>
+    <para>
+     From the &susemgr; &webui; under the <guimenu>Systems</guimenu> tab
+     select your client system to view the <guimenu>System Details</guimenu>
+     page. Select <guimenu>Software</guimenu> <guimenu>Software
+      Channels</guimenu>. From the Software Channels page you can edit which
+     channels a system is subscribed to. Select the new base software channel,
+     in this case it should be <literal>test-sles12-sp3-pool-x86_64</literal>.
+     Click the <guimenu>Confirm</guimenu> button to switch the Base Software
+     Channel and finalize it by clicking the <guimenu>Modify Base Software
+      Channel</guimenu> button.
+    </para>
+   </step>
+   <step>
+    <para>
+     From the <guimenu>Software Channels</guimenu> page select and add both
+     SLE Live Patching child channels by clicking the <guimenu>Change
+      Subscriptions</guimenu> button.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
+ 
+ <sect1>
+  <title>Applying Live Patches to a Kernel</title>
 
   <para>
    The following procedure will guide you through selecting and viewing
@@ -192,206 +307,7 @@
    </step>
   </procedure>
 
-<!--
- <sect1>
-  <title>Cloning Channels</title>
 
-  <para>
-   It is considered best practice to clone a vendor channel that will be
-   modified into a new channel with one of the following prefix names: (dev,
-   testing, and prod). In the following procedure you will clone the default
-   vendor channel into a new channel named
-   <filename>dev-sles12-sp3-pool-x86_64</filename> using the command line.
-  </para>
-
-  <procedure>
-   <step>
-    <para>
-     Open a terminal and as root enter:
-    </para>
-<screen># spacewalk-manage-channel-lifecycle -list-channels
-Spacewalk Username: admin
-Spacewalk Password: 
-Channel tree:
-
- 1. sles12-sp3-pool-x86_64
-      \__ sle-live-patching12-pool-x86_64-sp3
-      \__ sle-live-patching12-updates-x86_64-sp3
-      \__ sle-manager-tools12-pool-x86_64-sp3
-      \__ sle-manager-tools12-updates-x86_64-sp3
-      \__ sles12-sp3-updates-x86_64  </screen>
-   </step>
-   <step>
-    <para>
-     Now use the <emphasis>-init</emphasis> argument to automatically create a
-     new development clone of the original vendor channel:
-    </para>
-<screen>spacewalk-manage-channel-lifecycle -init -c sles12-sp3-pool-x86_64</screen>
-   </step>
-  </procedure>
- </sect1>
- 
- <sect1>
-  <title>Removing Kernel Patches</title>
-
-  <para>
-   In the following procedure you will remove all kernel patch updates located
-   in the dev-sles12-sp3-updates-x86_64 channel that require a reboot.
-  </para>
-
-  <procedure>
-   <step>
-    <para>
-     Check the current kernel version in use on your client:
-    </para>
-<screen># uname -r
-3.12.62-60.64.8-default</screen>
-   </step>
-   <step>
-    <para>
-     From the SUSE Manager WebUI select <guimenu>Channels</guimenu>
-     <guimenu>Manage Software Channels</guimenu>
-     <guimenu>dev-sles12-sp3-updates-x86_64</guimenu>
-     <guimenu>Patches</guimenu> <guimenu>List/Remove</guimenu>. Type
-     <literal>kernel</literal> in the search field. Find the kernel version
-     that matches the kernel in use on your minion.
-    </para>
-   </step>
-   <step>
-    <para>
-     Remove all kernel update versions that are later than the current kernel.
-    </para>
-   </step>
-   <step>
-    <para>
-     Your channel is now ready to promote for testing SLE Live Patching.
-    </para>
-   </step>
-  </procedure>
- </sect1>
- <sect1>
-  <title>Promoting Channels</title>
-
-  <para>
-   The following procedure will guide you through promoting and cloning
-   a development channel to a testing channel. You will change the
-   subscription from the dev repositories on your client to the new
-   testing channel repositories. You will also add the SLE Live Patching
-   child channels to your client.
-  </para>
-
-  <procedure>
-   <step>
-    <para>
-     Promote and clone the <literal>dev-sles12-sp3-pool-x86_64</literal> to a
-     new testing channel:
-    </para>
-<screen>&prompt.root;spacewalk-manage-channel-lifecycle -promote -c dev-sles12-sp3-pool-x86_64</screen>
-   </step>
-   <step>
-    <para>
-     From the &susemgr; &webui; under the <guimenu>Systems</guimenu> tab
-     select your client system to view the <guimenu>System Details</guimenu>
-     page. Select <guimenu>Software</guimenu> <guimenu>Software
-     Channels</guimenu>. From the Software Channels page you can edit which
-     channels a system is subscribed to. Select the new base software channel,
-     in this case it should be <literal>test-sles12-sp3-pool-x86_64</literal>.
-     Click the <guimenu>Confirm</guimenu> button to switch the Base Software
-     Channel and finalize it by clicking the <guimenu>Modify Base Software
-     Channel</guimenu> button.
-    </para>
-   </step>
-   <step>
-    <para>
-     From the <guimenu>Software Channels</guimenu> page select and add both
-     SLE Live Patching child channels by clicking the <guimenu>Change
-     Subscriptions</guimenu> button.
-    </para>
-   </step>
-  </procedure>
- </sect1>
- <sect1>
-  <title>Installing kGraft Kernel Patches</title>
-
-  <para>
-   The following section will guide you through installing and enabling kGraft
-   and utilizing kGraft patches.
-  </para>
-
-  <procedure>
-   <step>
-    <para>
-     You will have to wait a moment for new channel meta-data to refresh. You
-     can verify completion from the client with:
-    </para>
-<screen># zypper ref</screen>
-   </step>
-   <step>
-    <para>
-     You will now install the first kGraft patch on your client. Keep in mind
-     the first kGraft patch will required a reboot of the system. All kGraft
-     patches applied after the initial patch installation will not require a
-     reboot. Using zypper search for the kgraft patch that matches your current
-     kernel version. <literal>3.12.62-60.64.8-default</literal>
-    </para>
-<screen># zypper ref
-# zypper se -s kgraft-patch-3.12.62-60.64.8-default
-...
-| kgraft-patch-3_12_62-60_64_8-default  | package | 3-2.1   | x86_64 | test-sle-live-patching12-updates-x86_64-sp3
-| kgraft-patch-3_12_62-60_64_8-default  | package | 2-2.1   | x86_64 | test-sle-live-patching12-updates-x86_64-sp3
-| kgraft-patch-3_12_62-60_64_8-default  | package | 1-2.2   | x86_64 | test-sle-live-patching12-updates-x86_64-sp3
-...</screen>
-   </step>
-   <step>
-    <para>
-     Always install the lowest version of a kGraft patch. Keep in mind kGraft
-     patches do not patch anything they only prepare the kernel for live
-     patching. Install the lowest version of kGraft that matches your kernel:
-    </para>
-<screen># zypper in kgraft-patch-3_12_62-60_64_8-default-1-2.2</screen>
-   </step>
-   <step>
-    <para>
-     From the &susemgr; &webui; select <guimenu>Systems</guimenu> then select
-     your client system. On the <guimenu>System Details</guimenu> page you will
-     notice several things:
-    </para>
-    <itemizedlist>
-     <listitem>
-      <para>
-       Under <literal>System Status</literal> The system requires a reboot to
-       enable use of the kGraft live patching technology.
-      </para>
-     </listitem>
-     <listitem>
-      <para>
-       Under <literal>System Info</literal> <literal>Kernel:</literal> You can
-       see that <literal>Live patch: kgraft_patch_1_2_2</literal> has been
-       applied.
-      </para>
-     </listitem>
-    </itemizedlist>
-   </step>
-   <step>
-    <para>
-     Reboot the client system.
-    </para>
-   </step>
-   <step>
-    <para>
-     After the reboot bring your client system up to date by patching.
-    </para>
-   </step>
-   <step>
-    <para>
-     On the <guimenu>System Details</guimenu> page you will notice the
-     <literal>System Status</literal> message is <literal>System is up to
-     date</literal> and under <literal>System Info Kernel:</literal> you will
-     see the latest kGraft patch has been applied: <literal>Live patch:
-     kgraft_patch_3_2_1</literal>.
-    </para>
-   </step>
-  </procedure>
 
   <important>
    <title>CVE Availability</title>
@@ -401,6 +317,6 @@ Channel tree:
     patches are always a subset of the full kernel patches.
    </para>
   </important>
--->
+
  </sect1>
 </chapter>
