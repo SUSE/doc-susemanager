@@ -19,6 +19,13 @@
   </abstract>
  </info>
 
+ <sect1>
+  <title>Requirements</title>
+
+  <para>
+   This images feature is only available for Salt minions running on
+   &sls; 12 or later.  You will need git to store docker files.
+  </para>
  <para>
   For additional information on Docker or Kubernetes, see:
  </para>
@@ -43,13 +50,6 @@
   </listitem>
  </itemizedlist>
  
- <sect1>
-  <title>Requirements</title>
-
-  <para>
-   This images feature is only available for Salt minions running on
-   &sls; 12 or later.  You will need git to store docker files.
-  </para>
  </sect1>
  <sect1 xml:id="bp.images.buildhost">
   <title>Creating a Build Host</title>
@@ -94,9 +94,10 @@
      clicking <guimenu>Change Subscriptions</guimenu>.
     </para>
    </step>
-   <!-- Is this actually needed after beta? -->
    <step>
     <para>
+     <remark>Is this actually still needed?  Or was this just an issue
+     during beta development?</remark> 
      Update the <package>salt</package> and
      <package>salt-minion</package> packages.
     </para>
@@ -119,20 +120,17 @@
     </para>
    </step>
    <step>
-    <!-- Check this.  After enabling "Docker Build
-         Host" SUMA prints:
-
-Note: This action will not result in state application. To apply the
-state, either use the states page or run `state.highstate` from the
-command line.
-    -->
     <para>
-     A state will be applied that installs the required packages.
+     Apply the state that will install the required packages; on the
+     system's details page select
+     <menuchoice><guimenu>States</guimenu><guimenu>Highstate</guimenu></menuchoice>
+     and click <guimenu>Apply Highstate</guimenu>, or run
+     <literal>state.highstate</literal> from the command line.
     </para>
    </step>
   </procedure>
  </sect1>
- <sect1>
+ <sect1 xml:id="bp.images.buildchannels">
   <title>Define Container Build Channels with an Activation Key</title>
 
   <para>
@@ -167,13 +165,15 @@ command line.
    <step>
     <para>
      Enter a <guimenu>Description</guimenu>, a <guimenu>Key</guimenu>
-     name, Use the dropdown to select the <guimenu>Base
+     name, Use the drop-down box to select the <guimenu>Base
      Channel</guimenu> that should be associated with this key.  Confirm
      with <guimenu>Create Activation Key</guimenu>.
     </para>
    </step>
   </procedure>
-  <!-- For more info, see ... -->
+  <para>
+   For more information, see <xref linkend="bp.key.managment"/>.
+  </para>
  </sect1>
  <sect1>
   <title>Creating an Image Store</title>
@@ -233,7 +233,7 @@ command line.
    </step>
   </procedure>
  </sect1>
- <sect1>
+ <sect1 xml:id="bp.images.profile">
   <title>Creating an Image Profile</title>
 
   <para>
@@ -283,9 +283,9 @@ command line.
       For the <guimenu>Path</guimenu> field you should use a git url
       (http/https) with the following format:
      </para>
-<screen> https://git.domain.top/path/my.git#branchname:folder</screen>
+<screen>https://git.example.com/path/my.git#branchname:folder</screen>
      <para>
-      If a branchname is not specified the <literal>Master</literal> branch
+      If a branchname is not specified the <literal>master</literal> branch
       will be used by default. If a <literal>folder</literal> is not specified
       a <literal>Dockerfile</literal> is expected to be in the root directory
       of the checkout.
@@ -305,8 +305,8 @@ command line.
     See the following example Dockerfile. A docker file is specified when
     creating an image profile and stored in a git repository:
    </para>
-<screen>   FROM registry.mgr.suse.de/sles12sp2
-   MAINTAINER Tux Administrator "tux@suse.de"
+<screen>   FROM registry.mgr.example.com/sles12sp2
+   MAINTAINER Tux Administrator "tux@example.com"
    
    ARG repo
    ARG cert
@@ -362,7 +362,7 @@ command line.
    <step>
     <para>
      Add a different tag name if you want a version other than the default
-     <literal>Latest</literal>.
+     <literal>latest</literal>.
     </para>
    </step>
    <step>
