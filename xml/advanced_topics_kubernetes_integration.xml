@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="advanced.topics.kubernetes.integration">
+
+    <title>Kubernetes Integration Guide</title>
+
+
+    <sect1 xml:id="at.k8s.integration.intro">
+        <title>Introduction</title>
+        <para>Into to chapter and covered material</para>
+
+    </sect1>
+
+    <sect1 xml:id="at.k8s.integration.requires">
+        <title>Prerequisites</title>
+        <para>The prerequisites listed below should be met before proceeding. </para>
+        <itemizedlist>
+            <listitem>
+                <para>At least one <emphasis>Kubernetes</emphasis> or <emphasis>CaaSP</emphasis>
+                    cluster available on your network</para>
+            </listitem>
+            <listitem>
+                <para>SUSE Manager version <emphasis>3.1.2</emphasis> or higher</para>
+            </listitem>
+            <listitem>
+                <para>SUSE Manager configured for container management <note>
+                        <para><!-- Add required links and info here -->Required channels are
+                            present, a registered build host available etc.</para>
+                    </note></para>
+            </listitem>
+            <listitem>
+                <para><emphasis>virtual-host-gatherer-Kubernetes</emphasis> package installed on
+                    your SUSE Manager server</para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+
+    <sect1>
+        <title>Requirements</title>
+        <itemizedlist>
+            <listitem>
+                <para>Kubernetes version 1.5.0 or Higher. Alternatively use CaaSP <emphasis>(CaaSP
+                        includes K8s 1.5.0 by default)</emphasis></para>
+            </listitem>
+            <listitem>
+                <para>Docker version 1.12 or higher on the container build host</para>
+            </listitem>
+        </itemizedlist>
+        <note>
+            <para>To enable all Kubernetes related features within the WebUI, the
+                    <emphasis>virtual-host-gatherer-Kubernetes</emphasis> package must be
+                installed.</para>
+        </note>
+    </sect1>
+
+    <sect1>
+        <title>Register Kubernetes as a Virtual Host Manager</title>
+
+        <para><emphasis>Kubernetes</emphasis> clusters are registered with SUSE Manager as
+                <literal>virtual host managers</literal>. Registration and authorization begins with
+            importing a <literal>kubeconfig</literal> file using Kubernetes official command line
+            tool <literal>kubectl</literal>.</para>
+
+        <procedure>
+            <title>Registering a Kubernetes Cluster with &susemgr;</title>
+
+            <step>
+                <para>Select <menuchoice>
+                        <guimenu>Systems</guimenu>
+                        <guimenu>Virtual Host Managers</guimenu>
+                    </menuchoice> from the navigation menu.</para>
+            </step>
+            <step>
+                <para>Expand the <guibutton>Create</guibutton> dropdown in the upper right corner of
+                    the page and select <guimenu>Kubernetes Cluster</guimenu>.</para>
+            </step>
+            <step>
+                <para>Input a label for the new Virtual Host Manager.</para>
+            </step>
+            <step>
+                <para>Select the <literal>kubeconfig</literal> file which contains the required data
+                    for the Kubernetes cluster.</para>
+            </step>
+            <step>
+                <para>Select the correct <emphasis>context</emphasis> for the cluster, as specified
+                    in the kubeconfig file.</para>
+            </step>
+            <step>
+                <para>Click <guibutton>Create</guibutton>.</para>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Viewing the List of Nodes in a Cluster</title>
+        <procedure>
+            <step>
+                <para>Select <menuchoice>
+                        <guimenu>Systems</guimenu>
+                        <guimenu>Virtual Host Managers</guimenu>
+                    </menuchoice> from the navigation menu.</para>
+            </step>
+            <step>
+                <para>Select the desired Kubernetes cluster to view it.</para>
+            </step>
+            <step>
+                <para>Node data is not refreshed during registration. To refresh node data, click on
+                        <guibutton>Schedule refresh data</guibutton>.</para>
+            </step>
+            <step>
+                <para>Refresh the browser. If the node data is not available wait a few moments and
+                    try again.</para>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Obtaining Runtime Data about Images</title>
+        <para/>
+
+        <procedure>
+            <step>
+                <para>Select <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Images</guimenu>
+                    </menuchoice> from the navigation menu.</para>
+            </step>
+            <step>
+                <para>In the image list table, take notice of the new runtime columns. These are
+                    labeled: <literal>Revision</literal>, <literal>Runtime</literal> and
+                        <literal>Instances</literal>. Initially these columns will not provide
+                    useful data.<itemizedlist>
+                        <listitem>
+                            <para><literal>Revision</literal>: An artificial sequence number which
+                                increments on every rebuild for manager-built images, or on every
+                                reimport for externally built images.</para>
+                        </listitem>
+                        <listitem>
+                            <para><literal>Runtime</literal>: Overall status of the running
+                                instances of the image throughout the registered clusters. The
+                                status can be one of the following:<itemizedlist>
+                                    <listitem>
+                                        <para>All instances are consistent with SUSE Manager: All
+                                            the running instances are running the same build of the
+                                            image as tracked by SUSE Manager.</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>Outdated instances found: Some of the instances are
+                                            running an older build of the image. A redeploy of the
+                                            image into the pod may be required.</para>
+                                    </listitem>
+                                    <listitem>
+                                        <para>No information: The checksum of the instance image
+                                            does not match the image data contained in SUSE Manager.
+                                            A redeploy of the image into the pod may be
+                                            required.</para>
+                                    </listitem>
+                                </itemizedlist></para>
+                        </listitem>
+                        <listitem>
+                            <para><literal>Instances</literal>: Number of instances running this
+                                image across all the clusters registered in SUSE Manager. A
+                                breakdown of numbers can be seen by clicking on the pop-up icon next
+                                to the number.</para>
+                        </listitem>
+                    </itemizedlist></para>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Building an image for deployment in Kubernetes</title>
+        <para/>
+        <procedure>
+            <step>
+                <para>Under Images > Stores, create an image store.</para>
+            </step>
+            <step>
+                <para>Under Images > Profiles, create an image profile (with a Dockerfile which is
+                    suitable to deploy to Kubernetes).</para>
+            </step>
+            <step>
+                <para>Under Images > Build, build an image with the created profile and wait for the
+                    build to finish.</para>
+            </step>
+            <step>
+                <para>Deploy the image into one of the registered Kubernetes clusters (via
+                    kubectl).</para>
+            </step>
+            <step>
+                <para>Notice the updated data in Runtime and Instances columns in the respective
+                    image row. </para>
+            </step>
+        </procedure>
+    </sect1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</chapter>
