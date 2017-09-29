@@ -11,6 +11,8 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="mgr.expanded.support">
     <title>Expanded Support</title>
     <para/>
+
+
     <sect1>
         <title>Managing RES Clients</title>
         <para>The following sections provide guidance on managing Red Hat Expanded Support clients,
@@ -65,8 +67,7 @@
                             <literal>mgr-sync</literal></para>
                 </listitem>
                 <listitem>
-                    <para>It can take up to or more than 24 hours for an initial channel
-                        sync.</para>
+                    <para>It can take up to 24 hours for an initial channel sync to complete.</para>
                 </listitem>
                 <listitem>
                     <para>Once you have completed the initial sync process of any RES channel it is
@@ -196,9 +197,6 @@ Packages to sync:              3690
                         <para>On the server command line as root, create a bootstrap repo for RHEL
                             with the following command :</para>
                         <screen>mgr-create-bootstrap-repo RHEL_activation_channel_key</screen>
-                        <para>If required, recreate the bootstrap script with the Salt option
-                            enabled:</para>
-                        <screen>mgr-bootstrap --salt</screen>
                     </step>
                     <step>
                         <para>Rename bootstrap.sh to resversion-boostrap.sh:</para>
@@ -282,178 +280,185 @@ Packages to sync:              3690
         </sect2>
     </sect1>
 
+
+
     <sect1>
-        <title>Managing CentOS Expanded Support Clients (RES)</title>
-        <para>The following sections will guide you through preparing CentOS channels and
-            repositories for bootstrapping CentOS clients to SUSE Manager.</para>
+        <title>Preparing Channels and Repositories for CentOS Traditional Clients</title>
+        <para>This following section provides an example procedure for configuring CentOS channels
+            and repositories and finally registering a CentOS client with SUSE Manager. These steps
+            will be identical for Scientific Linux and Fedora.</para>
+        <procedure>
+            <title>Preparing Channels and Repositories</title>
+            <step>
+                <para>As <literal>root</literal> install <literal>spacewalk-utils</literal> on your
+                    &susemgr; server:</para>
+                <screen>zypper in spacewalk-utils</screen>
+                <important>
+                    <para>The spacewalk-utils package contains a collection of upstream command line
+                        tools which provide assistance with spacewalk administrative operations. You
+                        will be using the <literal>spacewalk-common-channels</literal> tool. Keep in
+                        mind SUSE only provides support for spacewalk-clone-by-date and
+                        spacewalk-manage-channel-lifecycle tools. </para>
+                </important>
+            </step>
+            <step>
+                <para>Run the spacewalk-common-channels script to add the CentOS7 base, updates, and
+                    Spacewalk client channels. </para>
+                <screen>spacewalk-common-channels -u admin -p &lt;secret&gt; -a x86_64 'centos7',
+spacewalk-common-channels -u admin -p &lt;secret&gt; -a x86_64 'centos7-updates'
+spacewalk-common-channels -u admin -p &lt;secret&gt; -a x86_64 'spacewalk26-client-centos7'</screen>
+                <note>
+                    <para>The /etc/rhn/spacewalk-common-channels.ini must contain the channel
+                        references to be added. If the a channel is not listed, check the latest
+                        version here for updates: <link
+                            xlink:href="https://github.com/spacewalkproject/spacewalk/blob/master/utils/spacewalk-common-channels.ini"
+                        />
+                    </para>
+                </note>
+            </step>
+            <step>
+                <para>From the WebUI select <menuchoice>
+                        <guimenu>Software</guimenu>
+                        <guimenu>Manage Software Channels</guimenu>
+                        <guimenu>Overview</guimenu>
+                    </menuchoice>. Select the base channel you wish to sync, in this case
+                        <literal>CentOS7 (x86_64)</literal>. Select <menuchoice>
+                        <guimenu>Repositories</guimenu>
+                        <guimenu>Sync</guimenu>
+                    </menuchoice>. Check the channels you wish to sync and then click the
+                        <guimenu>Sync Now</guimenu> button or optionall schedule a regular sync
+                    time. </para>
+            </step>
+            <step>
+                <para>Copy all relevant GPG keys to <filename>/srv/www/htdocs/pub</filename>.
+                    Depending on what distribution you are interested in managing these could
+                    include an EPEL key, SUSE keys, Red Hat keys, and CentOS keys. After copying
+                    these you can reference them in a comma-delimited list within your bootstrap
+                    script (see example below)</para>
+                <itemizedlist>
+                    <listitem>
+                        <para> CentOS7 key files: <link
+                                xlink:href="http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7"
+                            /></para>
+                    </listitem>
+                    <listitem>
+                        <para>EPEL key file: <link
+                                xlink:href="http://mirrors.kernel.org/fedora-epel/RPM-GPG-KEY-EPEL-7"
+                            /></para>
+                    </listitem>
+                    <listitem>
+                        <para>Spacewalk key: <link
+                                xlink:href="http://spacewalk.redhat.com/yum/RPM-GPG-KEY-spacewalk-2015"
+                            /></para>
+                    </listitem>
+                    <listitem>
+                        <para> Red Hat keys: <link
+                                xlink:href="http://www.redhat.com/contact/security-response-team/gpg-keys.html"
+                            /></para>
+                    </listitem>
+                </itemizedlist>
+            </step>
+            <step>
+                <para>Install and setup a CentOS 7 client with the default installation
+                    packages.</para>
+            </step>
+            <step>
+                <para>Ensure the client machine can resolve itself via DNS as well as your &susemgr;
+                    server. Validate that there is an entry in /etc/hosts for the real IP address of
+                    the client.</para>
+            </step>
+            <step>
+                <para>Create an activation key (centos7) on the &susemgr; server that points to the
+                    correct parent/child channels, including the CentOS base repo, updates, and
+                    Spacewalk client.</para>
+            </step>
+        </procedure>
 
-        <sect2>
-            <title>Creating Channels and Repositories</title>
-            <para>Create the repositories for CentOS.</para>
-            <procedure>
-                <title>Adding the Base repository</title>
-                <step>
-                    <para>Login to your SUSE Manager WebUI and browse to:
-                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
-                            Channels</guimenu> &gt; <guimenu>Manage Repositories</guimenu> and
-                        select <guimenu>Create New Repository</guimenu></para>
-                </step>
-                <step>
-                    <para>Add the Base repository details:</para>
-                    <screen>Repository label: CentOS 6 Base x86_64
-Repository URL: http://mirrors.kernel.org/centos/6/os/x86_64/
+        <procedure>
+            <title>Preparing the Bootstrap Script</title>
+            <step>
+                <para>Create/edit your bootstrap script to correctly reflect the following:</para>
+                <screen># can be edited, but probably correct (unless created during initial install):
 
-Has signed metadata? UNCHECKED</screen>
-                </step>
-                <step>
-                    <para>Repeat previous steps and create the updates repository:</para>
-                    <screen>Repository label: CentOS 6 updates x86_64
-Repository URL: http://mirrors.kernel.org/centos/6/updates/x86_64/
-(or your preferred mirror)
+# NOTE: ACTIVATION_KEYS *must* be used to bootstrap a client machine.
 
-Has signed metadata? UNCHECKED</screen>
-                </step>
-            </procedure>
+ACTIVATION_KEYS=1-centos7
+
+ORG_GPG_KEY=res.key,RPM-GPG-KEY-CentOS-7,suse-307E3D54.key,suse-9C800ACA.key,RPM-GPG-KEY-spacewalk-2015
 
 
-        </sect2>
+FULLY_UPDATE_THIS_BOX=0
 
-        <sect2>
-            <title>Creating CentOS Channels</title>
-            <para>Create the CentOS channels.</para>
-            <procedure>
-                <title>Creating the CentOS Channels</title>
-                <step>
-                    <para>Login to your SUSE Manager WebUI and browse to:
-                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
-                            Channels</guimenu> &gt; <guimenu>Create New Channel</guimenu></para>
-                </step>
-                <step>
-                    <para>Add the following base channel details:</para>
-                    <screen>Channel Name*: CentOS 6 Base - x86_64
-Channel Label*: centos6-base-x86_64
-Parent Channel: None
-Architecture: x86_64
-Repository Checksum Type: sha1
-
-Channel Summary, etc: fill as desired
-
-GPG key URL: http://mirrors.kernel.org/centos/6/os/x86_64/RPM-GPG-KEY-CentOS-6
-GPG key ID: C105B9DE
-GPG key Fingerprint: C1DA C52D 1664 E8A4 386D BA43 0946 FCA2 C105 B9DE</screen>
-                </step>
-                <step>
-                    <para>Repeat the previous steps and create the updates child channel</para>
-                    <screen>Channel Name*: CentOS 6 Updates - x86_64
-Channel Label*: centos6-updates-x86_64
-Parent Channel: CentOS 6 Base - x86_64
-Architecture: x86_64
-Repository Checksum Type: sha1
-
-Channel Summary, etc: fill as desired
-
-GPG key URL: http://mirrors.kernel.org/centos/6/os/x86_64/RPM-GPG-KEY-CentOS-6
-GPG key ID: C105B9DE
-GPG key Fingerprint: C1DA C52D 1664 E8A4 386D BA43 0946 FCA2 C105 B9DE</screen>
-                </step>
-            </procedure>
-
-        </sect2>
-
-        <sect2>
-            <title>Adding the Repositories to the New Channels</title>
-            <para>Add the repositories to your new channels.</para>
-            <procedure>
-                <title>Add Repositories to Channels</title>
-                <step>
-                    <para>Login to your SUSE Manager WebUI and browse to:
-                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
-                            Channels</guimenu> and click the <guimenu>CentOS Base channel</guimenu>
-                        created previously.</para>
-                </step>
-                <step>
-                    <para/>
-                    <para>Select the <guimenu>Repositories</guimenu> tab and select the CentOS base
-                        repository.</para>
-                </step>
-                <step>
-                    <para>Now add the updates repository to the updates child channel. Browse to
-                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
-                            Channels</guimenu> and select the <guimenu>CentOS Updates
-                            Channel</guimenu> created previously.</para>
-                </step>
-                <step>
-                    <para>Select the <guimenu>Repositories</guimenu> tab and select the CentOS
-                        updates repository.</para>
-                </step>
-                <step>
-                    <para>You may optionally force a sync of channel packages by clicking the
-                            <guimenu>Sync</guimenu>.</para>
-                </step>
-                <step>
-                    <para>Once you have completed syncing the Updates and Base CentOS channels you
-                        should see an estimated 6000+ packages for the base channel and a few
-                        hundred for the updates channel. The next section will cover registering
-                        CentOS clients.</para>
-                </step>
-            </procedure>
-
-        </sect2>
-
-        <sect2>
-            <title>Registering CentOS salt-minions with SUSE Manager</title>
-            <para>The following procedure will guide you through registering a CentOS Minion.</para>
-            <warning>
-                <title>Support for CentOS Patches</title>
-                <para>Warning: CentOS utilizing patches originating from CentOS is not officially
-                    supported by SUSE. Please reference the matrix of SUMA clients on the main page
-                    of the SUSE Manager wiki.<link
-                        xlink:href="https://wiki.microfocus.com/images/e/eb/SUMA3-client-matrix-20170509.png"
-                    /></para>
-            </warning>
-            <procedure>
-                <title>Register a CentOS 7 Minion</title>
-                <step>
-                    <para>Add the Open Build Service repo for Salt:</para>
-                    <screen>yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/</screen>
-                </step>
-                <step>
-                    <para>Import the repo key:</para>
-                    <screen>rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key</screen>
-                </step>
-                <step>
-                    <para>Check if there's any other repo that contains Salt. If there's only one
-                        repo listed then you're fine. If not disable any other repo that contains
-                        Salt apart from the OBS one.</para>
-                    <screen>yum list --showduplicates salt</screen>
-                </step>
-                <step>
-                    <para>Install the Salt minion:</para>
-                    <screen>yum install salt salt-minion</screen>
-                </step>
-                <step>
-                    <para>Change the Salt configuration to point to the Suse Manager server:</para>
-                    <screen>mkdir -p /etc/salt/minion.d
-echo "master: &lt;server fqdn&gt;" &gt; /etc/salt/minion.d/susemanager.conf</screen>
-                </step>
-                <step>
-                    <para>Restart the minion</para>
-                    <screen>systemctl restart salt-minion</screen>
-                </step>
-                <step>
-                    <para>Proceed to <menuchoice>
-                            <guimenu>Salt</guimenu>
-                            <guimenu>Onboarding</guimenu>
-                        </menuchoice> from the WebUI and accept the minion key.</para>
-                </step>
-            </procedure>
-
-        </sect2>
-
+yum clean all
+# Install the prerequisites
+yum -y install yum-rhn-plugin rhn-setup 
+</screen>
+            </step>
+            <step>
+                <para>Add the following lines to the bottom of your script, (just before
+                        <literal>echo “-bootstrap complete -”</literal> )</para>
+                <screen># This section is for commands to be executed after registration
+mv /etc/yum.repos.d/Cent* /root/
+yum clean all
+chkconfig rhnsd on
+chkconfig osad on
+service rhnsd restart
+service osad restart</screen>
+            </step>
+            <step>
+                <para>Continue by following normal bootstrap procedures to bootstrap the new
+                    client.</para>
+            </step>
+        </procedure>
     </sect1>
 
+    <sect1>
+        <title>Registering CentOS salt-minions with SUSE Manager</title>
+        <para>The following procedure will guide you through registering a CentOS Minion.</para>
+        <warning>
+            <title>Support for CentOS Patches</title>
+            <para>Warning: CentOS utilizing patches originating from CentOS is not officially
+                supported by SUSE. Please reference the matrix of SUMA clients on the main page of
+                the SUSE Manager wiki.<link
+                    xlink:href="https://wiki.microfocus.com/images/e/eb/SUMA3-client-matrix-20170509.png"
+                /></para>
+        </warning>
+        <procedure>
+            <title>Register a CentOS 7 Minion</title>
+            <step>
+                <para>Add the Open Build Service repo for Salt:</para>
+                <screen>yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/</screen>
+            </step>
+            <step>
+                <para>Import the repo key:</para>
+                <screen>rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key</screen>
+            </step>
+            <step>
+                <para>Check if there's any other repo that contains Salt. If there's only one repo
+                    listed then you're fine. If not disable any other repo that contains Salt apart
+                    from the OBS one.</para>
+                <screen>yum list --showduplicates salt</screen>
+            </step>
+            <step>
+                <para>Install the Salt minion:</para>
+                <screen>yum install salt salt-minion</screen>
+            </step>
+            <step>
+                <para>Change the Salt configuration to point to the Suse Manager server:</para>
+                <screen>mkdir -p /etc/salt/minion.d
+echo "master: &lt;server fqdn&gt;" &gt; /etc/salt/minion.d/susemanager.conf</screen>
+            </step>
+            <step>
+                <para>Restart the minion</para>
+                <screen>systemctl restart salt-minion</screen>
+            </step>
+            <step>
+                <para>Proceed to <menuchoice>
+                        <guimenu>Salt</guimenu>
+                        <guimenu>Keys</guimenu>
+                    </menuchoice> from the WebUI and accept the minion key.</para>
+            </step>
+        </procedure>
 
-
-
-
+    </sect1>
 </chapter>
