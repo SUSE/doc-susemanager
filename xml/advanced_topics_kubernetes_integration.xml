@@ -181,28 +181,159 @@
 
     <sect1>
         <title>Building an image for deployment in Kubernetes</title>
-        <para>See the following steps to build an image for deployment.</para>
+        <para>The following steps will help you build an image for deployment in Kubernetes.</para>
         <procedure>
             <step>
-                <para>Under Images > Stores, create an image store.</para>
+                <para>Under <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Stores</guimenu>
+                    </menuchoice>, create an image store.</para>
             </step>
             <step>
-                <para>Under Images > Profiles, create an image profile (with a Dockerfile which is
-                    suitable to deploy to Kubernetes).</para>
+                <para>Under <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Profiles</guimenu>
+                    </menuchoice>, create an image profile (with a Dockerfile which is suitable to
+                    deploy to Kubernetes).</para>
             </step>
             <step>
-                <para>Under Images > Build, build an image with the created profile and wait for the
-                    build to finish.</para>
+                <para>Under <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Build</guimenu>
+                    </menuchoice>, build an image with the new profile and wait for the build to
+                    finish.</para>
             </step>
             <step>
                 <para>Deploy the image into one of the registered Kubernetes clusters (via
-                    kubectl).</para>
+                        <literal>kubectl</literal>).</para>
             </step>
             <step>
-                <para>Notice the updated data in Runtime and Instances columns in the respective
-                    image row. </para>
+                <para>Notice the updated data in <literal>Runtime</literal> and
+                        <literal>Instances</literal> columns in the respective image row. </para>
             </step>
         </procedure>
+    </sect1>
+    <sect1>
+        <title>Importing an image already deployed in Kubernetes</title>
+        <para>The following steps will guide you through importing a previously deployed image in
+            Kubernetes.</para>
+        <procedure>
+            <step>
+                <para>Select an image that has already been deployed to any of your registered
+                    Kubernetes clusters.</para>
+            </step>
+            <step>
+                <para>Add the registry owning the image to SUSE Manager as an image store.</para>
+            </step>
+            <step>
+                <para>Select <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Images</guimenu>
+                    </menuchoice>, click <literal>Import</literal> from the top-right corner, fill
+                    in the form fields and click <literal>Import</literal>.</para>
+            </step>
+            <step>
+                <para>Notice the updated data in <literal>Runtime</literal> and
+                        <literal>Instances</literal> columns in the respective image row.</para>
+            </step>
+        </procedure>
+    </sect1>
+    <sect1>
+        <title>Obtaining Additional Runtime Data</title>
+        <para>The following steps will help you find additional runtime data.</para>
+        <procedure>
+            <step>
+                <para>Select to <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Images</guimenu>
+                    </menuchoice>, click the <literal>Details</literal> button on the right end of a
+                    row which has running instances.</para>
+            </step>
+            <step>
+                <para>Under the <literal>Overview</literal> tab, notice the data in
+                        <literal>Runtime</literal> and <literal>Instances</literal> fields under
+                        <literal>Image Info</literal> section.</para>
+            </step>
+            <step>
+                <para>Select the <literal>Runtime</literal> tab.</para>
+            </step>
+            <step>
+                <para>Here is a breakdown of the Kubernetes pods running this image in all the
+                    registered clusters including the following data:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Pod name </para>
+                    </listitem>
+                    <listitem>
+                        <para>Namespace which the pod resides in </para>
+                    </listitem>
+                    <listitem>
+                        <para>The runtime status of the container in the specific pod. Status icons
+                            are explained in the preceeding example.</para>
+                    </listitem>
+                </itemizedlist>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Rebuilding a Previously Deployed Image in Kubernetes</title>
+        <para>The following steps will guide you through rebuilding an image which has been deployed
+            to a Kubernetes cluster.</para>
+        <procedure>
+            <step>
+                <para>Go to <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Images</guimenu>
+                    </menuchoice>, click the Details button on the right end of a row which has
+                    running instances. The image must be manager-built.</para>
+            </step>
+            <step>
+                <para>Click the <literal>Rebuild</literal> button located under the <literal>Build
+                        Status</literal> section and wait for the build to finish.</para>
+            </step>
+            <step>
+                <para>Notice the change in the <literal>Runtime</literal> icon and title, reflecting
+                    the fact that now the instances are running a previous build of the image.
+                </para>
+            </step>
+        </procedure>
+    </sect1>
+    <sect1>
+        <title>Role Based Access Control Permissions and Certificate Data</title>
+        <important>
+            <para>Currently, only kubeconfig files containing all embedded certificate data may be
+                used with SUSE Manager</para>
+        </important>
+        <para>The API calls from &susemgr; are:</para>
+        <itemizedlist>
+            <listitem>
+                <para>GET /api/v1/pods</para>
+            </listitem>
+            <listitem>
+                <para>GET /api/v1/nodes</para>
+            </listitem>
+        </itemizedlist>
+
+        <para>According to this list, the minimum recommended permissions for &susemgr; should be as
+            follows:</para>
+        <itemizedlist>
+            <listitem>
+                <para>A ClusterRole to list all the nodes:</para>
+                <screen>resources: ["nodes"]
+verbs: ["list"] </screen>
+            </listitem>
+            <listitem>
+                <para>A ClusterRole to list pods in all namespaces (role binding must not restrict
+                    the namespace):</para>
+                <screen>resources: ["pods"]
+verbs: ["list"]</screen>
+            </listitem>
+        </itemizedlist>
+        <para> Due to a a 403 response from /pods, the entire cluster will be ignored by SUSE
+            Manager.</para>
+        <para>For more information on working with RBAC Authorization see: <link
+                xlink:href="https://kubernetes.io/docs/admin/authorization/rbac/"/></para>
     </sect1>
 
 
