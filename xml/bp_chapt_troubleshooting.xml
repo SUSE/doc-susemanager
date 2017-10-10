@@ -410,6 +410,81 @@ jabberd/router[31437]: shutting down</screen>
 
     </sect1>
 
+ <!-- ============================================================ -->
+ <!-- requested 2017-05-05:
+      https://bugzilla.suse.com/show_bug.cgi?id=1037798
+ -->
+ <sect1 xml:id="bp.troubleshooting.timeouts">
+  <title>RPC Connection Timeout Settings</title>
+  <!--idx-->
+  <indexterm>
+  <primary>connection timeout</primary></indexterm><indexterm>
+  <primary>timeout settings</primary>
+  <secondary>RPC connection</secondary>
+ </indexterm>
+
+  <para>
+   RPC connection timeouts are configurable on the &susemgr; server,
+   &susemgrproxy; server, and the clients. For example, if package
+   downloads take longer then expected, you can increase timeout values.
+   <command>spacewalk-proxy restart</command> should be run after the
+   setting is added or modified.
+  </para>
+
+  <para>
+   Set the following variables to a value in seconds specifying how long an
+   RPC connection may take at maximum:
+  </para>
+
+<!--
+- Comment #1 from Michael Calmer <mc@suse.com> 2013-08-08 08:33:38 UTC -
+You can configure the timeout (how long a RPC connection maximal take) now on
+Server, Proxy and Client.
+  -->
+
+  <variablelist>
+   <varlistentry>
+    <term>Server &mdash; <filename>/etc/rhn/rhn.conf</filename>:</term>
+    <listitem>
+<screen>server.timeout = <replaceable>number</replaceable></screen>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Proxy Server &mdash; <filename>/etc/rhn/rhn.conf</filename>:</term>
+    <listitem>
+<!-- bsc#929379 -->
+<screen>proxy.timeout = <replaceable>number</replaceable></screen>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>&sls; Clients (using <package>zypp-plugin-spacewalk</package>) &mdash; <filename>/etc/zypp/zypp.conf</filename>:</term>
+    <listitem>
+<screen>## Valid values:  [0,3600]
+## Default value: 180
+download.transfer_timeout = 180</screen>
+     <para>
+      This is the maximum time in seconds that a transfer operation is
+      allowed to take. This is useful for preventing batch jobs from hanging
+      for hours due to slow networks or links going down. If limiting
+      operations to less than a few minutes, you risk aborting perfectly
+      normal operations.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>&rhel; Clients (using <package>yum-rhn-plugin</package>) &mdash; <filename>/etc/yum.conf</filename>:</term>
+    <listitem>
+<screen>timeout = <replaceable>number</replaceable></screen>
+<!--
+(yum has multiple places where you can configure something and I am not sure
+where it read all the timeout from. Possible is also the special 
+/etc/yum/pluginconf.d/rhnplugin.conf and per repo in /etc/yum.repos.d/...repo )
+     -->
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </sect1>
+<!-- ============================================================ -->
 
 
 </chapter>
