@@ -9,111 +9,151 @@
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="mgr.expanded.support">
-    <title>Expanded Support</title>
-    <para/>
+ <title>Expanded Support</title>
+ <para/>
+ <sect1>
+  <title>Managing RES Clients</title>
 
+  <para>
+   The following sections provide guidance on managing Red Hat Expanded Support
+   clients, this includes salt-minions and traditional systems.
+  </para>
 
-    <sect1>
-        <title>Managing RES Clients</title>
-        <para>The following sections provide guidance on managing Red Hat Expanded Support clients,
-            this includes salt-minions and traditional systems. </para>
+  <sect2>
+   <title>Server Configuration for RES Channels</title>
+   <para>
+    This section provides guidance on server configuration for RES Channels
+    provided by SUSE.
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      Minimum of 8GB ram and at least two physical CPU or virtual CPU's.
+      Taskomatic will use 1 of these CPUs
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Taskomatic requires of minimum of 3072MB Ram. This should be set in
+      <filename>/etc/rhn/rhn.conf</filename>:
+     </para>
+<screen>taskomatic.java.maxmemory=3072</screen>
+    </listitem>
+    <listitem>
+     <para>
+      Provision enough disk space. <filename>/var/spacewalk</filename> contains
+      all mirrored RPMs. For example: RES 6 x86_64 channels require 90GB+
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      LVM or an NFS mount is recommended
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Access to RHEL 5/6/7 Subscription Media
+     </para>
+    </listitem>
+   </itemizedlist>
+   <warning>
+    <title>Access to RHEL Media/repositories</title>
+    <para>
+     Access to Red Hat base media repositories and RHEL installation media is
+     the responsibility of our customers. Ensure that all your RHEL systems
+     obtain support from RHEL, or alternatively all your RHEL systems obtain
+     support from SUSE. If you do not follow these practices you may violate
+     terms with Red Hat.
+    </para>
+   </warning>
+  </sect2>
 
-        <sect2>
-            <title>Server Configuration for RES Channels</title>
-            <para>This section provides guidance on server configuration for RES Channels provided
-                by SUSE.</para>
-            <itemizedlist>
-                <listitem>
-                    <para>Minimum of 8GB ram and at least two physical CPU or virtual CPU's.
-                        Taskomatic will use 1 of these CPUs</para>
-                </listitem>
-                <listitem>
-                    <para>Taskomatic requires of minimum of 3072MB Ram. This should be set in
-                            <filename>/etc/rhn/rhn.conf</filename>:</para>
-                    <screen>taskomatic.java.maxmemory=3072</screen>
-                </listitem>
-                <listitem>
-                    <para>Provision enough disk space. <filename>/var/spacewalk</filename> contains
-                        all mirrored RPMs. For example: RES 6 x86_64 channels require 90GB+ </para>
-                </listitem>
-                <listitem>
-                    <para>LVM or an NFS mount is recommended</para>
-                </listitem>
-                <listitem>
-                    <para>Access to RHEL 5/6/7 Subscription Media</para>
-                </listitem>
-            </itemizedlist>
-            <warning>
-                <title>Access to RHEL Media/repositories</title>
-                <para>Access to Red Hat base media repositories and RHEL installation media is the
-                    responsibility of our customers. Ensure that all your RHEL systems obtain
-                    support from RHEL, or alternatively all your RHEL systems obtain support from
-                    SUSE. If you do not follow these practices you may violate terms with Red
-                    Hat.</para>
-            </warning>
-        </sect2>
+  <sect2>
+   <title>RES Channel Management Tips</title>
+   <para>
+    This section provides tips on RES channel management.
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      The base parent distribution/architecture RES channel contains zero
+      packages. No base media is provided by SUSE. The RHEL media or
+      installation ISOs should be added as child channels of the RES parent
+      channel.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The RES and tools channels are provided by SUSE Customer Center(SCC)
+      using <literal>mgr-sync</literal>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      It can take up to 24 hours for an initial channel sync to complete.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Once you have completed the initial sync process of any RES channel it is
+      recommended to clone the channel before working with it. This provides
+      you with a backup of the original sync.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect2>
 
-        <sect2>
-            <title>RES Channel Management Tips</title>
-            <para>This section provides tips on RES channel management.</para>
-            <itemizedlist>
-                <listitem>
-                    <para>The base parent distribution/architecture RES channel contains zero
-                        packages. No base media is provided by SUSE. The RHEL media or installation
-                        ISOs should be added as child channels of the RES parent channel.</para>
-                </listitem>
-                <listitem>
-                    <para>The RES and tools channels are provided by SUSE Customer Center(SCC) using
-                            <literal>mgr-sync</literal></para>
-                </listitem>
-                <listitem>
-                    <para>It can take up to 24 hours for an initial channel sync to complete.</para>
-                </listitem>
-                <listitem>
-                    <para>Once you have completed the initial sync process of any RES channel it is
-                        recommended to clone the channel before working with it. This provides you
-                        with a backup of the original sync.</para>
-                </listitem>
-            </itemizedlist>
-        </sect2>
-
-        <sect2>
-            <title>Mirroring RHEL Media into a Channel</title>
-            <para>The following procedure guides you through setup of the RHEL media as a SUSE
-                Manager channel. All packages on the RHEL media will be mirrored into a child
-                channel located under RES 5/6/7 distribution/architecture.</para>
-
-            <procedure>
-                <title>Mirroring RHEL Media into a Channel</title>
-                <step>
-                    <para>Create a new Channel by logging into the WebUI and selecting
-                            <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
-                            Channels</guimenu> &gt; <guimenu>Create Channel. </guimenu></para>
-                </step>
-                <step>
-                    <para>Fill in basic channel details and add the channel as a child to the
-                        corresponding RES 5/6/7 distribution/architecture channel from Customer
-                        Center. The base parent channel should contain zero packages.</para>
-                </step>
-                <step>
-                    <para>Modify the RES 5/6/7 activation key to include this new child
-                        channel</para>
-                </step>
-                <step>
-                    <para>As root on the SUSE Manager command line copy the ISO to
-                            <filename>/tmp</filename> directory.</para>
-                </step>
-                <step>
-                    <para>Create a directory to contain the media content:</para>
-                    <screen># mkdir -p /srv/www/htdocs/pub/rhel</screen>
-                </step>
-                <step>
-                    <para>Mount the ISO:</para>
-                    <screen># mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel</screen>
-                </step>
-                <step>
-                    <para>Start spacewalk-repo-sync to sync packages:</para>
-                    <screen># spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
+  <sect2>
+   <title>Mirroring RHEL Media into a Channel</title>
+   <para>
+    The following procedure guides you through setup of the RHEL media as a
+    SUSE Manager channel. All packages on the RHEL media will be mirrored into
+    a child channel located under RES 5/6/7 distribution/architecture.
+   </para>
+   <procedure>
+    <title>Mirroring RHEL Media into a Channel</title>
+    <step>
+     <para>
+      Create a new Channel by logging into the WebUI and selecting
+      <guimenu>Channels</guimenu> &gt; <guimenu>Manage Software
+      Channels</guimenu> &gt; <guimenu>Create Channel. </guimenu>
+     </para>
+    </step>
+    <step>
+     <para>
+      Fill in basic channel details and add the channel as a child to the
+      corresponding RES 5/6/7 distribution/architecture channel from Customer
+      Center. The base parent channel should contain zero packages.
+     </para>
+    </step>
+    <step>
+     <para>
+      Modify the RES 5/6/7 activation key to include this new child channel
+     </para>
+    </step>
+    <step>
+     <para>
+      As root on the SUSE Manager command line copy the ISO to
+      <filename>/tmp</filename> directory.
+     </para>
+    </step>
+    <step>
+     <para>
+      Create a directory to contain the media content:
+     </para>
+<screen># mkdir -p /srv/www/htdocs/pub/rhel</screen>
+    </step>
+    <step>
+     <para>
+      Mount the ISO:
+     </para>
+<screen># mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel</screen>
+    </step>
+    <step>
+     <para>
+      Start spacewalk-repo-sync to sync packages:
+     </para>
+<screen># spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
 Repo URL: https://127.0.0.1/pub/rhel/Server/
 Packages in repo:              3690
 Packages already synced:          0
@@ -122,263 +162,337 @@ Packages to sync:              3690
 2/3690 : boost-filesystem-1.41.0-18.el6-0.i686
 3/3690 : policycoreutils-newrole-2.0.83-19.39.el6-0.x86_64
 [...]</screen>
-                </step>
-                <step>
-                    <para>Once the channel has completed the sync process you can utilize the
-                        channel as any normal SUSE Manager channel.</para>
-                </step>
-            </procedure>
-        </sect2>
+    </step>
+    <step>
+     <para>
+      Once the channel has completed the sync process you can utilize the
+      channel as any normal SUSE Manager channel.
+     </para>
+    </step>
+   </procedure>
+  </sect2>
 
-        <sect2>
-            <title>Registering RES salt-minions with SUSE Manager</title>
-            <para>This section will guide you through registering RHEL minions with SUSE Manager.
-                This section assumes you have updated your server to the latest patch level</para>
+  <sect2>
+   <title>Registering RES salt-minions with SUSE Manager</title>
+   <para>
+    This section will guide you through registering RHEL minions with SUSE
+    Manager. This section assumes you have updated your server to the latest
+    patch level
+   </para>
+   <sect3>
+    <title>Syncing Appropriate RES Channels</title>
+    <para>
+     Ensure you have the corresponding RES product enabled and required
+     channels have been fully synced:
+    </para>
+    <itemizedlist>
+     <title>RHEL 7.x</title>
+     <listitem>
+      <para>
+       - Product: RES 7
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       - Mandatory channels: rhel-x86_64-server-7,
+       res7-suse-manager-tools-x86_64, res7-x86_64
+      </para>
+     </listitem>
+    </itemizedlist>
+    <itemizedlist>
+     <title>RHEL 6.x</title>
+     <listitem>
+      <para>
+       - Product: RES 6
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       - Mandatory channels: rhel-x86_64-server-6,
+       res6-suse-manager-tools-x86_64, res6-x86_64
+      </para>
+     </listitem>
+    </itemizedlist>
+    <tip>
+     <title>Checking Sync Progress</title>
+     <para>
+      To check if a channel has finished syncing you can do one of the
+      following:
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        From the SUSE Manager WebUI browse to <guimenu>Admin</guimenu> >
+        <guimenu>Setup Wizard</guimenu> and select the <guimenu>SUSE
+        Products</guimenu> tab. Here you will find a percent completion bar for
+        each product.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Alternatively you may check the sync log file located under
+        <filename>/var/log/rhn/reposync/&lt;channel-label&gt;.log</filename>
+        using cat or the tailf command. Keep in mind that base channels can
+        contain multiple child channels. Each of these child channels will
+        generate its own log during the sync progress. Do not assume a channel
+        has finished syncing until you have checked all relevant log files
+        including base and child channels.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </tip>
+    <para>
+     Create an activation key associated with the RES channel.
+    </para>
+   </sect3>
+   <sect3>
+    <title>Creating a Bootstrap Repository</title>
+    <para>
+     The following procedure demonstrate creating a bootstrap repository for
+     RHEL
+    </para>
+    <procedure>
+     <step>
+      <para>
+       On the server command line as root, create a bootstrap repo for RHEL
+       with the following command :
+      </para>
+<screen>mgr-create-bootstrap-repo RHEL_activation_channel_key</screen>
+     </step>
+     <step>
+      <para>
+       Rename bootstrap.sh to resversion-boostrap.sh:
+      </para>
+<screen># cp bootstrap.sh res7-bootstrap.sh</screen>
+     </step>
+    </procedure>
+   </sect3>
+  </sect2>
 
-            <sect3>
-
-                <title> Syncing Appropriate RES Channels</title>
-                <para>Ensure you have the corresponding RES product enabled and required channels
-                    have been fully synced:</para>
-
-                <itemizedlist>
-                    <title>RHEL 7.x</title>
-                    <listitem>
-                        <para>- Product: RES 7</para>
-                    </listitem>
-                    <listitem>
-                        <para>- Mandatory channels: rhel-x86_64-server-7,
-                            res7-suse-manager-tools-x86_64, res7-x86_64</para>
-                    </listitem>
-                </itemizedlist>
-
-                <itemizedlist>
-                    <title>RHEL 6.x</title>
-                    <listitem>
-                        <para>- Product: RES 6</para>
-                    </listitem>
-                    <listitem>
-                        <para>- Mandatory channels: rhel-x86_64-server-6,
-                            res6-suse-manager-tools-x86_64, res6-x86_64</para>
-                    </listitem>
-                </itemizedlist>
-                <tip>
-                    <title>Checking Sync Progress</title>
-                    <para>To check if a channel has finished syncing you can do one of the
-                        following:</para>
-                    <itemizedlist>
-                        <listitem>
-                            <para>From the SUSE Manager WebUI browse to <guimenu>Admin</guimenu> >
-                                    <guimenu>Setup Wizard</guimenu> and select the <guimenu>SUSE
-                                    Products</guimenu> tab. Here you will find a percent completion
-                                bar for each product.</para>
-                        </listitem>
-                        <listitem>
-                            <para>Alternatively you may check the sync log file located under
-                                    <filename>/var/log/rhn/reposync/&lt;channel-label&gt;.log</filename>
-                                using cat or the tailf command. Keep in mind that base channels can
-                                contain multiple child channels. Each of these child channels will
-                                generate its own log during the sync progress. Do not assume a
-                                channel has finished syncing until you have checked all relevant log
-                                files including base and child channels.</para>
-                        </listitem>
-                    </itemizedlist>
-                </tip>
-
-                <para>Create an activation key associated with the RES channel.</para>
-            </sect3>
-
-            <sect3>
-                <title>Creating a Bootstrap Repository</title>
-                <para>The following procedure demonstrate creating a bootstrap repository for
-                    RHEL</para>
-                <procedure>
-                    <step>
-                        <para>On the server command line as root, create a bootstrap repo for RHEL
-                            with the following command :</para>
-                        <screen>mgr-create-bootstrap-repo RHEL_activation_channel_key</screen>
-                    </step>
-                    <step>
-                        <para>Rename bootstrap.sh to resversion-boostrap.sh:</para>
-                        <screen># cp bootstrap.sh res7-bootstrap.sh</screen>
-                    </step>
-                </procedure>
-
-            </sect3>
-
-
-        </sect2>
-
-        <sect2>
-            <title>Register a Salt Minion via Bootstrap</title>
-            <para>The following procedure will guide you through registering a Salt-minion using the
-                bootstrap script.</para>
-            <procedure>
-                <title> Registration Using the Bootstrap Script </title>
-                <step>
-                    <para>From your new minion download the bootstrap script from the SUSE Manager
-                        server:</para>
-                    <screen>wget --no-check-certificate https://&lt;server&gt;/pub/bootstrap/res7-bootstrap.sh</screen>
-                </step>
-                <step>
-                    <para>Add the appropriate res-gpg-pubkey-#####-#####.key to the
-                            <literal>ORG_GPG_KEY</literal> key parameter, comma delimited in your
-                        res7-bootstrap.sh script. These are located on your SUSE Manager server
-                        at:</para>
-                    <screen>http://(FDQN)/pub/</screen>
-                </step>
-                <step>
-                    <para>Make the bootstrap.sh script executable and run it. This will install
-                        necessary Salt packages from the bootstrap repository and start the
-                        salt-minion service:</para>
-                    <screen># chmod +x res7-bootstrap.sh
+  <sect2>
+   <title>Register a Salt Minion via Bootstrap</title>
+   <para>
+    The following procedure will guide you through registering a Salt-minion
+    using the bootstrap script.
+   </para>
+   <procedure>
+    <title>Registration Using the Bootstrap Script</title>
+    <step>
+     <para>
+      From your new minion download the bootstrap script from the SUSE Manager
+      server:
+     </para>
+<screen>wget --no-check-certificate https://&lt;server&gt;/pub/bootstrap/res7-bootstrap.sh</screen>
+    </step>
+    <step>
+     <para>
+      Add the appropriate res-gpg-pubkey-#####-#####.key to the
+      <literal>ORG_GPG_KEY</literal> key parameter, comma delimited in your
+      res7-bootstrap.sh script. These are located on your SUSE Manager server
+      at:
+     </para>
+<screen>http://(FDQN)/pub/</screen>
+    </step>
+    <step>
+     <para>
+      Make the bootstrap.sh script executable and run it. This will install
+      necessary Salt packages from the bootstrap repository and start the
+      salt-minion service:
+     </para>
+<screen># chmod +x res7-bootstrap.sh
 # ./res7-boostrap.sh</screen>
-                </step>
-                <step>
-                    <para>From the SUSE Manager WebUI select the <guimenu>Salt</guimenu> >
-                            <guimenu>Onboarding</guimenu> and accept the new minions key.</para>
-                </step>
-            </procedure>
+    </step>
+    <step>
+     <para>
+      From the SUSE Manager WebUI select the <guimenu>Salt</guimenu> >
+      <guimenu>Onboarding</guimenu> and accept the new minions key.
+     </para>
+    </step>
+   </procedure>
+   <important>
+    <title>Troubleshooting Bootstrap</title>
+    <para>
+     If you have issues bootstrapping a minion its usually due to missing
+     packages. These missing packages are contained on the RHEL installation
+     media. The RHEL installation media should be loop mounted and added as a
+     child channel to the RES channel. See the warning above on access to RHEL
+     Media.
+    </para>
+   </important>
+  </sect2>
 
-            <important>
-                <title>Troubleshooting Bootstrap</title>
-                <para>If you have issues bootstrapping a minion its usually due to missing packages.
-                    These missing packages are contained on the RHEL installation media. The RHEL
-                    installation media should be loop mounted and added as a child channel to the
-                    RES channel. See the warning above on access to RHEL Media.</para>
-            </important>
-        </sect2>
-
-        <sect2>
-            <title>Manual Salt-minion Registration</title>
-            <para>The following procedure will guide you through the registration of a Salt-minion
-                manually.</para>
-            <procedure>
-                <step>
-                    <para>Add the bootstrap repository:</para>
-                    <screen>yum-config-manager --add-repo https://&lt;server&gt;/pub/repositories/res/7/bootstrap</screen>
-                </step>
-                <step>
-                    <para>Install the salt-minion package:</para>
-                    <screen># yum install salt-minion</screen>
-                </step>
-                <step>
-                    <para>Edit the salt-minion configuration file to point to the SUSE manager
-                        server:</para>
-                    <screen># mkdir /etc/salt/minion.d
+  <sect2>
+   <title>Manual Salt-minion Registration</title>
+   <para>
+    The following procedure will guide you through the registration of a
+    Salt-minion manually.
+   </para>
+   <procedure>
+    <step>
+     <para>
+      Add the bootstrap repository:
+     </para>
+<screen>yum-config-manager --add-repo https://&lt;server&gt;/pub/repositories/res/7/bootstrap</screen>
+    </step>
+    <step>
+     <para>
+      Install the salt-minion package:
+     </para>
+<screen># yum install salt-minion</screen>
+    </step>
+    <step>
+     <para>
+      Edit the salt-minion configuration file to point to the SUSE manager
+      server:
+     </para>
+<screen># mkdir /etc/salt/minion.d
 # echo "master: &lt;server fqdn&gt;" &gt; /etc/salt/minion.d/susemanager.conf </screen>
-                </step>
-                <step>
-                    <para>Start the minion service:</para>
-                    <screen># systemctl start salt-minion</screen>
-                </step>
-                <step>
-                    <para>From the SUSE Manager WebUI select the <guimenu>Salt</guimenu> >
-                            <guimenu>Onboarding</guimenu> and accept the new minions key.</para>
-                </step>
-            </procedure>
-        </sect2>
-    </sect1>
+    </step>
+    <step>
+     <para>
+      Start the minion service:
+     </para>
+<screen># systemctl start salt-minion</screen>
+    </step>
+    <step>
+     <para>
+      From the SUSE Manager WebUI select the <guimenu>Salt</guimenu> >
+      <guimenu>Onboarding</guimenu> and accept the new minions key.
+     </para>
+    </step>
+   </procedure>
+  </sect2>
+ </sect1>
+ <sect1>
+  <title>Preparing Channels and Repositories for CentOS Traditional Clients</title>
 
+  <para>
+   This following section provides an example procedure for configuring CentOS
+   channels and repositories and finally registering a CentOS client with SUSE
+   Manager. These steps will be identical for Scientific Linux and Fedora.
+  </para>
 
-
-    <sect1>
-        <title>Preparing Channels and Repositories for CentOS Traditional Clients</title>
-        <para>This following section provides an example procedure for configuring CentOS channels
-            and repositories and finally registering a CentOS client with SUSE Manager. These steps
-            will be identical for Scientific Linux and Fedora.</para>
-        <procedure>
-            <title>Preparing Channels and Repositories</title>
-            <step>
-                <para>As <literal>root</literal> install <literal>spacewalk-utils</literal> on your
-                    &susemgr; server:</para>
-                <screen>zypper in spacewalk-utils</screen>
-                <important>
-                    <para>The spacewalk-utils package contains a collection of upstream command line
-                        tools which provide assistance with spacewalk administrative operations. You
-                        will be using the <literal>spacewalk-common-channels</literal> tool. Keep in
-                        mind SUSE only provides support for spacewalk-clone-by-date and
-                        spacewalk-manage-channel-lifecycle tools. </para>
-                </important>
-            </step>
-            <step>
-                <para>Run the spacewalk-common-channels script to add the CentOS7 base, updates, and
-                    Spacewalk client channels. </para>
-                <screen>spacewalk-common-channels -u admin -p &lt;secret&gt; -a x86_64 'centos7',
+  <procedure>
+   <title>Preparing Channels and Repositories</title>
+   <step>
+    <para>
+     As <literal>root</literal> install <literal>spacewalk-utils</literal> on
+     your &susemgr; server:
+    </para>
+<screen>zypper in spacewalk-utils</screen>
+    <important>
+     <para>
+      The spacewalk-utils package contains a collection of upstream command
+      line tools which provide assistance with spacewalk administrative
+      operations. You will be using the
+      <literal>spacewalk-common-channels</literal> tool. Keep in mind SUSE only
+      provides support for spacewalk-clone-by-date and
+      spacewalk-manage-channel-lifecycle tools.
+     </para>
+    </important>
+   </step>
+   <step>
+    <para>
+     Run the spacewalk-common-channels script to add the CentOS7 base, updates,
+     and Spacewalk client channels.
+    </para>
+<screen>spacewalk-common-channels -u admin -p &lt;secret&gt; -a x86_64 'centos7',
 spacewalk-common-channels -u admin -p &lt;secret&gt; -a x86_64 'centos7-updates'
 spacewalk-common-channels -u admin -p &lt;secret&gt; -a x86_64 'spacewalk26-client-centos7'</screen>
-                <note>
-                    <para>The /etc/rhn/spacewalk-common-channels.ini must contain the channel
-                        references to be added. If the a channel is not listed, check the latest
-                        version here for updates: <link
+    <note>
+     <para>
+      The /etc/rhn/spacewalk-common-channels.ini must contain the channel
+      references to be added. If the a channel is not listed, check the latest
+      version here for updates:
+      <link
                             xlink:href="https://github.com/spacewalkproject/spacewalk/blob/master/utils/spacewalk-common-channels.ini"
                         />
-                    </para>
-                </note>
-            </step>
-            <step>
-                <para>From the WebUI select <menuchoice>
-                        <guimenu>Software</guimenu>
-                        <guimenu>Manage Software Channels</guimenu>
-                        <guimenu>Overview</guimenu>
-                    </menuchoice>. Select the base channel you wish to sync, in this case
-                        <literal>CentOS7 (x86_64)</literal>. Select <menuchoice>
-                        <guimenu>Repositories</guimenu>
-                        <guimenu>Sync</guimenu>
-                    </menuchoice>. Check the channels you wish to sync and then click the
-                        <guimenu>Sync Now</guimenu> button or optionall schedule a regular sync
-                    time. </para>
-            </step>
-            <step>
-                <para>Copy all relevant GPG keys to <filename>/srv/www/htdocs/pub</filename>.
-                    Depending on what distribution you are interested in managing these could
-                    include an EPEL key, SUSE keys, Red Hat keys, and CentOS keys. After copying
-                    these you can reference them in a comma-delimited list within your bootstrap
-                    script (see example below)</para>
-                <itemizedlist>
-                    <listitem>
-                        <para> CentOS7 key files: <link
+     </para>
+    </note>
+   </step>
+   <step>
+    <para>
+     From the WebUI select <menuchoice> <guimenu>Software</guimenu>
+     <guimenu>Manage Software Channels</guimenu> <guimenu>Overview</guimenu>
+     </menuchoice>. Select the base channel you wish to sync, in this case
+     <literal>CentOS7 (x86_64)</literal>. Select <menuchoice>
+     <guimenu>Repositories</guimenu> <guimenu>Sync</guimenu> </menuchoice>.
+     Check the channels you wish to sync and then click the <guimenu>Sync
+     Now</guimenu> button or optionall schedule a regular sync time.
+    </para>
+   </step>
+   <step>
+    <para>
+     Copy all relevant GPG keys to <filename>/srv/www/htdocs/pub</filename>.
+     Depending on what distribution you are interested in managing these could
+     include an EPEL key, SUSE keys, Red Hat keys, and CentOS keys. After
+     copying these you can reference them in a comma-delimited list within your
+     bootstrap script (see example below)
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       CentOS7 key files:
+       <link
                                 xlink:href="http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7"
-                            /></para>
-                    </listitem>
-                    <listitem>
-                        <para>EPEL key file: <link
+                            />
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       EPEL key file:
+       <link
                                 xlink:href="http://mirrors.kernel.org/fedora-epel/RPM-GPG-KEY-EPEL-7"
-                            /></para>
-                    </listitem>
-                    <listitem>
-                        <para>Spacewalk key: <link
+                            />
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Spacewalk key:
+       <link
                                 xlink:href="http://spacewalk.redhat.com/yum/RPM-GPG-KEY-spacewalk-2015"
-                            /></para>
-                    </listitem>
-                    <listitem>
-                        <para> Red Hat keys: <link
+                            />
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       Red Hat keys:
+       <link
                                 xlink:href="http://www.redhat.com/contact/security-response-team/gpg-keys.html"
-                            /></para>
-                    </listitem>
-                </itemizedlist>
-            </step>
-            <step>
-                <para>Install and setup a CentOS 7 client with the default installation
-                    packages.</para>
-            </step>
-            <step>
-                <para>Ensure the client machine can resolve itself via DNS as well as your &susemgr;
-                    server. Validate that there is an entry in /etc/hosts for the real IP address of
-                    the client.</para>
-            </step>
-            <step>
-                <para>Create an activation key (centos7) on the &susemgr; server that points to the
-                    correct parent/child channels, including the CentOS base repo, updates, and
-                    Spacewalk client.</para>
-            </step>
-        </procedure>
+                            />
+      </para>
+     </listitem>
+    </itemizedlist>
+   </step>
+   <step>
+    <para>
+     Install and setup a CentOS 7 client with the default installation
+     packages.
+    </para>
+   </step>
+   <step>
+    <para>
+     Ensure the client machine can resolve itself via DNS as well as your
+     &susemgr; server. Validate that there is an entry in /etc/hosts for the
+     real IP address of the client.
+    </para>
+   </step>
+   <step>
+    <para>
+     Create an activation key (centos7) on the &susemgr; server that points to
+     the correct parent/child channels, including the CentOS base repo,
+     updates, and Spacewalk client.
+    </para>
+   </step>
+  </procedure>
 
-        <procedure>
-            <title>Preparing the Bootstrap Script</title>
-            <step>
-                <para>Create/edit your bootstrap script to correctly reflect the following:</para>
-                <screen># can be edited, but probably correct (unless created during initial install):
+  <procedure>
+   <title>Preparing the Bootstrap Script</title>
+   <step>
+    <para>
+     Create/edit your bootstrap script to correctly reflect the following:
+    </para>
+<screen># can be edited, but probably correct (unless created during initial install):
 
 # NOTE: ACTIVATION_KEYS *must* be used to bootstrap a client machine.
 
@@ -393,72 +507,94 @@ yum clean all
 # Install the prerequisites
 yum -y install yum-rhn-plugin rhn-setup 
 </screen>
-            </step>
-            <step>
-                <para>Add the following lines to the bottom of your script, (just before
-                        <literal>echo “-bootstrap complete -”</literal> )</para>
-                <screen># This section is for commands to be executed after registration
+   </step>
+   <step>
+    <para>
+     Add the following lines to the bottom of your script, (just before
+     <literal>echo “-bootstrap complete -”</literal> )
+    </para>
+<screen># This section is for commands to be executed after registration
 mv /etc/yum.repos.d/Cent* /root/
 yum clean all
 chkconfig rhnsd on
 chkconfig osad on
 service rhnsd restart
 service osad restart</screen>
-            </step>
-            <step>
-                <para>Continue by following normal bootstrap procedures to bootstrap the new
-                    client.</para>
-            </step>
-        </procedure>
-    </sect1>
+   </step>
+   <step>
+    <para>
+     Continue by following normal bootstrap procedures to bootstrap the new
+     client.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
+ <sect1>
+  <title>Registering CentOS salt-minions with SUSE Manager</title>
 
-    <sect1>
-        <title>Registering CentOS salt-minions with SUSE Manager</title>
-        <para>The following procedure will guide you through registering a CentOS Minion.</para>
-        <warning>
-            <title>Support for CentOS Patches</title>
-            <para>Warning: CentOS utilizing patches originating from CentOS is not officially
-                supported by SUSE. Please reference the matrix of SUMA clients on the main page of
-                the SUSE Manager wiki.<link
+  <para>
+   The following procedure will guide you through registering a CentOS Minion.
+  </para>
+
+  <warning>
+   <title>Support for CentOS Patches</title>
+   <para>
+    Warning: CentOS utilizing patches originating from CentOS is not officially
+    supported by SUSE. Please reference the matrix of SUMA clients on the main
+    page of the SUSE Manager
+    wiki.<link
                     xlink:href="https://wiki.microfocus.com/images/e/eb/SUMA3-client-matrix-20170509.png"
-                /></para>
-        </warning>
-        <procedure>
-            <title>Register a CentOS 7 Minion</title>
-            <step>
-                <para>Add the Open Build Service repo for Salt:</para>
-                <screen>yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/</screen>
-            </step>
-            <step>
-                <para>Import the repo key:</para>
-                <screen>rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key</screen>
-            </step>
-            <step>
-                <para>Check if there's any other repo that contains Salt. If there's only one repo
-                    listed then you're fine. If not disable any other repo that contains Salt apart
-                    from the OBS one.</para>
-                <screen>yum list --showduplicates salt</screen>
-            </step>
-            <step>
-                <para>Install the Salt minion:</para>
-                <screen>yum install salt salt-minion</screen>
-            </step>
-            <step>
-                <para>Change the Salt configuration to point to the Suse Manager server:</para>
-                <screen>mkdir -p /etc/salt/minion.d
-echo "master: &lt;server fqdn&gt;" &gt; /etc/salt/minion.d/susemanager.conf</screen>
-            </step>
-            <step>
-                <para>Restart the minion</para>
-                <screen>systemctl restart salt-minion</screen>
-            </step>
-            <step>
-                <para>Proceed to <menuchoice>
-                        <guimenu>Salt</guimenu>
-                        <guimenu>Keys</guimenu>
-                    </menuchoice> from the WebUI and accept the minion key.</para>
-            </step>
-        </procedure>
+                />
+   </para>
+  </warning>
 
-    </sect1>
+  <procedure>
+   <title>Register a CentOS 7 Minion</title>
+   <step>
+    <para>
+     Add the Open Build Service repo for Salt:
+    </para>
+<screen>yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/</screen>
+   </step>
+   <step>
+    <para>
+     Import the repo key:
+    </para>
+<screen>rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key</screen>
+   </step>
+   <step>
+    <para>
+     Check if there's any other repo that contains Salt. If there's only one
+     repo listed then you're fine. If not disable any other repo that contains
+     Salt apart from the OBS one.
+    </para>
+<screen>yum list --showduplicates salt</screen>
+   </step>
+   <step>
+    <para>
+     Install the Salt minion:
+    </para>
+<screen>yum install salt salt-minion</screen>
+   </step>
+   <step>
+    <para>
+     Change the Salt configuration to point to the Suse Manager server:
+    </para>
+<screen>mkdir -p /etc/salt/minion.d
+echo "master: &lt;server fqdn&gt;" &gt; /etc/salt/minion.d/susemanager.conf</screen>
+   </step>
+   <step>
+    <para>
+     Restart the minion
+    </para>
+<screen>systemctl restart salt-minion</screen>
+   </step>
+   <step>
+    <para>
+     Proceed to <menuchoice> <guimenu>Salt</guimenu> <guimenu>Keys</guimenu>
+     </menuchoice> from the WebUI and accept the minion key.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
 </chapter>
