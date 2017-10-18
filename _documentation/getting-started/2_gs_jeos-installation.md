@@ -19,7 +19,7 @@ This chapter provides the required (KVM) settings for installation of SUSE Linux
 ### SUSE Virtualization Guide {#suse-virtualization-guide}
 
 For more information on virtualization, see:
- * [https://www.suse.com/documentation/sles-12/singlehtml/book_virt/book_virt.html](https://www.suse.com/documentation/sles-12/singlehtml/book_virt/book_virt.html).
+ * [https://www.suse.com/documentation/sles-12/singlehtml/book_virt/book_virt.html](https://www.suse.com/documentation/sles-12/singlehtml/book_virt/book_virt.html)
 
 Enter the following settings when creating a new virtual machine using **virt-manager**.
 
