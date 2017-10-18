@@ -1,4 +1,4 @@
-*** HERE IS MY CHANGE -- MY CHANGE IS HERE ***
+
 
 ---
 layout: documentation
@@ -6,7 +6,7 @@ title: Introduction & Requirements
 category: Getting-started
 order: 1
 ---
-
+*** HERE IS MY CHANGE -- MY CHANGE IS HERE ***
 ## Introducing SUSE Manager {#introducing-suse-manager}
 
 SUSE Manager lets you efficiently manage large sets of Linux systems and keep them up to date. It provides automated and cost-effective software management, asset management, and system provisioning. SUSE Manager provides a best in class solution for organizations requiring absolute control of maintenance and package deployment on their servers. It allows customers the highest level of flexibility and power ensuring their servers remain secure while facilitating and advancing an organizations system life-cycle requirements.
