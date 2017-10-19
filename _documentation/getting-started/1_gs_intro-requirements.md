@@ -112,11 +112,10 @@ Clients with the following operating systems are supported for registration with
 | Operating Systems | Architecture | Traditional Clients | Salt Clients |
 | --- | --- | --- | --- |
 | SUSE Linux Enterprise 11 SP4 LTSS | x86, x86_64, Itanium, IBM POWER, z Systems | Supported | Supported |
-| SUSE Linux Enterprise 12 SP1, SP2, SP3 | x86_64, IBM POWER (ppc64le), z Systems | Supported | Supported |
-| Red Hat Enterprise Linux 5 | x86, x86_64 | Supported | Unsupported |
+| SUSE Linux Enterprise 12 SP2, SP3 | x86_64, IBM POWER (ppc64le), z Systems | Supported | Supported |
 | Red Hat Enterprise Linux 6 | x86, x86_64 | Supported | Supported |
 | Red Hat Enterprise Linux 7 | x86, x86_64 | Supported | Supported |
-| Novell Open Enterprise Server 11, SP1, SP2, SP3 LTSS | x86, x86_64 | Supported | Supported |
+| Novell Open Enterprise Server 11, SP3 LTSS | x86, x86_64 | Supported | Supported |
 
 
 
