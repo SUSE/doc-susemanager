@@ -17,6 +17,6 @@ For more details on SUSE Manager documentation please visit our wiki: [SUSE Mana
 --
 ### Contributing
 
-See `Add contribution guide`
+See `IN_PROGRESS 2017-10-19 contribution guide`
 
 
