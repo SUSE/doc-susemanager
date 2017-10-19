@@ -2,19 +2,11 @@
 title: Markdown Style Guide
 description: Readable and portable Markdown style guide.
 ---
+### Introduction
+Styleguide adapted from http://www.cirosantilli.com/markdown-style-guide/
 
-### Alternatives To this Guide
+A common standard is required to ensure we have a somewhat consistent style throughout our documentation. Please use the following "standards" when submitting a pull request to keep your contributions in line with our goals. Thank you!
 
-[google/styleguide](https://github.com/google/styleguide/blob/3591b2e540cbcb07423e02d20eee482165776603/docguide/style.md)
-by Google.
-
-[carwin/markdown-styleguide](https://github.com/carwin/markdown-styleguide/tree/9121c77bd177a3ade6713d50ab1228782d7c02a7).
-This guide was originally forked from it. It has been extended considerably,
-some decisions were modified, and no original lines remain.
-
-<http://tirania.org/blog/archive/2014/Sep-30.html> by Miguel de Icaza (GNOME, Mono). Short.
-
-<https://github.com/slang800/markdown-styleguide>
 
 ## General rules
 
