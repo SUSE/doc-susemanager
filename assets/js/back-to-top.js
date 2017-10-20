@@ -3,4 +3,4 @@ window.onload = function() {
     element: document.querySelector('#back-to-top'),
     duration: 1000
   });
-}
+};

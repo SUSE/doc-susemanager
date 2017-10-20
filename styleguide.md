@@ -3,6 +3,7 @@ layout:styleguide
 title: Styleguide
 permalink: /styleguide/
 ---
+
 ### Introduction
 Styleguide adapted from http://www.cirosantilli.com/markdown-style-guide/
 
@@ -13,6 +14,9 @@ contributions in line with our documentation goals. Thank you!
 - a
 {:toc}
 
+<div class="alert alert-success">
+Blah blah blah
+</div>
 
 ## General rules
 
