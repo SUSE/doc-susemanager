@@ -5,7 +5,7 @@ keywords: release notes, announcements, what's new, new features, changelog
 last_updated: June 27, 2017
 summary: "SUSE Manager 3.1 release notes. Latest features and changes"
 sidebar: sumadoc-31_sidebar
-permalink: suse_mgr_release_notes3.1.html
+permalink: suse_mgr_release_notes_31.html
 folder: suse-mgr3.1
 ---
 
