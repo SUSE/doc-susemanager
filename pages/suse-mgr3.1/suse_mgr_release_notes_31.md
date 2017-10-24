@@ -11,8 +11,8 @@ folder: suse-mgr3.1
 
 # Release notes for SUSE Manager 3.1 Server
 
-<font size="4">_Version 3.1.2_</font>
-<font size="4">Friday September 22, 2017</font></center>
+### Version 3.1.2
+Friday September 22, 2017
 
 
 This SUSE product includes materials licensed to SUSE under the GNU General Public License (GPL). The GPL requires that SUSE makes available certain source code that corresponds to the GPL-licensed material. The source code is available for download at [http://www.suse.com/download-linux/source-code.html](http://www.suse.com/download-linux/source-code.html).

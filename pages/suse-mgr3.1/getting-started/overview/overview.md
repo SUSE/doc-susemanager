@@ -11,7 +11,7 @@ summary: Jump in and get your feet wet by setting up an KVM learning environment
 
 SUSE Manager lets you efficiently manage large sets of Linux systems and keep them up to date. It provides automated and cost-effective software management, asset management, and system provisioning. SUSE Manager provides a best in class solution for organizations requiring absolute control of maintenance and package deployment on their servers. It allows customers the highest level of flexibility and power ensuring their servers remain secure while facilitating and advancing an organizations system life-cycle requirements.
 
-<span class="label label-success">New Features:</span>
+### <span class="label label-success">New Features:</span> {#new-features}
 
 
 - The inclusion of [Salt](https://saltstack.com/salt-open-source/) in SUSE Manager 3.1 provides powerful event-driven configuration and management capabilities for fine grained control of any modern infrastructure.
