@@ -27,7 +27,7 @@ SUSE Manager may be integrated within your network infrastructure in multiple wa
 
 ## Prerequisites for Installation {#prerequisites-for-installation}
 
-This guide requires that you have created an account with SCC (SUSE Customer Center). During installation of both SUSE Linux Enterprise Server 12 and SUSE Manager 3.1, SUSE Customer Center credentials will be requested and you must enter them to receive the latest packages and updates. The following procedure will guide you through obtaining your SCC `Organizational Credentials`.
+This guide requires that you have created an account with SCC (SUSE Customer Center). During installation of both SUSE Linux Enterprise Server 12 and SUSE Manager 3.1, SUSE Customer Center credentials will be requested and you must enter them to receive the latest packages and updates. The following procedure will guide you through obtaining your `SCC Organization Credentials`.
 
 Procedure 1.1. Obtaining Your SCC Organization Credentials
 
@@ -55,12 +55,4 @@ After logging into your SCC account, you can find the installation images provid
 
 {% include tip.html content="The SLES 12 JeOS image provides the quickest route for setup of a test environment. The JeOS image total size is about 240 MB. The alternative would be the 3 GB SUSE Linux Enterprise Server 12 DVD image. Both installation media are appropriate, but depend upon available bandwidth or your application needs. Both methods of installation will be covered in this guide." %}
 
-## Hardware Requirements {#hardware-requirements}
 
-The following table provides hardware and software requirements for SUSE Manager.
-
-| Hardware | Recommended |
-| --- | --- |
-| CPU | Multi-core 64-bit CPU (x86_64) |
-| RAM | Minimum 4 GB+ for test server |
-| Free Disk Space | Minimum 100 GB for root partition |

@@ -5,7 +5,7 @@ sidebar: sumadoc-31_sidebar
 permalink: overview.html
 folder: suse-mgr3.1/getting-started/overview
 toc: false
-summary: Get started with SUSE Manager 3 by setting up a KVM learning environment. This quick-start guide will provide you with introductory guidance on setting up SUSE Manager server. You will learn the basics of managing both traditional SUSE Manager clients and Salt clients. This guide is intended for system administrators.
+summary: Jump in and get your feet wet by setting up an KVM learning environment for SUSE Manager 3. This document will provide you with guidance on setting up a SUSE Manager server. You will also be introduced to basic management principles of both traditional SUSE Manager clients and Salt clients. This guide is intended for system administrators.
 ---
 ## Introducing SUSE Manager 3.1 {#introducing-suse-manager-31}
 
