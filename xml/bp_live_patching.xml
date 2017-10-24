@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.live.patching">
+ <title>Live Patching with SUSE Manager</title>
+ <sect1>
+  <title>Introduction</title>
+
+  <para> Under normal circumstances a system needs to be rebooted after a kernel update. SLE Live
+   Patching allows you skipping the reboot by applying a subset of Linux kernel releases injected
+   via kGraft live patching technology. </para>
+
+  <para> In the following sections you will learn how to use SLE Live Patching to avoid the typical
+   reboot requirement after updating a system kernel. </para>
+
+  <para> For in depth information covering kGraft use, see <link
+    xlink:href="https://www.suse.com/documentation/sles-12/singlehtml/book_sle_admin/book_sle_admin.html#cha.kgraft"
+   />. </para>
+ </sect1>
+ <sect1>
+  <title>Initial Setup Requirements</title>
+
+  <para> To work with SLE Live Patching the following expectations are assumed: </para>
+
+  <itemizedlist>
+   <listitem>
+    <para> &susemgr; 3.0 or later fully updated. </para>
+   </listitem>
+   <listitem>
+    <para> At least 1 Salt Minion running SLES 12 SP1 or later and registered with &susemgr;.
+    </para>
+   </listitem>
+   <listitem>
+    <para> The matching SLES 12 SPx channels including the SLE Live Patching child channel fully
+     synced. </para>
+   </listitem>
+   <!--  <listitem>
+    <para> spacewalk-utils package installed on the &susemgr; server: </para>
+    <screen>&prompt.root;zypper in spacewalk-utils</screen>
+   </listitem> -->
+  </itemizedlist>
+ </sect1>
+ <sect1>
+  <title>Live Patching Setup</title>
+
+  <procedure>
+   <step>
+    <para> Subscribe all systems to be managed via live patching to your fully synced live patching
+     child channels within your systems base channel by browsing to <menuchoice>
+      <guimenu>Software</guimenu>
+      <guimenu>Software Channels</guimenu>
+     </menuchoice>. Select both live patching channels and change subscription. </para>
+    <note>
+     <para> When subscribing to a channel that contains a product, the product package will
+      automatically be installed on traditionaly registered systems and added to the package state
+      on Salt managed systems. For Salt managed systems please apply the highstate to push these
+      changes to your systems. </para>
+    </note>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="enable_live_patching_channels.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="enable_live_patching_channels.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para> Use the search field listed under <menuchoice>
+      <guimenu>Software</guimenu>
+      <guimenu>Packages</guimenu>
+      <guimenu>Install</guimenu>
+     </menuchoice> to install the latest <filename>kgraft</filename> package to all systems to be
+     managed via live patching. </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="enable_live_patching_kgraft_install.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="enable_live_patching_kgraft_install.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para> Apply the highstate to enable live patching: </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="enable_live_patching_apply_highstate.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="enable_live_patching_apply_highstate.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para> Once the highstate has been applied on Salt systems or the package has been installed on
+     traditional systems browse to the systems details page for confirmation that live patching has
+     been enabled. You can check the live patching state listed under the <menuchoice>
+      <guimenu>System Info</guimenu>
+      <guimenu>Kernel</guimenu>
+     </menuchoice> table field: </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="enable_live_patching_successful.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="enable_live_patching_successful.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+  </procedure>
+ </sect1>
+
+ <sect1>
+  <title>Cloning Channels</title>
+
+  <para> It is considered best practice to clone a vendor channel that will be modified into a new
+   channel with one of the following prefix names: (dev, testing, and prod). In the following
+   procedure you will clone the default vendor channel into a new channel named
+    <filename>dev-sles12-sp3-pool-x86_64</filename> using the command line. </para>
+
+  <procedure>
+   <step>
+    <para> Open a terminal and as root enter: </para>
+    <screen># spacewalk-manage-channel-lifecycle -list-channels
+Spacewalk Username: admin
+Spacewalk Password: 
+Channel tree:
+
+ 1. sles12-sp3-pool-x86_64
+      \__ sle-live-patching12-pool-x86_64-sp3
+      \__ sle-live-patching12-updates-x86_64-sp3
+      \__ sle-manager-tools12-pool-x86_64-sp3
+      \__ sle-manager-tools12-updates-x86_64-sp3
+      \__ sles12-sp3-updates-x86_64  </screen>
+   </step>
+   <step>
+    <para> Now use the <emphasis>-init</emphasis> argument to automatically create a new development
+     clone of the original vendor channel: </para>
+    <screen>spacewalk-manage-channel-lifecycle -init -c sles12-sp3-pool-x86_64</screen>
+   </step>
+  </procedure>
+ </sect1>
+
+ <sect1>
+  <title>Removing Non-live Kernel Patches from the Cloned Channels</title>
+
+  <para> In the following procedure you will remove all kernel patch updates located in the
+   dev-sles12-sp3-updates-x86_64 channel that require a reboot. </para>
+
+  <procedure>
+   <step>
+    <para> Check the current kernel version in use on your client: </para>
+    <screen># uname -r
+3.12.62-60.64.8-default</screen>
+   </step>
+   <step>
+    <para> From the SUSE Manager WebUI select<menuchoice>
+      <guimenu>Software</guimenu>
+      <guimenu>Manage Software Channels</guimenu>
+      <guimenu>Overview</guimenu>
+      <guimenu>dev-sles12-sp3-updates-x86_64</guimenu>
+      <guimenu>Patches</guimenu>
+      <guimenu>List/Remove</guimenu>
+     </menuchoice>. Type <literal>kernel</literal> in the search field. Find the kernel version that
+     matches the kernel in use on your minion. </para>
+   </step>
+   <step>
+    <para> Remove all kernel update versions that are later than the current kernel. </para>
+   </step>
+   <step>
+    <para> Your channel is now ready to promote for testing SLE Live Patching. </para>
+   </step>
+  </procedure>
+ </sect1>
+
+ <sect1>
+  <title>Promoting Channels</title>
+
+  <para> The following procedure will guide you through promoting and cloning a development channel
+   to a testing channel. You will change the subscription from the dev repositories on your client
+   to the new testing channel repositories. You will also add the SLE Live Patching child channels
+   to your client. </para>
+
+  <procedure>
+   <step>
+    <para> Promote and clone the <literal>dev-sles12-sp3-pool-x86_64</literal> to a new testing
+     channel: </para>
+    <screen>&prompt.root;spacewalk-manage-channel-lifecycle -promote -c dev-sles12-sp3-pool-x86_64</screen>
+   </step>
+   <step>
+    <para> From the &susemgr; &webui; under the <guimenu>Systems</guimenu> tab select your client
+     system to view the <guimenu>System Details</guimenu> page. Select <menuchoice>
+      <guimenu>Software</guimenu>
+      <guimenu>Software Channels</guimenu>
+     </menuchoice>. From the Software Channels page you can edit which channels a system is
+     subscribed to. Select the new base software channel, in this case it should be
+      <literal>test-sles12-sp3-pool-x86_64</literal>. Click the <guimenu>Confirm</guimenu> button to
+     switch the Base Software Channel and finalize it by clicking the <guimenu>Modify Base Software
+      Channel</guimenu> button. </para>
+   </step>
+   <step>
+    <para> From the <guimenu>Software Channels</guimenu> page select and add both SLE Live Patching
+     child channels by clicking the <guimenu>Change Subscriptions</guimenu> button. </para>
+   </step>
+  </procedure>
+ </sect1>
+
+ <sect1>
+  <title>Applying Live Patches to a Kernel</title>
+
+  <para> The following procedure will guide you through selecting and viewing available CVE Patches
+   (Common Vulnerabilities and Exposures) then applying these kernel updates using the new SLE Live
+   Patching feature. </para>
+
+  <procedure>
+   <step>
+    <para> Select your SLES 12 SP3 minion from the <guimenu>Systems</guimenu> page to view its
+      <guimenu>System Details</guimenu>. Once you have added the SLES 12 SP3 Updates child channel
+     to your client, you should see several <literal>Critical</literal> software updates available.
+     Click on <literal>Critical</literal> to see a list of available patches. Select any of these
+     patches listed with the following synopsis: <emphasis>Important: Security update for the Linux
+      kernel</emphasis>. All fixed security bugs will be listed along with their number. For
+     example:(CVE-2016-8666) </para>
+    <important>
+     <title>Reboot Icon</title>
+     <para> Normal or non-live kernel patches always require a reboot. In SUSE Manager these are
+      represented by a <literal>Reboot Required</literal> icon located next to the
+       <literal>Security</literal> shield icon. </para>
+    </important>
+   </step>
+   <step>
+    <para> You can search for individual CVE's by selecting the <guimenu>Audit</guimenu> tab from
+     the navigation menu. Try searching for <literal>CVE-2016-8666</literal>. You will see that the
+     patch is available in the vendor update channel and the systems it applies to will be listed.
+    </para>
+   </step>
+  </procedure>
+
+
+
+  <important>
+   <title>CVE Availability</title>
+   <para> Not all security issues can be fixed by applying a live patch. Some security issues can
+    only be fixed by applying a full kernel update and will required a reboot. The assigned CVE
+    numbers for these issues are not included in live patches. A CVE audit will display this
+    requirement. </para>
+  </important>
+
+ </sect1>
+</chapter>

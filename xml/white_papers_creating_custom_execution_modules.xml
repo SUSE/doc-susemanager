@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="white.papers.creating.custom.execution.modules">
+
+    <title>Creating Custom Execution Modules</title>
+    <para>The following chapter will guide you through the process of creating a custom execution
+        module for use with Salt. Salt provides many execution modules out of the box that are used
+        to wrap typical configuration tasks. You may wish to expand already existing Salt modules by
+        creating a custom module designed around your configuration needs. Custom execution modules
+        are written in python and may be added to your Salt configuration.</para>
+
+    <warning>
+        <title>White Papers</title>
+        <para>All content contained in a White Papers document is under development and subject to change. Things will break
+            and may not work as intended. For testing environments only. These documents are
+            unsupported. </para>
+    </warning>
+    <sect1>
+        <title>Creating an Execution Module for Snapper</title>
+        <para>This exercise assumes you have already followed and created the master-less setup used
+            in: <xref linkend="white.papers.writing.custom.salt.grains"/> You may use the same setup
+            for the following exercise.</para>
+        <note>
+            <title>Testing Environment</title>
+            <para>Ensure your test environment uses <filename>Btrfs</filename> as its filesystem and
+                    <filename>Snapper</filename> is installed. (Snapper is installed by default on
+                SUSE systems using Btrfs)</para>
+        </note>
+
+        <procedure>
+            <title>Preparing the Snapper Module</title>
+            <step>
+                <para>Change the directories to:<filename>/srv/salt</filename>:</para>
+                <screen># cd /srv/salt</screen>
+            </step>
+            <step>
+                <para>To keep your Salt data organized, create a new <literal>_modules</literal>
+                    directory. The _modules directory will contain any custom modules that will be
+                    synced to minions:</para>
+                <screen># md _modules</screen>
+            </step>
+            <step>
+                <para>Change to the new directory and create a new python file named
+                        <literal>snapper.py</literal> containing the following content:</para>
+                <screen>import dbus
+
+bus = dbus.SystemBus()
+
+snapper = dbus.Interface(bus.get_object('org.opensuse.Snapper',
+                                       '/org/opensuse/Snapper'),
+                         dbus_interface='org.opensuse.Snapper')
+
+
+def list_snapshots(config='root'):
+
+  '''
+  List available snapshots
+  '''
+  return snapper.ListSnapshots(config)</screen>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Sync the New Module</title>
+        <procedure>
+            <title>Sync the New Snapper Module to Your Master-less Minion</title>
+            <step>
+                <para>In a normal Salt Master to minion setup you would target some or all of your
+                    servers and run the <command>salt '*' saltutil.sync_all</command> command.
+                    Alternatively you can narrow the scope to sync modules only using <command>salt
+                        '*' saltutil.sync_modules</command>. Keep in mind this exercise is working
+                    locally therefore you need to use the <command>salt-call</command> command
+                    instead. Execute the following command to sync your new module with the
+                    master-less minion now:</para>
+                <screen>salt-call saltutil.sync_modules</screen>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Test the New Execution Module</title>
+        <procedure>
+            <title>Test your New Snapper Execution Module</title>
+            <step>
+                <para>If your python syntax is correct and you receive no errors the following call
+                    should list all stored snapshots on your minion:</para>
+                <screen>salt-call snapper.list_snapshots</screen>
+                <note>
+                    <title>Smoothing out the Data</title>
+                    <para>This example is particularly short because the output from the D-Bus
+                        Python bindings is in a format that can directly be serialized into the YAML
+                        output you see on the command line. Normally you would rework/massage the
+                        data and create a custom dictionary to return.</para>
+                </note>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Passing Values and Creating a New Function</title>
+        <procedure>
+            <title>Passing Values and Creating a New Snapper Function</title>
+            <step>
+                <para>In the previous steps you passed the name of a snapper configuration and gave
+                    it a default configuration of <literal>def
+                        list_snapshots(config='root')</literal>. Verify that you can pass other
+                    configurations from the command line. The following command should throw an
+                    error as this configuration does not exist:</para>
+                <screen>salt-call snapper.list_snapshots config='test'</screen>
+                <para>Revert the previous change to the default and the command should execute
+                    properly as it is a valid snapper configuration:</para>
+                <screen>salt-call snapper.list_snapshots config='root'</screen>
+            </step>
+            <step>
+                <para>Now you will add another function to
+                        <filename>/srv/salt/_modules/snapper.py</filename> that allows you to
+                    compare snapshots. Add the following definition to
+                    <literal>snapper.py</literal>:</para>
+                <screen>def compare(config='root', first=1, second=2):
+  
+  snapper.CreateComparison(config, first, second)
+  
+  return snapper.GetFiles(config, first, second)</screen>
+            </step>
+            <step>
+                <para>After adding the new definition sync the module again:</para>
+                <screen>salt-call saltutil.sync_modules</screen>
+            </step>
+            <step>
+                <para>Now use the <command>list_snapshots</command> function to determine which
+                    snapshots may be compared.</para>
+            </step>
+            <step>
+                <para>Try it out now by providing the snapshot IDs:</para>
+                <screen>salt-call snapper.compare first=3 second=4</screen>
+                <note>
+                    <title>Listing Available Functions</title>
+                    <para>Keep in mind you can always see what Salt module functions are available
+                        by using the <command>salt-call sys.list_functions snapper</command>
+                        command.</para>
+                    <para>You can also list the complete set of documentation using the:
+                            <command>salt-call sys.list_fucntions sys</command> command.</para>
+                </note>
+            </step>
+
+        </procedure>
+
+        <itemizedlist>
+            <title>Final Recommendations</title>
+            <listitem>
+                <para>In production code you may want to add additional error handling and debugging
+                    (e.g. logging).</para>
+            </listitem>
+            <listitem>
+                <para>Always add documentation to your modules. Remember that anything placed into
+                    your functions <literal>docstrings</literal> is picked up by Salt’s
+                    documentation framework automatically.</para>
+            </listitem>
+            <listitem>
+                <para>Before writing custom execution modules, check Salt documentation for existing
+                    modules. <emphasis>There is already a far more powerful Snapper module that
+                        exists external to this exercise.</emphasis></para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+
+
+
+</chapter>

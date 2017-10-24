@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sect1
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<!-- Converted by suse-upgrade version 1.1 -->
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!-- <appendix xmlns="http://docbook.org/ns/docbook"
+xmlns:xi="http://www.w3.org/2001/XInclude"
+xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+xml:id="ap-sample-autoinst-system-upgrade"> -->
+<sect1 xmlns="http://docbook.org/ns/docbook"
+xmlns:xi="http://www.w3.org/2001/XInclude"
+xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+xml:id="ap-sample-autoinst-system-upgrade">
+ <title>Sample Autoinstallation Script for System Upgrade (SLES 11 SP3 to SLES 12 SP3)</title>
+ <info/>
+ <!--idx-->
+ <indexterm>
+ <primary>autoinstallation system upgrade</primary>
+ <secondary>sample file</secondary></indexterm>
+ <para></para>
+<screen><![CDATA[<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns"
+         xmlns:config="http://www.suse.com/1.0/configns">
+  <general>
+  $SNIPPET('spacewalk/sles_no_signature_checks')
+    <mode>
+      <confirm config:type="boolean">false</confirm>
+    </mode>
+  </general>
+  <add-on>
+    <add_on_products config:type="list">
+      <listentry>
+        <ask_on_error config:type="boolean">true</ask_on_error>
+        <media_url>http://$redhat_management_server/ks/dist/child/sles12-sp3-updates-x86_64/summer2017</media_url>
+        <name>SLES12 SP3 Updates</name>
+        <product>SLES12-SP3</product>
+        <product_dir>/</product_dir>
+      </listentry>
+      <listentry>
+        <ask_on_error config:type="boolean">true</ask_on_error>
+        <media_url>http://$redhat_management_server/ks/dist/child/sle-manager-tools12-pool-x86_64-sp3/summer2017</media_url>
+        <name>SLE12 SP3 Manager Tools Pool</name>
+        <product>SLES12-SP3</product>
+        <product_dir>/</product_dir>
+      </listentry>
+      <listentry>
+        <ask_on_error config:type="boolean">true</ask_on_error>
+        <media_url>http://$redhat_management_server/ks/dist/child/sle-manager-tools12-updates-x86_64-sp3/summer2017</media_url>
+        <name>SLE12 SP3 Manager Tools Updates</name>
+        <product>SLES12-SP3</product>
+        <product_dir>/</product_dir>
+      </listentry>
+    </add_on_products>
+  </add-on>
+  <upgrade>
+    <only_installed_packages config:type="boolean">false</only_installed_packages>
+    <stop_on_solver_conflict config:type="boolean">true</stop_on_solver_conflict>
+  </upgrade>
+  <backup>
+    <sysconfig config:type="boolean">true</sysconfig>
+    <modified config:type="boolean">true</modified>
+    <remove_old config:type="boolean">false</remove_old>
+  </backup>
+  <networking>
+    <keep_install_network config:type="boolean">true</keep_install_network>
+    <start_immediately config:type="boolean">true</start_immediately>
+  </networking>
+   <scripts>
+    <init-scripts config:type="list">
+      $SNIPPET('spacewalk/sles_register_script')
+    </init-scripts>
+  </scripts>
+</profile>]]></screen>
+<!-- </appendix> -->
+</sect1>

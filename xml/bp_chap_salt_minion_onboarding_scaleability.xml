@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.chap.salt.minion.scaleability">
+ <title>Salt Minion Scalability</title>
+
+ <sect1>
+  <title>Salt Minion Onboarding Rate</title>
+  <para>The rate at which SUSE Manager can on-board minions (accept Salt keys) is limited and
+   depends on hardware resources. On-boarding minions at a faster rate than SUSE Manager is
+   configured for will build up a backlog of unprocessed keys slowing the process and potentially
+   exhausting resources. It is recommended to limit the acceptance key rate pro-grammatically. A
+   safe starting point would be to on-board a minion every 15 seconds, which can be implemented via
+   the following command:</para>
+  <screen>for k in $(salt-key -l un|grep -v Unaccepted); do salt-key -y -a $k; sleep 15; done </screen>
+ </sect1>
+
+ <sect1 xml:id="bp.chap.salt.minion.scaleability.unaccepted">
+  <title>Minions Running with Unaccepted Salt Keys</title>
+  <para> Minions which have not been on-boarded, (minions running with unaccepted Salt keys) consume
+   resources, in particular inbound network bandwidth for ~2.5 Kb/s per minion. 1000 idle minions
+   will consume around ~2.5 Mb/s, and this number will drop to almost 0 once on-boarding has been
+   completed. Limit non-onboarded systems for optimal performance. </para>
+
+  <para> Salt's official documentation suggests the maximum number of opened files should be set to
+   at least 2 × the minion count. Current default is 16384, which is sufficient for ~8000 minions.
+   For larger installations, this number may be increased by editing the following line in
+    <filename>/usr/lib/systemd/system/salt-master.service</filename>: </para>
+  <screen>LimitNOFILE=16384</screen>
+ </sect1>
+
+ <sect1 xml:id="bp.chap.salt.minion.scaleability.timeouts">
+  <!--
+      https://wiki.microfocus.com/index.php?title=SUSE_Manager/SaltTimeoutsForMinions&action=edit
+  -->
+  <title>Salt Timeouts</title>
+  <sect2>
+   <title>Background Information</title>
+   <para> Salt features two timeout parameters called <literal>timeout</literal> and
+     <literal>gather_job_timeout</literal> that are relevant during the execution of Salt commands
+    and jobs—it does not matter whether they are triggered using the command line interface or API.
+    These two parameters are explained in the following article. </para>
+
+   <para> This is a normal workflow when all minions are well reachable: </para>
+   <itemizedlist>
+    <listitem>
+     <para> A salt command or job is executed: </para>
+     <screen>salt '*' test.ping</screen>
+    </listitem>
+    <listitem>
+     <para> Salt master publishes the job with the targeted minions into the Salt PUB channel.
+     </para>
+    </listitem>
+    <listitem>
+     <para> Minions take that job and start working on it. </para>
+    </listitem>
+    <listitem>
+     <para> Salt master is looking at the Salt RET channel to gather responses from the minions.
+     </para>
+    </listitem>
+    <listitem>
+     <para> If Salt master gets all responses from targeted minions, then everything is completed
+      and Salt master will return a response containing all the minion responses. </para>
+    </listitem>
+   </itemizedlist>
+   <para> If some of the minions are down during this process, the workflow continues as follows: </para>
+   <orderedlist>
+    <listitem>
+     <para> If <literal>timeout</literal> is reached before getting all expected responses from the
+      minions, then Salt master would trigger an aditional job (a Salt <command>find_job</command>
+      job) targeting only pending minions to check whether the job is already running on the minion.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para> Now <literal>gather_job_timeout</literal> is evaluated. A new counter is now triggered.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para> If this new <command>find_job</command> job responses that the original job is actually
+      running on the minion, then Salt master will wait for that minion's response. </para>
+    </listitem>
+
+    <listitem>
+     <para> In case of reaching <literal>gather_job_timeout</literal> without having any response
+      from the minion (neither for the initial <command>test.ping</command> nor for the
+       <command>find_job</command> job), Salt master will return with only the gathered responses
+      from the responding minions. </para>
+    </listitem>
+   </orderedlist>
+
+   <para> By default, &susemgr; globally sets <literal>timeout</literal> and
+     <literal>gather_job_timeout</literal> to 120 seconds. So, in the worst case, a Salt call
+    targeting unreachable minions will end up <emphasis>with 240 seconds of waiting</emphasis> until
+    getting a response. </para>
+  </sect2>
+
+  <sect2 xml:id="bp.chap.salt.minion.scaleability.timeouts.presence">
+   <title>A Presence Ping Mechanism for Unreachable Salt Minions</title>
+   <para> In order to prevent waiting until timeouts are reached when some minions are down, &suse;
+    introduced a so-called "presence mechanism" for Salt minions. </para>
+
+   <para> On &susemgr; 3.0.5 and later, this presence mechanism checks for unreachable Salt minions
+    when &susemgr; is performing synchronous calls to these minions, and it excludes unreachable
+    minions from that call. Synchronous calls are going to be displaced in favor of asynchronous
+    calls but currently still being used during some workflows. </para>
+   <para> The presence mechanism triggers a Salt <command>test.ping</command> with a custom and
+    fixed short Salt timeout values. Default Salt values for the presence ping are: <literal>timeout
+     = 4</literal> and <literal>gather_job_timeout = 1</literal>. This way, we can quickly detect
+    which targeted minions are unreachable, and then exclude them from the synchronous call. </para>
+  </sect2>
+  <sect2>
+   <title>Overriding Salt Presence Timeout Values</title>
+   <para> &susemgr; administrators can increase or decrease default presence ping timeout values by
+    removing the comment markers (<literal>#</literal>) and setting the desired values for
+     <literal>salt_presence_ping_timeout</literal> and
+     <literal>salt_presence_ping_gather_job_timeout</literal> options in
+     <filename>/etc/rhn/rhn.conf</filename>: </para>
+   <screen># SUSE Manager presence timeouts for Salt minions
+# salt_presence_ping_timeout = 4
+# salt_presence_ping_gather_job_timeout = 1</screen>
+  </sect2>
+  <sect2>
+   <title>Salt SSH Minions (SSH Push)</title>
+   <para> Salt SSH minions are slightly different that regular minions (zeromq). Salt SSH minions do
+    not use Salt PUB/RET channels but a wrapper Salt command inside of an SSH call. Salt
+     <literal>timeout</literal> and <literal>gather_job_timeout</literal> are not playing a role
+    here. </para>
+   <para> &susemgr; defines a timeout for SSH connections in <filename>/etc/rhn/rhn.conf</filename>: </para>
+   <screen># salt_ssh_connect_timeout = 180</screen>
+   <para> The presence ping mechanism is also working with SSH minions. In this case, &susemgr; will
+    use <literal>salt_presence_ping_timeout</literal> to override the default timeout value for SSH
+    connections. </para>
+  </sect2>
+ </sect1>
+</chapter>

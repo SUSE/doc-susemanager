@@ -1,0 +1,1822 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!DOCTYPE sect1
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<!-- z: s2-sm-system-kickstart ref.webui.systems.autoinst -->
+<sect1 xmlns="http://docbook.org/ns/docbook"
+       xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:xlink="http://www.w3.org/1999/xlink"
+       version="5.0"
+       xml:id="ref.webui.systems.autoinst">
+ <title>Autoinstallation</title>
+
+ <note>
+  <title>Autoinstallation Types: &ay; and Kickstart</title>
+  <para>
+   In the following section, &ay; and &ay; features apply for &sle;
+   client systems only. For &rhela; systems, use Kickstart and Kickstart
+   features.
+  </para>
+ </note>
+
+ <para>
+  &ay; and Kickstart configuration files allow administrators to create
+  an environment for automating otherwise time-consuming system
+  installations, such as multiple servers or workstations. &ay; files
+  have to be uploaded to be managed with &susemgr;. Kickstart files can
+  be created, modified, and managed within the &susemgr; Web interface.
+ </para>
+
+ <para>
+  &susemgr; also features the Cobbler installation server.  For more
+  information on Cobbler, see <xref linkend="advanced.topics.cobbler"/>.
+ </para>
+
+ <para>
+  &susemgr; provides an
+  interface for developing Kickstart and &ay; profiles that can be used
+  to install &rhel; or &sle; on either new or already-registered
+  systems automatically according to certain specifications.
+ </para>
+
+ <figure>
+  <title>Autoinstallation Overview</title>
+  <mediaobject>
+   <imageobject role="fo">
+    <imagedata fileref="systems_kickstart_overview.png" width="444"/>
+   </imageobject>
+   <imageobject role="html">
+    <imagedata fileref="systems_kickstart_overview.png" width="444"/>
+   </imageobject>
+<!--
+    <textobject>
+     <para>
+      <menuchoice> <guimenu>Systems</guimenu> <guimenu>Kickstart</guimenu>
+      </menuchoice>
+     </para>
+    </textobject>
+-->
+  </mediaobject>
+ </figure>
+
+ <para>
+  This overview page displays the status of automated installations
+  (Kickstart and &ay;) on your client systems: the types and number of
+  profiles you have created and the progress of systems that are
+  scheduled to be installed using Kickstart or &ay;. In the upper right
+  area is the <guimenu>Autoinstallation Actions</guimenu> section, which
+  contains a series of links to management actions for your Kickstart or
+  &ay; profiles.
+
+  Before explaining the various automated installation options on this
+  page, the next two sections provide an introduction to &ay; (<xref
+  linkend="ref.webui.systems.autoinst.ay-intro"/>) and Kickstart (<xref
+  linkend="ref.webui.systems.autoinst.kick-intro"/>).
+ </para>
+
+<!-- z: s3-sm-system-ay-intro ref.webui.systems.autoinst.ay-intro -->
+ <sect2 xml:id="ref.webui.systems.autoinst.ay-intro">
+  <title>Introduction to &ay;</title>
+  <remark role="needinfo">
+    2011-01-19 - ke: do we want to enhance this intro?
+    2011-01-24: it can stay as is for the moment.
+   </remark>
+  <para>
+   Using &ay;, a system administrator can create a single file containing
+   the answers to all the questions that would normally be asked during a
+   typical installation of a &sle; system.
+  </para>
+  <para>
+   &ay; files can be kept on a single server system and read by
+   individual computers during the installation. This way the same &ay;
+   file is used to install &sle; on multiple machines.
+  </para>
+  <para>
+   The <citetitle> &sls; &ay;</citetitle> (<link
+   xlink:href="https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html"/>)
+   contains an in-depth discussion of <quote>Automated
+   Installation</quote> using &ay;.
+  </para>
+
+  <sect3 xml:id="s4-system-ay-intro-explain">
+   <title>&ay; Explained</title><indexterm>
+   <primary>&ay;</primary>
+   <secondary>explained</secondary></indexterm>
+   <para>
+    When a machine is to receive a network-based &ay; installation, the
+    following events must occur in this order:
+   </para>
+   <orderedlist spacing="normal">
+    <listitem>
+     <para>
+      After being connected to the network and turned on, the machine's PXE
+      logic broadcasts its MAC address and requests to be discovered.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      If no static IP address is used, the DHCP server recognizes the
+      discovery request and offers network information needed for the new
+      machine to boot. This includes an IP address, the default gateway to
+      be used, the netmask of the network, the IP address of the TFTP or
+      HTTP server holding the bootloader program, and the full path and file
+      name to that program (relative to the server's root).
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The machine applies the networking information and initiates a session
+      with the server to request the bootloader program.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The bootloader searches for its configuration file on the server from
+      which it was loaded. This file dictates which Kernel and Kernel
+      options, such as the initial RAM disk (initrd) image, should be
+      executed on the booting machine. Assuming the bootloader program is
+      SYSLINUX, this file is located in the
+      <filename>pxelinux.cfg</filename> directory on the server and named
+      the hexadecimal equivalent of the new machine's IP address. For
+      example, a bootloader configuration file for &sls; should contain:
+     </para>
+<screen>port 0
+prompt 0
+timeout 1
+default autoyast
+label autoyast
+  kernel vmlinuz
+  append autoyast=http://<replaceable>my_susemanager_server</replaceable>/<replaceable>path</replaceable> \
+    install=http://<replaceable>my_susemanager_server</replaceable>/<replaceable>repo_tree</replaceable></screen>
+    </listitem>
+    <listitem>
+     <para>
+      The machine accepts and uncompresses the initrd and kernel, boots the
+      kernel, fetches the instsys from the install server and initiates the
+      &ay; installation with the options supplied in the bootloader
+      configuration file, including the server containing the &ay;
+      configuration file.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The new machine is installed based on the parameters established
+      within the &ay; configuration file.
+     </para>
+    </listitem>
+   </orderedlist>
+  </sect3>
+  <sect3 xml:id="s4-system-ay-intro-prereq">
+   <title>&ay; Prerequisites</title>
+   <para>
+    Some preparation is required for your infrastructure to handle &ay;
+    installations. For instance, before creating &ay; profiles, you may
+    consider:
+   </para>
+   <remark role="needinfo">
+     2011-01-21 - ke: Does it make sense to mention this?
+     2011-01-24: Recommended by ug, there is now an item on HTTP and SM.
+     </remark>
+   <itemizedlist mark="bullet" spacing="normal">
+    <listitem>
+     <para>
+      A DHCP server is not required for &ay;, but it can make things
+      easier. If you are using static IP addresses, you should select static
+      IP while developing your &ay; profile.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Host the &ay; distribution trees via HTTP, properly provided by
+      &susemgr;.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      If conducting a so-called bare-metal &ay; installation, provide
+      the following settings:
+     </para>
+     <itemizedlist mark="bullet" spacing="normal">
+      <listitem>
+       <para>
+        Configure DHCP to assign the required networking parameters and the
+        bootloader program location.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        In the bootloader configuration file, specify the kernel and
+        appropriate kernel options to be used.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+   </itemizedlist>
+  </sect3>
+  <sect3 xml:id="s4-system-ay-ISO">
+<!--status="rfc"-->
+   <title>Building Bootable &ay; ISOs</title>
+   <remark role="needinfo">
+      2011-01-24 - ke: good enough?
+    </remark>
+   <remark role="needinfo">
+     2011-02-09 - kkaempf: Does this work this way on SLE?
+    </remark>
+   <remark role="generic">
+     2011-02-09 - ke: Yes, it does.  Confirmed by ug.  See
+     http://www.suse.de/~ug/AutoYaST_FAQ.html#bD
+    </remark>
+   <remark>
+     2015-08-11 - ke: http://doccomments.provo.novell.com/comments/28738
+     wants us to recommend cobbler.  Changing accordingly.
+    </remark>
+   <para>
+    While you can schedule a registered system to be installed by &ay;
+    with a new operating system and package profile, you can also
+    automatically install a system that is not registered with &susemgr;,
+    or does not yet have an operating system installed. One common method of
+    doing this is to create a bootable CD-ROM that is inserted into the
+    target system. When the system is rebooted or switched on, it boots from
+    the CD-ROM, loads the &ay; configuration from your &susemgr;, and
+    proceeds to install &sls; according to the &ay; profile you have
+    created.
+   </para>
+<!--
+    <procedure>
+     <title>Building a Bootable &ay; ISO and CD-ROM</title>
+     <step>
+      <para>
+     To create an &ay; profile, copy the contents of the
+     <filename>loader/</filename> directory (e.g.,
+     <filename><replaceable>.../mounted-iso</replaceable>/boot/i386/loader/</filename>) from the installation medium
+     of the target distribution to a temporary location (e.g., the
+     current directory):
+      </para>
+      <screen>mkdir loader
+cp <replaceable>.../mounted-iso</replaceable>/boot/i386/loader/* loader</screen>
+     </step>
+     <step>
+      <para>
+       Edit the
+       <filename>isolinux.cfg</filename> file in the temporary
+       <filename>loader/</filename> directory to boot
+       <literal>autoyast</literal> by default and add an <literal>autoyast</literal>
+     section:
+    </para>
+<screen>default autoyast
+label autoyast
+kernel vmlinuz
+  append textmode=1 autoyast=<replaceable>url</replaceable> initrd=<replaceable>initrd</replaceable> \
+    install=<replaceable>url_repo_tree</replaceable></screen>
+     <note>
+      <title>IP Range</title>
+     <para>
+     The &ay; distribution defined by the IP range should match the
+     distribution from which you are building the ISO, otherwise errors will occur.
+    </para>
+     </note>
+     </step>
+     <step>
+    <para>
+     You may customize <filename>isolinux.cfg</filename> according to
+     your needs, for example, by adding multiple &ay; options, different
+     boot messages, shorter timeout periods, etc.
+    </para>
+     </step>
+     <step>
+    <para>
+     Issue the command:
+    </para>
+<screen>mkisofs -o file.iso -b isolinux.bin -c boot.cat -no-emul-boot \
+  -boot-load-size 4 -boot-info-table -R -J -v -T loader/</screen>
+    <para>
+     Note that <filename>loader/</filename> is the relative path to the
+     directory containing the modified isolinux files copied from the
+     distribution medium, while <filename>file.iso</filename> is the output
+     ISO file, which is placed into the current directory.
+    </para>
+     </step>
+     <step>
+    <para>
+     Burn the ISO on a CD-ROM.
+    </para>
+     </step>
+    </procedure>
+-->
+<!--
+   <para>
+    Build an ISO with cobbler and burn it on a CD-ROM. For more information,
+    see <xref linkend="s1-cobbler-build-iso"/>.
+    </para>
+    -->
+   <para>
+    To use the CD-ROM, boot the system and type <literal>autoyast</literal>
+    at the prompt (assuming you left the label for the &ay; boot as
+    <literal>autoyast</literal>). When you press <keycap>Enter</keycap>, the
+    &ay; installation begins.
+   </para>
+   <para>
+    For more information about image creation, refer to KIWI at
+    <link xlink:href="http://doc.opensuse.org/projects/kiwi/doc/"/>.
+   </para>
+  </sect3>
+  <sect3 xml:id="s4-system-ay-PXE">
+<!--status="rfc"-->
+   <title>Integrating &ay; with PXE</title>
+   <para>
+    <remark role="needinfo">
+      2011-01-19 - ke: reality check required
+     </remark>
+    <remark role="generic">
+      2011-01-24 - ke: I added note on uploading with Web UI
+     </remark>
+    In addition to CD-ROM-based installations, &ay; installation through
+    a Pre-Boot Execution Environment (PXE) is supported. This is less
+    error-prone than CDs, enables &ay; installation from bare metal, and
+    integrates with existing PXE/DHCP environments.
+   </para>
+   <para>
+    To use this method, make sure your systems have network interface cards
+    (NIC) that support PXE, install and configure a PXE server, ensure DHCP
+    is running, and place the installation repository on an HTTP server for
+    deployment. Finally upload the &ay; profile via the Web interface to
+    the &susemgr; server. Once the &ay; profile has been created, use
+    the URL from the <guimenu>Autoinstallation Overview</guimenu> page, as
+    for CD-ROM-based installations.
+   </para>
+   <para>
+    To obtain specific instructions for conducting PXE &ay; installation,
+    refer to the <emphasis>Using PXE Boot</emphasis> section of the
+    <citetitle>&sle; &deploy;</citetitle>.
+   </para>
+   <para>
+    Starting with <xref linkend="ref.webui.systems.autoinst.profiles"/>, &ay;
+    options available from
+    <menuchoice><guimenu>Systems</guimenu><guimenu>Kickstart</guimenu></menuchoice>
+    are described.
+   </para>
+   </sect3>
+
+  </sect2>
+
+<!-- z: s3-sm-system-kick-intro ref.webui.systems.autoinst.kick-intro -->
+
+ <sect2 xml:id="ref.webui.systems.autoinst.kick-intro">
+  <title>Introduction to Kickstart</title>
+  <remark role="needinfo">
+    2011-01-19 - ke: do we want to keep this intro and the following sections?
+
+    =&gt; joe: yes, it is important.
+   </remark>
+  <para>
+   Using Kickstart, a system administrator can create a single file
+   containing the answers to all the questions that would normally be asked
+   during a typical installation of &rhel;.
+  </para>
+  <para>
+   Kickstart files can be kept on a single server and read by individual
+   computers during the installation. This method allows you to use one
+   Kickstart file to install &rhel; on multiple machines.
+  </para>
+  <para>
+   The <citetitle>Red Hat Enterprise Linux System Administration
+   Guide</citetitle> contains an in-depth description of Kickstart
+   (<link xlink:href="https://access.redhat.com/documentation/en/red-hat-enterprise-linux/"/>).
+  </para>
+
+  <sect3 xml:id="s4-system-ks-intro-explain">
+   <title>Kickstart Explained</title><indexterm>
+   <primary>Kickstart</primary>
+   <secondary>explained</secondary></indexterm>
+   <para>
+    When a machine is to receive a network-based &kickstart;, the
+    following events must occur in this order:
+   </para>
+   <orderedlist spacing="normal">
+    <listitem>
+     <para>
+      After being connected to the network and turned on, the machine's PXE
+      logic broadcasts its MAC address and requests to be discovered.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      If no static IP address is used, the DHCP server recognizes the
+      discovery request and offers network information needed for the new
+      machine to boot. This information includes an IP address, the default
+      gateway to be used, the netmask of the network, the IP address of the
+      TFTP or HTTP server holding the bootloader program, and the full path
+      and file name of that program (relative to the server's root).
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The machine applies the networking information and initiates a session
+      with the server to request the bootloader program.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The bootloader searches for its configuration file on the server from
+      which it was loaded. This file dictates which kernel and kernel
+      options, such as the initial RAM disk (initrd) image, should be
+      executed on the booting machine. Assuming the bootloader program is
+      SYSLINUX, this file is located in the
+      <filename>pxelinux.cfg</filename> directory on the server and named
+      the hexadecimal equivalent of the new machine's IP address. For
+      example, a bootloader configuration file for Red Hat Enterprise Linux
+      AS 2.1 should contain:
+     </para>
+<screen>port 0 
+prompt 0 
+timeout 1 
+default My_Label 
+label My_Label 
+      kernel vmlinuz 
+      append ks=http://<replaceable>my_susemanager_server</replaceable>/<replaceable>path</replaceable> \
+          initrd=initrd.img network apic</screen>
+    </listitem>
+    <listitem>
+     <para>
+      The machine accepts and uncompresses the init image and kernel, boots
+      the kernel, and initiates a Kickstart installation with the options
+      supplied in the bootloader configuration file, including the server
+      containing the Kickstart configuration file.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      This &kickstart; configuration file in turn directs the machine to
+      the location of the installation files.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The new machine is built based on the parameters established within
+      the Kickstart configuration file.
+     </para>
+    </listitem>
+   </orderedlist>
+  </sect3>
+  <sect3 xml:id="s4-system-ks-intro-prereq">
+   <title>Kickstart Prerequisites</title>
+   <para>
+    Some preparation is required for your infrastructure to handle
+    &kickstart;s. For instance, before creating Kickstart profiles, you
+    may consider:
+   </para>
+   <itemizedlist mark="bullet" spacing="normal">
+    <listitem>
+     <para>
+      A DHCP server is not required for kickstarting, but it can make things
+      easier. If you are using static IP addresses, select static IP while
+      developing your Kickstart profile.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      An FTP server can be used instead of hosting the Kickstart
+      distribution trees via HTTP.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      If conducting a bare metal &kickstart;, you should configure DHCP
+      to assign required networking parameters and the bootloader program
+      location. Also, specify within the bootloader configuration file the
+      kernel to be used and appropriate kernel options.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect3>
+  <sect3 xml:id="s4-system-ks-ISO">
+   <title>Building Bootable Kickstart ISOs</title>
+   <para>
+    While you can schedule a registered system to be kickstarted to a new
+    operating system and package profile, you can also &kickstart; a
+    system that is not registered with &susemgr; or does not yet have an
+    operating system installed. One common method of doing this is to create
+    a bootable CD-ROM that is inserted into the target system. When the
+    system is rebooted, it boots from the CD-ROM, loads the &kickstart;
+    configuration from your &susemgr;, and proceeds to install &rhel;
+    according to the Kickstart profile you have created.
+   </para>
+   <para>
+    To do this, copy the contents of <filename>/isolinux</filename> from the
+    first CD-ROM of the target distribution. Then edit the
+    <filename>isolinux.cfg</filename> file to default to 'ks'. Change the
+    'ks' section to the following template:
+   </para>
+<screen>label ks 
+kernel vmlinuz 
+  append text ks=<replaceable>url</replaceable> initrd=initrd.img lang= devfs=nomount \
+    ramdisk_size=16438 <replaceable>ksdevice</replaceable></screen>
+   <para>
+    IP address-based &kickstart; URLs will look like this:
+   </para>
+<screen>http://<replaceable>my.manager.server</replaceable>/kickstart/ks/mode/ip_range 
+</screen>
+   <para>
+    The &kickstart; distribution defined via the IP range should match
+    the distribution from which you are building, or errors will occur.
+    <replaceable>ksdevice</replaceable> is optional, but looks like:
+   </para>
+<screen>ksdevice=eth0 
+</screen>
+   <para>
+    It is possible to change the distribution for a Kickstart profile within
+    a family, such as Red Hat Enterprise Linux AS 4 to Red Hat Enterprise
+    Linux ES 4, by specifying the new distribution label. Note that you
+    cannot move between versions (4 to 5) or between updates (U1 to U2).
+   </para>
+   <para>
+    Next, customize <filename>isolinux.cfg</filename> further for your needs
+    by adding multiple Kickstart options, different boot messages, shorter
+    timeout periods, etc.
+   </para>
+   <para>
+<!-- also distribed in the RHEL 5 Install Guide -->
+    Next, create the ISO as described in the <emphasis>Making an
+    Installation Boot CD-ROM</emphasis> section of the <citetitle>Red Hat
+    Enterprise Linux Installation Guide</citetitle>. Alternatively, issue
+    the command:
+   </para>
+<screen>mkisofs -o file.iso -b isolinux.bin -c boot.cat -no-emul-boot \
+  -boot-load-size 4 -boot-info-table -R -J -v -T isolinux/</screen>
+   <para>
+    Note that <filename>isolinux/</filename> is the relative path to the
+    directory containing the modified isolinux files copied from the
+    distribution CD, while <filename>file.iso</filename> is the output ISO
+    file, which is placed into the current directory.
+   </para>
+   <para>
+    Burn the ISO to CD-ROM and insert the disc. Boot the system and type
+    &quot;ks&quot; at the prompt (assuming you left the label for the
+    Kickstart boot as 'ks'). When you press <keycap>Enter</keycap>,
+    Kickstart starts running.
+   </para>
+  </sect3>
+  <sect3 xml:id="s4-system-ks-PXE">
+   <title>Integrating Kickstart with PXE</title>
+   <para>
+    In addition to CD-ROM-based installs, Kickstart supports a Pre-Boot
+    Execution Environment (PXE). This is less error-prone than CDs, enables
+    kickstarting from bare metal, and integrates with existing PXE/DHCP
+    environments.
+   </para>
+   <para>
+    To use this method, make sure your systems have network interface cards
+    (NIC) that support PXE. Install and configure a PXE server and ensure
+    DHCP is running. Then place the appropriate files on an HTTP server for
+    deployment. Once the &kickstart; profile has been created, use the
+    URL from the <guimenu>Kickstart Details</guimenu> page, as for
+    CD-ROM-based installs.
+   </para>
+<!-- FIXME remove reference ? joe: keep it -->
+   <para>
+    To obtain specific instructions for conducting PXE &kickstart;s,
+    refer to the <emphasis>PXE Network Installations</emphasis> chapter of
+    the <citetitle>Red Hat Enterprise Linux 4 System Administration
+    Guide</citetitle>.
+   </para>
+   <note>
+    <para>
+     Running the Network Booting Tool, as described in the Red Hat
+     Enterprise Linux 4: System Administration Guide, select
+     &quot;HTTP&quot; as the protocol and include the domain name of
+     the &susemgr; in the Server field if you intend to use it to
+     distribute the installation files.
+    </para>
+   </note>
+   <para>
+    The following sections describe the autoinstallation options available
+    from the
+    <menuchoice><guimenu>Systems</guimenu><guimenu>Autoinstallation</guimenu></menuchoice>
+    page.
+   </para>
+   </sect3>
+
+ </sect2>
+
+<!-- z: s3-system-ks-list-profiles ref.webui.systems.autoinst.profiles -->
+
+    <sect2 xml:id="ref.webui.systems.autoinst.profiles">
+     <title>Autoinstallation > Profiles (Kickstart and &ay;)</title>
+  
+
+  <para> This page lists all profiles for your organization, shows whether these profiles are
+   active, and specifies the distribution tree with which each profile is associated.</para>
+     <informalfigure>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="systems_kickstart_overview.png" width="444"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="systems_kickstart_overview.png" width="444"/>
+       </imageobject>
+      </mediaobject>
+     </informalfigure>
+     
+  <para> You can either create a Kickstart profile by clicking the <guimenu>Create Kickstart
+    Profile</guimenu> link, upload or paste the contents of a new profile using the <guimenu>Upload
+    Kickstart/Autoyast File</guimenu>, or edit an existing Kickstart profile by clicking the name of
+   the profile. Note, you can only update &ay; profiles using the upload button. You can also view
+   &ay; profiles in the edit box or change the virtualization type using the selection list.
+   <!-- viewing in edit box, change virtualization type, [selection
+         box]; mentioned above. -->
+  </para>
+
+<!-- z: s3-sm-system-kick-create ref.webui.systems.autoinst.profiles.create -->
+
+ <sect3 xml:id="ref.webui.systems.autoinst.profiles.create">
+<!--status="rfc"-->
+  <title>Create a Kickstart Profile</title>
+  <para>
+   Click on the <guimenu>Create Kickstart Profile</guimenu> link from
+   the
+   <menuchoice><guimenu>Systems</guimenu><guimenu>Autoinstallation</guimenu></menuchoice>
+   page to start the wizard that populates the base values needed for a
+   Kickstart profile.
+  </para>
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="create_profile_wizard.png" width="444"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="create_profile_wizard.png" width="444"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+  <procedure>
+   <title>Creating a Kickstart Profile</title>
+   <step>
+    <para>
+     On the first line, enter a Kickstart profile label. This label
+     cannot contain spaces, so use dashes (<literal>-</literal>) or
+     underscores (<literal>_</literal>) as separators.
+    </para>
+   </step>
+   <step>
+    <para>
+     Select a <guimenu>Base Channel</guimenu> for this profile, which
+     consists of packages based on a specific architecture and Red Hat
+     Enterprise Linux release.
+    </para>
+    <note>
+     <title>Creating Base Channel</title>
+     <para>
+      Base channels are only available if a suitable distribution is
+      created first.  For creating distributions, see <xref
+      linkend="ref.webui.systems.autoinst.distribution"/>.
+     </para>
+    </note>
+   </step>
+   <step>
+    <para>
+     Select an <guimenu>Kickstartable Tree</guimenu> for this profile. The
+     <guimenu>Kickstartable Tree</guimenu> drop-down menu is only
+     populated if one or more distributions have been created for the
+     selected base channel (see <xref linkend="ref.webui.systems.autoinst.distribution"/>).
+    </para>
+   </step>
+   <step>
+    <para>
+     <!-- FIXME: check whether the box is dynamically created -->
+     Instead of selecting a specific tree, you can also check the box
+     <guimenu>Always use the newest Tree for this base channel.</guimenu>
+     This setting lets &susemgr; automatically pick the latest tree that
+     is associated with the specified base channels. If you add new trees
+     later, &susemgr; will always keep the most recently created or
+     modified.
+    </para>
+   </step>
+   <step>
+    <para>
+     Select the <guimenu>Virtualization Type</guimenu> from the drop-down
+     menu.<!-- <phrase os="hidden"> For more information about virtualization,
+     refer to <xref linkend="ch-virtualization"/>.</phrase> -->
+    </para>
+    <note os="hidden">
+     <para>
+      If you do not intend to use the Kickstart profile to create virtual
+      guest systems, you can leave the drop-down at the default
+      <guimenu>None</guimenu> choice.
+     </para>
+    </note>
+   </step>
+   <step>
+    <para>
+     On the second page, select (or enter) the location of the Kickstart
+     tree.
+    </para>
+   </step>
+   <step>
+    <para>
+     On the third page, select a root password for the system.
+    </para>
+   </step>
+  </procedure>
+  <para>
+   Depending on your base channel, your newly created Kickstart profile
+   might be subscribed to a channel that is missing required packages. For
+   &kickstart; to work properly, the following packages should be present
+   in its base channel: <filename>pyOpenSSL</filename>,
+   <filename>rhnlib</filename>, <filename>libxml2-python</filename>, and
+   <filename>spacewalk-koan</filename> and associated packages.
+  </para>
+  <para>
+   To resolve this issue:
+  </para>
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     Make sure that the Tools software channel for the Kickstart profile's
+     base channel is available to your organization. If it is not, you must
+     request entitlements for the Tools software channel from the
+     &susemgr; administrator.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Make sure that the Tools software channel for this Kickstart profile's
+     base channel is available to your &susemgr; as a child channel.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Make sure that <filename>rhn-kickstart</filename> and associated
+     packages corresponding to this &kickstart; are available in the
+     Tools child channel.
+    </para>
+   </listitem>
+  </itemizedlist>
+  <para>
+   The final stage of the wizard presents the
+   <menuchoice><guimenu>Autoinstallation
+   Details</guimenu><guimenu>Details</guimenu></menuchoice> tab. On this tab
+   and the other subtabs, nearly every option for the new Kickstart profile
+   can be customized.
+  </para>
+  <para>
+   Once created, you can access the Kickstart profile by downloading it from
+   the <guimenu>Autoinstallation Details</guimenu> page by clicking the
+   <guimenu>Autoinstallation File</guimenu> subtab and clicking the
+   <guimenu>Download Autoinstallation File</guimenu> link.
+  </para>
+  <para>
+   If the Kickstart file is <emphasis>not</emphasis> managed by
+   &susemgr;, you can access it via the following URL:
+  </para>
+<screen>http://<replaceable>my.manager.server</replaceable>/ks/dist/ks-rhel-<replaceable>ARCH</replaceable>-<replaceable>VARIANT</replaceable>-<replaceable>VERSION</replaceable></screen>
+  <para>
+   In the above example, <replaceable>ARCH</replaceable> is the architecture
+   of the Kickstart file, <replaceable>VARIANT</replaceable> is either
+   <literal>client</literal> or <literal>server</literal>, and
+   <replaceable>VERSION</replaceable> is the release of &rhel; associated
+   with the Kickstart file.
+  </para>
+  <para>
+   The following sections describe the options available on each subtab.
+  </para>
+  <sect4 xml:id="s4-system-ks-details-details">
+   <title><!--guimenu-->
+    Autoinstallation Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Details
+<!--/guimenu-->
+    <!-- We need to create a few example kickstart profiles to generate the autoinstallation details pages for capture with casperjs -->
+   </title>
+   <figure xml:id="s3-system-ks-autoinst-details">
+    <title>Autoinstallation Details</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="details-ks-3.png" width="444"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="details-ks-3.png" width="444"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    <xref linkend="s3-system-ks-autoinst-details"/> shows the subtabs that
+    are available. On the <menuchoice><guimenu>Autoinstallation
+    Details</guimenu><guimenu>Details</guimenu></menuchoice> page, you have
+    the following options:
+   </para>
+   <itemizedlist mark="bullet" spacing="normal">
+    <listitem>
+     <para>
+      Change the profile <guimenu>Label</guimenu>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Change the operating system by clicking
+      <guimenu>(Change)</guimenu>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Change the <guimenu>Virtualization Type</guimenu>.
+     </para>
+     <note>
+      <para>
+       Changing the <guimenu>Virtualization Type</guimenu> may require
+       changes to the Kickstart profile bootloader and partition options,
+       potentially overwriting user customizations. Consult the
+       <guimenu>Partitioning</guimenu> tab to verify any new or changed
+       settings.
+      </para>
+     </note>
+    </listitem>
+    <listitem>
+     <para>
+      Change the amount of <guimenu>Virtual Memory</guimenu> (in Megabytes
+      of RAM) allocated to virtual guests autoinstalled with this profile.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Change the number of <guimenu>Virtual CPUs</guimenu> for each virtual
+      guest.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Change the <guimenu>Virtual Storage Path</guimenu> from the default in
+      <filename>/var/lib/xen/</filename>.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Change the amount of <guimenu>Virtual Disk Space</guimenu> (in GB)
+      allotted to each virtual guest.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Change the <guimenu>Virtual Bridge</guimenu> for networking of the
+      virtual guest.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Deactivate the profile so that it cannot be used to schedule a
+      &kickstart; by removing the <guimenu>Active</guimenu> check mark.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Check whether to enable logging for custom <option>%post</option>
+      scripts to the <filename>/root/ks-post.log</filename> file.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Decide whether to enable logging for custom <option>%pre</option>
+      scripts to the <filename>/root/ks-pre.log</filename> file.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Choose whether to preserve the <filename>ks.cfg</filename> file and
+      all <literal>%include</literal> fragments to the
+      <filename>/root/</filename> directory of all systems autoinstalled
+      with this profile.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Select whether this profile is the default for all of your
+      organization's &kickstart;s by checking or unchecking the box.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Add any <guimenu>Kernel Options</guimenu> in the corresponding text
+      box.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Add any <guimenu>Post Kernel Options</guimenu> in the corresponding
+      text box.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Enter comments that are useful to you in distinguishing this profile
+      from others.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-details-options">
+   <title><!--guimenu-->
+    Autoinstallation Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Operating System
+<!--/guimenu-->
+   </title>
+   <para>
+    On this page, you can make the following changes to the operating system
+    that the Kickstart profile installs:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term>Change the base channel</term>
+     <listitem>
+      <para>
+       Select from the available base channels. &susemgr; administrators
+       see a list of all base channels that are currently synced to the
+       &susemgr;.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Child Channels</term>
+     <listitem>
+      <para>
+       Subscribe to available child channels of the base channel, such as
+       the Tools channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Available Trees</term>
+     <listitem>
+      <para>
+       Use the drop-down menu to choose from available trees associated with
+       the base channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Always use the newest Tree for this base channel.</term>
+     <listitem>
+      <para>
+       Instead of selecting a specific tree, you can also check the box
+       <guimenu>Always use the newest Tree for this base channel.</guimenu>
+       This setting lets &susemgr; automatically pick the latest tree
+       that is associated with the specified base channels. If you add new
+       trees later, &susemgr; will always keep the most recently created
+       or modified.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Software URL (File Location)</term>
+     <listitem>
+      <para>
+       The exact location from which the Kickstart tree is mounted. This
+       value is determined when the profile is created. You can view it on
+       this page but you cannot change it.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect4>
+  <sect4 xml:id="s4-sm-system-kick-details-variables">
+   <title><!--guimenu
+    -->Autoinstallation Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Variables<!--
+/guimenu--></title>
+   <para>
+    Autoinstallation variables can substitute values in Kickstart and
+    &ay; profiles. To define a variable, create a name-value pair
+    (<replaceable>name/value</replaceable>) in the text box.
+   </para>
+   <para>
+    For example, if you want to autoinstall a system that joins the network
+    of a specified organization (for example the Engineering department),
+    you can create a profile variable to set the IP address and the gateway
+    server address to a variable that any system using that profile will
+    use. Add the following line to the <guimenu>Variables</guimenu> text
+    box.
+   </para>
+<screen>IPADDR=192.168.0.28
+GATEWAY=192.168.0.1</screen>
+   <para>
+    Now you can use the name of the variable in the profile instead of a
+    specific value. For example, the <option>network</option> part of a
+    Kickstart file looks like the following:
+   </para>
+<screen>network --bootproto=static --device=eth0 --onboot=on --ip=$IPADDR \
+  --gateway=$GATEWAY</screen>
+   <para>
+    The <option>$IPADDR</option> will be resolved to
+    <literal>192.168.0.28</literal>, and the <option>$GATEWAY</option> to
+    <literal>192.168.0.1</literal>
+   </para>
+   <note>
+    <para>
+     There is a hierarchy when creating and using variables in Kickstart
+     files. System Kickstart variables take precedence over
+     <guimenu>Profile</guimenu> variables, which in turn take precedence
+     over <guimenu>Distribution</guimenu> variables. Understanding this
+     hierarchy can alleviate confusion when using variables in
+     &kickstart;s.
+    </para>
+   </note>
+   <para>
+    Using variables are just one part of the larger Cobbler infrastructure
+    for creating templates that can be shared between multiple profiles and
+    systems. For more information about Cobbler and templates, refer to
+    <xref linkend="advanced.topics.cobbler"/>.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-sm-system-kick-details-advanced">
+   <title><!--guimenu-->
+    Autoinstallation Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Advanced Options
+<!--/guimenu-->
+   </title>
+   <para>
+    From this page, you can toggle several installation options on and off
+    by checking and unchecking the boxes to the left of the option. For most
+    installations, the default options are correct. Refer to Red Hat
+    Enterprise Linux documentation for details.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-sm-system-kick-details-defprofile">
+   <title>Assigning Default Profiles to an Organization</title>
+   <para>
+    You can specify an Organization Default Profile by clicking
+    <menuchoice><guimenu>Autoinstallation</guimenu>
+    <guimenu>Profiles</guimenu> <guimenu><replaceable>profile
+    name</replaceable></guimenu>
+    <guimenu>Details</guimenu></menuchoice>, then checking the
+    <guimenu>Organization Default Profile</guimenu> box and finally clicking
+    <guimenu>Update</guimenu>.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-sm-system-kick-details-IPrange">
+   <title>Assigning IP Ranges to Profiles</title>
+   <para>
+    You can associate an IP range to an autoinstallation profile by clicking
+    on <menuchoice><guimenu>Autoinstallation</guimenu>
+    <guimenu>Profiles</guimenu> <guimenu>profile name</guimenu>
+    <guimenu>Bare Metal Autoinstallation</guimenu></menuchoice>, adding an
+    IPv4 range and finally clicking <guimenu>Add IP Range</guimenu>.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-sm-system-kick-details-packages">
+   <title><!--guimenu-->
+    Autoinstallation Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Bare Metal Autoinstallation
+<!--/guimenu-->
+   </title>
+   <para>
+    This subtab provides the information necessary to Kickstart systems that
+    are not currently registered with &susemgr;. Using the on-screen
+    instructions, you may either autoinstall systems using boot media
+    (CD-ROM) or by IP address.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-sm-system-kick-details-pre">
+   <title><!--guimenu-->
+    System Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Details
+<!--/guimenu-->
+   </title>
+   <figure xml:id="s3-system-ks-system-details">
+    <title>System Details</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="details-ks-4.png" width="444"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="details-ks-4.png" width="444"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    <xref linkend="s3-system-ks-system-details"/> shows the subtabs that are
+    available from the <guimenu>System Details</guimenu> tab.
+   </para>
+   <para>
+    On the <menuchoice><guimenu>System
+    Details</guimenu><guimenu>Details</guimenu></menuchoice> page, you have
+    the following options:
+   </para>
+   <itemizedlist mark="bullet" spacing="normal">
+    <listitem>
+     <para>
+      Select between DHCP and static IP, depending on your network.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Choose the level of SELinux that is configured on kickstarted systems.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Enable configuration management or remote command execution on
+      kickstarted systems.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Change the root password associated with this profile.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect4>
+  <sect4 xml:id="s4-sm-system-kick-details-post">
+   <title><!--guimenu-->
+    System Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Locale
+<!--/guimenu-->
+   </title>
+   <para>
+    Change the timezone for kickstarted systems.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-sysd-partition">
+   <title><!--guimenu-->
+    System Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Partitioning
+<!--/guimenu-->
+   </title>
+   <para>
+    From this subtab, indicate the partitions that you wish to create during
+    installation. For example:
+   </para>
+<screen>partition /boot --fstype=ext3 --size=200 
+partition swap --size=2000 
+partition pv.01 --size=1000 --grow 
+volgroup myvg pv.01 logvol / --vgname=myvg --name=rootvol --size=1000 --grow</screen>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-sysd-file-pres">
+   <title><!--guimenu-->
+    System Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    File Preservation
+<!--/guimenu-->
+   </title>
+   <para>
+    If you have previously created a file preservation list, include this
+    list as part of the &kickstart;. This will protect the listed files
+    from being over-written during the installation process. Refer to
+    <xref linkend="ref.webui.systems.autoinst.preserve"/> for information on how to
+    create a file preservation list.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-sysd-gpg-ssl">
+   <title><!--guimenu-->
+    System Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    GPG &amp; SSL
+<!--/guimenu-->
+   </title>
+   <para>
+    From this subtab, select the GPG keys and/or SSL certificates to be
+    exported to the kickstarted system during the %post section of the
+    &kickstart;. For &susemgr; customers, this list includes the SSL
+    Certificate used during the installation of &susemgr;.
+   </para>
+   <note>
+    <para>
+     Any GPG key you wish to export to the kickstarted system must be in
+     ASCII rather than binary format.
+    </para>
+   </note>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-sysd-trouble">
+   <title><!--guimenu-->
+    System Details
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Troubleshooting
+<!--/guimenu-->
+   </title>
+   <para>
+    From this subtab, change information that may help with troubleshooting
+    hardware problems:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term>Bootloader</term>
+     <listitem>
+      <para>
+       For some headless systems, it is better to select the non-graphic
+       LILO bootloader.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Kernel Parameters</term>
+     <listitem>
+      <para>
+       Enter kernel parameters here that may help to narrow down the source
+       of hardware issues.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-soft-pkg-group">
+<!--status="rfc"-->
+   <title><!--guimenu-->
+    Software
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Package Groups
+<!--/guimenu-->
+   </title>
+   <figure xml:id="s3-system-ks-software">
+    <title>Software</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="details-ks-5.png" width="444"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="details-ks-5.png" width="444"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    <xref linkend="s3-system-ks-software"/> shows the subtabs that are
+    available from the <guimenu>Software</guimenu> tab.
+   </para>
+   <para>
+    Enter the package groups, such as <systemitem>@office</systemitem> or
+    <systemitem>@admin-tools</systemitem> you would like to install on the
+    kickstarted system in the large text box. If you would like to know what
+    package groups are available, and what packages they contain, refer to
+    the <filename>RedHat/base/</filename> file of your Kickstart tree.
+<!-- I'd say we do not need such vague guessing...
+     &susemgr; customers will most likely locate this file
+     here:
+     <filename>/srv/www/htdocs/manager/rhn/kickstart/<replaceable>kickstart_label</replaceable>/RedHat/base/comps.xml</filename>. -->
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-soft-pkg-profile">
+   <title><!--guimenu-->
+    Software
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Package Profiles
+<!--/guimenu-->
+   </title>
+   <para>
+    If you have previously created a Package Profile from one of your
+    registered systems, you can use that profile as a template for the
+    files to be installed on a kickstarted system. Refer to <xref
+    linkend="s1-package-profiles"/> in <xref
+    linkend="s4-sm-system-details-packages"/> for more information about
+    package profiles.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-act-keys">
+   <title>Activation Keys</title>
+   <figure>
+    <title>Activation Keys</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="details-ks-6.png" width="444"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="details-ks-6.png" width="444"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    The <guimenu>Activation Keys</guimenu> tab allows you to select
+    Activation Keys to include as part of the Kickstart profile. These keys,
+    which must be created before the Kickstart profile, will be used when
+    re-registering kickstarted systems.
+   </para>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-scripts">
+   <title>Scripts</title>
+   <figure>
+    <title>Scripts</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="details-ks-7.png" width="444"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="details-ks-7.png" width="444"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    The <guimenu>Scripts</guimenu> tab is where %pre and %post scripts are
+    created. This page lists any scripts that have already been created for
+    this Kickstart profile. To create a Kickstart script, perform the
+    following procedure:
+   </para>
+   <procedure>
+    <step>
+     <para>
+      Click the <guimenu>add new kickstart script</guimenu> link in the
+      upper right corner.
+     </para>
+    </step>
+    <step>
+     <para>
+<!-- FIXME: interpreter -->
+      Enter the path to the scripting language used to create the script,
+      such as <literal>/usr/bin/perl</literal>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Enter the full script in the large text box.
+     </para>
+    </step>
+    <step>
+     <para>
+      Indicate whether this script is to be executed in the %pre or %post
+      section of the Kickstart process.
+     </para>
+    </step>
+    <step>
+     <para>
+      Indicate whether this script is to run outside of the chroot
+      environment. Refer to the <citetitle>Post-installation
+      Script</citetitle> section of the <citetitle>Red Hat Enterprise Linux
+      System Administration Guide</citetitle> for further explanation of the
+      <option>nochroot</option> option.
+     </para>
+    </step>
+   </procedure>
+   <note>
+    <para>
+     &susemgr; supports the inclusion of separate files within the
+     Partition Details section of the Kickstart profile. For instance, you
+     may dynamically generate a partition file based on the machine type and
+     number of disks at &kickstart; time. This file can be created via
+     %pre script and placed on the system, such as
+     <filename>/tmp/part-include</filename>. Then you can call for that file
+     by entering the following line in the Partition Details field of the
+     <menuchoice><guimenu>System
+     Details</guimenu><guimenu>Partitioning</guimenu></menuchoice> tab:
+    </para>
+<screen>%include /tmp/part-include</screen>
+   </note>
+  </sect4>
+  <sect4 xml:id="s4-system-ks-ks-file">
+   <title>Autoinstallation File</title>
+   <figure>
+    <title>Autoinstallation File</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="details-ks-8.png" width="444"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="details-ks-8.png" width="444"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    The <guimenu>Autoinstallation File</guimenu> tab allows you to view or
+    download the profile that has been generated from the options chosen in
+    the previous tabs.
+   </para>
+  </sect4>
+  </sect3>
+
+<!-- z: s3-sm-system-kick-upload ref.webui.systems.autoinst.profiles.upload -->
+
+ <sect3 xml:id="ref.webui.systems.autoinst.profiles.upload">
+  <title>Upload Kickstart/&ay; File</title>
+  <para>
+   Click the <guimenu>Upload Kickstart/Autoyast File</guimenu> link
+   from the
+   <menuchoice><guimenu>Systems</guimenu><guimenu>Autoinstallation</guimenu></menuchoice>
+   page to upload an externally prepared &ay; or Kickstart profile.
+  </para>
+  <procedure>
+   <step>
+    <para>
+     In the first line, enter a profile <guimenu>Label</guimenu> for the
+     automated installation. This label cannot contain spaces, so use dashes
+     (-) or underscores (_) as separators.
+    </para>
+   </step>
+   <step>
+    <para>
+     Select an <guimenu>Autoinstallable Tree</guimenu> for this profile. The
+     <guimenu>Autoinstallable Tree</guimenu> drop-down menu is only
+     populated if one or more distributions have been created for the
+     selected base channel (see <xref linkend="ref.webui.systems.autoinst.distribution"/>).
+    </para>
+   </step>
+   <step>
+    <para>
+     Instead of selecting a specific tree, you can also check the box
+     <guimenu>Always use the newest Tree for this base channel.</guimenu>
+     This setting lets &susemgr; automatically pick the latest tree that
+     is associated with the specified base channels. If you add new trees
+     later, &susemgr; will always keep the most recently created or
+     modified.
+    </para>
+   </step>
+   <step>
+    <para>
+     Select the <guimenu>Virtualization Type</guimenu> from the drop-down
+     menu. For more information about virtualization,
+     refer to <xref linkend="advanced.topics.virtualization"/>.
+    </para>
+    <note>
+     <para>
+      If you do not intend to use the autoinstall profile to create virtual
+      guest systems, you can leave the drop-down set to the default choice
+      <guimenu>KVM Virtualized Guest</guimenu>.
+     </para>
+    </note>
+   </step>
+   <step>
+    <para>
+     Finally, either provide the file contents with cut-and-paste or update
+     the file from the local storage medium:
+    </para>
+    <itemizedlist mark="bullet" spacing="normal">
+     <listitem>
+      <para>
+       Paste it into the <guimenu>File Contents</guimenu> box and click
+       <guimenu>Create</guimenu>, or
+      </para>
+     </listitem>
+     <listitem>
+      <para>
+       enter the file name in the <guimenu>File to Upload</guimenu> field
+       and click <guimenu>Upload File</guimenu>.
+      </para>
+     </listitem>
+    </itemizedlist>
+   </step>
+  </procedure>
+  <para>
+   Once done, four subtabs are available: <guimenu>Details</guimenu>
+   (see <xref linkend="s4-sm-system-kick-details-pre"/>), <guimenu>Bare
+   Metal</guimenu> (see <xref
+   linkend="s4-sm-system-kick-details-packages"/>),
+   <guimenu>Variables</guimenu> (see <xref
+   linkend="s4-sm-system-kick-details-variables"/>), and
+   <guimenu>Autoinstallable File</guimenu> (see <xref
+   linkend="s4-system-ks-ks-file"/>) are available.
+  </para>
+  </sect3>
+ </sect2>
+<!-- z: s3-system-ks-bare-metal ref.webui.systems.autoinst.bare-metal -->
+ <sect2 xml:id="ref.webui.systems.autoinst.bare-metal">
+  <title><!--guimenu-->
+   Autoinstallation
+<!--/guimenu-->
+   &gt;
+<!--guimenu-->
+   Bare Metal
+<!--/guimenu-->
+  </title>
+  <para>
+   Lists the IP addresses that have been associated with the profiles
+   created by your organization. Click either the range or the profile name
+   to access different tabs of the <guimenu>Autoinstallation
+   Details</guimenu> page.
+  </para>
+ </sect2>
+<!-- z: s3-sm-system-kick-keys ref.webui.systems.autoinst.keys -->
+ <sect2 xml:id="ref.webui.systems.autoinst.keys">
+  <title><!--guimenu-->
+   Autoinstallation
+<!--/guimenu-->
+   &gt;
+<!--guimenu-->
+   GPG and SSL Keys
+<!--/guimenu-->
+  </title>
+  <para>
+   Lists keys and certificates available for inclusion in &kickstart;
+   profiles and provides a means to create new ones. This is especially
+   important for customers of &susemgr; or the Proxy Server because
+   systems kickstarted by them must have the server key imported into
+   &susemgr; and associated with the relevant &kickstart; profiles.
+   Import it by creating a new key here and then make the profile
+   association in the <guimenu>GPG and SSL keys</guimenu> subtab of the
+   <guimenu>Autoinstallation Details</guimenu> page.
+  </para>
+  <para>
+   To create a key or certificate, click the <guimenu>Create Stored
+   Key/Cert</guimenu> link in the upper-right corner of the page. Enter a
+   description, select the type, upload the file, and click the
+   <guimenu>Update Key</guimenu> button. A unique description is
+   required.
+  </para>
+  <important>
+   <para>
+    The GPG key you upload to &susemgr; must be in ASCII format. Using a
+    GPG key in binary format causes anaconda, and therefore the
+    &kickstart; process, to fail.
+   </para>
+  </important>
+ </sect2>
+
+<!-- z: s3-sm-system-kick-dist ref.webui.systems.autoinst.distribution -->
+ <sect2 xml:id="ref.webui.systems.autoinst.distribution">
+ <!-- verified for suma3 -->
+  <title><!--guimenu-->
+   Autoinstallation
+<!--/guimenu-->
+   &gt;
+<!--guimenu-->
+   Distributions
+<!--/guimenu-->
+  </title>
+  <para>
+   The <guimenu>Distributions</guimenu> page enables you to find and create
+   custom installation trees that may be used for automated installations.
+  </para>
+  <note>
+   <para>
+    The <guimenu>Distributions</guimenu> page does not display distributions
+    already provided. They can be found within the
+    <guimenu>Distribution</guimenu> drop-down menu of the
+    <guimenu>Autoinstallation Details</guimenu> page.
+   </para>
+   <para>
+<!--
+      2011-01-25 - ke: Will it actually work with remote trees?  HTTP/FTP?
+      2011-01-28 - ke: remote trees do not work for me.
+      also confirmed by ug.
+     -->
+    Before creating a distribution, you must make an installation data
+    available, as described in the <citetitle>&sle; &deploy;</citetitle>
+    (<link
+    xlink:href="https://www.suse.com/documentation/sles-12/singlehtml/book_sle_deployment/book_sle_deployment.html"/>)
+    or, respectively, the <emphasis>Kickstart Installations</emphasis>
+    chapter of the <citetitle>Red Hat Enterprise Linux System
+    Administration Guide</citetitle>. This tree must be located in a
+    local directory on the &susemgr; server.
+   </para>
+  </note>
+  <procedure>
+   <title>Creating a Distribution for Autoinstallation</title>
+   <step>
+    <para>
+     To create a distribution, on the <guimenu>Autoinstallable
+     Distributions</guimenu> page click <guimenu>Create
+     Distribution</guimenu> in the upper right corner.
+    </para>
+   </step>
+   <step>
+    <para>
+     On the <guimenu>Create Autoinstallable Distribution</guimenu> page,
+     provide the following data:
+    </para>
+    <substeps performance="required">
+     <step>
+      <para>
+       Enter a label (without spaces) in the <guimenu>Distribution
+       Label</guimenu> field, such as <literal>my-orgs-sles-12-sp2</literal>
+       or <literal>my-orgs-rhel-as-7</literal>.
+      </para>
+     </step>
+     <step>
+      <para>
+       In the <guimenu>Tree Path</guimenu> field, paste the path to the base
+       of the installation tree.
+<!-- FIXME: checkit; at least on Fedora, README does not exist in the root dir of the medium 
+       For &rhel; systems, you can test this by appending
+       &quot;images/pxeboot/README&quot; to the URL in a Web browser,
+       pressing <keycap>Enter</keycap>, and ensuring that the readme file
+       appears. -->
+      </para>
+     </step>
+     <step>
+      <para>
+       Select the matching distribution from the <guimenu>Base
+       Channel</guimenu> and <guimenu>Installer Generation</guimenu>
+       drop-down menus, such as <literal>SUSE Linux</literal> for &sle;,
+       or <literal>Red Hat Enterprise Linux 7</literal> for &rhel; 7
+       client systems.
+      </para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para>
+     When finished, click the <guimenu>Create Autoinstallable
+     Distribution</guimenu> button.
+    </para>
+   </step>
+  </procedure>
+<!-- ================================================================ -->
+  <sect3 xml:id="s4-sm-system-kick-dist-variables">
+   <title><!--guimenu-->
+    Autoinstallation
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Distributions
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Variables
+<!--/guimenu--></title>
+<!--
+     2011-09-22 - ke: Now also supported by &ay; (ug).
+-->
+   <para>
+    Autoinstallation variables can be used to substitute values into
+    Kickstart and &ay; profiles. To define a variable, create a
+    name-value pair (<replaceable>name/value</replaceable>) in the text box.
+   </para>
+   <para>
+    For example, if you want to autoinstall a system that joins the network
+    of a specified organization (for example the Engineering department) you
+    can create a profile variable to set the IP address and the gateway
+    server address to a variable that any system using that profile will
+    use. Add the following line to the <guimenu>Variables</guimenu> text
+    box.
+   </para>
+<screen>IPADDR=192.168.0.28
+GATEWAY=192.168.0.1</screen>
+   <para>
+    To use the distribution variable, use the name of the variable in the
+    profile to substitute the value. For example, the
+    <option>network</option> part of a &kickstart; file looks like the
+    following:
+   </para>
+<screen>network --bootproto=static --device=eth0 --onboot=on --ip=$IPADDR \
+  --gateway=$GATEWAY</screen>
+   <para>
+    The <option>$IPADDR</option> will be resolved to
+    <literal>192.168.0.28</literal>, and the <option>$GATEWAY</option> to
+    <literal>192.168.0.1</literal>.
+   </para>
+   <note>
+    <para>
+     There is a hierarchy when creating and using variables in Kickstart
+     files. System Kickstart variables take precedence over Profile
+     variables, which in turn take precedence over Distribution variables.
+     Understanding this hierarchy can alleviate confusion when using
+     variables in &kickstart;s.
+    </para>
+   </note>
+   <para>
+    In &ay; profiles you can use such variables as well.
+   </para>
+   <para>
+    Using variables are just one part of the larger Cobbler infrastructure
+    for creating templates that can be shared between multiple profiles and
+    systems. For more information about Cobbler and templates, refer to
+    <xref linkend="advanced.topics.cobbler"/>.
+   </para>
+  </sect3>
+ </sect2>
+<!-- z: s3-sm-system-kick-preserve ref.webui.systems.autoinst.preserve -->
+ <sect2 xml:id="ref.webui.systems.autoinst.preserve">
+  <title><!--guimenu-->
+   Autoinstallation
+<!--/guimenu-->
+   &gt;
+<!--guimenu-->
+   File Preservation
+<!--/guimenu-->
+  </title>
+  <para>
+   Collects lists of files to be protected and re-deployed on systems during
+   &kickstart;. For instance, if you have many custom configuration files
+   located on a system to be kickstarted, enter them here as a list and
+   associate that list with the Kickstart profile to be used.
+  </para>
+  <para>
+   To use this feature, click the <guimenu>Create File Preservation
+   List</guimenu> link at the top. Enter a suitable label and all files and
+   directories to be preserved. Enter absolute paths to all files and
+   directories. Then click <guimenu>Create List</guimenu>.
+  </para>
+  <important>
+   <para>
+    Although file preservation is useful, it does have limitations. Each
+    list is limited to a total size of 1 MB. Special devices like
+    <filename>/dev/hda1</filename> and <filename>/dev/sda1</filename> are
+    not supported. Only file and directory names may be entered. No regular
+    expression wildcards can be used.
+   </para>
+  </important>
+  <para>
+   When finished, you may include the file preservation list in the
+   Kickstart profile to be used on systems containing those files. Refer
+   to <xref linkend="ref.webui.systems.autoinst.profiles.create"/> for
+   precise steps.
+  </para>
+ </sect2>
+<!-- ================================================================ -->
+
+<!-- Add this info on account of bnc#788758 -->
+<!-- z: s3-sm-system-kick-snippet ref.webui.systems.autoinst.snippet -->
+ <sect2 xml:id="ref.webui.systems.autoinst.snippet">
+  <title><!--guimenu-->
+   Autoinstallation
+<!--/guimenu-->
+   &gt;
+<!--guimenu-->
+   Autoinstallation Snippets
+<!--/guimenu-->
+  </title>
+  <para>
+   Use snippets to store common blocks of code that can be shared across
+   multiple Kickstart or &ay; profiles in &susemgr;.
+  </para>
+  <sect3 xml:id="s4-sm-system-kick-snippet-default">
+   <title><!--guimenu-->
+    Autoinstallation
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Autoinstallation Snippets
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Default Snippets
+<!--/guimenu--></title>
+   <para>
+    Default snippets coming with &susemgr; are not editable. You can use
+    a snippet, if you add the <guimenu>Snippet Macro</guimenu> statement
+    such as <literal>$SNIPPET('spacewalk/sles_register_script')</literal> to
+    your autoinstallation profile. This is an &ay; profile example:
+   </para>
+<screen>&lt;init-scripts config:type="list"&gt;
+  $SNIPPET('spacewalk/sles_register_script')
+&lt;/init-scripts&gt;</screen>
+   <para>
+    When you create a snippet with the <guimenu>Create Snippet</guimenu>
+    link, all profiles including that snippet will be updated accordingly.
+   </para>
+  </sect3>
+  <sect3 xml:id="s4-sm-system-kick-snippet-custom">
+   <title><!--guimenu-->
+    Autoinstallation
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Autoinstallation Snippets
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Custom Snippets
+<!--/guimenu--></title>
+   <para>
+    This is the tab with custom snippets. Click a name of a snippet to view,
+    edit, or delete it.
+   </para>
+  </sect3>
+  <sect3 xml:id="s4-sm-system-kick-snippet-all">
+   <title><!--guimenu-->
+    Autoinstallation
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    Autoinstallation Snippets
+<!--/guimenu-->
+    &gt;
+<!--guimenu-->
+    All Snippets
+<!--/guimenu--></title>
+   <para>
+    The <guimenu>All Snippets</guimenu> tab lists default and custom
+    snippets together.
+   </para>
+  </sect3>
+ </sect2>
+</sect1>

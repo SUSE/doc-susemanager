@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="white.papers.creating.taling.to.a.raspberry.pi.with.the.sensehat.module">
+
+
+    <title>Writing a Salt Execution Module for the Raspberry Pi 3 and a SenseHat Module</title>
+
+
+    <para>The following chapter provides guidance on working with a SenseHat module and Raspberry Pi
+        with Salt acting the communication medium. The SenseHat was designed for the Astro Pi
+        mission and was launched for research purposes to the International Space Station in
+        December of 2015. In the following exercise you will write an Salt execution module for
+        interacting with a SenseHat module.</para>
+
+    <warning>
+        <title>White Papers</title>
+        <para>All content contained in a White Papers document is under development and subject to change. Things will
+            break and may not work as intended. For testing environments only. These documents are
+            unsupported. </para>
+    </warning>
+    <sect1>
+        <title>Preparations</title>
+        <procedure>
+            <title>Basic Preparation</title>
+            <step>
+                <para>To get started you will need a Raspberry Pi 3 and the SenseHat Shield.</para>
+            </step>
+            <step>
+                <para>Download <literal>NOOBS Light</literal> and install the <literal>Raspbian
+                        Light</literal> image as described in the official Raspberry Pi
+                        Documentation:<link
+                        xlink:href="https://www.raspberrypi.org/learning/software-guide/"/></para>
+            </step>
+            <step>
+                <para>Once you have completed the initial installation steps Log in as the user
+                        <literal>pi</literal> and password <literal>raspberry</literal>.</para>
+            </step>
+            <step>
+                <para>Create a root password:</para>
+                <screen># sudo -i</screen>
+                <screen># passwd</screen>
+                <warning>
+                    <para>For the purposes of this guide we will use <literal>linux</literal> as the
+                        root password. <emphasis>Never use such a password for any kind of
+                            production system.</emphasis></para>
+                </warning>
+            </step>
+            <step>
+                <para>To make this guide as simple as possible you will need to ensure you can use
+                    ssh as root with a password. This removes the need for any extra configuration.
+                    In <filename>/etc/ssh/sshd_config</filename> set the parameter
+                        <literal>PermitRootLogin</literal> to <literal>yes</literal>.</para>
+                <important>
+                    <para>Using ssh as root with a password can be dangerous. Under most
+                        circumstances this practice should be used only for testing
+                        environments.</para>
+                </important>
+            </step>
+            <step>
+                <para>Reboot your Raspberry Pi:</para>
+                <screen># reboot now</screen>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Preparing the Raspberry to be Managed via salt-ssh</title>
+        <procedure>
+            <title>Preparing salt-ssh</title>
+            <step>
+                <para>As root add the Raspberry Pi to your salt-ssh roster file located in:</para>
+                <screen>/etc/salt/roster</screen>
+                <screen>raspi:
+host: 192.168.0.1
+passwd: linux</screen>
+                <para>You will need to replace the <literal>host:</literal> ip address with the one
+                    from your Raspberry Pi 3. On your Pi use the <command>ifconfig</command> or
+                        <command>ip link</command> commands to view the current IP Address.</para>
+            </step>
+            <step>
+                <para>Test the connection, use the <literal>-i</literal> option to ignore strict
+                    host key checking or the connection will fail:</para>
+                <screen># salt-ssh -i raspi test.ping</screen>
+            </step>
+            <step>
+                <para>Install the SenseHat Python libraries:</para>
+                <screen># salt-ssh raspi pkg.install sense-hat</screen>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Write the Execution Module</title>
+        <procedure>
+            <title>Write the Execution Module</title>
+            <step>
+                <para>On your test system change the working directory to:</para>
+                <screen># cd /srv/salt/_modules</screen>
+            </step>
+            <step>
+                <para>If you have followed along since exercise 1 this directory should already
+                    exist on your test system.</para>
+            </step>
+            <step>
+                <para>Create a python file named <filename>sensehat.py</filename> with the following
+                    content:</para>
+                <screen>from sense_hat import SenseHat
+
+
+_s = SenseHat()
+
+
+def set_pixel(x, y, color):
+  '''
+  '''
+  
+  _s.set_pixel(x, y, color)
+  return {'color': color}</screen>
+            </step>
+
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Test the New Execution Module</title>
+        <procedure>
+            <title>Test the New Execution Module</title>
+            <step>
+                <para>On your test system change the color of a single pixel on the SenseHat by
+                    executing the following command:</para>
+                <screen>salt-ssh raspi sensehat.set_pixel 0 0 [0,255,0]</screen>
+                <para>You may pick any RBG value ranging from <literal>0 - 255</literal>.</para>
+            </step>
+        </procedure>
+        <para>For additional tests and inspiration see the official SenseHat documentation:<link
+                xlink:href="https://pythonhosted.org/sense-hat/api/"/></para>
+    </sect1>
+</chapter>

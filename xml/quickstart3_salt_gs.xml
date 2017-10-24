@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="quickstart.salt.gs">
+
+    <title>Salt Getting Started</title>
+
+
+    <sect1>
+        <title>Introduction</title>
+        <para> This chapter provides an introduction to using the new Salt features added in
+            &susemgr; 3. This chapter assumes you have completed all former sections within the
+            &mgrgetstart;. <remark>Add links to onboarding salt minions from former
+                sections.</remark> You should have a running &susemgr; server and at least two
+            on-boarded Salt minions to complete the sections of this chapter. If you find yourself
+            stuck at any point refer to the <citetitle>SaltStack Get Started</citetitle> tutorial
+            located at <link
+                xlink:href="https://docs.saltstack.com/en/getstarted/fundamentals/index.html"/>. </para>
+
+        <tip>
+            <title>Use More than One Minion</title>
+            <para>Connecting two or more minions during your testing is considered best practice.
+                Using two or more minions will allow you to target individual systems using Salt and
+                experiment with the power of its targeting features.</para>
+        </tip>
+
+        <para> This guide does not attempt to cover all that Salt has to offer. This guide is a
+            primer for using Salt with &susemgr;. For comprehensive Salt documentation, see <link
+                xlink:href="https://docs.saltstack.com/en/latest/contents.html"/>. </para>
+    </sect1>
+
+    <sect1>
+        <title>Basic Salt Commands</title>
+        <para>In the following section you will view and test several basic Salt commands. You will
+            also test Salt in master-less mode.</para>
+        <tip>
+            <title>Terminology: Master</title>
+            <para>This guide uses the term master. The term master can be used interchangeably with
+                your SUSE Manager server as it is a Salt master. </para>
+        </tip>
+
+        <sect2>
+            <title>Running Your First Salt Function</title>
+            <procedure>
+                <step>
+                    <para>In a terminal on the Salt master run the following command as root:</para>
+                    <screen># salt-key</screen>
+                    <para>The <command>salt-key</command> command lists all
+                            <emphasis>Accepted/Denied/Unaccepted/Rejected</emphasis> minion names.
+                        If you have added minions via the SUSE manager on-boarding page you will see
+                        those minions listed here. You can target a minion based on the listed
+                        name.</para>
+                </step>
+                <step>
+                    <para>Send a <command>test.ping</command> to a minion with the following Salt
+                        command:</para>
+                    <screen># salt minion_name test.ping</screen>
+                    <para>If the accepted minion is running it will return
+                        <command>True</command>.</para>
+                    <tip>
+                        <title>Salt Command Format</title>
+                        <para>The format of a Salt command is:</para>
+                        <screen>command [options] '&lt;target>' &lt;function> [arguments]</screen>
+                    </tip>
+                </step>
+            </procedure>
+        </sect2>
+
+        <sect2>
+            <title>Exploring Available Modules and Functions</title>
+            <procedure>
+                <step>
+                    <para><remark>Provide an introduction on modules and functions</remark>You can
+                        use <command>sys.list_functions</command> to print a list of all available
+                        functions from within a Salt module. For example call <command>salt
+                            minion_name sys.list_functions test</command> to see all functions in
+                        the test module:</para>
+                    <screen># salt minion_name sys.list_functions test
+minion_name:
+    - test.arg
+    - test.arg_repr
+    - test.arg_type
+    - test.assertion
+    - test.attr_call
+    - test.collatz
+    - test.conf_test
+    - test.cross_test
+    - test.echo
+    - test.exception
+    - test.false
+    - test.fib
+    - test.get_opts
+    - test.kwarg
+    - test.module_report
+    - test.not_loaded
+    - test.opts_pkg
+    - test.outputter
+    - test.ping
+    - test.provider
+    - test.providers
+    - test.rand_sleep
+    - test.rand_str
+    - test.retcode
+    - test.sleep
+    - test.stack
+    - test.true
+    - test.try_
+    - test.tty
+    - test.version
+    - test.versions
+    - test.versions_information
+    - test.versions_report</screen>
+                </step>
+                <step>
+                    <para>Print the version of Salt running on a minion with
+                            <command>test.version</command>:</para>
+                    <screen># salt minion_name test.version
+minion_name:
+    2015.8.7</screen>
+                    <para>Display the version of Salt and its dependencies on a minion with
+                            <command>test.versions</command>:</para>
+                    <screen># salt minion_name test.versions
+minion_name:
+    Salt Version:
+               Salt: 2015.8.7
+     
+    Dependency Versions:
+             Jinja2: 2.7.3
+           M2Crypto: Not Installed
+               Mako: Not Installed
+             PyYAML: 3.10
+              PyZMQ: 14.0.0
+             Python: 2.7.9 (default, Dec 21 2014, 11:02:59) [GCC]
+               RAET: Not Installed
+            Tornado: 4.2.1
+                ZMQ: 4.0.4
+               cffi: 1.1.0
+           cherrypy: Not Installed
+           dateutil: Not Installed
+              gitdb: Not Installed
+          gitpython: Not Installed
+              ioflo: Not Installed
+            libgit2: Not Installed
+            libnacl: Not Installed
+       msgpack-pure: Not Installed
+     msgpack-python: 0.4.6
+       mysql-python: Not Installed
+          pycparser: 2.10
+           pycrypto: 2.6.1
+             pygit2: Not Installed
+       python-gnupg: Not Installed
+              smmap: Not Installed
+            timelib: Not Installed
+     
+    System Versions:
+               dist: SuSE 12 x86_64
+            machine: x86_64
+            release: 3.12.67-60.64.24-default
+             system: SUSE Linux Enterprise Server  12 x86_64</screen>
+                </step>
+            </procedure>
+        </sect2>
+
+        <sect2>
+            <title>Salt Help from the Command Line</title>
+            <para>Explore Salt help documentation with the following procedure.</para>
+
+            <procedure>
+                <step>
+                    <para>To get help, enter the following command:</para>
+                    <screen># salt minion_name sys.doc</screen>
+                    <para><command>sys.doc </command>displays far to much information in most cases.
+                        It is better to be more specific. Target a specific module with the
+                        following command:</para>
+                    <screen># salt minion_name sys.doc test</screen>
+                    <para>You can also look up information for any function in a module:</para>
+                    <screen>salt minion_name sys.doc test.versions
+test.versions:
+
+This function is an alias of ``versions_report``.
+
+    Returns versions of components used by salt
+
+    CLI Example:
+
+        salt '*' test.versions_report</screen>
+                </step>
+            </procedure>
+        </sect2>
+
+        <sect2>
+            <title>What is Master-less Salt?</title>
+
+            <para>Up to this point you have run all salt commands from the master with a minion as a
+                target. It is also possible to run the same functions locally from a minion. The
+                following procedure will guide you through using master-less mode locally on a
+                minion.</para>
+
+            <procedure>
+                <step>
+                    <para>From an open terminal session on any of your minions as root run:</para>
+                    <screen># salt-call test.versions</screen>
+                    <para>The Salt command does not work locally on minions. Use
+                            <command>salt-call</command> to run salt commands locally on any
+                        minion.</para>
+                </step>
+                <step>
+                    <para>Try running <command>salt-call test.ping</command>. Salt looks like it is
+                        running without a master.</para>
+                </step>
+                <step>
+                    <para>In a terminal session on the salt master, stop the salt-master
+                        service.</para>
+                    <screen># systemctl stop salt-master</screen>
+                </step>
+                <step>
+                    <para>On one of your minions run a local ping again:</para>
+                    <screen># salt-call test.ping</screen>
+                    <para>Notice the command is taking some time to execute. The minion is
+                        attempting to contact the master to check if there is any content that needs
+                        to be downloaded. Eventually the command will time out. </para>
+                    <para>To run a minion in true master-less mode you will need to make a change to
+                        the minion configuration file located in
+                            <filename>/etc/salt/minion</filename>. Open the minion configuration
+                        file and change the <emphasis>file_client</emphasis> value to
+                            <emphasis>local</emphasis>:</para>
+                    <screen>file_client: local</screen>
+                </step>
+                <step>
+                    <para>Save the configuration change and restart the minion:</para>
+                    <screen># systemctl restart salt-minion</screen>
+                    <para>Test the command on the minion again to see it run locally:</para>
+                    <screen># salt-call test.ping</screen>
+                </step>
+                <step>
+                    <para>Once you have finished testing local commands, set the
+                            <emphasis>file_client: local</emphasis> value back to the default and
+                        restart the salt minion.</para>
+                </step>
+                <step>
+                    <para>On your master start the <command>salt-master</command> service:</para>
+                    <screen># systemctl start salt-master</screen>
+                </step>
+            </procedure>
+
+            <para>In this chapter you learned the following Salt concepts:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Learned how to run <command>salt &lt;target> test.ping</command> to check
+                        connectivity between the master and a minion</para>
+                </listitem>
+                <listitem>
+                    <para>Learned out how to view/list available functions with
+                            <command>sys.list_functions</command></para>
+                </listitem>
+                <listitem>
+                    <para>Learned how to access help on modules and their sub functions</para>
+                </listitem>
+                <listitem>
+                    <para>Learned how to use Salt in master-less mode</para>
+                </listitem>
+            </itemizedlist>
+
+        </sect2>
+
+    </sect1>
+
+    <sect1>
+        <title>Getting Information from Systems with Grains</title>
+        <para>In this chapter you will learn the following concepts:<remark>explain what grains are
+                and provide a few more examples</remark></para>
+        <itemizedlist>
+            <listitem>
+                <para>View system information stored in Salt grains</para>
+            </listitem>
+            <listitem>
+                <para>Query packages which are install on a minion</para>
+            </listitem>
+            <listitem>
+                <para>Install Apache2 and start the service</para>
+            </listitem>
+        </itemizedlist>
+
+        <sect2>
+            <title>Using Salt Hardware Grains</title>
+            <procedure>
+                <step>
+                    <para>On your Salt master enter the following command:</para>
+                    <screen># salt minion_name grains.items</screen>
+                    <para>This returns a long list of available grains on a system. </para>
+                </step>
+                <step>
+                    <para>Narrow down the search by entering a specific grain by name:</para>
+                    <screen># salt minion_name grains.item cpu_model</screen>
+                </step>
+            </procedure>
+        </sect2>
+
+        <sect2>
+            <title>Exploring Salt Package Functions</title>
+            <procedure>
+                <step>
+                    <para>View a list package management related modules with
+                            <command>sys.list_modules</command>:</para>
+                    <screen># salt minion_name sys.list_modules | grep pkg</screen>
+                </step>
+                <step>
+                    <para>List all packages installed on a minion with
+                            <command>pkg.list_pkgs</command>:</para>
+                    <screen># salt minion_name pkg.list_pkgs</screen>
+                    <para>This list is too long to be useful. Try being more specific with
+                            <command>grep</command>:</para>
+                    <screen># salt minion_name pkg.list_pkgs | grep apache2</screen>
+                </step>
+                <step>
+                    <para>Install <filename>apache2</filename> on a minion with
+                            <command>pkg.install</command>:</para>
+                    <screen># salt minion_name pkg.install apache2</screen>
+                </step>
+                <step>
+                    <para>Check the service status of the <filename>apache2</filename>:</para>
+                    <screen># salt minion_name service.status apache2</screen>
+                </step>
+                <step>
+                    <para>If the service is not running, start it now:</para>
+                    <screen># salt minion_name service.start apache2</screen>
+                    <para>After running the command you should see <emphasis>True</emphasis>
+                        returned. Check the status again with <command>salt minion_name
+                            service.status apache2</command>.</para>
+                </step>
+            </procedure>
+
+            <para>In this chapter you learned the following Salt concepts:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>Learned how to access system information stored in grains</para>
+                </listitem>
+                <listitem>
+                    <para>Learned how to check which packages are installed on a minion</para>
+                </listitem>
+                <listitem>
+                    <para>Learned how to install a package with Salt</para>
+                </listitem>
+                <listitem>
+                    <para>Learned how to start and manage services with Salt</para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+    </sect1>
+
+
+
+</chapter>

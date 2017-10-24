@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="chapt.bp.channel.management">
+
+  <!-- ################################################################################# -->
+  <!-- Draft 1 Channel Management-->
+  <!-- ################################################################################# -->
+
+
+  <title>Channel Management</title>
+
+  <sect1 xml:id="chapt.bp.channel.management.intro">
+    <title>Introduction</title>
+    <para>This chapter discusses the critical topic of channel design within &susemgr; and provides
+      an overview of channel management concepts. This includes naming, base and child channel
+      relationships, deployment and maintenance of vendor and custom channels for &susemgr; Server
+      and &susemgrproxy; as well as the &susemgr; channel life cycle and staging. This chapter also
+      provides information about repositories, cloning, and provides information about the various
+      security options available for channels. It is assumed that &susemgr; is connected to &scc;
+      and retrieving channel information. </para>
+  </sect1>
+  <sect1 xml:id="chapt.bp.channel.management.channel.design.concepts">
+    <title>The Importance of Channel Design</title>
+    <para>The design of your channels influence all other component interaction within &susemgr; and
+      as such, channel design requires careful planning and a concrete understanding of channel
+      terminology. While re-working channels after initial setup is certainly possible, in large
+      environments this will become an increasingly difficult task. Therefore it is important to
+      plan your channel implementation with this consideration in mind, specifically when regarding
+      large production environments. </para>
+
+    <para>Channels in &susemgr; represent the software sources for your clients. Like other media
+      types channels contain software packages, patches and updates for client systems. Channels
+      also provide an administrator with strict controls as to which packages may be installed on
+      client systems and make an organizations application life cycle easier to manage.</para>
+    <para>The following section briefly covers channel terms used both internally and externally by
+      our teams. These terms will provide you with the terminology necessary for planning and
+      implementing your life-cycle and staging design goals.</para>
+   
+
+    <sect2>
+      <title>Channel Terminology</title>
+
+      <formalpara>
+        <title>Channels and Repositories</title>
+        <para>A channel could also be called a repository manager within SUSE Manager. A channel is
+          a collection of RPMs and when present, patch data. Each base channel also contains
+          information specific to the product and architecture. A term often confused with channels,
+          is a <systemitem>repository</systemitem>. A repository is simply a storage location from
+          which software packages may be retrieved and installed. A repository contains a set of
+          packages similar to a channel. However, while a channel can contain several repositories,
+          a repository only contains package sets. &susemgr; channels may include external
+          repositories. One or more of these repositories may be added to a base channel or assigned
+          to multiple child channels.</para>
+      </formalpara>
+
+      <formalpara>
+        <title>Base Channels</title>
+        <para>Base channels are built on a specific architecture and &sle; or RHEL release. A
+          channel may contain one or more channels. These additional channels are referred to as
+          child channels. A client system may only be assigned to one base channel. If the base
+          channel is a clone (copy) of a SUSE channel it also contains the meta information required
+          to perform a SUSE Manager support pack migration.</para>
+      </formalpara>
+
+      <formalpara>
+        <title>Child channels</title>
+        <para>These channels belong to a single base channel and are from the same architecture and
+          SLES or RHEL release. A registered system may have one or more child channels, but all
+          children must belong to the same base channel.</para>
+      </formalpara>
+
+      <formalpara>
+        <title>Patches</title>
+        <para>Patches are a collection of packages which belong together and aid in solving security
+          issues, contain bug fixes or to simply provide an update. The data within a patch is
+          gathered together and termed patches. Regarding SUSE Manager, most
+          actions performed within software channels are executed using these patches. </para>
+      </formalpara>
+
+      <formalpara>
+        <title>Packages</title>
+        <para>Packages are RPMs that contain all necessary files: configuration, binaries, scripts,
+          as well as pre and post installation scripts.</para>
+      </formalpara>
+
+      <formalpara>
+        <title>Clones</title>
+        <para>A clone is a copy of a channel and will include exactly the same information as the
+          original channel from when the channel was created. If the original channel receives
+          updates after the clone has been created, these changes have to be updated (or cloned) to
+          the cloned channel. This is a manual process which can be automated with the standard SLES
+          tools. Cloning is especially useful in life-cycle management. More information on cloning
+          can be found here.</para>
+      </formalpara>
+
+    </sect2>
+
+
+  </sect1>
+  <sect1>
+    <title>Channel Life-cycle Management</title>
+    <para>This section describes &susemgr; Life-cycle best practices.<remark>Speak with MB and TH
+        need info.</remark></para>
+  </sect1>
+
+  <sect1>
+    <title>What is Channel Staging?</title>
+    <para>Staging is the next step in life-cycle management. Selecting the correct staging model
+      based on your organizational requirements is necessary to safeguard the stability of your
+      production systems. The following list identifies some of the recommended staging
+      models.</para>
+
+    <para>Staging models available in &susemgr;</para>
+    <itemizedlist>
+      <listitem>
+        <para>Three tier model. Tiers may be reduced or extended depending on your requirements.
+        </para>
+      </listitem>
+      <listitem>
+        <para>A clone model based on a date or period of time.</para>
+      </listitem>
+      <listitem>
+        <para>A clone model based on specific projects.</para>
+      </listitem>
+      <listitem>
+        <para>A combination of one or more of the above models.</para>
+      </listitem>
+    </itemizedlist>
+    <para>The following figure illustrates the three tier model in practice.<remark>This image
+        should probably move to the models example section.</remark></para>
+    <figure>
+      <title>Three Tier Model</title>
+      <mediaobject>
+        <imageobject role="fo">
+          <imagedata fileref="3tier.png" width="444"/>
+        </imageobject>
+        <imageobject role="html">
+          <imagedata fileref="3tier.png" width="80%"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
+  </sect1>
+
+  <sect1 xml:id="chapt.bp.channel.management.base.child.relationships">
+    <title> Channel Hierarchy: Base and Child Channels</title>
+    <para>It is important to understand channel hierarchy when working with channels. </para>
+
+    <para>There are two types of channels in &susemgr;:</para>
+    <itemizedlist>
+      <listitem>
+        <para><systemitem>base</systemitem>channel: A <systemitem>base</systemitem> channel consists
+          of packages built for a specific architecture and a SUSE Linux Enterprise Server or Red
+          Hat Enterprise Linux release.</para>
+      </listitem>
+      <listitem>
+        <para><systemitem>child</systemitem>channels: A <systemitem>child</systemitem> channel is a
+          channel associated with a base channel and contains extra packages to extend its base
+          channel.</para>
+      </listitem>
+    </itemizedlist>
+
+
+
+    <para> </para>
+    <para> A client system must be assigned a base channel as this provides it's main media sources.
+      A client may only have one base channel assigned to it, but a base channel may be assigned
+      multiple child channels. A base channel could also be referred to as a parent channel to which
+      all child channels belong. A subscribed client system may only install or update packages
+      available through its assigned base and child channels.</para>
+
+  </sect1>
+
+  <!-- TODO: This section needs to be organized into the book. Content belongs in other sections. 
+    <sect1>
+    <title> Connecting Clients to &susemgr;<remark>This chapter may not belong here. Perhaps a
+        separate chapter.</remark></title>
+    <para>Below you will find the various methods available for registering client systems with
+      &susemgr;.</para>
+      
+    <formalpara>
+      <title>Registering Client Systems with Salt (In development)</title>
+      <para>In the future it will be possible to register client systems to a &susemgr; server
+        master as minions as well as accepting keys to assign base and child channels.
+        <remark>Description will be added at a later time as well as links to reference book</remark></para>
+    </formalpara>
+    
+    <formalpara>
+      <title>Registering Clients with Activation Keys</title>
+      <para>Due to the simplicity and speed of activation keys, this is the preferred method
+          <remark>Is this still the preferred method with salt-stack on the way?</remark>for
+        registering client systems with either an &susemgrproxy; server or a &susemgr; Server.
+        Systems registered using an activation key are subscribed to all channels associated with
+        its unique activation key. For more information about activation keys, see also:<remark>Link
+          to section for activation keys</remark> the &susemgr; Reference Guide. </para>
+    </formalpara>
+    
+    <formalpara>
+      <title>Registering Client Systems Using the &susemgr; Web Interface</title>
+      <para>Specific child channels are available through subscription, depending on the system's
+        base channel. A system may be subscribed to a child channel through the &susemgr; web
+        interface. If your organization has created custom base channels, the systems may also be
+        reassigned to these custom channels through the &susemgr; web interface. For more
+        information about subscribing to channels online, see the &susemgr; web interface chapter of
+        the &susemgr; Reference Guide. <remark>Link to reference guide here explaining this
+          process!</remark></para>
+    </formalpara>
+    
+    <formalpara>
+      <title>Registering Client systems with the <command>spacewalk-channel</command>
+        Command</title>
+      <para>The <command>spacewalk-channel</command> command line tool allows you to subscribe a
+        system to specific channels via the command line without logging into </para>
+    </formalpara>
+    
+    
+  </sect1> -->
+<!-- 
+  <sect1>
+    <title>Relationship Between Products and Channels</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+
+  <sect1>
+    <title>Organization Credentials</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+
+  <sect1>
+    <title>Adding Products</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+
+  <sect1>
+    <title>Channel Cloning</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+  <sect1>
+    <title>Cloning Channels by Date</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+
+  <sect1>
+    <title>Channel Security</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+
+  <sect1>
+    <title>Signed Third party packages</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+
+  <sect1>
+    <title>Signed Internal Packages</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+
+  <sect1>
+    <title>GPG key usage</title>
+    <para>IN DEVELOPMENT</para>
+
+  </sect1>
+-->
+</chapter>

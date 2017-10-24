@@ -1,0 +1,974 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<!-- Converted by suse-upgrade version 1.1 -->
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<!-- z: s1-sm-audit ref.webui.audit -->
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ref.webui.audit">
+ <title>Audit</title>
+ <info/>
+ <para>
+  Select <guimenu>Audit</guimenu> from the left navigation menu to audit
+  your managed systems.
+ </para>
+<!-- z: s2-sm-audit-cve ref.webui.audit.cve -->
+ <sect1 xml:id="ref.webui.audit.cve">
+  <title>CVE Audit</title><indexterm>
+
+  <primary>CVE audit</primary>
+
+  <secondary>&susemgr; data</secondary></indexterm>
+
+  <para>
+   The <guimenu>CVE Audit</guimenu> page will display a list of client systems
+   with their patch status regarding a given CVE (Common Vulnerabilities and
+   Exposures) number.
+  </para>
+
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="audit_cve_audit.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="audit_cve_audit.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+  <sect2 xml:id="s1-cve-usage">
+   <title>Normal Usage</title><indexterm>
+   <primary>CVE Audit</primary>
+   <secondary>usage</secondary></indexterm>
+   <para>
+    Proceed as follows if you want to verify that a client system has received
+    a given CVE patch:
+   </para>
+   <procedure>
+    <step>
+     <para>
+      Make sure that the CVE data is up-to-date. For more information, see
+      <xref
+       linkend="sec-cve-maint"/>.
+     </para>
+    </step>
+    <step>
+     <para>
+<!--In the Web interface, -->
+      Click <menuchoice><guimenu>Audit</guimenu><guimenu>CVE
+      Audit</guimenu></menuchoice> in the left navigation menu to open
+      the <guimenu>CVE Audit</guimenu> page.
+     </para>
+    </step>
+    <step>
+     <para>
+      Input a 13-char CVE identifier in the <guimenu>CVE Number</guimenu>
+      field. The year setting will be automatically adjusted. Alternatively,
+      set the year manually and add the last four digits.
+     </para>
+    </step>
+    <step>
+     <para>
+      Optionally, uncheck the patch statuses you are not interested in.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click <guimenu>Audit systems</guimenu>.
+     </para>
+    </step>
+   </procedure>
+   <para>
+    Performing this procedure will result in a list of client systems, where
+    each system comes with a <guimenu>Patch Status</guimenu> belonging to the
+    given CVE identifier. Possible statuses are:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><inlinemediaobject>
+      <textobject role="description"><phrase>[red]</phrase>
+      </textobject>
+      <imageobject role="fo">
+       <imagedata fileref="patch-status-affected-patch-inapplicable.png" width="1.6em" format="PNG"
+        />
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="patch-status-affected-patch-inapplicable.png" width="1em" format="PNG"/>
+      </imageobject></inlinemediaobject> — Affected, patches are available in channels that are not
+      assigned:</term>
+     <listitem>
+      <para>
+       The system is affected by the vulnerability and &susemgr; has one or
+       more patches for it, but at this moment, the channels offering the
+       patches are not assigned to the system.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><inlinemediaobject>
+      <textobject role="description"><phrase>[orange]</phrase>
+      </textobject>
+      <imageobject role="fo">
+       <imagedata fileref="patch-status-affected-patch-applicable.png" width="1.6em" format="PNG"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="patch-status-affected-patch-applicable.png" width="1em" format="PNG"/>
+      </imageobject></inlinemediaobject> — Affected, at least one patch available in an assigned channel:</term>
+     <listitem>
+      <para>
+       The system is affected by the vulnerability, &susemgr; has at least one
+       patch for it in a channel that is directly assigned to the system.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><inlinemediaobject>
+      <textobject role="description"><phrase>[grey]</phrase>
+      </textobject>
+      <imageobject role="fo">
+       <imagedata fileref="patch-status-not-affected.png" width="1.6em" format="PNG"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="patch-status-not-affected.png" width="1em" format="PNG"/>
+      </imageobject></inlinemediaobject> — Not affected:</term>
+     <listitem>
+      <para>
+       The system does not have any packages installed that are patchable.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><inlinemediaobject>
+      <textobject role="description"><phrase>[green]</phrase>
+      </textobject>
+      <imageobject role="fo">
+       <imagedata fileref="patch-status-patched.png" width="1.6em" format="PNG"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="patch-status-patched.png" width="1em" format="PNG"/>
+      </imageobject></inlinemediaobject> — Patched:</term>
+     <listitem>
+      <para>
+       A patch has already been installed.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <para>
+    In other words, it can mean the following:
+   </para>
+   <itemizedlist mark="bullet" spacing="normal">
+<!-- https://bugzilla.suse.com/show_bug.cgi?id=900087 2015-08-17 -->
+    <listitem>
+     <para>
+      More than one patch might be needed to fix a certain vulnerability.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      The <inlinemediaobject>
+      <textobject role="description"><phrase>[orange]</phrase>
+      </textobject>
+      <imageobject role="fo">
+       <imagedata fileref="patch-status-affected-patch-applicable.png" width="1.6em" format="PNG"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="patch-status-affected-patch-applicable.png" width="1em" format="PNG"/>
+      </imageobject>
+      </inlinemediaobject> state is displayed when &susemgr; has at
+      least one patch in an assigned channel. This might mean that,
+      after installing such patch, others might be needed&mdash;users
+      should double check the CVE Audit page after applying a patch to
+      be sure that their systems are not affected anymore.
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    For a more precise definitions of these states, see
+    <xref linkend="sec-cve-tips"/>.
+   </para>
+   <note>
+    <title>Unknown CVE Number</title>
+    <para>
+     If the CVE number is not known to &susemgr;, an error message is displayed
+     because &susemgr; cannot collect and display any audit data.
+    </para>
+   </note>
+   <para>
+    For each system, the <guimenu>Next Action</guimenu> column contains
+    suggestions on the steps to take to address the vulnerabilities.
+    Under these circumstances it is either sensible to install a certain patch
+    or assign a new channel. If applicable, a list of <quote>candidate</quote>
+    channels or patches is displayed for your convenience.
+   </para>
+   <para>
+    You can also assign systems to a <guimenu>System Set</guimenu> for further
+    batch processing.
+   </para>
+  </sect2>
+
+  <sect2>
+   <title>API Usage</title>
+   <para>
+    An API method called <literal>audit.listSystemsByPatchStatus</literal> is
+    available to run CVE audits from custom scripts. Details on how to use it
+    are available in the API guide.
+   </para>
+  </sect2>
+
+  <sect2 xml:id="sec-cve-maint">
+   <title>Maintaining CVE Data</title>
+   <para>
+    To produce correct results, CVE Audit must periodically refresh the data
+    needed for the search in the background. By default, the refresh is
+    scheduled at 11:00 PM every night. It is recommended to run such a refresh
+    right after the &susemgr; installation to get proper results immediately
+    instead of waiting until the next day.
+   </para>
+   <procedure>
+    <step>
+     <para>
+      In the Web interface, click
+      <menuchoice><guimenu>Admin</guimenu><guimenu>Task
+      Schedules</guimenu></menuchoice> in the left navigation menu.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click the <literal>cve-server-channels-default</literal> schedule link.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click the <literal>cve-server-channels-bunch</literal> link.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click the <guimenu>Single Run Schedule</guimenu> button.
+     </para>
+    </step>
+    <step>
+     <para>
+      After some minutes, refresh the page and check that the scheduled run
+      status is <literal>FINISHED</literal>.
+     </para>
+    </step>
+   </procedure>
+   <para>
+    A direct link is also available on the <guimenu>CVE Audit</guimenu> page
+    (<guimenu>extra CVE data update</guimenu>).
+   </para>
+  </sect2>
+
+  <sect2 xml:id="sec-cve-tips">
+   <title>Tips and Background Information</title>
+   <para>
+    Audit results are only correct if the assignment of channels to systems did
+    not change since the last scheduled refresh (normally at 11:00 PM every
+    night). If a CVE audit is needed and channels were assigned or unassigned
+    to any system during the day, a manual run is recommended. For more
+    information, see <xref linkend="sec-cve-maint"/>.
+   </para>
+   <para>
+    Systems are called <quote>affected</quote>, <quote>not affected</quote> or
+    <quote>patched</quote> not in an absolute sense, but based on information
+    available to &susemgr;. This implies that concepts such as <quote>being
+    affected by a vulnerability</quote> have particular meanings in this
+    context. The following definitions apply:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term>System affected by a certain vulnerability:</term>
+     <listitem>
+      <para>
+       A system which has an installed package with version lower than the
+       version of the same package in a relevant patch marked for the
+       vulnerability.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>System not affected by a certain vulnerability:</term>
+     <listitem>
+      <para>
+       A system which has no installed package that is also in a relevant patch
+       marked for the vulnerability.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>System patched for a certain vulnerability:</term>
+     <listitem>
+      <para>
+       A system which has an installed package with version equal to or greater
+       than the version of the same package in a relevant patch marked for the
+       vulnerability.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Relevant patch:</term>
+     <listitem>
+      <para>
+       A patch known by &susemgr; in a relevant channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Relevant channel:</term>
+     <listitem>
+      <para>
+       A channel managed by &susemgr;, which is either assigned to the system,
+       the original of a cloned channel which is assigned to the system, a
+       channel linked to a product which is installed on the system or a past
+       or future service pack channel for the system.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <para>
+    A notable consequence of the above definitions is that results can be
+    incorrect in cases of unmanaged channels, unmanaged packages, or
+    non-compliant systems.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="ref.webui.audit.subscription">
+  <title><guimenu>Subscription Matching</guimenu></title>
+
+  <para>
+   To match subscriptions with your systems use the Subscription
+   Matcher tool.  For more information about Virtual Host Managers, see
+   <xref linkend="ref.webui.audit.submatch.vhm"/>.
+  </para>
+
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="audit_subscription_matching.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="audit_subscription_matching.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+  <para>
+   It gathers information about systems, subscriptions and pinned matches
+   (fixed customer defined subscriptions to systems mapping) as input and
+   returns the best possible match according to the SUSE Terms and Conditions.
+   The Subscription Matcher (<command>subscription-matcher</command>) is also
+   able to write CSV Reports.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     The <guimenu>Subscriptions Report</guimenu> provides subscriptions report
+     data when used
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The <guimenu>Unmatched Products Report</guimenu> provides information on
+     products and their systems when a match to a subscription cannot be found
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The <guimenu>Error Report</guimenu> provides a list of errors raised
+     during the matching process
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   Selecting <menuchoice> <guimenu>Audit</guimenu> <guimenu>Subscription
+   Matching</guimenu> </menuchoice> from the left navigation menu will
+   provide you with an overview of all results generated by the
+   Subscription Matcher.
+  </para>
+
+  <important>
+   <title>Subscription Matcher Accuracy</title>
+   <para>
+    This tool's goal is to help provide visual coverage on current subscription
+    use and support reporting. The Subscription Matcher is excellent at
+    matching systems and products registered with &susemgr;, however any
+    systems, products or environments which are not found in the database will
+    remain unmatched. This tool is not intended to act as a replacement for
+    auditing. Auditing should always take precedence over subscription
+    matching.
+   </para>
+  </important>
+
+<!-- In the Ref Guide, this does not make sense here -->
+
+<!-- What's actually virtual-host-gatherer ? -->
+
+<!--
+  <note>
+   <title>Coexistence of virtual-host-gather and Poller</title>
+   <para>
+    <command>virtual-host-gatherer</command> should not be used for
+    gathering the data from hypervisors that are registered systems in
+    &susemgr; (running &sls; or &rhel;). Information from these
+    hypervisors has already been retrieved using the poller utility and
+    redundant information from virtual-host-gatherer may cause
+    conflicts.
+   </para>
+  </note>
+  -->
+
+  <sect2>
+   <title><guimenu>Subscription Matching</guimenu> &gt; <guimenu>Subscriptions</guimenu></title>
+   <para>
+    The Subscription Matching overview provides subscription part numbers,
+    product descriptions, policies, matched total subscriptions used and
+    remaining, and the start and end dates of subscriptions.
+   </para>
+   <figure>
+    <title>Subscription Matching Overview</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="smatching-overview.png" width="96%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="smatching-overview.png" width="80%"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <variablelist>
+    <varlistentry>
+     <term>Part Number</term>
+     <listitem>
+      <para>
+       Identifier of a particular product
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Description</term>
+     <listitem>
+      <para>
+       Name of a particular product
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Policy</term>
+     <listitem>
+      <para>
+       Kind of the subscription of this product
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Matched/Total</term>
+     <listitem>
+      <itemizedlist>
+       <listitem>
+        <formalpara>
+         <title>Fully Matched</title>
+         <para>
+          If the total amounts of a subscription are fully matched, the
+          quantity column value is highlighted with a yellow warning triangle:
+          <inlinemediaobject>
+          <textobject role="description"><phrase>Warning</phrase>
+          </textobject>
+          <imageobject role="fo">
+           <imagedata fileref="fa-warning.svg" width="0.9em" format="SVG"/>
+          </imageobject>
+          <imageobject role="html">
+           <imagedata fileref="fa-warning.png" width="1em" format="PNG"/>
+          </imageobject>
+          </inlinemediaobject>
+         </para>
+        </formalpara>
+       </listitem>
+       <listitem>
+        <formalpara>
+         <title>Susbscritions about to Expire</title>
+         <para>
+          When a subscription will expire within less than 3 months, the
+          record is highlighted.
+         </para>
+        </formalpara>
+       </listitem>
+       <listitem>
+        <formalpara>
+         <title>Expired Subscriptions</title>
+         <para>
+          If a subscription is expired, the record for it is faded.
+         </para>
+        </formalpara>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Start Date</term>
+     <listitem>
+      <para>
+       Start date of the subscription
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>End Date</term>
+     <listitem>
+      <para>
+       End date of the subscription
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2>
+   <title>Subscription Matcher Reports</title>
+   <para>
+    &susemgr; automatically generates up-to-date nightly status reports
+    by matching your &suse; subscriptions with all your registered
+    systems. These reports are stored in
+    <filename>/var/lib/spacewalk/subscription-matcher</filename> and
+    provided in CSV format. These CSV files may be opened with a
+    spreadsheet application such as LibreOffice Calc.
+   </para>
+   <para>
+    If you want to schedule these reports to be produced at different
+    times, or at a certain frequency or schedule a one time completion you
+    can perform this task by editing the Taskomatic settings for the
+    gatherer-matcher located in the &webui; at <menuchoice>
+    <guimenu>Admin</guimenu> <guimenu>Task Schedules</guimenu>
+    <guimenu>gatherer-matcher-default</guimenu> </menuchoice>.
+   </para>
+   <informalfigure>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="audit_subscription_matching_gatherer_matcher_default.png" width="96%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="audit_subscription_matching_gatherer_matcher_default.png" width="80%"/>
+     </imageobject>
+    </mediaobject>
+   </informalfigure>
+  </sect2>
+
+  <sect2 xml:id="ref.webui.audit.submatch.unmatched.systems">
+   <title><guimenu>Subscription Matching</guimenu> &gt; <guimenu>Unmatched Products</guimenu></title>
+   <para>
+    Selecting the <menuchoice> <guimenu>Subscription Matching</guimenu>
+    <guimenu>Unmatched Products</guimenu> </menuchoice> tab provides an
+    overview of all systems the matcher could not find in the database or which
+    were not registered with &susemgr;. The <guimenu>Unmatched
+    Products</guimenu> overview contains product names and the number of
+    systems which remain unmatched with known installed products.
+   </para>
+   <figure>
+    <title>Unmatched Products</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="audit_subscription_matching_unmatched_products.png" width="96%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="audit_subscription_matching_unmatched_products.png" width="80%"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <variablelist>
+    <varlistentry>
+     <term>Show System List</term>
+     <listitem>
+      <para>
+       Select to open and display a list of all systems which were detected
+       with an installed product but remain unmatched with a subscription.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 xml:id="ref.webui.audit.submatch.sub.pinning">
+   <title><guimenu>Subscription Matching</guimenu> &gt; <guimenu>Pins</guimenu></title>
+   <para>
+    The subscription pinning feature allows a user to instruct the subscription
+    matcher to favor matching a specific subscription with a given system or
+    group of systems. This is achieved by creating pins. Each pin contains
+    information about the preferred subscription-system match.
+   </para>
+   <informalfigure>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="audit_subscription_matching_pins.png" width="96%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="audit_subscription_matching_pins.png" width="80%"/>
+     </imageobject>
+    </mediaobject>
+   </informalfigure>
+   <note>
+    <title>Respecting Pins</title>
+    <para>
+     In some cases the algorithm may determine that a specific pin cannot be
+     respected, depending on the subscription's availability and applicability
+     rules, in this case it will be shown as not satisfied.
+    </para>
+   </note>
+   <para>
+    The pins table displays a list of all pins. Items in the list contain the
+    status of pins, which can be <literal>satisfied</literal>, <literal>not
+    satisfied</literal> and <literal>pending next run</literal>.
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      A pin is <literal>satisfied</literal> if its system and subscription was
+      matched in the last matcher run.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      A pin is <literal>not satisfied</literal> if its system and subscription
+      was <emphasis>not</emphasis> matched in the last matcher run. This can
+      happen, for example, if the pin violates terms and conditions for
+      subscriptions.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      A pin is in the <literal>pending next run</literal> state when it needs a
+      new matcher run to be taken into account. After the new run, the pin will
+      become either <literal>satisfied</literal> or <literal>not
+      satisfied</literal>.
+     </para>
+    </listitem>
+   </itemizedlist>
+   <figure>
+    <title>Subscription Pinning</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="sm-pins.png" width="96%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="sm-pins.png" width="80%"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    Click the <guimenu>Add a Pin</guimenu> button to open the
+    <guimenu>Available Systems</guimenu> window. You may filter systems by name
+    and select a system for the matcher to pin manually.
+   </para>
+   <figure>
+    <title>Add a Pin</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="add-pin.png" width="333"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="add-pin.png" width="80%"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+   <para>
+    Within the <guimenu>Subscriptions Available for Selected System</guimenu>
+    window click the <guimenu>Save Pin</guimenu> button to raise priority for
+    subscription use on the selected system.
+   </para>
+  </sect2>
+
+  <sect2 xml:id="ref.webui.audit.submatch.submatch.messages">
+   <title><guimenu>Subscription Matching</guimenu> &gt; <guimenu>Messages</guimenu></title>
+   <para>
+    You can review all messages related to <guimenu>Subscription
+    Matching</guimenu> from the <menuchoice> <guimenu>Subscription
+    Matching</guimenu> <guimenu>Messages</guimenu> </menuchoice> overview.
+   </para>
+   <para>
+    The following status messages can be displayed.
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term>Unknown Part Number</term>
+     <listitem>
+      <para>
+       Unsupported part number detected
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Physical Guest</term>
+     <listitem>
+      <para>
+       Physical system is reported as virtual guest, check hardware data
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Guest with Unknown Host</term>
+     <listitem>
+      <para>
+       Virtual guest has unknown host, assuming it is a physical system
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Unknown CPU Count</term>
+     <listitem>
+      <para>
+       System has an unknown number of sockets, assuming 16
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <informalfigure>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="audit_subscription_matching_messages.png" width="96%"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="audit_subscription_matching_messages.png" width="80%"/>
+     </imageobject>
+    </mediaobject>
+   </informalfigure>
+  </sect2>
+
+  <sect2 xml:id="ref.webui.audit.submatch.vhm">
+   <title>Virtual Host Managers</title>
+   <para>
+    A pre-requirement for matching subscriptions with systems is to have
+    complete information covering which virtual systems are running on which
+    virtual host. &susemgr; gets this information without any further
+    configuration if the hypervisor is a registered system running on &sls; or
+    &rhel;. Third party hypervisors, like VMware or Hyper-V, will need further
+    configuration as described in this chapter.
+   </para>
+   <para>
+    Third party hypervisors and hypervisor managers such as VMWare vCenter are
+    called <quote>Virtual Host Managers</quote> (VHM) within &susemgr;, as they
+    can manage one or multiple virtual hosts, which in turn may contain
+    virtual guests. &susemgr; &productnumber; ships with a tool
+    <command>virtual-host-gatherer</command> that can connect to VHMs using
+    their API, and request information about virtual hosts. This tool is
+    automatically invoked via Taskomatic nightly, therefore you need to
+    configure your VHMs via XMLRPC APIs.
+    <command>virtual-host-gatherer</command> maintains the concept of optional
+    modules, where each module enables a specific Virtual Host Manager.
+   </para>
+   <para>
+    On the <guimenu>Subscription Matching</guimenu> overview select
+    <guimenu>Edit Virtual Host Managers</guimenu>. This will take you to
+    the <menuchoice> <guimenu>Systems</guimenu> <guimenu>Virtual Host
+    Managers</guimenu> </menuchoice> overview. In the upper right you
+    can select either <guimenu>Add VMware-based Virtual Host
+    Manager</guimenu> or <guimenu>Add File-based Virtual Host
+    Manager</guimenu>. These modules allow you to match subscriptions to
+    machines managed by a virtual host such as VMware, ESX, ESXi, and
+    vCenter. If using an unsupported virtual host you can also create a
+    custom json file to provide <command>virtual-host-gatherer</command>
+    with the required host and guest information.
+   </para>
+   <sect3>
+    <title>VMware-based Virtual Host Manager</title>
+    <para>
+     Select <guimenu>VMware-based Virtual Host Manager</guimenu> to enter the
+     location of your VMware-based virtual host. Enter a
+     <guimenu>Label</guimenu>, <guimenu>Hostname</guimenu>,
+     <guimenu>Port</guimenu>, <guimenu>Username</guimenu> and
+     <guimenu>Password</guimenu>. Finally click the <guimenu>Add Virtual Host
+     Manager</guimenu> button.
+    </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="systems_virtual_host_managers_vmware.png" width="96%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="systems_virtual_host_managers_vmware.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </sect3>
+   <sect3>
+    <title>File-based Virtual Host Manager</title>
+    <para>
+     If you are using an unsupported virtual host manager, you can create and
+     use a file formatted in json containing information about a host and all
+     managed guest machines. Select <guimenu>Add File-based Virtual Host
+     Manager</guimenu>, then enter a label and URL leading to the location of
+     this file for the <command>virtual-host-gatherer</command>.
+    </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="systems_virtual_host_managers_file.png" width="96%"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="systems_virtual_host_managers_file.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+    <para>
+     The following json example describes how this file should look:
+    </para>
+<screen language="json"><prompt>> </prompt>virtual-host-gatherer --infile infile.json
+{
+    "examplevhost": {
+        "10.11.12.13": {
+            "cpuArch": "x86_64",
+            "cpuDescription": "AMD Opteron(tm) Processor 4386",
+            "cpuMhz": 3092.212727,
+            "cpuVendor": "amd",
+            "hostIdentifier": "'vim.HostSystem:host-182'",
+            "name": "11.11.12.13",
+            "os": "VMware ESXi",
+            "osVersion": "5.5.0",
+            "ramMb": 65512,
+            "totalCpuCores": 16,
+            "totalCpuSockets": 2,
+            "totalCpuThreads": 16,
+            "type": "vmware",
+            "vms": {
+                "vCenter": "564d6d90-459c-2256-8f39-3cb2bd24b7b0"
+            }
+        },
+        "10.11.12.14": {
+            "cpuArch": "x86_64",
+            "cpuDescription": "AMD Opteron(tm) Processor 4386",
+            "cpuMhz": 3092.212639,
+            "cpuVendor": "amd",
+            "hostIdentifier": "'vim.HostSystem:host-183'",
+            "name": "10.11.12.14",
+            "os": "VMware ESXi",
+            "osVersion": "5.5.0",
+            "ramMb": 65512,
+            "totalCpuCores": 16,
+            "totalCpuSockets": 2,
+            "totalCpuThreads": 16,
+            "type": "vmware",
+            "vms": {
+                "49737e0a-c9e6-4ceb-aef8-6a9452f67cb5": "4230c60f-3f98-2a65-f7c3-600b26b79c22",
+                "5a2e4e63-a957-426b-bfa8-4169302e4fdb": "42307b15-1618-0595-01f2-427ffcddd88e",
+                "NSX-gateway": "4230d43e-aafe-38ba-5a9e-3cb67c03a16a",
+                "NSX-l3gateway": "4230b00f-0b21-0e9d-dfde-6c7b06909d5f",
+                "NSX-service": "4230e924-b714-198b-348b-25de01482fd9"
+            }
+        }
+    }
+}</screen>
+    <para>
+     For more information, see the man page on your &susemgr; server for
+     <command>virtual-host-gatherer</command>:
+    </para>
+<screen><prompt> ></prompt>man virtual-host-gatherer</screen>
+   </sect3>
+  </sect2>
+
+  <sect2>
+   <title>Configuring Virtual Host Managers via XMLRPC API</title>
+   <para>
+    The following APIs allow you to get a list of available
+    <command>virtual-host-manager</command> modules and the parameters they
+    require:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      <literal>virtualhostmanager.listAvailableVirtualHostGathererModules(session)</literal>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <literal>virtualhostmanager.getModuleParameters(session,
+      moduleName)</literal>
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    The following APIs allow you to create and delete VHMs. Take care that the
+    module parameter map must match the map returned by
+    <literal>virtualhostmanager.getModuleParameters</literal> to work
+    correctly:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      <literal>virtualhostmanager.create(session, label, moduleName,
+      parameters)</literal>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <literal>virtualhostmanager.delete(session, label)</literal>
+     </para>
+    </listitem>
+   </itemizedlist>
+   <para>
+    The following APIs return information about configured VHMs:
+   </para>
+   <itemizedlist>
+    <listitem>
+     <para>
+      <literal>virtualhostmanager.listVirtualHostManagers(session)</literal>
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      <literal>virtualhostmanager.getDetail(session, label)</literal>
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect2>
+ </sect1>
+<!-- z: s2-sm-audit-openscap ref.webui.audit.openscap -->
+ <sect1 xml:id="ref.webui.audit.openscap">
+  <title>OpenSCAP</title>
+
+  <para>
+   If you click
+   <menuchoice><guimenu>Audit</guimenu><guimenu>OpenSCAP</guimenu><guimenu>All
+   Scans</guimenu></menuchoice> in the left navigation menu, an overview
+   of the &openscap; Scans appears. SCAP (Security Content Automation
+   Protocol) is a framework to maintain the security of enterprise
+   systems. It mainly performs the following tasks:
+  </para>
+
+  <itemizedlist mark="bullet" spacing="normal">
+   <listitem>
+    <para>
+     Automatically verifying the availability of patches
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Checking system security configuration settings
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Examining systems for signs of compromise
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <para>
+   For a description of the &webui; dialogs, see
+   <xref linkend="s2-openscap-suma-pages"/>.
+  </para>
+
+  <para>
+   For instructions and tips on how to best use OpenSCAP with &susemgr;,
+   refer to <xref linkend="ch-openscap"/>. To learn more about OpenSCAP,
+   see the project home page at <link
+   xlink:href="http://open-scap.org"/>.
+  </para>
+ </sect1>
+ <xi:include href="manager_reference_openscap.xml" parse="xml"/>
+</chapter>

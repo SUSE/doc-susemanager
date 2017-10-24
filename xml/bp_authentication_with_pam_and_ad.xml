@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="bp.authentication.with.pam.and.ad">
+    <title>Authentication Against &susemgr;</title>
+
+    <sect1>
+        <title>Authentication Via PAM</title>
+        <para>As security measures become increasingly complex, SUSE Manager supports network-based
+            authentication systems via Pluggable Authentication Modules (PAM). PAM is a suite of
+            libraries that allows to integrate SUSE Manager with a centralized authentication
+            mechanism, thus eliminating the need to remember multiple passwords. SUSE Manager
+            supports LDAP, Kerberos, and other network-based authentication systems via PAM. To
+            enable SUSE Manager to use PAM in your organization's authentication infrastructure,
+            follow the steps below.</para>
+
+        <procedure>
+            <step>
+                <para>Set up a PAM service file (default location:
+                        <filename>/etc/pam.d/susemanager</filename>) then enforce its use by adding
+                    the following line to <filename>/etc/rhn/rhn.conf</filename>:</para>
+                <screen>pam_auth_service = susemanager</screen>
+                <note>
+                    <para>This assumes the PAM service file is named susemanager.</para>
+                </note>
+            </step>
+            <step>
+                <para>To enable a new or existing user to authenticate with PAM, proceed to the
+                        <guimenu>Create User</guimenu> page and select the checkbox labeled
+                    Pluggable Authentication Modules (PAM) positioned below the password and
+                    password confirmation fields.</para>
+            </step>
+            <step>
+                <para> To authenticate a &slsa; system against Kerberos add the following lines to
+                        <filename>/etc/pam.d/susemanager</filename>:</para>
+                <screen> #%PAM-1.0
+ auth     include        common-auth
+ account  include        common-account
+ password include        common-password
+ session  include        common-session</screen>
+                <note>
+                    <para>To register a Red Hat Enterprise Linux System against Kerberos add the
+                        following lines to <filename>/etc/pam.d/susemanager</filename></para>
+                    <screen> #%PAM-1.0
+ auth        required      pam_env.so
+ auth        sufficient    pam_krb5.so no_user_check
+ auth        required      pam_deny.so
+ account     required      pam_krb5.so no_user_check</screen>
+                </note>
+            </step>
+            <step>
+                <para>YaST can now be used to configure PAM, when packages such as yast2-ldap-client
+                    and yast2-kerberos-client are installed; for detailed information on configuring
+                    PAM, see the SUSE Linux Enterprise Server Security Guide <link
+                        xlink:href="https://www.suse.com/documentation/sles-12/book_security/data/part_auth.html"
+                    />. This example is not limited to Kerberos; it is generic and uses the current
+                    server configuration. Note that only network based authentication services are
+                    supported.</para>
+                <important>
+                    <title>Changing Passwords</title>
+                    <para>Changing the password on the SUSE Manager Web interface changes only the
+                        local password on the SUSE Manager server. But this password may not be used
+                        at all if PAM is enabled for that user. In the above example, for instance,
+                        the Kerberos password will not be changed.</para>
+                </important>
+            </step>
+        </procedure>
+    </sect1>
+    <sect1>
+        <title>Authentication Via eDirectory and PAM</title>
+        <procedure>
+            <step>
+                <para>First check to ensure eDirectory authentication is working with your current
+                    OS for example:</para>
+                <screen>#getent passwd</screen>
+            </step>
+            <step>
+                <para>If users are returned from eDirectory then create the following file:</para>
+                <screen># cat /etc/pam.d/susemanager</screen>
+            </step>
+            <step>
+                <para>And add the following content:</para>
+                <screen> #%PAM-1.0
+ auth     include        common-auth
+ account  include        common-account
+ password include        common-password
+ session  include        common-session
+ #</screen>
+            </step>
+            <step>
+                <para>Finally add the following lines to the &susemgr; conf file:</para>
+                <screen> # grep -i pam /etc/rhn/rhn.conf
+ pam_auth_service = susemanager</screen>
+            </step>
+            <step>
+                <para>You may now create users with the same id that appears on eDirectory and mark
+                    the Use PAM check-box from the SUSE Manager WebUI.</para>
+            </step>
+        </procedure>
+        <para/>
+    </sect1>
+    <!-- ACTIVE DIRECTORY UPDATE LAST UPDATE FROM 2012 NEW IMAGES ETC. See Last link on : https://wiki.microfocus.com/index.php/SUSE_Manager/Authentication#AD_-_Active_Directory -->
+</chapter>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="white.papers.creating.a.machinery.renderer">
+
+    <title>Creating a Machinery Renderer</title>
+    <para>The following chapter will guide you through the process of creating a custom renderer for
+        displaying the JSON system manifest created by Machinery using python. Normally, Salt states
+        are written in YAML therefore you may use the Jinja2 template syntax to dynamically modify
+        YAML states before they are rendered. </para>
+    <warning>
+        <title>White Papers</title>
+        <para>All content contained in a White Papers document is under development and subject to change. Things will
+            break and may not work as intended. For testing environments only. These documents are
+            unsupported. </para>
+    </warning>
+    <sect1>
+        <title>Preparations</title>
+        <para>This exercise assumes you have already followed and created the master-less setup used
+            in: <xref linkend="white.papers.writing.custom.salt.grains"/> You may use the same setup
+            for the following exercise.</para>
+
+        <procedure>
+            <title>Preparations</title>
+            <step>
+                <para>Install Machinery as root, if you are using SLES make sure you have added the
+                    Advanced Systems Management Module using YaST2 for access to the Machinery
+                    package:</para>
+                <screen># zypper in machinery</screen>
+            </step>
+            <step>
+                <para>Create the JSON system manifest using Machinery:</para>
+                <screen># machinery inspect -s packages,users,groups,services localhost</screen>
+            </step>
+            <step>
+                <para>Display the manifest:</para>
+                <screen># machinery show localhost</screen>
+            </step>
+            <step>
+                <para>Switch to the directory containing the JSON manifest:</para>
+                <screen># cd /root/.machinery/localhost</screen>
+            </step>
+            <step>
+                <para>Display the contents:</para>
+                <screen># l</screen>
+            </step>
+            <step>
+                <para>Take a look at the manifest file:</para>
+                <screen># cat manifest.json</screen>
+            </step>
+            <step>
+                <para>Copy the <filename>manifest.json</filename> file to
+                        <filename>/srv/salt/manifest.sls</filename>. Make sure you have included the
+                        <literal>sls</literal> extension</para>
+            </step>
+            <step>
+                <para>Open the <filename>manifest.sls</filename> file and add a shebang. The first
+                    line should read:</para>
+                <screen>#!machinery</screen>
+            </step>
+        </procedure>
+    </sect1>
+    <sect1>
+        <title>Writing the Renderer</title>
+        <procedure>
+            <title>Writing the Renderer</title>
+            <step>
+                <para>Move to the directory where the renderer will be placed:</para>
+                <screen># cd /srv/salt</screen>
+            </step>
+            <step>
+                <para>Create a renderers directory:</para>
+                <screen># mkdir _renderers</screen>
+            </step>
+            <step>
+                <para>Move to the new directory:</para>
+                <screen>#cd _renderers</screen>
+            </step>
+            <step>
+                <para>Create a new python file named <filename>machinery.py</filename> and add the
+                    following content:</para>
+                <screen>import json
+
+def render(manifest_file, saltenv='base', sls='', **kws):
+  '''
+  '''
+
+
+  manifest = manifest_file.read()
+  manifest = manifest[(manifest.find('{')):]
+
+  input = json.loads(manifest)
+
+  output = {}
+
+  if 'packages' in input.keys():
+      pkgs = []
+      packages = input['packages']['_elements']
+      for package in packages:
+          pkgs.append(package['name'])
+      output['manifest_install_packages'] = {'pkg.installed': [{'pkgs': pkgs}]}
+
+  return output</screen>
+            </step>
+        </procedure>
+
+    </sect1>
+
+    <sect1>
+        <title>Sync the Renderer</title>
+        <procedure>
+            <title>Sync the New Renderer to You Minions(localhost)</title>
+            <step>
+                <para>Normally you would sync using the <command>salt</command> command on the Salt
+                    Master and target some or all of your servers such as: <command>salt '*'
+                        saltutil.sync_renderers</command>. Keep in mind you are using Salt
+                    masterless and need to call the local Salt using the
+                        <command>salt-call</command> command. Sync the new renderer:</para>
+                <screen># salt-call saltutil.sync_renderers</screen>
+                <note>
+                    <para>You will need to repeat the sync process each time you edit/change your
+                        renderers python file.</para>
+                </note>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Test the Renderer</title>
+        <procedure>
+            <title>Test The Renderer</title>
+            <step>
+                <para>Now you can test the new renderer. View the JSON manifest in a pretty-printed
+                    format with the following command:</para>
+                <screen># salt-call state.show_sls manifest | less</screen>
+            </step>
+            <step>
+                <para>You can see how useful this manifest is by trying out the following:</para>
+                <screen># salt-call state.apply manifest</screen>
+                <para>Of course the installed packages should be the same as those listed on the
+                    manifest, so running the above command will not change anything.</para>
+            </step>
+            <step>
+                <para>Now try making a system change by uninstalling vim:</para>
+                <screen># zypper rm vim</screen>
+            </step>
+            <step>
+                <para>Now test the change by applying the state again:</para>
+                <screen># salt-call state.apply manifest</screen>
+                <para>The manifest file, now acts as a system state ensuring all current
+                    configurations of services, groups, and installed packages remains the same. Vim
+                    has been reinstalled.</para>
+            </step>
+        </procedure>
+
+        <itemizedlist>
+            <title>Things to Keep in Mind</title>
+            <listitem>
+                <para>All state files must have the <literal>.sls</literal> suffix.</para>
+            </listitem>
+            <listitem>
+                <para>Due to the above limitation you must use a <literal>shebang</literal> which
+                    may lead to files that do not following a specification. Alternatively you can
+                    use the state file in a context where you can explicitly provide a
+                    renderer.</para>
+            </listitem>
+        </itemizedlist>
+
+    </sect1>
+
+
+</chapter>

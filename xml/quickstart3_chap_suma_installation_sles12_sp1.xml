@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="quickstart3.chap.suma.installation.sles12">
+ <title>SLES 12 Installation</title>
+  <note>
+   <title>Version Information</title>
+   <para>
+    &susemgr; 3.1 was originally released as a SLES 12 SP2 extension.
+    With the next maintenance update (2017), &susemgr; 3.1 will be based
+    on SLES 12 SP3 and it will support SLE 12 SP3 clients officially.
+    In the following sections and chapters, it is highly recommended to
+    use SLE 12 SP3 instead of SP2.
+   </para>
+  </note>
+ <sect1>
+  <title>SLES 12 KVM Requirements</title>
+
+  <para>
+   This chapter provides the required (kvm) settings for installation of
+   &sls; 12 media as the base for the &susemgr; 3.1. A kernel virtual machine
+   (kvm) combined with Virtual Machine Manager
+   (<command>virt-manager</command>) will be used as a sandbox for this
+   installation.
+  </para>
+
+  <para>
+   Enter the following settings when creating a new virtual machine using
+   <command>virt-manager</command>.
+  </para>
+
+  <informaltable>
+   <tgroup cols="2">
+    <colspec colname="c1" colwidth="1*" align="left"/>
+    <colspec colname="c2" colwidth="4*" align="left"/>
+    <thead>
+     <row>
+      <entry namest="c1" nameend="c2" align="left">
+       <para>
+        KVM Settings for SLES 12
+       </para>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        Installation Method:
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Local install media (ISO image or CDROM)
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        OS:
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Linux
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Version:
+       </para>
+      </entry>
+      <entry><literal>SLE-12-SP2-Server-x86_64-GM-DVD1.iso</literal></entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Memory:
+       </para>
+      </entry>
+      <entry>
+       <para>
+        4096 MB
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        CPUs:
+       </para>
+      </entry>
+      <entry>
+       <para>
+        2
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Storage Format:
+       </para>
+      </entry>
+      <entry>
+       <para>
+        ISO 3 GB
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Additional Disks:
+       </para>
+      </entry>
+      <entry>
+       <para/>
+       <para>
+        230 GB split between 4 GB swap and 130 GB mounted at
+        <filename>/var/spacewalk/</filename> (Virtual Disk 1) and 50 GB
+        mounted at <filename>/var/lib/pgsql</filename> (Virtual Disk 2)
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Name:
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <literal>example-server</literal>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Network
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Bridge <literal>br0</literal>
+       </para>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </informaltable>
+ </sect1>
+ <sect1 xml:id="sles.installation.within.kvm.media">
+  <title>SLES 12 KVM Settings</title>
+
+  <para>
+   This section provides guidance on installation of &susemgr; utilizing the
+   full installation media with KVM and <command>virt-manager</command>. This
+   section assumes you have previously setup an account with SCC and downloaded
+   the SLES 12 full installation media.
+  </para>
+
+  <procedure>
+   <title>Preparing for SLES 12 Installation</title>
+   <step>
+    <para>
+     In <command>virt-manager</command> select <guimenu>File</guimenu> then
+     <guimenu>New Virtual Machine</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Choose <guimenu>Local install media (ISO image or CDROM).</guimenu>
+    </para>
+   </step>
+   <step>
+    <para>
+     Ensure <guimenu>Use ISO Image</guimenu> is selected then click
+     <guimenu>Browse</guimenu> and locate the full SLES 12 image you
+     downloaded from your SCC account.
+    </para>
+   </step>
+   <step>
+    <para>
+     Configure your machine with at least 4096 MB RAM and a minimum of 2 CPUs.
+    </para>
+   </step>
+   <step>
+    <para>
+     Create a storage device with a minimum of 230 GB storage space for
+     the installation. During the partitioning setup of the SLES 12
+     installation this disk should be partitioned into a 4 GB
+     <literal>swap</literal> a 130 GB partition (or a dedicated virtual
+     disk) for <filename>/var/spacewalk/</filename> (XFS) and an
+     additional 50 GB partition (or a dedicated virtual disk) for
+     <filename>/var/lib/pgsql/</filename> (XFS). The remaining storage
+     space will be used by the operating system.  Select
+     <guimenu>Finish</guimenu> to begin the installation.
+    </para>
+   </step>
+  </procedure>
+
+  <para>
+   Installation of &sls; 12 will begin. For more information on completing an
+   installation of &sls; 12, see
+   <link
+                xlink:href="https://www.suse.com/documentation/sles-12/book_quickstarts/data/sec_sle_installquick.html"
+            />.
+  </para>
+ </sect1>
+ <sect1 xml:id="quickstart3.sec.suma.installation.sles12.sp1.sumaext">
+  <title>Selecting the &susemgr; 3.1 Extension</title>
+
+  <para>
+   During the &sls; 12 installation you will be presented with the
+   <guimenu>Extension and Module Selection</guimenu> (see <xref
+   linkend="fig.suma.installation.sles12.sumaext"/>).  Select the
+   &susemgr; 3.1 Extension and then complete the &sls; 12 installation.
+   <!--
+       This new extension will install &susemgr; 3.1 and configures
+       &susemgr; as a Salt-master by default.
+   -->
+  </para>
+
+  <figure
+         xml:id="fig.suma.installation.sles12.sumaext">
+   <title>Selecting &susemgr; Extension</title>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="manager-extension.png" width="444"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="manager-extension.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+ </sect1>
+</chapter>

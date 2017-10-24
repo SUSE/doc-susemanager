@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ref.webui.salt">
+ <title>Salt</title>
+<!-- index --><indexterm>
+ <primary>Web Interface</primary>
+ <secondary>Salt</secondary></indexterm>
+ <para>
+  Open the <guimenu>Salt</guimenu> menu on the left bar.
+  <guimenu>Keys</guimenu> provides an overview of your Salt minions
+  (clients). Use
+<!-- <guimenu>Bootstrapping</guimenu> to bootstrap
+ systems remotely or -->
+  <guimenu>Remote Commands</guimenu> to execute remote commands on your Salt
+  minions. You can also define a <guimenu>State Catalog</guimenu> for creating
+  a collection of salt system states.
+ </para>
+ <sect1 xml:id="ref.webui.salt.onboarding">
+  <title>Keys</title>
+
+  <para>
+   The <guimenu>Keys</guimenu> page provides a summary of your minions,
+   including their names, fingerprints, state, and actions you may
+   perform on them.
+  </para>
+
+  <para>
+   Once you have pointed a minion to the &susemgr; server as its master within
+   <replaceable>/etc/salt/minion</replaceable>, you can choose to accept or
+   reject a minion from this page.  Either click the check mark or cross
+   in the actions column.
+  </para>
+
+  <figure>
+   <title>Keys Overview</title>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="onboarding.png" width="444"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="onboarding.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+  <para>
+   For more information about key handling and onboarding, see
+   <xref
+    linkend="preparing.and.registering.clients.salt"/>.
+  </para>
+ </sect1>
+ <sect1 xml:id="ref.webui.salt.remote.commands">
+  <title>Remote Commands</title>
+
+<!-- Update the images for running a remote command and add script to fennek -->
+
+  <para>
+   The remote commands page allows you to execute and run commands from the
+   &susemgr; server on several minions.
+  </para>
+
+  <figure>
+   <title>Remote Commands</title>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="remote_commands.png" width="444"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="remote_commands.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+  <warning>
+   <title>Remote Commands Security</title>
+   <para>
+    All commands run from the <guimenu>Remote Commands</guimenu> page are
+    executed as &rootuser; on minions. As you may use wildcards to run commands
+    across any number of systems you must always take extra precaution as this
+    may have drastic consequences for your systems.
+   </para>
+  </warning>
+
+  <para>
+   On the <guimenu>Remote Commands</guimenu> page located under
+   <menuchoice> <guimenu>Salt</guimenu> <guimenu>Remote Commands</guimenu>
+   </menuchoice> you will see two text boxes. The first box is for entering
+   commands. The second box is for targeting minions by name, group or by
+   using wildcards.
+  </para>
+
+  <para>
+   Input a command you want to execute, add a target minion, group or wildcard
+   you want to execute the command on. Select the <guimenu>Find
+   Targets</guimenu> button to verify which machines will be targeted. Select
+   the <guimenu>Run Command</guimenu> button to execute a command on selected
+   systems.
+  </para>
+ </sect1>
+ <sect1 xml:id="ref.webui.salt.states.catalog">
+  <title>State Catalog</title>
+
+  <para>
+   Selecting <menuchoice> <guimenu>Salt</guimenu> <guimenu>State
+   Catalog</guimenu> </menuchoice> presents you with the <guimenu>State
+   Catalog</guimenu> overview. You can use this page to manage custom Salt
+   states. Salt states created on this page may be applied to organizations,
+   groups, and single systems.
+  </para>
+
+  <figure>
+   <title>State Catalog</title>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="state_catalog.png" width="444"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="state_catalog.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+
+<!--Add script to fennek for creating a state with example -->
+
+  <para>
+   Click the <guimenu>Create State</guimenu> button to open the <guimenu>Create
+   State</guimenu> page. On this page you can define custom states which will
+   be stored within the <guimenu>State Catalog</guimenu>. For example, to
+   create a custom state for installation of the apache Web server you would
+   provide a name: <guimenu>Webserver</guimenu> and the state content:
+  </para>
+
+<screen>apache:
+  pkg.installed: []
+  service.running:
+    - require:
+      - pkg: apache</screen>
+
+  <para>
+   When you have finished entering your custom state definition click the
+   <guimenu>Create State</guimenu> button. This will save the state and allow
+   use of this specific state at the minion, group, and organization level.
+  </para>
+
+  <para>
+   To add this state at the individual minion level perform the following
+   actions:
+  </para>
+
+  <procedure>
+   <title>Using a State with a Minion</title>
+   <step>
+    <para>
+     From the <guimenu>Systems</guimenu> overview page, select a salt managed
+     minion. You will be taken to the <guimenu>System Details</guimenu> page.
+    </para>
+   </step>
+   <step>
+    <para>
+     Select <menuchoice> <guimenu>States</guimenu> <guimenu>Custom</guimenu>
+     </menuchoice> from the navigation tabs.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click the search button to look at an overview of all available states, or
+     enter a custom state name to find it within the <guimenu>State
+     Catalog</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Select the <guimenu>Assign</guimenu> check box to assign the state to this
+     minion.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click the <guimenu>Save</guimenu> button to save this assignment to the
+     database. Then click the <guimenu>Apply</guimenu> button to finalize
+     application of the state or states which you have selected.
+    </para>
+   </step>
+  </procedure>
+
+  <note>
+   <title>The Save Button</title>
+   <para>
+    The <guimenu>Save</guimenu> button saves your changes but does not apply
+    the state. If you leave the page after clicking the save button your state
+    will be saved to the database but not yet applied. You must apply states
+    for all minions, groups, or organizations for states to be finalized.
+   </para>
+  </note>
+ </sect1>
+</chapter>

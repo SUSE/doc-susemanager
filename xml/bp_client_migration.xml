@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml"
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         version="5.0"
+         xml:id="bp.client.migration">
+ <title>Client Migration</title>
+
+ <info>
+  <abstract>
+   <para>
+    &susemgr; supports you with upgrading SLE clients to the latest
+    version or SP (service pack).  Upgrading from SLE 12, SLE 12 SP1, or
+    SP2 to SLE 12 SP3 or later (when available) is straight forward.
+    Upgrading from SLE 11 SPx to SLE 12 SP3 or later (when available)
+    requires some additional steps, but can be automated.
+   </para>
+  </abstract>
+ </info>
+
+ <sect1 xml:id="bp.client.migration.sle12">
+  <title>Migrating &sls; 12 or later to version 12 SP3</title>
+  
+  <para>
+   Existing &sls; 12 clients (SLE) may be upgraded to SP3 with the
+   <guimenu>SP Migration</guimenu> procedure provided by the &webui;.
+   The same applies for other supported products based on &sle; 12.
+  </para>
+
+  <warning>
+   <title>Synchronizing Target Channels</title>
+   <para>
+    Before successfully initializing the product migration, you first
+    must make sure that the migration target channels are completely
+    mirrored.  For the upgrade to &sle; 12 SP3, at least the
+    <systemitem>SLES12-SP3-Pool</systemitem> base channel with the
+    <systemitem>SLE-Manager-Tools12-Pool</systemitem> child channel for
+    your architecture is required.  The matching update channels such as
+    <systemitem>SLE-Manager-Tools12-Updates</systemitem> and
+    <systemitem>SLES12-SP3-Updates</systemitem> are recommended.
+   </para>
+  </warning>
+  <procedure>
+   <title>Migrating &sle; 12 Client to SP3</title>
+   <step>
+    <para>
+     Direct your browser to the &susemgr; &webui; where your client is
+     registered, and login.
+    </para>
+   </step>
+   <step>
+    <para>
+     On the
+     <menuchoice><guimenu>Systems</guimenu><guimenu>All</guimenu></menuchoice>
+     page select your client system from the table.
+    </para>
+    <figure xml:id="fig-sles-old-details">
+     <title>Client System Details Page</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_old_details_page.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_old_details_page.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+      
+    <para>
+     If there are <guimenu>Software Updates Available</guimenu> in the
+     <guimenu>System Status</guimenu> notification install these updates
+     first to avoid trouble during the migration process.
+    </para>
+   </step>
+     
+   <step>
+    <para>
+     On the system's detail page (<xref
+     linkend="fig-sles-old-details"/>) select the
+     <guimenu>Software</guimenu> tab, then the <guimenu>SP
+     Migration</guimenu> tab (<xref linkend="fig-sles-old-spmigr"/>).
+    </para>
+    <figure xml:id="fig-sles-old-spmigr">
+     <title>SP Migration Page</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_old_details_spmigration.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_old_details_spmigration.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+
+   </step>
+   
+   <step>
+    <para>
+     On <xref linkend="fig-sles-old-spmigr"/> you will see the installed
+     products listed on your client. Select the wanted <guimenu>Target
+     Products</guimenu> (if there is more than one), which is
+     <systemitem>&sls; 12 SP3</systemitem>.
+    </para>
+    <figure xml:id="fig-sles-migration-target">
+     <title>SP Migration Target</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_migration_target.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_migration_target.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+    <para>
+     Then confirm with <guimenu>Select Channels</guimenu>.
+    </para>
+    <figure xml:id="fig-sles-migration-channels">
+     <title>SP Migration Channels</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_migration_channels.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_migration_channels.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </step>
+   <step>
+    <para>
+     On <xref linkend="fig-sles-migration-channels"/>, <guimenu>Schedule
+     Migration</guimenu>, and on <xref
+     linkend="fig-sles-migration-schedule"/>,
+     <guimenu>Confirm</guimenu>.
+    </para>
+    <figure xml:id="fig-sles-migration-schedule">
+     <title>Schedule Client System Migration</title>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="sles_migration_schedule.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="sles_migration_schedule.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </figure>
+   </step>
+  </procedure>
+  <!-- <result> -->
+  <para>
+   Check the <guimenu>System Status</guimenu> on the system's details
+   when the migration is done.
+  </para>
+  <figure xml:id="fig-sles-migrated">
+   <title>Migrated Client System</title>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="sles_migrated.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="sles_migrated.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </figure>
+  <!-- </result> -->
+  <para>
+   If the <guimenu>System Status</guimenu> notification does not report
+   a successful migration but lists <guimenu>Software Updates
+   Available</guimenu>, install the update now and then check again.
+  </para>
+  <para>
+   Finally, consider to schedule a reboot.
+  </para>
+ </sect1>
+ <!-- FIXME: check this! -->
+ <sect1 xml:id="bp.client.migration.sle11">
+  <title>Migrating &sle; 11 SP3 to version 12 SP3</title>
+
+  <para>
+   &sle; 11 SP3 clients may be auto-upgraded to version 12 SP3 by means
+   of &yast; auto-installation.
+   The same applies for other supported products based on &sle; 11.
+  </para>
+
+  <para>
+   During the procedure, the machine reboots and performs the system
+   upgrade.  The process is controlled by &yast; and &ay;, not by
+   plain <command>zypper</command> commands.
+  </para>
+  <important>
+   <para>
+    Only perform this migration on client systems managed by &susemgr;
+    servers. For upgrading the &susemgr; server itself, see <xref
+    linkend="bp.sp.migration"/>. This is a viable method for major
+    version upgrades such as an upgrade from &sle; 11 to 12.
+   </para>
+  </important>
+
+  <para>
+   Perform the following steps:
+  </para>
+  <procedure xml:id="bp.proc.client.migration.sle11.prep">
+   <title>System Upgrade Preparation</title>
+   <note>
+   <para>
+    Make sure your &susemgr; and all the clients you want to upgrade have
+    installed all available updates, including the &susemgr; tools. This
+    is absolutely necessary, otherwise the system upgrade will fail.
+   </para>
+  </note>
+  <step>
+   <para>
+    On the &susemgr; server, create a local tree with the SLES 12 SP3
+    installation sources. This is needed for booting the clients into
+    the installation or upgrade scenario. For example, download the ISO
+    image of the DVD1 with the installation sources and mount the ISO
+    image as <filename>/mnt/sles12-sp3</filename>:
+   </para>
+<screen>mkdir /mnt/sles12-sp3
+mount -o loop <replaceable>DVD1</replaceable>.iso /mnt/sles12-sp3</screen>
+  </step>
+  <step>
+   <para>
+    Create an auto-installation distribution: For all distributions you want
+    to perform a system upgrade, you need to create a SLE 12 SP3 distribution
+    in &susemgr;. Use the following steps to create one:
+   </para>
+   <substeps performance="required">
+    <step>
+     <para>
+      In the &susemgr; Web interface, click <menuchoice>
+      <guimenu>Systems</guimenu> <guimenu>Autoinstallation</guimenu>
+      <guimenu>Distributions</guimenu> </menuchoice>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Enter a <guimenu>Distribution Label</guimenu> for your distribution
+      (for example, use <literal>summer2017</literal>) as a label and specify the
+      <guimenu>Tree Path</guimenu>, which is the root directory of the
+      &sls; 12 SP3 installation sources (for example, in this case
+      <filename>/mnt/sles12-sp3</filename>). As the <guimenu>Base
+      Channel</guimenu> use the update target distribution
+      <quote>SLES12-SP3-Pool for x86_64</quote>.
+      <!-- FIXME: needed?
+           *** autoupgrade=1 *** ??? -->
+     </para>
+    </step>
+    <step>
+     <para>
+      Confirm with <guimenu>Create Autoinstallable Distribution</guimenu>.
+     </para>
+    </step>
+   </substeps>
+   <para>
+    For more information about Autoinstallation, see <xref
+    linkend="ref.webui.systems.autoinst"/>.
+   </para>
+  </step>
+  <step>
+   <para>
+    Create an activation key for your SLE 12 SP3 systems.
+   </para>
+   <para>
+    In order to switch from the old SLES 11 base channel to the new SLE 12
+    SP3 base channel, you need an activation key. Use the following steps to
+    create it:
+   </para>
+   <substeps performance="required">
+    <step>
+     <para>
+      Go to <menuchoice> <guimenu>Systems</guimenu> <guimenu>Activation
+      Keys</guimenu> </menuchoice> and click <guimenu>Create
+      Key</guimenu>.
+     </para>
+    </step>
+    <step xml:id="st.maintenance-migration.activationkey">
+     <para>
+      Enter a description for your key.
+     </para>
+    </step>
+    <step>
+     <para>
+      Enter a key or leave it blank to generate an automatic key.
+     </para>
+    </step>
+    <step>
+     <para>
+      If you want to limit the usage, enter your value in the
+      <guimenu>Usage</guimenu> text field.
+     </para>
+    </step>
+    <step>
+     <para>
+      Select the <quote>SLES12-SP3-Pool for x86_64</quote> base channel.
+     </para>
+    </step>
+    <step>
+     <para>
+      Decide about <guimenu>Add-On System Types</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click <guimenu>Create Activation Key</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click the <guimenu>Child Channels</guimenu> tab and select the
+      required channels. Finish with <guimenu>Update Key</guimenu>.
+     </para>
+    </step>
+   </substeps>
+  </step>
+<!-- ============================================================ -->
+  <step xml:id="st.maintenance-migration.upload">
+   <para>
+    Upload an &ay; profile.
+   </para>
+   <para/>
+   <substeps performance="required">
+    <step>
+     <para>
+      <!-- FIXME -->
+      Create an &ay; XML file according to
+      <xref linkend="ap-sample-autoinst-system-upgrade"/>.
+     </para>
+     <para>
+      For more information about &ay;, see
+      <xref linkend="ref.webui.systems.autoinst.ay-intro"/>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Go to <menuchoice> <guimenu>Systems</guimenu>
+      <guimenu>Autoinstallation</guimenu> </menuchoice> and click
+      <guimenu>Upload Kickstart/Autoyast File</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Paste the XML content in the text area or select the file to upload.
+      Click <guimenu>Create</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Add <literal>autoupgrade=1</literal> in the <guimenu>Kernel
+      Options</guimenu> of the <guimenu>Details</guimenu> tab and click
+      <guimenu>Update</guimenu>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Switch to the <guimenu>Variable</guimenu> tab.
+     </para>
+    </step>
+    <step>
+     <para>
+      Enter in the text field <literal>registration_key=</literal> and the
+      key from <xref linkend="st.maintenance-migration.activationkey"/>.
+     </para>
+    </step>
+    <step>
+     <para>
+      Click <guimenu>Update Variables</guimenu>.
+     </para>
+    </step>
+   </substeps>
+  </step>
+ </procedure>
+
+ <para>
+  After you have successfully finished the previous procedure,
+  everything is prepared for an upgrade. To upgrade a system, continue
+  with <xref linkend="bp.proc.client.migration.sle11.upgrade"/>.
+ </para>
+
+  <procedure xml:id="bp.proc.client.migration.sle11.upgrade">
+   <title>Upgrading &sls; 11 SP3 to version 12 SP3</title>
+
+  <warning>
+   <title>Synchronizing Target Channels</title>
+   <para>
+    Before successfully initializing the product migration,
+    make sure that the migration target channels are completely
+    mirrored.  For the upgrade to &sle; 12 SP3, at least the
+    <systemitem>SLES12-SP3-Pool</systemitem> base channel with the
+    <systemitem>SLE-Manager-Tools12-Pool</systemitem> child channel for
+    your architecture is required.  The matching update channels such as
+    <systemitem>SLE-Manager-Tools12-Updates</systemitem> and
+    <systemitem>SLES12-SP3-Updates</systemitem> are recommended.
+   </para>
+    <para>
+     For example, watch progress in
+     <filename>/var/log/rhn/reposync/sles12-sp3-pool-x86_64.log</filename>.
+    </para>
+  </warning>
+
+  <step>
+   <para>
+    Go to the system via <guimenu>Systems</guimenu> and click the name of
+    the system. Then on the systems details page, click <menuchoice>
+    <guimenu>Provisioning</guimenu> <guimenu>Autoinstallation</guimenu>
+    <guimenu>Schedule</guimenu> </menuchoice>, and choose the &ay; XML
+    profile you have uploaded in <xref
+    linkend="bp.proc.client.migration.sle11.prep"/>, <xref
+    linkend="st.maintenance-migration.upload"/>.
+   </para>
+  </step>
+  <step>
+   <para>
+    Click <guimenu>Schedule Autoinstallation and Finish</guimenu>.
+   </para>
+<!-- ; see -->
+    <!-- <xref linkend="fig.maint.migration.autoinst.schedule"/>. -->
+    <!-- <figure xml:id="fig.maint.migration.autoinst.schedule">
+  <title>Schedule Autoinstallation (System Upgrade, Offline Migration)</title>
+  <mediaobject>
+   <imageobject role="fo">
+    <imagedata fileref="susemanager_maint_migration_autoinst_schedule.png" width="85%"/>
+   </imageobject>
+   <imageobject role="html">
+    <imagedata fileref="susemanager_maint_migration_autoinst_schedule.png" width="75%"/>
+   </imageobject>
+  </mediaobject>
+ </figure>
+-->
+    <para>
+     Next time the machine asks the &susemgr; server for jobs, it will
+     receive a reinstallation job which fetches kernel and initrd and
+     writes a new <filename>/boot/grub/menu.lst</filename> (containing
+     pointers to the new kernel and initrd).
+    </para>
+    <para>
+     When the machine boots, it will use the &grub; configuration and
+     boots the new kernel with its initrd. No PXE boot is required for
+     this process.  A shutdown of the machine is initiated as well,
+     effectively 3 minutes after the job was fetched.
+    </para>
+  </step>
+  </procedure>
+
+ </sect1>
+
+ <xi:include href="bp_ex_autoinst_system-upgrade.xml"/>
+
+</chapter>

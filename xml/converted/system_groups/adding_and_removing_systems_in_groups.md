@@ -1,0 +1,3 @@
+### Adding and Removing Systems in Groups {#adding-and-removing-systems-in-groups}
+
+Systems can be added and removed from system groups. Clicking the group name takes you to the Details page. The Systems tab shows all systems in the group and allows you to select some or all systems for deletion. Click Remove Systems to remove the selected systems from the group. The Target Systems page shows you all systems that can be added to the group. Select the systems and click the Add Systems button.

@@ -1,0 +1,3818 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en"
+    xml:id="at.mgr.spacecmd.command.guide">
+
+    <title>spacecmd Reference</title>
+
+
+    <sect1 xml:id="at.spacecmd.introduction">
+        <title>Introduction</title>
+        <para>The following section will help you become more familiar with the
+                <command>spacecmd</command> command-line interface. This interface is available for
+            SUSE Manager, Satellite and Spacewalk servers. spacecmd is written in Python and uses
+            the XML-RPC API provided by the server.</para>
+
+        <itemizedlist>
+            <title>What can spacecmd do for me?</title>
+            <listitem>
+                <para>Manage almost all aspects of SUSE Manager from the command line with
+                    spacecmd</para>
+            </listitem>
+            <listitem>
+                <para>Tab completion is available for all commands</para>
+            </listitem>
+            <listitem>
+                <para>Single commands can be passed to spacecmd without entering the interactive
+                    shell (excellent for shell scripts)</para>
+            </listitem>
+            <listitem>
+                <para>May also be accessed and used as an interactive shell</para>
+            </listitem>
+            <listitem>
+                <para>Advanced search methods are available for finding specific systems, thus
+                    removing the need to create system groups (nevertheless groups are still
+                    recommended)</para>
+            </listitem>
+            <listitem>
+                <para>Complete functionality through the Spacewalk API. Almost all commands that can
+                    be executed from the WebUI can be performed via the spacecmd command-line</para>
+            </listitem>
+
+        </itemizedlist>
+
+
+    </sect1>
+
+
+    <sect1 xml:id="at.spacecmd.configuration.overview">
+        <title>Configuring spacecmd</title>
+        <para>The following section provides configuration tips for spacecmd.</para>
+
+        <sect2>
+            <title>Setup Spacecmd Credentials</title>
+            <para>Normally spacecmd prompts you for a username and password each time you attempt to
+                login to the interactive shell. Alternatively you can configure spacecmd with a
+                credentials file to avoid this requirement.</para>
+            <procedure>
+                <title>Creating a spacecmd Credentials File</title>
+                <step>
+                    <para>Create a hidden spacecmd directory in your home directory and set
+                        permissions:</para>
+                    <screen>mkdir ~/.spacecmd
+chmod 700 ~/.spacecmd</screen>
+                </step>
+                <step>
+                    <para>Create a <literal>config</literal> file in
+                            <filename>~/.spacecmd/</filename> and provide proper permissions:</para>
+                    <screen>touch ~/.spacecmd/config
+chmod 600 ~/.spacecmd/config</screen>
+                </step>
+                <step>
+                    <para>Edit the <literal>config</literal> file and add the following
+                        configuration lines. (You can use either localhost or the FQDN of your SUSE
+                        Manager server):</para>
+                    <screen>[spacecmd]
+
+server=FQDN-here
+
+username=username-here
+password=password-here</screen>
+                </step>
+                <step>
+                    <para>Check connectivity by entering <command>spacecmd</command> as root:</para>
+                    <screen># spacecmd</screen>
+                </step>
+            </procedure>
+        </sect2>
+        <sect2>
+            <title>spacecmd Quiet Mode</title>
+            <para>By default spacecmd prints server status messages during connection attempts.
+                These messages can cause a lot of clutter when parsing system lists. The following
+                alias will force spacecmd to use quiet mode thus preventing this behavior. Add the
+                following line to your <literal>~/.bashrc</literal> file:</para>
+            <screen>alias spacecmd='spacecmd -q'</screen>
+        </sect2>
+
+
+        <sect2>
+            <title>spacecmd Help</title>
+            <para>spacecmd help can be access by typing spacecmd <command>-h --help</command></para>
+            <screen>Usage: spacecmd [options] [command]
+
+Options:
+  -u USERNAME, --username=USERNAME
+                        use this username to connect to the server
+  -p PASSWORD, --password=PASSWORD
+                        use this password to connect to the server
+  -s SERVER, --server=SERVER
+                        connect to this server [default: local hostname]
+  --nossl               use HTTP instead of HTTPS
+  --nohistory           do not store command history
+  -y, --yes             answer yes for all questions
+  -q, --quiet           print only error messages
+  -d, --debug           print debug messages (can be passed multiple times)
+  -h, --help            show this help message and exit</screen>
+
+            <para>As root you can access available functions without entering the spacecmd
+                shell:</para>
+            <screen># spacecmd -- help
+        
+        Documented commands (type help &lt;topic&gt;):
+========================================
+activationkey_addchildchannels         org_trustdetails                     
+activationkey_addconfigchannels        package_details                      
+activationkey_addentitlements          package_listdependencies             
+activationkey_addgroups                package_listerrata                   
+activationkey_addpackages              package_listinstalledsystems         
+activationkey_clone                    package_listorphans                  
+activationkey_create                   package_remove                       
+activationkey_delete                   package_removeorphans                
+activationkey_details                  package_search                       
+activationkey_diff                     repo_addfilters                      
+activationkey_disable                  repo_clearfilters                    
+activationkey_disableconfigdeployment  repo_create
+
+...</screen>
+        </sect2>
+        
+    </sect1>
+
+<sect1>
+    <title>Troubleshooting</title>
+    <para>This section provides troubleshooting solutions when working with spacecmd</para>
+    
+    <sect2>
+        <title>Creating a Distribution With spacecmd Sets Localhost Instead of FQDN</title>
+        <para>The support article associated with this issue may be located at:<link xlink:href="https://www.suse.com/support/kb/doc/?id=7018627"/></para>
+        <variablelist>
+            <varlistentry>
+                <term>Situation</term>
+                <listitem>
+                    <para>When creating a distribution with spacecmd it will  automatically set
+                            localhost as the server name instead of the FQDN of SUSE Manager. This
+                            will result in the following kernel option being written:</para><screen>install=http://localhost/ks/dist/&lt;distributionname></screen>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Resolution</term>
+                <listitem>
+                    <para>Set the FQDN in <filename>$HOME/.spacecmd/config</filename> like the following:
+                    </para>
+                    <screen>test:~/.spacecmd # cat config
+[spacecmd]
+server=test.mytest.env
+username=admin
+password=password
+nossl=0</screen>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Cause</term>
+                <listitem>
+                    <para>This problem may be experienced if <filename>$HOME/.spacecmd/config</filename> has been created and the server name option was set to localhost.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+        
+       
+        
+    </sect2>
+        
+</sect1>
+
+
+    <!-- spacecmd Command Reference -->
+    <sect1 xml:id="at.spacecmd.command.reference">
+        <title>spacecmd Functions</title>
+        <para>The following sections provide descriptions for all documented spacecmd commands. Each
+            command is grouped by the function prefix. Keep in mind that all commands may also be
+            called using scripts and passed to spacecmd as stand-alone commands. </para>
+
+
+        <!-- activationkey_ -->
+        <sect2 xml:id="at.spacecmd.activationkey">
+            <title>activationkey_</title>
+            <para>The following spacecmd commands are available for use with activation keys.</para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>activationkey_addchildchannels</term>
+                    <listitem>
+                        <para>Add child channels to an activation key.</para>
+                        <screen>usage: activationkey_addchildchannels KEY &lt;CHANNEL ...&gt;</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_addconfigchannels</term>
+                    <listitem>
+                        <para>Add configuration channels to an activation key.</para>
+                        <screen>usage: activationkey_addconfigchannels KEY &lt;CHANNEL ...&gt; [options]
+
+options:
+  -t add channels to the top of the list
+  -b add channels to the bottom of the list</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>activationkey_addentitlements</term>
+                    <listitem>
+                        <para>Add available entitlements to an activation key.</para>
+                        <note>
+                            <title>WebUI Name Change</title>
+                            <para>In the WebUI entitlements are known as System Types. Nevertheless
+                                the spacecmd backend still utilizes the entitlements term. Therefore
+                                any scripts you may be using can remain unchanged.</para>
+                        </note>
+                        <screen>usage: activationkey_addentitlements KEY &lt;ENTITLEMENT ...&gt;</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_addgroups</term>
+                    <listitem>
+                        <para>Add existing groups to an activation key.</para>
+                        <screen>usage: activationkey_addgroups KEY &lt;GROUP ...&gt;</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_addpackages</term>
+                    <listitem>
+                        <para>Add packages to an activation key.</para>
+                        <screen>usage: activationkey_addpackages KEY &lt;PACKAGE ...&gt;</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_clone</term>
+                    <listitem>
+                        <para>Clone an existing activation key.</para>
+                        <screen>usage examples:
+                 activationkey_clone foo_key -c bar_key
+                 activationkey_clone foo_key1 foo_key2 -c prefix
+                 activationkey_clone foo_key -x "s/foo/bar"
+                 activationkey_clone foo_key1 foo_key2 -x "s/foo/bar"
+
+options:
+  -c CLONE_NAME  : Name of the resulting key, treated as a prefix for multiple
+                   keys
+  -x "s/foo/bar" : Optional regex replacement, replaces foo with bar in the
+                   clone description, base-channel label, child-channel
+                   labels, config-channel names </screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_create</term>
+                    <listitem>
+                        <para>Create a new activation key.</para>
+                        <screen>usage: activationkey_create [options]
+
+options:
+  -n NAME
+  -d DESCRIPTION
+  -b BASE_CHANNEL
+  -u set key as universal default
+  -e [enterprise_entitled,virtualization_host]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_delete</term>
+                    <listitem>
+                        <para>Delete an existing activation key.</para>
+                        <screen>usage: activationkey_delete KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_details</term>
+                    <listitem>
+                        <para>Show details of an existing activation key.</para>
+                        <screen>usage: activationkey_details KEY ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_diff</term>
+                    <listitem>
+                        <para>Check the difference between two activation keys.</para>
+                        <screen>usage: activationkey_diff SOURCE_ACTIVATIONKEY TARGET_ACTIVATIONKEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_disable</term>
+                    <listitem>
+                        <para>Disable an existing activation key.</para>
+                        <screen>usage: activationkey_disable KEY [KEY ...]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term/>
+                    <listitem>
+                        <para>Disable configuration channel deployment for an existing activation
+                            key.</para>
+                        <screen>usage: activationkey_disableconfigdeployment KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_enable</term>
+                    <listitem>
+                        <para>Enable an existing activation key.</para>
+                        <screen>usage: activationkey_enable KEY [KEY ...]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_enableconfigdeployment</term>
+                    <listitem>
+                        <para>Enable configuration channel deployment for an existing activation
+                            key.</para>
+                        <screen>usage: activationkey_enableconfigdeployment KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_export</term>
+                    <listitem>
+                        <para>Export activation key(s) to a JSON formatted file.</para>
+                        <screen>usage: activationkey_export [options] [&lt;KEY&gt; ...]
+
+options:
+    -f outfile.json : specify an output filename, defaults to &lt;KEY&gt;.json
+                      if exporting a single key, akeys.json for multiple keys,
+                      or akey_all.json if no KEY specified (export ALL)
+
+Note : KEY list is optional, default is to export ALL keys </screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_import</term>
+                    <listitem>
+                        <para>Import activation key(s) from JSON file(s)</para>
+                        <screen>usage: activationkey_import &lt;JSONFILE ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_list</term>
+                    <listitem>
+                        <para>List all existing activation keys.</para>
+                        <screen>usage: activationkey_list</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listbasechannel</term>
+                    <listitem>
+                        <para>List the base channel associated with an activation key.</para>
+                        <screen>usage: activationkey_listbasechannel KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listchildchannels</term>
+                    <listitem>
+                        <para>List child channels associated with an activation key.</para>
+                        <screen>usage: activationkey_listchildchannels KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listconfigchannels</term>
+                    <listitem>
+                        <para>List configuration channels associated with an activation key.</para>
+                        <screen>usage: activationkey_listconfigchannels KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listentitlements</term>
+                    <listitem>
+                        <para>List entitlements associated with an activation key.</para>
+                        <screen>usage: activationkey_listentitlements KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listgroups</term>
+                    <listitem>
+                        <para>List groups associated with an activation key</para>
+                        <screen>usage: activationkey_listgroups KEY
+</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listpackages</term>
+                    <listitem>
+                        <para>List packages associated with an activation key.</para>
+                        <screen>usage: activationkey_listpackages KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_listsystems</term>
+                    <listitem>
+                        <para>List systems registered with an activation key.</para>
+                        <screen>usage: activationkey_listsystems KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removechildchannels</term>
+                    <listitem>
+                        <para>Remove child channels from an activation key.</para>
+                        <screen>usage: activationkey_removechildchannels KEY &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removeconfigchannels</term>
+                    <listitem>
+                        <para>Remove configuration channels from an activation key.</para>
+                        <screen>usage: activationkey_removeconfigchannels KEY &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removeentitlements</term>
+                    <listitem>
+                        <para>Remove entitlements from an activation key.</para>
+                        <screen>usage: activationkey_removeentitlements KEY &lt;ENTITLEMENT ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removegroups</term>
+                    <listitem>
+                        <para> Remove groups from an activation key.</para>
+                        <screen>usage: activationkey_removegroups KEY &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_removepackages</term>
+                    <listitem>
+                        <para>Remove packages from an activation key.</para>
+                        <screen>usage: activationkey_removepackages KEY &lt;PACKAGE ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setbasechannel</term>
+                    <listitem>
+                        <para>Set the base channel for an activation key.</para>
+                        <screen>usage: activationkey_setbasechannel KEY CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setconfigchannelorder</term>
+                    <listitem>
+                        <para>Set the ranked order of configuration channels.</para>
+                        <screen>usage: activationkey_setconfigchannelorder KEY</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setcontactmethod</term>
+                    <listitem>
+                        <para>Set the contact method to use for systems registered with a specific
+                            key. (Use the XML-RPC API to access the latest contact methods.) The
+                            following contact methods are available for use with traditional
+                            spacecmd: ['default', 'ssh-push', 'ssh-push-tunnel']</para>
+                        <screen>usage: activationkey_setcontactmethod KEY CONTACT_METHOD</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setdescription</term>
+                    <listitem>
+                        <para>Add a description for an activation key.</para>
+                        <screen>usage: activationkey_setdescription KEY DESCRIPTION</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setuniversaldefault</term>
+                    <listitem>
+                        <para>Set a specific key as the universal default. </para>
+                        <screen>usage: activationkey_setuniversaldefault KEY</screen>
+                        <warning>
+                            <title>Universal Default Key</title>
+                            <para>Using a universal default key is not a Best Practice
+                                recommendation.</para>
+                        </warning>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>activationkey_setusagelimit</term>
+                    <listitem>
+                        <para>Set the usage limit of an activation key, can be a number or
+                            "unlimited".</para>
+                        <screen>usage: activationkey_setbasechannel KEY &lt;usage limit>
+usage: activationkey_setbasechannel KEY unlimited</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+            <tip>
+                <title>Usage Limits</title>
+                <para>Usage limits are only applicable to traditionally managed systems. Currently
+                    usage limits do not apply to Salt or foreign managed systems.</para>
+            </tip>
+
+        </sect2>
+
+        <!-- api_ -->
+        <sect2 xml:id="at.spacecmd.api">
+            <title>api</title>
+            <para>The following API command and its options are available for calling the XML-RPC
+                API directly. Calling the API directly allows you to use the latest features in SUSE
+                Manager from the command-line using spacecmd as a wrapper for stand-alone commands
+                or used from within scripts. </para>
+            <note>
+                <title>Use the api Command for Access to Latest Features</title>
+                <para>spacecmd is the traditional tool for spacewalk. It functions out of the box
+                    with SUSE Manager but you should know that latest features (eg. Salt) are often
+                    excluded from traditional spacecmd command-line tool. To gain access to the
+                    latest feature additions call <command>api api.getApiCallList</command> from
+                    within spacecmd to list all currently available API commands formatted in json.
+                    You can then call these commands directly.</para>
+            </note>
+            <variablelist>
+                <varlistentry>
+                    <term>api</term>
+                    <listitem>
+                        <para>Call XML-RPC API with arguments directly.</para>
+                        <screen>usage: api [options] API_STRING
+
+options:
+  -A, --args  Arguments for the API other than session id in comma separated
+              strings or JSON expression
+  -F, --format   Output format
+  -o, --output   Output file
+
+examples:
+  api api.getApiCallList
+  api --args "sysgroup_A" systemgroup.listSystems
+  api -A "rhel-i386-server-5,2011-04-01,2011-05-01" -F "%(name)s" \
+      channel.software.listAllPackages</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- clear -->
+        <sect2 xml:id="at.spacecmd.clear">
+            <title>clear</title>
+            <para>Clears the terminal screen</para>
+        </sect2>
+
+        <!-- clear_caches -->
+        <sect2 xml:id="at.spacecmd.clearcaches">
+            <title>clear_caches</title>
+            <para>Clear the internal caches kept for systems and packages</para>
+            <screen>usage: clear_caches</screen>
+        </sect2>
+
+        <!-- configchannel_ -->
+        <sect2 xml:id="at.spacecmd.configchannel">
+            <title>configchannel_</title>
+            <para>The following spacecmd commands are available for use with configuration
+                channels.</para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>configchannel_addfile</term>
+                    <listitem>
+                        <para>Creates a configuration file.</para>
+                        <screen>usage: configchannel_addfile [CHANNEL] [options]
+
+options:
+  -c CHANNEL
+  -p PATH
+  -r REVISION
+  -o OWNER [default: root]
+  -g GROUP [default: root]
+  -m MODE [defualt: 0644]
+  -x SELINUX_CONTEXT
+  -d path is a directory
+  -s path is a symlink
+  -b path is a binary (or other file which needs base64 encoding)
+  -t SYMLINK_TARGET
+  -f local path to file contents
+
+  Note re binary/base64: Some text files, notably those containing trailing
+  newlines, those containing ASCII escape characters (or other charaters not
+  allowed in XML) need to be sent as binary (-b).  Some effort is made to auto-
+  detect files which require this, but you may need to explicitly specify.</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>configchannel_backup</term>
+                    <listitem>
+                        <para>Backup a configuration channel.</para>
+                        <screen>usage: configchannel_backup CHANNEL [OUTDIR]
+
+OUTDIR defaults to $HOME/spacecmd-backup/configchannel/YYYY-MM-DD/CHANNEL
+</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>configchannel_clone</term>
+                    <listitem>
+                        <para>Clone configuration channel(s).</para>
+                        <screen>usage examples:
+                 configchannel_clone foo_label -c bar_label
+                 configchannel_clone foo_label1 foo_label2 -c prefix
+                 configchannel_clone foo_label -x "s/foo/bar"
+                 configchannel_clone foo_label1 foo_label2 -x "s/foo/bar"
+
+options:
+  -c CLONE_LABEL : name/label of the resulting cc (note does not update
+                   description, see -x option), treated as a prefix if
+                   multiple keys are passed
+  -x "s/foo/bar" : Optional regex replacement, replaces foo with bar in the
+                   clone name, label and description
+  Note : If no -c or -x option is specified, interactive is assumed</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>configchannel_create</term>
+                    <listitem>
+                        <para>Create a configuration channel.</para>
+                        <screen>usage: configchannel_create [options]
+
+options:
+  -n NAME
+  -l LABEL
+  -d DESCRIPTION</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>configchannel_delete</term>
+                    <listitem>
+                        <para>Delete a configuration channel.</para>
+                        <screen>usage: configchannel_delete CHANNEL ...</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_details</term>
+                    <listitem>
+                        <para>Show the details of a configuration channel.</para>
+                        <screen>usage: configchannel_details CHANNEL ...</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_diff</term>
+                    <listitem>
+                        <para>Find differences between configuration channels.</para>
+                        <screen>usage: configchannel_diff SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_export</term>
+                    <listitem>
+                        <para>Export configuration channel(s) to a json formatted file.</para>
+                        <screen>usage: configchannel_export &lt;CHANNEL>... [options]
+options:
+    -f outfile.json : specify an output filename, defaults to &lt;CHANNEL>.json
+                      if exporting a single channel, ccs.json for multiple
+                      channels, or cc_all.json if no CHANNEL specified
+                      e.g (export ALL)
+
+Note : CHANNEL list is optional, default is to export ALL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_filedetails</term>
+                    <listitem>
+                        <para>Show the details of a file in a configuration channel.</para>
+                        <screen>usage: configchannel_filedetails CHANNEL FILE [REVISION]</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_forcedeploy</term>
+                    <listitem>
+                        <para>Forces a redeployment of files within a channel on all subscribed
+                            systems.</para>
+                        <screen>usage: configchannel_forcedeploy CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_import</term>
+                    <listitem>
+                        <para>Import configuration channel(s) from a json file.</para>
+                        <screen>usage: configchannel_import &lt;JSONFILES...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_list</term>
+                    <listitem>
+                        <para>List all configuration channels.</para>
+                        <screen>usage: configchannel_list</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_listfiles</term>
+                    <listitem>
+                        <para>List all files in a configuration channel.</para>
+                        <screen>usage: configchannel_listfiles CHANNEL ...</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_listsystems</term>
+                    <listitem>
+                        <para>List all systems subscribed to a configuration channel.</para>
+                        <screen>usage: configchannel_listsystems CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_removefiles</term>
+                    <listitem>
+                        <para>Remove configuration files.</para>
+                        <screen>usage: configchannel_removefile CHANNEL &lt;FILE ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_sync</term>
+                    <listitem>
+                        <para>Sync configuration files between two configuration channels.</para>
+                        <screen>usage: configchannel_sync SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_updatefile</term>
+                    <listitem>
+                        <para>Update a configuration file.</para>
+                        <screen>usage: configchannel_updatefile CHANNEL FILE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>configchannel_verifyfile</term>
+                    <listitem>
+                        <para>Verify a configuration file.</para>
+                        <screen>usage: configchannel_verifyfile CHANNEL FILE &lt;SYSTEMS>
+
+&lt;SYSTEMS> may be substituted with any of the following targets:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- cryptokey_ -->
+        <sect2 xml:id="at.spacecmd.cryptokey">
+            <title>cryptokey_</title>
+            <para>The following spacecmd commands are available for use with cryptographic
+                keys.</para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>cryptokey_create</term>
+                    <listitem>
+                        <para>Create a cryptographic key.</para>
+                        <screen>usage: cryptokey_create [options]
+
+options:
+  -t GPG or SSL
+  -d DESCRIPTION
+  -f KEY_FILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>cryptokey_delete</term>
+                    <listitem>
+                        <para>Delete a cryptographic key.</para>
+                        <screen>usage: cryptokey_delete NAME</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>cryptokey_details</term>
+                    <listitem>
+                        <para>Show the contents of a cryptographic key.</para>
+                        <screen>usage: cryptokey_details KEY ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>cryptokey_list</term>
+                    <listitem>
+                        <para>List all cryptographic keys (SSL, GPG).</para>
+                        <screen>usage: cryptokey_list</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- custominfo_ -->
+        <sect2 xml:id="at.spacecmd.custominfo">
+            <title>custominfo_</title>
+            <para>The following spacecmd commands are available for working with custom keys.</para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>custominfo_createkey</term>
+                    <listitem>
+                        <para>Create a custom key.</para>
+                        <screen>usage: custominfo_createkey [NAME] [DESCRIPTION]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>custominfo_deletekey</term>
+                    <listitem>
+                        <para>Delete a custom key.</para>
+                        <screen>usage: custominfo_deletekey KEY ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>custominfo_details</term>
+                    <listitem>
+                        <para>Show the details of a custom key.</para>
+                        <screen>usage: custominfo_details KEY ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>custominfo_listkeys</term>
+                    <listitem>
+                        <para>List all custom keys.</para>
+                        <screen>usage: custominfo_listkeys</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>custominfo_updatekey</term>
+                    <listitem>
+                        <para>Update a custom key.</para>
+                        <screen>usage: custominfo_updatekey [NAME] [DESCRIPTION]</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- distribution_ -->
+        <sect2 xml:id="at.spacecmd.distribution">
+            <title>distribution_</title>
+            <para>The following spacecmd commands are available for working with kickstart
+                distributions.</para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>distribution_create</term>
+                    <listitem>
+                        <para>Create a Kickstart tree.</para>
+                        <screen>usage: distribution_create [options]
+
+options:
+  -n NAME
+  -p path to tree
+  -b base channel to associate with
+  -t install type [fedora|rhel_4/5/6|suse|generic_rpm]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>distribution_delete</term>
+                    <listitem>
+                        <para>Delete a Kickstart tree.</para>
+                        <screen>usage: distribution_delete LABEL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>distribution_details</term>
+                    <listitem>
+                        <para>Show the details of a Kickstart tree.</para>
+                        <screen>usage: distribution_details LABEL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>distribution_list</term>
+                    <listitem>
+                        <para>List the available autoinstall trees.</para>
+                        <screen>usage: distribution_list</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>distribution_rename</term>
+                    <listitem>
+                        <para>Rename a Kickstart tree.</para>
+                        <screen>usage: distribution_rename OLDNAME NEWNAME</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>distribution_update</term>
+                    <listitem>
+                        <para>Update the path of a Kickstart tree.</para>
+                        <screen>usage: distribution_update NAME [options]
+
+options:
+  -p path to tree
+  -b base channel to associate with
+  -t install type [fedora|rhel_4/5/6|suse|generic_rpm]</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- errata_ -->
+        <sect2 xml:id="at.spacecmd.errata">
+            <title>errata_</title>
+            <para>The following spacecmd commands are available for use with errata data.</para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>errata_apply</term>
+                    <listitem>
+                        <para>Apply an patch to all affected systems.</para>
+                        <screen>usage: errata_apply ERRATA|search:XXX ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_delete</term>
+                    <listitem>
+                        <para>Delete an patch.</para>
+                        <screen>usage: errata_delete ERRATA|search:XXX ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_details</term>
+                    <listitem>
+                        <para>Show the details of an patch.</para>
+                        <screen>usage: errata_details ERRATA|search:XXX ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_findbycve</term>
+                    <listitem>
+                        <para>List errata addressing a CVE.</para>
+                        <screen>usage: errata_findbycve CVE-YYYY-NNNN ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_list</term>
+                    <listitem>
+                        <para>List all patches.</para>
+                        <screen>usage: errata_list</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_listaffectedsystems</term>
+                    <listitem>
+                        <para>List of systems affected by an patch.</para>
+                        <screen>usage: errata_listaffectedsystems ERRATA|search:XXX ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_listcves</term>
+                    <listitem>
+                        <para>List of CVEs addressed by an patch.</para>
+                        <screen>usage: errata_listcves ERRATA|search:XXX ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_publish</term>
+                    <listitem>
+                        <para>Publish an patch to a channel.</para>
+                        <screen>usage: errata_publish ERRATA|search:XXX &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_search</term>
+                    <listitem>
+                        <para>List patches that meet user provided criteria</para>
+                        <screen>usage: errata_search CVE|RHSA|RHBA|RHEA|CLA ...
+
+Example:
+> errata_search CVE-2009:1674
+> errata_search RHSA-2009:1674</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>errata_summary</term>
+                    <listitem>
+                        <para>Print a summary of all errata.</para>
+                        <screen>usage: errata_summary</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- filepreservation_ -->
+        <sect2 xml:id="at.spacecmd.kickstart.filepreservation">
+            <title>filepreservation_</title>
+            <para>The following spacecmd commands are available for working with kickstart file
+                preservation lists.</para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>filepreservation_create</term>
+                    <listitem>
+                        <para>Create a file preservation list.</para>
+                        <screen>usage: filepreservation_create [NAME] [FILE ...]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>filepreservation_delete</term>
+                    <listitem>
+                        <para>Delete a file preservation list.</para>
+                        <screen>filepreservation_delete NAME</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>filepreservation_details</term>
+                    <listitem>
+                        <para>Show the details of a file preservation list.</para>
+                        <screen>usage: filepreservation_details NAME</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>filepreservation_list</term>
+                    <listitem>
+                        <para>List all file preservations.</para>
+                        <screen>usage: filepreservation_list</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- get_ -->
+        <sect2 xml:id="at.spacecmd.get">
+            <title>get_</title>
+            <para/>
+
+            <variablelist>
+                <varlistentry>
+                    <term>get_apiversion</term>
+                    <listitem>
+                        <para>Display the API version of the server.</para>
+                        <screen>usage: get_apiversion</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>get_certificateexpiration</term>
+                    <listitem>
+                        <para>Print the expiration date of the server's entitlement
+                            certificate.</para>
+                        <screen>usage: get_certificateexpiration</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>get_serverversion</term>
+                    <listitem>
+                        <para>Display SUSE Manager server version.</para>
+                        <screen>usage: get_serverversion</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>get_session</term>
+                    <listitem>
+                        <para>Show the current session string.</para>
+                        <screen>usage: get_session</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- group_ -->
+        <sect2 xml:id="at.spacecmd.group">
+            <title>group_</title>
+            <para/>
+
+            <variablelist>
+                <varlistentry>
+                    <term>group_addsystems</term>
+                    <listitem>
+                        <para>Add systems to a group.</para>
+                        <screen>usage: group_addsystems GROUP &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>group_backup</term>
+                    <listitem>
+                        <para>Backup a system group.</para>
+                        <screen>usage: group_backup NAME [OUTDIR]
+
+OUTDIR defaults to $HOME/spacecmd-backup/group/YYYY-MM-DD/NAME</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>group_create</term>
+                    <listitem>
+                        <para>Create a system group.</para>
+                        <screen>usage: group_create [NAME] [DESCRIPTION]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>group_delete</term>
+                    <listitem>
+                        <para>Delete a system group.</para>
+                        <screen>usage: group_delete NAME ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>group_details</term>
+                    <listitem>
+                        <para>Show the details of a system group.</para>
+                        <screen>usage: group_details GROUP ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>group_list</term>
+                    <listitem>
+                        <para>List available system groups.</para>
+                        <screen>usage: group_list</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>group_listsystems</term>
+                    <listitem>
+                        <para>List the members of a group.</para>
+                        <screen>usage: group_listsystems GROUP</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>group_removesystems</term>
+                    <listitem>
+                        <para>Remove systems from a group.</para>
+                        <screen>usage: group_removesystems GROUP &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>group_restore</term>
+                    <listitem>
+                        <para>Restore a system group.</para>
+                        <screen>usage: group_backup INPUTDIR [NAME] ...</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- help -->
+        <sect2 xml:id="at.spacecmd.help">
+            <title>help</title>
+            <remark>Add link to this section from intro for an overview of commands.</remark>
+            <para>List all available spacecmd commands with the help function. Check for additional
+                help on a specific function by calling for example:<command>user_create
+                    --help</command>.</para>
+            <screen>Documented commands (type help &lt;topic>):
+========================================
+activationkey_addchildchannels         org_trustdetails                     
+activationkey_addconfigchannels        package_details                      
+activationkey_addentitlements          package_listdependencies             
+activationkey_addgroups                package_listerrata                   
+activationkey_addpackages              package_listinstalledsystems         
+activationkey_clone                    package_listorphans                  
+activationkey_create                   package_remove                       
+activationkey_delete                   package_removeorphans                
+activationkey_details                  package_search                       
+activationkey_diff                     repo_addfilters                      
+activationkey_disable                  repo_clearfilters                    
+activationkey_disableconfigdeployment  repo_create                          
+activationkey_enable                   repo_delete                          
+activationkey_enableconfigdeployment   repo_details                         
+activationkey_export                   repo_list                            
+activationkey_import                   repo_listfilters                     
+activationkey_list                     repo_removefilters                   
+activationkey_listbasechannel          repo_rename                          
+activationkey_listchildchannels        repo_setfilters                      
+activationkey_listconfigchannels       repo_updatessl                       
+activationkey_listentitlements         repo_updateurl                       
+activationkey_listgroups               report_duplicates                    
+activationkey_listpackages             report_errata                        
+activationkey_listsystems              report_inactivesystems               
+activationkey_removechildchannels      report_ipaddresses                   
+activationkey_removeconfigchannels     report_kernels                       
+activationkey_removeentitlements       report_outofdatesystems              
+activationkey_removegroups             report_ungroupedsystems              
+activationkey_removepackages           scap_getxccdfscandetails             
+activationkey_setbasechannel           scap_getxccdfscanruleresults         
+activationkey_setconfigchannelorder    scap_listxccdfscans                  
+activationkey_setcontactmethod         scap_schedulexccdfscan               
+activationkey_setdescription           schedule_cancel                      
+activationkey_setuniversaldefault      schedule_details                     
+activationkey_setusagelimit            schedule_getoutput                   
+api                                    schedule_list                        
+clear                                  schedule_listarchived                
+clear_caches                           schedule_listcompleted               
+configchannel_addfile                  schedule_listfailed                  
+configchannel_backup                   schedule_listpending                 
+configchannel_clone                    schedule_reschedule                  
+configchannel_create                   snippet_create                       
+configchannel_delete                   snippet_delete                       
+configchannel_details                  snippet_details                      
+configchannel_diff                     snippet_list                         
+configchannel_export                   snippet_update                       
+configchannel_filedetails              softwarechannel_adderrata            
+configchannel_forcedeploy              softwarechannel_adderratabydate      
+configchannel_import                   softwarechannel_addpackages          
+configchannel_list                     softwarechannel_addrepo              
+configchannel_listfiles                softwarechannel_clone                
+configchannel_listsystems              softwarechannel_clonetree            
+configchannel_removefiles              softwarechannel_create               
+configchannel_sync                     softwarechannel_delete               
+configchannel_updatefile               softwarechannel_details              
+configchannel_verifyfile               softwarechannel_diff                 
+cryptokey_create                       softwarechannel_errata_diff          
+cryptokey_delete                       softwarechannel_errata_sync          
+cryptokey_details                      softwarechannel_getorgaccess         
+cryptokey_list                         softwarechannel_list                 
+custominfo_createkey                   softwarechannel_listallpackages      
+custominfo_deletekey                   softwarechannel_listbasechannels     
+custominfo_details                     softwarechannel_listchildchannels    
+custominfo_listkeys                    softwarechannel_listerrata           
+custominfo_updatekey                   softwarechannel_listerratabydate     
+distribution_create                    softwarechannel_listlatestpackages   
+distribution_delete                    softwarechannel_listpackages         
+distribution_details                   softwarechannel_listrepos            
+distribution_list                      softwarechannel_listsyncschedule     
+distribution_rename                    softwarechannel_listsystems          
+distribution_update                    softwarechannel_mirrorpackages       
+errata_apply                           softwarechannel_regenerateneededcache
+errata_delete                          softwarechannel_regenerateyumcache   
+errata_details                         softwarechannel_removeerrata         
+errata_findbycve                       softwarechannel_removepackages       
+errata_list                            softwarechannel_removerepo           
+errata_listaffectedsystems             softwarechannel_removesyncschedule   
+errata_listcves                        softwarechannel_setorgaccess         
+errata_publish                         softwarechannel_setsyncschedule      
+errata_search                          softwarechannel_sync                 
+errata_summary                         softwarechannel_syncrepos            
+filepreservation_create                ssm_add                              
+filepreservation_delete                ssm_clear                            
+filepreservation_details               ssm_intersect                        
+filepreservation_list                  ssm_list                             
+get_apiversion                         ssm_remove                           
+get_certificateexpiration              system_addchildchannels              
+get_serverversion                      system_addconfigchannels             
+get_session                            system_addconfigfile                 
+group_addsystems                       system_addcustomvalue                
+group_backup                           system_addentitlements               
+group_create                           system_addnote                       
+group_delete                           system_applyerrata                   
+group_details                          system_comparepackageprofile         
+group_list                             system_comparepackages               
+group_listsystems                      system_comparewithchannel            
+group_removesystems                    system_createpackageprofile          
+group_restore                          system_delete                        
+help                                   system_deletecrashes                 
+history                                system_deletenotes                   
+kickstart_addactivationkeys            system_deletepackageprofile          
+kickstart_addchildchannels             system_deployconfigfiles             
+kickstart_addcryptokeys                system_details                       
+kickstart_addfilepreservations         system_getcrashfiles                 
+kickstart_addoption                    system_installpackage                
+kickstart_addpackages                  system_list                          
+kickstart_addscript                    system_listbasechannel               
+kickstart_addvariable                  system_listchildchannels             
+kickstart_clone                        system_listconfigchannels            
+kickstart_create                       system_listconfigfiles               
+kickstart_delete                       system_listcrashedsystems            
+kickstart_details                      system_listcrashesbysystem           
+kickstart_diff                         system_listcustomvalues              
+kickstart_disableconfigmanagement      system_listentitlements              
+kickstart_disableremotecommands        system_listerrata                    
+kickstart_enableconfigmanagement       system_listevents                    
+kickstart_enablelogging                system_listhardware                  
+kickstart_enableremotecommands         system_listinstalledpackages         
+kickstart_export                       system_listnotes                     
+kickstart_getcontents                  system_listpackageprofiles           
+kickstart_getsoftwaredetails           system_listupgrades                  
+kickstart_getupdatetype                system_lock                          
+kickstart_import                       system_reboot                        
+kickstart_import_raw                   system_removechildchannels           
+kickstart_importjson                   system_removeconfigchannels          
+kickstart_list                         system_removecustomvalues            
+kickstart_listactivationkeys           system_removeentitlement             
+kickstart_listchildchannels            system_removepackage                 
+kickstart_listcryptokeys               system_rename                        
+kickstart_listcustomoptions            system_runscript                     
+kickstart_listoptions                  system_schedulehardwarerefresh       
+kickstart_listpackages                 system_schedulepackagerefresh        
+kickstart_listscripts                  system_search                        
+kickstart_listvariables                system_setbasechannel                
+kickstart_removeactivationkeys         system_setconfigchannelorder         
+kickstart_removechildchannels          system_setcontactmethod              
+kickstart_removecryptokeys             system_show_packageversion           
+kickstart_removefilepreservations      system_syncpackages                  
+kickstart_removeoptions                system_unlock                        
+kickstart_removepackages               system_updatecustomvalue             
+kickstart_removescript                 system_upgradepackage                
+kickstart_removevariables              toggle_confirmations                 
+kickstart_rename                       user_adddefaultgroup                 
+kickstart_setcustomoptions             user_addgroup                        
+kickstart_setdistribution              user_addrole                         
+kickstart_setlocale                    user_create                          
+kickstart_setpartitions                user_delete                          
+kickstart_setselinux                   user_details                         
+kickstart_setupdatetype                user_disable                         
+kickstart_updatevariable               user_enable                          
+list_proxies                           user_list                            
+login                                  user_listavailableroles              
+logout                                 user_removedefaultgroup              
+org_addtrust                           user_removegroup                     
+org_create                             user_removerole                      
+org_delete                             user_setemail                        
+org_details                            user_setfirstname                    
+org_list                               user_setlastname                     
+org_listtrusts                         user_setpassword                     
+org_listusers                          user_setprefix                       
+org_removetrust                        whoami                               
+org_rename                             whoamitalkingto                      
+            
+
+Miscellaneous help topics:
+==========================
+time  systems  ssm</screen>
+        </sect2>
+
+        <!-- history -->
+        <sect2 xml:id="at.spacecmd.history">
+            <title>history</title>
+            <para>List recent commands using the <command>history</command> command.</para>
+            <screen>spacecmd {SSM:0}> history
+   1  help
+   2  api
+   3  exit
+   4  help
+   5  time --help
+   6  quit
+   7  clear
+spacecmd {SSM:0}> </screen>
+        </sect2>
+
+        <!-- kickstart_ -->
+        <sect2 xml:id="at.spacecmd.kickstart">
+            <title>kickstart_</title>
+            <para>The following spacecmd functions are available for use with kickstart. </para>
+
+            <variablelist>
+                <varlistentry>
+                    <term>kickstart_addactivationkeys</term>
+                    <listitem>
+                        <para>Add activation keys to a Kickstart profile.</para>
+                        <screen>usage: kickstart_addactivationkeys PROFILE &lt;KEY ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_addchildchannels</term>
+                    <listitem>
+                        <para>Add a child channels to a Kickstart profile.</para>
+                        <screen>usage: kickstart_addchildchannels PROFILE &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_addcryptokeys</term>
+                    <listitem>
+                        <para>Add cryptography keys to a Kickstart profile.</para>
+                        <screen>usage: kickstart_addcryptokeys PROFILE &lt;KEY ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_addfilepreservations</term>
+                    <listitem>
+                        <para>Add file preservations to a Kickstart profile.</para>
+                        <screen>usage: kickstart_addfilepreservations PROFILE &lt;FILELIST ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_addoption</term>
+                    <listitem>
+                        <para>Set an option for a Kickstart profile.</para>
+                        <screen>usage: kickstart_addoption PROFILE KEY [VALUE]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_addpackages</term>
+                    <listitem>
+                        <para>Add packages to a Kickstart profile.</para>
+                        <screen>usage: kickstart_addpackages PROFILE &lt;PACKAGE ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_addscript</term>
+                    <listitem>
+                        <para>Add a script to a Kickstart profile.</para>
+                        <screen>usage: kickstart_addscript PROFILE [options]
+
+options:
+  -p PROFILE
+  -e EXECUTION_TIME ['pre', 'post']
+  -i INTERPRETER
+  -f FILE
+  -c execute in a chroot environment
+  -t ENABLING_TEMPLATING</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_addvariable</term>
+                    <listitem>
+                        <para>Add a variable to a Kickstart profile.</para>
+                        <screen>usage: kickstart_addvariable PROFILE KEY VALUE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_clone</term>
+                    <listitem>
+                        <para>Clone a Kickstart profile.</para>
+                        <screen>usage: kickstart_clone [options]
+
+options:
+  -n NAME
+  -c CLONE_NAME</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_create</term>
+                    <listitem>
+                        <para>Create a Kickstart profile.</para>
+                        <screen>usage: kickstart_create [options]
+
+options:
+  -n NAME
+  -d DISTRIBUTION
+  -p ROOT_PASSWORD
+  -v VIRT_TYPE ['none', 'para_host', 'qemu', 'xenfv', 'xenpv']</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_delete</term>
+                    <listitem>
+                        <para>Delete kickstart profile(s).</para>
+                        <screen>usage: kickstart_delete PROFILE
+usage: kickstart_delete PROFILE1 PROFILE2
+usage: kickstart_delete "PROF*"</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_details</term>
+                    <listitem>
+                        <para>Show the details of a Kickstart profile.</para>
+                        <screen>usage: kickstart_details PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_diff</term>
+                    <listitem>
+                        <para>List differences between two kickstart files.</para>
+                        <screen>usage: kickstart_diff SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_disableconfigmanagement</term>
+                    <listitem>
+                        <para>Disable configuration management on a Kickstart profile.</para>
+                        <screen>usage: kickstart_disableconfigmanagement PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_disableremotecommands</term>
+                    <listitem>
+                        <para>Disable remote commands on a Kickstart profile.</para>
+                        <screen>usage: kickstart_disableremotecommands PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_enableconfigmanagement</term>
+                    <listitem>
+                        <para>Enable configuration management on a Kickstart profile.</para>
+                        <screen>usage: kickstart_enableconfigmanagement PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_enablelogging</term>
+                    <listitem>
+                        <para>Enable logging for a Kickstart profile.</para>
+                        <screen>usage: kickstart_enablelogging PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_enableremotecommands</term>
+                    <listitem>
+                        <para>Enable remote commands on a Kickstart profile.</para>
+                        <screen>usage: kickstart_enableremotecommands PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_export</term>
+                    <listitem>
+                        <para>Export kickstart profile(s) to json formatted file.</para>
+                        <screen>usage: kickstart_export &lt;KSPROFILE>... [options]
+options:
+    -f outfile.json : specify an output filename, defaults to &lt;KSPROFILE>.json
+                      if exporting a single kickstart, profiles.json for multiple
+                      kickstarts, or ks_all.json if no KSPROFILE specified
+                      e.g (export ALL)
+
+Note : KSPROFILE list is optional, default is to export ALL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_getcontents</term>
+                    <listitem>
+                        <para>Show the contents of a Kickstart profile as they would be presented to
+                            a client.</para>
+                        <screen>usage: kickstart_getcontents LABEL</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_getsoftwaredetails</term>
+                    <listitem>
+                        <para>Gets kickstart profile software details.</para>
+                        <screen>usage: kickstart_getsoftwaredetails KS_LABEL
+usage: kickstart_getsoftwaredetails KS_LABEL KS_LABEL2 ...</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_getupdatetype</term>
+                    <listitem>
+                        <para>Get the update type for a kickstart profile(s).</para>
+                        <screen>usage: kickstart_getupdatetype PROFILE
+usage: kickstart_getupdatetype PROFILE1 PROFILE2
+usage: kickstart_getupdatetype "PROF*"</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_import</term>
+                    <listitem>
+                        <para>Import a Kickstart profile from a file.</para>
+                        <screen>usage: kickstart_import [options]
+
+options:
+  -f FILE
+  -n NAME
+  -d DISTRIBUTION
+  -v VIRT_TYPE ['none', 'para_host', 'qemu', 'xenfv', 'xenpv']</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_import_raw</term>
+                    <listitem>
+                        <para>Import a raw Kickstart or autoyast profile from a file.</para>
+                        <screen>usage: kickstart_import_raw [options]
+
+options:
+  -f FILE
+  -n NAME
+  -d DISTRIBUTION
+  -v VIRT_TYPE ['none', 'para_host', 'qemu', 'xenfv', 'xenpv']</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_importjson</term>
+                    <listitem>
+                        <para>Import kickstart profile(s) from json file.</para>
+                        <screen>usage: kickstart_import &lt;JSONFILES...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_list</term>
+                    <listitem>
+                        <para>List the available Kickstart profiles.</para>
+                        <screen>usage: kickstart_list</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_listactivationkeys</term>
+                    <listitem>
+                        <para>List the activation keys associated with a Kickstart profile.</para>
+                        <screen>usage: kickstart_listactivationkeys PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_listchildchannels</term>
+                    <listitem>
+                        <para>List the child channels of a Kickstart profile.</para>
+                        <screen>usage: kickstart_listchildchannels PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_listcryptokeys</term>
+                    <listitem>
+                        <para>List the crypto keys associated with a Kickstart profile.</para>
+                        <screen>usage: kickstart_listcryptokeys PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_listcustomoptions</term>
+                    <listitem>
+                        <para>List the custom options of a Kickstart profile.</para>
+                        <screen>usage: kickstart_listcustomoptions PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_listoptions</term>
+                    <listitem>
+                        <para>List the options of a Kickstart profile.</para>
+                        <screen>usage: kickstart_listoptions PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_listpackages</term>
+                    <listitem>
+                        <para>List the packages for a Kickstart profile.</para>
+                        <screen>usage: kickstart_listpackages PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_listscripts</term>
+                    <listitem>
+                        <para>List the scripts for a Kickstart profile.</para>
+                        <screen>usage: kickstart_listscripts PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_listvariables</term>
+                    <listitem>
+                        <para>List the variables of a Kickstart profile.</para>
+                        <screen>usage: kickstart_listvariables PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_removeactivationkeys</term>
+                    <listitem>
+                        <para>Remove activation keys from a Kickstart profile.</para>
+                        <screen>usage: kickstart_removeactivationkeys PROFILE &lt;KEY ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_removechildchannels</term>
+                    <listitem>
+                        <para>Remove child channels from a Kickstart profile.</para>
+                        <screen>usage: kickstart_removechildchannels PROFILE &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_removecryptokeys</term>
+                    <listitem>
+                        <para>Remove crypto keys from a Kickstart profile.</para>
+                        <screen>usage: kickstart_removecryptokeys PROFILE &lt;KEY ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_removefilepreservations</term>
+                    <listitem>
+                        <para>Remove file preservations from a Kickstart profile.</para>
+                        <screen>usage: kickstart_removefilepreservations PROFILE &lt;FILE ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_removeoptions</term>
+                    <listitem>
+                        <para>Remove options from a Kickstart profile.</para>
+                        <screen>usage: kickstart_removeoptions PROFILE &lt;OPTION ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_removepackages</term>
+                    <listitem>
+                        <para>Remove packages from a Kickstart profile.</para>
+                        <screen>usage: kickstart_removepackages PROFILE &lt;PACKAGE ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_removescript</term>
+                    <listitem>
+                        <para>Add a script to a Kickstart profile.</para>
+                        <screen>usage: kickstart_removescript PROFILE [ID]</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_removevariables</term>
+                    <listitem>
+                        <para>Remove variables from a Kickstart profile.</para>
+                        <screen>usage: kickstart_removevariables PROFILE &lt;KEY ...></screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_rename</term>
+                    <listitem>
+                        <para>Rename a Kickstart profile</para>
+                        <screen>usage: kickstart_rename OLDNAME NEWNAME</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_setcustomoptions</term>
+                    <listitem>
+                        <para>Set custom options for a Kickstart profile.</para>
+                        <screen>usage: kickstart_setcustomoptions PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_setdistribution</term>
+                    <listitem>
+                        <para>Set the distribution for a Kickstart profile.</para>
+                        <screen>usage: kickstart_setdistribution PROFILE DISTRIBUTION</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_setlocale</term>
+                    <listitem>
+                        <para>Set the locale for a Kickstart profile.</para>
+                        <screen>usage: kickstart_setlocale PROFILE LOCALE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_setpartitions</term>
+                    <listitem>
+                        <para>Set the partitioning scheme for a Kickstart profile.</para>
+                        <screen>usage: kickstart_setpartitions PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_setselinux</term>
+                    <listitem>
+                        <para>Set the SELinux mode for a Kickstart profile.</para>
+                        <screen>usage: kickstart_setselinux PROFILE MODE</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_setupdatetype</term>
+                    <listitem>
+                        <para>Set the update type for a kickstart profile(s).</para>
+                        <screen>usage: kickstart_setupdatetype [options] KS_LABEL
+
+options:
+    -u UPDATE_TYPE ['red_hat', 'all', 'none']</screen>
+                    </listitem>
+                </varlistentry>
+
+                <varlistentry>
+                    <term>kickstart_updatevariable</term>
+                    <listitem>
+                        <para>Update a variable in a Kickstart profile.</para>
+                        <screen>usage: kickstart_updatevariable PROFILE KEY VALUE</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- list_proxies -->
+        <sect2 xml:id="at.spacecmd.list.proxies">
+            <title>list_proxies</title>
+            <para>The following spacecmd function is available for listing proxies.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>list_proxies</term>
+                    <listitem>
+                        <para>List the proxies within the user's organization.</para>
+                        <screen>usage: list_proxies</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- login -->
+        <sect2 xml:id="at.spacecmd.login">
+            <title>login</title>
+            <para>Connect as a specific user to the SUSE manager server.</para>
+            <screen># spacecmd -- login &lt;USERNAME&gt;</screen>
+        </sect2>
+
+        <!-- logout -->
+        <sect2 xml:id="at.spacecmd.logout">
+            <title>logout</title>
+            <para>Logout from server as the current user.</para>
+            <screen># spacecmd -- logout</screen>
+        </sect2>
+
+        <!-- org_ -->
+        <sect2 xml:id="at.spacecmd.org">
+            <title>org_</title>
+            <para>The following spacecmd functions are available for use with organizations.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>org_addtrust</term>
+                    <listitem>
+                        <para>Add a trust between two organizations</para><screen>usage: org_addtrust YOUR_ORG ORG_TO_TRUST</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_create</term>
+                    <listitem>
+                        <para>Create an organization.</para><screen>usage: org_create [options]
+
+options:
+  -n ORG_NAME
+  -u USERNAME
+  -P PREFIX (Dr., Mr., Miss, Mrs., Ms.)
+  -f FIRST_NAME
+  -l LAST_NAME
+  -e EMAIL
+  -p PASSWORD
+  --pam enable PAM authentication</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_delete</term>
+                    <listitem>
+                        <para>Delete an organization.</para><screen>usage: org_delete NAME</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_details</term>
+                    <listitem>
+                        <para>Show the details of an organization.</para><screen>usage: org_details NAME</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_list</term>
+                    <listitem>
+                        <para>List all organizations.</para><screen>usage: org_list</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_listtrusts</term>
+                    <listitem>
+                        <para>List an organization's trusts.</para><screen>org_listtrusts NAME</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_listusers</term>
+                    <listitem>
+                        <para>List an organization's users.</para><screen>org_listusers NAME</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_removetrust</term>
+                    <listitem>
+                        <para>Remove a trust between two organizations.</para><screen>usage: org_removetrust YOUR_ORG TRUSTED_ORG</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_rename</term>
+                    <listitem>
+                        <para>Rename an organization.</para><screen>usage: org_rename OLDNAME NEWNAME</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>org_trustdetails</term>
+                    <listitem>
+                        <para>Show the details of an organizational trust.</para><screen>usage: org_trustdetails TRUSTED_ORG</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- package_ -->
+        <sect2 xml:id="at.spacecmd.package">
+            <title>package_</title>
+            <para>The following spacecmd functions are available for working with packages.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>package_details</term>
+                    <listitem>
+                        <para>Show the details of a software package.</para>
+                        <screen>usage: package_details PACKAGE ...</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>package_listdependencies</term>
+                    <listitem>
+                        <para>List the dependencies for a package.</para>
+                        <screen>usage: package_listdependencies PACKAGE</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>package_listerrata</term>
+                    <listitem>
+                        <para>List the errata that provide this package.</para>
+                        <screen>usage: package_listerrata PACKAGE ...</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>package_listinstalledsystems</term>
+                    <listitem>
+                        <para>List the systems with a package installed.</para>
+                        <screen>usage: package_listinstalledsystems PACKAGE ...</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>package_listorphans</term>
+                    <listitem>
+                        <para>List packages that are not in a channel.</para>
+                        <screen>usage: package_listorphans</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>package_remove</term>
+                    <listitem>
+                        <para>Remove a package from SUSE Manager/Satellite</para>
+                        <screen>usage: package_remove PACKAGE ...</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>package_removeorphans</term>
+                    <listitem>
+                        <para>Remove packages that are not in a channel.</para>
+                        <screen>usage: package_removeorphans</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>package_search</term>
+                    <listitem>
+                        <para>Find packages that meet the given criteria.</para>
+                        <screen>usage: package_search NAME|QUERY
+
+Example: package_search kernel
+
+Advanced Search:
+Available Fields: name, epoch, version, release, arch, description, summary
+Example: name:kernel AND version:2.6.18 AND -description:devel</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- repo_ -->
+        <sect2 xml:id="at.spacecmd.repo">
+            <title>repo_</title>
+            <para>The following spacecmd functions are available for working with repositories.</para>
+            
+            <variablelist>
+                <varlistentry>
+                    <term>repo_addfilters</term>
+                    <listitem>
+                        <para>Add filters for a user repository.</para>
+                        <screen>usage: repo_addfilters repo &lt;filter ...></screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_clearfilters</term>
+                    <listitem>
+                        <para>Clears the filters for a user repository.</para>
+                        <screen>usage: repo_clearfilters repo</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_create</term>
+                    <listitem>
+                        <para>Create a user repository.</para>
+                        <screen>usage: repo_create &lt;options>
+
+options:
+  -n, --name   name of repository
+  -u, --url    url of repository
+
+  --ca         SSL CA certificate (not required)
+  --cert       SSL Client certificate (not required)
+  --key        SSL Client key (not required)</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_delete</term>
+                    <listitem>
+                        <para>Delete a user repository.</para>
+                        <screen>usage: repo_delete &lt;repo ...></screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_details</term>
+                    <listitem>
+                        <para>Show the details of a user repository.</para>
+                        <screen>usage: repo_details &lt;repo ...></screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_list</term>
+                    <listitem>
+                        <para>List all available user repository.</para>
+                        <screen>usage: repo_list</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_listfilters</term>
+                    <listitem>
+                        <para>Show the filters for a user repository.</para>
+                        <screen>usage: repo_listfilters repo</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_removefilters</term>
+                    <listitem>
+                        <para>Remove filters from a user repository.</para>
+                        <screen>usage: repo_removefilters repo &lt;filter ...></screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_rename</term>
+                    <listitem>
+                        <para>Rename a user repository.</para>
+                        <screen>usage: repo_rename OLDNAME NEWNAME</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_setfilters</term>
+                    <listitem>
+                        <para>Set the filters for a user repo.</para>
+                        <screen>usage: repo_setfilters repo &lt;filter ...></screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_updatessl</term>
+                    <listitem>
+                        <para>Change the SSL certificates of a user repository.</para>
+                        <screen>usage: repo_updatessl &lt;options>
+options:
+  --ca         SSL CA certificate (not required)
+  --cert       SSL Client certificate (not required)
+  --key        SSL Client key (not required)</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>repo_updateurl</term>
+                    <listitem>
+                        <para>Change the URL of a user repository.</para>
+                        <screen>usage: repo_updateurl &lt;repo> &lt;url></screen>
+                    </listitem>
+                </varlistentry>
+                
+                
+            </variablelist>
+        </sect2>
+
+        <!-- report_ -->
+        <sect2 xml:id="at.spacecmd.report">
+            <title>report_</title>
+            <para>The following spacecmd functions are available for working with reports.</para>
+            <variablelist>
+            <varlistentry>
+                <term>report_duplicates</term>
+                <listitem>
+                    <para>List duplicate system profiles.</para>
+                    <screen>usage: report_duplicates</screen>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term>report_errata</term>
+                <listitem>
+                    <para>List all errata and how many systems they affect.</para>
+                    <screen>usage: report_errata [ERRATA|search:XXX ...]</screen>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term>report_inactivesystems</term>
+                <listitem>
+                    <para>List all inactive systems.</para>
+                    <screen>usage: report_inactivesystems [DAYS]</screen>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term>report_ipaddresses</term>
+                <listitem>
+                    <para>List the hostname and IP of each system.</para>
+                    <screen>usage: report_network [&lt;SYSTEMS>]
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term>report_kernels</term>
+                <listitem>
+                    <para>List the running kernel of each system.</para>
+                    <screen>usage: report_kernels [&lt;SYSTEMS>]
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term>report_outofdatesystems</term>
+                <listitem>
+                    <para>List all out-of-date systems.</para>
+                    <screen>usage: report_outofdatesystems</screen>
+                </listitem>
+            </varlistentry>
+            
+            <varlistentry>
+                <term>report_ungroupedsystems</term>
+                <listitem>
+                    <para>List all ungrouped systems.</para>
+                    <screen>usage: report_ungroupedsystems</screen>
+                </listitem>
+            </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- scap_ -->
+        <sect2 xml:id="at.spacecmd.scap">
+            <title>scap_</title>
+            <para>The following spacecmd functions are available for working with OpenSCAP.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>scap_getxccdfscandetails</term>
+                    <listitem>
+                        <para>Get details of given OpenSCAP XCCDF scan.</para>
+                        <screen>usage: scap_getxccdfscandetails &lt;XID></screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>scap_getxccdfscanruleresults</term>
+                    <listitem>
+                        <para>Return a full list of RuleResults for given OpenSCAP XCCDF
+                            scan.</para>
+                        <screen>usage: scap_getxccdfscanruleresults &lt;XID></screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>scap_listxccdfscans</term>
+                    <listitem>
+                        <para>Return a list of finished OpenSCAP scans for given systems.</para>
+                        <screen>usage: scap_listxccdfscans &lt;SYSTEMS></screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>scap_schedulexccdfscan</term>
+                    <listitem>
+                        <para>Schedule Scap XCCDF scan.</para>
+                        <screen>usage: scap_schedulexccdfscan PATH_TO_XCCDF_FILE XCCDF_OPTIONS SYSTEMS
+
+Example:
+> scap_schedulexccdfscan '/usr/share/openscap/scap-security-xccdf.xml' 'profile Web-Default' \
+system-scap.example.com</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- schedule_ -->
+        <sect2 xml:id="at.spacecmd.schedule">
+            <title>schedule_</title>
+            <para>The following spacecmd functions are available for working with scheduling.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>schedule_cancel</term>
+                    <listitem>
+                        <para>Cancel a scheduled action.</para><screen>usage: schedule_cancel ID|* ...</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>schedule_details</term>
+                    <listitem>
+                        <para>Show the details of a scheduled action.</para><screen>usage: schedule_details ID</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>schedule_getoutput</term>
+                    <listitem>
+                        <para>Show the output from an action.</para><screen>usage: schedule_getoutput ID</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>schedule_list</term>
+                    <listitem>
+                        <para>List all actions.</para><screen>usage: schedule_list [BEGINDATE] [ENDDATE]
+
+Dates can be any of the following:
+Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
+
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
+
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>schedule_listarchived</term>
+                    <listitem>
+                        <para>List archived actions.</para><screen>usage: schedule_listarchived [BEGINDATE] [ENDDATE]
+
+Dates can be any of the following:
+Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
+
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
+
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>schedule_listcompleted</term>
+                    <listitem>
+                        <para>List completed actions.</para><screen>Dates can be any of the following:
+Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
+
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
+
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>schedule_listfailed</term>
+                    <listitem>
+                        <para>List failed actions.</para><screen>usage: schedule_listfailed [BEGINDATE] [ENDDATE]
+
+Dates can be any of the following:
+Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
+
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
+
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>schedule_listpending</term>
+                    <listitem>
+                        <para>List pending actions.</para><screen>usage: schedule_listpending [BEGINDATE] [ENDDATE]
+
+Dates can be any of the following:
+Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
+
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
+
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>schedule_reschedule</term>
+                    <listitem>
+                        <para>Reschedule failed actions.</para><screen>usage: schedule_reschedule ID|* ...</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- snippet_ -->
+        <sect2 xml:id="at.spacecmd.snippet">
+            <title>snippet_</title>
+            <para>The following spacecmd functions are available for working with Kickstart
+                snippets.</para>
+            
+           <variablelist>
+               <varlistentry>
+                   <term>snippet_create</term>
+                   <listitem>
+                       <para>Create a Kickstart snippet</para><screen>usage: snippet_create [options]
+
+options:
+  -n NAME
+  -f FILE</screen>
+                   </listitem>
+               </varlistentry>
+               
+               <varlistentry>
+                   <term>snippet_delete</term>
+                   <listitem>
+                       <para>Delete a Kickstart snippet.</para><screen>usage: snippet_removefile NAME</screen>
+                   </listitem>
+               </varlistentry>
+               
+               <varlistentry>
+                   <term>snippet_details</term>
+                   <listitem>
+                       <para>Show the contents of a snippet.</para><screen>usage: snippet_details SNIPPET ...</screen>
+                   </listitem>
+               </varlistentry>
+               
+               <varlistentry>
+                   <term>snippet_list</term>
+                   <listitem>
+                       <para>List the available Kickstart snippets.</para><screen>usage: snippet_list</screen>
+                   </listitem>
+               </varlistentry>
+               
+               <varlistentry>
+                   <term>snippet_update</term>
+                   <listitem>
+                       <para>Update a Kickstart snippet.</para><screen>usage: snippet_update NAME</screen>
+                   </listitem>
+               </varlistentry>
+           </variablelist>
+        </sect2>
+
+        <!-- softwarechannel_ -->
+        <sect2 xml:id="at.spacecmd.softwarechannel">
+            <title>softwarechannel_</title>
+            <para>The following spacecmd functions are available for working with software
+                channels.</para>
+            
+            <variablelist>
+                <varlistentry>
+                    <term>softwarechannel_adderrata</term>
+                    <listitem>
+                        <para>Add patches from one channel into another channel.</para><screen>usage: softwarechannel_adderrata SOURCE DEST &lt;ERRATA|search:XXX ...>
+Options:
+    -q/--quick : Don't display list of packages (slightly faster)
+    -s/--skip :  Skip errata which appear to exist already in DEST</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_adderratabydate</term>
+                    <listitem>
+                        <para>Add errata from one channel into another channel based on a date
+                            range.</para><screen>usage: softwarechannel_adderratabydate [options] SOURCE DEST BEGINDATE ENDDATE
+Date format : YYYYMMDD
+Options:
+        -p/--publish : Publish errata to the channel (don't clone)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_addpackages</term>
+                    <listitem>
+                        <para>Add packages to a software channel.</para><screen>usage: softwarechannel_addpackages CHANNEL &lt;PACKAGE ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_addrepo</term>
+                    <listitem>
+                        <para>Add a repo to a software channel.</para><screen>usage: softwarechannel_addrepo CHANNEL REPO</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_clone</term>
+                    <listitem>
+                        <para>Clone a software channel.</para><screen>usage: softwarechannel_clone [options]
+
+options:
+  -s SOURCE_CHANNEL
+  -n NAME
+  -l LABEL
+  -p PARENT_CHANNEL
+  --gpg-copy/-g (copy SOURCE_CHANNEL GPG details)
+  --gpg-url GPG_URL
+  --gpg-id GPG_ID
+  --gpg-fingerprint GPG_FINGERPRINT
+  -o do not clone any patches
+  --regex/-x "s/foo/bar" : Optional regex replacement,
+        replaces foo with bar in the clone name and label</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_clonetree</term>
+                    <listitem>
+                        <para>Clone a software channel and its child channels.</para><screen>usage: softwarechannel_clonetree [options]A
+             e.g    softwarechannel_clonetree foobasechannel -p "my_"
+                    softwarechannel_clonetree foobasechannel -x "s/foo/bar"
+                    softwarechannel_clonetree foobasechannel -x "s/^/my_"
+
+options:
+  -s/--source-channel SOURCE_CHANNEL
+  -p/--prefix PREFIX (is prepended to the label and name of all channels)
+  --gpg-copy/-g (copy GPG details for correspondoing source channel))
+  --gpg-url GPG_URL (applied to all channels)
+  --gpg-id GPG_ID (applied to all channels)
+  --gpg-fingerprint GPG_FINGERPRINT (applied to all channels)
+  -o do not clone any errata
+  --regex/-x "s/foo/bar" : Optional regex replacement,
+        replaces foo with bar in the clone name, label and description</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_create</term>
+                    <listitem>
+                        <para>Create a software channel.</para><screen>usage: softwarechannel_create [options]
+
+options:
+  -n NAME
+  -l LABEL
+  -p PARENT_CHANNEL
+  -a ARCHITECTURE ['ia32', 'ia64', 'x86_64', 'ppc',
+                  'i386-sun-solaris', 'sparc-sun-solaris']
+  -c CHECKSUM ['sha1', 'sha256', 'sha384', 'sha512']
+  -u GPG_URL
+  -i GPG_ID
+  -f GPG_FINGERPRINT</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_delete</term>
+                    <listitem>
+                        <para>Delete a software channel.</para><screen>usage: softwarechannel_delete &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_details</term>
+                    <listitem>
+                        <para>Show the details of a software channel.</para><screen>usage: softwarechannel_details &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_diff</term>
+                    <listitem>
+                        <para>Check the difference between software channels.</para><screen>usage: softwarechannel_diff SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_errata_diff</term>
+                    <listitem>
+                        <para>Check the difference between software channel files.</para><screen>usage: softwarechannel_errata_diff SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_errata_sync</term>
+                    <listitem>
+                        <para>Sync errata of two software channels.</para><screen>usage: softwarechannel_errata_sync SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_getorgaccess</term>
+                    <listitem>
+                        <para>Get the org-access for the software channel.</para><screen>usage : softwarechannel_getorgaccess : get org access for all channels
+usage : softwarechannel_getorgaccess &lt;channel_label(s)> : get org access for specific channel(s)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_list</term>
+                    <listitem>
+                        <para>List all available software channels.</para><screen>usage: softwarechannel_list [options]'
+options:
+  -v verbose (display label and summary)
+  -t tree view (pretty-print child-channels)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listallpackages</term>
+                    <listitem>
+                        <para>List all packages in a channel.</para><screen>usage: softwarechannel_listallpackages CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listbasechannels</term>
+                    <listitem>
+                        <para>List all base software channels.</para><screen>usage: softwarechannel_listbasechannels [options]
+options:
+  -v verbose (display label and summary)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listchildchannels</term>
+                    <listitem>
+                        <para>List child software channels.</para><screen>usage:
+softwarechannel_listchildchannels [options]
+softwarechannel_listchildchannels : List all child channels
+softwarechannel_listchildchannels CHANNEL : List children for a specific base channel
+options:
+ -v verbose (display label and summary)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listerrata</term>
+                    <listitem>
+                        <para>List the errata associated with a software channel.</para><screen>usage: softwarechannel_listerrata &lt;CHANNEL ...> [from=yyyymmdd [to=yyyymmdd]]</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listerratabydate</term>
+                    <listitem>
+                        <para>List errata from channelbased on a date range.</para><screen>usage: softwarechannel_listerratabydate CHANNEL BEGINDATE ENDDATE
+Date format : YYYYMMDD</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listlatestpackages</term>
+                    <listitem>
+                        <para>List the newest version of all packages in a channel.</para><screen>usage: softwarechannel_listlatestpackages CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listpackages</term>
+                    <listitem>
+                        <para>List the most recent packages available from a software
+                            channel.</para><screen>usage: softwarechannel_listpackages CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listrepos</term>
+                    <listitem>
+                        <para>List the repos for a software channel.</para><screen>usage: softwarechannel_listrepos CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listsyncschedule</term>
+                    <listitem>
+                        <para>List sync schedules for all software channels.</para><screen>usage: softwarechannel_listsyncschedule : List all channels</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_listsystems</term>
+                    <listitem>
+                        <para>List all systems subscribed to a software channel.</para><screen>usage: softwarechannel_listsystems CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_mirrorpackages</term>
+                    <listitem>
+                        <para>Download packages of a given channel.</para><screen>usage: softwarechannel_mirrorpackages CHANNEL
+Options:
+    -l/--latest : Only mirror latest package version</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_regenerateneededcache</term>
+                    <listitem>
+                        <para>Regenerate the needed errata and package cache for all systems.</para><screen>usage: softwarechannel_regenerateneededcache</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_regenerateyumcache</term>
+                    <listitem>
+                        <para>Regenerate the YUM cache for a software channel.</para><screen>usage: softwarechannel_regenerateyumcache &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_removeerrata</term>
+                    <listitem>
+                        <para>Remove patches from a software channel.</para><screen>usage: softwarechannel_removeerrata CHANNEL &lt;ERRATA:search:XXX ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_removepackages</term>
+                    <listitem>
+                        <para>Remove packages from a software channel.</para><screen>usage: softwarechannel_removepackages CHANNEL &lt;PACKAGE ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_removerepo</term>
+                    <listitem>
+                        <para>Remove a repo from a software channel.</para><screen>usage: softwarechannel_removerepo CHANNEL REPO</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_removesyncschedule</term>
+                    <listitem>
+                        <para>Removes the repo sync schedule for a software channel.</para><screen>usage: softwarechannel_setsyncschedule &lt;CHANNEL></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_setorgaccess</term>
+                    <listitem>
+                        <para>Set the org-access for the software channel.</para><screen>usage : softwarechannel_setorgaccess &lt;channel_label> [options]
+-d,--disable : disable org access (private, no org sharing)
+-e,--enable : enable org access (public access to all trusted orgs)</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_setsyncschedule</term>
+                    <listitem>
+                        <para>Sets the repo sync schedule for a software channel.</para><screen>usage: softwarechannel_setsyncschedule &lt;CHANNEL> &lt;SCHEDULE>
+
+The schedule is specified in Quartz CronTrigger format without enclosing quotes.
+For example, to set a schedule of every day at 1am, &lt;SCHEDULE> would be 0 0 1 * * ?</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_sync</term>
+                    <listitem>
+                        <para>Sync the packages of two software channels.</para><screen>usage: softwarechannel_sync SOURCE_CHANNEL TARGET_CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>softwarechannel_syncrepos</term>
+                    <listitem>
+                        <para>Sync users repos for a software channel.</para><screen>usage: softwarechannel_syncrepos &lt;CHANNEL ...></screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- ssm_ -->
+        <sect2 xml:id="at.spacecmd.ssm">
+            <title>ssm_</title>
+            <para>The following spacecmd functions are available for use with System Set
+                Manager.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>ssm_add</term>
+                    <listitem>
+                        <para>Add systems to the SSM.</para><screen>usage: ssm_add &lt;SYSTEMS>
+
+see 'help ssm' for more details
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ssm_clear</term>
+                    <listitem>
+                        <para>Remove all systems from the SSM.</para><screen>usage: ssm_clear</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ssm_intersect</term>
+                    <listitem>
+                        <para>Replace the current SSM with the intersection of the current list of
+                            systems and the list of systems passed as arguments.</para><screen>usage: ssm_intersect &lt;SYSTEMS>
+
+see 'help ssm' for more details
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ssm_list</term>
+                    <listitem>
+                        <para>List the systems currently in the SSM.</para><screen>usage: ssm_list
+
+see 'help ssm' for more details</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>ssm_remove</term>
+                    <listitem>
+                        <para>Remove systems from the SSM.</para><screen>usage: ssm_remove &lt;SYSTEMS>
+
+see 'help ssm' for more details
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- system_ -->
+        <sect2 xml:id="at.spacecmd.system">
+            <title>system_</title>
+            <para>The following spacecmd functions are available for use with systems.</para>
+            
+            <variablelist>
+                <varlistentry>
+                    <term>system_addchildchannels</term>
+                    <listitem>
+                        <para>Add child channels to a system.</para><screen>usage: system_addchildchannels &lt;SYSTEMS> &lt;CHANNEL ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>system_addconfigchannels</term>
+                    <listitem>
+                        <para>Add config channels to a system.</para><screen>usage: system_addconfigchannels &lt;SYSTEMS> &lt;CHANNEL ...> [options]
+
+options:
+  -t add channels to the top of the list
+  -b add channels to the bottom of the list
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>system_addconfigfile</term>
+                    <listitem>
+                        <para>Create a configuration file.</para><screen>Note this is only for system sandbox or locally-managed files
+Centrally managed files should be created via configchannel_addfile
+usage: system_addconfigfile [SYSTEM] [options]
+
+options:
+  -S/--sandbox : list only system-sandbox files
+  -L/--local   : list only locally managed files
+  -p PATH
+  -r REVISION
+  -o OWNER [default: root]
+  -g GROUP [default: root]
+  -m MODE [defualt: 0644]
+  -x SELINUX_CONTEXT
+  -d path is a directory
+  -s path is a symlink
+  -b path is a binary (or other file which needs base64 encoding)
+  -t SYMLINK_TARGET
+  -f local path to file contents
+
+  Note re binary/base64: Some text files, notably those containing trailing
+  newlines, those containing ASCII escape characters (or other charaters not
+  allowed in XML) need to be sent as binary (-b).  Some effort is made to auto-
+  detect files which require this, but you may need to explicitly specify.</screen>
+                    </listitem>
+                </varlistentry>
+                
+                <varlistentry>
+                    <term>system_addcustomvalue</term>
+                    <listitem>
+                        <para>Set a custom value for a system.</para><screen>usage: system_addcustomvalue KEY VALUE &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_addentitlements</term>
+                    <listitem>
+                        <para>Add entitlements to a system.</para><screen>usage: system_addentitlements &lt;SYSTEMS> ENTITLEMENT
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_addnote</term>
+                    <listitem>
+                        <para>Set a note for a system.</para><screen>usage: system_addnote &lt;SYSTEM> [options]
+
+options:
+  -s SUBJECT
+  -b BODY
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_applyerrata</term>
+                    <listitem>
+                        <para>Apply errata to a system.</para><screen>usage: system_applyerrata &lt;SYSTEMS> [ERRATA|search:XXX ...]
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_comparepackageprofile</term>
+                    <listitem>
+                        <para>Compare a system against a package profile.</para><screen>usage: system_comparepackageprofile &lt;SYSTEMS> PROFILE
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_comparepackages</term>
+                    <listitem>
+                        <para>Compare the packages between two systems.</para><screen>usage: system_comparepackages SOME_SYSTEM ANOTHER_SYSTEM</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_comparewithchannel</term>
+                    <listitem>
+                        <para>Compare the installed packages on a system with those in the channels
+                            it is registered to, or optionally some other channel.</para><screen>usage: system_comparewithchannel &lt;SYSTEMS> [options]
+options:
+         -c/--channel : Specific channel to compare against,
+                        default is those subscribed to, including
+                        child channels
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_createpackageprofile</term>
+                    <listitem>
+                        <para>Create a package profile.</para><screen>usage: system_createpackageprofile SYSTEM [options]
+
+options:
+  -n NAME
+  -d DESCRIPTION</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_delete</term>
+                    <listitem>
+                        <para>Delete a system profile.</para><screen>usage: system_delete &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_deletecrashes</term>
+                    <listitem>
+                        <para>Delete crashes reported by spacewalk-abrt.</para><screen>usage: Delete all crashes for all systems    : system_deletecrashes [--verbose]
+usage: Delete all crashes for a single system: system_deletecrashes -i sys_id [--verbose]
+usage: Delete a single crash record          : system_deletecrashes -c crash_id [--verbose]</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_deletenotes</term>
+                    <listitem>
+                        <para>Delete notes from a system.</para><screen>usage: system_deletenotes &lt;SYSTEM> &lt;ID|*>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_deletepackageprofile</term>
+                    <listitem>
+                        <para>Delete a package profile.</para><screen>usage: system_deletepackageprofile PROFILE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_deployconfigfiles</term>
+                    <listitem>
+                        <para>Deploy all configuration files for a system.</para><screen>usage: system_deployconfigfiles &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_details</term>
+                    <listitem>
+                        <para>Show the details of a system profile.</para><screen>usage: system_details &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_getcrashfiles</term>
+                    <listitem>
+                        <para>Download all files for a crash record.</para><screen>usage: system_getcrashfiles -c crash_id [--verbose]
+usage: system_getcrashfiles -c crash_id [--dest_folder=/tmp/crash_files] [--verbose]</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_installpackage</term>
+                    <listitem>
+                        <para>Install a package on a system.</para><screen>usage: system_installpackage &lt;SYSTEMS> &lt;PACKAGE ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_list</term>
+                    <listitem>
+                        <para>List all system profiles.</para><screen>usage: system_list</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listbasechannel</term>
+                    <listitem>
+                        <para>List the base channel for a system.</para><screen>usage: system_listbasechannel &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listchildchannels</term>
+                    <listitem>
+                        <para>List the child channels for a system.</para><screen>usage: system_listchildchannels &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listconfigchannels</term>
+                    <listitem>
+                        <para>List the config channels of a system.</para><screen>usage: system_listconfigchannels &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listconfigfiles</term>
+                    <listitem>
+                        <para>List the managed config files of a system.</para><screen>usage: system_listconfigfiles &lt;SYSTEMS>'
+options:
+  -s/--sandbox : list only system-sandbox files
+  -l/--local   : list only locally managed files
+  -c/--central : list only centrally managed files
+  -q/--quiet   : quiet mode (omits the header)
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listcrashedsystems</term>
+                    <listitem>
+                        <para>List all systems that have experienced a crash and reported by
+                            spacewalk-abrt.</para><screen>usage: system_listcrashedsystems</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listcrashesbysystem</term>
+                    <listitem>
+                        <para>List all reported crashes for a system.</para><screen>usage: system_listcrashesbysystem -i sys_id</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listcustomvalues</term>
+                    <listitem>
+                        <para>List the custom values for a system.</para><screen>usage: system_listcustomvalues &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listentitlements</term>
+                    <listitem>
+                        <para>List the entitlements for a system.</para><screen>usage: system_listentitlements &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listerrata</term>
+                    <listitem>
+                        <para>List available errata for a system.</para><screen>usage: system_listerrata &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listevents</term>
+                    <listitem>
+                        <para>List the event history for a system.</para><screen>usage: system_listevents &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listhardware</term>
+                    <listitem>
+                        <para>List the hardware details of a system.</para><screen>usage: system_listhardware &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listinstalledpackages</term>
+                    <listitem>
+                        <para>List the installed packages on a system.</para><screen>usage: system_listinstalledpackages &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listnotes</term>
+                    <listitem>
+                        <para>List the available notes for a system.</para><screen>usage: system_listnotes &lt;SYSTEM>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listpackageprofiles</term>
+                    <listitem>
+                        <para>List all package profiles.</para><screen>usage: system_listpackageprofiles</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_listupgrades</term>
+                    <listitem>
+                        <para>List the available upgrades for a system.</para><screen>usage: system_listupgrades &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_lock</term>
+                    <listitem>
+                        <para>Lock a system.</para><screen>usage: system_lock &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_reboot</term>
+                    <listitem>
+                        <para>Reboot a system.</para><screen>usage: system_reboot &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removechildchannels</term>
+                    <listitem>
+                        <para>Remove child channels from a system.</para><screen>usage: system_removechildchannels &lt;SYSTEMS> &lt;CHANNEL ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removeconfigchannels</term>
+                    <listitem>
+                        <para>Remove config channels from a system.</para><screen>usage: system_removeconfigchannels &lt;SYSTEMS> &lt;CHANNEL ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removecustomvalues</term>
+                    <listitem>
+                        <para>Remove a custom value for a system.</para><screen>usage: system_removecustomvalues &lt;SYSTEMS> &lt;KEY ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removeentitlement</term>
+                    <listitem>
+                        <para>Remove an entitlement from a system.</para><screen>usage: system_removeentitlement &lt;SYSTEMS> ENTITLEMENT
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_removepackage</term>
+                    <listitem>
+                        <para>Remove a package from a system.</para><screen>usage: system_removepackage &lt;SYSTEMS> &lt;PACKAGE ...>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_rename</term>
+                    <listitem>
+                        <para>Rename a system profile.</para><screen>usage: system_rename OLDNAME NEWNAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_runscript</term>
+                    <listitem>
+                        <para>Schedule a script to run on the list of systems provided.</para><screen>usage: system_runscript &lt;SYSTEMS> [options]
+
+options:
+  -u USER
+  -g GROUP
+  -t TIMEOUT
+  -s START_TIME
+  -l LABEL
+  -f FILE
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL
+
+
+Dates can be any of the following:
+Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
+
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
+
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_schedulehardwarerefresh</term>
+                    <listitem>
+                        <para>Schedule a hardware refresh for a system.</para><screen>usage: system_schedulehardwarerefresh &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_schedulepackagerefresh</term>
+                    <listitem>
+                        <para>Schedule a software package refresh for a system.</para><screen>usage: system_schedulepackagerefresh &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_search</term>
+                    <listitem>
+                        <para>List systems that match the given criteria.</para><screen>usage: system_search QUERY
+
+Available Fields:
+id
+name
+ip
+hostname
+device
+vendor
+driver
+uuid
+
+Examples:
+> system_search device:vmware
+> system_search ip:192.168.82</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_setbasechannel</term>
+                    <listitem>
+                        <para>Set a system's base software channel.</para><screen>usage: system_setbasechannel &lt;SYSTEMS> CHANNEL
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_setconfigchannelorder</term>
+                    <listitem>
+                        <para>Set the ranked order of configuration channels.</para><screen>usage: system_setconfigchannelorder &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_setcontactmethod</term>
+                    <listitem>
+                        <para>Set the contact method for given system(s).</para><screen>Available contact methods: ['default', 'ssh-push', 'ssh-push-tunnel']
+usage: system_setcontactmethod &lt;SYSTEMS> &lt;CONTACT_METHOD>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_show_packageversion</term>
+                    <listitem>
+                        <para>Shows version of installed package on given system(s).</para><screen>usage: system_show_packageversion &lt;SYSTEM> &lt;PACKAGE>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_syncpackages</term>
+                    <listitem>
+                        <para>Sync packages between two systems.</para><screen>usage: system_syncpackages SOURCE TARGET</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_unlock</term>
+                    <listitem>
+                        <para>Unlock a system.</para><screen>usage: system_unlock &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_updatecustomvalue</term>
+                    <listitem>
+                        <para>Update a custom value for a system.</para><screen>usage: system_updatecustomvalue KEY VALUE &lt;SYSTEMS>
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>system_upgradepackage</term>
+                    <listitem>
+                        <para>Upgrade a package on a system.</para><screen>usage: system_upgradepackage &lt;SYSTEMS> &lt;PACKAGE ...>|*
+
+&lt;SYSTEMS> can be any of the following:
+name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                    </listitem>
+                </varlistentry>
+                
+            </variablelist>
+        </sect2>
+
+        <!-- toggle_ -->
+        <sect2 xml:id="at.spacecmd.toggle">
+            <title>toggle_</title>
+            <para/>
+            <variablelist>
+                <varlistentry>
+                    <term>toggle_confirmations</term>
+                    <listitem>
+                        <para>Toggle confirmation messages on/off.</para><screen>usage: toggle_confirmations</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- user_ -->
+        <sect2 xml:id="at.spacecmd.user">
+            <title>user_</title>
+            <para/>
+            <variablelist>
+                <varlistentry>
+                    <term>user_adddefaultgroup</term>
+                    <listitem>
+                        <para>Add a default group to an user account.</para><screen>usage: user_adddefaultgroup USER &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_addgroup</term>
+                    <listitem>
+                        <para>Add a group to an user account.</para><screen>usage: user_addgroup USER &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_addrole</term>
+                    <listitem>
+                        <para>Add a role to an user account.</para><screen>usage: user_addrole USER ROLE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_create</term>
+                    <listitem>
+                        <para>Create an user.</para><screen>usage: user_create [options]
+
+options:
+  -u USERNAME
+  -f FIRST_NAME
+  -l LAST_NAME
+  -e EMAIL
+  -p PASSWORD
+  --pam enable PAM authentication</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_delete</term>
+                    <listitem>
+                        <para>Delete an user.</para><screen>usage: user_delete NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_details</term>
+                    <listitem>
+                        <para>Show the details of an user.</para><screen>usage: user_details USER ...</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_disable</term>
+                    <listitem>
+                        <para>Disable an user account.</para><screen>usage: user_disable NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_enable</term>
+                    <listitem>
+                        <para>Enable an user account.</para><screen>usage: user_enable NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_list</term>
+                    <listitem>
+                        <para>List all users.</para><screen>usage: user_list</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_listavailableroles</term>
+                    <listitem>
+                        <para>List all available roles for users.</para><screen>usage: user_listavailableroles</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_removedefaultgroup</term>
+                    <listitem>
+                        <para>Remove a default group from an user account.</para><screen>usage: user_removedefaultgroup USER &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_removegroup</term>
+                    <listitem>
+                        <para>Remove a group to an user account.</para><screen>usage: user_removegroup USER &lt;GROUP ...></screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_removerole</term>
+                    <listitem>
+                        <para>Remove a role from an user account.</para><screen>usage: user_removerole USER ROLE</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setemail</term>
+                    <listitem>
+                        <para>Set an user accounts email field.</para><screen>usage: user_setemail USER EMAIL</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setfirstname</term>
+                    <listitem>
+                        <para>Set an user accounts first name field.</para><screen>usage: user_setfirstname USER FIRST_NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setlastname</term>
+                    <listitem>
+                        <para>Set an user accounts last name field.</para><screen>usage: user_setlastname USER LAST_NAME</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setpassword</term>
+                    <listitem>
+                        <para>Set an user accounts name prefix field.</para><screen>usage: user_setpassword USER PASSWORD</screen>
+                    </listitem>
+                </varlistentry>
+                <varlistentry>
+                    <term>user_setprefix</term>
+                    <listitem>
+                        <para>Set an user accounts name prefix field.</para><screen>usage: user_setprefix USER PREFIX</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- whoami -->
+        <sect2 xml:id="at.spacecmd.whoami">
+            <title>whoami</title>
+            <para>The following command is available for returning the currently logged spacecmd
+                username.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>whoami</term>
+                    <listitem>
+                        <para>Print the currently logged spacecmd user.</para><screen>spacecmd {SSM:0}> whoami
+admin</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- whoamitalkingto -->
+        <sect2 xml:id="at.spacecmd.whoamitalkingto">
+            <title>whoamitalkingto</title>
+            <para>The following spacecmd function is available for returning the server
+                hostname.</para>
+            <variablelist>
+                <varlistentry>
+                    <term>whoamitalkingto</term>
+                    <listitem>
+                        <para>Return the server hostname that spacecmd is connected with.</para><screen>spacecmd {SSM:0}> whoamitalkingto
+MGR_SERVER_HOSTNAME</screen>
+                    </listitem>
+                </varlistentry>
+            </variablelist>
+        </sect2>
+
+        <!-- miscellaneous help topics -->
+
+        <sect2 xml:id="at.spacecmd.misc.help.topics">
+            <title>Miscellaneous Help Topics</title>
+            <para>The following help topics are printed with all functions requiring the relevant
+                information.</para>
+                <variablelist>
+                    <varlistentry>
+                        <term>time</term>
+                        <listitem>
+                            <para>Dates can be any of the following:</para><screen>Explicit Dates:
+Dates can be expressed as explicit date strings in the YYYYMMDD[HHMM]
+format.  The year, month and day are required, while the hours and
+minutes are not; the hours and minutes will default to 0000 if no
+values are provided.
+
+Deltas:
+Dates can be expressed as delta values.  For example, '2h' would
+mean 2 hours in the future.  You can also use negative values to
+express times in the past (e.g., -7d would be one week ago).
+
+Units:
+s -> seconds
+m -> minutes
+h -> hours
+d -> days</screen>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>systems</term>
+                        <listitem>
+                            <para>&lt;SYSTEMS> can be any of the following:</para><screen>name
+ssm (see 'help ssm')
+search:QUERY (see 'help system_search')
+group:GROUP
+channel:CHANNEL</screen>
+                        </listitem>
+                    </varlistentry>
+                    <varlistentry>
+                        <term>ssm</term>
+                        <listitem>
+                        <para>The System Set Manager (SSM) is a group of systems that you </para>
+                        <para>can perform tasks on as a group.</para><screen>Adding Systems:
+> ssm_add group:rhel5-x86_64
+> ssm_add channel:rhel-x86_64-server-5
+> ssm_add search:device:vmware
+> ssm_add host.example.com
+
+Intersections:
+> ssm_add group:rhel5-x86_64
+> ssm_intersect group:web-servers
+
+Using the SSM:
+> system_installpackage ssm zsh
+> system_runscript ssm</screen>
+                        </listitem>
+                    </varlistentry>
+                </variablelist>
+        </sect2>
+
+    </sect1>
+
+</chapter>

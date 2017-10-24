@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="white.papers.writing.custom.salt.grains">
+
+    <title>Writing Custom Salt Grains</title>
+
+    <para>The following chapter will guide you through writing a custom grain for use with Salt. You
+        may wish to extend existing Salt functionality by writing customs grains. Custom grains
+        allow you to collect additional information from Salt minions.</para>
+    <warning>
+        <title>White Papers</title>
+        <para>All content contained in a White Papers document is under development and subject to change. Things will break
+            and may not work as intended. For testing environments only. These documents are
+            unsupported. </para>
+    </warning>
+   
+
+    <sect1>
+        <title>Writing a Grain to Report Package Installation Status</title>
+        <para>In the following exercise you will write a grain that reports if a minion has the
+                <literal>zypper</literal> rpm package installed.</para>
+        <tip>
+            <para>The following should be kept in mind when writing grains:</para>
+            <itemizedlist>
+                <listitem>
+                    <para>In most cases grains are not updated automatically. Do not rely on grains
+                        for information that changes on a regular basis. For information that
+                        changes regularly consider using an execution module.</para>
+                </listitem>
+                <listitem>
+                    <para>The following example exercise will be executed on your local Linux
+                        system. You should be logged into a shell as root and have a recent version
+                        of Salt (salt-minion and salt-ssh) installed.</para>
+                </listitem>
+            </itemizedlist>
+        </tip>
+
+        <procedure>
+            <title>Preparing Your Master-less Salt Minion</title>
+            <step>
+                <para>For this exercise you do not require a Salt Master. To ensure the command
+                        <literal>salt-call</literal> does not look for a master and uses only local
+                    files you will need to change the minions configuration. Best practice dictates
+                    placing custom configuration changes within a separate file located in
+                        <filename>/etc/salt/minion.d</filename>.</para>
+                <screen># cd /etc/salt/minion.d</screen>
+            </step>
+            <step>
+                <para>Create a file called <filename>custom.conf</filename> with the following
+                    content:</para>
+                <screen>file_client: local</screen>
+            </step>
+        </procedure>
+
+    </sect1>
+    <sect1>
+        <title>Creating a New Grain</title>
+        <procedure>
+            <title>Creating a New Grain</title>
+            <step>
+                <para>All custom salt data should be placed within <filename>/srv/salt</filename>. </para>
+                <screen># cd /srv/salt</screen>
+            </step>
+            <step>
+                <para>To keep your Salt data organized create a new directory labeled:
+                        <filename>_grains</filename></para>
+                <screen># md _grains</screen>
+                <para>Switch to the new directory:</para>
+                <screen># cd _grains</screen>
+            </step>
+            <step>
+                <para>Create a new python file named <filename>my_grains.py</filename> with the
+                    following content:</para>
+                <screen>from os import popen
+
+def has_zypper():
+
+  """
+  Return 'zypper' command location if present.
+  """
+
+  path = popen('which zypper').read().strip()
+  zypper = {}
+  zypper['available'] = path != ''
+  zypper['path'] = path
+  return {'zypper': zypper}</screen>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Sync the New Grain</title>
+        <procedure>
+            <title>Sync the New Grain to Your (Local)Minion</title>
+            <step>
+                <para>Before syncing the new grain, its a good idea to check what grains exist on
+                    the minion so you can see the difference when adding a new one.</para>
+                <screen>salt-call grains.items</screen>
+                <para>You probably noticed that there is not a zypper grain after running the above
+                    command. You need to sync the new grain with your minion.</para>
+            </step>
+            <step>
+                <para>Sync the new grain to your minion with:</para>
+                <screen>salt-call saltutil.sync_all</screen>
+                <para>Alternatively narrow the scope to grains only with:</para>
+                <screen>salt-call saltutil.sync_grains</screen>
+                <tip>
+                    <para>Normally when using a Salt Master you would target some or all of your
+                        minions with the <command>salt '*' saltutil.sync_grains</command>. This
+                        exercise uses the <command>salt-call</command> command to execute Salt
+                        commands locally. This is great for testing new custom Salt features.</para>
+                </tip>
+            </step>
+        </procedure>
+
+    </sect1>
+
+    <sect1>
+        <title>Test the New Grain</title>
+        <procedure>
+            <title>Testing the New Grain</title>
+            <step>
+                <para>List all grains now by running:</para>
+                <screen># salt-call grains.items
+
+###Cut for clarity###
+...                    
+saltpath:
+        /usr/lib/python2.7/site-packages/salt
+    saltversion:
+        2015.8.7
+    saltversioninfo:
+        - 2015
+        - 8
+        - 7
+        - 0
+    server_id:
+        1232718050
+    shell:
+        /bin/bash
+    systemd:
+        ----------
+        features:
+            +PAM +LIBWRAP +AUDIT +SELINUX -IMA +SYSVINIT +LIBCRYPTSETUP +GCRYPT +ACL +XZ +SECCOMP +APPARMOR
+        version:
+            210
+    uuid:
+        7891063b-c3a6-46d3-b7a0-f08fd9112e49
+    virtual:
+        kvm
+    zmqversion:
+        4.0.4
+    zypper:
+        ----------
+        available:
+            True
+        path:
+            /usr/bin/zypper
+</screen>
+                <para>To narrow the grains scope to show only zypper, execute:</para>
+                <screen># salt-call grains.item zypper
+
+local:                                                                                                                                                                                                             
+    ----------                                                                                                                                                                                                     
+    zypper:                                                                                                                                                                                                        
+        ----------                                                                                                                                                                                                 
+        available:                                                                                                                                                                                                 
+            True                                                                                                                                                                                                   
+        path:                                                                                                                                                                                                      
+            /usr/bin/zypper</screen>
+            </step>
+        </procedure>
+
+        <para>Keep in mind every time you change a grains file you will need to re-sync the grain to
+            your minions:</para>
+        <screen>salt-call saltutil.sync_grains</screen>
+    </sect1>
+
+
+
+
+</chapter>

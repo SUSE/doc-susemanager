@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="advanced.topics.kubernetes.integration">
+
+    <title>Kubernetes Integration Guide</title>
+
+    <sect1 xml:id="at.k8s.integration.intro">
+        <title>Introduction</title>
+        <para>Into to chapter and covered material</para>
+
+    </sect1>
+
+    <sect1 xml:id="at.k8s.integration.requires">
+        <title>Prerequisites</title>
+        <para>The prerequisites listed below should be met before proceeding. </para>
+        <itemizedlist>
+            <listitem>
+                <para>At least one <emphasis>Kubernetes</emphasis> or <emphasis>SUSE CaaS Platform
+                    </emphasis> cluster available on your network</para>
+            </listitem>
+            <listitem>
+                <para>SUSE Manager version <emphasis>3.1.2</emphasis> or higher</para>
+            </listitem>
+            <listitem>
+                <para>SUSE Manager configured for container management</para>
+                <note>
+                    <para><!-- Add required links and info here -->Required channels are present, a
+                        registered build host available etc.</para>
+                </note>
+            </listitem>
+            <listitem>
+                <para><emphasis>virtual-host-gatherer-Kubernetes</emphasis> package installed on
+                    your SUSE Manager server</para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+
+    <sect1>
+        <title>Requirements</title>
+        <itemizedlist>
+            <listitem>
+                <para>Kubernetes version 1.5.0 or Higher. Alternatively use SUSE CaaS Platform
+                        <emphasis>(SUSE CaaS Platform includes K8s 1.5.0 by
+                    default)</emphasis></para>
+            </listitem>
+            <listitem>
+                <para>Docker version 1.12 or higher on the container build host</para>
+            </listitem>
+        </itemizedlist>
+        <note>
+            <para>To enable all Kubernetes related features within the WebUI, the
+                    <emphasis>virtual-host-gatherer-Kubernetes</emphasis> package must be
+                installed.</para>
+        </note>
+    </sect1>
+
+    <sect1>
+        <title>Register Kubernetes as a Virtual Host Manager</title>
+
+        <para><emphasis>Kubernetes</emphasis> clusters are registered with SUSE Manager as
+                <literal>virtual host managers</literal>. Registration and authorization begins with
+            importing a <literal>kubeconfig</literal> file using Kubernetes official command line
+            tool <literal>kubectl</literal>.</para>
+
+        <procedure>
+            <title>Registering a Kubernetes Cluster with &susemgr;</title>
+
+            <step>
+                <para>Select <menuchoice>
+                        <guimenu>Systems</guimenu>
+                        <guimenu>Virtual Host Managers</guimenu>
+                    </menuchoice> from the navigation menu.</para>
+            </step>
+            <step>
+                <para>Expand the <literal>Create</literal> dropdown in the upper right corner of the
+                    page and select <guimenu>Kubernetes Cluster</guimenu>.</para>
+            </step>
+            <step>
+                <para>Input a label for the new Virtual Host Manager.</para>
+            </step>
+            <step>
+                <para>Select the <literal>kubeconfig</literal> file which contains the required data
+                    for the Kubernetes cluster.</para>
+            </step>
+            <step>
+                <para>Select the correct <emphasis>context</emphasis> for the cluster, as specified
+                    in the kubeconfig file.</para>
+            </step>
+            <step>
+                <para>Click <literal>Create</literal>.</para>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Viewing the List of Nodes in a Cluster</title>
+        <procedure>
+            <step>
+                <para>Select <menuchoice>
+                        <guimenu>Systems</guimenu>
+                        <guimenu>Virtual Host Managers</guimenu>
+                    </menuchoice> from the navigation menu.</para>
+            </step>
+            <step>
+                <para>Select the desired Kubernetes cluster to view it.</para>
+            </step>
+            <step>
+                <para>Node data is not refreshed during registration. To refresh node data, click on
+                        <literal>Schedule refresh data</literal>.</para>
+            </step>
+            <step>
+                <para>Refresh the browser. If the node data is not available wait a few moments and
+                    try again.</para>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Obtaining Runtime Data about Images</title>
+        <para>See the following steps to find runtime data for images.</para>
+
+        <procedure>
+            <step>
+                <para>Select <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Images</guimenu>
+                    </menuchoice> from the navigation menu.</para>
+            </step>
+            <step>
+                <para>In the image list table, take notice of the new runtime columns. These are
+                    labeled: <literal>Revision</literal>, <literal>Runtime</literal> and
+                        <literal>Instances</literal>. Initially these columns will not provide
+                    useful data.</para>
+                <itemizedlist>
+                    <listitem>
+                        <para><literal>Revision</literal>: An artificial sequence number which
+                            increments on every rebuild for manager-built images, or on every
+                            reimport for externally built images.</para>
+                    </listitem>
+                    <listitem>
+                        <para><literal>Runtime</literal>: Overall status of the running instances of
+                            the image throughout the registered clusters. The status can be one of
+                            the following:</para>
+                        <itemizedlist>
+                            <listitem>
+                                <para>All instances are consistent with SUSE Manager: All the
+                                    running instances are running the same build of the image as
+                                    tracked by SUSE Manager.</para>
+                            </listitem>
+                            <listitem>
+                                <para>Outdated instances found: Some of the instances are running an
+                                    older build of the image. A redeploy of the image into the pod
+                                    may be required.</para>
+                            </listitem>
+                            <listitem>
+                                <para>No information: The checksum of the instance image does not
+                                    match the image data contained in SUSE Manager. A redeploy of
+                                    the image into the pod may be required.</para>
+                            </listitem>
+                        </itemizedlist>
+                    </listitem>
+                    <listitem>
+                        <para><literal>Instances</literal>: Number of instances running this image
+                            across all the clusters registered in SUSE Manager. A breakdown of
+                            numbers can be seen by clicking on the pop-up icon next to the
+                            number.</para>
+                    </listitem>
+                </itemizedlist>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Building an image for deployment in Kubernetes</title>
+        <para>The following steps will help you build an image for deployment in Kubernetes.</para>
+        <procedure>
+            <step>
+                <para>Under <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Stores</guimenu>
+                    </menuchoice>, create an image store.</para>
+            </step>
+            <step>
+                <para>Under <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Profiles</guimenu>
+                    </menuchoice>, create an image profile (with a Dockerfile which is suitable to
+                    deploy to Kubernetes).</para>
+            </step>
+            <step>
+                <para>Under <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Build</guimenu>
+                    </menuchoice>, build an image with the new profile and wait for the build to
+                    finish.</para>
+            </step>
+            <step>
+                <para>Deploy the image into one of the registered Kubernetes clusters (via
+                        <literal>kubectl</literal>).</para>
+            </step>
+            <step>
+                <para>Notice the updated data in <literal>Runtime</literal> and
+                        <literal>Instances</literal> columns in the respective image row. </para>
+            </step>
+        </procedure>
+    </sect1>
+    <sect1>
+        <title>Importing an image already deployed in Kubernetes</title>
+        <para>The following steps will guide you through importing a previously deployed image in
+            Kubernetes.</para>
+        <procedure>
+            <step>
+                <para>Select an image that has already been deployed to any of your registered
+                    Kubernetes clusters.</para>
+            </step>
+            <step>
+                <para>Add the registry owning the image to SUSE Manager as an image store.</para>
+            </step>
+            <step>
+                <para>Select <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Images</guimenu>
+                    </menuchoice>, click <literal>Import</literal> from the top-right corner, fill
+                    in the form fields and click <literal>Import</literal>.</para>
+            </step>
+            <step>
+                <para>Notice the updated data in <literal>Runtime</literal> and
+                        <literal>Instances</literal> columns in the respective image row.</para>
+            </step>
+        </procedure>
+    </sect1>
+    <sect1>
+        <title>Obtaining Additional Runtime Data</title>
+        <para>The following steps will help you find additional runtime data.</para>
+        <procedure>
+            <step>
+                <para>Select to <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Images</guimenu>
+                    </menuchoice>, click the <literal>Details</literal> button on the right end of a
+                    row which has running instances.</para>
+            </step>
+            <step>
+                <para>Under the <literal>Overview</literal> tab, notice the data in
+                        <literal>Runtime</literal> and <literal>Instances</literal> fields under
+                        <literal>Image Info</literal> section.</para>
+            </step>
+            <step>
+                <para>Select the <literal>Runtime</literal> tab.</para>
+            </step>
+            <step>
+                <para>Here is a breakdown of the Kubernetes pods running this image in all the
+                    registered clusters including the following data:</para>
+                <itemizedlist>
+                    <listitem>
+                        <para>Pod name </para>
+                    </listitem>
+                    <listitem>
+                        <para>Namespace which the pod resides in </para>
+                    </listitem>
+                    <listitem>
+                        <para>The runtime status of the container in the specific pod. Status icons
+                            are explained in the preceeding example.</para>
+                    </listitem>
+                </itemizedlist>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Rebuilding a Previously Deployed Image in Kubernetes</title>
+        <para>The following steps will guide you through rebuilding an image which has been deployed
+            to a Kubernetes cluster.</para>
+        <procedure>
+            <step>
+                <para>Go to <menuchoice>
+                        <guimenu>Images</guimenu>
+                        <guimenu>Images</guimenu>
+                    </menuchoice>, click the Details button on the right end of a row which has
+                    running instances. The image must be manager-built.</para>
+            </step>
+            <step>
+                <para>Click the <literal>Rebuild</literal> button located under the <literal>Build
+                        Status</literal> section and wait for the build to finish.</para>
+            </step>
+            <step>
+                <para>Notice the change in the <literal>Runtime</literal> icon and title, reflecting
+                    the fact that now the instances are running a previous build of the image.
+                </para>
+            </step>
+        </procedure>
+    </sect1>
+    <sect1>
+        <title>Role Based Access Control Permissions and Certificate Data</title>
+        <important>
+            <para>Currently, only kubeconfig files containing all embedded certificate data may be
+                used with SUSE Manager</para>
+        </important>
+        <para>The API calls from &susemgr; are:</para>
+        <itemizedlist>
+            <listitem>
+                <para>GET /api/v1/pods</para>
+            </listitem>
+            <listitem>
+                <para>GET /api/v1/nodes</para>
+            </listitem>
+        </itemizedlist>
+
+        <para>According to this list, the minimum recommended permissions for &susemgr; should be as
+            follows:</para>
+        <itemizedlist>
+            <listitem>
+                <para>A ClusterRole to list all the nodes:</para>
+                <screen>resources: ["nodes"]
+verbs: ["list"] </screen>
+            </listitem>
+            <listitem>
+                <para>A ClusterRole to list pods in all namespaces (role binding must not restrict
+                    the namespace):</para>
+                <screen>resources: ["pods"]
+verbs: ["list"]</screen>
+            </listitem>
+        </itemizedlist>
+        <para> Due to a a 403 response from /pods, the entire cluster will be ignored by SUSE
+            Manager.</para>
+        <para>For more information on working with RBAC Authorization see: <link
+                xlink:href="https://kubernetes.io/docs/admin/authorization/rbac/"/></para>
+    </sect1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</chapter>

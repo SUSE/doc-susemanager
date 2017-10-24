@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="advanced.topics.security">
+    <title>Security</title>
+
+
+    <sect1>
+        <title>Setup a Minion to Master Validation Fingerprint</title>
+        <para>In highly secure network configurations you may wish to ensure your minions are
+            connecting a specific master. To setup validation from minion to master enter the
+            masters fingerprint within the <filename>/etc/salt/minion</filename> configuration file.
+            See the following procedure:</para>
+        <procedure>
+            <step>
+                <para>On the master enter the following command as root and note the
+                    fingerprint:</para>
+                <screen>salt-key -F master</screen>
+                <para>On your minion, open the minion configuration file located in
+                        <filename>/etc/salt/minion</filename>. Uncomment the following line and
+                    enter the masters fingerprint replacing the example fingerprint:</para>
+                <screen>master_finger: 'ba:30:65:2a:d6:9e:20:4f:d8:b2:f3:a7:d4:65:11:13'</screen>
+            </step>
+            <step>
+                <para>Restart the salt-minion service:</para>
+                <screen># systemctl restart salt-minion</screen>
+            </step>
+        </procedure>
+        <para>For more information on configuring security from a minion see: <link
+                xlink:href="https://docs.saltstack.com/en/latest/ref/configuration/minion.html"
+            /></para>
+    </sect1>
+
+
+
+
+</chapter>

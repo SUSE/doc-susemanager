@@ -1,0 +1,5 @@
+## Virtual Host Managers {#virtual-host-managers}
+
+Third party hypervisors and hypervisor managers such as VMWare vCenter are called “Virtual Host Managers” (VHM) within SUSE Manager. These managers can manage one or multiple virtual hosts, which in turn may contain virtual guests. SUSE Manager ships with a tool called **virtual-host-gatherer** that can connect to VHMs using their API, and request information about virtual hosts. This tool is automatically invoked via Taskomatic nightly, therefore you need to configure your VHMs via XMLRPC APIs. **virtual-host-gatherer** maintains the concept of optional modules, where each module enables a specific Virtual Host Manager.
+
+Proceed to Systems+Virtual Host Managers page in the WebUI to begin working with a Virtual Host Manager. In the upper right you can select either Add VMware-based Virtual Host Manager or Add File-based Virtual Host Manager.

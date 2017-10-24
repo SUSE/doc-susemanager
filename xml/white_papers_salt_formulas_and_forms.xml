@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+    xml:id="white.papers.salt.formulas.and.forms">
+
+    <title>Salt Formulas and SUSE Manager</title>
+
+    <para>This chapter provides an introduction for using Salt Formulas with SUSE Manager. Creation
+        of custom formulas will also be introduced.</para>
+
+
+    <!-- Add Images of UI, showing examples to help clarify this chapters goals -->
+
+    <sect1>
+        <title>What are Salt Formulas?</title>
+        <para>Formulas are collections of Salt States that have been pre-written by other Salt users
+            and contain generic parameter fields. Formulas allow for reliable reproduction of a
+            specific configuration again and again. Formulas can be installed from RPM binaries or
+            an external git repository. </para>
+
+        <para>The following list should help you in making the decision to use a state or a
+            formula.</para>
+        <itemizedlist>
+            <title>Formula Tips</title>
+            <listitem>
+                <para>When writing states for trivial tasks, formulas are probably not worth the
+                    time investment</para>
+            </listitem>
+            <listitem>
+                <para>For large, non-trivial configurations use formulas</para>
+            </listitem>
+            <listitem>
+                <para>Formulas and States both act as a kind of configuration documentation. Once
+                    written and stored you will have a snapshot of what your infrastructure should
+                    look like.</para>
+            </listitem>
+            <listitem>
+                <para>You can greatly decrease the amount of time required for writing a formula by
+                    grabbing one of the many pre-written formulas on github. There are pre-written
+                    formulas for hundreds of configurations. You can find these located at: <link
+                        xlink:href="https://github.com/saltstack-formulas"/>
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <important>
+            <title>Creating Formulas as a Time Investment</title>
+            <para>Creating formulas is possibly one of the most time consuming tasks for a SUSE
+                Manager administrator. However utilizing well designed formulas provides excellent
+                pay-offs, as managing thousands of systems becomes a maintainable, and more
+                importantly a reproducible task. You can find many community prepared formulas and
+                examples at the official Saltstack repository located on github: <link
+                    xlink:href="https://github.com/saltstack-formulas"/></para>
+        </important>
+    </sect1>
+
+    <!-- How to install salt formulas from an RPM package and location of files after installation -->
+    <sect1>
+        <title>Installing Salt Formulas via RPM</title>
+
+        <para>SUSE releases formulas as RPM packages. These may be installed using
+                zypper.<remark>Add note here on where to find RPMs when released.</remark></para>
+        <note>
+            <title>Formula Channel Location</title>
+            <para>Available formulas can be located within the
+                    <filename>SUSE-Manager-Server-3.1-Pool</filename> channel.</para>
+        </note>
+        <procedure>
+            <title>Installing Salt Formulas from an RPM</title>
+            <step>
+                <para>To search for available formulas, execute the following command on your SUSE
+                    Manager server:</para>
+                <screen># zypper se formula</screen>
+                <para>You will be presented with a list of available Salt Formulas:</para>
+                <screen>S | Name              | Summary                                                    | Type      
+--+-------------------+------------------------------------------------------------+-----------
+  | locale-formula    | Locale Salt Formula for SUSE Manager                       | package   
+  | locale-formula    | Locale Salt Formula for SUSE Manager                       | srcpackage</screen>
+            </step>
+            <step>
+                <para>For more information (metadata) about a specific formula run from the command
+                    line as root:</para>
+                <screen># zypper info locale-formula</screen>
+                <screen>Information for package locale-formula:
+-----------------------------------------
+Repository: SUSE-Manager-Server-3.1-Pool
+Name:  locale-formula
+Version:  0.2-1.1
+Arch: noarch
+Vendor:  SUSE LLC &lt;https://www.suse.com/>
+Support Level: Level 3
+Status: not installed
+Installed Size: 47.9 KiB
+Installed: No
+Source package : locale-formula-0.2-1.1.src 
+Summary        : Locale Salt Formula for SUSE Manager
+Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
+            </step>
+            <step>
+                <para>To install a formula, as root run:</para>
+                <screen># zypper in locale-formula</screen>
+            </step>
+        </procedure>
+
+    </sect1>
+
+
+    <sect1>
+        <title>File Structure Overview</title>
+        <para>RPM-based formulas need to be placed within a specific directory structure to ensure
+            proper functionality. A formula always consists of two separate directories: The
+                <literal>state</literal> directory and the <literal>metadata</literal> directory.
+            Folders in these directories need to have an exactly matching name, for example:
+            (timezone).</para>
+
+        <variablelist>
+            <varlistentry>
+                <term>The Formula State Directory</term>
+                <listitem>
+                    <para>The formula state directory contains anything necessary for a Salt state
+                        to work independently. This includes <filename>.sls</filename> files,
+                            a<filename>map.jinja</filename> file and any other required files. This
+                        directory should only be modified by RPMs and should not be edited manually.
+                        For example the locale-formula state directory is located in:</para>
+                    <screen>/usr/share/susemanager/formulas/states/locale/</screen>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>The Formula Metadata Directory</term>
+                <listitem>
+                    <para>The metadata directory contains a <literal>form.yml</literal> file which
+                        defines the forms for SUSE Manager and an optional metadata.yml file that
+                        can contain additional information about a formula. For example the locale
+                        meta directory is located in: </para>
+                    <screen>/usr/share/susemanager/formulas/metadata/locale/</screen>
+
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>Custom Formulas</term>
+                <listitem>
+                    <para>Custom formula data or (non-RPM) formulas should be placed in the
+                        following directories:</para>
+                    <variablelist>
+                        <varlistentry>
+                            <term>State directory</term>
+                            <listitem>
+                                <para>Custom state formula data should be placed in:</para>
+                                <screen>/srv/salt/custom-locale/</screen>
+                            </listitem>
+                        </varlistentry>
+                        <varlistentry>
+                            <term>Metadata Directory</term>
+                            <listitem>
+                                <para>Custom metadata(information) should be placed in:</para>
+                                <screen>/srv/salt/formula_metadata/custom-locale/</screen>
+                            </listitem>
+                        </varlistentry>
+                    </variablelist>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
+        <para>All custom folders located in the following directories should contain a
+                <literal>form.yml</literal> file. These files are detected as form recipes and may
+            be applied to groups and systems from the WebUI:</para>
+        <screen>/srv/formula_data/&lt;custom-formula-name&gt;/form.yml</screen>
+    </sect1>
+
+    <sect1>
+        <title>Editing Pillar Data in SUSE Manager</title>
+
+        <para>SUSE Manager requires a file called <filename>form.yml</filename>, to describe how
+            formula data should look within the WebUI. <filename>form.yml</filename> is used by SUSE
+            Manager to generate the desired form, with values editable by a user.</para>
+        <para>For example the <literal>form.yml</literal> that is included with the locale formula
+            is placed in:</para>
+        <screen>/usr/share/susemanager/formulas/metadata/locale/form.yml</screen>
+        <para>See the following locale-formula example:</para>
+        <screen># This file is part of locale-formula.
+#
+# Foobar is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Foobar is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar.  If not, see &lt;http://www.gnu.org/licenses/>.
+
+timezone:
+  $type: group
+
+  name:
+    $type: select
+    $values: ["CET",
+              "CST6CDT",
+              "EET",
+              "EST",
+              "EST5EDT",
+              "GMT",
+              "GMT+0",
+              "GMT-0",
+              "GMT0",
+              "Greenwich",
+              "HST",
+              "MET",
+              "MST",
+              "MST7MDT",
+              "NZ",
+              "NZ-CHAT",
+              "Navajo",
+              "PST8PDT",
+              "UCT",
+              "UTC",
+              "Universal",
+              "W-SU",
+              "WET",
+              "Zulu",
+              "Etc/GMT+1",
+              "Etc/GMT+2",
+              "Etc/GMT+3",
+              "Etc/GMT+4",
+              "Etc/GMT+5",
+              "Etc/GMT+6",
+              "Etc/GMT+7",
+              "Etc/GMT+8",
+              "Etc/GMT+9",
+              "Etc/GMT+10",
+              "Etc/GMT+11",
+              "Etc/GMT+12",
+              "Etc/GMT-1",
+              "Etc/GMT-2",
+              "Etc/GMT-3",
+              "Etc/GMT-4",
+              "Etc/GMT-5",
+              "Etc/GMT-6",
+              "Etc/GMT-7",
+              "Etc/GMT-8",
+              "Etc/GMT-9",
+              "Etc/GMT-10",
+              "Etc/GMT-11",
+              "Etc/GMT-12",
+              "Etc/GMT-13",
+              "Etc/GMT-14",
+              "Etc/GMT",
+              "Etc/GMT+0",
+              "Etc/GMT-0",
+              "Etc/GMT0",
+              "Etc/Greenwich",
+              "Etc/UCT",
+              "Etc/UTC",
+              "Etc/Universal",
+              "Etc/Zulu"
+              ]
+    $default: CET
+
+  hardware_clock_set_to_utc:
+    $type: boolean
+    $default: True
+
+keyboard_and_language:
+  $type: group
+
+  language:
+    $type: select
+    $values: ["Afrikaans",
+              "Arabic",
+              "Asturian",
+              "Bulgarian",
+              "Bengali",
+              "Bosnian",
+              "Catalan",
+              "Czech",
+              "Welsh",
+              "Danish",
+              "German",
+              "Greek",
+...</screen>
+
+
+        <para><filename>form.yml</filename> contains additional information that describes how the
+            form for a pillar should look for SUSE Manager. This information is contained in
+            attributes that always start with a <literal>$</literal> sign.</para>
+        <important>
+            <title>Ignored Values</title>
+            <para>All values that start with a <literal>$</literal> sign and are not valid
+                attributes will be ignored.</para>
+        </important>
+        <para>The following are valid attributes.</para>
+        <variablelist>
+
+            <varlistentry>
+                <term>$type</term>
+                <listitem>
+                    <para>The most important attribute is the $type attribute. It defines the type
+                        of the pillar value and the form-field that is generated. The following
+                        represent the currently supported types:</para>
+                    <itemizedlist>
+                        <listitem>
+                            <para>text</para>
+                        </listitem>
+                        <listitem>
+                            <para>password</para>
+                        </listitem>
+                        <listitem>
+                            <para>number</para>
+                        </listitem>
+                        <listitem>
+                            <para>url</para>
+                        </listitem>
+                        <listitem>
+                            <para>email</para>
+                        </listitem>
+                        <listitem>
+                            <para>date</para>
+                        </listitem>
+                        <listitem>
+                            <para>time</para>
+                        </listitem>
+                        <listitem>
+                            <para>datetime</para>
+                        </listitem>
+                        <listitem>
+                            <para>boolean</para>
+                        </listitem>
+                        <listitem>
+                            <para>color</para>
+                        </listitem>
+                        <listitem>
+                            <para>select</para>
+                        </listitem>
+                        <listitem>
+                            <para>group</para>
+                        </listitem>
+                        <listitem>
+                            <para>hidden-group</para>
+                        </listitem>
+                    </itemizedlist>
+                    <para>Many of these values are self-explanatory: <literal>text</literal> will
+                        generate a simple text field, <literal>password</literal> a password field
+                        and the <literal>color</literal> type will generate a color picker. </para>
+                    <para>The <literal>group</literal> and <literal>hidden-group</literal> types do
+                        not generate an editable field and are used to structure form and pillar
+                        data. The difference between group and hidden-group is
+                            <literal>group</literal> generates a visible border with a heading, and
+                        hidden-group shows nothing visually(and is only used to structure pillar
+                        data).</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$default</term>
+                <listitem>
+                    <para>$default allows you to specify a default value that is displayed and used,
+                        if no other value is entered.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$name</term>
+                <listitem>
+                    <para>$name allows you to specify the name of a value that is shown in the form.
+                        If this value is not set, the pillar name is used and capitalized without
+                        underscores and dashes.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$help and $placeholder</term>
+                <listitem>
+                    <para>The $help and $placeholder attributes are used to give a user a better
+                        understanding of what the value should be. $help defines the message a user
+                        sees when hovering over a field and $placeholder displays a gray placeholder
+                        text in the field. $placeholder may only be used with text fields like text,
+                        password, email or date.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$scope</term>
+                <listitem>
+                    <para>$scope allows you to specify a hierarchy level at which a value may be
+                        edited. Possible values are <literal>system</literal>,
+                            <literal>group</literal> and <literal>readonly</literal>. </para>
+                    <para>The default <literal>$scope: system</literal> allows values to be edited
+                        at group and system levels. This implies a value should be entered for each
+                        system, but you can also choose to set a default for an entire group if a
+                        system-specific value is found. </para>
+                    <para>If using <literal>$scope: group</literal>, a value may only be edited for
+                        a group. On the system level you will be able to see the value, but not edit
+                        it. </para>
+                    <para>The <literal>$scope: readonly</literal> option makes a field read-only. It
+                        can be used to show a user data which should be known, but should not be
+                        editable. This option only makes sense in combination with the $default
+                        attribute.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term> $visibleIf</term>
+                <listitem>
+                    <para>$visibleIf allows you to show a field or group if a simple condition is
+                        met. A condition always looks similar to the following example: </para>
+                    <screen>some_group$another_group$my_checkbox == true</screen>
+
+
+                    <para>The left part of the above statement is the path to another value, and
+                        groups are separated by <literal>$</literal> signs. The middle section of
+                        the command should be either <literal>==</literal> for a value to be equal
+                        or <literal>!=</literal> for values that should be not equal. The last field
+                        in the statement can be any value which a field should have or not
+                        have.</para>
+
+                    <para>The field with this attribute associated with it will now be shown only
+                        when the condition is met. In this example the field will be shown only if
+                            <literal>my_checkbox</literal> is checked. The ability to use
+                        conditional statements is not limited to check boxes. It may also be used to
+                        check values of select-fields, text-fields etc.</para>
+
+                    <para>A check box should be structured like the following example:</para>
+                    <screen>some_group:
+  $type: group
+
+  another_group:
+    $type: group
+
+      my_checkbox:
+        $type: boolean</screen>
+
+                    <para>By using multiple groups with the attribute, you can allow a user to
+                        select an option and show a completely different form, dependant upon the
+                        selected value.</para>
+
+                    <note>
+                        <title>Hidden Values</title>
+                        <para>Hidden values will still be merged into the pillar data and sent to
+                            the minion. The formula must check the condition again and use the
+                            appropriate data. For example:</para>
+                        <screen>show_option:
+  $type: checkbox
+some_text:
+  $visibleIf: show_option == true</screen>
+                        <screen>{% if pillar.show_option %}
+do_something:
+  with: {{ pillar.some_text }}
+{% endif %}</screen>
+
+                    </note>
+
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>$values</term>
+                <listitem>
+                    <para>$value can only be used together with $type: select to specify the
+                        different options in the select-field. $values must be a list of possible
+                        values to select. For example:</para>
+                    <screen>select_something:
+  $type: select
+  $values: [“option1”, “option2”]</screen>
+                    <para>Or alternatively:</para>
+                    <screen>select_something:
+  $type: select
+  $values:
+    - option1
+    - option2</screen>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
+    </sect1>
+
+    <sect1>
+        <title>Writing Salt Formulas</title>
+
+
+        <para>Salt formulas are pre-written Salt states, which may be configured with pillar data.
+            You can parametrize state files using Jinja. Jinja allows you to access pillar data by
+            using the following syntax(This syntax works best when your uncertain a pillar value
+            exists as it will throw an error):</para>
+        <screen>pillar.some.value</screen>
+        <para>When you are sure a pillar exists may also use the following syntax:</para>
+        <screen>salt['pillar.get']('some:value', 'default value')</screen>
+
+        <para>You may also replace the <literal>pillar</literal> value with
+                <literal>grains</literal> (e.g. grains.some.value) allowing access to grains.</para>
+
+        <para>Using data this way allows you to make a formula configurable. The following code
+            snippet will install a package specified in the pillar <literal>package_name</literal>.
+            For example:</para>
+        <screen>install_a_package:
+  pkg.installed:
+    - name: {{ pillar.package_name }}</screen>
+        <para>You may also use more complex constructs such as <literal>if/else</literal> and
+                <literal>for-loop</literal>'s To provide greater functionality. For Example:</para>
+        <screen>{% if pillar.installSomething %}
+something:
+  pkg.installed
+{% else %}
+anotherPackage:
+  pkg.installed
+{% endif %}</screen>
+        <para>Another example:</para>
+        <screen>{% for service in pillar.services %}
+start_{{ service }}:
+  service.running:
+    - name: {{ service }}
+{% endfor %}</screen>
+
+        <para>Jinja also provides other helpful functions. For example you can iterate over a
+            dictionary:</para>
+        <screen>{% for key, value in some_dictionary.items() %}
+do_something_with_{{ key }}: {{ value }}
+{% endfor %}</screen>
+
+        <para>You may want to have Salt manage your files (E.g. configuration files for a program),
+            and you can change these with pillar data. For example the following snippet shows how
+            you can manage a file using Salt:</para>
+        <screen>/etc/my_program/my_program.conf:
+  file.managed:
+
+    - source: salt://my_state/files/my_program.conf
+    - template: jinja</screen>
+
+
+        <para>Salt will copy the file
+                <filename>&lt;salt-file_roots&gt;/my_state/files/my_program.conf</filename> on the
+            salt master to <filename>/etc/my_program/my_program.conf</filename> on the minion and
+            template it with Jinja. This allows you to use Jinja in the file, exactly like shown
+            above for states:</para>
+        <screen>some_config_option = {{ pillar.config_option_a }}</screen>
+
+
+    </sect1>
+
+
+    <sect1>
+        <title>Separating Data</title>
+        <para>It is often a good idea to separate data from a state to increase its flexibility and
+            add re-usability value. This is often done by writing values into a separate file named
+                <filename>map.jinja</filename>. This file should be placed within the same directory
+            as your state files.</para>
+        <para>The following example will set <literal>data</literal> to a dictionary with different
+            values, depending on which system the state runs on. It will also merge data with the
+            pillar using the <literal>some.pillar.data</literal> value so you can access
+                <literal>some.pillar.data.value</literal> by just using
+                <literal>data.value</literal>.</para>
+        <para>You can also choose to override defined values from pillars (e.g. by overriding
+                <literal>some.pillar.data.package</literal> in the example). </para>
+        <screen>{% set data = salt[‘grains.filter_by’]({
+    ‘Suse’: {
+        ‘package’: ‘packageA’,
+        ‘service’: ‘serviceA’
+    },
+    ‘RedHat’: {
+        ‘package’: ‘package_a’,
+        ‘service’: ‘service_a’
+    }
+}, merge=salt[‘pillar.get’](‘some:pillar:data’)) %}</screen>
+        <para>After creating a map file like the above example, you can easily maintain
+            compatibility with multiple system types while accessing "deep" pillar data in a simpler
+            way. Now you can import and use <literal>data</literal> in any file. For example:</para>
+        <screen>{% from “some_folder/map.jinja” import data with context %}
+
+install_package_a:
+  pkg.installed:
+    - name: {{ data.package }}</screen>
+
+        <para>You can also define multiple variables by copying the <literal>{% set ... %}</literal>
+            statement with different values and then merge it with other pillars. For
+            example:</para>
+        <screen>{% set server = salt[‘grains.filter_by’]({
+    ‘Suse’: {
+        ‘package’: ‘my-server-pkg’
+    }
+}, merge=salt[‘pillar.get’](‘myFormula:server’)) %}
+{% set client = salt[‘grains.filter_by’]({
+    ‘Suse’: {
+        ‘package’: ‘my-client-pkg’
+    }
+}, merge=salt[‘pillar.get’](‘myFormula:client’)) %}</screen>
+
+        <para>To import multiple variables, separate them with a comma. For Example:</para>
+        <screen>{% from “map.jinja” import server, client with context %}</screen>
+        <para>Formulas utilized with SUSE Manager should follow formula conventions listed in the
+            official documentation:<link
+                xlink:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html"
+            /></para>
+    </sect1>
+
+    <sect1>
+        <title> SUSE Manager Generated Pillar Data </title>
+        <para>When pillar data is generated (e.g. after applying the highstate) the following
+            external pillar script generates pillar data for packages, group ids, etc. and includes
+            all pillar data for a system:</para>
+        <screen>/usr/share/susemanager/modules/pillar/suma_minion.py</screen>
+        <para>The process is executed as follows:</para>
+        <procedure>
+            <step>
+                <para>The suma_minion.py script starts and finds all formulas for a system (by
+                    checking the <literal>group_formulas.json</literal> and
+                        <literal>server_formulas.json</literal> files). </para>
+            </step>
+            <step>
+                <para>suma_minion.py loads the values for each formula (groups and from the system)
+                    and merges them with the highstate (default: if no values are found, a group
+                    overrides a system if $scope: group etc.).</para>
+            </step>
+            <step>
+                <para>suma_minion.py also includes a list of formulas applied to the system in a
+                    pillar named formulas. This structure makes it possible to include states. The
+                    top file (in this case specifically generated by the mgr_master_tops.py script)
+                    includes a state called formulas for each system. This includes the
+                        <literal>formulas.sls</literal> file located in:</para>
+                <screen>/usr/share/susemanager/formulas/states/</screen>
+                <para>The content looks similar to the following:</para>
+                <screen>include: {{ pillar["formulas"] }}</screen>
+                <para>This pillar includes all formulas, that are specified in pillar data generated
+                    from the external pillar script.</para>
+            </step>
+        </procedure>
+    </sect1>
+
+    <sect1>
+        <title>Formula Requirements</title>
+        <para>Formulas should be designed/created directly after a SUSE Manager installation, but if
+            you encounter any issues check the following:</para>
+        <itemizedlist>
+            <listitem>
+                <para>The external pillar script (suma_minion.py) must include formula data</para>
+            </listitem>
+            <listitem>
+                <para>Data is saved to <filename>/srv/susemanager/formula_data</filename> and the
+                        <filename>pillar</filename> and <filename>group_pillar</filename>
+                    sub-directories. These should be automatically generated by the server</para>
+            </listitem>
+            <listitem>
+                <para>Formulas must be included for every minion listed in the top file. Currently
+                    this process is initiated by the <filename>mgr_master_tops.py</filename> script
+                    which includes the formulas.sls file located in:</para>
+                <screen>/usr/share/susemanager/formulas/states/</screen>
+                <para>This directory must be a salt file root. File roots are configured on the
+                    salt-master (SUSE Manager) located in:</para>
+                <screen>/etc/salt/master.d/susemanager.conf</screen>
+            </listitem>
+
+        </itemizedlist>
+    </sect1>
+    <sect1>
+        <title>Using Salt Formulas with SUSE Manager</title>
+        <para>The following procedure provides an overview on using Salt Formulas with SUSE
+            Manager.</para>
+
+        <procedure>
+            <step>
+                <para>Official formulas may be installed as RPMs. If you have written your own
+                    formulas, place the states within /srv/salt/&lt;your-formula-name&gt;/ and the
+                    metadata (form.yml and metadata.yml) in
+                    /srv/formula_metadata/&lt;your-formula-name&gt;/ After installing your formulas
+                    they will appear in the Formula Cataolg, located under the Salt tab on the main
+                    menu.</para>
+            </step>
+            <step>
+                <para>To begin using a formula, apply it to a group or system. Apply a formula to a
+                    group or system by selecting the Formulas tab from the main menu of a system or
+                    system group. From the Formulas page you can select any formulas you wish to
+                    apply to a group or system. Click the save button to save your changes to the
+                    database.</para>
+            </step>
+            <step>
+                <para>After applying one or more formulas to a group or system, additional tabs will
+                    become available from the top menu, one for each formula selected. From these
+                    tabs you may configure your formulas.</para>
+            </step>
+            <step>
+                <para>Once you have finished customizing your formula values you will need to apply
+                    the highstate for them to take effect. Applying the highstate will execute the
+                    state associated with the formula and configure targeted systems. You can use
+                    the <literal>Apply Highstate</literal> button from any formulas page of a group
+                    or systems page or alternatively use the Highstate page under any system’s Salt
+                    tab.</para>
+            </step>
+            <step>
+                <para>When a change to any or your values is required or you need to reapply the
+                    formula state because of a failure or bug, change values located on your formula
+                    pages and re-apply the highstate. Salt will ensure that only modified values are
+                    adjusted and restart or reinstall services only when necessary.</para>
+            </step>
+        </procedure>
+        <para>This conclude your introduction to Salt Formulas. For additional information visit:
+                <link
+                xlink:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html"
+            /></para>
+    </sect1>
+
+
+</chapter>

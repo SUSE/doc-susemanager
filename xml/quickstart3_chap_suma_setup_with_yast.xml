@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="suma.setup.with.yast">
+ <title>SUSE Manager Setup</title>
+ <sect1 xml:id="suma.setup.with.yast.setup">
+  <title>Included Topics</title>
+
+  <para>
+   This section covers setup procedures of &susemgr; 3.1. You will perform the
+   following procedures:
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     Initiate &susemgr; 3.1 setup from the command line
+    </para>
+   </listitem>
+   <listitem>
+    <para> Create the <systemitem>admin</systemitem> user with the &susemgr; &webui; </para>
+   </listitem>
+   <listitem>
+    <para> Synchronize with &scc; (SCC) to obtain a list of product channels available for your
+     clients. </para>
+   </listitem>
+   <listitem>
+    <para> Add the &sle; 12 SP2 channel </para>
+   </listitem>
+  </itemizedlist>
+  <note>
+   <title>Version Information</title>
+   <para>
+    &susemgr; 3.1 was originally released as a SLES 12 SP2 extension.
+    With the next maintenance update (2017), &susemgr; 3.1 will be based
+    on SLES 12 SP3 and it will support SLE 12 SP3 clients officially.
+    In the following sections and chapters, it is highly recommended to
+    use SLE 12 SP3 instead of SP2.
+   </para>
+  </note>
+ </sect1>
+ <sect1 xml:id="suma.setup.with.yast.sumasetup">
+  <title>&susemgr; Setup via GUI</title>
+
+  <procedure>
+   <title>&susemgr; Setup</title>
+   <para> This section will guide you through &susemgr; setup procedures. </para>
+   <step>
+    <para> Log in to the &sle; 12 desktop and start the &yast; &susemgr; Setup module: Either click <menuchoice>
+      <guimenu>Applications</guimenu>
+      <guimenu>System Tools</guimenu>
+      <guimenu>YaST</guimenu>
+     </menuchoice> and enter <guimenu>&susemgr; Setup</guimenu>, or open a terminal and as
+     &rootuser; type <command>yast2 susemanager_setup</command> to initiate the setup. </para>
+   </step>
+   <step>
+    <para> On the initial screen select <guimenu>Setup SUSE Manager from scratch</guimenu> and
+     select <guimenu>Next</guimenu> to continue. </para>
+   </step>
+   <step>
+    <para> Enter an email address which will receive notifications about the server's status. The
+     number of emails sent from &susemgr; can be extensive, therefore notifications via email may be
+     disabled from the &webui; after setup if desired. If wanted, enable advertising &susemgr; via
+     SLP; this can simplify client setup. </para>
+    <para> Select <guimenu>Next</guimenu> to continue. </para>
+   </step>
+   <step>
+    <para> Enter your certificate information and a password. The password should be stored in a
+     secure location. <emphasis>Without this password it will not be possible to setup a &susemgr;
+      Proxy Server.</emphasis> Select <guimenu>Next</guimenu> to continue. </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="quickstart-mgr-setup4.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="quickstart-mgr-setup4.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para> In <guimenu>Database Settings</guimenu>, enter a database user and password. This
+     password should be stored in a secure location. Select <guimenu>Next</guimenu> to continue. </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="quickstart-mgr-setup5.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="quickstart-mgr-setup5.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para> &susemgr; requires that you connect to &scc; for software, updates and patches. You will
+     be unable to synchronize or provide channels to your clients without this information. Enter
+     your &scc; <systemitem>Organization Credentials</systemitem>. You may open <link
+      xlink:href="https://scc.suse.com/login"/> to register or access to your organization
+     credentials. Select <systemitem>Next</systemitem> to continue. </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="quickstart-mgr-setup6.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="quickstart-mgr-setup6.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para> Select <guimenu>Yes</guimenu> to run setup when prompted. When completed select
+      <systemitem>Next</systemitem> to continue. </para>
+    <para> You will be presented with your new &susemgr; &webui; address. </para>
+    <para> Select <guimenu>Finish</guimenu> to complete &susemgr; setup. </para>
+   </step>
+  </procedure>
+
+  <para> In <xref linkend="suma.setup.with.yast.admin"/>, you will create the administrator's
+   account and synchronize with &scc;. </para>
+ </sect1>
+ <sect1 xml:id="suma.setup.with.yast.admin">
+  <title>Creating the Organization with the Administrator's Account</title>
+
+  <para> This section will walk you through creating the organization with the administrator's
+   account for your &susemgr; Server. The administrator's account is the highest authority account
+   within &susemgr; and therefore administrator account access information should be stored in a
+   secure location. It is recommended that an administrator creates low level user accounts
+   designated for administration of each organization or group under the administrator's account for
+   security. </para>
+
+  <procedure xml:id="suma.setup.admin.account">
+   <title>Setting up the Administrator's Account</title>
+   <step>
+    <para> To begin open your browser and direct it to your &susemgr; Server URL which was provided
+     to you after completing setup. </para>
+    <para> Enter the <guimenu>Organization Name</guimenu>, then your <guimenu>Desired
+      Login</guimenu> name and <guimenu>Desired Password</guimenu>. Fill in the Account Information
+     fields including an email for system notifications. Select <guimenu>Create
+      Organization</guimenu> to finish creating your administration account. </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="quickstart-mgr-setup-admin1.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="quickstart-mgr-setup-admin1.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+  </procedure>
+
+  <para> Congratulations! You should now be presented with the &susemgr; Front Page. <xref
+    linkend="quickstart.first.channel.sync"/> will help prepare the server for connecting your first
+   client. </para>
+ </sect1>
+ <sect1 xml:id="quickstart.first.channel.sync">
+  <title>Synchronizing with &scc; (SCC)</title>
+
+  <para> &scc; (SCC) maintains a collection of repositories which contain packages, software and
+   updates for all supported client systems. These repositories are organized into channels each of
+   which provide software specific to a distribution, release and architecture. You must synchronize
+   your &susemgr; Server with SCC to add channels for your client systems. After synchronizing with
+   SCC your clients are able to receive updates or be organized into groups to be assigned to a
+   specific software channel. This section covers synchronizing with SCC from the &webui; and adding
+   your first client channels. </para>
+
+  <procedure>
+   <title>Synchronizing with &scc;</title>
+   <step>
+    <para> From the &susemgr; &webui; start page select <menuchoice>
+      <guimenu>Admin</guimenu>
+      <guimenu>Setup Wizard</guimenu>
+     </menuchoice>. </para>
+   </step>
+   <step>
+    <para> From the <guimenu>Setup Wizard</guimenu> page select the <guimenu>&suse;
+      Products</guimenu> tab. Wait a moment for the <guimenu>Available Products Below</guimenu> list
+     to populate. You are present with a list of repositories provided from SCC. Each of these
+     repositories represents a single software source known as a <systemitem>Base
+      Channel</systemitem> within &susemgr;. You can also see the architecture, channels, and status
+     information from this page. </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="admin_suse_products.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="admin_suse_products.png" width="80%" />
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para> As you are adding a &sle; 12 SP2 client based on the <systemitem>x86_64</systemitem>
+     architecture, scroll down the page and select the check box for this channel now. </para>
+    <itemizedlist>
+     <listitem>
+      <para> Add single channels to &susemgr; by selecting the check box to the left the
+        <guimenu>+</guimenu> button of each channel. </para>
+     </listitem>
+     <listitem>
+      <para> Add multiple channels by selecting the check boxes to the left of the channels list and
+       then schedule synchronization by clicking the <command>+ Add products</command> button
+       located at the bottom of the page. </para>
+     </listitem>
+    </itemizedlist>
+   </step>
+  </procedure>
+
+  <para> After adding your first channel &susemgr; will schedule the channel to be copied and begin
+   mirroring it. This can take a long time as &susemgr; must copy all software sources from the
+   &suse; Vendor repositories located at &scc; to your servers local
+    <replaceable>/var/spacewalk/</replaceable> directory. </para>
+
+  <tip>
+   <!-- bsc#965684 -->
+   <title>PostgreSQL and Transparant Huge Pages</title>
+   <para> In some environments, Transparent Huge Pages provided by the kernel may slow down
+    PostgreSQL workloads significantly. </para>
+   <para> To disable transparant huge pages set the <literal>transparent_hugepage</literal> kernel
+    parameter to <literal>never</literal>. This has to be changed in
+     <filename>/etc/default/grub</filename> and added to the line
+     <literal>GRUB_CMDLINE_LINUX_DEFAULT</literal>, for example: </para>
+   <screen>GRUB_CMDLINE_LINUX_DEFAULT="resume=/dev/sda1 splash=silent quiet showopts elevator=noop transparent_hugepage=never"</screen>
+   <para> To write the new configuration run <command>grub2-mkconfig -o
+     /boot/grub2/grub.cfg</command>. To update the grub2 during boot run <command>grub2-install
+     /dev/sda</command>. </para>
+  </tip>
+
+  <para> Monitor channel synchronization process in real-time by viewing channel log files located
+   in the following directory: </para>
+
+  <screen>example-server:/var/log/rhn/reposync/# tail -f &lt;Channel_Name&gt;.log</screen>
+
+  <para> After your channel sync has completed proceed to <xref
+    linkend="preparing.and.registering.clients"/>. </para>
+ </sect1>
+</chapter>

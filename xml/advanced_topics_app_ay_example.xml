@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE appendix
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+
+<appendix xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+ xml:id="advanced.topics.app.ay.example_simple">
+
+ <title>Minimalist &ay; Profile for Automated Installations and Useful Enhancements</title>
+ <para> The following &ay; profile will install a &sls; system with all default installation options
+  including a default network configuration with DHCP. After the installation is completed, a
+  bootstrap script located on the &susemgr; server will be executed in order to register the freshly
+  installed system with &susemgr;. You need to adjust the IP address of the &susemgr; server, the
+  name of the bootstrap script and the &rootuser; password according to your needs in the following
+  lines: </para>
+ <screen>&lt;user&gt;
+ ...
+ &lt;username&gt;root&lt;/username&gt;
+ &lt;user_password&gt;<replaceable>linux</replaceable>&lt;/user_password&gt;
+&lt;/user&gt;
+
+&lt;location&gt;http://<replaceable>192.168.1.1</replaceable>/pub/bootstrap/<replaceable>my_bootstrap.sh</replaceable>&lt;/location&gt;
+</screen>
+ <para> The complete &ay; file: </para>
+ <screen><![CDATA[<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns"
+         xmlns:config="http://www.suse.com/1.0/configns">
+ <general>
+  <mode>
+   <confirm config:type="boolean">false</confirm>
+  </mode>
+ </general>
+ <networking>
+  <keep_install_network config:type="boolean">true</keep_install_network>
+ </networking>
+ <software>
+  <install_recommended config:type="boolean">true</install_recommended>
+   <patterns config:type="list">
+    <pattern>base</pattern>
+   </patterns>
+ </software> 
+ <users config:type="list">
+  <user>
+   <encrypted config:type="boolean">false</encrypted>
+   <fullname>root</fullname>
+   <gid>0</gid>
+   <home>/root</home>
+   <password_settings>
+    <expire></expire>
+    <flag></flag>
+    <inact></inact>
+    <max></max>
+    <min></min>
+    <warn></warn>
+   </password_settings>
+   <shell>/bin/bash</shell>
+   <uid>0</uid>
+   <username>root</username>
+   <user_password>linux</user_password>
+  </user>
+ </users>
+ <scripts>
+  <init-scripts config:type="list">
+   <script>
+    <interpreter>shell</interpreter>
+    <location>http://192.168.1.1/pub/bootstrap/my_bootstrap.sh</location>
+   </script>
+  </init-scripts>
+ </scripts>
+</profile>]]></screen>
+
+ <!-- bnc#788758 and bnc#780261: about child channels -->
+ <para> Use the following enhancement fragment to add child channels: </para>
+
+ <screen>&lt;add-on&gt;
+ &lt;add_on_products config:type="list"&gt;
+  &lt;listentry&gt;
+   &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
+   &lt;media_url&gt;http://$c_server/ks/dist/child/<replaceable>channel-label</replaceable>/<replaceable>distribution-label</replaceable>&lt;/media_url&gt;
+   &lt;name&gt;$c_name&lt;/name&gt;
+   &lt;product&gt;$c_product&lt;/product&gt;
+   &lt;product_dir&gt;/&lt;/product_dir&gt;
+  &lt;/listentry&gt;
+...
+ &lt;/add_on_products&gt;
+&lt;/add-on&gt;</screen>
+
+ <para> Replace <replaceable>channel-label</replaceable> and
+   <replaceable>distribution-label</replaceable> with actual labels such as
+   <literal>sles11-sp1-updates-x86_64</literal> and <literal>sles11-sp2-x86_64</literal>, and set
+  the variables (<literal>$c_server</literal>, etc.) according to your environment. For information
+  about variable, see <xref linkend="s4-sm-system-kick-dist-variables"/>. </para>
+
+ <important>
+  <title>Add the Updates Channel</title>
+  <para>It is required to add the updates tools channel to the &lt;add-on> AutoYaST snippet section.
+   This ensures your systems are provided with an up-to-date version of libzypp. Without the
+   inclusion of an updates channel you will encounter 400 errors. See the following example where
+   the (DISTRIBUTION_NAME) is replaced with the name of the autoinstallation distribution created
+   previously in <menuchoice>
+    <guimenu>Systems</guimenu>
+    <guimenu>Autoinstallation</guimenu>
+    <guimenu>Distributions</guimenu>
+   </menuchoice></para>
+  <screen>&lt;listentry>
+     &lt;ask_on_error config:type="boolean">true&lt;/ask_on_error>
+     &lt;media_url>http://$redhat_management_server/ks/dist/child/sles12-sp2-updates-x86_64/(DISTRIBUTION_NAME)&lt;/media_url>
+     &lt;name>sles12 sp2 updates&lt;/name>
+     &lt;product>SLES12&lt;/product>
+     &lt;product_dir>/&lt;/product_dir>
+  &lt;/listentry></screen>
+ </important>
+</appendix>

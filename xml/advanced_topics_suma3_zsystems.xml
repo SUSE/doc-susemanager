@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink"
+    version="5.0" xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en"
+    xml:id="art.suma.install.zsystems">
+ <title>&susemgr; on IBM &zseries;</title>
+ <sect1>
+  <title>Introduction</title>
+
+  <para>
+   This best practice guide is intended for z/VM administrators responsible for
+   operating the IBM &zseries; Mainframe. The goal of this guide is to lead an
+   z/VM administrator trained on normal &zseries; operating protocols through
+   the installation of &susemgr; &productnumber; onto an existing mainframe
+   system. The intent of this article is not to cover the variety of hardware
+   configuration profiles available on &zseries; but instead to provide a
+   foundational overview of the procedure and requirements necessary for a
+   successful &susemgr; server deployment.
+  </para>
+ </sect1>
+ <sect1>
+  <title>Base System Requirements</title>
+
+  <para>
+   The z/VM administrator should acquire and prepare the following resources
+   for a successful &susemgr; installation. SUSE Manager &productnumber; is
+   delivered as an extension. These sections will provide you with the minimum
+   and recommended system requirements for &susemgr;. The base system for
+   &susemgr; &productnumber; is SLES 12 SP3.
+  </para>
+
+  <informaltable>
+   <tgroup cols="2">
+    <colspec colname="c1" colwidth="1*"/>
+    <colspec colname="c2" colwidth="4*"/>
+    <thead>
+     <row>
+      <entry>
+       <para>
+        Hardware
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Recommended Hardware
+       </para>
+      </entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>
+       <para>
+        IBM Systems
+       </para>
+      </entry>
+      <entry>
+       <itemizedlist>
+        <listitem>
+         <para>
+          IBM zEnterprise System z196 <emphasis>(z196)</emphasis>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          IBM zEnterprise System z114 <emphasis>(z114)</emphasis>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          IBM zEnterprise EC12 <emphasis>(zEC12)</emphasis>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          IBM zEnterprise EC12 <emphasis>(zEC12)</emphasis>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          IBM zEnterprise BC12 <emphasis>(zBC12)</emphasis>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          IBM z13 <emphasis>(z13)</emphasis>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          LinuxOne Rockhopper
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          LinuxOne Emperor
+         </para>
+        </listitem>
+       </itemizedlist>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        RAM
+       </para>
+      </entry>
+      <entry>
+       <para>
+        <emphasis>Split memory requirements across available RAM, VDISK and
+        swap to suit your environment. On a production system the ratio of
+        physical memory to VDISK will need to be re-evaluated based on the
+        number of clients which will be supported.</emphasis>
+       </para>
+       <para>
+        Minimum 5&nbsp; GB+ for test server <emphasis>(3GB RAM + 2GB VDISK
+        Swap)</emphasis>
+       </para>
+       <para>
+        Minimum 16&nbsp;GB+ for base installation
+       </para>
+       <para>
+        Minimum 32&nbsp;GB+ for a production server
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Free Disk Space
+       </para>
+      </entry>
+      <entry>
+       <para>
+        Minimum 100&nbsp;GB for root partition
+       </para>
+       <para>
+        Minimum 50&nbsp;GB for <replaceable>/var/lib/pgsql</replaceable>
+       </para>
+       <para>
+        Minimum 50&nbsp;GB per SUSE product + 100 GB per Red Hat product
+        <replaceable>/var/spacewalk</replaceable>
+       </para>
+      </entry>
+     </row>
+     <row>
+      <entry>
+       <para>
+        Network Connection
+       </para>
+      </entry>
+      <entry>
+       <itemizedlist>
+        <listitem>
+         <para>
+          OSA Express Ethernet <emphasis>(including Fast and Gigabit Ethernet)
+          </emphasis>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          HiperSockets or Guest LAN
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          10 GBE, VSWITCH
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          RoCE <emphasis>(RDMA over Converged Ethernet)</emphasis>
+         </para>
+        </listitem>
+       </itemizedlist>
+       <para>
+        The following interfaces are still included but no longer supported:
+       </para>
+       <itemizedlist>
+        <listitem>
+         <para>
+          CTC <emphasis>(or virtual CTC)</emphasis>
+         </para>
+        </listitem>
+        <listitem>
+         <para>
+          IP network interface for IUCV
+         </para>
+        </listitem>
+       </itemizedlist>
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </informaltable>
+
+  <itemizedlist>
+   <title>Media Requirements</title>
+   <listitem>
+    <para>
+     &sle; 12 SP3 Installation Media for IBM z Systems:
+    </para>
+    <para>
+     <link xlink:href="https://www.suse.com/products/server/download/"/>
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <sect1>
+  <title>Additional Requirements</title>
+
+  <para>
+   There are a few additional resource requirements you will need to prepare
+   before installing the SUSE Manager extension on your system. This section
+   overviews these requirements.
+  </para>
+
+  <para>
+   The guest z/VM should be provided with a static IP address and hostname as
+   these cannot be easily changed after initial setup. The hostname should
+   contain less than 8 characters.
+  </para>
+
+  <para>
+   For more information on &susemgr; &productnumber; additional requirements
+   see also:
+   <link
+                xlink:href="https://www.suse.com/documentation/suse-manager-3/book_suma_best_practices/data/mgr_conceptual_overview.html"
+            />
+  </para>
+
+  <para>
+   You are required to calculate sufficient disk storage for
+   &susemgr;<emphasis> before running</emphasis> <command>yast2</command>
+   <command>susemanager_setup</command>. The following information will help
+   fulfill these requirements.
+  </para>
+
+  <warning>
+   <title>&susemgr; Default Volume Groups and Disk Space</title>
+   <para>
+    By default the file system of &susemgr; including the embedded database and
+    patch directories will reside within the root volume. While adjustments are
+    possible once installation has completed it becomes the administrators
+    responsibility to specify and monitor these adjustments.
+   </para>
+   <para>
+    If your &susemgr; runs out of disk space, this can have a severe impact on
+    its database and file structure. Preparing storage requirements in
+    accordance with this section will aid in preventing these harmful effects.
+   </para>
+   <para>
+    <emphasis>SUSE technical services will be unable to provide support for
+    systems suffering from low disk space conditions as this can have an effect
+    on an entire system and therefore becomes unresolvable. A full recovery is
+    only possible with a previous backup or a new SUSE Manager
+    installation.</emphasis>
+   </para>
+  </warning>
+
+  <itemizedlist>
+   <title>Required Storage Devices</title>
+   <listitem>
+    <para>
+     An additional disk is required for database storage. This should be an
+     <systemitem>zFCP</systemitem> or <systemitem>DASD</systemitem> device as
+     these are preferred for use with <systemitem>HYPERPAV</systemitem>. This
+     disk should fulfill the following requirements
+    </para>
+    <para>
+     At least 50 GB for
+    </para>
+<screen>/var/lib/pgsql</screen>
+    <para>
+     Minimum 50&nbsp;GB per SUSE product + 100 GB per Red Hat product
+    </para>
+<screen>/var/spacewalk</screen>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+ <sect1>
+  <title>SLES 12 SP3 Installation and the SUSE Manager Extension</title>
+
+  <para>
+   This section covers the installation of &susemgr; &productnumber; as an
+   extension to SLES 12 SP3.
+  </para>
+
+  <para>
+   For more information on deploying SLES 12 SP3 on your hardware see:
+   <link
+                xlink:href="https://www.suse.com/documentation/sles-12/book_sle_deployment/data/cha_zseries.html"
+            />
+  </para>
+
+  <para>
+   During installation of SLES 12 SP3 select SUSE Manager 3 as an extension.
+  </para>
+
+  <para>
+   After rebooting you will need to setup the additional storage required for
+   <filename>/var/spacewalk</filename> and <filename>/var/lib/pgsql</filename>
+   and swap space using the yast partitioner tool. This step is
+   <emphasis>required</emphasis> before running <command>yast2
+   susemanager_setup</command>.
+  </para>
+
+  <para>
+   After configuring the storage requirements, having executed a yast2 online
+   update and completed a full system reboot, run &susemgr; setup to finalize
+   the &susemgr; installation on your &zseries; mainframe:
+  </para>
+
+<screen><prompt>#</prompt> yast2 susemanager_setup</screen>
+
+  <para>
+   This completes the installation of &susemgr; &productnumber; on your
+   &zseries;. For more information on beginning management with &susemgr;,
+   review the documentation at
+   <link xlink:href="https://www.suse.com/documentation/suse-manager-3/"/>.
+  </para>
+ </sect1>
+</chapter>

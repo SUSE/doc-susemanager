@@ -1,0 +1,548 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.images">
+ <title>Image Building and Management</title>
+ <info>
+  <abstract>
+   <para>
+    &susemgr; enables system administrators to build containers, create
+    image stores, and profiles. The following sections target
+    administrators with former experience using Docker and Kubernetes.
+   </para>
+  </abstract>
+ </info>
+
+ <sect1>
+  <title>Requirements</title>
+
+  <para>
+   This images feature is only available for Salt minions running on
+   &sls; 12 or later.  You will need git to store docker files.
+  </para>
+ <para>
+  For additional information on Docker or Kubernetes, see:
+ </para>
+ 
+ <itemizedlist>
+  <listitem>
+   <para>
+    <link
+        xlink:href="https://www.suse.com/documentation/sles-12/book_sles_docker/data/book_sles_docker.html"
+        />
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    <link xlink:href="https://docs.docker.com/"/>
+   </para>
+  </listitem>
+  <listitem>
+   <para>
+    <link xlink:href="https://kubernetes.io/docs/home/"/>
+   </para>
+  </listitem>
+ </itemizedlist>
+ 
+ </sect1>
+ <sect1 xml:id="bp.images.buildhost">
+  <title>Creating a Build Host</title>
+
+  <para>
+   To build container images with &susemgr;, you will need to create a build
+   host. Build hosts must be a Salt minion running SLES 12 or later.
+  </para>
+
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="images_image_build.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="images_image_build.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+  <para>
+   From the &susemgr; &webui; perform the following steps to create a build
+   host.
+  </para>
+
+  <procedure>
+   <step>
+    <para>
+     Select the desired build host minion from the
+     <menuchoice><guimenu>Systems</guimenu><guimenu>Overview</guimenu></menuchoice>
+     page.
+    </para>
+   </step>
+   <step>
+    <para>
+     From the <guimenu>System Details</guimenu> page assign the containers
+     modules to the Salt minion by going to <menuchoice>
+     <guimenu>Software</guimenu> <guimenu>Software Channels</guimenu>
+     </menuchoice> and enable
+     <literal>SLE-Module-Containers12-Pool</literal> and
+     <literal>SLE-Module-Containers12-Updates</literal>.  Confirm with
+     clicking <guimenu>Change Subscriptions</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     <remark>Is this actually still needed?  Or was this just an issue
+     during beta development?</remark> 
+     Update the <package>salt</package> and
+     <package>salt-minion</package> packages.
+    </para>
+    <warning>
+     <title>Upating Salt</title>
+     <para>
+      Do not update <package>salt</package> itself using Salt
+      states. First update your other system packages using Salt states
+      then update <package>salt</package> as a separate stand-alone step
+      from the &susemgr; &webui;.
+     </para>
+    </warning>
+   </step>
+   <step>
+    <para>
+     From the <menuchoice> <guimenu>System Details</guimenu>
+     <guimenu>Properties</guimenu> </menuchoice> page, enable the
+     <guimenu>Add-on System Type</guimenu> <literal>Container Build
+     Host</literal> and confirm with <guimenu>Update
+     Properties</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Apply the state that will install the required packages; on the
+     system's details page select
+     <menuchoice><guimenu>States</guimenu><guimenu>Highstate</guimenu></menuchoice>
+     and click <guimenu>Apply Highstate</guimenu>, or run
+     <literal>state.highstate</literal> from the command line.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
+ <sect1 xml:id="bp.images.buildchannels">
+  <title>Define Container Build Channels with an Activation Key</title>
+
+  <para>
+   Create an activation key associated with the channel that should be
+   used with your image.
+  </para>
+
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="systems_create_activation_key.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="systems_create_activation_key.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+  <procedure>
+   <step>
+    <para>
+     From the left navigation menu select
+     <menuchoice><guimenu>Systems</guimenu><guimenu>Activation
+     Keys</guimenu></menuchoice>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click <guimenu>Create Key</guimenu>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Enter a <guimenu>Description</guimenu>, a <guimenu>Key</guimenu>
+     name, Use the drop-down box to select the <guimenu>Base
+     Channel</guimenu> that should be associated with this key.  Confirm
+     with <guimenu>Create Activation Key</guimenu>.
+    </para>
+   </step>
+  </procedure>
+  <para>
+   For more information, see <xref linkend="bp.key.managment"/>.
+  </para>
+ </sect1>
+ <sect1>
+  <title>Creating an Image Store</title>
+
+  <para>
+   When working with images you will need a place to store them.
+  </para>
+
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="images_image_stores.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="images_image_stores.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+  <procedure>
+   <step>
+    <para>
+     From the left navigation menu select
+     <menuchoice><guimenu>Images</guimenu>
+     <guimenu>Stores</guimenu></menuchoice>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click <guimenu>Create</guimenu> to create a new store.
+    </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="imeages_image_stores_create.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="imeages_image_stores_create.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para>
+     Currently, &susemgr; only supports <literal>Registry</literal> for
+     the <guimenu>Store Type</guimenu>.  Define a
+     <guimenu>Label</guimenu> for the image store and provide a
+     <guimenu>URI</guimenu>. For containers the FQDN of the host
+     containing the registry is sufficient usually.
+    </para>
+   </step>
+   <step>
+    <para>
+     Click <guimenu>Create</guimenu> to add the new <literal>Image
+     Store</literal>.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
+ <sect1 xml:id="bp.images.profile">
+  <title>Creating an Image Profile</title>
+
+  <para>
+   You can create an image profile for your images. You can define an image
+   type, a specific store and select an activation key the image should be
+   associated with.
+  </para>
+
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="images_image_profiles.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="images_image_profiles.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+  <procedure>
+   <title>Create Image Profile</title>
+   <step>
+    <para>
+     To create an image profile select <menuchoice> <guimenu>Image</guimenu>
+     <guimenu>Profiles</guimenu> </menuchoice> and click
+     <guimenu>Create</guimenu>.
+    </para>
+    <informalfigure>
+     <mediaobject>
+      <imageobject role="fo">
+       <imagedata fileref="images_image_create_profile.png" width="400"/>
+      </imageobject>
+      <imageobject role="html">
+       <imagedata fileref="images_image_create_profile.png" width="80%"/>
+      </imageobject>
+     </mediaobject>
+    </informalfigure>
+   </step>
+   <step>
+    <para>
+     Fill in the <guimenu>Label</guimenu>, <guimenu>Image Type</guimenu>,
+     <guimenu>Target Image Store</guimenu>, <guimenu>Path</guimenu>, and
+     <guimenu>Activation Key</guimenu> fields.
+    </para>
+     <para>
+      For the <guimenu>Path</guimenu> field use a git URL
+      (http/https) with the following format:
+     </para>
+<screen>https://git.example.com/path/my.git#branchname:folder</screen>
+     <para>
+      If a branchname is not specified the <literal>master</literal> branch
+      will be used by default. If a <literal>folder</literal> is not specified
+      a <literal>Dockerfile</literal> is expected to be in the root directory
+      of the checkout.
+     </para>
+   </step>
+   <step>
+    <para>
+     Click the <guimenu>Create</guimenu> button.
+    </para>
+   </step>
+  </procedure>
+
+  <sect2>
+   <title>Example Dockerfile</title>
+   <para>
+    See the following example Dockerfile. A docker file is specified when
+    creating an image profile and stored in a git repository:
+   </para>
+<screen>   FROM registry.mgr.example.com/sles12sp2
+   MAINTAINER Tux Administrator "tux@example.com"
+   
+   ARG repo
+   ARG cert
+   
+   RUN echo "$cert" > /etc/pki/trust/anchors/RHN-ORG-TRUSTED-SSL-CERT.pem
+   RUN update-ca-certificates
+   RUN echo "$repo" > /etc/zypp/repos.d/susemanager:dockerbuild.repo
+   
+   ... do the required tasks
+   
+   RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo</screen>
+   <note>
+    <title>Packages Required for Inspecting</title>
+    <para>
+     If you want to inspect an image and provide the package or
+     product list of a container to the &susemgr; &webui; you are
+     required to install <package>python</package> and
+     <package>python-xml</package> in your container. If these packages
+     remain uninstalled, images will still build, but the package and
+     product list will not be read and the package/product list
+     information will not be available from the &webui;.
+    </para>
+   </note>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="bp.images.image.building">
+  <title>Building an Image</title>
+
+  <para>
+   There are two ways to build an image. You can select <menuchoice>
+   <guimenu>Images</guimenu> <guimenu>Build</guimenu> </menuchoice> from the
+   left navigation bar, or click the build icon in the <menuchoice>
+   <guimenu>Images</guimenu> <guimenu>Profiles</guimenu> </menuchoice> list.
+  </para>
+
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="images_image_build.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="images_image_build.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+  <procedure>
+   <title>Build an Image</title>
+   <step>
+    <para>
+     For this example select <menuchoice> <guimenu>Images</guimenu>
+     <guimenu>Build</guimenu> </menuchoice>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Add a different tag name if you want a version other than the default
+     <literal>latest</literal>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Select the <guimenu>Build Profile</guimenu> and a <guimenu>Build
+     Host</guimenu>
+    </para>
+    <note>
+     <title>Profile Summary</title>
+     <para>
+      Notice the <guimenu>Profile Summary</guimenu> to the right of the build
+      fields. When you have selected a build profile detailed information
+      about the selected profile will show up in this area.
+     </para>
+    </note>
+   </step>
+   <step>
+    <para>
+     To schedule a build click the <guimenu>Build</guimenu> button.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
+ <sect1 xml:id="bp.images.image.importing">
+  <title>Importing an Image</title>
+
+  <para>
+   You can import and inspect arbitrary images.  Select <menuchoice>
+   <guimenu>Images</guimenu> <guimenu>Images</guimenu> </menuchoice>
+   from the left navigation bar.  Fill the text boxes of the Import
+   dialog.  When processed the imported image will get listed on the
+   <guimenu>Images</guimenu> page.
+  </para>
+
+   <procedure>
+   <title>Import an Image</title>
+   <step>
+    <para>
+     From <menuchoice>
+     <guimenu>Images</guimenu> <guimenu>Images</guimenu> </menuchoice>
+     click the <guimenu>Import</guimenu> to open the <guimenu>Import
+     Image</guimenu> dialog.
+    </para>
+   </step>
+   <step>
+    <para>
+     In the <guimenu>Import</guimenu> dialog fill the following fields:
+    </para>
+    <variablelist>
+     <varlistentry>
+      <term>Image store</term>
+      <listitem>
+       <para>
+        The registry from where the image will be pulled for inspection.
+       </para>
+      </listitem>
+     </varlistentry>
+        
+     <varlistentry>
+      <term>Image name</term>
+      <listitem>
+       <para>
+         The name of the image in the registry.
+        </para>
+      </listitem>
+     </varlistentry>
+        
+     <varlistentry>
+      <term>Image version</term>
+      <listitem>
+       <para>
+        The version of the image in the registry.
+        </para>
+      </listitem>
+     </varlistentry>
+        
+     <varlistentry>
+      <term>Build host</term>
+      <listitem>
+       <para>
+         The build host that will pull and inspect the image.
+        </para>
+      </listitem>
+     </varlistentry>
+        
+     <varlistentry>
+      <term>Activation key</term>
+      <listitem>
+       <para>
+        To get the channels against which the image will be inspected.
+       </para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+    <para>
+     For confirmation, click <guimenu>Import</guimenu>.
+    </para>
+   </step>
+   </procedure>
+   <para>
+    At this point, the entry for the image is created in the database
+    and an Inspect Image action on &susemgr; is scheduled right away.
+   </para>
+   <para>
+    When processed find the imported image in the images list.  You can
+    recognize it because of a different icon in the Build column, which
+    means that the image is imported (see screenshot below). The status
+    icon for the imported image can also be seen on the overview tab for
+    the image.
+   </para>
+ </sect1>
+ 
+ <sect1>
+  <title>Listing Available Build Images</title>
+
+  <para>
+   To list available build images select <menuchoice> <guimenu>Images</guimenu>
+   <guimenu>Images</guimenu> </menuchoice>. A list of all build images will be
+   displayed.
+  </para>
+
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="images_list_images.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="images_list_images.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+  <para>
+   Displayed data about images includes an image <guimenu>Name</guimenu>, its
+   <guimenu>Version</guimenu> and the build <guimenu>Status</guimenu>. You will
+   also see an images update status with a listing of possible patch/package
+   updates that are available for the image.
+  </para>
+
+  <para>
+   Clicking the <guimenu>Details</guimenu> button on an image will provide a
+   detailed view including an exact list of relevant patches and a list of all
+   packages installed within the image.
+  </para>
+
+  <note>
+   <para>
+    The patch and package list is only available if the inspect state after a
+    build was successful.
+   </para>
+  </note>
+ </sect1>
+ <sect1>
+  <title>Troubleshooting</title>
+
+  <para>
+   The following are some known pitfalls when working with images.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     HTTPS certificates to access the registry or the git repositories should
+     be deployed to the minion by a custom written state file.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     SSH git access with docker is currently not working.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     In case <package>python</package> and <package>python-xml</package>
+     is not installed in an image, Salt cannot run within the container
+     and reporting of installed packages or products will fail. This
+     results in an unknown update status.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </sect1>
+</chapter>

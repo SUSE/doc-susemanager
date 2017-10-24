@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+ type="text/xml"
+ title="Profiling step"?>
+
+<!DOCTYPE article [
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+  %entities;
+]>
+
+<chapter xmlns="http://docbook.org/ns/docbook"
+ xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+ <?suse-quickstart color="suse"?>
+ <title>&susemgr; in the Public Cloud</title>
+ <subtitle>&susemgr; Server and &susemgr; Proxy in the Public
+  Cloud</subtitle>
+ <info>
+  <productnumber><phrase>3</phrase></productnumber>
+  <productname>&susemgr;</productname>
+  <date>
+   <?dbtimestamp format="B d, Y" ?></date>
+  <abstract>
+   <para> &susemgr; delivers best-in-class Linux server management
+    capabilities. For detailed information about the product please refer to
+    the <link xlink:href="https://www.suse.com/documentation/suse_manager">SUSE
+     Manager</link> documentation. </para>
+   <para> The &susemgr; Server and &susemgr; Proxy images published by
+    SUSE in selected Public Cloud environments are provided as Bring Your Own
+    Subscription (BYOS) images. &susemgr; Server instances need to be
+    registered with the SUSE Customer Center (SCC). Subscriptions of
+    &susemgr; Proxy instances are handled through their parent &susemgr;
+    Server. After an instance is launched, &susemgr; needs to be set up and
+    configured following the procedure in the &susemgr; documentation. </para>
+  </abstract>
+ </info>
+
+ <sect1 xml:id="instance-requirements">
+  <title>Instance Requirements</title>
+  <para> Select an instance size that meets the system requirements as
+   documented in the &susemgr; documentation. </para>
+  <itemizedlist>
+   <listitem>
+    <para> Minimal main memory: &gt;12G </para>
+   </listitem>
+   <listitem>
+    <para>The &susemgr; setup procedure performs a Forward-confirmed
+     reverse DNS lookup. This must succeed in order for the setup procedure to
+     complete successfully and for &susemgr; to operate as expected. Therefore
+     it is important that the hostname and IP configuration be performed prior
+     to running the &susemgr; setup procedure.</para>
+   </listitem>
+   <listitem>
+    <para>&susemgr; Server and &susemgr; Proxy instances are expected
+     to run in a network configuration that provides you control over
+     DNS entries and that is shielded from the Internet at large. Within
+     this network configuration DNS (Domain Name Service) resolution
+     must be provided, such that <literal>hostname -f</literal> returns
+     the FQDN (Full Qualified Domain Name). The DNS resolution is not only
+     important for the &susemgr; Server procedure but is also important
+     when clients are configured to be managed via &susemgr;. Configuring
+     DNS is Cloud Framework dependent, please refer to the cloud service
+     provider documentation for detailed instructions.</para>
+   </listitem>
+   <listitem>
+     <para> Minimal free disk space for &susemgr; 15G.</para>
+     <para>For Public Cloud instances we recommend that the repositories
+     and the &susemgr; Server database, and respectively the &susemgr; Proxy
+     squid cache, be located on an external virtual disk. The details for
+     this setup are provided in
+     <xref linkend="using-separate-storage-volume"/>. </para>
+    <para> Storing the database and the repositories on an external virtual
+     disk ensures that the data is not lost should the instance need to be
+     terminated for some reason. </para>
+   </listitem>
+  </itemizedlist>
+  <para> Please ensure that the selected instance type matches the requirements
+   listed above. Although we recommend that the database and the repositories
+   are stored on a separate device it is still recommended to set the root
+   volume size of the instance to 20G. </para>
+ </sect1>
+ <sect1 xml:id="setup">
+  <title>Setup</title>
+  <procedure>
+   <step>
+    <para> Run an instance of the &susemgr; Server or &susemgr; Proxy
+     image as published by SUSE. </para>
+    <para> The images are identifiable by the suse, manager, server or proxy,
+     and byos keywords in each public cloud environment. </para>
+    <para> The &susemgr; instance must run in a network access restricted
+     environment such as the private subnet of a VPC or with an appropriate
+     firewall setting such that it can only be accessed by machines in the IP
+     ranges you use. A generally accessible &susemgr; instance violates the
+     terms of the &susemgr; EULA. Access to the web interface of SUSE
+     Manager requires https. </para>
+   </step>
+   <step>
+    <para> Setup the hostname as follows: </para>
+
+    <para> &susemgr; requires a stable and reliable hostname and does not
+     take kindly to hostname changes. All commands provided need to be
+     executed as the <emphasis role="strong">root</emphasis> user.</para>
+    <orderedlist>
+     <listitem>
+      <para> Disable hostname setup in the dhcp configuration file:
+        <filename>/etc/sysconfig/network/dhcp</filename>
+      </para>
+      <screen>DHCLIENT_SET_HOSTNAME="no"</screen>
+     </listitem>
+
+     <listitem>
+      <para> Set the hostname to a name of your choice. Please note
+       it is important to provide the <replaceable>system name</replaceable>
+       and not the <replaceable>fully qualified hostname</replaceable>
+       to the <filename>hostnamectl</filename> command.</para>
+
+       <para>It is expected that the Fully Qualified Domain Name (FQDN) is
+       set by the cloud framework; for example if 
+       <emphasis role="strong">cloud_instance.cloud.net</emphasis> is the
+       fully qualified name than
+       <emphasis role="strong">cloud_instance</emphasis>
+       is the system name and <emphasis role="strong">cloud.net</emphasis>
+       is the domain name.</para>
+
+       <para>In the following example we will change the system name to
+       <emphasis role="strong">suma</emphasis></para>
+       <screen>$ hostnamectl set-hostname suma</screen>
+       <para>The fully qualified hostname is now locally set to
+       <emphasis role="strong">suma.cloud.net</emphasis>. Once the hostname
+       is set locally a DNS entry needs to be created in your network
+       environment such that domain name resolution works properly.</para>
+
+       <para>Alternatively to force proper resolution of the name on the
+       &susemgr; system you may alter the <filename>/etc/hosts</filename>
+       file as follows:</para>
+       <screen>$ echo "${local_address} suma.cloud.net suma" >> /etc/hosts</screen>
+       <para>The current value for the <replaceable>local_address</replaceable>,
+       can be obtained from the public cloud Web console or from within
+       a terminal session as follows:</para>
+       <itemizedlist>
+       <listitem>
+        <para> Obtain local ip address from within Amazon EC2 instance </para>
+        <screen>$ ec2metadata --local-ipv4</screen>
+       </listitem>
+       <listitem>
+        <para> Obtain local ip address from within Google Compute Engine instance </para>
+        <screen>$ gcemetadata --query instance --network-interfaces --ip</screen>
+       </listitem>
+       <listitem>
+        <para> Obtain local ip address from within Microsoft Azure instance </para>
+        <screen>$ azuremetadata --internal-ip</screen>
+       </listitem>
+       </itemizedlist>
+
+       <para>Note that forcing the DNS resolution to work via modification
+       of the <filename>/etc/hosts</filename> file will allow the
+       <filename>yast2 susemanager_setup</filename> procedure to work. However,
+       if DNS resolution is not properly configured this also implies that
+       any client that is to be managed via this &susemgr; instance must
+       also receive the same modification to <filename>/etc/hosts</filename>.
+       </para>
+
+       <para>One more aspect of hostname resolution is the
+       <filename>/etc/resolv.conf</filename> file. Depending on the order of
+       your setup, i.e. if you started the &susemgr; instance prior to setting
+       up DNS services the file may not contain the appropriate
+       <emphasis role="strong">search</emphasis> directive. Double check
+       that the proper search directive exists in
+       <filename>/etc/resolv.conf</filename>. In our example the directive
+       would be <emphasis role="strong">search cloud.net</emphasis>. If the
+       directive is missing add it to the file.
+       </para>
+
+       <para>Reference information for the DNS record update is provided
+       below.</para>
+     </listitem>
+
+     <listitem>
+       <para>For an update of the DNS records for the instance within the
+       DNS service of your network environment, refer to the cloud service
+       provider documentation for detailed instructions:</para>
+       <itemizedlist>
+       <listitem>
+        <para><link
+         xlink:href="http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-dns.html">
+         DNS setup on Amazon EC2</link></para>
+       </listitem>
+       <listitem>
+        <para><link
+         xlink:href="https://cloud.google.com/compute/docs/networking">
+         DNS setup on Google Compute Engine</link></para>
+       </listitem>
+       <listitem>
+        <para><link
+         xlink:href="https://azure.microsoft.com/en-us/documentation/articles/dns-operations-recordsets">
+         DNS setup on Microsoft Azure</link></para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </orderedlist>
+   </step>
+   <step>
+    <para> Configure &susemgr; </para>
+    <substeps performance="required">
+     <step>
+       <para> If you run a &susemgr; Server instance run YaST as shown
+       below after the instance is launched, the external storage is
+       attached and prepared according to
+       <xref linkend="using-separate-storage-volume"/>, and the DNS resolution
+       is set up as described earlier.</para>
+       <screen>$ /sbin/yast2 susemanager_setup</screen>
+       <para>Note that the setup of &susemgr; from this point forward does
+       not differ from the documentation in the <link
+        xlink:href="https://www.suse.com/documentation/suse_manager">SUSE
+        Manager Guide</link>. </para>
+      <para>The &susemgr; setup procedure in YaST is designed as a one pass
+       process with no rollback or cleanup capability. Therefore, if the
+       setup procedure is interrupted or ends with an error, it is not
+       recommended to attempt a recovery as a reapate of the setup process or
+       attempts to manually "fix" the configuration are most likely to fail
+       and result in a broken &susemgr; installation. In case of any
+       errors we recommend to start a new instance in order to run a
+       fresh setup procedure on a clean system.
+      </para>
+      <para> If you are prompted with a message that there is not enough space
+       available for the setup of &susemgr; verify that your root volume is
+       at least 20GB and double check that the instructions in <xref
+        linkend="using-separate-storage-volume"/> had the desired effects. </para>
+      <para> &susemgr; Server for the Public Cloud comes with a bootstrap
+       data module pre-installed that contains optimized package lists for
+       bootstrapping instances started from SUSE Linux Enterprise images
+       published by SUSE. If you intend to register such an instance,
+       make sure when creating the bootstrap repository you run the
+       mgr-create-bootstrap-repo script as follows:
+      </para>
+      <screen>$ mgr-create-bootstrap-repo --datamodule=mgr_pubcloud_bootstrap_data -c SLE-12-SP1-x86_64</screen>
+      <para> The above example creates a bootstrap repository suitable for SUSE
+       Linux Enterprise Server 12 SP1 instances. See <link
+       xlink:href="https://www.suse.com/documentation/suse-manager-3/book.suma.getting-started/data/create_tools_repository.html">
+       Creating the SUSE Manger Tools Repository</link> for more information on bootstrapping.
+      </para>
+      <para>Prior to registering instances started from on demand images
+        remove the following packages from the instance to be registered:</para>
+        <orderedlist>
+           <listitem>
+             <para>cloud-regionsrv-client</para>
+           </listitem>
+           <listitem>
+             <para><emphasis role="strong">For Amazon EC2</emphasis></para>
+             <para>regionServiceClientConfigEC2</para>
+             <para>regionServiceCertsEC2</para>
+           </listitem>
+           <listitem>
+             <para><emphasis role="strong">For Google Compute Engine</emphasis></para>
+             <para>cloud-regionsrv-client-plugin-gce</para>
+             <para>regionServiceClientConfigGCE</para>
+             <para>regionServiceCertsGCE</para>
+           </listitem>
+           <listitem>
+             <para><emphasis role="strong">For Microsoft Azure</emphasis></para>
+             <para>regionServiceClientConfigAzure</para>
+             <para>regionServiceCertsAzure</para>
+           </listitem>
+        </orderedlist>
+        <para>If these packages are not removed it is possible to create interference
+        between the repositories provided by &susemgr; and the repositories
+        provided by the SUSE operated update infrastructure.
+      </para>
+      <para>Additionally remove the line from the
+      <filename>/etc/hosts</filename> file that contains the
+      <emphasis role="strong">susecloud.net</emphasis> reference.</para>
+     </step>
+     <step>
+      <para> If you run a &susemgr; Proxy instance </para>
+      <para> Launch the instance, optionally with external storage configured.
+      If you use external storage (recommended), prepare it according to
+      <xref linkend="using-separate-storage-volume"/>. It is recommended but
+      not required to prepare the storage before configuring &susemgr; proxy,
+      as the suma-storage script will migrate any existing cached data to the
+      external storage. After preparing the instance, register the system
+      with the parent SUSE Manager, which could be a &susemgr; Server or
+      another &susemgr; Proxy. See the <link
+        xlink:href="https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_proxyquick/book_susemanager_proxyquick.html"
+        > &susemgr; Proxy Setup guide</link> for details. Once registered,
+       run </para>
+      <screen>$ /usr/sbin/configure-proxy.sh</screen>
+      <para> to configure your &susemgr; Proxy instance. </para>
+     </step>
+    </substeps>
+   </step>
+   <step>
+    <para> After the completion of the configuration step, &susemgr; should
+     be functional and running. For &susemgr; Server, the setup process
+     created an administrator user with following user name: </para>
+    <simplelist>
+     <member>User name: <literal>admin</literal></member>
+    </simplelist>
+    <table>
+     <title>Account credentials for admin user</title>
+     <tgroup cols="3">
+      <thead>
+       <row>
+        <entry>
+         <para> Amazon EC2 </para>
+        </entry>
+        <entry>
+         <para> Google Compute Engine </para>
+        </entry>
+        <entry>
+         <para> Microsoft Azure </para>
+        </entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>
+         <para>
+          <replaceable>Instance-ID</replaceable>
+         </para>
+        </entry>
+        <entry>
+         <para>
+          <replaceable>Instance-ID</replaceable>
+         </para>
+        </entry>
+        <entry>
+         <para>
+          <replaceable>Instance-Name</replaceable><emphasis role="strong"
+           >-suma</emphasis>
+         </para>
+        </entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+    <para> The current value for the <replaceable>Instance-ID</replaceable> or
+      <replaceable>Instance-Name</replaceable> in case of the Azure Cloud, can
+     be obtained from the public cloud Web console or from within a terminal
+     session as follows: </para>
+    <itemizedlist>
+     <listitem>
+      <para> Obtain instance id from within Amazon EC2 instance </para>
+      <screen>$ ec2metadata --instance-id</screen>
+     </listitem>
+     <listitem>
+      <para> Obtain instance id from within Google Compute Engine instance </para>
+      <screen>$ gcemetadata --query instance --id</screen>
+     </listitem>
+     <listitem>
+      <para> Obtain instance name from within Microsoft Azure instance </para>
+      <screen>$ azuremetadata --instance-name</screen>
+     </listitem>
+    </itemizedlist>
+    <para> After logging in through the &susemgr; Server Web UI, <emphasis
+      role="strong">change</emphasis> the default password. </para>
+    <para> &susemgr; Proxy does not have administration Web interface
+     itself. It can be managed through its parent &susemgr; Server. </para>
+   </step>
+  </procedure>
+  <sect2 xml:id="using-separate-storage-volume">
+   <title>Using Separate Storage Volume</title>
+   <para> We recommend that the repositories and the database for &susemgr;
+    be stored on a virtual storage device. This best practice will avoid data
+    loss in cases where the &susemgr; instance may need to be terminated.
+    These steps <emphasis role="strong">must</emphasis> be performed <emphasis
+     role="strong">prior</emphasis> to running the YaST &susemgr; setup
+    procedure. </para>
+   <procedure>
+    <step>
+     <para> Provision a disk device in the public cloud environment, refer to
+      the cloud service provider documentation for detailed instructions. The
+      size of the disk is dependent on the number of distributions and channels
+      you intend to manage with &susemgr;. For sizing information refer to
+       <link xlink:href="https://www.suse.com/support/kb/doc.php?id=7015050"
+       >&susemgr; sizing examples</link>. A rule of thumb is 25 GB per
+      distribution per channel. </para>
+    </step>
+    <step>
+     <para> Once attached the device appears as Unix device node in your
+      instance. For the following command to work this device node name is
+      required. In many cases the attached storage appears as <emphasis
+       role="strong">/dev/sdb</emphasis>. In order to check which disk devices
+      exists on your system, call the following command: </para>
+     <screen>$ hwinfo --disk | grep -E "Device File:"</screen>
+    </step>
+    <step>
+     <para> With the device name at hand the process of re-linking the
+      directories in the filesystem &susemgr; uses to store data is handled
+      by the suma-storage script. In the following example we use
+       <filename>/dev/sdb</filename> as the device name. </para>
+     <screen>$ /usr/bin/suma-storage /dev/sdb</screen>
+     <para> After the call all database and repository files used by SUSE
+      Manager Server are moved to the newly created xfs based storage. In case
+      your instance is a &susemgr; Proxy, the script will move the Squid
+      cache, which caches the software packages, to the newly created storage.
+      The xfs partition is mounted below the path
+       <filename>/manager_storage</filename>. </para>
+    </step>
+    <step>
+     <para> Create an entry in /etc/fstab (optional) </para>
+     <para> Different cloud frameworks treat the attachment of external storage
+      devices differently at instance boot time. Please refer to the cloud
+      environment documentation for guidance about the fstab entry. </para>
+     <para> If your cloud framework recommends to add an fstab entry, add the
+      following line to the <emphasis role="strong">/etc/fstab</emphasis> file. </para>
+     <screen>/dev/sdb1 /manager_storage xfs defaults 1 1</screen>
+    </step>
+   </procedure>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="registration-of-cloned-systems">
+  <title>Registration of Cloned Systems</title>
+  <para> &susemgr; treats systems (instances) with the same system ID as one.
+   This implies that one instance will mask another if the instances have the
+   same system ID. This situation occurs by launching multiple instances from
+   the same image or when an image has been created from a running instance.
+   Thus prior to registering a new instance complete step 5.1 or 5.2, 
+   depending on the distribution on the following wiki.</para>
+  <para>
+   <link
+    xlink:href="http://wiki.novell.com/index.php/SUSE_Manager/Register_Clones"
+   />
+  </para>
+ </sect1>
+</chapter>

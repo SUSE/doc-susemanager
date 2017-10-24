@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml" 
+                 title="Profiling step"?>
+<!DOCTYPE chapter
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<!-- proposed better xml:id: bp.cert.custom -->
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+         xml:id="bp.chap.bring.your.own.cert">
+ <!-- based on
+      https://wiki.microfocus.com/index.php/SUSE_Manager/Import_Custom_Certificate
+ -->
+
+ <title>Using a Custom SSL Certificate</title>
+ <para>
+  The following section will guide you through using a custom certificate with
+  &susemgr; &productnumber; and &susemgrproxy; &productnumber;.
+ </para>
+ <sect1 xml:id="bp.cert.custom.req">
+  <title>Prerequisites</title>
+
+  <para>
+   The following list provides requirements for using a custom certificate.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     A Certificate Authority (CA) SSL public certificate file
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     A Web server SSL private key file
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     A Web server SSL public certificate file
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Key and Certificate files must be in PEM format
+    </para>
+   </listitem>
+  </itemizedlist>
+
+  <important>
+   <title>Hostname and SSL Keys</title>
+   <para>
+    The hostname of the web server's SSL keys and relevant certificate files
+    must match the hostname of the machine which they will be deployed on.
+   </para>
+  </important>
+
+  <tip>
+   <!-- https://bugzilla.suse.com/show_bug.cgi?id=1052691 -->
+   <title>Intermediate Certificates</title>
+   <para>
+    In case you want to use CAs with intermediate certificates, merge
+    the intermediate and root CA certificates into one file. It is
+    important that the intermediate certificate comes first within the
+    combined file.
+   </para>
+  </tip>
+  
+ </sect1>
+ <sect1 xml:id="bp.cert.custom.setup">
+  <title>Setup</title>
+  <para>
+   After completing &yast; firstboot procedures, export your current environment
+   variables and point them to the correct SSL files to be imported. Running
+   these commands will make the default certificate obsolete after executing
+   the <command>yast2 susemanager_setup</command> command. For more information
+   on &yast; firstboot, see
+   <link
+        xlink:href="https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_install/book_susemanager_install.html#sec.manager.inst.setup"
+      />.
+  </para>
+
+  <procedure xml:id="bp.cert.custom.setup.proc">
+   <step xml:id="bp.cert.custom.setup.proc.export">
+    <para>
+     Export the environment variables and point to the SSL files to be
+     imported:
+    </para>
+<screen>export CA_CERT=<replaceable>path_to_CA_certificate_file</replaceable>
+export SERVER_KEY=<replaceable>path_to_web_server_key</replaceable>
+export SERVER_CERT=<replaceable>path_to_web_server_certificate</replaceable></screen>
+   </step>
+   <step>
+    <para>
+     Execute &susemgr; setup with
+    </para>
+    <screen>yast2 susemanager_setup</screen>
+    <para>
+     Proceed with the default setup. Upon reaching the Certificate Setup
+     window during &yast; installation, fill in random values, as these
+     will be overridden with the values specified in <xref
+     linkend="bp.cert.custom.setup.proc.export"/>.
+    </para>
+    <note>
+     <title>Shell Requirements</title>
+     <para>
+      Make sure that you execute <command>yast2
+      susemanager_setup</command> from within the same shell the
+      environment variables were exported from.
+     </para>
+    </note>
+   </step>
+  </procedure>
+ </sect1>
+ <sect1 xml:id="bp.cert.custom.proxy">
+  <title>Using a Custom Certificate with &susemgrproxy; &productnumber;</title>
+
+  <para>
+   After completing the installation with yast found in
+   <xref
+        linkend="advanced.topics.proxy.quickstart"/> continue with a
+   modified <xref
+        linkend="at.manager.proxy.run.confproxy"/> procedure:
+  </para>
+
+  <procedure xml:id="bp.cert.custom.proxy.proc">
+   <step>
+    <para>
+     Execute <command>configure-proxy.sh</command>.
+    </para>
+   </step>
+   <step>
+    <para>
+     When prompted with:
+    </para>
+<screen>Do you want to import existing certificates?</screen>
+    <para>
+     Answer with <keycap>y</keycap>.
+    </para>
+   </step>
+   <step>
+    <para>
+     Continue by following the script prompts.
+    </para>
+   </step>
+  </procedure>
+ </sect1>
+</chapter>

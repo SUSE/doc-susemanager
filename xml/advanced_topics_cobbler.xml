@@ -1,0 +1,678 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl"
+                 type="text/xml"
+                 title="Profiling step"?>
+
+<!DOCTYPE chapter[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<!-- id was: ch-cobbler -->
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="advanced.topics.cobbler">
+
+ <title>Cobbler</title>
+ <!--idx-->
+ <indexterm>
+  <primary>Cobbler</primary></indexterm>
+ <indexterm>
+  <primary>cobbler</primary></indexterm>
+ <indexterm>
+  <primary>Koan</primary></indexterm>
+ <indexterm>
+  <primary>koan</primary>
+ </indexterm>
+ <para> &susemgr; features the Cobbler server that allows administrators to centralize their system
+  installation and provisioning infrastructure. Cobbler is an installation server that provides
+  various methods of performing unattended system installations, whether it be server, workstation,
+  or guest systems in a full or para-virtualized setup. </para>
+ <para> Cobbler offers several tools to assist in pre-installation guidance, automated installation
+  file management, installation environment management, and more. This section explains supported
+  features of Cobbler, which include: </para>
+ <itemizedlist>
+  <listitem>
+   <para> installation environment analysis using the <command>cobbler check</command> command,
+   </para>
+  </listitem>
+  <listitem>
+   <para> multi-site installation server configuration with <command>cobbler replicate</command>,
+     <remark role="needinfo">emap: RH dropped replicate. Keep or not?</remark>
+   </para>
+  </listitem>
+  <listitem>
+   <para> virtual machine guest installation automation with the <command>koan</command> client-side
+    tool, </para>
+  </listitem>
+  <listitem>
+   <para> building installation ISOs with PXE-like menus using the <command>cobbler
+     buildiso</command> command for &susemgr; systems with x86_64 architecture. <remark
+     role="needinfo">emap: added in RH docs. Valid for SUSE as well? There's also a new section on
+     building ISOs with Cobbler at the end.</remark>
+   </para>
+  </listitem>
+ </itemizedlist>
+
+ <para> For more detailed upstream documentation on Cobbler, see <link
+   xlink:href="http://cobbler.github.io/manuals/"/>. </para>
+
+ <important>
+  <title>Supported Cobbler Functions</title>
+  <para> &suse; only support those Cobbler functions that are either listed within our formal
+   documentation or available via the Web Interface and API. </para>
+ </important>
+
+ <sect1 xml:id="advanced.topics.cobbler.reqs">
+  <title>Cobbler Requirements</title>
+
+  <para> To use Cobbler as a PXE boot server, follow these guidelines: </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     <!-- bnc#847514 --> For system installation with PXE, you must have a TFTP server installed and
+     configured. By default, &susemgr; installs such a TFTP server. </para>
+   </listitem>
+   <listitem>
+    <para> To PXE boot systems for installation, you must either set up a DHCP server for Cobbler
+     PXE booting or have access to your network's DHCP server. Edit
+      <filename>/etc/dhcp.conf</filename> to change <option>next-server</option> to the hostname or
+     IP address of your Cobbler server. </para>
+   </listitem>
+   <!--
+   <listitem>
+    <para>
+     <remark role="needinfo">emap: added in RH. Valid? Replaced yum
+     with zypper.</remark>
+     <remark>ke: not needed on SLES; see
+     https://bugzilla.suse.com/show_bug.cgi?id=880027</remark>
+     The latest <filename>cobbler-loaders</filename> package needs to be
+     installed. This is to ensure that the <filename>pxelinux.0</filename>
+     boot image is installed and available on the &susemgr; before PXE
+     booting. To install the latest version, use: <command>zypper install
+     cobbler-loaders</command>.
+    </para>
+   </listitem>
+   -->
+  </itemizedlist>
+  <important>
+   <title>Correct Hostname Configuration</title>
+   <para>When onboarding bare metal systems using the pxe-default-image, it's important to ensure
+    all systems to be on-board have unique hostnames. Otherwise, if you later assign a provisioning
+    profile to it, the new configuration file will overwrite the configuration settings for any
+    system with the duplicate hostname. Cobbler uses hostnames as a unique key for each system.
+   </para>
+  </important>
+  <sect2 xml:id="advanced.topics.cobbler.reqs.settings">
+   <title>Configuring Cobbler with /etc/cobbler/settings</title>
+   <para> Cobbler configuration is mainly done in the <filename>/etc/cobbler/settings</filename>
+    file. With the default settings unchanged, Cobbler runs as intended. All configurable settings
+    are explained in detail in the <filename>/etc/cobbler/settings</filename> file with regard to
+    how they affect functionality of Cobbler and whether it is recommended for users to adjust
+    values to their environment. </para>
+
+   <note>
+    <!-- SLE 12 SP1 -->
+    <title>Supported Languages</title>
+    <para> If &susemgr; complains about language '<literal>en</literal>' was not found within the
+     list of supported languages available at <filename>/usr/share/YaST2/data/languages</filename>,
+     remove the lang in <filename>/etc/cobbler/settings</filename> or add a proper value such as
+      <literal>en_US</literal>. </para>
+    <para> For background info, see <link
+      xlink:href="https://www.suse.com/support/kb/doc?id=7018334"/>. </para>
+   </note>
+
+  </sect2>
+
+  <sect2 xml:id="advanced.topics.cobbler.req.dhcp">
+   <title>Cobbler and DHCP</title>
+   <para> Cobbler supports bare-metal automated installation of systems configured to perform
+    network boots using a PXE boot server. To properly implement a Cobbler installation server,
+    administrators need to either have administrative access to the network's DHCP server or set up
+    DHCP on the Cobbler server itself. </para>
+   <sect3 xml:id="advanced.topics.cobbler.reqs.dhcp.notmanaged">
+    <title>Configuring an Existing DHCP Server</title>
+    <para> If you have a DHCP server deployed on another system in the network, you will need
+     administrative access to the DHCP server to edit the DHCP configuration file so that it points
+     to the Cobbler server and PXE boot image. </para>
+    <para> As &rootuser; on the DHCP server, edit the <filename>/etc/dhcpd.conf</filename> file and
+     append a new class with options for performing PXE boot installation. For example: </para>
+    <screen>allow booting;
+allow bootp; <co xml:id="co.s2-cobbler-dhcp.exist.bootp"/>
+class &quot;PXE&quot; <co xml:id="co.s2-cobbler-dhcp.exist.pxe"/> {
+match if substring(option vendor-class-identifier, 0, 9) = &quot;PXEClient&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.pxeclient"/>
+next-server 192.168.2.1; <co xml:id="co.s2-cobbler-dhcp.exist.cobbler"/>
+filename &quot;pxelinux.0&quot;; <co xml:id="co.s2-cobbler-dhcp.exist.bootloader"/>
+}</screen>
+    <para> Step by step explanation: </para>
+    <calloutlist>
+     <callout arearefs="co.s2-cobbler-dhcp.exist.bootp">
+      <para> Enable network booting with the <systemitem>bootp</systemitem> protocol. </para>
+     </callout>
+     <callout arearefs="co.s2-cobbler-dhcp.exist.pxe">
+      <para> Create a class called <literal>PXE</literal>.</para>
+     </callout>
+     <callout arearefs="co.s2-cobbler-dhcp.exist.pxeclient">
+      <para>A system configured to have PXE first in its boot priority identifies itself as
+        <literal>PXEClient</literal>. </para>
+     </callout>
+     <callout arearefs="co.s2-cobbler-dhcp.exist.cobbler">
+      <para> As a result, the DHCP server directs the system to the Cobbler server at
+        <literal>192.168.2.1</literal>. </para>
+     </callout>
+     <callout arearefs="co.s2-cobbler-dhcp.exist.bootloader">
+      <para> The DHCP server retrieves the <filename>pxelinux.0</filename> bootloader file. </para>
+     </callout>
+    </calloutlist>
+   </sect3>
+   <sect3 xml:id="advanced.topics.cobbler.reqs.dhcp.kvm">
+    <title>Setting up PXE Boot in KVM</title>
+    <para> Not necessarily for production, but for lab or demo environments you can alternativly set
+     up PXE boot in KVM. Such a configuration can replace the <literal>next-server</literal> setting
+     on a DHCP server explained in <xref linkend="advanced.topics.cobbler.reqs.dhcp.notmanaged"/>.
+     To edit the network XML description with <command>virsh</command>, proceed as follow: </para>
+
+    <procedure>
+     <!--        net-edit network -->
+     <step>
+      <para>Produce an XML dump of the current description:</para>
+      <screen>&prompt.root;virsh net-dumpxml --inactive network > network.xml</screen>
+     </step>
+     <step>
+      <para> Open the XML dump file (here <filename>network.xml</filename>) with a text editor and
+       add a <literal>bootp</literal> statement within the <literal>&lt;dhcp></literal> element: </para>
+      <screen><![CDATA[<bootp file='/pxelinux.0' server='192.168.100.153'/>]]></screen>
+
+     </step>
+     <step>
+      <para> Install the edited description: </para>
+      <screen>&prompt.root;virsh net-define network.xml</screen>
+     </step>
+    </procedure>
+    <para> Or try the <literal>net-edit</literal> subcommand that does some error checking. </para>
+
+    <example xml:id="at.cobbler.bootp.kvm">
+     <title>Minimal Network XML Description for KVM</title>
+     <screen><![CDATA[<network>
+  <name>default</name>
+  <uuid>1da84185-31b5-4c8b-9ee2-a7f5ba39a7ee</uuid>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='virbr0' stp='on' delay='0'/>
+  <mac address='52:54:00:29:59:18'/>
+  <domain name='default'/>
+  <ip address='192.168.100.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.100.128' end='192.168.100.254'/>
+      <bootp file='/pxelinux.0' server='192.168.100.153'/>]]><co xml:id="at.cobbler.bootp.kvm.bootp"/><![CDATA[
+    </dhcp>
+  </ip>
+</network>]]></screen>
+     <!--
+         <para>
+         Step by step explanation:
+         </para>
+     -->
+     <calloutlist>
+      <callout arearefs="at.cobbler.bootp.kvm.bootp">
+       <para>
+        <literal>bootp</literal> statement that directs to the PXE server. </para>
+      </callout>
+     </calloutlist>
+    </example>
+
+   </sect3>
+  </sect2>
+
+  <sect2 xml:id="advanced.topics.cobbler.reqs.tftp">
+   <title>Xinetd and TFTP</title>
+   <para> &susemgr; uses the <systemitem class="daemon">atftpd</systemitem> daemon, but it can also
+    operate with Xinetd/TFTP. The <systemitem class="daemon">atftpd</systemitem> is installed by
+    default as the recommended method for providing PXE services. Usually, you do not have to change
+    its configuration, but if you have to, use the &yast; Sysconfig Editor. </para>
+   <para> Xinetd is a daemon that manages a suite of services, including TFTP, the FTP server used
+    for transferring the boot image to a PXE client. </para>
+   <para> To configure TFTP, you must first enable the service via Xinetd. To do this, edit the
+     <filename>/etc/xinetd.d/tftp</filename> file as &rootuser; and change the <option>disable =
+     yes</option> line to <literal>disable = no</literal>. </para>
+   <para> Before TFTP can serve the <filename>pxelinux.0</filename> boot image, you must start the
+    Xinetd service. Start &yast; and use <menuchoice>
+     <guimenu>System</guimenu>
+     <guimenu>Services Manager</guimenu>
+    </menuchoice> to configure the <systemitem class="daemon">Xinetd</systemitem> daemon. </para>
+   <!--<screen>chkconfig &#x2d;&#x2d;level 345 xinetd on
+/sbin/service xinetd start</screen>
+   <para>
+    The <command>chkconfig</command> command turns on the
+    <command>xinetd</command> service for all user runlevels, while the
+    <command>/sbin/service</command> command turns on
+    <command>xinetd</command> immediately.
+   </para>
+-->
+  </sect2>
+
+  <sect2 xml:id="advanced.topics.cobbler.reqs.sync.tftp">
+   <title>Syncing TFTP Contents to SUSE Manager Proxies</title>
+
+   <!-- Re-using
+        http://wiki.novell.com/index.php/SUSE_Manager/SSHServerPush#TFTP_Sync
+   -->
+   <para> It is possible to sync cobbler generated TFTP contents to &susemgr; Proxies to perform PXE
+    booting via these proxies. </para>
+
+   <sect3>
+    <title>Installation</title>
+
+    <para> On the &susemgr; Server, install the package
+      <systemitem>susemanager-tftpsync</systemitem>: </para>
+    <screen>&prompt.root;zypper install susemanager-tftpsync</screen>
+
+    <para> On the &susemgrproxy; systems, install the package
+      <systemitem>susemanager-tftpsync-recv</systemitem>: </para>
+    <screen>&prompt.root;zypper install susemanager-tftpsync-recv</screen>
+   </sect3>
+   <sect3>
+    <title>Configuring &susemgrproxy;</title>
+    <para> Execute <filename>configure-tftpsync.sh</filename> on the &susemgrproxy; systems. </para>
+    <para> This setup script asks for hostnames and IP addresses of the &susemgr; server and the
+     proxy. Additionally, it asks for the <literal>tftpboot</literal> directory on the proxy. For
+     more information, see the output of <command>configure-tftpsync.sh --help</command>. </para>
+   </sect3>
+   <sect3>
+    <title>Configuring &susemgr; Server</title>
+
+    <para> Execute <filename>configure-tftpsync.sh</filename> on &susemgr; Server: </para>
+
+    <screen>&prompt.root;configure-tftpsync.sh proxy1.example.com proxy2.example.com</screen>
+
+    <para> Execute <command>cobbler sync</command> to initially push the files to the proxy systems.
+     This will succeed if all listed proxies are properly configured. </para>
+    <note>
+     <title>Changing the List of Proxy Systems</title>
+     <para> You can call <command>configure-tftpsync.sh</command> to change the list of proxy
+      systems. You must always provide the full list of proxy systems. </para>
+    </note>
+    <note>
+     <title>Reinstalling a Configured Proxy</title>
+     <para> In case you reinstall an already configured proxy and want to push all files again you
+      must remove the cache file <filename>/var/lib/cobbler/pxe_cache.json</filename> before you can
+      call <command>cobbler sync</command> again. </para>
+    </note>
+   </sect3>
+
+   <sect3>
+    <title>Requirements</title>
+
+    <para> The &susemgr; Server must be able to access the &susemgrproxy; systems directly. Push via
+     proxies is not possible. </para>
+   </sect3>
+  </sect2>
+  <!-- 2011-01-19 toms: According to ug: Not applicable for SUSE Manager
+                         as we don't ship it with SELinux.
+                         The iptables would be ok, but without SELinux
+                         
+        FIXME: Add a short explanation on how to configure SUSEFirewall
+        for cobbler
+   -->
+
+  <!--  
+  <section status="notrevised" xml:id="s2-cobbler-reqs-security">
+   <title>Configuring SELinux and IPTables for Cobbler Support</title>
+    <remark>toms 2011-01-19: Probably not needed for SUSE Manager?</remark>
+   <para>
+    Red Hat Enterprise Linux is installed with SELinux support in addition
+    to secure firewall enabled by default. To properly configure a Red Hat
+    Enterprise Linux server to use Cobbler, you must first configure these
+    system and network safeguards to allow connections to and from the
+    Cobbler Server.
+   </para>
+   <section status="notrevised" xml:id="s3-cobbler-reqs-security-selinux">
+    <title>SELinux Configuration</title>
+    <para>
+     To enable SELinux for Cobbler support, you must set the SELinux boolean
+     to allow HTTPD web service components. Run the following command as
+     root on the Cobbler server:
+    </para>
+<screen>setsebool -P httpd_can_network_connect true</screen>
+    <para>
+     The <option>-P</option> switch is essential, as it enables HTTPD
+     connection persistently across all system reboots.
+    </para>
+    <para>
+     You must also set SELinux file context rules to ensure Cobbler properly
+     functions in an SELinux system.
+    </para>
+    <para>
+     Run the following as root on the Cobbler server:
+    </para>
+<screen>semanage fcontext -a -t public_content_t &quot;/tftpboot/.*&quot;</screen>
+    <para>
+     The command sets file context for TFTP to serve the boot image file.
+    </para>
+   </section>
+   <section status="notrevised" xml:id="s3-cobbler-reqs-security-iptables">
+    <title>IPTables Configuration</title>
+    <para>
+     Once you have configured SELinux, you must then configure IPTables to
+     allow incoming and outgoing network traffic on the Cobbler server.
+    </para>
+    <para>
+     If you have an existing firewall ruleset using IPTables, you need to
+     add the following rules to open the requisite Cobbler-related ports.
+     The following lists each of the requisite rules with their associated
+     service.
+    </para>
+    <itemizedlist>
+     <listitem>
+      <para>
+       For TFTP:
+      </para>
+<screen>/sbin/iptables -A INPUT -m state &#x2d;&#x2d;state NEW -m tcp -p tcp &#x2d;&#x2d;dport 69 -j ACCEPT
+/sbin/iptables -A INPUT -m state &#x2d;&#x2d;state NEW -m udp -p udp &#x2d;&#x2d;dport 69 -j ACCEPT</screen>
+     </listitem>
+     <listitem>
+      <para>
+       For HTTPD:
+      </para>
+<screen>/sbin/iptables -A INPUT -m state &#x2d;&#x2d;state NEW -m tcp -p tcp &#x2d;&#x2d;dport 80 -j ACCEPT
+/sbin/iptables -A INPUT -m state &#x2d;&#x2d;state NEW -m tcp -p tcp &#x2d;&#x2d;dport 443 -j ACCEPT</screen>
+     </listitem>
+     <listitem>
+      <para>
+       For Cobbler and Koan XMLRPC:
+      </para>
+<screen>/sbin/iptables -A INPUT -m state &#x2d;&#x2d;state NEW -m tcp -p tcp &#x2d;&#x2d;dport 25151 -j ACCEPT</screen>
+     </listitem>
+    </itemizedlist>
+    <para>
+     Once those firewall rules are entered, be sure to save the firewall
+     configuration:
+    </para>
+<screen>/sbin/iptables-save</screen>
+   </section>
+  </section>
+-->
+
+  <sect2 xml:id="advanced.topics.cobbler.reqs.service">
+   <title>Syncing and Starting the Cobbler Service</title>
+   <para> Before starting the cobbler service, run a check on the cobbler service to make sure that
+    all the prerequisites are configured according to the organization's needs with the command:
+     <command>cobbler check</command>. </para>
+   <para> If content, start the &susemgr; server with the following command: </para>
+   <screen>&prompt.root;/usr/sbin/spacewalk-service start</screen>
+   <warning>
+    <para> Do not start or stop the <command>cobblerd</command> service independent of the &susemgr;
+     service. Doing so may cause errors and other issues. </para>
+    <para> Always use <command>/usr/sbin/spacewalk-service</command> to start or stop &susemgr;.
+    </para>
+   </warning>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="advanced.topics.cobbler.adddistro">
+  <title>Adding a Distribution to Cobbler</title>
+
+  <para> If all Cobbler prerequisites have been met and Cobbler is running, you can use the Cobbler
+   server as an installation source for a distribution: Make installation files such as the kernel
+   image and the initrd image available on the Cobbler server. Then add a distribution to Cobbler,
+   using either the Web interface or the command line tools. </para>
+
+  <para> For information about creating and configuring &ay; or Kickstart distributions from the
+   &susemgr; interface, refer to <xref linkend="ref.webui.systems.autoinst.distribution"/>. </para>
+
+  <para> To create a distribution from the command line, use <command>cobbler</command> as follows: </para>
+
+  <screen>&prompt.root;cobbler distro add --name=<replaceable>string</replaceable><!--
+--> --kernel=<replaceable>path</replaceable><!--
+--> --initrd=<replaceable>path</replaceable></screen>
+
+  <para> The <option>--name=<replaceable>string</replaceable></option> option is a label used to
+   differentiate one distribution choice from another (for example,
+   <literal>sles12server</literal>). </para>
+
+  <para> The <option>--kernel=<replaceable>path</replaceable></option> option specifies the path to
+   the kernel image file. </para>
+
+  <para> The <option>--initrd=<replaceable>path</replaceable></option> option specifies the path to
+   the initial ram disk (initrd) image file. </para>
+ </sect1>
+ <sect1 xml:id="advanced.topics.cobbler.addprofile">
+  <title>Adding a Profile to Cobbler</title>
+
+  <para> Once you have added a distribution to Cobbler, you can add profiles. </para>
+
+  <para> Cobbler profiles associate a distribution with additional options like &ay; or Kickstart
+   files. Profiles are the core unit of provisioning and there must be at least one Cobbler profile
+   for every distribution added. For example, two profiles might be created for a Web server and a
+   desktop configuration. While both profiles use the same distribution, the profiles are for
+   different installation types. </para>
+  <para> For information about creating and configuring Kickstart and &ay; profiles in the &susemgr;
+   interface, refer to <xref linkend="ref.webui.systems.autoinst.profiles"/>. </para>
+  <para> Use <command>cobbler</command> to create profiles on the command line: </para>
+  <screen>&prompt.root;cobbler profile add --name=string --distro=string [--kickstart=url] \
+  [--virt-file-size=gigabytes] [--virt-ram=megabytes]</screen>
+
+  <para> The <option>--name=<replaceable>string</replaceable></option> is the unique label for the
+   profile, such as <literal>sles12webserver</literal> or <literal>sles12workstation</literal>. </para>
+
+  <para> The <option>--distro=<replaceable>string</replaceable></option> option specifies the
+   distribution that will be used for this particular profile. For adding distributions, see <xref
+    linkend="advanced.topics.cobbler.adddistro"/>. </para>
+
+  <para> The <option>--kickstart=<replaceable>url</replaceable></option> option specifies the
+   location of the Kickstart file (if available). </para>
+
+  <para> The <option>--virt-file-size=<replaceable>gigabytes</replaceable></option> option allows
+   you to set the size of the virtual guest file image. The default is 5 GB. </para>
+
+  <para> The <option>--virt-ram=<replaceable>megabytes</replaceable></option> option specifies how
+   many MB of physical RAM a virtual guest can consume. The default is 512 MB. </para>
+ </sect1>
+ <sect1 xml:id="advanced.topics.cobbler.addsystem">
+  <title>Adding a System to Cobbler</title>
+
+  <para> Once the distributions and profiles for Cobbler have been created, add systems to Cobbler.
+   System records map a piece of hardware on a client with the cobbler profile assigned to run on
+   it. </para>
+
+  <note>
+   <para> If you are provisioning via <command>koan</command> and PXE menus alone, it is not
+    required to create system records. They are useful when system-specific Kickstart templating is
+    required or to establish that a specific system should always get specific content installed. If
+    a client is intended for a certain role, system records should be created for it. </para>
+  </note>
+
+  <para> For information about creating and configuring automated installation from the &susemgr;
+   interface, refer to <xref linkend="s4-sm-system-details-kick"/>. </para>
+
+  <para> The following command adds a system to the Cobbler configuration: </para>
+
+  <screen>&prompt.root;cobbler system add --name=string --profile=string \
+  --mac-address=AA:BB:CC:DD:EE:FF</screen>
+
+  <para> The <option>--name=<replaceable>string</replaceable></option> is the unique label for the
+   system, such as <literal>engineering_server</literal> or
+    <literal>frontoffice_workstation</literal>. </para>
+
+  <para> The <option>--profile=<replaceable>string</replaceable></option> specifies the name of one
+   of the profiles added in <xref linkend="advanced.topics.cobbler.addprofile"/>. </para>
+
+  <para> The <option>--mac-address=<replaceable>AA:BB:CC:DD:EE:FF</replaceable></option> option
+   allows systems with the specified MAC address automatically being provisioned to the profile
+   associated with the system record when they are being installed. </para>
+
+  <para> For more options, such as setting hostname or IP addresses, refer to the Cobbler manpage
+    (<command>man cobbler</command>). </para>
+ </sect1>
+ <sect1 xml:id="advanced.topics.cobbler.templates">
+  <title>Using Cobbler Templates</title>
+
+  <para> The &susemgr; Web interface facilitates creating variables for use with Kickstart
+   distributions and profiles. To create a Kickstart profile variable, refer to <xref
+    linkend="s4-sm-system-kick-details-variables"/>. </para>
+
+  <para> Kickstart variables are part of an infrastructural change in &susemgr; to support
+   templating in Kickstart files. Kickstart templates are files describing how to build actual
+   Kickstart files rather than creating specific Kickstarts. </para>
+
+  <para> These templates are shared by various profiles and systems that have their own variables
+   and corresponding values. These variables modify the templates and a template engine parses the
+   template and variable data into a usable Kickstart file. Cobbler uses an advanced template engine
+   called Cheetah that provides support for templates, variables, and snippets. </para>
+
+  <para> Advantages of using templates include: </para>
+
+  <itemizedlist>
+   <listitem>
+    <para> Robust features that allow administrators to create and manage large amounts of profiles
+     or systems without duplication of effort or manually creating Kickstarts for every unique
+     situation. </para>
+   </listitem>
+   <listitem>
+    <para> While templates can become complex and involve loops, conditionals and other enhanced
+     features and syntax, you can keep them simple by creating Kickstart files without such
+     complexity. </para>
+   </listitem>
+  </itemizedlist>
+  <sect2 xml:id="advanced.topics.cobbler.templates.usage">
+   <title>Using Templates</title>
+   <para> Kickstart templates can have static values for certain common items such as PXE image file
+    names, subnet addresses, and common paths such as
+     <filename>/etc/sysconfig/network-scripts/</filename>. However, templates differ from standard
+    Kickstart files in their use of variables. </para>
+   <para> For example, a standard Kickstart file may have a networking section similar to the
+    following: </para>
+   <screen>&prompt.root;network --device=eth0 --bootproto=static --ip=192.168.100.24 \
+  --netmask=255.255.255.0 --gateway=192.168.100.1 --nameserver=192.168.100.2</screen>
+   <para> In a Kickstart template file, the networking section would rather look like this: </para>
+   <screen>&prompt.root;network --device=$net_dev --bootproto=static --ip=$ip_addr \
+  --netmask=255.255.255.0 --gateway=$my_gateway --nameserver=$my_nameserver</screen>
+   <para> These variables will be substituted with the values set in your Kickstart profile
+    variables or in your system detail variables. If the same variables are defined in both the
+    profile and the system detail, then the system detail variable takes precedence. </para>
+   <note>
+    <para> The template for the autoinstallation has syntax rules, using punctuation symbols. To
+     avoid clashes, they need to be properly treated. </para>
+   </note>
+   <para> In case the autoinstallation scenario contains any shell script using variables like
+     <literal>$(example)</literal>, its content should be escaped by using the backslash symbol:
+     <literal>\$(example)</literal>. </para>
+   <para> If the variable named <literal>example</literal> is defined in the autoinstallation
+    snippet, the templating engine will evaluate <literal>$example</literal> with its content. If
+    there is no such variable, the content will be left unchanged. Escaping the <keycap>$</keycap>
+    symbol will prevent the templating engine to perform its evaluation as an internal variable.
+    Long scripts or strings can be escaped by wrapping them with the <literal>#raw</literal> and
+     <literal>#end raw</literal> directives. For example: </para>
+   <screen>
+#raw
+#!/bin/bash
+for i in {0..2}; do
+ echo "$i - Hello World!"
+done
+#end raw
+   </screen>
+   <para> Also, pay attention to similar scenarios like the following: </para>
+   <screen>
+#start some section (this is a comment)
+echo "Hello, world"
+#end some section (this is a comment)
+   </screen>
+   <para> Any line with a <keycap>#</keycap> symbol followed by a whitespace is treated as a comment
+    and is therefore not evaluated. </para>
+   <para> For more information about Kickstart templates, refer to the Cobbler project page at: </para>
+   <para>
+    <link xlink:href="https://fedorahosted.org/cobbler/wiki/KickstartTemplating"/>
+   </para>
+  </sect2>
+
+  <sect2 xml:id="advanced.topics.cobbler.templates.snippets">
+   <title>Kickstart Snippets</title>
+   <para> If you have common configurations across all Kickstart templates and profiles, you can use
+    the Snippets feature of Cobbler to take advantage of code reuse. </para>
+   <para> Kickstart snippets are sections of Kickstart code that can be called by a
+     <option>$SNIPPET()</option> function that will be parsed by Cobbler and substituted with the
+    contents of the snippet. </para>
+   <para> For example, you might have a common hard drive partition configuration for all servers,
+    such as: </para>
+   <screen>clearpart --all
+part /boot --fstype ext3 --size=150 --asprimary
+part / --fstype ext3 --size=40000 --asprimary
+part swap --recommended
+
+part pv.00 --size=1 --grow
+
+volgroup vg00 pv.00
+logvol /var --name=var vgname=vg00 --fstype ext3 --size=5000</screen>
+   <para> Save this snippet of the configuration to a file like <filename>my_partition</filename>
+    and place the file in <filename>/var/lib/cobbler/snippets/</filename>, where Cobbler can access
+    it. </para>
+   <para> Use the snippet by calling the <option>$SNIPPET()</option> function in your Kickstart
+    templates. For example: </para>
+   <screen>$SNIPPET('my_partition')</screen>
+   <para> Wherever you invoke that function, the Cheetah parser will substitute the function with
+    the snippet of code contained in the <filename>my_partition</filename> file. </para>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="advanced.topics.cobbler.koan">
+  <title>Using Koan</title>
+
+  <para> Whether you are provisioning guests on a virtual machine or reinstalling a new distribution
+   on a running system, koan works in conjunction with Cobbler to provision systems. </para>
+
+  <sect2 xml:id="advanced.topics.cobbler.koan.virt">
+   <title>Using Koan to Provision Virtual Systems</title>
+   <para> If you have created a virtual machine profile as documented in <xref
+     linkend="advanced.topics.cobbler.addprofile"/>, you can use <command>koan</command> to initiate
+    the installation of a virtual guest on a system. </para>
+   <para> For example, create a Cobbler profile with the following command: </para>
+   <screen>&prompt.root;cobbler add profile --name=virtualfileserver \
+  --distro=sles12-x86_64-server --virt-file-size=20 --virt-ram=1000</screen>
+   <para> This profile is for a fileserver running &sls;&nbsp;12 with a 20 GB guest image size and
+    allocated 1 GB of system RAM. </para>
+   <para> To find the name of the virtual guest system profile, run the following
+     <command>koan</command> command: </para>
+   <screen>&prompt.root;koan --server=hostname --list-profiles</screen>
+   <para> This command lists all the available profiles created with <command>cobbler profile
+     add</command>. </para>
+   <para> Start creating the image file and the installation of the virtual guest system: </para>
+   <screen>&prompt.root;koan --virt --server=cobbler-server.example.com \
+  --profile=virtualfileserver --virtname=marketingfileserver</screen>
+   <para> The command specifies that a virtual guest system be created from the Cobbler server
+    (hostname <systemitem class="server">cobbler-server.example.com</systemitem>) using the
+     <literal>virtualfileserver</literal> profile. The <option>virtname</option> option specifies a
+    label for the virtual guest, which by default is the system's MAC address. </para>
+   <para> Once the installation of the virtual guest is complete, it can be used as any other
+    virtual guest system. </para>
+  </sect2>
+
+  <sect2 xml:id="advanced.topics.cobbler.koan.reinstall">
+   <title>Using Koan to Reinstall Running Systems</title>
+   <para>
+    <command>koan</command> can replace a still running system with a new installation from the
+    available Cobbler profiles by executing the following command <emphasis>on the system to be
+     reinstalled</emphasis>: </para>
+   <screen>&prompt.root;koan --replace-self --server=hostname --profile=name</screen>
+   <para> This command, running on the system to be replaced, will start the provisioning process
+    and replace its own system using the profile in <option>--profile=name</option> on the Cobbler
+    server specified in <option>--server=hostname</option>. </para>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="advanced.topics.cobbler.buildiso">
+  <title>Building ISOs with Cobbler</title>
+  <para> Some environments might lack PXE support. The cobbler buildiso command provides
+   functionality to create a boot ISO image containing a set of distributions and kernels, and a
+   menu similar to PXE network installations. Define the name and output location of the boot ISO
+   using the <option>--iso</option> option. </para>
+  <screen>&prompt.root;cobbler buildiso --iso=/path/to/boot.iso</screen>
+  <para> The boot ISO includes all profiles and systems by default. Limit these profiles and systems
+   using the <option>--profiles</option> and <option>--systems</option> options. </para>
+  <screen>&prompt.root;cobbler buildiso --systems="system1,system2,system3" \
+  --profiles="profile1,profile2,profile3"
+   </screen>
+  <note>
+   <para> Building ISOs with the <command>cobbler buildiso</command> command is supported for all
+    architectures except the &zsystems; architecture. </para>
+  </note>
+ </sect1>
+</chapter>
