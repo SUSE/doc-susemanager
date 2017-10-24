@@ -1,8 +1,8 @@
 ---
-title: Prerequisites and Requirements
+title: Prerequisites
 keywords: prerequisites
 sidebar: sumadoc-31_sidebar
-permalink: prerequisites-and-requirements.html
+permalink: prerequisites.html
 folder: suse-mgr3.1/getting-started/overview
 toc: false
 summary: Get started with SUSE Manager 3 by setting up a KVM learning environment. This quick-start guide will provide you with introductory guidance on setting up SUSE Manager server. You will learn the basics of managing both traditional SUSE Manager clients and Salt clients. This guide is intended for system administrators.
