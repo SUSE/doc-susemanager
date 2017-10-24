@@ -14,7 +14,10 @@
  </para>
  <sect1 xml:id="advanced.topics.app.ports.server">
   <title>&susemgr; Server</title>
-  <para/>
+  <para>
+   Some ports are only relevant if you run this related service on the
+   &susemgr; server.
+  </para>
   <!--
     port number
     internal (listening on 127.0.0.1) or external
@@ -39,25 +42,12 @@
     <term>69</term>
     <listitem>
      <para>
-      Inbound / 
+      Inbound / TFTP
      </para>
- 
-       <para>
-        Used when &susemgr; is configured as a PXE server and allows
-        installation and re-installation of PXE-boot enabled systems.
-       </para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term>80</term>
-    <listitem>
+     
      <para>
-      Inbound / 
-     </para>
- 
-     <para>
-      All &webui;, client, and proxy server requests
-      travel via HTTP or HTTPS.
+      Used when &susemgr; is configured as a PXE server and allows
+      installation and re-installation of PXE-boot enabled systems.
      </para>
     </listitem>
    </varlistentry>
@@ -65,11 +55,24 @@
     <term>80</term>
     <listitem>
      <para>
-      Outbound / 
+      Inbound / HTTP
+     </para>
+     
+     <para>
+      All &webui;, client, and proxy server requests travel via HTTP or
+      HTTPS.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>80</term>
+    <listitem>
+     <para>
+      Outbound / HTTP
      </para>
  
      <para>
-      CHECKIT! Used to contact &scc;.  Now HTTPS only?
+      CHECKIT! Used to contact &scc;/&ncc;.  Now HTTPS only?
      </para>
     </listitem>
    </varlistentry>
@@ -77,12 +80,12 @@
     <term>443</term>
     <listitem>
      <para>
-      Inbound / 
+      Inbound / HTTPS
      </para>
  
      <para>
-      All &webui;, client, and proxy server requests
-      travel via HTTP or HTTPS.
+      All &webui;, client, and proxy server requests travel via HTTP or
+      HTTPS.
      </para>
     </listitem>
    </varlistentry>
@@ -90,17 +93,41 @@
     <term>443</term>
     <listitem>
      <para>
-      Outbound / 
+      Outbound / HTTPS
      </para>
  
      <para>
       
-      &susemgr; uses this port to reach &scc;
-(unless running in a disconnected mode with SMT&mdash;as described in
-<xref linkend="sub.mgr.tool"/>). 
+      &susemgr; uses this port to reach &scc; (unless running in a
+      disconnected mode with SMT&mdash;as described in <xref
+      linkend="sub.mgr.tool"/>).
      </para>
     </listitem>
    </varlistentry>
+   <varlistentry>
+    <term>2828</term>
+    <listitem>
+     <para>
+      Internal / 
+     </para>
+ 
+     <para>
+      satellite-search API, used by the RHN application in Tomcat and Taskomatic.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>2829</term>
+    <listitem>
+     <para>
+      Internal / 
+     </para>
+ 
+     <para>
+      Taskomatic API, used by the RHN application in Tomcat.
+     </para>
+    </listitem>
+    </varlistentry>
    <varlistentry>
     <term>5222</term>
     <listitem>
@@ -110,7 +137,7 @@
  
      <para>
       When you wish to push actions to clients this port is required by the
-      <systemitem>osad</systemitem> daemon running on your client systems
+      <systemitem>osad</systemitem> daemon running on your client systems.
      </para>
     </listitem>
    </varlistentry>
@@ -153,7 +180,110 @@
      </para>
     </listitem>
    </varlistentry>
+   <varlistentry>
+    <term>6868</term>
+    <listitem>
+     <para>
+      Internal
+     </para>
+     <para>
+      Auditlog-keeper to database.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>6888</term>
+    <listitem>
+     <para>
+      Internal
+     </para>
+     <para>
+      Auditlog-keeper API, used by the RHN application in Tomcat.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>8005</term>
+    <listitem>
+     <para>
+      Internal
+     </para>
+     <para>
+      Tomcat shutdown port.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>8009</term>
+    <listitem>
+     <para>
+      Internal
+     </para>
+     <para>
+      Tomcat to Apache HTTPD (AJP).
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>8080</term>
+    <listitem>
+     <para>
+      Internal
+     </para>
+     <para>
+      Tomcat to Apache HTTPD (HTTP).
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>9080</term>
+    <listitem>
+     <para>
+      Internal
+     </para>
+     <para>
+      salt-api, used by the RHN application in Tomcat and Taskomatic.
+     </para>
+    </listitem>
+   </varlistentry>
+    <varlistentry>
+    <term>25151</term>
+    <listitem>
+     <para>
+
+     </para>
+     <para>
+      Cobbler.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>32000</term>
+    <term>32001</term>
+    <listitem>
+     <para>
+      Internal
+     </para>
+     <para>
+      Port for a TCP connection to the Java Virtual Machine (JVM) that
+      runs Taskomatic and the search (satellite-search).
+     </para>
+    </listitem>
+   </varlistentry>
   </variablelist>
+
+  <note>
+   <title>Ephemeral Ports</title>
+   <para>
+    Anything from port 32768 on (more exactly, what you can see with <command>cat
+    /proc/sys/net/ipv4/ip_local_port_range</command>) is an ephemeral port, typically
+used as the receiving end of a TCP connection.  So if process A opens a
+TCP connection to process B (for example, port 22), then A chooses an
+arbitrary source TCP port to match with destination port 22.
+   </para>
+  </note>
+
+
  </sect1>
  <sect1 xml:id="advanced.topics.app.ports.proxy">
   <title>&susemgr; Proxy Server</title>
@@ -220,12 +350,56 @@
   <variablelist>
    <title>Ports to Open on &susemgr; Client</title>
    <varlistentry>
-    <term>
-    </term>
+    <term>22</term>
+    <listitem>
+     <para>
+      Inbound / SSH
+     </para>
+     <para>
+      Required when using ssh-push or ssh-push-tunnel contact methods.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>80</term>
+    <term>443</term>
+    <listitem>	
+     <para>Outbound</para>
+     <para>
+      To reach the &susemgr; server or &susemgrproxy; server.
+     </para>
+    </listitem>
+   </varlistentry>
+   <!--
+   <varlistentry>
+    <term></term>
+    <term></term>
     <listitem>	
      <para>Inbound/Outbound</para>
      <para>
 
+     </para>
+    </listitem>
+   </varlistentry>
+   -->
+<!--
+4545
+	
+
+Inbound
+	
+
+For connections from the server or proxy server for monitoring.
+-->
+   <varlistentry>
+    <term>5222</term>
+
+    <listitem>	
+     <para>
+      Outbound
+     </para>
+     <para>
+      For push actions with the server or proxy server.
      </para>
     </listitem>
    </varlistentry>
