@@ -23,10 +23,13 @@ The Systems page displays a list of all your registered systems. Several columns
 
 *   System: The name of the system specified during registration. The default name is the host name of the system. Clicking the name of a system displays its System Details page. Refer to [the section called “System Details”](../system_details/README.md) for more information.
 
-- {% include image.html file="spacewalk-icon-virtual-host.svg" alt="Virtual Host" max-width="50" %} Virtual Host
-- {% include image.html file="spacewalk-icon-virtual-guest.svg" max-width="50" %} Virtual Guest
-- {% include image.html file="fa-236-non-virtual-system.svg" max-width="50" %} Non-Virtual System
-- {% include image.html file="spacewalk-icon-unprov-system.svg" max-width="50" %} Unprovisioned System
+| Description | Icon |  |
+|----         |----  |---- |
+| Virtual Host | {% include image.html file="spacewalk-icon-virtual-host.svg" alt="Virtual Host" max-width="50" %} |
+|Virtual Guest | {% include image.html file="spacewalk-icon-virtual-guest.svg" max-width="50" %} |
+| Non-Virtual System | {% include image.html file="fa-236-non-virtual-system.svg" max-width="50" %} |
+| Unprovisioned System | {% include image.html file="spacewalk-icon-unprov-system.svg" max-width="50" %} |
+
 
 *   Updates: Shows which type of update action is applicable to the system or confirms that the system is up-to-date. Some icons are linked to related tasks. For example, the standard Updates icon is linked to the Upgrade subtab of the packages list, while the Critical Updates icon links directly to the Software Patches page.
 
