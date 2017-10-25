@@ -1,11 +1,12 @@
 ---
 title: Systems
-keywords: systems
+keywords: systems overview
 sidebar: sumadoc-31_sidebar
 permalink: systems.html
 folder: suse-mgr3.1/webui-reference/systems
 toc: true
 ---
+
 ## Overview {#overview}
 
 The System Overview page provides a summary of your systems, including their status, number of associated patches (errata) and packages, and their so-called system type. Clicking the name of a system takes you to its System Details page. Refer to [the section called “System Details”](system_details/README.md) for more information.
