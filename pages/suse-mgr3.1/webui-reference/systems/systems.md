@@ -19,46 +19,64 @@ You can also click Use in SSM in the System Groups section to go directly to the
 
 The Systems page displays a list of all your registered systems. Several columns provide information for each system:
 
-*   Select box: Systems without a system type cannot be selected. To select systems, mark the appropriate check boxes. Selected systems are added to the System Set Manager, where actions can be carried out simultaneously on all systems in the set. Refer to [the section called “System Set Manager”](../system_set_manager/README.md) for details.
+### System Columns
 
-*   System: The name of the system specified during registration. The default name is the host name of the system. Clicking the name of a system displays its System Details page. Refer to [the section called “System Details”](../system_details/README.md) for more information.
+- Select box: Systems without a system type cannot be selected. To select systems, mark the appropriate check boxes. Selected systems are added to the System Set Manager, where actions can be carried out simultaneously on all systems in the set. Refer to [the section called “System Set Manager”](../system_set_manager/README.md) for details.
 
-| Description | Icon |  |
-|----         |----  |---- |
-| Virtual Host | {% include image.html file="spacewalk-icon-virtual-host.svg" alt="Virtual Host" max-width="50" %} |
-|Virtual Guest | {% include image.html file="spacewalk-icon-virtual-guest.svg" max-width="50" %} |
-| Non-Virtual System | {% include image.html file="fa-236-non-virtual-system.svg" max-width="50" %} |
-| Unprovisioned System | {% include image.html file="spacewalk-icon-unprov-system.svg" max-width="50" %} |
+- System: The name of the system specified during registration. The default name is the host name of the system. Clicking the name of a system displays its System Details page. Refer to [the section called “System Details”](../system_details/README.md) for more information.
+<br/>See also: [Systems Icons](#system-icons)
 
+- Updates: Shows which type of update action is applicable to the system or confirms that the system is up-to-date. Some icons are linked to related tasks. For example, the standard Updates icon is linked to the Upgrade subtab of the packages list, while the Critical Updates icon links directly to the Software Patches page.<br/> See also: [Update Icons](#update-icons)
 
-*   Updates: Shows which type of update action is applicable to the system or confirms that the system is up-to-date. Some icons are linked to related tasks. For example, the standard Updates icon is linked to the Upgrade subtab of the packages list, while the Critical Updates icon links directly to the Software Patches page.
+- Patches: Total number of patch alerts applicable to the system.
 
-    | ![Check Circle](fa-check-circle.png) — System is up-to-date. |
-    | --- |
-    | ![Exclamation Circle](fa-exclamation-circle.png) — Critical patch (errata) available, update _strongly_ recommended. |
-    | ![Warning](fa-warning.png) — Updates available and recommended. |
-    | ![Question](fa-question-circle.png) — System not checking in properly (for 24 hours or more). |
-    | ![Lock](fa-lock.png) — System is locked; actions prohibited. |
-    | ![Rocket](fa-rocket.png) — System is being deployed using AutoYaST or Kickstart. |
-    | ![Clock](fa-clock-o.png) — Updates have been scheduled. |
-    | ![Times](fa-times-circle.png) — System not entitled to any update service. |
+- Packages: Total number of package updates for the system, including packages related to patch alerts and newer versions of packages not related to patch alerts. For example, if a client system that has an earlier version of a package installed gets subscribed to the appropriate base channel (such as SUSE Linux Enterprise 12 SP2), that channel may have an updated version of the package. If so, the package appears in the list of available package updates.
 
-*   Patches: Total number of patch alerts applicable to the system.
+- Configs: Total number of configuration files applicable to the system.
 
-*   Packages: Total number of package updates for the system, including packages related to patch alerts and newer versions of packages not related to patch alerts. For example, if a client system that has an earlier version of a package installed gets subscribed to the appropriate base channel (such as SUSE Linux Enterprise 12 SP2), that channel may have an updated version of the package. If so, the package appears in the list of available package updates.
+- Base Channel: The primary channel for the system based on its operating system. Refer to
 
-    ### Package Conflict {#package-conflict}
+    ADDLINK??? for more information.
 
-    If SUSE Manager identifies package updates for the system, but the package updater (such as Red Hat Update Agent or YaST) responds with a message like &quot;Your system is fully updated&quot;, a conflict likely exists in the system&#039;s package profile or in the `up2date` configuration file. To resolve the conflict, either schedule a package list update or remove the packages from the package exceptions list. Refer to [the section called “System Details”](../system_details/README.md) for instructions.
-
-*   Configs: Total number of configuration files applicable to the system.
-
-*   Base Channel: The primary channel for the system based on its operating system. Refer to
-
-    ???
-
-    for more information.
-
-*   System Type: Shows whether the system is managed and at what service level.
+- System Type: Shows whether the system is managed and at what service level.
 
 Links in the navigation bar below Systems enable you to select and view predefined sets of your systems. All of the options described above can be applied within these pages.
+
+#### System Icons {#system-icons}
+
+The `System` column presents icons that represent the relationship to a system type.
+
+- {% include inline_image.html file="spacewalk-icon-virtual-host.svg" alt="Virtual Host Icon" max-width="30" %} **Virtual Host**
+
+- {% include inline_image.html file="spacewalk-icon-virtual-guest.svg" alt="Virtual Guest Icon" max-width="30" %} **Virtual Guest**
+
+- {% include inline_image.html file="fa-236-non-virtual-system.svg" alt="Non-Virtual System Icon" max-width="30" %} **Non-Virtual System**
+
+- {% include inline_image.html file="spacewalk-icon-unprov-system.svg" alt="Unprovisioned System Icon" max-width="30" %} **Unprovisioned System**
+
+#### Updates Icons {#update-icons}
+
+The `Updates` column present icons that represent an update type.
+
+- {% include inline_image.html file="fa-check-circle.svg" alt="Circle" max-width="30" %} **System is up-to-date**
+
+- {% include inline_image.html file="fa-exclamation-circle.svg" alt="Exclamation Circle" max-width="30" %} **Critical patch (errata) available, update _strongly_ recommended**
+
+- {% include inline_image.html file="fa-warning.svg" alt="Warning" max-width="36" %} **Updates available and recommended**
+
+- {% include inline_image.html file="fa-question-circle.svg" alt="Question" max-width="38" %} **System not checking in properly (for 24 hours or more)**
+
+- {% include inline_image.html file="fa-lock.svg" alt="Lock" max-width="40" %} **System is locked; actions prohibited**
+
+- {% include inline_image.html file="fa-rocket.svg" alt="Rocket" max-width="36" %} **System is being deployed using AutoYaST or Kickstart**
+
+- {% include inline_image.html file="fa-clock-o.svg" alt="Clock" max-width="40" %} **Updates have been scheduled**
+
+- {% include inline_image.html file="fa-times-circle.svg" alt="Times" max-width="40" %} **System not entitled to any update service**
+
+
+{% include important.html content="If SUSE Manager identifies package updates for the system, but the package updater (such as Red Hat Update Agent or YaST) responds with a message like &quot;Your system is fully updated&quot;, a conflict likely exists in the system&#039;s package profile or in the `up2date` configuration file. To resolve the conflict, either schedule a package list update or remove the packages from the package exceptions list. Refer to [the section called “System Details”](../system_details/README.md) for instructions." %}
+
+
+
+
