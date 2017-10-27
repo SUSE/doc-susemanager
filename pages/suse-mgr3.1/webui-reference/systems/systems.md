@@ -32,7 +32,7 @@ The Systems page displays a list of all your registered systems. Several columns
 
 - **Packages:** Total number of package updates for the system, including packages related to patch alerts and newer versions of packages not related to patch alerts. For example, if a client system that has an earlier version of a package installed gets subscribed to the appropriate base channel (such as SUSE Linux Enterprise 12 SP2), that channel may have an updated version of the package. If so, the package appears in the list of available package updates.
 
-- **Configs:** Total number of configuration files applicable to the system.
+- **Configs:** Total number of configuration files that differ from the assigned configuration channels.
 
 - **Base Channel:** The primary channel for the system based on its operating system. Refer to <span class="label label-info">??? Fix Link ???</span> for more information.
 
