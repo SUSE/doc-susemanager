@@ -1,7 +1,7 @@
 ---
 title: SUSE Manager 3.1 FAQ
 permalink: suse-mgr31-faq.html
-sidebar: mydoc_sidebar
+sidebar: sumadoc-31_sidebar
 keywords: frequently asked questions, FAQ, question and answer, collapsible sections, expand, collapse
 last_updated: October 27, 2017
 summary: "Welcome to the SUSE Manager 3.1 FAQ. Here you can find answers to many of our frequently asked questions."
