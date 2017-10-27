@@ -15,12 +15,24 @@ folder: suse-mgr-3.1/troubleshooting
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a class="noCrossRef accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">How can you guarantee that SUSE Manager is in fact a drop-in replacement for RH Satellite Server?</a>
+                                <a class="noCrossRef accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Is SUSE Manager is a drop-in replacement for RH Satellite Server?</a>
                             </h4>
                         </div>
                         <div id="collapseOne" class="panel-collapse collapse noCrossRef">
                             <div class="panel-body">
-                                QA is testing SUSE Manager against RHEL 5 and 6 clients, those currently supported by expanded support. The primary focus for our testsuite and for QA is patch and update management, we see this as the primary need for customers. Although SUSE Manager Server is build from the same sources as RH Satellite Server, it will not act as a drop-in replacement for legal and infrastructure reasons. SUSE Manager is not allowed to pull patches from Redhat Network upstream but will get them from the Novell Customer Center (NCC). SUSE Manager will be a drop-in replacement for RH Satellite Server for disconnected (no direct link to RHN or NCC) operations. However, functionality depending on Redhat Network upstream will not be available with SUSE Manager.
+                            <ul>
+                            <li>
+                            No, although SUSE Manager Server is build from the same sources as RH Satellite Server, it will not act as a drop-in replacement for legal and infrastructure based reasons.
+                            </li>
+                            <li>
+                            SUSE Manager is unable to pull patches directly from Redhat Network upstream, but instead obtains them from SUSE Customer Center (SCC).
+                            </li>
+                            <li>QA tests SUSE Manager against RHEL 6 and 7 clients, which are currently supported by our RES expanded support plan. The primary focus for QA is our testsuite and for patch and update management, as this is the primary request from our customers.
+                            </li>
+                            <li>
+                               Yes, SUSE Manager is a drop-in replacement for RH Satellite Server configured for disconnected operations with (no direct link to RHN or SCC). However, functionality that depends on Redhat Network upstream will not be available with SUSE Manager.
+                               </li>
+                               </ul>
                             </div>
                         </div>
                     </div>
@@ -35,6 +47,8 @@ folder: suse-mgr-3.1/troubleshooting
                             <div class="panel-body">
                                 IPv6 is known to work with the following subsystems and should be generally supported SUSE Manager Server. IPv6 has not been extensively tested:
                                 <ul>
+                                <li>SUSE Manager Server:</li>
+                                  <ul>
                                     <li>Apache - yes</li>
                                     <li>Monitoring uses Apache and an ssh connection. ssh is IPv6 ready.</li>
                                     <li>Oracle DB - oracle 10g does not support IPv6</li>
@@ -42,9 +56,12 @@ folder: suse-mgr-3.1/troubleshooting
                                     <li>Autoinstallation - bare metal installation via ipv6 should work via install=...something ipv6...., has not been tested for autoyast=... but this should work</li>
                                     <li>Virtualization - unknown</li>
                                     <li>Client activation - unknown</li>
-                                    <li>SUSE Manager Proxy:</li>
-                                    <li>Squid - NO (our squid is unable to react on IPv6) </li>
+                                  </ul>
+                                <li>SUSE Manager Proxy:</li>
+                                <ul>
+                                <li>Squid - NO (our squid is unable to react on IPv6) </li>
                                 </ul>
+                               </ul>
                             </div>
                         </div>
                     </div>
