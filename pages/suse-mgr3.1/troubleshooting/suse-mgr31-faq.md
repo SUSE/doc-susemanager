@@ -15,12 +15,12 @@ folder: suse-mgr-3.1/troubleshooting
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a class="noCrossRef accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">Lorem ipsum dolor sit amet, consectetur adipiscing elit?</a>
+                                <a class="noCrossRef accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">How can you guarantee that SUSE Manager is in fact a drop-in replacement for RH Satellite Server?</a>
                             </h4>
                         </div>
                         <div id="collapseOne" class="panel-collapse collapse noCrossRef">
                             <div class="panel-body">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                QA is testing SUSE Manager against RHEL 5 and 6 clients, those currently supported by expanded support. The primary focus for our testsuite and for QA is patch and update management, we see this as the primary need for customers. Although SUSE Manager Server is build from the same sources as RH Satellite Server, it will not act as a drop-in replacement for legal and infrastructure reasons. SUSE Manager is not allowed to pull patches from Redhat Network upstream but will get them from the Novell Customer Center (NCC). SUSE Manager will be a drop-in replacement for RH Satellite Server for disconnected (no direct link to RHN or NCC) operations. However, functionality depending on Redhat Network upstream will not be available with SUSE Manager.
                             </div>
                         </div>
                     </div>
@@ -28,12 +28,23 @@ folder: suse-mgr-3.1/troubleshooting
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
-                                <a class="noCrossRef accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">Curabitur eget leo at velit imperdiet varius. In eu ipsum vitae velit congue iaculis vitae at risus?</a>
+                                <a class="noCrossRef accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">Is there IPv6 support for SUSE Manager?</a>
                             </h4>
                         </div>
                         <div id="collapseTwo" class="panel-collapse collapse noCrossRef">
                             <div class="panel-body">
-                                Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                IPv6 is known to work with the following subsystems and should be generally supported SUSE Manager Server. IPv6 has not been extensively tested:
+                                <ul>
+                                    <li>Apache - yes</li>
+                                    <li>Monitoring uses Apache and an ssh connection. ssh is IPv6 ready.</li>
+                                    <li>Oracle DB - oracle 10g does not support IPv6</li>
+                                    <li>jabberd support IPv6, but requires a few changes in its configuration file.</li>
+                                    <li>Autoinstallation - bare metal installation via ipv6 should work via install=...something ipv6...., has not been tested for autoyast=... but this should work</li>
+                                    <li>Virtualization - unknown</li>
+                                    <li>Client activation - unknown</li>
+                                    <li>SUSE Manager Proxy:</li>
+                                    <li>Squid - NO (our squid is unable to react on IPv6) </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
