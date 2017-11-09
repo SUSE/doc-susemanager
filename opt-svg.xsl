@@ -17,8 +17,8 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    exclude-result-prefixes="sodipodi inkscape svg cc rdf">
 
-  <xsl:param name="targetheight" select="40"/>
-  <xsl:param name="targetwidth" select="40"/>
+  <xsl:param name="targetheight" select="32"/>
+  <xsl:param name="targetwidth" select="32"/>
 
   <xsl:variable name="originalheight" select="/svg:svg/@height"/>
   <xsl:variable name="originalwidth" select="/svg:svg/@width"/>
@@ -29,13 +29,16 @@
 
   <xsl:template match="node()|@*">
     <xsl:copy>
-      <xsl:apply-templates select="@* | node()"/>
+      <xsl:apply-templates select="@*"/>
+      <!-- FIXME: Working newline would be nice here. -->
+      <xsl:apply-templates select="node()"/>
     </xsl:copy>
   </xsl:template>
 
   <xsl:template match="svg:svg">
     <xsl:copy>
       <xsl:apply-templates select="@*"/>
+      <xsl:text>&#10;</xsl:text>
       <xsl:comment> opt-svg marker - don't remove </xsl:comment>
       <g transform="scale({$scaleratioheight} {$scaleratiowidth})">
         <xsl:apply-templates select="node()"/>
@@ -62,6 +65,11 @@
       cc:*|
       dc:*|
       @id|
+      @preserveAspectRatio|
+      @zoomAndPan|
+      @version|
+      @contentScriptType|
+      @contentStyleType|
       @inkscape:*|
       @sodipodi:*|
       @rdf:*|
