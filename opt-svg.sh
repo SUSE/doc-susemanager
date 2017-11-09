@@ -59,7 +59,7 @@ fi
 echo -e "Handling files: $files\n"
 
 for file in $files; do
-  fileout=$(echo "$file" | sed -r 's/\.svg$//')
+  fileout=${file%.svg}
   if [[ ! $(grep '<!-- opt-svg marker' "$file") ]]; then
     xsltproc --param targetwidth $width --param targetheight $height opt-svg.xsl "$file" > "${fileout}0${rename}" 2> /dev/null
     mv "${fileout}0${rename}" "${fileout}${rename}"
