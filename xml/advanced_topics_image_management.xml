@@ -7,17 +7,27 @@
     %entities;
 ]>
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
- xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.images">
+ xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="at.images">
  <title>Image Building and Management</title>
- <info>
-  <abstract>
-   <para> &susemgr; enables system administrators to build containers, create Image Stores, and
-    manage Image Profiles. The following sections target administrators familiar with containers,
-    registry services, and assocaited terminology. </para>
-  </abstract>
- </info>
 
- <sect1>
+ <sect1 xml:id="at.image.overview">
+  <title>Image Building Overview</title>
+  <para> &susemgr; enables system administrators to build containers, create Image Stores, and
+   manage Image Profiles. The following sections target administrators familiar with containers,
+   registry services, and assocaited terminology.</para>
+  <informalfigure>
+   <mediaobject>
+    <imageobject role="fo">
+     <imagedata fileref="image-building.png" width="400"/>
+    </imageobject>
+    <imageobject role="html">
+     <imagedata fileref="image-building.png" width="80%"/>
+    </imageobject>
+   </mediaobject>
+  </informalfigure>
+
+ </sect1>
+ <sect1 xml:id="at.image.requirements">
   <title>Requirements</title>
 
   <para>The containers feature is available for Salt minions running &sls; 12 or later. The
@@ -30,22 +40,22 @@
      sections)</para>
    </listitem>
    <listitem>
-    <para>Portus or other registry properly configured.</para>
+    <para>Portus or another image registry properly configured.</para>
     <note>
      <title>Registry Provider Solutions</title>
-     <para>If you require a private registry instance you can use an open source solution such as
+     <para>If you require a private image registry you can use an open source solution such as
        <literal>Portus</literal>. For additional information on setting up Portus as a registry
-      provider, see:</para>
+      provider, see the:</para>
      <itemizedlist>
 
       <listitem>
-       <para><link xlink:href="http://port.us.org/">Portus</link></para>
+       <para><link xlink:href="http://port.us.org/">Portus Documentation</link></para>
       </listitem>
      </itemizedlist>
     </note>
    </listitem>
   </itemizedlist>
-  <para>For more information on Containers, CaaSP or Kubernetes see the following links:</para>
+  <para>For more information on Containers or CaaS Platform review the following links:</para>
   <itemizedlist>
    <listitem>
     <para>
@@ -60,15 +70,10 @@
       Documentation</link>
     </para>
    </listitem>
-   <listitem>
-    <para>
-     <link xlink:href="https://kubernetes.io/docs/home/">Kubernetes Documentation</link>
-    </para>
-   </listitem>
   </itemizedlist>
 
  </sect1>
- <sect1 xml:id="bp.images.buildhost">
+ <sect1 xml:id="at.images.buildhost">
   <title>Creating a Build Host</title>
 
   <para> To build container images with &susemgr;, you will need to create and configure a build
@@ -135,7 +140,7 @@
    </step>
   </procedure>
  </sect1>
- <sect1 xml:id="bp.images.buildchannels">
+ <sect1 xml:id="at.images.buildchannels">
   <title>Define Container Build Channels with an Activation Key</title>
 
   <para> Create an activation key associated with the channel that your images will use. </para>
@@ -197,10 +202,10 @@
     <informalfigure>
      <mediaobject>
       <imageobject role="fo">
-       <imagedata fileref="imeages_image_stores_create.png" width="400"/>
+       <imagedata fileref="images_image_stores_create.png" width="400"/>
       </imageobject>
       <imageobject role="html">
-       <imagedata fileref="imeages_image_stores_create.png" width="80%"/>
+       <imagedata fileref="images_image_stores_create.png" width="80%"/>
       </imageobject>
      </mediaobject>
     </informalfigure>
@@ -211,8 +216,8 @@
       <guimenu>Label</guimenu> field. </para>
    </step>
    <step>
-    <para>Provide the path to the container registry by filling in the <guimenu>URI</guimenu> field.
-     The FQDN of the container registry host (whether local or external) is generally sufficient. </para>
+    <para>Provide the path to your image registry by filling in the <guimenu>URI</guimenu> field.
+     The FQDN of the container registry host (whether internal or external) is sufficient. </para>
     <screen>registry.example.com</screen>
    </step>
    <step>
@@ -220,7 +225,7 @@
    </step>
   </procedure>
  </sect1>
- <sect1 xml:id="bp.images.profile">
+ <sect1 xml:id="at.images.profile">
   <title>Creating an Image Profile</title>
 
   <para>Manage Image Profiles from the Image Profile page. </para>
@@ -262,12 +267,11 @@
     <para>Use a <literal>Dockerfile</literal> as the default <literal>Image Type</literal></para>
    </step>
    <step>
-    <para>Add your container registry location to the <literal>Image Store</literal> field</para>
-    <screen>registry.example.com</screen>
-
+    <para>Use the dropdown to select your registry from the <literal>Target Image Store</literal>
+     field. </para>
    </step>
    <step>
-    <para>Enter a GitHub or Gitlab repositiory URL (http/https/token authentication) in the
+    <para>Enter a Github or Gitlab repositiory URL (http/https/token authentication) in the
       <guimenu>Path</guimenu> field using one of the following formats: </para>
     <itemizedlist>
      <title>Github Path Options</title>
@@ -284,7 +288,7 @@
       <para>If your GIT repository is private and not publicly accessible, you need to modify the
        profile's GIT URL to include some authentication. Use the following URL format to
        authenticate with a Github token.</para>
-      <screen>https://USER:&lt;AUTHENTICATION_TOKEN&gt;@github.com/USER/myrepo.git#master:/container/testing/</screen>
+      <screen>https://USER:&lt;AUTHENTICATION_TOKEN&gt;@github.com/USER/project.git#master:/container/</screen>
      </listitem>
     </itemizedlist>
 
@@ -292,26 +296,26 @@
      <title>Gitlab Path Options</title>
      <listitem>
       <para>Gitlab Single User Project Repository</para>
-      <screen>https://gitlab.example.com/USER/myrepo.git#master:/container/testing/</screen>
+      <screen>https://gitlab.example.com/USER/project.git#master:/container/</screen>
      </listitem>
      <listitem>
       <para>Gitlab Groups Project Repository</para>
-      <screen>https://gitlab.example.com/GROUP/myrepo.git#master:/container/testing/</screen>
+      <screen>https://gitlab.example.com/GROUP/project.git#master:/container/</screen>
      </listitem>
      <listitem>
       <para>Gitlab Token Authentication</para>
       <para>If your GIT repository is private and not publicly accessible, you need to modify the
        profile's GIT URL to include some authentication. Use the following URL format to
        authenticate with a Gitlab token.</para>
-      <screen>https://gitlab-ci-token:&lt;AUTHENTICATION_TOKEN&gt;@gitlab.example.com/USER/myrepo.git#master:/container/testing/</screen>
+      <screen>https://gitlab-ci-token:&lt;AUTHENTICATION_TOKEN&gt;@gitlab.example.com/USER/project.git#master:/container/</screen>
      </listitem>
     </itemizedlist>
 
     <important>
-     <title>Specifying a GitHub or Gitlab Branch</title>
+     <title>Specifying a Github or Gitlab Branch</title>
      <para>If a branchname is not specified the <literal>master</literal> branch will be used by
       default. If a <literal>folder</literal> is not specified a <literal>Dockerfile</literal> is
-      expected to be in the root directory of the GitHub or Gitlab checkout. </para>
+      expected to be in the root directory of the Github or Gitlab checkout. </para>
     </important>
    </step>
    <step>
@@ -330,46 +334,71 @@
   </procedure>
 
   <sect2>
-   <title>Example Dockerfile</title>
-   <para>The following is an example Dockerfile. A Dockerfile is specified when creating an image
-    profile and should be stored in a GitHub/Gitlab repository: </para>
+   <title>Example Dockerfile and add_packages Script</title>
+   <para>The following is an example Dockerfile. You specify a Dockerfile that will be used during
+    iamge building when creating an image profile. A Dockerfiel and any assocaited scripts should be
+    stored within an internal or external Github/Gitlab repository: </para>
    <important>
     <title>Required Dockerfile Lines</title>
-    <para>The following lines provide you access to which repositories served by SUSE manager. The
-     provided example Dockerfile are used by SUSE Manager to trigger a build job on the build host
-     minion you setup previously. These lines ensure the image that is built is associated with the
-     correct repo version served by SUSE Manager. These <literal>ARG</literal>s allow you to build
-     image versions of SLES which are different than the version of SLES used by the build host
-     itself. For example: If you use cloneThe ARG repo and echo to the repo file is creating and
-     injecting the corresponding repo file for the version needed. A repo is determined by the
-     activation key assigned to an Image Profile.</para>
+    <para>The following basic Dockerfile lines provide access to a specific repository version
+     served by SUSE manager. The following example Dockerfile is used by SUSE Manager to trigger a
+     build job on a build host minion. These ARGS ensure that the image built is associated with the
+     desired repo version served by SUSE Manager. These <literal>ARG</literal>s also allow you to
+     build image versions of SLES which may differ from the version of SLES used by the build host
+     itself. </para>
+    <para>For example: The <literal>ARG repo</literal> and echo to the repository file creates and
+     then injects the correct path into the repo file for the desired channel version .
+      <emphasis>The repository version is determined by the activation key that you assigned to your
+      Image Profile.</emphasis></para>
    </important>
    <screen>FROM registry.example.com/sles12sp2
 MAINTAINER Tux Administrator "tux@example.com"
-   
+
+### Begin: These lines Required for use with SUSE Manager   
+
 ARG repo
 ARG cert
-   
+
+# Add the correct certificate
 RUN echo "$cert" > /etc/pki/trust/anchors/RHN-ORG-TRUSTED-SSL-CERT.pem
+
+# Update certificate trust store
 RUN update-ca-certificates
+
+# Add the repository path to the image
 RUN echo "$repo" > /etc/zypp/repos.d/susemanager:dockerbuild.repo
+
+### End: These lines required for use with SUSE Manager
    
-... do the required tasks
-   
-RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo</screen>
+# After building remove the repository path from image
+RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo
+
+# Add the package script
+ADD add_packages.sh /root/add_packages.sh
+
+# Run the package script
+RUN /root/add_packages.sh</screen>
 
 
+   <para>The following is an example add_packages.sh script for use with your Dockerfile:</para>
+   <screen>#!/bin/bash
+set -e
+
+zypper --non-interactive --gpg-auto-import-keys ref
+
+zypper --non-interactive in python python-xml aaa_base aaa_base-extras net-tools timezone vim less sudo tar</screen>
    <note>
     <title>Packages Required for Inspecting Your Images</title>
-    <para> If you want to inspect an image and provide the package or product list of a container to
-     the &susemgr; &webui; you are required to install <package>python</package> and
-      <package>python-xml</package> in your container. If these packages remain uninstalled, images
-     will still build, but the package and product list will not be read and the package/product
-     list information will not be available from the &webui;. </para>
+    <para> To inspect images and provide the package and product list of a container to the
+     &susemgr; &webui; you are required to install <package>python</package> and
+      <package>python-xml</package> within the container. If these packages remain uninstalled, your
+     images will still build, but the package and product list will be unavailable from the &webui;.
+    </para>
    </note>
+
   </sect2>
  </sect1>
- <sect1 xml:id="bp.images.image.building">
+ <sect1 xml:id="at.images.image.building">
   <title>Building an Image</title>
 
   <para> There are two ways to build an image. You can select <menuchoice>
@@ -418,7 +447,7 @@ RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo</screen>
    </step>
   </procedure>
  </sect1>
- <sect1 xml:id="bp.images.image.importing">
+ <sect1 xml:id="at.images.image.importing">
   <title>Importing an Image</title>
 
   <para> You can import and inspect arbitrary images. Select <menuchoice>
@@ -470,7 +499,7 @@ RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo</screen>
      <varlistentry>
       <term>Activation key</term>
       <listitem>
-       <para> To get the channels against which the image will be inspected. </para>
+       <para>The activation key provides the path to the software channel that the image will be inspected with. </para>
       </listitem>
      </varlistentry>
     </variablelist>
@@ -486,12 +515,12 @@ RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo</screen>
  </sect1>
 
  <sect1>
-  <title>Listing Available Build Images</title>
+  <title>Listing Images Available for Building</title>
 
-  <para> To list available build images select <menuchoice>
+  <para> To list images availabe for building select <menuchoice>
     <guimenu>Images</guimenu>
     <guimenu>Images</guimenu>
-   </menuchoice>. A list of all build images will be displayed. </para>
+   </menuchoice>. A list of all images will be displayed. </para>
 
   <informalfigure>
    <mediaobject>
@@ -525,15 +554,15 @@ RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo</screen>
   <itemizedlist>
    <listitem>
     <para> HTTPS certificates to access the registry or the git repositories should be deployed to
-     the minion by a custom written state file. </para>
+     the minion by a custom state file.</para>
    </listitem>
    <listitem>
-    <para> SSH git access with docker is currently not working. </para>
+    <para> SSH git access with docker is currently unsupported. You may test it, but SUSE will not provide support.</para>
    </listitem>
    <listitem>
-    <para> In case <package>python</package> and <package>python-xml</package> is not installed in
-     an image, Salt cannot run within the container and reporting of installed packages or products
-     will fail. This results in an unknown update status. </para>
+    <para> If the <package>python</package> and <package>python-xml</package> packages are not installed within
+     your images during the build process, Salt cannot run within the container and reporting of installed packages or products
+     will fail. This will result in an unknown update status. </para>
    </listitem>
   </itemizedlist>
  </sect1>
