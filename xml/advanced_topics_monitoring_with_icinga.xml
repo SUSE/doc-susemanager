@@ -16,7 +16,7 @@
 
     <sect1>
         <title>Introduction</title>
-        <para>This chapter provides guidance on the setup of an Icinga server using SLES12 SP2. More
+        <para>This chapter provides guidance on the setup of an Icinga server using SLES12 SP3. More
             information may be found within the Official Icinga documentation: <link
                 xlink:href="http://docs.icinga.org/latest/en/"/></para>
 
@@ -35,11 +35,12 @@
         <procedure>
             <title>Installation and Basic Configuration</title>
             <step>
-                <para>Register the monitoring server client with SUSE Manager and add the SUSE
-                    Manager client and update channels. For both SLES12 and SLES12 SP2 these
-                    channels are included by default.</para>
+                <para>Register the new client with SUSE Manager and subscribe it to the SUSE Manager
+                    client and update channels. SLES12 and SLES12 SP2 includes these channels by
+                    default.</para>
             </step>
             <step>
+                <para>Install the required Icinga packages on the new client:</para>
                 <screen>zypper in icinga icinga-idoutils-pgsql postgresql postgresql94-server \
 monitoring-plugins-all apache2</screen>
             </step>
@@ -105,7 +106,7 @@ host    all             all             ::1/128                 trust
                 <screen>systemctl reload postgresql.service</screen>
             </step>
             <step>
-                <para>Configure the database schema by running the following command in:
+                <para>Configure the database schema by running the following command in
                         <literal>/usr/share/doc/packages/icinga-idoutils-pgsql/pgsql/</literal>:</para>
                 <screen>psql -U icinga -d icinga &lt; pgsql.sql</screen>
             </step>
@@ -147,7 +148,7 @@ host    all             all             ::1/128                 trust
         <title>Icinga and NRPE Quickstart</title>
 
         <para>The following sections provides an overview on monitoring your SUSE Manager server
-            using Icinga. You will add SUSE Manager as a host to Icinga and use a nagios
+            using Icinga. You will add SUSE Manager as a host to Icinga and use a Nagios
             script/plugin to monitor running services via <literal>NRPE</literal> (Nagios Remote
             Plugin Executor). This section does not attempt to cover all monitoring solutions Icinga
             has to offer but should help you get started.</para>
@@ -757,7 +758,7 @@ command[check_suma_patches]=sudo /usr/lib/nagios/plugins/check_suma_patches $ARG
 command[check_events]=sudo /usr/lib/nagios/plugins/check_suma_lastevent $ARG1$ </screen>
             </step>
             <step>
-                <para>On your Icina server open
+                <para>On the Icinga server open
                         <filename>/etc/icinga/objects/commands.cfg</filename> and add the following
                     lines:</para>
                 <screen>define command{
