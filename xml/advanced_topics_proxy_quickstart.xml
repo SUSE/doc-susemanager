@@ -1179,7 +1179,21 @@ SUSE Manager Server again.
      </imageobject>
     </mediaobject>
    </figure>
-<!-- </result> -->
+   <!-- </result> -->
+
+   <note>
+    <!-- https://bugzilla.suse.com/show_bug.cgi?id=1074297#c9 -->
+    <title>Checking <literal>refresh_pattern</literal> in <filename>/etc/squid/squid.conf</filename></title>
+    <para>
+     If you migrate from an early &susemgrproxy; 3.0 add the
+     following <literal>refresh_pattern</literal> to
+     <filename>/etc/squid/squid.conf</filename>:
+    </para>
+
+<screen># salt minions get the repodata via a different URL
+refresh_pattern /rhn/manager/download/.*/repodata/.*$ 0 1% 1440 ignore-no-cache reload-into-ims refresh-ims</screen>
+
+   </note>
    <para>
     Finally consider to schedule a reboot.
    </para>
