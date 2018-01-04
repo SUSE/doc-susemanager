@@ -11,12 +11,15 @@
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="bp.chapt.suma3.troubleshooting">
     <title>Troubleshooting</title>
 
+    <para>
+     This chapter provides guidance on registering cloned systems with
+     SUSE Manager. This includes both Salt and Traditional clients. For
+     more information, see <link
+     xlink:href="https://www.novell.com/support/kb/doc.php?id=7012170"/>.
+    </para>
+
     <sect1 xml:id="bp.chapt.suma3.troubleshooting.registering.cloned.salt.systems">
         <title>Registering Cloned Salt Minions</title>
-
-        <para>This chapter provides guidance on registering cloned systems with SUSE Manager. This
-            includes both Salt and Traditional clients. For more information see:<link
-                xlink:href="https://www.novell.com/support/kb/doc.php?id=7012170"/></para>
 
         <procedure>
             <title>Registering a Cloned Salt Minion with SUSE Manager</title>
@@ -66,7 +69,7 @@
             conflict based on OS.</para>
 
         <procedure>
-            <title> SLES 12 Registering Salt Clones:</title>
+            <title> SLES 12 Registering Salt Clones</title>
             <step>
                 <para>SLES 12: If your machines have the same machine ids then delete the file on
                     each minion and recreate it:</para>
@@ -78,7 +81,7 @@
         </procedure>
 
         <procedure>
-            <title>SLES 11 Registering Salt Clones: </title>
+            <title>SLES 11 Registering Salt Clones</title>
             <step>
                 <para>SLES 11: As there is no systemd machine id, generate one from dbus:</para>
                 <screen># rm /var/lib/dbus/machine-id
@@ -140,7 +143,22 @@
         </procedure>
         <para>The next step you take will depend on the Operating System of the clone.</para>
         <procedure>
-            <title>SLES 12 Registering A Cloned Traditional System: </title>
+            <title>SLES 12 Registering A Cloned Traditional System</title>
+            <step>
+             <!-- mc said: We are also using the machine-id for
+                  traditional systems as well. This needs to be cleaned
+                  up in the same way as for minions.
+                  Thus I added this routine.
+             -->
+             <para>
+              If your machines have the same machine ids then delete the
+              file on each client and recreate it:
+             </para>
+             <screen># rm /etc/machine-id
+# rm /var/lib/dbus/machine-id
+# dbus-uuidgen --ensure
+# systemd-machine-id-setup</screen>
+            </step>
             <step>
                 <para>Remove the following credential files:</para>
                 <screen># rm  -f /etc/zypp/credentials.d/{SCCcredentials,NCCcredentials}</screen>
@@ -153,7 +171,7 @@
         </procedure>
 
         <procedure>
-            <title>SLES 11 Registering A Cloned Traditional System: </title>
+            <title>SLES 11 Registering A Cloned Traditional System </title>
             <step>
                 <para>Continued from section 1 step 5:</para>
                 <screen># suse_register -E</screen>
@@ -168,14 +186,16 @@
         </procedure>
 
         <procedure>
-            <title>SLES 10 Registering A Cloned Traditional System: </title>
+            <title>SLES 10 Registering A Cloned Traditional System </title>
             <step>
                 <para>Continued from section 1 step 5:</para>
                 <screen># rm -rf /etc/{zmd,zypp}</screen>
 
             </step>
             <step>
-                <screen># rm -rf /var/lib/zypp/  # ¡¡¡¡¡ except /var/lib/zypp/db/products/ !!!!!</screen>
+             <screen># ¡¡¡¡¡ everthing in /var/lib/zypp/ except /var/lib/zypp/db/products/ !!!!!
+# check whether this command works for you
+# rm -rf /var/lib/zypp/!(db)</screen>
             </step>
             <step>
                 <screen># rm -rf /var/lib/zmd/</screen>
@@ -188,7 +208,7 @@
         </procedure>
 
         <procedure>
-            <title>RHEL 5,6 and 7</title>
+            <title>RHEL 5, 6 and 7</title>
             <step>
                 <para>Continued from section 1 step 5:</para>
                 <screen># rm  -f /etc/NCCcredentials</screen>
