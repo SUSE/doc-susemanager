@@ -54,17 +54,17 @@
     If the <parameter class="option">MaxClients</parameter> value is reached
     while the software is running, new client connections will be queued and
     forced to wait, this may result in timeouts. You can check the Apache
-    httpd's error.log for details:
+    httpd's <filename>error.log</filename> for details:
    </para>
 <screen>[error] Server reached MaxClients setting, consider increasing the MaxClients setting</screen>
    <para>
     The default <parameter class="option">MaxClients</parameter> parameter can
     be overridden on SUSE Manager by editing the
-    <filename>server-tuning.conf</filename> file located at:
-    <systemitem>/etc/apache2/</systemitem>
+    <filename>server-tuning.conf</filename> file located at
+    <systemitem>/etc/apache2/</systemitem>.
    </para>
    <para>
-    Example server-tuning.conf file:
+    Example <filename>server-tuning.conf</filename> file:
    </para>
 <screen># prefork MPM
    &lt;IfModule prefork.c&gt;
@@ -95,7 +95,7 @@
     Tomcat's <parameter class="option">maxThreads</parameter> represents the
     maximum number of request processing threads that it will create. This
     value determines the maximum number of simultaneous requests that it is
-    able to handle. Note that all HTTP requests to the SUSE Manager server
+    able to handle. All HTTP requests to the SUSE Manager server
     (from clients, browsers, XMLRPC API scripts, etc.) are handled by Apache
     httpd, and some of them are routed to Tomcat for further processing. It is
     thus important that Tomcat is able to serve the same amount of simultaneous
@@ -104,8 +104,8 @@
     Apache httpd's <parameter class="option">MaxClients</parameter>. The
     <parameter class="option"
                 >maxThreads</parameter> value is
-    located within the <filename>server.xml</filename> file located at:
-    <systemitem>/etc/tomcat/</systemitem>
+    located within the <filename>server.xml</filename> file located at
+    <systemitem>/etc/tomcat/</systemitem>.
    </para>
    <para>
     Example relevant lines in <filename>server.xml</filename>:
@@ -121,8 +121,8 @@
                 >maxThreads</parameter>
      parameters you should also take into consideration that each HTTP
      connection will need one or more database connections. If the RDBMS is not
-     able to serve an adequate amount of connections, issues will arise. Please
-     see the following equation for a rough calculation of the needed amount of
+     able to serve an adequate amount of connections, issues will arise.
+     See the following equation for a rough calculation of the needed amount of
      database connections:
     </para>
 <screen language="python">((3 * java_max) +  apache_max + 60)</screen>
@@ -133,26 +133,26 @@
      <listitem>
       <para>
        3 is the number of Java processes the server runs with pooled
-       connections (Tomcat, Taskomatic and Search);
+       connections (Tomcat, Taskomatic and Search)
       </para>
      </listitem>
      <listitem>
       <para>
-       java_max is the maximum number of connections per Java pool (20 by
-       default, changeable in /etc/rhn/rhn.conf via the hibernate.c3p0.max_size
-       parameter);
+       java_max is the maximum number of connections per Java pool (20
+       by default, changeable in <filename>/etc/rhn/rhn.conf</filename>
+       via the hibernate.c3p0.max_size parameter)
       </para>
      </listitem>
      <listitem>
       <para>
        apache_max is Apache httpd's
-       <parameter class="option">MaxClients</parameter>;
+       <parameter class="option">MaxClients</parameter>
       </para>
      </listitem>
      <listitem>
       <para>
        60 is the maximum expected number of extra connections for local
-       processes and other uses.
+       processes and other uses
       </para>
      </listitem>
     </itemizedlist>
