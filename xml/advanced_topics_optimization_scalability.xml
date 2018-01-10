@@ -12,6 +12,91 @@
     xml:id="advanced.topics.optimizing.scalability">
  <title>Optimization and Scalability</title>
 
+ <sect1 xml:id="optimizing.general">
+  <title>General Recommendations</title>
+
+  <para>
+   &suse; recommands the following in a big scale &susemgr; deployment
+   (1000 minions or more):
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     &susemgr; servers should have at least 8 recent &x86; cores, 32 GiB
+     of RAM, and, most important, fast I/O devices such as at least an
+     SSD (2 SSDs in RAID-0 are strongly recommended).
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Proxies with many minions (hundreds) should have at least 2 recent
+     &x86; cores and 16 GiB of RAM.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Use one &susemgrproxy; per 500-1000 clients.  Keep into account
+     that download time depends on network capacity.  Here is a rough
+     example calculation with physical link speed of 1 GB/s:
+    </para>
+
+<screen> 400 Megabytes  *        3000       /      119 Megabyte/s        / 60
+= 169 Minutes</screen>
+<para>This is:</para>
+    <screen
+>Size of updates * Number of minions / Theoretical download speed / 60</screen>
+   </listitem>
+   <listitem>
+    <para>
+     Depending on hardware you can accept hundreds of minion keys.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Plan time for onboarding minions&mdash;at least one hour per 1000 minions.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     It is not recommended onboarding more than approx. 1000 minions
+     directly to the &susemgr; server&mdash;proxies should be used
+     instead. This is because every minion can use up to 3 TCP
+     connections simultaneously, and too many TCP connections can cause
+     performance issues.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     If the following error appears in output of
+     <command>dmesg</command>, you probably have an excessive number of
+     minions attached to a single &susemgr; server or proxy for the ARP
+     cache to contain all of their addresses:
+    </para>
+
+    <screen>kernel: neighbour table overflow</screen>
+
+    <para>
+     In that case, increase the ARP cache values via
+     <systemitem>sysctl</systemitem>, for example, by adding the
+     following lines to <filename>/etc/sysctl.conf</filename>:
+    </para>
+<screen>net.ipv4.neigh.default.gc_thresh1 = 4096
+net.ipv4.neigh.default.gc_thresh2 = 8192
+net.ipv4.neigh.default.gc_thresh3 = 16384
+net.ipv4.neigh.default.gc_interval = 60
+net.ipv4.neigh.default.gc_stale_time = 120</screen>
+   </listitem>
+  </itemizedlist>
+  <tip>
+   <title>Start Small and Scale Up</title>
+   <para>
+    Always start small and scale up gradually. Keep the server monitored
+    in order to identify possible issues early.
+   </para>
+  </tip>
+ </sect1>
+ 
  <sect1 xml:id="optimizing.apache_tomcat">
   <title>Optimizing Apache and Tomcat</title>
 
