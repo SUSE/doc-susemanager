@@ -12,12 +12,18 @@
     xml:id="advanced.topics.optimizing.scalability">
  <title>Optimization and Scalability</title>
 
- <sect1 xml:id="optimizing.general">
+ <sect1 xml:id="optimizing.big">
+  <title>Big Scale Deployment (1000 Minions or More)</title>
+  <para>
+   In the following sections find considerations about a big scale
+   deployment.  In this context, a big scale compromises 1000 minions or
+   more.
+  </para>
+  <sect2 xml:id="optimizing.big.general">
   <title>General Recommendations</title>
 
   <para>
-   &suse; recommands the following in a big scale &susemgr; deployment
-   (1000 minions or more):
+   &suse; recommends the following in a big scale &susemgr; deployment:
   </para>
 
   <itemizedlist>
@@ -95,6 +101,80 @@ net.ipv4.neigh.default.gc_stale_time = 120</screen>
     in order to identify possible issues early.
    </para>
   </tip>
+  </sect2>
+  <sect2 xml:id="optimizing.big.tuning">
+   <title>Tuning Proposals</title>
+
+   <para>
+    &suse; proposes the following tuning settingsin a big scale &susemgr;
+    deployment:
+   </para>
+
+   <itemizedlist>
+    <listitem>
+     <para>
+      Increase Tomcat memory to face a long queue of Salt return
+      results.  Items in the Salt return queue might accumulate in a
+      short time: Set 8 GiB instead of the current default 1 GiB.
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Several RHN parameters should be changed from their defaults:
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        The number of Taskomatic workers should be increased, and thus
+        parallelizing work on a high number of separate jobs
+        (onboarding, staging).
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Quartz should check for runnable jobs more frequently to reduce
+        latency (onboarding, staging, Action execution).
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Tomcat's Salt return result workers should be increased, and
+        thus parallelizing work on a high number of Salt return results
+        (patching).
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        The number of PostgreSQL connections available to Java
+        applications (Tomcat, Taskomatic) should increase
+        accordingly. Otherwise extra workers will starve waiting for a
+        connection.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Salt's presence ping timeouts should be increased because
+        responses might come back later than the defaults.
+       </para>
+      </listitem>
+     </itemizedlist>
+    </listitem>
+    <listitem>
+     <para>
+      Salt master worker threads should be increased to 100 from 15, and
+      thus parallelizing more requests (otherwise Tomcat and Taskomatic
+      workers will starve waiting for the API to do something).
+     </para>
+    </listitem>
+    <listitem>
+     <para>
+      Increasing the number of Salt master worker threads more requires
+      more RAM and does not bring benefits.  Apache maximum request time
+      should be increased.
+     </para>
+    </listitem>
+   </itemizedlist>
+  </sect2>
  </sect1>
  
  <sect1 xml:id="optimizing.apache_tomcat">
