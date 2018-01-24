@@ -59,13 +59,16 @@
      </warning>
      <para>
       Only machines running with the embedded PostgreSQL database may be
-      migrated. For the migration of an Oracle based installation, a
-      two-step migration is required: First the installation needs to
-      get migrated from Oracle to PostgreSQL (by means of a separate
-      tool) and afterwards the migration to &susemgr; 3 can be performed
-      as documented here. As &susemgr; 3 does no longer support &ncc;
-      but only SCC (&scc;), you can migrate a machine only after it has
-      been switched to SCC. The migration script will check if the
+      migrated in one go. For the migration of an Oracle based
+      installation, a two-step migration is required: First the
+      installation needs to get migrated from Oracle to PostgreSQL (by
+      means of a separate tool) and afterwards the migration to
+      &susemgr; 3 can be performed as documented here.
+     </para>
+     <para>
+      &susemgr; 3 does no longer support &ncc; but only SCC (&scc;).
+      Therefore, you can migrate a machine only after it has been
+      switched to SCC. The migration script will check if the
       installation has already been switched to SCC and will terminate
       if this is not the case. Switch to SCC on the source machine and
       repeat the migration. During migration the database from the
@@ -76,9 +79,9 @@
       costs a lot of runtime); so check the disk usage of the database
       with:
      </para>
-     <screen><prompt># </prompt>du -sch /var/lib/pgsql/data</screen>
+     <screen>&prompt.root;du -sch /var/lib/pgsql/data</screen>
      <para>
-      This will ensure that you have at least 30% of this value available in
+      This will ensure that you have at least 30 % of this value available in
       <filename>/var/spacewalk/tmp</filename>.
      </para>
      <para>
@@ -110,7 +113,7 @@
       To prepare the target machine (with the example host name
       <literal>suma30</literal>) proceed as follows:
      </para>
-     <procedure>
+     <procedure xml:id="proc.mgr.migration.setup.target">
       <title>Setup Target Machine</title>
       <step>
        <para>
@@ -176,22 +179,29 @@
       </step>
       <step>
        <para>
-        Continue by following the normal installation steps: Specify the
-        database parameters <emphasis>using the same database parameters
-        as the source system is recommended</emphasis>. Enter your SCC
-        credentials. After all the data has been gathered, &yast; will
-        terminate.
+        Continue by following the normal installation steps.
        </para>
        <important>
-        <title>Migration Must be Manually Triggered</title>
+        <title>Database Parameters</title>
         <para>
-         The actual migration will not start automatically but needs to
-         be triggered manually.  For more information, see <xref
-         linkend="bp.sec.mgr.migration.performing"/>.
+         Specify the database parameters using the same database
+         parameters as the source system is recommended.  At least,
+         using the the same database credentials as when creating the
+         source or original &susemgr; database is mandatory.
         </para>
        </important>
+       <para>
+        Enter your SCC credentials. After all the data has been
+        gathered, &yast; will terminate.
+       </para>
       </step>
      </procedure>
+
+     <para>
+      The actual migration will not start automatically but needs to be
+      triggered manually as outlined in <xref
+      linkend="bp.sec.mgr.migration.performing"/>.
+     </para>
 
     </sect2>
 
@@ -202,7 +212,7 @@
      </para>
      <screen>/usr/lib/susemanager/bin/mgr-setup -m</screen>
      <para>
-      This command reads the data gathered in the previous step, sets up
+      This command reads the data gathered during <xref linkend="proc.mgr.migration.setup.target"/>, sets up
       &susemgr; onto a new target machine and transfers all of the data
       from the source machine. As several operations need to be
       performed on the source machine via SSH, you will be prompted once
