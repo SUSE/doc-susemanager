@@ -74,7 +74,7 @@
    <step>
     <para>
      Enter a human readable <guimenu>Key</guimenu> string value such as
-     <literal>SLES12-SP3</literal> to represent the distribution and service
+     <literal>SLES&sles-version;-&sp-version;</literal> to represent the distribution and service
      pack associated with the key.
     </para>
     <warning>
@@ -97,8 +97,9 @@
    </step>
    <step>
     <para>
-     Select the &sle; 12 SP3 channel you added earlier from the <guimenu>Base
-     Channels</guimenu> drop down.
+     Select the &sle; channel you added during <xref
+     linkend="proc.quickstart.first.channel.sync"/> from the
+     <guimenu>Base Channels</guimenu> drop down.
     </para>
    </step>
    <step>
@@ -125,7 +126,7 @@
    registering traditional clients during the bootstrapping procedure. These
    packages will be installed from the newly generated repository during the
    registration process. In the following procedure you will create the &sle;
-   12 SP3 tools repository.
+   <!-- 12 SP3 --> tools repository.
   </para>
 
   <important>
@@ -135,9 +136,10 @@
     &suse; vendor channel you will be using with your client has been
     completely synced. You can check this by running <command>tail -f
     /var/log/rhn/reposync/<replaceable>CHANNEL_NAME</replaceable>.log</command>
-    as &rootuser;. For example:
+    as &rootuser;. For example  (replace
+   <replaceable>version</replaceable> with the actual version string):
    </para>
-<screen><prompt># </prompt>tail -f /var/log/rhn/reposync/sles12-sp3-pool-x86_64.log</screen>
+<screen><prompt># </prompt>tail -f /var/log/rhn/reposync/sles<replaceable>version</replaceable>-pool-x86_64.log</screen>
 <para>
  When finished you will see:
 </para>
@@ -152,21 +154,21 @@
   </important>
 
   <procedure>
-   <title>Generating the Tools Repository for &sle; 12 SP3</title>
+   <title>Generating the Tools Repository for &sle;</title>
    <step>
     <para>
      Open a terminal on the server as &rootuser; and enter the following
      command to list available bootstrap repositories:
     </para>
 <screen><prompt># </prompt><command>mgr-create-bootstrap-repo -l</command>
-1. SLE-12-SP3-x86_64</screen>
+1. SLE-<replaceable>version</replaceable>-x86_64</screen>
    </step>
    <step>
     <para>
      Then invoke the same command using the listed repository as the product
      label to actually create the bootstrap repository:
     </para>
-<screen><prompt># </prompt><command>mgr-create-bootstrap-repo -c SLE-12-SP3-x86_64</command></screen>
+<screen><prompt># </prompt><command>mgr-create-bootstrap-repo -c SLE-<replaceable>version</replaceable>-x86_64</command></screen>
    </step>
    <step>
     <para>
@@ -324,12 +326,12 @@ client-config-overrides.txt   sm-client-tools.rpm</screen>
       Create and rename two copies of the template bootstrap script for use
       with each of your clients.
      </para>
-<screen><prompt># </prompt><command>cp bootstrap.sh bootstrap-sles11-sp4.sh</command>
-<prompt># </prompt><command>cp bootstrap.sh bootstrap-sles12-sp3.sh</command></screen>
+<screen><prompt># </prompt><command>cp bootstrap.sh bootstrap-sles11.sh</command>
+<prompt># </prompt><command>cp bootstrap.sh bootstrap-sles12.sh</command></screen>
     </step>
     <step>
      <para>
-      Open <filename>sles12-sp3.sh</filename> for modification. Scroll down and
+      Open <filename>sles12.sh</filename> for modification. Scroll down and
       modify both lines marked in green. You must comment out <literal>exit
       1</literal> with a hash mark (<literal>#</literal>) to activate the
       script and then enter the name of the key for this script in the
@@ -342,7 +344,7 @@ echo
 
 # can be edited, but probably correct (unless created during initial install):
 # NOTE: ACTIVATION_KEYS *must* be used to bootstrap a client machine.
-ACTIVATION_KEYS=1-sles12-sp3
+ACTIVATION_KEYS=1-sles12
 ORG_GPG_KEY=</screen>
     </step>
     <step>
@@ -403,7 +405,7 @@ ORG_GPG_KEY=</screen>
     This concludes the bootstrap section of this guide.
     <xref
      linkend="preparing.and.registering.clients.salt"/> will go over
-    registering Salt minions for use with &susemgr; 3.
+    registering Salt minions for use with &susemgr;.
    </para>
   </sect2>
  </sect1>
