@@ -31,7 +31,7 @@
 
   <itemizedlist>
    <listitem>
-    <para> &susemgr; 3.0 or later fully updated. </para>
+    <para> &susemgr; fully updated. </para>
    </listitem>
    <listitem>
     <para> At least 1 Salt Minion running SLES 12 SP1 or later and registered with &susemgr;.
@@ -134,8 +134,8 @@
   names: <literal>dev</literal>, <literal>testing</literal>, and
   <literal>prod</literal>. In the following procedure you will clone the
   default vendor channel into a new channel named
-  <filename>dev-sles12-sp3-pool-x86_64</filename> using the command
-  line. </para>
+  <systemitem>dev-sles&sles-version;-sp&sp-ver;-pool-x86_64</systemitem>
+  using the command line. </para>
 
   <procedure xml:id="proc.live.patching.clones">
    <step>
@@ -145,17 +145,17 @@ Spacewalk Username: admin
 Spacewalk Password: 
 Channel tree:
 
- 1. sles12-sp3-pool-x86_64
-      \__ sle-live-patching12-pool-x86_64-sp3
-      \__ sle-live-patching12-updates-x86_64-sp3
-      \__ sle-manager-tools12-pool-x86_64-sp3
-      \__ sle-manager-tools12-updates-x86_64-sp3
-      \__ sles12-sp3-updates-x86_64  </screen>
+ 1. sles&sles-version;-sp&sp-ver;-pool-x86_64
+      \__ sle-live-patching&sles-version;-pool-x86_64-sp&sp-ver;
+      \__ sle-live-patching&sles-version;-updates-x86_64-sp&sp-ver;
+      \__ sle-manager-tools&sles-version;-pool-x86_64-sp&sp-ver;
+      \__ sle-manager-tools&sles-version;-updates-x86_64-sp&sp-ver;
+      \__ sles&sles-version;-sp&sp-ver;-updates-x86_64  </screen>
    </step>
    <step>
     <para> Now use the <emphasis>-init</emphasis> argument to automatically create a new development
      clone of the original vendor channel: </para>
-    <screen>spacewalk-manage-channel-lifecycle -init -c sles12-sp3-pool-x86_64</screen>
+    <screen>spacewalk-manage-channel-lifecycle -init -c sles&sles-version;-sp&sp-ver;-pool-x86_64</screen>
    </step>
   </procedure>
  </sect1>
@@ -164,8 +164,8 @@ Channel tree:
   <title>Removing Non-live Kernel Patches from the Cloned Channels</title>
 
   <para> In the following procedure you will remove all kernel patch updates located in the
-   dev-sles12-sp3-updates-x86_64 channel that require a reboot. You
-  created dev-sles12-sp3-updates-x86_64 during <xref
+   dev-sles&sles-version;-sp&sp-ver;-updates-x86_64 channel that require a reboot. You
+  created dev-sles&sles-version;-sp&sp-ver;-updates-x86_64 during <xref
   linkend="proc.live.patching.clones"/>. </para>
 
   <procedure>
@@ -175,11 +175,11 @@ Channel tree:
 3.12.62-60.64.8-default</screen>
    </step>
    <step>
-    <para> From the SUSE Manager WebUI select<menuchoice>
+    <para> From the &susemgr; &webui; select <menuchoice>
       <guimenu>Software</guimenu>
       <guimenu>Manage Software Channels</guimenu>
       <guimenu>Overview</guimenu>
-      <guimenu>dev-sles12-sp3-updates-x86_64</guimenu>
+      <guimenu>dev-sles&sles-version;-sp&sp-ver;-updates-x86_64</guimenu>
       <guimenu>Patches</guimenu>
       <guimenu>List/Remove</guimenu>
      </menuchoice>. Type <literal>kernel</literal> in the search field. Find the kernel version that
@@ -204,9 +204,9 @@ Channel tree:
 
   <procedure>
    <step>
-    <para> Promote and clone the <literal>dev-sles12-sp3-pool-x86_64</literal> to a new testing
+    <para> Promote and clone the <literal>dev-sles&sles-version;-sp&sp-ver;-pool-x86_64</literal> to a new testing
      channel: </para>
-    <screen>&prompt.root;spacewalk-manage-channel-lifecycle -promote -c dev-sles12-sp3-pool-x86_64</screen>
+    <screen>&prompt.root;spacewalk-manage-channel-lifecycle -promote -c dev-sles&sles-version;-sp&sp-ver;-pool-x86_64</screen>
    </step>
    <step>
     <para> From the &susemgr; &webui; under the <guimenu>Systems</guimenu> tab select your client
@@ -215,7 +215,7 @@ Channel tree:
       <guimenu>Software Channels</guimenu>
      </menuchoice>. From the Software Channels page you can edit which channels a system is
      subscribed to. Select the new base software channel, in this case it should be
-      <literal>test-sles12-sp3-pool-x86_64</literal>. Click the <guimenu>Confirm</guimenu> button to
+      <systemitem>test-sles&sles-version;-sp&sp-ver;-pool-x86_64</systemitem>. Click the <guimenu>Confirm</guimenu> button to
      switch the Base Software Channel and finalize it by clicking the <guimenu>Modify Base Software
       Channel</guimenu> button. </para>
    </step>
@@ -235,8 +235,8 @@ Channel tree:
 
   <procedure>
    <step>
-    <para> Select your SLES 12 SP3 minion from the <guimenu>Systems</guimenu> page to view its
-      <guimenu>System Details</guimenu>. Once you have added the SLES 12 SP3 Updates child channel
+    <para> Select your SLES &sles-version; SP&sp-ver; minion from the <guimenu>Systems</guimenu> page to view its
+      <guimenu>System Details</guimenu>. Once you have added the SLES &sles-version; SP&sp-ver; Updates child channel
      to your client, you should see several <literal>Critical</literal> software updates available.
      Click on <literal>Critical</literal> to see a list of available patches. Select any of these
      patches listed with the following synopsis: <emphasis>Important: Security update for the Linux
@@ -244,7 +244,7 @@ Channel tree:
      example:(CVE-2016-8666) </para>
     <important>
      <title>Reboot Icon</title>
-     <para> Normal or non-live kernel patches always require a reboot. In SUSE Manager these are
+     <para> Normal or non-live kernel patches always require a reboot. In &susemgr; these are
       represented by a <literal>Reboot Required</literal> icon located next to the
        <literal>Security</literal> shield icon. </para>
     </important>
