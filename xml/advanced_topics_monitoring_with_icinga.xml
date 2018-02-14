@@ -16,27 +16,28 @@
 
     <sect1>
         <title>Introduction</title>
-        <para>This chapter provides guidance on the setup of an Icinga server using SLES12 SP3. More
-            information may be found within the Official Icinga documentation: <link
-                xlink:href="http://docs.icinga.org/latest/en/"/></para>
+        <para>This chapter provides guidance on the setup of an Icinga
+        server using SLES &sles-version; &sp-version;. For more
+            information, see the Official Icinga documentation: <link
+                xlink:href="http://docs.icinga.org/latest/en/"/>.</para>
 
     </sect1>
 
     <sect1>
         <title>Installation and Basic Configuration</title>
-        <para>Icinga packages are found in the <literal>SLE-Manager-Tools12-Updates
+        <para>Icinga packages are found in the <literal>SLE-Manager-Tools&sles-version;-Updates
             x86_64</literal>.</para>
         <tip>
             <title>Icinga Installation Location</title>
-            <para>Do not install Icinga on the SUSE Manager server. Install Icinga on a stand-alone
-                SLE client.</para>
+            <para>Do not install Icinga on the &susemgr; server. Install Icinga on a stand-alone
+                &sle; client.</para>
         </tip>
 
         <procedure>
             <title>Installation and Basic Configuration</title>
             <step>
-                <para>Register the new client with SUSE Manager and subscribe it to the SUSE Manager
-                    client and update channels. SLES12 and SLES12 SP2 includes these channels by
+                <para>Register the new client with &susemgr; and subscribe it to the &susemgr;
+                    client and update channels. SLES &sles-version; and later include these channels by
                     default.</para>
             </step>
             <step>
@@ -61,7 +62,7 @@ systemctl start postgresql.service</screen>
             </step>
             <step>
                 <para>Create the database and user for Icinga:</para>
-                <screen>#su - postgres
+                <screen>&prompt.root;su - postgres
  
  >psql
  postgres=# ALTER USER postgres WITH PASSWORD '&lt;newpassword&gt;';
@@ -147,22 +148,22 @@ host    all             all             ::1/128                 trust
     <sect1>
         <title>Icinga and NRPE Quickstart</title>
 
-        <para>The following sections provides an overview on monitoring your SUSE Manager server
-            using Icinga. You will add SUSE Manager as a host to Icinga and use a Nagios
+        <para>The following sections provides an overview on monitoring your &susemgr; server
+            using Icinga. You will add &susemgr; as a host to Icinga and use a Nagios
             script/plugin to monitor running services via <literal>NRPE</literal> (Nagios Remote
             Plugin Executor). This section does not attempt to cover all monitoring solutions Icinga
             has to offer but should help you get started.</para>
 
         <procedure>
-            <title>Adding SUSE Manager to Icinga for Monitoring</title>
+            <title>Adding &susemgr; to Icinga for Monitoring</title>
             <step>
-                <para>On your SUSE Manager server install the required packages: </para>
+                <para>On your &susemgr; server install the required packages: </para>
                 <screen>zypper install nagios-nrpe susemanager-nagios-plugin insserv nrpe monitoring-plugins-nrpe</screen>
             </step>
             <step>
                 <para>Modify the NRPE configuration file located at:</para>
                 <screen>/etc/nrpe.cfg</screen>
-                <para>Edit/add the following lines:</para>
+                <para>Edit or add the following lines:</para>
                 <screen>server_port=5666
 nrpe_user=nagios
 nrpe_group=nagios
@@ -184,7 +185,7 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
                         <listitem>
                             <para>The variables <literal>nrpe_user</literal> and
                                     <literal>nrpe_group</literal> control the user and group IDs
-                                that nrpe will run under. SUSE Manager probes need access to the
+                                that nrpe will run under. &susemgr; probes need access to the
                                 database, therefore nrpe requires access to database credentials
                                 stored in <filename>/etc/rhn/rhn.conf</filename>. There are multiple
                                 ways to achieve this. You may add the user <literal>nagios</literal>
@@ -216,18 +217,21 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
                     <varlistentry>
                         <term>command[check_systemd.sh]</term>
                         <listitem>
-                            <para>You need to define the command(s) that nrpe can run on SUSE
-                                Manager. To add a new nrpe command specify a command call by adding
+                            <para>You need to define the command(s) that
+                            nrpe can run on &susemgr;.
+                            To add a new nrpe command specify a command call by adding
                                     <literal>command</literal> followed by square brackets
                                 containing the actual nagios/icinga plugin name. Next define the
-                                location of the script to be called on your SUSE Manager server.
+                                location of the script to be called on your &susemgr; server.
                                 Finally the variable <literal>$ARG1$</literal> will be replaced by
                                 the actual host the Icinga server would like information about. In
                                 the example above, the command is named
                                     <literal>check_systemd.sh</literal>. You can specify any name
                                 you like but keep in mind the command name is the actual script
-                                stored in <filename>/usr/lib/nagios/plugins/</filename> on your SUSE
-                                Manager server. This name must also match your probe definition on
+                                stored in
+                                <filename>/usr/lib/nagios/plugins/</filename>
+                                on your &susemgr; server. This name must
+                                also match your probe definition on
                                 the Icinga server. <emphasis>This will be described in greater
                                     detail later in the chapter. The check_systemd.sh script/plugin
                                     will also be provided in a later section.</emphasis></para>
@@ -238,7 +242,7 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
             <step>
                 <para>One your configuration is complete load the new nrpe configuration
                     with:</para>
-                <screen># systemctl start nrpe</screen>
+                <screen>&prompt.root;systemctl start nrpe</screen>
             </step>
         </procedure>
         <para>This concludes setup of nrpe.</para>
@@ -247,7 +251,7 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
             <title>Adding a Host to Icinga</title>
             <para>To add a new host to Icinga create a host.cfg file for each host in
                     <filename>/etc/icinga/conf.d/</filename>. For example
-                    <literal>susemanager.cfg</literal>: </para>
+                    <filename>susemanager.cfg</filename>: </para>
             <screen>define host {
   host_name           susemanager
   alias               SUSE Manager
@@ -263,7 +267,7 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
                         <literal>Address</literal> line.</para>
             </note>
             <para>After adding a new host restart Icinga and load the new configuation:</para>
-            <screen># systemctl restart icinga</screen>
+            <screen>&prompt.root;systemctl restart icinga</screen>
 
         </sect2>
 
@@ -281,7 +285,7 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
   check_interval      60
 }</screen>
             <para>After adding any new services restart Icinga to load the new configuration: </para>
-            <screen># systemctl restart icinga</screen>
+            <screen>&prompt.root;systemctl restart icinga</screen>
         </sect2>
 
         <sect2>
@@ -300,13 +304,13 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</scree
                 ensure you add the host_name to the members list of included hosts if you want it to
                 be included within a logical hostgroup.</para>
             <para>After adding hosts to a hostgroup restart Icinga to load the new configuration: </para>
-            <screen># systemctl restart icinga</screen>
+            <screen>&prompt.root;systemctl restart icinga</screen>
         </sect2>
 
         <sect2>
             <title>Creating Servicegroups</title>
             <para>You can create logical groupings of services as well. For example if you would
-                like to create a group of essential SUSE Manager services which are running define
+                like to create a group of essential &susemgr; services which are running define
                 them within a <filename>servicegroups.cfg</filename> file placed in
                     <filename>/etc/icinga/conf.d/</filename></para>
             <screen>#Servicegroup 1
@@ -320,7 +324,7 @@ define servicegroup {
   servicegroup_name     Client Patch Status
   alias                 SUSE Manager 3 Client Patch Status
 }</screen>
-            <para>Within each hosts host.cfg file add a service to a servicegroup with the following
+            <para>Within each host's <filename>host.cfg</filename> file add a service to a servicegroup with the following
                 variable:</para>
             <screen>define service {
   use                 generic-service
@@ -332,22 +336,22 @@ define servicegroup {
             <para>All services that include the <literal>servicegroups</literal> variable and the
                 name of the servicegroup will be added to the specified servicegroup. After adding
                 services to a servicegroup restart Icinga to load the new configuation: </para>
-            <screen># systemctl restart icinga</screen>
+            <screen>&prompt.root;systemctl restart icinga</screen>
         </sect2>
 
     </sect1>
 
     <sect1>
         <title>Monitoring Systemd Services</title>
-        <para>The following section provides information on monitoring uptime of critical SUSE
-            Manager services.</para>
+        <para>The following section provides information on monitoring uptime of critical &susemgr;
+        services.</para>
         <procedure>
             <title>Monitoring Running Systemd Services</title>
             <step>
                 <para>Create a new plugin file called <filename>check_systemd.sh</filename> in
-                        <filename>/usr/lib/nagios/plugins/</filename> on your SUSE Manager
+                        <filename>/usr/lib/nagios/plugins/</filename> on your &susemgr;
                     server:</para>
-                <screen># vi /usr/lib/nagios/plugins/ check_systemd.sh</screen>
+                <screen>&prompt.root;vi /usr/lib/nagios/plugins/ check_systemd.sh</screen>
             </step>
             <step>
                 <para>For this example you will use an opensource community script to monitor
@@ -405,7 +409,7 @@ exit $STATE_OK</screen>
                 <warning>
                     <title>Non-supported 3rd Party Plugin</title>
                     <para>The script used in this example is an external script and is not supported
-                        by SUSE. Always check to ensure scripts are not modified or contain malicous
+                        by &suse;. Always check to ensure scripts are not modified or contain malicous
                         code before using them on production machines.</para>
                 </warning>
             </step>
@@ -419,12 +423,14 @@ exit $STATE_OK</screen>
                     <filename>/etc/nrpe.cfg</filename>:</para>
                 <screen># SUSE Manager Service Checks
 command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$</screen>
-                <para>This will allow the Icinga server to call the plugin via nrpe on SUSE
-                    Manager.</para>
+<para>
+ This will allow the Icinga server to call the plugin via nrpe on
+ &susemgr;.
+</para>
             </step>
             <step>
                 <para>Provide proper permissions by adding the script to the sudoers file:</para>
-                <screen># visudo</screen>
+                <screen>&prompt.root;visudo</screen>
                 <screen>nagios  ALL=(ALL)       NOPASSWD:/usr/lib/nagios/plugins/check_systemd.sh
 Defaults:nagios !requiretty</screen>
                 <para>You can also add permissions to the entire plugin directory instead of
@@ -434,14 +440,15 @@ Defaults:nagios !requiretty</screen>
             <step>
                 <para>On your Icinga server define the following command within
                         <filename>/etc/icinga/objects/commands.cfg</filename>:</para>
-                <screen>define command{
+                <screen>define command {
         command_name   check-systemd-service
         command_line   /usr/lib/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c check_systemd.sh -a $ARG1$
 }</screen>
             </step>
             <step>
-                <para>Now you will add the following critical services to be montitored to your SUSE
-                    Manager host file: </para>
+                <para>Now you will add the following critical services
+                to be montitored to your
+                &susemgr; host file: </para>
                 <itemizedlist>
                     <listitem>
                         <para>auditlog-keeper.service</para>
@@ -486,10 +493,10 @@ Defaults:nagios !requiretty</screen>
                         <para>spacewalk-wait-for-taskomatic.service</para>
                     </listitem>
                 </itemizedlist>
-                <para>On your Icinga server add the following service blocks to your SUSE Manager
+                <para>On your Icinga server add the following service blocks to your &susemgr;
                     host file <filename>susemanager.cfg</filename> file located in
-                        <filename>/etc/icinga/conf.d/</filename>(This configuration file was created
-                    in the previous section <emphasis>Adding a Host to Icinga</emphasis>)</para>
+                        <filename>/etc/icinga/conf.d/</filename>. (This configuration file was created
+                    in the previous section <emphasis>Adding a Host to Icinga</emphasis>.)</para>
                 <screen># Monitor Audit Log Keeper
 define service {
        use                    generic-service
@@ -648,9 +655,10 @@ define service{
                 <para>Each of these service blocks will be passed as the
                     check-systemd-service!$ARG1$ variable to SUSE manager server via nrpe. You
                     probably noticed the servicegroups parameter was also included. This adds each
-                    service to a servicegroup and has been defined in a servicesgroups.cfg file
+                    service to a servicegroup and has been defined in a
+                    <filename>servicesgroups.cfg</filename> file
                     located in <filename>/etc/icinga/conf.d/</filename>:</para>
-                <screen>define servicegroup{
+                <screen>define servicegroup {
        servicegroup_name     SUSE Manager Essential Services
        alias                 Essential Services
 }</screen>
@@ -671,14 +679,14 @@ define service{
     <sect1>
         <title>Using the check_suma_patches Plugin</title>
         <para>You can use the <filename>check_suma_patches</filename> plugin to check if any
-            machines connected to SUSE Manager as clients require a patch or an update. The
+            machines connected to &susemgr; as clients require a patch or an update. The
             following procedure will guide you through the setup of the check_suma_patches
             plugin.</para>
 
         <procedure>
             <title>Setup check_suma_patches</title>
             <step>
-                <para>On your SUSE Manager server open <filename>/etc/nrpe.cfg</filename> and add
+                <para>On your &susemgr; server open <filename>/etc/nrpe.cfg</filename> and add
                     the following lines:</para>
                 <screen># SUSE Manager check_patches
 command[check_suma_patches]=sudo /usr/lib/nagios/plugins/check_suma_patches $ARG1$</screen>
@@ -693,10 +701,10 @@ command[check_suma_patches]=sudo /usr/lib/nagios/plugins/check_suma_patches $ARG
 }</screen>
             </step>
             <step>
-                <para>On your Icinga server open any of your SUSE Manager client host configration
+                <para>On your Icinga server open any of your &susemgr; client host configration
                     files lcoated at <filename>/etc/icinga/conf.d/clients.cfg</filename> and add the
                     following service definition:</para>
-                <screen>define service{
+                <screen>define service {
         use                             generic-service
         host_name                       client-hostname
         service_description             Available Patches for client-host_name 
@@ -752,7 +760,7 @@ command[check_suma_patches]=sudo /usr/lib/nagios/plugins/check_suma_patches $ARG
         <procedure>
             <title>Setup check_suma_lastevent</title>
             <step>
-                <para>On your SUSE Manager server open <filename>/etc/nrpe.cfg</filename> and add
+                <para>On your &susemgr; server open <filename>/etc/nrpe.cfg</filename> and add
                     the following lines:</para>
                 <screen># Check SUSE Manager Hosts last events
 command[check_events]=sudo /usr/lib/nagios/plugins/check_suma_lastevent $ARG1$ </screen>
@@ -761,7 +769,7 @@ command[check_events]=sudo /usr/lib/nagios/plugins/check_suma_lastevent $ARG1$ <
                 <para>On the Icinga server open
                         <filename>/etc/icinga/objects/commands.cfg</filename> and add the following
                     lines:</para>
-                <screen>define command{
+                <screen>define command {
         command_name    check_events
         command_line    /usr/lib/nagios/plugins/check_nrpe -H manager.suse.de -c $ARG1$ -a $HOSTNAME$
 }</screen>
@@ -789,7 +797,7 @@ command[check_events]=sudo /usr/lib/nagios/plugins/check_suma_lastevent $ARG1$ <
                         <para><literal>Critical:Last action failed</literal></para>
                     </listitem>
                     <listitem>
-                        <para><literal>Unspecified:The host cannot be found in the SUSE Manager
+                        <para><literal>Unspecified:The host cannot be found in the &susemgr;
                                 database or the host name is not unique</literal>
                         </para>
                     </listitem>
@@ -801,10 +809,12 @@ command[check_events]=sudo /usr/lib/nagios/plugins/check_suma_lastevent $ARG1$ <
 
     <sect1>
         <title>Additional Resources</title>
-        <para>For additional resources see Icinga's official documentation located at:<link
-                xlink:href="http://docs.icinga.org/latest/en"/></para>
-        <para>For some excellent time saving configuration tips and tricks not covered in this guide
-            check the following section located within the official documentation here:<link
+        <para>For more information, see Icinga's official documentation
+        located at <link
+                xlink:href="http://docs.icinga.org/latest/en"/>.</para>
+        <para>For some excellent time saving configuration tips and tricks not covered in this guide,
+            see the following section located within the official
+            documentation: <link
                 xlink:href="http://docs.icinga.org/latest/en/objecttricks.html"/></para>
     </sect1>
 
