@@ -3,11 +3,33 @@ language: bash
 services:
   - docker
 
+env:
+  global:
+    - secure: O59udTEk3O3kM0P4XOAkS/O89H1iq1yip2WUWos7v55qiaKvEeupZn6v62rMrGJLjtcQrXrwup6Crp+wZm4TNJuuQCazuaqeEvz8dete8fWYUrQDqhfTSdAsgA1D5eRdoY9cj4WaQyLdBMKBPivSp6nppZAVlRw0K0UIc4IN7VAPsNH2iMjhXdwZLOiWzHcGnfHPfN6Mh92NlYH0xhd6E5sIanlkzszI16OIhPLc5BIXgUti/lEeSomMz2RtLH1eYtt5CI8oiMRzrMbA4KVpF4Ma6cdAYc3ASK4H/S4H5VF9lZqYb8WsolLuHTZiLaOjDLfhmr3kiGb0CjyG05yhvVM/3FwS01ZL0tDgIxOWNz+D7EvtTl0Tx6iLSjZcuQ2Y4WfMCX6jeRL26LsB+fQmxoJgVYPgsfKEF46E3bJ/d7dGEobtnYXxyZ+Uvgo2p01nmXeGys+8xJA+SHOEtRgS0taOhbs2iNEYhB5noi8vUazY2ZexkNXd1Ryb011aol8vaqJctySrCfwRUPQDZ+qQ18K3/0Dg9Dz4SSR7WHnMVAVkTwItdCiuPO8oOcfLEdAoMBlHOlsw1wjEmZKdIeAgXDo05KpTqStJuvScJxDE5X9qqUMB901qUFJIPgL6mGtLhN4a665pVpXmYdSaUvmbqntiwrIqzC2SbmM0w+tTtxY=
+    - COMMIT_AUTHOR_MAIL: "doc-team@suse.com"
+    # If you want to see a list of installed packages in the doc-ci docker container, set to TRUE
+    - LIST_PACKAGES=0
+    # List branches that should be published on GitHub pages, omit the maintenance/ prefix
+    - PUBLISH_PRODUCTS="develop"
+
 before_install:
-  - wget https://raw.githubusercontent.com/openSUSE/doc-ci/susemanager/travis/travis.sh
+  - echo "TRAVIS_PULL_REQUEST=$TRAVIS_PULL_REQUEST" >> env.list
+  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH" >> env.list
+  - echo "SOURCE_BRANCH=$SOURCE_BRANCH" >> env.list
+  - echo "TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG" >> env.list
+  - echo "LIST_PACKAGES=$LIST_PACKAGES" >> env.list
+  - echo "PUBLISH_PRODUCTS=\"$PUBLISH_PRODUCTS\"" >> env.list
+  - echo "ENCRYPTED_PRIVKEY_SECRET=$ENCRYPTED_PRIVKEY_SECRET" >> env.list
+  - echo "TRAVIS_COMMIT=$TRAVIS_COMMIT" >> env.list
+  - wget https://raw.githubusercontent.com/openSUSE/doc-ci/develop/travis/travis.sh
+  - ls
+  - echo "Building docker image"
   - docker build -t sle-doc-image .
-  # list the installed packages (just for easier debugging)
-  - docker run --rm -it sle-doc-image rpm -qa | sort
 
 script:
   - docker run --rm -it sle-doc-image /bin/bash -c '/bin/bash travis.sh'
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
