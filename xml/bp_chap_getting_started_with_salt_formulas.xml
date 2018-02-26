@@ -440,9 +440,11 @@ timezone:
       nothing visually (and is only used to structure pillar data).  The
       difference between group and edit-group is
       <literal>edit-group</literal> allows to structure and restrict
-      editable fields in a more flexible way; for example, it supports
-      the <literal>$minItems</literal> and <literal>$maxItems</literal>
-      attributes.
+      editable fields in a more flexible way. For example,
+      <literal>edit-group</literal> supports the
+      <literal>$minItems</literal> and <literal>$maxItems</literal>
+      attributes, and thus it simplifies creating complex, but somehow
+      repeatable input structures.
      </para>
     </listitem>
    </varlistentry>
@@ -451,7 +453,9 @@ timezone:
     <listitem>
      <para>
       <literal>$default</literal> allows you to specify a default value
-      that is displayed and used, if no other value is entered.
+      that is displayed and used, if no other value is entered.  In an
+      <literal>edit-group</literal> it allows to create members of the
+      group and populate them with specified data.
      </para>
     </listitem>
    </varlistentry>
@@ -476,7 +480,7 @@ timezone:
       a user sees when hovering over a field and
       <literal>$placeholder</literal> displays a gray placeholder text
       in the field. <literal>$placeholder</literal> may only be used
-      with text fields like text, password, email or date. It doesnt
+      with text fields like text, password, email or date. It does not
       make sense to add a placeholder if you also use
       <literal>$default</literal> as this will hide the placeholder.
      </para>
@@ -487,9 +491,19 @@ timezone:
     <term>$minItems and $maxItems</term>
     <listitem>
      <para>
-      In a <literal>edit-group</literal>,
+      In an <literal>edit-group</literal>,
      <literal>$minItems</literal> and <literal>$maxItems</literal> allow
-     you to specify the lowest and highest number the value can occur.
+     you to specify the lowest and highest number the group can occur.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>$itemName</term>
+    <listitem>
+     <para>
+      In an <literal>edit-group</literal>, <literal>$itemName</literal>
+      allows to define a template for the name to used for the members
+      of the group.
      </para>
     </listitem>
    </varlistentry>
@@ -498,6 +512,8 @@ timezone:
     <term>$prototype</term>
     <listitem>
      <para>
+      In an <literal>edit-group</literal>, <literal>$prototype</literal>
+      allows to define a template to used for the members of the group.
      </para>
     </listitem>
    </varlistentry>
@@ -610,7 +626,51 @@ do_something:
     </listitem>
    </varlistentry>
   </variablelist>
+
+  <example xml:id="ex.salt.formula.edit-group">
+   <title>Defining Hard Disk Partitions with
+   <literal>edit-group</literal></title>
+   <screen>partitions:
+  $name: "Hard Disk Partitions"
+  $type: "edit-group"
+  $minItems: 1
+  $maxItems: 4
+  $itemName: "Partition ${name}"
+  $prototype:
+    name:
+      $default: "New partition"
+    mountpoint:
+      $default: "/var"
+    size:
+      $type: "number"
+      $name: "Size in GB"
+  $default:
+    - name: "Boot"
+      mountpoint: "/boot"
+    - name: "Root"
+      mountpoint: "/"
+      size: 5000</screen>
+  </example>
+
+  <para>
+   After clicking <guimenu>Add</guimenu> for one time you will the
+   <xref linkend="fig-formula-custom-harddisk-partitions"/> filled the
+   predefined default values.
+  </para>
+  <figure xml:id="fig-formula-custom-harddisk-partitions">
+      <title></title>
+      <mediaobject>
+       <imageobject role="fo">
+        <imagedata fileref="formula-custom-harddisk-partitions.png"/>
+       </imageobject>
+       <imageobject role="html">
+        <imagedata fileref="formula-custom-harddisk-partitions.png"/>
+       </imageobject>
+      </mediaobject>
+  </figure>
+  
  </sect1>
+ <!-- ============================================================== -->
  <sect1 xml:id="best.practice.salt.formulas.writing">
   <title>Writing Salt Formulas</title>
 
