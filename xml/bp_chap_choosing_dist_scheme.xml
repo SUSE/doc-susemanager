@@ -23,17 +23,17 @@
   </listitem>
   <listitem>
    <para>
-    If you have special network security requirements which do not allow access
-    from your internal network to the internet then you may use a &sls; 12
-    running the Repository Mirroring Tool (RMT) or Subscription Management Tool (SMT).
-    These tools will contact &scc; from a system connected to the
-    external network and obtain updates for your clients which you may then
-    mount on your internal &susemgr; server. This is the preferred method for
-    managing client systems within a highly secure network infrastructure.
+    If you have special network security requirements which do not allow
+    access from your internal network to the internet then you may use a
+    &sls; 12 running the &rmtool; (RMT) or &smtool; (SMT).  These tools
+    will contact &scc; from a system connected to the external network
+    and obtain updates for your clients which you may then mount on your
+    internal &susemgr; server. This is the preferred method for managing
+    client systems within a highly secure network infrastructure.
    </para>
   </listitem>
  </itemizedlist>
- <sect1>
+ <sect1 xml:id="scc">
   <title>&scc; (SCC)</title>
 
   <para>
@@ -49,35 +49,85 @@
    see <link xlink:href="https://scc.suse.com/docs/userguide"/>.
   </para>
  </sect1>
- <sect1 xml:id="sub.mgr.tool">
-  <title>&smt; Subscription Management Tool (SMT) and Disconnected Setup (DMZ)</title>
+ <sect1 xml:id="disconnect-setup">
+  <title>Disconnected Setup (DMZ)</title>
 
   <para>
-   SMT
-  </para>
-  <para>
-   If it is not possible to connect SUSE Manager directly or via a proxy to the
-   Internet, a disconnected setup in combination with Subscription Management
-   Tool (SMT) is the recommended solution. In this scenario, SMT stays in an
-   “external” network with a connection to &scc; and synchronizes the
-   software channels and repositories on a removable storage medium. Then you
-   separate the storage medium from SMT, and mount it locally on your SUSE
-   Manager server to read the updated data.
+   If it is not possible to connect &susemgr; directly or via a proxy to
+   the Internet, a disconnected setup in combination with RMT or SMT is
+   the recommended solution.  In this scenario, RMT or SMT stays in an
+   <quote>external</quote> network with a connection to &scc; and
+   synchronizes the software channels and repositories on a removable
+   storage medium. Then you separate the storage medium from RMT or SMT,
+   and mount it locally on your &susemgr; server to read the updated
+   data.
   </para>
 
-  <para>
-   The following procedure will guide you through using SMT.
-  </para>
+  <formalpara>
+   <title>RMT</title>
+   <para>
+    The successor of SMT und currently runs on the following systems:
+   </para>
+  </formalpara>
+  <itemizedlist>
+   <listitem>
+    <para>&sle; 15, 12 SP2, and 12 SP3</para>
+   </listitem>
+   <listitem>
+    <para>openSUSE Leap 42.2, Leap 42.3, and openSUSE Tumbleweed</para>
+   </listitem>
+  </itemizedlist>
+   <para>
+    RMT allows you to provision updates for all of your devices running
+    a product based on &sle; 12 SPx and later as well as openSUSE Leap.
+   </para>
+
+  <formalpara>
+   <title>SMT</title>
+   <para>
+    The predecessor of RMT and no longer actively developed.  It runs on
+    &sls; 12 SPx and allows you to provision updates for products based
+    on &sle; 12 SPx and earlier.
+   </para>
+  </formalpara>
+  
+  <sect2 xml:id="rmtool">
+   <title>&rmtool; (RMT) and Disconnected Setup (DMZ)</title>
+   <para>
+    The following procedure will guide you through using RMT.
+   </para>
+   <para>
+    For more information, see <link
+    xlink:href="https://github.com/SUSE/rmt#offline-mode"/>.
+   </para>
+  <procedure>
+   <title>RMT: Fetching Repository Data from &scc;</title>
+   <step>
+    <para>
+     Configure RMT in the external network with SCC. For details about
+     configuring RMT with &sle; 12 SP3 or version 15 (when available),
+     see <link
+     xlink:href="https://github.com/SUSE/rmt#installation-and-configuration"
+     />.
+    </para>
+   </step>
+  </procedure>
+  </sect2>
+  
+  <sect2 xml:id="sub.mgr.tool">
+   <title>&smtool; (SMT) and Disconnected Setup (DMZ)</title>
+   <para>
+    The following procedure will guide you through using SMT.
+   </para>
 
   <procedure>
    <title>SMT: Fetching Repository Data from &scc;</title>
    <step>
     <para>
-     Configure SMT in the external network with SUSE Customer Center (SCC). For
-     details about configuring SMT with &sle; 12, see:
-     <link
-                        xlink:href="https://www.suse.com/documentation/sles-12/book_smt/data/book_smt.html"
-                    />
+     Configure SMT in the external network with SCC. For details about
+     configuring SMT with &sle; 12, see <link
+     xlink:href="https://www.suse.com/documentation/sles-12/book_smt/data/book_smt.html"
+     />.
     </para>
    </step>
    <step>
@@ -220,5 +270,6 @@ mgr-sync add channel channel-label</screen>
   <para>
    This concludes using SMT with &susemgr;.
   </para>
- </sect1>
+ </sect2>
+</sect1>
 </chapter>
