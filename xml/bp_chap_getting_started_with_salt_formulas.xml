@@ -9,7 +9,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
     xml:id="best.practice.salt.formulas.and.forms">
- <title>Salt Formulas and SUSE Manager</title>
+ <title>Salt Formulas and &susemgr;</title>
  <para>
   This chapter provides an introduction for using Salt Formulas with
   &susemgr;.  Creation of custom formulas will also be introduced.
@@ -22,11 +22,11 @@
    Formulas are collections of Salt States that have been pre-written by other
    Salt users and contain generic parameter fields. Formulas allow for reliable
    reproduction of a specific configuration again and again. Formulas can be
-   installed from RPM binaries or an external git repository.
+   installed from RPM packages or an external git repository.
   </para>
 
   <para>
-   The following list should help you in making the decision to use a state or
+   The following list will help you in making the decision to use a state or
    a formula.
   </para>
 
@@ -117,7 +117,7 @@ Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
    </step>
    <step>
     <para>
-     To install a formula, as &rootuser; or with sudo run:
+     To install a formula, as &rootuser; or with <command>sudo</command> run:
     </para>
 <screen>&prompt.root;zypper in locale-formula</screen>
    </step>
@@ -202,7 +202,7 @@ Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
    and may be applied to groups and systems from the &webui;:
   </para>
 
-<screen>/srv/formula_metadata/<replaceable>custom-formula-name</replaceable>/form.yml</screen>
+<screen>/srv/salt/formula_metadata/<replaceable>custom-formula-name</replaceable>/form.yml</screen>
  </sect1>
  <sect1 xml:id="best.practice.salt.formulas.pillar">
   <title>Editing Pillar Data in &susemgr;</title>
@@ -233,7 +233,7 @@ Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
 # (at your option) any later version.
 #
 # Foobar is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# but WITHOUT ANY WARRANTY; without even the implied warranty of 
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
@@ -339,72 +339,82 @@ timezone:
       The most important attribute is the <literal>$type</literal>
       attribute. It defines the type of the pillar value and the
       form-field that is generated. The following represent the
-      currently supported types:
+      supported types:
      </para>
      <itemizedlist>
       <listitem>
        <para>
-        text
+        <literal>text</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        password
+        <literal>password</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        number
+        <literal>number</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        url
+        <literal>url</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        email
+        <literal>email</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        date
+        <literal>date</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        time
+        <literal>time</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        datetime
+        <literal>datetime</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        boolean
+        <literal>boolean</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        color
+        <literal>color</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        select
+        <literal>select</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        group
+        <literal>group</literal>
        </para>
       </listitem>
       <listitem>
        <para>
-        hidden-group
+        <literal>edit-group</literal>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+       <literal>namespace</literal>
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        <literal>hidden-group</literal> (obsolete, renamed to <literal>namespace</literal>)
        </para>
       </listitem>
      </itemizedlist>
@@ -421,12 +431,22 @@ timezone:
       field and the <literal>color</literal> type will generate a color picker.
      </para>
      <para>
-      The <literal>group</literal> and <literal>hidden-group</literal> types do
-      not generate an editable field and are used to structure form and pillar
-      data. The difference between group and hidden-group is
-      <literal>group</literal> generates a visible border with a heading, and
-      hidden-group shows nothing visually (and is only used to structure pillar
-      data).
+      The <literal>group</literal>, <literal>edit-group</literal>, and
+      <literal>namespace</literal> (formerly
+      <literal>hidden-group</literal>) types do not generate an editable
+      field and are used to structure form and pillar data. The
+      difference between <literal>group</literal> and
+      <literal>namespace</literal> is <literal>group</literal> generates
+      a visible border with a heading, and <literal>namespace</literal>
+      shows nothing visually (and is only used to structure pillar
+      data).  The difference between <literal>group</literal> and
+      <literal>edit-group</literal> is <literal>edit-group</literal>
+      allows to structure and restrict editable fields in a more
+      flexible way. For example, <literal>edit-group</literal> supports
+      the <literal>$minItems</literal> and <literal>$maxItems</literal>
+      attributes, and thus it simplifies complex and repeatable input
+      structures.  For an <literal>edit-group</literal> example, see
+      <xref linkend="salt.formulas.ex.edit-group"/>.
      </para>
     </listitem>
    </varlistentry>
@@ -435,7 +455,9 @@ timezone:
     <listitem>
      <para>
       <literal>$default</literal> allows you to specify a default value
-      that is displayed and used, if no other value is entered.
+      that is displayed and used, if no other value is entered.  In an
+      <literal>edit-group</literal> it allows to create inital members
+      of the group and populate them with specified data.
      </para>
     </listitem>
    </varlistentry>
@@ -460,12 +482,45 @@ timezone:
       a user sees when hovering over a field and
       <literal>$placeholder</literal> displays a gray placeholder text
       in the field. <literal>$placeholder</literal> may only be used
-      with text fields like text, password, email or date. It doesnt
+      with text fields like text, password, email or date. It does not
       make sense to add a placeholder if you also use
       <literal>$default</literal> as this will hide the placeholder.
      </para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>$minItems and $maxItems</term>
+    <listitem>
+     <para>
+      In an <literal>edit-group</literal>,
+     <literal>$minItems</literal> and <literal>$maxItems</literal> allow
+     you to specify the lowest and highest number the group can occur.
+     </para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>$itemName</term>
+    <listitem>
+     <para>
+      In an <literal>edit-group</literal>, <literal>$itemName</literal>
+      allows to define a template for the name to be used for the members
+      of the group.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>$prototype</term>
+    <listitem>
+     <para>
+      In an <literal>edit-group</literal>, <literal>$prototype</literal>
+      allows to define default (or pre-filled) values for newly added
+      members in the group.
+     </para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term>$scope</term>
     <listitem>
@@ -574,7 +629,62 @@ do_something:
     </listitem>
    </varlistentry>
   </variablelist>
+
+  <sect2 xml:id="salt.formulas.ex.edit-group">
+   <title>Simple <literal>edit-group</literal> Example</title>
+   <example xml:id="ex.salt.formula.edit-group">
+    <title>Defining Hard Disk Partitions with
+    <literal>edit-group</literal></title>
+    <screen>partitions:
+  $name: "Hard Disk Partitions"
+  $type: "edit-group"
+  $minItems: 1
+  $maxItems: 4
+  $itemName: "Partition ${name}"
+  $prototype:
+    name:
+      $default: "New partition"
+    mountpoint:
+      $default: "/var"
+    size:
+      $type: "number"
+      $name: "Size in GB"
+  $default:
+    - name: "Boot"
+      mountpoint: "/boot"
+    - name: "Root"
+      mountpoint: "/"
+      size: 5000</screen>
+   </example>
+
+   <para>
+    After clicking <guimenu>Add</guimenu> for one time you will see
+    <xref linkend="fig-formula-custom-harddisk-partitions"/> filled with
+    the default values.  The formula itself is called
+    <filename>hd-partitions</filename> and will appear as <guimenu>Hd
+    Partitions</guimenu> in the &webui;.
+   </para>
+   <figure xml:id="fig-formula-custom-harddisk-partitions">
+    <title><literal>edit-group</literal> Example in the &webui;</title>
+    <mediaobject>
+     <imageobject role="fo">
+      <imagedata fileref="formula-custom-harddisk-partitions.png"/>
+     </imageobject>
+     <imageobject role="html">
+      <imagedata fileref="formula-custom-harddisk-partitions.png"/>
+     </imageobject>
+    </mediaobject>
+   </figure>
+
+   <para>
+    To remove definition of a partition click the minus symbol in the
+    title line of an inner group.  When form fields are properly filled
+    confirm with clicking <guimenu>Save Formula</guimenu> in the upper
+    right corner of the formula.
+   </para>
+  </sect2>
  </sect1>
+ <!-- ============================================================== -->
  <sect1 xml:id="best.practice.salt.formulas.writing">
   <title>Writing Salt Formulas</title>
 
