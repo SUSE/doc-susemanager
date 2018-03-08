@@ -96,24 +96,62 @@
   <sect2 xml:id="rmtool">
    <title>&rmtool; (RMT) and Disconnected Setup (DMZ)</title>
    <para>
-    The following procedure will guide you through using RMT.
+    The following procedure will guide you through using RMT.  It will
+    work best with a dedicated RMT per &susemgr;.
    </para>
    <para>
     For more information, see <link
     xlink:href="https://github.com/SUSE/rmt#offline-mode"/>.
    </para>
-  <procedure>
-   <title>RMT: Fetching Repository Data from &scc;</title>
-   <step>
-    <para>
-     Configure RMT in the external network with SCC. For details about
-     configuring RMT with &sle; 12 SP3 or version 15 (when available),
-     see <link
-     xlink:href="https://github.com/SUSE/rmt#installation-and-configuration"
-     />.
-    </para>
-   </step>
-  </procedure>
+   <procedure>
+    <title>RMT: Fetching Repository Data from &scc;</title>
+    <step>
+     <para>
+      Configure RMT in the external network with SCC. For details about
+      configuring RMT with &sle; 12 SP3 or version 15 (when available),
+      see <link
+      xlink:href="https://github.com/SUSE/rmt#installation-and-configuration"
+      />.
+     </para>
+    </step>
+    <step>
+     <para>
+      Using RMT, mirror all required repositories.
+     </para>
+    </step>
+    <step>
+     <para>
+      Get the required JSON responses from SCC and save them as files at
+      the specified path (for example, <filename>/mnt/usb</filename>):
+     </para>
+<screen>&prompt.root;rmt-cli export data /mnt/usb</screen>
+    </step>
+    <step>
+     <para>
+      Export settings about repositories to mirror to the specified path
+      (in this case, <filename>/mnt/usb</filename>); this command will
+      create a <filename>repos.json</filename> file:
+     </para>
+     <screen>&prompt.root;rmt-cli export settings /mnt/usb</screen>
+     <para>
+      Check <filename>repos.json</filename> and manually remove the
+      repositories you do not need.
+     </para>
+    </step>
+    <!--
+        Mirror repositories according to settings in the
+        <filename>repos.json</filename> file and store the repositories to
+        the specified path:
+        
+        rmt-cli export repos /mnt/usb
+    -->
+    <step>
+     <para>
+      Unmount the storage medium and carry it securely to your &susemgr;
+      server.
+     </para>
+    </step>
+   </procedure>
   </sect2>
   
   <sect2 xml:id="sub.mgr.tool">
@@ -142,7 +180,7 @@
      Create a <quote>database replacement file</quote> (for example,
      <filename>/tmp/dbrepl.xml</filename>.
     </para>
-<screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
+<screen>&prompt.root;smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
    </step>
    <step xml:id="pro.mgr.tool.mount.storage">
     <para>
