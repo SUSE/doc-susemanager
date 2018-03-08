@@ -18,63 +18,173 @@
   <listitem>
    <para>
     Directly connecting to &scc; is the recommended default way of managing
-    your &susemgr; Server.
+    your &susemgr; server.
    </para>
   </listitem>
   <listitem>
    <para>
-    If you have special network security requirements which do not allow access
-    from your internal network to the internet then you may use a &sle; 12
-    Server running the Subscription Management Tool (SMT).
-    This tool will contact &scc; from a system connected to the
-    external network and obtain updates for your clients which you may then
-    mount on your internal &susemgr; Server. This is the preferred method for
-    managing client systems within a highly secure network infrastructure.
+    If you have special network security requirements which do not allow
+    access from your internal network to the internet then you can use
+    &sls; 12 running the &rmtool; (RMT) or &smtool; (SMT).  These tools
+    will contact &scc; from a system connected to the external network
+    and obtain updates for your clients which you may then mount on your
+    internal &susemgr; server. This is the preferred method for managing
+    client systems within a highly secure network infrastructure.
    </para>
   </listitem>
  </itemizedlist>
- <sect1>
-  <title>SUSE Customer Center (SCC)</title>
+ <sect1 xml:id="scc">
+  <title>&scc; (SCC)</title>
 
   <para>
-   SUSE Customer Center (SCC) is the central place to manage your purchased
-   SUSE subscriptions, helping you access your update channels
-   and get in contact with SUSE experts. The user-friendly interface gives you
-   a centralized view of all your SUSE subscriptions, allowing you to easily
-   find all subscription information you need. The improved registration
-   provides faster access to your patches and updates. SUSE Customer Center is
-   also designed to provide a common platform for your support requests and
-   feedback. Discover a new way of managing your SUSE account and subscriptions
-   via one interface—anytime, anywhere. For more information on using &scc;
-   see: <link xlink:href="https://scc.suse.com/docs/userguide"/>
+   &scc; (SCC) is the central place to manage your purchased &suse;
+   subscriptions, helping you access your update channels and get in
+   contact with &suse; experts. The user-friendly interface gives you a
+   centralized view of all your &suse; subscriptions, allowing you to
+   easily find all subscription information you need. The improved
+   registration provides faster access to your patches and
+   updates. &scc; is also designed to provide a common platform for your
+   support requests and feedback. Discover a new way of managing your
+   &suse; account and subscriptions via one interface—anytime,
+   anywhere. For more information on using &scc;, see <link
+   xlink:href="https://scc.suse.com/docs/userguide"/>.
   </para>
  </sect1>
- <sect1 xml:id="sub.mgr.tool">
-  <title>Subscription Management Tool (SMT) and Disconnected Setup (DMZ)</title>
+ <sect1 xml:id="disconnect-setup">
+  <title>Disconnected Setup with RMT or SMT (DMZ)</title>
 
   <para>
-   If it is not possible to connect SUSE Manager directly or via a proxy to the
-   Internet, a disconnected setup in combination with Subscription Management
-   Tool (SMT) is the recommended solution. In this scenario, SMT stays in an
-   “external” network with a connection to &scc; and synchronizes the
-   software channels and repositories on a removable storage medium. Then you
-   separate the storage medium from SMT, and mount it locally on your SUSE
-   Manager server to read the updated data.
+   If it is not possible to connect &susemgr; directly or via a proxy to
+   the Internet, a disconnected setup in combination with RMT or SMT is
+   the recommended solution.  In this scenario, RMT or SMT stays in an
+   <quote>external</quote> network with a connection to &scc; and
+   synchronizes the software channels and repositories on a removable
+   storage medium. Then you separate the storage medium from RMT or SMT,
+   and mount it locally on your &susemgr; server to read the updated
+   data.
   </para>
 
-  <para>
-   The following procedure will guide you through using SMT.
-  </para>
+  <formalpara>
+   <title>RMT</title>
+   <para>
+    The successor of SMT and currently runs on the following systems:
+   </para>
+  </formalpara>
+  <itemizedlist>
+   <listitem>
+    <para>&sle; 15 (when available), 12 SP2, and 12 SP3</para>
+   </listitem>
+   <listitem>
+    <para>openSUSE Leap 42.2, Leap 42.3, and openSUSE Tumbleweed</para>
+   </listitem>
+  </itemizedlist>
+   <para>
+    RMT allows you to provision updates for all of your devices running
+    a product based on &sle; 12 SPx and later as well as openSUSE Leap.
+   </para>
+
+  <formalpara>
+   <title>SMT</title>
+   <para>
+    The predecessor of RMT and is no longer actively developed.  It runs on
+    &sls; 12 SPx and allows you to provision updates for products based
+    on &sle; 12 SPx and earlier.  You will still need it, if you want to
+    update &sle; 11 clients.
+   </para>
+  </formalpara>
+  
+  <sect2 xml:id="rmtool">
+   <title>&rmtool; (RMT) and Disconnected Setup (DMZ)</title>
+   <para>
+    The following procedure will guide you through using RMT.  It will
+    work best with a dedicated RMT instance per &susemgr;.
+   </para>
+   <para>
+    For more information, see <link
+    xlink:href="https://github.com/SUSE/rmt#offline-mode"/>.
+   </para>
+   <procedure>
+    <title>RMT: Fetching Repository Data from &scc;</title>
+    <step>
+     <para>
+      Configure RMT in the external network with SCC. For details about
+      configuring RMT with &sle; 12 SP3 or version 15 (when available),
+      see <link
+      xlink:href="https://github.com/SUSE/rmt#installation-and-configuration"
+      />.
+     </para>
+    </step>
+    <step>
+     <para>
+      Using RMT, mirror all required repositories.
+     </para>
+    </step>
+    <step>
+     <para>
+      Get the required JSON responses from SCC and save them as files at
+      the specified path (for example, <filename>/mnt/usb</filename>):
+     </para>
+<screen>&prompt.root;rmt-cli export data /mnt/usb</screen>
+    </step>
+    <step>
+     <para>
+      Export settings about repositories to mirror to the specified path
+      (in this case, <filename>/mnt/usb</filename>); this command will
+      create a <filename>repos.json</filename> file there:
+     </para>
+     <screen>&prompt.root;rmt-cli export settings /mnt/usb</screen>
+     <para>
+      Check <filename>repos.json</filename> and edit it to remove the
+      repositories you do not need.
+     </para>
+    </step>
+    <step xml:id="pro.rmtool.export.repos">
+     <para>
+      Mirror the repositories according to the settings in the
+      <filename>repos.json</filename> file to the specified path (in
+      this case, <filename>/mnt/usb</filename>).
+     </para>
+     <important>
+      <title>Write Permissions for RMT User</title>
+      <para>
+       The directory being written to must be writeable for the same
+       user as the rmt service. The rmt user setting is defined in the
+       <literal>cli</literal> section of
+       <filename>/etc/rmt.conf</filename>.
+      </para>
+     </important>
+     <para>
+      Enter:
+     </para>
+     <screen>&prompt.root;rmt-cli export repos /mnt/usb</screen>
+    </step>
+    <step>
+     <para>
+      Unmount the storage medium and carry it securely to your &susemgr;
+      server.
+     </para>
+    </step>
+   </procedure>
+   <para>
+    On the &susemgr; server, continue with <xref
+    linkend="disconnect.mgr.update-repos"/>.
+   </para>
+  </sect2>
+  
+  <sect2 xml:id="sub.mgr.tool">
+   <title>&smtool; (SMT) and Disconnected Setup (DMZ)</title>
+   <para>
+    The following procedure will guide you through using SMT.
+   </para>
 
   <procedure>
    <title>SMT: Fetching Repository Data from &scc;</title>
    <step>
     <para>
-     Configure SMT in the external network with SUSE Customer Center (SCC). For
-     details about configuring SMT with &sle; 12, see:
-     <link
-                        xlink:href="https://www.suse.com/documentation/sles-12/book_smt/data/book_smt.html"
-                    />
+     Configure SMT in the external network with SCC. For details about
+     configuring SMT with &sle; 12, see <link
+     xlink:href="https://www.suse.com/documentation/sles-12/book_smt/data/book_smt.html"
+     />.
     </para>
    </step>
    <step>
@@ -84,10 +194,10 @@
    </step>
    <step>
     <para>
-     Create a "database replacement file" (for example,
+     Create a <quote>database replacement file</quote> (for example,
      <filename>/tmp/dbrepl.xml</filename>.
     </para>
-<screen>smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
+<screen>&prompt.root;smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
    </step>
    <step xml:id="pro.mgr.tool.mount.storage">
     <para>
@@ -105,15 +215,15 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
     <important>
      <title>Write Permissions for SMT User</title>
      <para>
-      The directory being written too must be writeable for the same user as
+      The directory being written to must be writeable for the same user as
       the smt daemon (user=smt). The smt user setting is defined in
       <filename>/etc/smt.conf</filename>. You can check if the correct user is
       specified via the following command:
      </para>
-<screen># egrep '^smtUser' /etc/smt.conf</screen>
+<screen>&prompt.root;egrep '^smtUser' /etc/smt.conf</screen>
     </important>
     <note>
-     <title>Keeping A Disconnected Server Up-to-date</title>
+     <title>Keeping the Disconnected Server Up-to-date</title>
      <para>
       <command>smt-sync</command> also exports your subscription
       data. To keep &susemgr; up-to-date with your subscriptions,
@@ -128,14 +238,23 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
     </para>
    </step>
   </procedure>
-
+   <para>
+    On the &susemgr; server, continue with <xref
+    linkend="disconnect.mgr.update-repos"/>.
+   </para>
+  </sect2>
+  
+  <sect2 xml:id="disconnect.mgr.update-repos">
+   <title>Updating Repositories on &susemgr; From Storage Media</title>
+   
   <para>
-   The next procedure will show you how to update your server from the SMT
-   media.
+   <remark>Will this work the same way with media created on
+   RMT?</remark> This procedure will show you how to update the
+   repositories on the &susemgr; server from the storage media.
   </para>
 
   <procedure>
-   <title>Updating Your &susemgr; Server from the Storage Medium</title>
+   <title>Updating the &susemgr; Server from the Storage Medium</title>
    <step>
     <para>
      Mount the storage medium on your &susemgr; server (for example, at
@@ -188,20 +307,24 @@ mgr-sync add channel channel-label</screen>
   <para>
    Up-to-date data is now available on your &susemgr; server and is ready for
    updating client systems. According to your maintenance windows or update
-   schedule refresh the data on the storage medium with SMT.
+   schedule refresh the data on the storage medium with RMT or SMT.
   </para>
-
+  </sect2>
+  <sect2>
+   <title>Refreshing Data on the Storage Medium</title>
   <procedure>
-   <title>Refreshing Data on the Storage Medium from SMT</title>
+   <title>Refreshing Data on the Storage Medium from RMT or SMT</title>
    <step>
     <para>
      On your &susemgr; server, unmount the storage medium and carry it to your
-     SMT.
+     RMT or SMT.
     </para>
    </step>
    <step>
     <para>
-     On your SMT system, continue with <xref linkend="pro.mgr.tool.sync"/>.
+     On your RMT or SMT system, continue with the synchronization step
+     (either <xref linkend="pro.rmtool.export.repos"/> or <xref
+     linkend="pro.mgr.tool.sync"/>).
     </para>
     <warning>
      <title>Data Corruption</title>
@@ -215,7 +338,8 @@ mgr-sync add channel channel-label</screen>
   </procedure>
 
   <para>
-   This concludes using SMT with &susemgr;.
+   This concludes using RMT or SMT with &susemgr;.
   </para>
- </sect1>
+ </sect2>
+</sect1>
 </chapter>
