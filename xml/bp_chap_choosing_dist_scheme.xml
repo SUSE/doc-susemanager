@@ -67,12 +67,12 @@
   <formalpara>
    <title>RMT</title>
    <para>
-    The successor of SMT und currently runs on the following systems:
+    The successor of SMT and currently runs on the following systems:
    </para>
   </formalpara>
   <itemizedlist>
    <listitem>
-    <para>&sle; 15, 12 SP2, and 12 SP3</para>
+    <para>&sle; 15 (when available), 12 SP2, and 12 SP3</para>
    </listitem>
    <listitem>
     <para>openSUSE Leap 42.2, Leap 42.3, and openSUSE Tumbleweed</para>
@@ -97,7 +97,7 @@
    <title>&rmtool; (RMT) and Disconnected Setup (DMZ)</title>
    <para>
     The following procedure will guide you through using RMT.  It will
-    work best with a dedicated RMT per &susemgr;.
+    work best with a dedicated RMT instance per &susemgr;.
    </para>
    <para>
     For more information, see <link
@@ -130,21 +130,34 @@
      <para>
       Export settings about repositories to mirror to the specified path
       (in this case, <filename>/mnt/usb</filename>); this command will
-      create a <filename>repos.json</filename> file:
+      create a <filename>repos.json</filename> file there:
      </para>
      <screen>&prompt.root;rmt-cli export settings /mnt/usb</screen>
      <para>
-      Check <filename>repos.json</filename> and manually remove the
+      Check <filename>repos.json</filename> and edit it to remove the
       repositories you do not need.
      </para>
     </step>
-    <!--
-        Mirror repositories according to settings in the
-        <filename>repos.json</filename> file and store the repositories to
-        the specified path:
-        
-        rmt-cli export repos /mnt/usb
-    -->
+    <step xml:id="pro.rmtool.export.repos">
+     <para>
+      Mirror the repositories according to the settings in the
+      <filename>repos.json</filename> file to the specified path (in
+      this case, <filename>/mnt/usb</filename>).
+     </para>
+     <important>
+      <title>Write Permissions for RMT User</title>
+      <para>
+       The directory being written to must be writeable for the same
+       user as the rmt service. The rmt user setting is defined in the
+       <literal>cli</literal> section of
+       <filename>/etc/rmt.conf</filename>.
+      </para>
+     </important>
+     <para>
+      Enter:
+     </para>
+     <screen>&prompt.root;rmt-cli export repos /mnt/usb</screen>
+    </step>
     <step>
      <para>
       Unmount the storage medium and carry it securely to your &susemgr;
@@ -152,6 +165,10 @@
      </para>
     </step>
    </procedure>
+   <para>
+    On the &susemgr; server, continue with <xref
+    linkend="disconnect.mgr.update-repos"/>.
+   </para>
   </sect2>
   
   <sect2 xml:id="sub.mgr.tool">
@@ -221,20 +238,23 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
     </para>
    </step>
   </procedure>
+   <para>
+    On the &susemgr; server, continue with <xref
+    linkend="disconnect.mgr.update-repos"/>.
+   </para>
   </sect2>
   
-  <sect2>
-   <title>Updating &susemgr; From Storage Media</title>
+  <sect2 xml:id="disconnect.mgr.update-repos">
+   <title>Updating Repositories on &susemgr; From Storage Media</title>
    
   <para>
    <remark>Will this work the same way with media created on
-   RMT?</remark>
-   The next procedure will show you how to update your server from the storage
-   media.
+   RMT?</remark> This procedure will show you how to update the
+   repositories on the &susemgr; server from the storage media.
   </para>
 
   <procedure>
-   <title>Updating Your &susemgr; Server from the Storage Medium</title>
+   <title>Updating the &susemgr; Server from the Storage Medium</title>
    <step>
     <para>
      Mount the storage medium on your &susemgr; server (for example, at
@@ -302,9 +322,9 @@ mgr-sync add channel channel-label</screen>
    </step>
    <step>
     <para>
-     <!-- FIXME: add rmt ref here -->
      On your RMT or SMT system, continue with the synchronization step
-     (<xref linkend="pro.mgr.tool.sync"/>).
+     (either <xref linkend="pro.rmtool.export.repos"/> or <xref
+     linkend="pro.mgr.tool.sync"/>).
     </para>
     <warning>
      <title>Data Corruption</title>
