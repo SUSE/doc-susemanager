@@ -80,7 +80,7 @@
     </para>
    </listitem>
    <listitem>
-    <para>openSUSE Leap 42.2, Leap 42.3, and openSUSE Tumbleweed</para>
+    <para>Not officially supported: openSUSE Leap 42.2, Leap 42.3, and openSUSE Tumbleweed</para>
    </listitem>
   </itemizedlist>
    <para>
@@ -104,20 +104,53 @@
     The following procedure will guide you through using RMT.  It will
     work best with a dedicated RMT instance per &susemgr;.
    </para>
+   <!-- refer to official SLE guide:
    <para>
     For more information, see <link
     xlink:href="https://github.com/SUSE/rmt#offline-mode"/>.
-   </para>
+    </para>
+    -->
    <procedure>
     <title>RMT: Fetching Repository Data from &scc;</title>
     <step>
      <para>
       Configure RMT in the external network with SCC. For details about
-      configuring RMT with &sle; 12 SP3 or version 15 (when available),
+      configuring RMT, see the official guide (when available).
+      <!--
       see <link
       xlink:href="https://github.com/SUSE/rmt#installation-and-configuration"
       />.
+      -->
+      <!--
+          Run rmt-cli sync to download available products and repositories data for your organization from SCC
+          Run rmt-cli products list -\-all to see the list of products that are available for your organization
+          Run rmt-cli repos list -\-all to see the list of all repositories available
+-->
      </para>
+     <orderedlist>
+      <listitem>
+       <para>
+        Preparation work:
+       </para>
+          <para>Run <command>rmt-cli sync</command> to download available products and repositories data for your organization from SCC.</para>
+          <para>Run <command>rmt-cli products list --all</command> to see the list of products that are available for your organization.</para>
+          <para>Run <command>rmt-cli repos list --all</command> to see the list of all repositories available.</para>
+       
+      </listitem>
+      <listitem>
+       <para>
+        With <command>rmt-cli repos enable</command> enable repositories
+        you want to mirror.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        With <command>rmt-cli products enable</command>enable products.
+        For example, to enable &slsa;_15:
+       </para>
+       <screen>rmt-cli product enable sles/15/x86_64</screen>
+      </listitem>
+     </orderedlist>
     </step>
     <step>
      <para>
@@ -127,27 +160,7 @@
     <step>
      <para>
       Get the required JSON responses from SCC and save them as files at
-      the specified path (for example, <filename>/mnt/usb</filename>):
-     </para>
-<screen>&prompt.root;rmt-cli export data /mnt/usb</screen>
-    </step>
-    <step>
-     <para>
-      Export settings about repositories to mirror to the specified path
-      (in this case, <filename>/mnt/usb</filename>); this command will
-      create a <filename>repos.json</filename> file there:
-     </para>
-     <screen>&prompt.root;rmt-cli export settings /mnt/usb</screen>
-     <para>
-      Check <filename>repos.json</filename> and edit it to remove the
-      repositories you do not need.
-     </para>
-    </step>
-    <step xml:id="pro.rmtool.export.repos">
-     <para>
-      Mirror the repositories according to the settings in the
-      <filename>repos.json</filename> file to the specified path (in
-      this case, <filename>/mnt/usb</filename>).
+      the specified path (for example, <filename>/mnt/usb</filename>).
      </para>
      <important>
       <title>Write Permissions for RMT User</title>
@@ -160,6 +173,28 @@
      </important>
      <para>
       Enter:
+     </para>
+<screen>&prompt.root;rmt-cli export data /mnt/usb</screen>
+    </step>
+    <step>
+     <para>
+      Export settings about repositories to mirror to the specified path
+      (in this case, <filename>/mnt/usb</filename>); this command will
+      create a <filename>repos.json</filename> file there:
+     </para>
+     <screen>&prompt.root;rmt-cli export settings /mnt/usb</screen>
+     <!--
+     <para>
+      Check <filename>repos.json</filename> and edit it to remove the
+      repositories you do not need.
+     </para>
+     -->
+    </step>
+    <step xml:id="pro.rmtool.export.repos">
+     <para>
+      Mirror the repositories according to the settings in the
+      <filename>repos.json</filename> file to the specified path (in
+      this case, <filename>/mnt/usb</filename>).
      </para>
      <screen>&prompt.root;rmt-cli export repos /mnt/usb</screen>
     </step>
@@ -253,9 +288,8 @@ smt-mirror --dbreplfile /tmp/dbrepl.xml --directory /media/disk \
    <title>Updating Repositories on &susemgr; From Storage Media</title>
    
   <para>
-   <remark>Will this work the same way with media created on
-   RMT?</remark> This procedure will show you how to update the
-   repositories on the &susemgr; server from the storage media.
+   This procedure will show you how to update the repositories on the
+   &susemgr; server from the storage media.
   </para>
 
   <procedure>
