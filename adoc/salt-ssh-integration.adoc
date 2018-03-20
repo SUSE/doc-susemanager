@@ -1,0 +1,49 @@
+= Salt SSH Integration
+Doc Contributor <malbu@suse.de>
+Doc Editor <jcayouette@suse.de>
+Version 1, 2018-03-20
+
+:toc:
+:sectanchors:
+:sectlinks:
+:imagesdir: ../images/src/png
+:homepage: https://github.com/SUSE/doc-susemanager
+
+
+[#salt-ssh-introduction]
+== Summary
+
+The following topic provides an overview of the https://docs.saltstack.com/en/latest/topics/ssh/[Salt SSH] integration with SUSE Manager. This integration adds support for both ssh-push and ssh-push-tunnel connections for Salt minions.
+
+
+[#ssh-push-overview]
+== ssh-push Overview
+
+Like the traditional stack, Salt minions may use an ssh connection to manage minions in place of https://docs.saltstack.com/en/latest/topics/transports/zeromq.html[Zeromq]. This additional functionality is based on Salt SSH. With Salt SSH one may also execute salt commands and states via ssh without ever installing a salt-minion
+
+When the server executes an action on a minion an ssh connection is made on demand. This connection differs from the always-connected mode used by minions managed via Zeromq.
+
+In SUSE Manager there are two ssh-push methods. In both use cases the server initiates an ssh connection to the minion in order to execute a Salt call using `salt-ssh`. The difference in the two methods is how `zypper/_yum_`  initially connects to the server repositories:
+
+
+[#zypper-connection-methods]
+.zypper Connection Methods
+
+ssh-push:: zypper works as usual. The http(s) connection to the server is created directly.
+
+ssh-push-tunnel:: The server creates an http(s) connection through an ssh tunnel. The http(s) connection initiated by `zypper` is redirected through the tunnel by means of `/etc/hosts` aliasing (see below). This method should be used for in place firewall setups that block http(s) connections from a minion to the server.
+
+[#salt-ssh-integration]
+== salt-ssh Integration
+
+As with all Salt calls, SUSE Manager invokes `salt-ssh` via the `salt-api`.
+
+Salt SSH relies on a Roster to obtain details such as hostname, ports, and ssh parameters of an ssh minion. SUSE Manager keeps these details in the database and makes them available to Salt by generating a temporary Roster file for each salt-ssh call. The location of the temporary Roster file is supplied to salt-ssh using the `--roster-file= option`.
+
+=== Authentication
+
+salt-ssh supports both password and key authentication. SUSE Manager uses both methods:
+
+Bootstrapping Authentication:: Password authentication is used only when bootstrapping. During the bootstrap step the key of the server is not authorized on the minion and therefore a password must be utilized for a connection to be made. The password is used transiently in a temporary roster file used for bootstrapping. This password is not stored.
+
+Common Salt Call Authentication:: All other common salt calls use key authentication. During the bootstrap step the ssh key of the server is authorized on the minion (added to a minion's `~/.ssh/authorized_keys` file). Therefore subsequent calls no longer require a password.
