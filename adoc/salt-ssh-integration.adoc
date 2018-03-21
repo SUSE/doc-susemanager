@@ -8,7 +8,7 @@ ifdef::env-github[]
 endif::[]
 :sectanchors:
 :sectlinks:
-:imagesdir: ../images/src/png
+:imagesdir: ../images/src/adoc-images
 :homepage: https://github.com/SUSE/doc-susemanager
 :toc:
 :toc-placement!:
@@ -180,4 +180,69 @@ See also:
 
 In order to make salt-ssh work with SUSE Managers proxies the ssh connection is chained from one server/proxy to the next. This is also know as multi-hop or multi gateway ssh connection.
 
+.Salt SSH Proxy Multiple Hops
 image::salt-ssh-proxy-multi-hop.png[]
+
+=== The ProxyCommand
+In order to redirect the ssh connection through the proxies the ssh `ProxyCommand` option is used. This options invokes an arbitrary command that is expected to connect to the ssh port on the target host. The standard input and output of the command is used by the invoking ssh process to talk to the remote ssh daemon.
+
+The ProxyCommand basically replaces the TCP/IP connection. It doesn't do any authorization, encryption, etc. Its role is simply to create a byte stream to the remote ssh daemon's port.
+
+E.g. connecting to a server behind a gateway:
+
+image::salt-ssh-proxycommand.png[]
+
+[NOTE]
+In this example netcat (nc) is used to pipe port 22 of the target host into the ssh std i/o.
+
+=== Salt SSH Call Sequence via Proxy
+
+. SUSE Manager initates the ssh connections as described above.
+
+. Additionally the ProxyCommand uses ssh to create a connection from the server to the minion through the proxies.
+
+==== Twin Proxies and SSH Push
+The following example uses the ProxyCommand option with two proxies and the usual ssh-push method:
+
+.Twin Proxies and ssh-push
+[source,bash]
+----
+# 1
+/usr/bin/ssh -i /srv/susemanager/salt/salt_ssh/mgr_ssh_id -o StrictHostKeyChecking=no -o User=mgrsshtunnel  proxy1
+# 2
+/usr/bin/ssh -i /var/lib/spacewalk/mgrsshtunnel/.ssh/id_susemanager_ssh_push -o StrictHostKeyChecking=no -o User=mgrsshtunnel -W minion:22  proxy2
+----
+
+.Steps
+. connect from the server to the first proxy
+
+. connect from the first proxy to the second and forward standard input/output on the client to minion:22 using the -W option.
+
+image::salt-ssh-push-push-plain-sequence.png[]
+
+==== Twin Proxies and SSH Push Tunnel
+
+The following example uses the ProxyCommand option with two proxies over an ssh-push-tunnel connection:
+
+[source, bash]
+----
+# 1
+/usr/bin/ssh -i /srv/susemanager/salt/salt_ssh/mgr_ssh_id -o User=mgrsshtunnel  proxy1
+# 2
+/usr/bin/ssh -i /home/mgrsshtunnel/.ssh/id_susemanager_ssh_push -o User=mgrsshtunnel  proxy2
+# 3
+/usr/bin/ssh -i /home/mgrsshtunnel/.ssh/id_susemanager_ssh_push -o User=root -R 1233:proxy2:443 minion
+# 4
+/usr/bin/ssh -i /root/.ssh/mgr_own_id -W minion:22 -o User=root minion
+----
+
+.Steps
+. Connect from the server to the first proxy.
+
+. Connect from the first proxy to the second.
+
+. connect from the second proxy to the minion and open an reverse tunnel (-R 1233:proxy2:443) from the minion to the https port on the second proxy.
+
+. Connect from the minion to itself and forward the std i/o of the server to the ssh port of the minion (-W minion:22). This is equivalent to ssh ... proxy2 netcat minion 22 and is needed because ssh doesn't allow to have both the reverse tunnel (-R 1233:proxy2:443) and the standard i/o forwarding (-W minion:22) in the same command.
+
+image::salt-ssh-push-push-tunnel-sequence.png[]
