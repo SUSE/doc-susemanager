@@ -1,0 +1,244 @@
+[[_ref.webui.schedule]]
+= Schedule
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+
+[abstract]
+--
+menu:Schedule[]
+ helps with managing actions and combining actions to action chains. 
+--
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+
+(((Schedule)))
+
+(((WebLogic,Schedule)))
+
+menu:Schedule[]
+ on the left navigation menu features pages that enable you to manage the actions carried out on your systems.
+An action is a scheduled task to be performed on one or more client systems.
+For example, an action can be scheduled to apply all patches to a system.
+Actions can also be grouped into action chains to schedule them at the same time in a particular order, for example to reboot a system after deploying patches. 
+
+{susemgr}
+keeps track of the following action types: 
+
+* package alteration (installation, upgrade, and removal), 
+* rollback package actions, 
+* system reboots, 
+* patch application, 
+* configuration file alteration (deploy, upload, and diff), 
+* hardware profile updates, 
+* package list profile updates, 
+* automated installation initiation, 
+* service pack migrations, 
+* remote commands. 
+
+
+Each page in the menu:Schedule[]
+ category represents an action status. 
+
+[[_ref.webui.schedule.pending]]
+== Pending Actions
+
+
+The menu:Pending Actions[]
+ page appears when clicking menu:Schedule[Pending
+   Actions]
+.
+It displays actions not yet started or still in progress. 
+image::schedule_pending_actions.png[]
+
+
+To cancel an action, select the action, and click menu:Cancel Actions[]
+, then menu:Confirm[]
+. 
+
+[[_ref.webui.schedule.fail]]
+== Failed Actions
+
+(((SUSE Manager Administrator,Failed Actions)))
+
+
+Sometimes actions cannot be completed.
+If the action returns an error, it is displayed here. 
+image::schedule_failed_actions.png[]
+
+
+[[_ref.webui.schedule.compl]]
+== Completed Actions
+
+
+List of actions successfully carried out. 
+image::schedule_completed_actions.png[]
+
+
+[[_s2_sm_action_arch]]
+== Archived Actions
+
+(((SUSE Manager Administrator,Archived Actions)))
+
+
+If you selected actions to store for review, they are displayed here and can be deleted. 
+image::schedule_archived_actions.png[]
+
+
+[[_ref.webui.schedule.chains]]
+== Action Chains
+
+
+You can create action chains{mdash}
+or grouped actions{mdash}
+for example, in the menu:Software[Packages]
+ or menu:Software[Packages]
+ subtabs on a system details page (see <<_s4_sm_system_details_errata>> or <<_s4_sm_system_details_packages>>) or in the menu:Configuration[Deploy Files]
+ subtab on a system details page (see <<_s5_sdc_configuration_deploy_files>>). 
+image::schedule_action_chains.png[]
+
+
+In the menu:Action Chain List[]
+ you can click the label to view or edit an menu:Action Chain[]
+.
+In the top right corner is the menu:delete action chain[]
+ link.
+To add actions to an existing chain, pick up a "`chainable`"
+ action (such as running a remote command) from a system details page (see <<_s3_sm_system_details>>.
+Then check menu:Add to Action Chain[]
+ and select an action chain from the drop-down box.
+Confirm with menu:Schedule[]
+. 
+
+To create a new action chain, configure the first action, then select menu:Add to Action Chain[]
+ instead of menu:Schedule no sooner than[]
+.
+Click the drop-down box, enter a name, and click menu:Schedule[]
+ to save the chain.
+Then proceed to the next action and add it to the new chain. 
+
+Action chains can be edited via the menu:Schedule[Action Chains]
+ page.
+Click a chain name to see the actions in the order they will be performed.
+The following tasks can be carried out here: 
+
+* Change the order of actions by dragging the respective action to the right position and dropping it. 
+* Delete actions from the chain by clicking the menu:delete action[] link. 
+* Inspect the list of systems on which an action is run by clicking the menu:+[] sign. 
+* Delete a single system from an action chain by clicking the menu:delete system[] link. 
+* Delete the complete action chain with the menu:delete action chain[] link in the top-left corner. 
+* Change an action chain label by clicking it. 
+* Schedule an action chain for execution on a certain date by clicking the menu:Save and Schedule[] button. 
+
+
+.Unsaved Changes
+[NOTE]
+====
+If you leave the page without clicking either menu:Save[]
+ or menu:Save and Schedule[]
+ all unsaved changes will be discarded.
+In this case, a confirmation dialog will pop up. 
+====
+
+
+Currently you cannot add an action to an action chain from the menu:Edit[]
+ section of the action chain details page.
+When a Chain is scheduled, the actions it contains will be displayed under menu:Schedule[]
+ on the appropriate pages: menu:Pending Actions[]
+, menu:Failed Actions[]
+ or menu:Completed Actions[]
+, depending on the status.
+If one action fails on a system no other actions from the same chain will be executed on that systems.
+Because of technical limitations it is not possible to reuse Action Chains. 
+
+[[_ref.webui.schedule.list]]
+== Actions List
+
+(((SUSE Manager Administrator,Actions List)))
+
+
+On each action page, each row in the list represents a single scheduled event or action that might affect multiple systems and involve various packages.
+The list contains several columns of information: 
+
+* menu:Filter by Action[] -- Enter a term to filter the listed actions or use the check boxes in this column to select actions. Then either add them to your selection list or archive them by clicking menu:Archive Actions[] . If you archive a pending action, it is not canceled, but the action item moves from the menu:Pending Actions[] list to the menu:Archived Actions[] list. 
+* menu:Action[] -- Type of action to perform such as Patches or Package Install. Clicking an action name shows its menu:Action Details[] page. Refer to <<_s3_sm_action_details>> for more information. 
+* menu:Scheduled Time[] -- The earliest day and time the action will be performed. 
+* menu:Succeeded[] -- Number of systems on which this action was successfully carried out. 
+* menu:Failed[] -- Number of systems on which this action has been tried and failed. 
+* menu:In Progress[] -- Number of systems on which this action is taking place. 
+* menu:Total[] -- Total number of systems on which this action has been scheduled. 
+
+
+[[_s3_sm_action_details]]
+== Action Details
+
+
+If you click the name of an action, the menu:Action Details[]
+ page appears.
+This page is split into the following tabs. 
+
+[[_s4_sm_action_details_details]]
+=== Action Details >  Details
+
+
+General information about the action.
+This is the first tab you see when you click an action.
+It displays the action type, scheduling administrator, earliest execution, and notes. 
+
+.Patch Advisory
+[NOTE]
+====
+Clicking the Patch Advisory takes you to the menu:Patch Details[]
+ page.
+The Patch Advisory appears only if the action is a patch.
+Refer to <<_s3_sm_errata_details>> for more information. 
+====
+
+[[_s4_sm_action_details_completed]]
+=== Action Details > Completed Systems
+
+
+List of systems on which the action has been successfully performed.
+Clicking a system name displays its menu:System Details[]
+ page.
+Refer to <<_s3_sm_system_details>> for more information. 
+
+[[_s4_sm_action_details_progress]]
+=== Action Details > In Progress Systems
+
+
+List of systems on which the action is now being carried out.
+To cancel an action, select the system by marking the appropriate check box and click the menu:Unschedule Action[]
+ button.
+Clicking a system name shows its menu:System Details[]
+ page.
+Refer to <<_s3_sm_system_details>> for more information. 
+
+[[_s4_sm_action_details_failed]]
+=== Action Details > Failed Systems
+
+
+List of systems on which the action has failed.
+It can be rescheduled here.
+Clicking a system name takes you to its menu:System Details[]
+ page.
+Refer to <<_s3_sm_system_details>> for more information. 
+
+[[_s4_sm_action_details_packagelist]]
+=== Action Details > Package List
+
+
+List of packages are associated with this action.
+The tab appears only if the action is package related (installation, removal, etc.). 
+
+ifdef::backend-docbook[]
+[index]
+== Index
+// Generated automatically by the DocBook toolchain.
+endif::backend-docbook[]

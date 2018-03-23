@@ -1,0 +1,567 @@
+[[_ref.webui.channels]]
+= Software
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+
+(((Web UI,Software and Configuration Files)))
+
+(((WebLogic,channels)))
+
+
+The pages in the menu:Software[]
+ category enable you to view and manage software channels and packages associated with your systems. 
+
+[[_ref.webui.channels.software]]
+== Channels
+
+(((channel list )))
+
+(((child channel)))
+
+(((WebLogic,channel list)))
+
+
+The menu:Channels[]
+ page is the first to appear in the menu:Software[]
+ category.
+A software channel provides packages grouped by products or applications to simplify the selection of packages to be installed on a system. 
+
+There are two types of software channels: base channels and child channels. 
+
+[[_s3_sm_channel_list_base]]
+Base Channels::
+A base channel consists of packages built for a specific architecture and release.
+For example, all of the packages in {sls}{nbsp}
+12 for the `x86_64` architecture make up a base channel.
+The list of packages in {sls}{nbsp}
+12 for the `s390x` architecture make up a different base channel. 
++
+A system must be subscribed to only one base channel assigned automatically during registration based on the {sle}
+release and system architecture.
+For paid base channels, an associated subscription must exist. 
++
+
+ifdef::showremarks[]
+#toms 2011-02-07: Need to add a section about Long Term Support?#
+endif::showremarks[]
+
+[[_s3_sm_channel_list_child]]
+Child Channels::
+A child channel is associated with a base channel and provides extra packages.
+For example, an organization can create a child channel associated with {sls}
+on `x86_64` architecture that contains extra packages for a custom application. 
++
+Especially important are the {susemgr}
+Tools channels that are available for every base channel.
+These tools channels provide the tools needed to connect the clients with the {susemgr}
+server. 
++
+A system can be subscribed to multiple child channels of its base channel.
+Only packages provided by a subscribed channel can be installed or updated. {susemgr}
+Administrators and Channel Administrators have channel management authority.
+This authority gives them the ability to create and manage their own custom channels. 
++
+
+
+[NOTE]
+====
+Do not create child channels containing packages that are not compatible with the client system. 
+====
++
+Channels can be further distinguished by relevance: menu:All[]
+, menu:SUSE[]
+, menu:Channels[]
+, menu:My Channels[]
+, menu:Shared[]
+, and menu:Retired[]
+. 
+
+[[_s3_sm_channel_list_all]]
+=== All
+
+
+Under menu:Channels[]
+ in the left navigation menu select menu:All[]
+.
+All channels available to your organization are listed. 
+image::channels_all_channels.png[]
+
+
+Links within this list go to different tabs of the menu:Software Channel Details[]
+ page.
+Clicking a channel name takes you to the menu:Details[]
+ tab.
+Clicking the number of packages takes you to the menu:Packages[]
+ tab.
+Clicking the number of systems takes you to the menu:Subscribed Systems[]
+ tab.
+Refer to <<_s3_sm_channel_details>> for details. 
+
+.Package Count Update Change
+[IMPORTANT]
+====
+During a channel synchronization all package are now downloaded before they are incremented and displayed within the WebUI.
+When packages have completed the initial download, packages will begin to increment in your channel as they are imported to the database. 
+====
+
+[[_s3_sm_channel_list_redhat]]
+=== {suse}
+
+(((channels,Novell)))
+
+
+The menu:SUSE[]
+ page displays all {suse}
+ channels and any available child channels. 
+image::channels_vendor_channels.png[]
+
+
+.{suse}Channels Cannot be Deleted
+[WARNING]
+====
+When imported, {suse}
+channels cannot be deleted.
+Only custom software channels can be deleted. 
+====
+
+[[_s3_sm_channel_list_popular]]
+=== Popular
+
+
+The menu:Popular[]
+ page displays the software channels most subscribed by systems registered to your organization. 
+image::channels_popular_channels.png[]
+
+
+You can refine the search by using the drop-down box to list only the channels with at least a certain number of systems subscribed. 
+
+[[_s3_sm_channel_list_my]]
+=== My Channels
+
+(((channels,my)))
+
+
+The menu:My Channels[]
+ page displays all software channels that belong to your organization, including both {suse}
+ and custom channels.
+Use the text box to filter by channel name. 
+image::channels_custom_channels.png[]
+
+
+[[_s3_sm_channel_list_shared]]
+=== Shared
+
+
+The menu:Shared[]
+ page displays the channels shared with others in the organizational trust. 
+image::channels_shared_channels.png[]
+
+
+[[_s3_sm_channel_list_retired]]
+=== Retired
+
+(((channels,retired)))
+
+
+The menu:Retired[]
+ page displays available channels that have reached their end-of-life dates and do not receive updates. 
+image::channels_retired_channels.png[]
+
+
+[[_s3_sm_channel_details]]
+=== Channel Details
+
+(((WebLogic,software channel details)))
+
+
+If you click the name of a channel, the menu:Channel Details[]
+ page appears. 
+
+[[_s4_sm_channel_details_details]]
+==== menu:Channel Details[] > menu:Details[]
+
+
+General information about the channel and its parent if applicable.
+This summary, description, and architecture is also displayed when clicking a channel. 
+image::channels_details_channels.png[]
+
+
+In addition, menu:Per-User Subscription Restrictions[]
+ can be set globally by {susemgr}
+ administrators and channel administrators.
+By default, any user can subscribe channels to a system.
+To manage user permissions, select menu:Only selected users within your organization may subscribe to this channel[]
+ and click menu:Update[]
+.
+The menu:Subscribers[]
+ tab appears.
+Click it to grant specific users subscription permissions to a channel. {susemgr}
+ administrators and channel administrators can always subscribe any channels to a system. 
+
+Only customers with custom base channels can change their systems' base channel assignments via the {susemgr}
+Web interface in two ways: 
+
+* Assign the system to a custom base channel. 
+* Revert subscriptions from a custom base channel to the appropriate distribution-based base channel. 
+
+
+[NOTE]
+====
+The assigned base channel must match the installed system.
+For example, a system running {sle}{nbsp}
+11 for `x86_64` cannot be registered to a {sle}{nbsp}
+12 for `s390x` base channel.
+Use the files [path]``/etc/os-release``
+ or [path]``/etc/SuSE-release``
+ to check your product, architecture (try [command]``uname -a``), version, and patch level. 
+====
+
+[[_s4_sm_channel_details_managers]]
+==== menu:Channel Details[] > menu:Managers[]
+
+
+On the menu:Managers[]
+ page, you can check which users are authorized to manage the selected channel. 
+image::channels_details_managers_channels.png[]
+
+
+Real name and e-mail address are listed with the user names.
+Organization and Channel administrators can manage any channel.
+As a {susemgr}
+administrator you can change roles for specific users by clicking the name.
+For more information on user management and the menu:User Details[]
+ page, see <<_ref.webui.users>>. 
+
+[[_s4_sm_channel_details_errata]]
+==== menu:Channel Details[] > menu:Patches[]
+
+(((software channels,patches)))
+
+
+The menu:Patches[]
+ page lists patches to be applied to packages provided in the channel. 
+image::channels_details_patches_channels.png[]
+
+
+The list displays advisory types, names, summaries, and issue dates.
+Clicking an advisory name takes you to its menu:Patch Details[]
+ page.
+Refer to <<_s3_sm_errata_details>> for more information. 
+
+[[_s4_sm_channel_details_packages]]
+==== menu:Channel Details[] > menu:Packages[]
+
+(((package installation,filter)))
+
+
+This page lists packages in the channel.
+Clicking a package name takes you to the menu:Package Details[]
+ page. 
+image::channels_details_packages_channels.png[]
+
+
+This page displays a set of tabs with information about the package, including architectures on which it runs, the package size, build date, package dependencies, change log, list of files in the package, newer versions, and which systems have the package installed.
+Download the packages as RPMs. 
+
+To search for a specific package or a subset of packages, use the package filter at the top of the list.
+Enter a substring to search for package names containing the string.
+For example, typing `dd` in the filter might return: [systemitem]``dd_rescue``
+, [systemitem]``ddclient``
+, and [systemitem]``uuidd``
+.
+The filter is case-insensitive. 
+
+[[_s4_sm_channel_details_subsys]]
+==== menu:Channel Details[] > menu:Subscribed Systems[]
+
+
+The list displays system names and their system type.
+Clicking a system name takes you to its menu:System Details[]
+ page.
+Refer to <<_s3_sm_system_details>> for more information. 
+
+[[_s4_sm_channel_details_tarsys]]
+==== menu:Software Channel Details[] > menu:Target Systems[]
+
+
+List of systems eligible for subscription to the channel.
+This tab appears only for child channels.
+Use the check boxes to select the systems, then click the menu:Confirm[]
+ and menu:Subscribe[]
+ button on the bottom right-hand corner.
+You will receive a success message or be notified of any errors.
+This can also be accomplished through the menu:Channels[]
+ tab of the menu:System Details[]
+ page.
+Refer to <<_s3_sm_system_details>> for more information. 
+
+[[_ref.webui.channels.search]]
+== Package Search
+
+(((SUSE Manager Administrator,searching)))
+image::channels_search_channels.png[]
+
+
+The menu:Package Search[]
+ page allows you to search through packages using various criteria provided by the menu:What to search for[]
+ selection list: 
+
+* menu:Free Form[] -- a general keyword search useful when the details of a particular package and its contents are unknown. 
+* menu:Name Only[] -- Targeted search to find a specific package known by name. 
+* menu:Name and Summary[] -- Search for a package or program which might not show up in the respective package name but in its one-line summary. 
+* menu:Name and Description[] -- Search package names and their descriptions. 
+
+
+The menu:Free Form[]
+ field additionally allows you to search using field names that you prepend to search queries and filter results by that field keyword. 
+
+For example, if you wanted to search all of the {sle}
+packages for the word `java` in the description and summary, type the following in the menu:Free Form[]
+ field: 
+
+----
+summary:java and description:java
+----
+
+
+Other supported field names include: 
+
+* ``name``: search package names for a particular keyword, 
+* ``version``: search for a particular package version, 
+* ``filename``: search the package file names for a particular keyword, 
+* ``description``: search the packages' detailed descriptions for a particular keyword, 
+* ``summary``: search the packages' brief summary for a particular keyword, 
+* ``arch``: search the packages by their architecture (such as ``x86_64``, ``ppc64le``, or ``s390``). 
+
+
+You can also limit searches to menu:Channels relevant to your systems[]
+ by clicking the check box.
+Additionally, you can restrict your search by platform (menu:Specific channel you have access to[]
+) or architecture (menu:Packages of a specific architecture[]
+). 
+
+[[_ref.webui.channels.manage]]
+== Manage Software Channels
+
+(((software channels,managing)))
+
+
+This menu allows administrators to create, clone, and delete custom channels.
+These channels may contain altered versions of distribution-based channels or custom packages. 
+
+[[_ref.webui.channels.manage.overview]]
+=== Manage Software Channels > Overview
+
+
+The menu:Overview[]
+ page of the menu:Manage Software Channels[]
+ menu lists all available channels including custom, distribution-based, and child channels. 
+
+To clone an existing channel, click the menu:Clone Channel[]
+ link.
+Select the channel to be cloned from the drop-down box, select whether to clone the current state (including patches) or the original state (without patches). You can also select specific patches to use for cloning.
+Then click the menu:Create Channel[]
+ button.
+In the next screen select options for the new channel, including base architecture and GPG, then click menu:Create Channel[]
+. 
+
+.GPG Key URL
+[NOTE]
+====
+The GPG key URL may be either an internal file location such as `file:///` or you may use an external URL.
+====
+
+
+To create a new channel, click the menu:Create Channel[]
+ link.
+Select the appropriate options for the new channel, including base architecture and GPG options, then click menu:Create Channel[]
+.
+Note that a channel created in this manner is blank, containing no packages.
+You must either upload software packages or add packages from other repositories.
+You may also choose to include patches in your custom channel. 
+
+.Enable GPG Check
+[IMPORTANT]
+====
+`Enable GPG Check` is automatically selected when creating a new channel.
+If you would like to add custom packages and applications to your channel, make sure you deselect this box or you cannot install/add unsigned packages.
+Keep in mind this is a security risk for packages from an untrusted source.
+====
+
+[[_s3_chnl_mgmt_channel_details]]
+=== menu:Manage Software Channels[] > menu:Channel Details[]
+
+
+
+[[_s4_chnlmgmt_cdetails_cdetails]]
+==== menu:Manage Software Channels[] > menu:Channel Details[] > menu:Details[]
+
+
+This page lists the settings made during channel creation. 
+
+[[_s4_chnlmgmt_cdetails_manage]]
+==== menu:Manage Software Channels[] > menu:Channel Details[] > menu:Managers[]
+
+{susemgr}
+administrators and channel administrators may alter or delete any channel.
+To grant other users rights to alter or delete this channel, check the box next to the user's name and click menu:Update[]
+. 
+
+To allow all users to manage the channel, click the menu:Select All[]
+ button at the bottom of the list then click menu:Update[]
+.
+To remove a user's right to manage the channel, uncheck the box next to their name and click menu:Update[]
+. 
+
+[[_s4_chnlmgmt_cdetails_errata]]
+==== menu:Manage Software Channels[] > menu:Channel Details[] > menu:Patches[]
+
+
+Channel managers can list, remove, clone, and add patches to their custom channel.
+Custom channels not cloned from a distribution may not contain patches until packages are available.
+Only patches that match the base architecture and apply to a package in that channel may be added.
+Finally, only cloned or custom patches may be added to custom channels.
+Patches may be included in a cloned channel if they are selected during channel creation. 
+
+The menu:Sync[]
+ tab lists patches that were updated since they were originally cloned in the selected cloned channel.
+More specifically, a patch is listed here if and only if: 
+
+* it is a cloned patch, 
+* it belongs to the selected cloned channel, 
+* it has already been published in the selected cloned channel, 
+* it does not contain a package that the original patch has, or it has at least one package with a different version with regard to the corresponding one in the original patch, or both. 
+
+
+Clicking the menu:Sync Patches[]
+ button opens a confirmation page in which a subset of those patches can be selected for synchronization.
+Clicking the menu:Confirm[]
+ button in the confirmation page results in such patches being copied over from the original channel to the cloned channel, thus updating corresponding packages. 
+
+[[_s4_cnlmgmt_cdetails_pkgs]]
+==== menu:Manage Software Channels[] > menu:Channel Details[] > menu:Packages[]
+
+
+As with patches, administrators can list, remove, compare, and add packages to a custom channel. 
+
+To list all packages in the channel, click the menu:List / Remove Packages[]
+ link.
+Check the box to the left of any package you want to remove, then click menu:Remove Packages[]
+. 
+
+To add packages, click the menu:Add Packages[]
+ link.
+From the drop-down box activate a channel from which to add packages and click menu:View[]
+ to continue.
+Check the box to the left of any package you want to add to the custom channel, then click menu:Add Packages[]
+. 
+
+To compare packages in the current channel with those in another, select a channel from the drop-down box and click menu:Compare[]
+.
+Packages in both channels are compared, including architecture and the latest version of packages.
+The results are displayed on the next screen. 
+
+To make the two channels identical, click the menu:Merge Differences[]
+ button.
+In the next dialog, resolve any conflicts. menu:Preview Merge[]
+ allows you to review the changes before applying them to the channels.
+Select those packages that you want to merge.
+Click menu:Merge Packages[]
+ then menu:Confirm[]
+ to perform the merge. 
+
+[[_s4_chnlmgmt_cdetails_repos]]
+==== menu:Manage Software Channels[] > menu:Channel Details[] > menu:Repositories[]
+
+
+On the menu:Repositories[]
+ page, assign software repositories to the channel and synchronize repository content: 
+
+* menu:Add/Remove[] lists configured repositories, which can be added and removed by selecting the check box next to the repository name and clicking menu:Update Repositories[] . 
+* menu:Sync[] lists configured repositories. The synchronization schedule can be set using the drop-down boxes, or an immediate synchronization can be performed by clicking menu:Sync Now[] . 
+
+
+The menu:Manage Repositories[]
+ tab to the left shows all assigned repositories.
+Click a name to see details and possibly delete a repository. 
+
+[[_s3_chnl_mgmt_mng_pkgs]]
+=== menu:Manage Software Channels[] > menu:Manage Software Packages[]
+
+
+This page allows managing custom software packages, listing all software or viewing only packages in a custom channel.
+Select the respective channel from the drop-down box and click menu:View Packages[]
+. 
+
+[[_s3_chnl_mgmt_mng_repos]]
+=== menu:Manage Software Channels[] > menu:Manage Repositories[]
+
+
+Add or manage custom or third-party package repositories and link the repositories to an existing channel.
+The repositories feature currently supports repomd repositories. 
+
+To create a new repository click the menu:Create Repository[]
+ link at the top right of the menu:Manage Repositories[]
+ page.
+The menu:Create Repository[]
+ screen prompts you to enter a menu:Repository Label[]
+ such as `sles-12-x86_64` and a menu:Repository URL[]
+.
+You may enter URLs pointing to mirror lists or direct download repositories, then click menu:Create Repository[]
+.
+Select the desired SSL certificate of authority, client certificate and key from the drop down list.
+SSL keys should be placed in [path]``http://<EXAMPLE-MANAGER-FQDN.com/pub>``
+.
+
+To link the new repository to an existing software channel, select menu:Manage Software Channels[]
+ from the left menu, then click the channel you want to link.
+In the channel's detail page, click the menu:Repositories[]
+ subtab, then check the box next to the repository you want to link to the channel.
+Click menu:Update Repositories[]
+. 
+
+To synchronize packages from a custom repository to your channel, click the menu:Sync[]
+ link from the channel's menu:Repositories[]
+ subtab, and confirm by clicking the menu:Sync[]
+ button. 
+
+You can also perform a synchronization via command line by using the [command]``spacewalk-repo-sync`` command, which additionally allows you to accept keys. 
+
+[command]``spacewalk-repo-sync`` creates log files in the [path]``/var/log/rhn/reposync``
+ directory. {susemgr}
+ uses one log file per channel and reuses it with the next synchronization run. 
+
+[[_ref.webui.channels.mapping]]
+== Distribution Channel Mapping
+
+
+The Distribution Channel Mapping page displays a list of all your defined default base channels that clients will pick up according to their operating system and architecture at registration time.
+These mappings can be overriden, but cannot be deleted.
+To create such a mapping click menu:Create Distribution Channel Mapping[]
+ in the upper-right corner.
+Several columns provide information for each mapping. 
+
+.Using Distribution Channel Mapping
+[NOTE]
+====
+For {sle}
+or {rhel}{suse}
+does not use the menu:Distribution Channel Mapping[]
+ feature.
+It can be used for other products (for example, for free products such as openSUSE, Fedora, Oracle Linux, etc.). It can help when letting clients pick up base channels automatically. 
+====
+
+ifdef::backend-docbook[]
+[index]
+== Index
+// Generated automatically by the DocBook toolchain.
+endif::backend-docbook[]

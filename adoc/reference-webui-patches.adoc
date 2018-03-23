@@ -1,0 +1,403 @@
+[[_ref.webui.patches]]
+= Patches
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+
+(((Patches)))
+
+(((WebLogic,Patches)))
+
+
+The menu:Patches[]
+ menu from the left bar helps tracking the availability and application of patches to your managed systems. 
+
+The menu:Patches[Patches]
+ page displays all or relevant patches for at least one of your managed systems that have not been applied yet. 
+
+.Receiving Patches for Your System
+[NOTE]
+====
+To receive an e-mail when patches are issued for your system, go to menu:Overview[Your Preferences]
+ and select menu:Receive email notifications[]
+. 
+====
+
+{suse}
+distinguishes three types of patches: security updates, bug fix updates, and enhancement updates.
+Each patch consists of a summary of the problem and solution, including the RPM packages fixing the problem. 
+
+Icons are used to identify the three types: 
+
+* image:fa-shield.svg[Security Alert] -- Security Updates available, _strongly_ recommended 
+* image:fa-bug.svg[Bug Fix Alert] -- Bug Fix Updates available, recommended 
+* image:spacewalk-icon-enhancement.svg[Enhancement Alert] -- Enhancement Updates available, optional 
+
+
+A summary of each patch is provided in list form displaying its type, advisory ID, synopsis (with the severity as a textual prefix in case of security updates, such as "`critical`"
+, "`important`"
+, "`moderate`"
+, or "`low`"
+), number of affected systems in your network, and date updated. 
+
+In addition, you may view patches by product line at the following location: http://download.suse.com/patch/psdb/.
+For more information on security updates, see https://www.suse.com/support/security/. 
+
+[[_ref.webui.patches.relevant]]
+== Relevant
+
+(((Web UI,viewing list of applicable patches)))
+
+
+The menu:Relevant[]
+ patches page displays a customized list of patches applying to your registered systems. 
+image::patches_relevant_patches.png[]
+
+
+Clicking an menu:Advisory[]
+ ID of a patch takes you to the menu:Details[]
+ page of the menu:Patch Details[]
+ page.
+Clicking the number of associated systems takes you to the menu:Affected Systems[]
+ page of the menu:Patch Details[]
+ page.
+Refer to <<_s3_sm_errata_details>> for more information. 
+
+[[_ref.webui.patches.all]]
+== All
+
+(((Web UI,All Patches)))
+
+(((WebLogic,All Patches)))
+
+
+The menu:All[]
+ patches page displays a list of all patches released by {suse}
+, irrelevant of whether they apply to your registered systems or not. 
+image::patches_all_patches.png[]
+
+
+Like in the menu:Relevant Patches[]
+ page, clicking either menu:Advisory[]
+ or the number of systems affected takes you to related tabs of the menu:Patch Details[]
+ page.
+Refer to <<_s3_sm_errata_details>> for more information. 
+
+[[_s3_sm_apply_errata]]
+=== Applying Patches
+
+
+Patches include a list of updated packages.
+To apply patches to a system, the system must be entitled. 
+
+Apply all applicable patches to a system by clicking menu:Systems[Systems]
+ in the top and left navigation bars.
+Click the name of an entitled system.
+Then in the menu:System Details[]
+ page click the menu:Software[Patches]
+ subtab.
+When the relevant patch list appears, click menu:Select All[]
+ then menu:Apply Patches[]
+ on the bottom right-hand corner of the page.
+Only patches not scheduled, scheduled but failed, or canceled patches are listed.
+Pending updates are excluded. 
+
+In addition, users with appropriate roles can apply patches using two other methods: 
+
+* To apply a specific patch to one or more systems, locate it in the patch list and click the number of systems affected, which takes you to the menu:Affected Systems[] page of the menu:Patch Details[] page. Select the individual systems to be updated and click the menu:Apply Patches[] button. Double-check the systems to be updated on the confirmation page, then click the menu:Confirm[] button. 
+* To apply more than one patch to one or more systems, select the systems from the menu:Systems[] list. Click the menu:System Set Manager[] link in the left navigation bar, then click the menu:Systems[] tab. After ensuring the appropriate systems are selected, click the menu:Patches[] tab, select the patches to apply, and click the menu:Apply Patches[] button. Schedule a date and time for the patch to be applied. Default is the current date. Click the menu:Confirm[] button. You can follow the progress of the patch application via the menu:Pending Actions[] list. Refer to <<_ref.webui.schedule>> for more details. 
+
+
+[IMPORTANT]
+====
+If you use scheduled package installation, the packages or patches are installed via the {susemgr}
+daemon ([command]``rhnsd``). You must enable the {susemgr}
+ daemon on your systems.
+For more information about the {susemgr}
+ daemon, see <<_bp.contact.methods.rhnsd>>. 
+====
+
+
+The following rules apply to patches: 
+
+* Each package is a member of one or more channels. If a selected system is not subscribed to a channel containing the package, the update will not be installed on that system. 
+* If a newer version of the package is already installed on the system, the update will not be installed. 
+* If an older version of the package is installed, the package will be upgraded. 
+
+
+[[_s3_sm_errata_details]]
+=== Patch Details
+
+(((Web UI,viewing details)))
+
+
+If you click the advisory of a patch in the menu:Relevant[]
+ or menu:All[]
+ pages, its menu:Patch Details[]
+ page appears.
+This page is further divided into the following tabs: 
+
+[[_s4_sm_errata_details_details]]
+==== menu:Patch Details[] > menu:Details[]
+
+
+This subtab displays the patch report issued by {suse}
+.
+It provides a synopsis of the patch first (with the severity as a textual prefix in case of security updates, such as "`critical`"
+, "`important`"
+, "`moderate`"
+, or "`low`"
+), issue date, and any update dates.
+This is followed by a description of the patch and the steps required to resolve the issue. 
+
+Below the menu:Affected Channels[]
+ label, all channels that contain the affected package are listed.
+Clicking a channel name displays the menu:Packages[]
+ subtab of the menu:Channel Details[]
+ page for that channel.
+Refer to <<_s3_sm_channel_details>> for more information. 
+
+Security updates list the specific vulnerability as tracked by http://cve.mitre.org.
+This information is listed below the menu:CVEs[]
+ label. 
+
+OVAL is an open vulnerability and assessment language promoted by Mitre, http://oval.mitre.org.
+Clicking the link below the menu:Oval[]
+ label downloads this information to your system.
+More useful are the {suse}
+ Update Advisories at https://www.suse.com/support/update/. 
+
+[[_s4_sm_errata_details_packages]]
+==== menu:Patch Details[] > menu:Packages[]
+
+
+This page provides links to each of the updated RPMs by channel.
+Clicking the name of a package displays its menu:Package Details[]
+ page. 
+
+[[_s4_sm_errata_details_systems]]
+==== menu:Patch Details[] > menu:Affected Systems[]
+
+
+This page lists systems affected by the patches.
+You can apply updates here.
+(See <<_s3_sm_apply_errata>>.) Clicking the name of a system takes you to its menu:System Details[]
+ page.
+Refer to <<_s3_sm_system_details>> for more information. 
+
+To determine whether an update has been scheduled, refer to the menu:Status[]
+ column in the affected systems table.
+Possible values are: N/A, Pending, Picked Up, Completed, and Failed.
+This column identifies only the last action related to a patch.
+For example, if an action fails and you reschedule it, this column shows the status of the patch as pending with no mention of the previous failure.
+Clicking a status other than menu:N/A[]
+ takes you to the menu:Action Details[]
+ page.
+This column corresponds to one on the menu:Patch[]
+ tab of the menu:System Details[]
+ page. 
+
+[[_ref.webui.patches.search]]
+== Advanced Search
+
+(((Web UI,searching)))
+
+
+The menu:Patches Search[]
+ page allows you to search through patches by specific criteria. 
+image::patches_advanced_search_patches.png[]
+
+
+* menu:All Fields[] -- Search patches by synopsis, description, topic, or solution. 
+* menu:Patch Advisory[] -- The name or the label of the patch. 
++
+* menu:Package Name[] -- Search particular packages by name: 
++
+
+----
+kernel
+----
++
+Results will be grouped by advisory.
+For example, searching for 'kernel' returns all package names containing the string ``kernel``, grouped by advisory. 
+* menu:CVE[] -- The name assigned to the security advisory by the Common Vulnerabilities and Exposures (CVE) project at http://cve.mitre.org. For example: 
++
+
+----
+CVE-2006-4535
+----
+
+
+To filter patch search results, check or uncheck the boxes next to the type of advisory: 
+
+* Bug Fix Advisory -- Patches that fix issues reported by users or discovered during development or testing. 
+* Security Advisory -- Patches fixing a security issue found during development, testing, or reported by users or a software security clearing house. A security advisory usually has one or more CVE names associated with each vulnerability found in each package. 
+* Product Enhancement Advisory -- Patches providing new features, improving functionality, or enhancing performance of a package. 
+
+
+[[_ref.webui.patches.manage]]
+== Manage Patches
+
+(((Web UI,Managing Patches)))
+
+
+Custom patches enable organizations to issue patch alerts for the packages in their custom channels, schedule deployment and manage patches across organizations. 
+image::patches_published_patches.png[]
+
+
+[WARNING]
+====
+If the organization is using both {susemgr}
+and {susemgr}
+Proxy server, then manage patches only on the {susemgr}
+server since the proxy servers receive updates directly from it.
+Managing patches on a proxy in this combined configuration risks putting your servers out of synchronization. 
+====
+
+[[_s3_sm_errata_create]]
+=== Creating and Editing Patches
+
+(((Web UI,Editing Patches)))
+
+
+To create a custom patch alert, proceed as follows: 
+
+
+. On the top navigation bar, click menu:Patches[] , then select menu:Manage Patches[] on the left navigation bar. On the menu:Patches Management[] page, click menu:Create Patch[] . 
++
+image::patches_create_patch.png[]
+. Enter a label for the patch in the menu:Advisory[] field, ideally following a naming convention adopted by your organization. 
++
+ifdef::showremarks[]
+#emap: Similar patch
+       beginnings for SUSE? "Note that this label cannot begin with the letters "RH" (capitalized or
+       not) to prevent confusion between custom errata and those issued by Red Hat."#
+endif::showremarks[]
+. Complete all remaining required fields, then click the menu:Create Patch[] button. View standard SUSE Alerts for examples of properly completed fields. 
+
+
+Patch management distinguishes between published and unpublished patches. 
+
+* menu:Published[] : this page displays the patch alerts the organization has created and disseminated. To edit an existing published patch, follow the steps described in <<_s3_sm_errata_create>>. To distribute the patch, click menu:Send Notification[] in the menu:Send Patch Mail[] section on the top of the menu:Patch Details[] page. The patch alert is sent to the administrators of all affected systems. 
+* menu:Unublished[] : this page displays the patch alerts your organization has created but not yet distributed. To edit an existing unpublished patch, follow the steps described in <<_s3_sm_errata_create>>. To publish the patch, click menu:Publish Patch[] on the top-right corner of the menu:Patch Details[] page. Confirm the channels associated with the patch and click the menu:Publish Patch[] button, now in the lower-right corner. The patch alert is moved to the menu:Published[] page awaiting distribution. 
+
+{susemgr}
+administrators can also create patches by cloning an existing one.
+Cloning preserves package associations and simplifies issuing patches.
+See <<_ref.webui.patches.clone>> for instructions. 
+
+To edit an existing patch alert's details, click its advisory on the menu:Patches Management[]
+ page, make the changes in the appropriate fields of the menu:Details[]
+ tab, and click the menu:Update Patch[]
+ button.
+Click the menu:Channels[]
+ tab to alter the patch's channel association.
+Click the menu:Packages[]
+ tab to view and modify its packages. 
+
+To delete patches, select their check boxes on the menu:Patches Management[]
+ page, click the menu:Delete Patches[]
+ button, and confirm the action.
+Deleting published patches might take a few minutes. 
+
+[[_s3_sm_errata_assign_packs]]
+=== Assigning Packages to Patches
+
+
+To assign packages to patches, proceed as follows: 
+
+
+. Select a patch, click the menu:Packages[] tab, then the menu:Add[] subtab. 
+. To associate packages with the patch being edited, select the channel from the menu:View[] drop-down box that contains the packages and click menu:View[] . Packages already associated with the patch being edited are not displayed. Selecting menu:All managed packages[] presents all available packages. 
+. After clicking menu:View[] , the package list for the selected option appears. Note that the page header still lists the patch being edited. 
+. In the list, select the check boxes of the packages to be assigned to the edited patch and click menu:Add Packages[] at the bottom-right corner of the page. 
+. A confirmation page appears with the packages listed. Click menu:Confirm[] to associate the packages with the patch. The menu:List/Remove[] subtab of the menu:Managed Patch Details[] page appears with the new packages listed. 
+
+
+When packages are assigned to a patch, the patch cache is updated to reflect the changes.
+This update is delayed briefly so that users may finish editing a patch before all the changes are made available.
+To initiate the changes to the cache manually, follow the directions to menu:commit the changes immediately[]
+ at the top of the page. 
+
+[[_s3_sm_errata_publish]]
+=== Publishing Patches
+
+
+After adding packages to the patch, the patch needs to be published to be disseminated to affected systems.
+Follow this procedure to publish patches: 
+
+
+. On the top navigation bar, click menu:Patches[] , then menu:Manage Patches[Unpublished] on the left navigation bar to see all the unpublished patches listed. 
+. Click the patch menu:Advisory[] name to open the patch details pages. 
+. On the patch details page, click menu:Publish Patch[] . A confirmation page appears that will ask you to select which channels you want to make the patch available in. Choose the relevant channels. 
+. At the bottom of the page, click menu:Publish Patch[] . The patch published will now appear on the menu:Published[] page of menu:Manage Patches[] . 
+
+
+[[_s3_sm_errata_published]]
+=== Published
+
+(((Web UI,Published Patches)))
+
+
+Here all published patches are listed.
+It is possible to perform the following actions: 
+
+* To create a patch, click menu:Create Patch[] . 
+* To delete patches, select them first and then click menu:Delete Patches[] . 
+* Click an Advisory name to open the patch details page. 
+
+
+[[_s3_sm_errata_unpublished]]
+=== Unpublished
+
+
+Here all published patches are listed.
+It is possible to perform the same actions as with published patches.
+For more information, see <<_s3_sm_errata_published>>.
+Additionally, on a patch details page, you can click menu:Publish Patch[]
+ for publishing. 
+
+[[_ref.webui.patches.clone]]
+== Cloning Patches
+
+(((Web UI,Cloning Patches)))
+
+
+Patches can be cloned for easy replication and distribution as part of {susemgr}
+. 
+image::patches_clone_patches.png[]
+
+
+Only patches potentially applicable to one of your channels can be cloned.
+Patches can be applicable to a channel if that channel was cloned from a channel to which the patch applies.
+To access this functionality, click menu:Patches[]
+ on the top navigation bar, then menu:Clone Patches[]
+ on the left navigation bar. 
+
+On the menu:Clone Patches[]
+ page, select the channel containing the patch from the menu:View[]
+ drop-down box and click menu:View[]
+.
+When the patch list appears, select the check box of the patch to be cloned and click menu:Clone Patch[]
+.
+A confirmation page appears with the patch listed.
+Click menu:Confirm[]
+ to finish cloning. 
+
+The cloned patch appears in the menu:Unpublished[]
+ patch list.
+Verify the patch text and the packages associated with that patch, then publish the patch so it is available to users in your organization. 
+
+ifdef::backend-docbook[]
+[index]
+== Index
+// Generated automatically by the DocBook toolchain.
+endif::backend-docbook[]

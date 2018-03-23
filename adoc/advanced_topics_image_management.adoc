@@ -1,0 +1,342 @@
+[[_at.images]]
+= Image Building and Management
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+
+[[_at.image.overview]]
+== Image Building Overview
+
+{susemgr}
+enables system administrators to build containers, create Image Stores, and manage Image Profiles.
+The following sections target administrators familiar with containers, registry services, and assocaited terminology.
+image::image-building.png[]
+
+
+[[_at.image.requirements]]
+== Requirements
+
+
+The containers feature is available for Salt minions running {sls}
+ 12 or later.
+The following requirements should be met before following this guide:
+
+* You will need an existing external Github or internal Gitlab Repository containing a Dockerfile and configuration scripts (Example scripts are provided in the following sections)
+* Portus or another image registry properly configured.
++
+
+.Registry Provider Solutions
+NOTE: If you require a private image registry you can use an open source solution such as ``Portus``.
+For additional information on setting up Portus as a registry provider, see the:
+** http://port.us.org/[Portus Documentation]
+
+
+For more information on Containers or CaaS Platform review the following links:
+
+* https://www.suse.com/documentation/sles-12/book_sles_docker/data/book_sles_docker.html[SUSE Linux Enterprise Server 12 SP3 Docker Guide]
+* https://www.suse.com/documentation/suse-caasp-2/[SUSE CaaS Platform 2 Documentation]
+
+
+[[_at.images.buildhost]]
+== Creating a Build Host
+
+
+To build container images with {susemgr}
+, you will need to create and configure a build host.
+Build hosts are Salt minions running SLES 12 or later.
+The following steps will guide you though the initial configuration for a build host.
+
+From the {susemgr}{webui}
+perform the following steps to configure a build host. 
+
+
+. Select a minion that will be designated as a build host from the menu:Systems[Overview] page. 
+. From the menu:System Details[] page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enable `SLE-Module-Containers12-Pool` and ``SLE-Module-Containers12-Updates``. Confirm by clicking menu:Change Subscriptions[] . 
+. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``Container Build Host`` and confirm by selecting menu:Update Properties[] . 
+. Install all required packaged by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[] . Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line. 
+
+
+[[_at.images.buildchannels]]
+== Define Container Build Channels with an Activation Key
+
+
+Create an activation key associated with the channel that your images will use. 
+image::systems_create_activation_key.png[]
+
+
+
+. From the left navigation menu select menu:Systems[Activation Keys] . 
+. Click menu:Create Key[] . 
+. Enter a menu:Description[] , a menu:Key[] name, Use the drop-down box to select the menu:Base Channel[] that should be associated with this key. Confirm with menu:Create Activation Key[] . 
+
+
+For more information, see <<_bp.key.managment>>. 
+
+== Creating an Image Store
+
+
+Define a location to store all of your images by creating an Image Store. 
+image::images_image_stores.png[]
+
+
+
+. From the left navigation menu select menu:Images[Stores] . 
+. Click menu:Create[] to create a new store. 
++
+image::images_image_stores_create.png[]
+. {susemgr} currently provides support only for the `Registry`menu:Store Type[] . Define a name for the image store in the menu:Label[] field. 
+. Provide the path to your image registry by filling in the menu:URI[] field. The FQDN of the container registry host (whether internal or external) is sufficient. 
++
+
+----
+registry.example.com
+----
+. Click menu:Create[] to add the new ``Image Store``. 
+
+
+[[_at.images.profile]]
+== Creating an Image Profile
+
+
+Manage Image Profiles from the Image Profile page. 
+image::images_image_profiles.png[]
+
+
+.Procedure: Create an Image Profile
+. To create an image profile select menu:Image[Profiles] and click menu:Create[] . 
++
+image::images_image_create_profile.png[]
+. Provide a name for the `Image Profile` by filling in the menu:Label[] field.
+. Use a `Dockerfile` as the default `Image Type`
+. Use the dropdown to select your registry from the `Target Image Store` field. 
+. Enter a Github or Gitlab repositiory URL (http/https/token authentication) in the menu:Path[] field using one of the following formats: 
+
+.Github Path Options **Github Single User Project Repository:
++
+
+----
+https://github.com/USER/project.git#branchname:folder
+----
+** Github Organization Project Repository:
++
+
+----
+https://github.com/ORG/project.git#branchname:folder
+----
+** Github Token Authentication
++ 
+If your GIT repository is private and not publicly accessible, you need to modify the profile's GIT URL to include some authentication.
+Use the following URL format to authenticate with a Github token.
++
+
+----
+https://USER:<AUTHENTICATION_TOKEN>@github.com/USER/project.git#master:/container/
+----
+
+
+.Gitlab Path Options **Gitlab Single User Project Repository
++
+
+----
+https://gitlab.example.com/USER/project.git#master:/container/
+----
+** Gitlab Groups Project Repository
++
+
+----
+https://gitlab.example.com/GROUP/project.git#master:/container/
+----
+** Gitlab Token Authentication
++ 
+If your GIT repository is private and not publicly accessible, you need to modify the profile's GIT URL to include some authentication.
+Use the following URL format to authenticate with a Gitlab token.
++
+
+----
+https://gitlab-ci-token:<AUTHENTICATION_TOKEN>@gitlab.example.com/USER/project.git#master:/container/
+----
+
++
+
+.Specifying a Github or Gitlab Branch
+IMPORTANT: If a branchname is not specified the `master` branch will be used by default.
+If a `folder` is not specified a `Dockerfile` is expected to be in the root directory of the Github or Gitlab checkout. 
+. Select an `Activation Key` (Activation Keys ensure images using a profile are assigned to the correct channel and packages).
++
+
+.Relationship Between Activation Keys and Image Profiles
+NOTE: When you associate an activation key with an image profile you are ensuring any image using the profile will use the correct software channel and any packages in the channel.
+. Click the menu:Create[] button. 
+
+
+=== Example Dockerfile and add_packages Script
+
+
+The following is an example Dockerfile.
+You specify a Dockerfile that will be used during iamge building when creating an image profile.
+A Dockerfiel and any assocaited scripts should be stored within an internal or external Github/Gitlab repository: 
+
+.Required Dockerfile Lines
+[IMPORTANT]
+====
+The following basic Dockerfile lines provide access to a specific repository version served by SUSE manager.
+The following example Dockerfile is used by SUSE Manager to trigger a build job on a build host minion.
+These ARGS ensure that the image built is associated with the desired repo version served by SUSE Manager.
+These ``ARG``s also allow you to build image versions of SLES which may differ from the version of SLES used by the build host itself. 
+
+For example: The `ARG repo` and echo to the repository file creates and then injects the correct path into the repo file for the desired channel version . _The repository version is determined by the activation key that you assigned to your
+      Image Profile._
+====
+
+----
+FROM registry.example.com/sles12sp2
+MAINTAINER Tux Administrator "tux@example.com"
+
+### Begin: These lines Required for use with SUSE Manager   
+
+ARG repo
+ARG cert
+
+# Add the correct certificate
+RUN echo "$cert" > /etc/pki/trust/anchors/RHN-ORG-TRUSTED-SSL-CERT.pem
+
+# Update certificate trust store
+RUN update-ca-certificates
+
+# Add the repository path to the image
+RUN echo "$repo" > /etc/zypp/repos.d/susemanager:dockerbuild.repo
+
+### End: These lines required for use with SUSE Manager
+
+# Add the package script
+ADD add_packages.sh /root/add_packages.sh
+
+# Run the package script
+RUN /root/add_packages.sh
+
+# After building remove the repository path from image
+RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo
+----
+
+
+The following is an example add_packages.sh script for use with your Dockerfile:
+
+----
+#!/bin/bash
+set -e
+
+zypper --non-interactive --gpg-auto-import-keys ref
+
+zypper --non-interactive in python python-xml aaa_base aaa_base-extras net-tools timezone vim less sudo tar
+----
+
+.Packages Required for Inspecting Your Images
+[NOTE]
+====
+To inspect images and provide the package and product list of a container to the {susemgr}{webui}
+you are required to install [package]#python#
+ and [package]#python-xml#
+ within the container.
+If these packages remain uninstalled, your images will still build, but the package and product list will be unavailable from the {webui}
+. 
+====
+
+[[_at.images.image.building]]
+== Building an Image
+
+
+There are two ways to build an image.
+You can select menu:Images[Build]
+ from the left navigation bar, or click the build icon in the menu:Images[Profiles]
+ list. 
+image::images_image_build.png[]
+
+
+.Procedure: Build an Image
+. For this example select menu:Images[Build] . 
+. Add a different tag name if you want a version other than the default ``latest``. 
+. Select the menu:Build Profile[] and a menu:Build Host[]
++
+
+.Profile Summary
+NOTE: Notice the menu:Profile Summary[]
+ to the right of the build fields.
+When you have selected a build profile detailed information about the selected profile will show up in this area. 
+. To schedule a build click the menu:Build[] button. 
+
+
+[[_at.images.image.importing]]
+== Importing an Image
+
+
+You can import and inspect arbitrary images.
+Select menu:Images[Images]
+ from the left navigation bar.
+Fill the text boxes of the Import dialog.
+When processed the imported image will get listed on the menu:Images[]
+ page. 
+
+.Procedure: Import an Image
+. From menu:Images[Images] click the menu:Import[] to open the menu:Import Image[] dialog. 
+. In the menu:Import[] dialog fill the following fields: 
++
+
+Image store::
+The registry from where the image will be pulled for inspection. 
+
+Image name::
+The name of the image in the registry. 
+
+Image version::
+The version of the image in the registry. 
+
+Build host::
+The build host that will pull and inspect the image. 
+
+Activation key::
+The activation key provides the path to the software channel that the image will be inspected with. 
++
+For confirmation, click menu:Import[]
+. 
+
+
+At this point, the entry for the image is created in the database and an Inspect Image action on {susemgr}
+is scheduled right away. 
+
+When processed find the imported image in the images list.
+You can recognize it because of a different icon in the Build column, which means that the image is imported (see screenshot below). The status icon for the imported image can also be seen on the overview tab for the image. 
+
+== Listing Images Available for Building
+
+
+To list images availabe for building select menu:Images[Images]
+.
+A list of all images will be displayed. 
+image::images_list_images.png[]
+
+
+Displayed data about images includes an image menu:Name[]
+, its menu:Version[]
+ and the build menu:Status[]
+.
+You will also see an images update status with a listing of possible patch/package updates that are available for the image. 
+
+Clicking the menu:Details[]
+ button on an image will provide a detailed view including an exact list of relevant patches and a list of all packages installed within the image. 
+
+[NOTE]
+====
+The patch and package list is only available if the inspect state after a build was successful. 
+====
+
+== Troubleshooting
+
+
+The following are some known pitfalls when working with images. 
+
+* HTTPS certificates to access the registry or the git repositories should be deployed to the minion by a custom state file.
+* SSH git access with docker is currently unsupported. You may test it, but SUSE will not provide support.
+* If the [package]#python# and [package]#python-xml# packages are not installed within your images during the build process, Salt cannot run within the container and reporting of installed packages or products will fail. This will result in an unknown update status. 

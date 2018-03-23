@@ -1,0 +1,711 @@
+[[_ref.webui.admin]]
+= Admin
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+
+
+The menu:Admin[]
+ pages allows {susemgr}
+ customers to manage the basic configuration, including creating and managing multiple organizations.
+Only the {susemgr}
+ administrator can access the menu:Admin[]
+ pages. 
+
+[[_ref.webui.admin.wizard]]
+== menu:Admin[] > menu:Setup Wizard[]
+
+
+Setting up {susemgr}
+typically requires some extra steps after installation for common configuration tasks. 
+
+The menu:Setup Wizard[]
+ link is displayed when the {susemgr}
+ Web interface is used for the fist time and can be accessed later at any time by clicking menu:Admin[Setup
+   Wizard]
+.
+On the three tabs configure the HTTP proxy server, organization credentials, and {suse}
+ products. 
+
+menu:HTTP Proxy:[]::
+Configure a proxy server that {susemgr}
+will use to access SCC ({suse}
+Customer Center) and other remote servers here. 
++
+image::admin_proxy_settings.png[]
++
+Use `hostname:port` syntax in the menu:Hostname[]
+field if the proxy port is not 8080.
+Clearing the fields disables proxy. 
+
+menu:Organization Credentials:[]::
+Click menu:Add a new credential[]
+and enter user name and password to allow a user to access SCC. 
++
+image::admin_organization_credentials.png[]
++
+After saving, a new credential card will be displayed.
+Buttons below the credential card allow you to: 
+
+* see the credential validation status (green tick or red cross icon). To re-check the credential with SCC, click the icon; 
+* set the primary credentials for inter-server synchronization (yellow star icon); 
+* list the subscriptions related to a certain credential (list icon); 
+* edit the credential (pencil icon); 
+* delete the credential (trash can icon). 
+
+menu:SUSE Products:[]::
+On the menu:SUSE Products[]
+page, select product-specific channels you are entitled to. 
++
+image::admin_suse_products.png[]
++
+The products displayed are directly linked to your organization credentials and your {suse}
+subscriptions.
+Product extentions and modules are shown when you select the corresponding base product or click the plus sign to its left.
+After you have made your selection, click menu:Add products[]
+.
+This equals running [command]``mgr-sync add products`` or [command]``mgr-sync`` without any argument. 
++
+
+
+.Synchronization Time
+[NOTE]
+====
+Channel synchronization will start and might take several hours.
+When finished the corresponding channels can be used in {susemgr}
+. 
+====
++
+
+.If Synchronization Fails
+[IMPORTANT]
+====
+SUSE does not automatically trust 3rd party GPG keys.
+Should a reposync fail you can detect if an untrusted GPG key is the root cause by viewing log files located in: 
+
+----
+/var/log/rhn/reposync
+----
+
+Look for lines similar to the following: 
+
+----
+['/usr/bin/spacewalk-repo-sync', '--channel', 'sle-12-sp1-ga-desktop-
+      nvidia-driver-x86_64', '--type', 'yum', '--non-interactive']
+    ChannelException: The GPG key for this repository is not part of
+      the keyring.
+    Please run spacewalk-repo-sync in interactive mode to import it.
+----
+====
++
+Alternatively, you can add listed channels right away by clicking the menu:Add this product[]
+button in the status column.
+A progress bar will be displayed.
+The main product will expand, and now you can select add-on products belonging to the product that is currently added.
+To check for required channels, click the list icon in the menu:Channels[]
+column.
+When a product is downloaded and ready to use, the state will change to menu:Finished[]
+. 
+
+[[_ref.webui.admin.org]]
+== menu:Admin[] > menu:Organizations[]
+
+
+The organizations feature allows {susemgr}
+administrators to create and manage multiple organizations across {susemgr}
+.
+Administrators can control an organization's access to system management tasks. 
+image::admin_list_organizations.png[]
+
+
+If you click the name of an organization, the Organization Details page appears. 
+
+[[_s2_sattools_org_details_details]]
+=== menu:Organization Details[] > menu:Details[]
+
+
+The menu:Organization Details[]
+ page lists the details of the selected organization. 
+image::admin_organization_details.png[]
+
+
+The following details are avialable: 
+
+* menu:Organization Name[] : String (between 3 and 128 characters). This is the only value that you can change here. When done, confirm with clicking the menu:Update Organization[] button. 
+* menu:Organization ID[] : Number 
+* menu:Active Users[] : Number. Clicking this number will open the menu:Users[] tab. For more information, see <<_s2_sattools_org_details_users>>. 
+* menu:Systems[] : Number 
+* menu:System Groups[] : Number 
+* menu:Activation Keys[] : Number 
+* menu:Autoinstallation Profiles[] : Number 
+* menu:Configuration Channels[] : Number 
+
+
+[[_s2_sattools_org_details_users]]
+=== menu:Organization Details[] > menu:Users[]
+
+
+List of all the users of an organization. 
+image::admin_organization_users.png[]
+
+
+You can modify the user details if you belong to that organization and have organization administrator privileges.
+For more information, see <<_ref.webui.admin.users>>. 
+
+[[_s2_sattools_org_details_trust]]
+=== menu:Organization Details[] > menu:Trust[]
+
+
+Here establish trust between organizations. 
+image::admin_organization_trusts.png[]
+
+
+Such a trust allows sharing contents and migrate systems between these two organizations.
+You may add a trust by checking the box next to an organization (or remove a trust by unchecking it) and clicking the menu:Modify Trusts[]
+ button. 
+
+[[_s2_sattools_org_details_conf]]
+=== menu:Organization Details[] > menu:Configuration[]
+
+
+Here you enable the Organization Administrator to manage Organization configuration, configure the organization to use staged contents ("`pre-fetching`"
+ packages, etc.), set up software crash reporting, and upload of SCAP files. 
+image::admin_organization_configuration.png[]
+
+
+
+SUSE Manager Configuration::
+Enable menu:Allow Organization Admin to manage Organization Configuration[]
+if wanted. 
+
+Organization Configuration::
+
+* menu:Enable Staging Contents[]
+* menu:Enable Errata E-mail Notifications (for users belonging to this organization)[]
+* menu:Enable Software Crash Reporting[]
+* menu:Enable Upload Of Crash Files[]
+* menu:Crash File Upload Size Limit[]
+* menu:Enable Upload Of Detailed SCAP Files[]
+* menu:SCAP File Upload Size Limit[]
+* menu:Allow Deletion of SCAP Results[]
+* menu:Allow Deletion After (period in days)[]
+
+When settings are done, confirm with clicking the menu:Update Organization[]
+ button. 
+
+.Enable Staging Contents
+The clients will download packages in advance and stage them.
+This has the advantage that the package installation action will take place immediately, when the schedule is actually executed.
+This "`pre-fetching`"
+ saves maintenance window time, which is good for service uptime. 
+
+
+For staging contents ("`pre-fetching`"
+), edit on the client [path]``/etc/sysconfig/rhn/up2date``
+: 
+
+----
+stagingContent=1
+stagingContentWindow=24
+----
+
+`stagingContentWindow` is a time value expressed in hours and determines when downloading will start.
+It is the number of hours before the scheduled installation or update time.
+In this case, it means `24` hours before the installation time.
+The exact download start time depends on the contact method{mdash}
+when the next [command]``rhn_check`` is performed. 
+
+Next time an action is scheduled, packages will automatically be downloaded but not installed yet.
+When the scheduled time comes, the action will use the staged version. 
+
+.Minion Content Staging
+Every Organization administrator can enable Content Staging from the Organization configuration page menu:Admin[Organization > OrgName > Configuration > Enable Staging
+     Contents]
+. 
+
+
+Staging content for minions is affected by two parameters. 
+
+* [path]``salt_content_staging_advance:`` expresses the advance time, in hours, for the content staging window to open with regard to the scheduled installation/upgrade time. 
+* [path]``salt_content_staging_window:`` expresses the duration, in hours, of the time window for Salt minions to stage packages in advance of scheduled installations or upgrades. 
+
+
+A value of *salt_content_staging_advance* equal to *salt_content_staging_window* results in the content staging window closing exactly when the installation/upgrade is scheduled to be executed, a larger value allows  separating the download time from the installation time. 
+
+These options are configured in [path]``/usr/share/rhn/config-defaults/rhn_java.conf``
+ and by default assume the following values: 
+
+* [path]``salt_content_staging_advance: 8 hours``
+* [path]``salt_content_staging_window: 8 hours``
+
+
+[NOTE]
+====
+These parameters will only have an effect when Content Staging is enabled for the targeted Organization. 
+====
+
+[[_s2_sattools_org_details_states]]
+=== menu:Organization Details[] > menu:States[]
+
+
+From the menu:Admin[Organizations > States]
+ page you can assign State Channels to all systems in an organization.
+For example, this way it is possible to define a few global security policies or add a common admin user to all machines. 
+image::admin_organization_states.png[]
+
+
+For more information about the State Channels, see <<_ref.webui.config.channels>>. 
+
+[[_ref.webui.admin.users]]
+== menu:Admin[] > menu:Users[]
+
+
+To view and manage all users of the organization you are currently logged in to, click menu:Users[]
+ in the left navigation bar.
+The table lists user name, real name, organization and whether the user is organization or {susemgr}
+ administrator.
+To modify administrator privileges, click the user name to get to the user's menu:Details[]
+ page.
+For more information, see <<_s3_sm_user_active_details>>. 
+ifdef::showremarks[]
+#emap 2014-05-09: Commented description of ext. auth tab description since
+   it will be disabled for 2.1 release. Possible used in future versions.#
+endif::showremarks[]
+
+
+[[_ref.webui.admin.config]]
+== menu:Admin[] > menu:Manager Configuration[]
+
+menu:Manager Configuration[]
+ is split into tabs that allow you to configure most aspects of {susemgr}
+. 
+
+[[_s3_sattools_config_gen]]
+=== menu:Admin[] > menu:Manager Configuration[] > menu:General[]
+
+
+This page allows you to alter basic {susemgr}
+administration settings. 
+image::admin_general_configuration.png[]
+
+
+menu:Administrator Email Address[]::
+E-mail address of the {susemgr}
+administrator. 
+
+menu:SUSE Manager Hostname[]::
+Host name of the {susemgr}
+server. 
+
+{susemgr} Proxy Configuration::
+menu:HTTP proxy[]
+, menu:HTTP proxy username[]
+, menu:HTTP proxy password[]
+, and menu:Confirm HTTP proxy password[]
+. 
++
+The HTTP proxy settings are for the communication with a {susemgr}
+parent server, if there is any.
+The HTTP proxy should be of the form: ``hostname:port``; the default port `8080` will be used if none is explicitly provided.
+HTTP proxy settings for client systems to connect to this {susemgr}
+can be different, and will be configured separately, for example via <<_s3_sattools_config_bootstrap>>. 
+
+menu:RPM repository mount point[]::
+The directory where RPM packages are mirrored.
+By default: [path]``/var/spacewalk``
+. 
+
+menu:Default To SSL[]::
+For secure communication, use SSL. 
+
+
+When done, confirm with menu:Update[]
+. 
+
+[[_s3_sattools_config_bootstrap]]
+=== menu:Admin[] > menu:Manager Configuration[] > menu:Bootstrap Script[]
+
+
+The menu:Manager Configuration[Bootstrap Script]
+ page allows you to generate a bootstrap script that registers the client systems with {susemgr}
+ and disconnects them from the remote {scc}
+. 
+image::admin_configuration_bootstrap.png[]
+
+
+This generated script will be placed within the [path]``/srv/www/htdocs/pub/bootstrap/``
+ directory on your {susemgr}
+ server.
+The bootstrap script will significantly reduce the effort involved in reconfiguring all systems, which by default obtain packages from the {scc}
+.
+The required fields are pre-populated with values derived from previous installation steps.
+Ensure this information is accurate. 
+
+SUSE Manager server hostname::
+The name of the SUSE Manager server where you want to register the client (pre-populated). 
+
+SSL cert location::
+Location and name of the SSL certificate (pre-populated). 
+
+Bootstrap using Salt::
+To bootstrap traditional clients, uncheck menu:Bootstrap using Salt[]
+.
+For more information, see <<_registering.clients.traditional>>. 
+
+Enable SSL::
+It is advised keeping SSL enabled.
+If enabled the corporate public CA certificate will be installed on the client.
+If disabled the user must manage CA certificates to be able to run the registration ([command]``rhnreg_ks``). 
+
+Enable Client GPG checking::
+GNU Privacy Guard (GPG) 
+
+Enable Remote Configuration::
+Enable remote configuration management and remote command acceptance of the systems to be bootstrapped to the {susemgr}
+.
+Both features are useful for completing client configuration.
+For more information, see <<_ref.webui.config>> and <<_s5_sm_system_details_remote>>. 
+
+Client HTTP Proxy::
+Client HTTP proxy settings if you are using an HTTP proxy server. 
+
+
+When finished, click menu:Update[]
+. 
+
+[[_s3_sattools_config_orgs]]
+=== menu:Admin[] > menu:Manager Configuration[] > menu:Organizations[]
+
+
+The menu:Manager Configuration[Organizations]
+ page contains details about the organizations feature of {susemgr}
+, and links for creating and configuring organizations. 
+image::admin_configuration_organization.png[]
+
+
+[[_s3_sattools_config_restart]]
+=== menu:Admin[] > menu:Manager Configuration[] > menu:Restart[]
+
+
+The menu:Manager Configuration[Restart]
+ page comprises the final step in configuring {susemgr}
+. 
+image::admin_configuration_restart.png[]
+
+
+Click the menu:Restart[]
+ button to restart {susemgr}
+ and incorporate all of the configuration options added on the previous screens.
+It will take between four and five minutes for the restart to finish. 
+
+[[_s3_sattools_config_cobbler]]
+=== menu:Admin[] > menu:Manager Configuration[] > menu:Cobbler[]
+
+
+On the menu:Manager Configuration[Cobbler]
+ page you can run the Cobbler synchronization by clicking menu:Update[]
+. 
+image::admin_configuration_cobbler.png[]
+
+
+Cobbler synchronization is used to repair or rebuild the contents of [path]``/srv/tftpboot``
+ or [path]``/srv/www/cobbler``
+ when a manual modification of the cobbler setup has occurred. 
+
+[[_s3_sattools_config_bare_metal]]
+=== menu:Admin[] > menu:Manager Configuration[] > menu:Bare-metal systems[]
+
+
+Here you can add unprovisioned ("bare-metal") systems capable of booting using PXE to an organization. 
+image::admin_configuration_bare_metal_systems.png[]
+
+
+First click menu:Enable adding to this organization[]
+.
+Those systems then will appear in the menu:Systems[]
+ list, where regular provisioning via autoinstallation is possible in a completely unattended fashion.
+Only AMD64/Intel 64 systems with at least 1 GB of RAM are supported. {susemgr}
+ server will use its integrated Cobbler instance and will act as TFTP server for this feature to work, so the network segment that connects it to target systems must be properly configured.
+In particular, a DHCP server must exist and have a next-server configuration parameter set to the {susemgr}
+ server IP address or hostname. 
+
+When enabled, any bare-metal system connected to the SUSE Manager server network will be automatically added to the organization when it powers on.
+The process typically takes a few minutes; when it finishes, the system will automatically shut down and then appear in the menu:Systems[]
+ list. 
+
+[NOTE]
+====
+New systems will be added to the organization of the administrator who enabled this feature.
+To change the organization, disable the feature, log in as an administrator of a different organization and enable it again. 
+====
+
+
+Provisioning can be initiated by clicking the menu:Provisioning[]
+ tab.
+In case of bare-metal systems, though, provisioning cannot be scheduled, it will happen automatically when it is completely configured and the system is powered on. 
+
+It is possible to use menu:System Set Manager[]
+ with bare-metal systems, although in that case some features will not be available as those systems do not have an operating system installed.
+This limitation also applies to mixed sets with regular and bare-metal systems: full features will be enabled again when all bare-metal systems are removed from the set. 
+
+[[_ref.webui.admin.iss]]
+== menu:Admin[] > menu:ISS Configuration[]
+
+
+Inter-Server Synchronization (ISS) allows {susemgr}
+synchronizing content and permissions from another {susemgr}
+instance in a peer-to-peer relationship. 
+
+[[_s3_sattools_iss_master]]
+=== Configuring the Master {susemgr} Server
+
+
+The following will help you set up a master ISS server. 
+image::admin_iss_configuration_master.png[]
+
+
+Click menu:Admin[>ISS
+    Configuration > Master Setup]
+.
+In the top right-hand corner of this page, click menu:Add New Slave[]
+: 
+image::admin_iss_configuration_edit_slave.png[]
+
+
+and fill in the following information: 
+
+* Slave Fully Qualified Domain Name (FQDN) 
+* {empty}
++
++ 
+Allow Slave to Sync? {mdash}
+Choosing this field will allow the slave {susemgr}
+to access this master {susemgr}
+.
+Otherwise, contact with this slave will be denied. 
+* Sync All Orgs to Slave? {mdash} Checking this field will synchronize all organizations to the slave {susemgr} . 
+
+
+[NOTE]
+====
+Choosing the menu:Sync All Orgs to Slave?[]
+ option on the menu:Master Setup[]
+ page will override any specifically selected organizations in the local organization table. 
+====
+
+
+Click menu:Create[]
+.
+Optionally, click any local organization to be exported to the slave {susemgr}
+ then click menu:Allow Orgs[]
+. 
+
+.Enabling Inter-server Synchronization in {susemgr}2.1
+[NOTE]
+====
+ISS is enabled by default in {susemgr}
+ 3.1 and later. 
+
+To enable the inter-server synchronization (ISS) feature in {susemgr}
+ 2.1, edit the [path]``/etc/rhn/rhn.conf``
+ file and set: [command]``disable_iss=0``.
+Save the file and restart the httpd service with [command]``service httpd
+     restart``. 
+====
+
+
+For synchronization timeout settings, see <<_bp.troubleshooting.timeouts>>. 
+
+[[_s3_sattools_iss_slave]]
+=== Configuring Slave Servers
+
+
+Slave servers receive content synchronized from the master server. 
+image::admin_iss_configuration_slave.png[]
+
+
+To securely transfer content to the slave servers, the ORG-SSL certificate from the master server is needed.
+Click menu:Admin[ISS Configuration > Slave Setup]
+.
+In the top right-hand corner, click menu:Add New Master:[]
+image::admin_iss_configuration_edit_master.png[]
+
+menu:[]
+ and fill in the following information: 
+
+* Master Fully Qualified Domain Name (FQDN) 
+* Default Master? 
+* Filename of this Master's CA Certificate: use the full path to the CA Certificate. For example: 
++
+
+----
+/etc/pki/trust/anchors
+----
+
+
+Click menu:Add New Master[]
+. 
+
+Once the master and slave servers are configured, start the synchronization on the Master server by executing [command]``mgr-inter-sync``: 
+
+----
+mgr-inter-sync -c`YOUR-CHANNEL`
+----
+
+[[_s3_sattools_iss_map_orgs]]
+=== Mapping {susemgr} Master Server Organizations to Slave Organizations
+
+
+A mapping between organizational names on the master {susemgr}
+allows for channel access permissions being set on the master server and propagated when content is synchronized to a slave {susemgr}
+.
+Not all organization and channel details need to be mapped for all slaves. {susemgr}
+administrators can select which permissions and organizations can be synchronized by allowing or omitting mappings. 
+
+To complete the mapping, log in to the Slave {susemgr}
+as administrator.
+Click menu:Admin[ISS
+    Configuration > Slave Setup]
+ and select a master {susemgr}
+ by clicking its name.
+Use the drop-down box to map the exported master organization name to a matching local organization in the slave {susemgr}
+, then click menu:Update Mapping[]
+. 
+
+On the command line, issue the synchronization command on each of the custom channels to obtain the correct trust structure and channel permissions: 
+
+----
+mgr-inter-sync -c`YOUR-CHANNEL`
+----
+
+[[_ref.webui.admin.schedules]]
+== menu:Admin[] > menu:Task Schedules[]
+
+
+Under menu:Task Schedules[]
+ all predefined task bunches are listed. 
+image::admin_task_schedules.png[]
+
+
+Click a menu:Schedule name[]
+ to open its menu:Basic Schedule Details[]
+ where you disable it or change the frequency. Click menu:Edit Schedule[]
+ to update the schedule with your settings.
+To delete a schedule, click menu:delete schedule[]
+ in the upper right-hand corner. 
+
+[WARNING]
+====
+Only disable or delete a schedule if you are absolutely certain this is necessary as they are essential for {susemgr}
+to work properly. 
+====
+
+
+If you click a bunch name, a list of runs of that bunch type and their status will be displayed.
+Clicking the start time links takes you back to the menu:Basic Schedule Details[]
+. 
+
+For example, the following predefined task bunches are scheduled by default and can be configured: 
+
+menu:channel-repodata-default:[]::
+(re)generates repository metadata files. 
+
+menu:cleanup-data-default:[]::
+cleans up stale package change log and monitoring time series data from the database. 
+
+menu:clear-taskologs-default:[]::
+clears task engine (taskomatic) history data older than a specified number of days, depending on the job type, from the database. 
+
+menu:cobbler-sync-default:[]::
+synchronizes distribution and profile data from {susemgr}
+to Cobbler.
+For more information on Cobbler, see <<_advanced.topics.cobbler>>. 
+
+menu:compare-configs-default:[]::
+compares configuration files as stored in configuration channels with the files stored on all configuration-enabled servers.
+To review comparisons, click the menu:Systems[]
+tab and click the system of interest.
+Go tomenu: Configuration[Compare Files]
+.
+For more information, refer to <<_s5_sdc_configuration_diff>>. 
+
+menu:cve-server-channels-default:[]::
+updates internal pre-computed CVE data that is used to display results on the menu:CVE Audit[]
+page.
+Search results in the menu:CVE Audit[]
+page are updated to the last run of this schedule). For more information, see <<_ref.webui.audit.cve>>. 
+
+menu:daily-status-default:[]::
+sends daily report e-mails to relevant addresses.
+See <<_s4_usr_active_details_prefs>> to learn more about how to configure notifications for specific users. 
+
+menu:errata-cache-default:[]::
+updates internal patch cache database tables, which are used to look up packages that need updates for each server.
+Also, this sends notification emails to users that might be interested in certain patches.
+For more information on patches, see <<_ref.webui.patches>>. 
+
+menu:errata-queue-default:[]::
+queues automatic updates (patches) for servers that are configured to receive them. 
+
+menu:kickstart-cleanup-default:[]::
+cleans up stale kickstart session data. 
+
+menu:kickstartfile-sync-default:[]::
+generates Cobbler files corresponding to Kickstart profiles created by the configuration wizard. 
+
+menu:mgr-register-default:[]::
+calls the [command]``mgr-register`` command, which synchronizes client registration data with NCC (new, changed or deleted clients' data are forwarded). 
+
+menu:mgr-sync-refresh-default:[]::
+the default time at which the start of synchronization with SUSE Customer Center (SCC) takes place (``mgr-sync-refresh``). 
+
+menu:package-cleanup-default:[]::
+deletes stale package files from the file system. 
+
+menu:reboot-action-cleanup-default:[]::
+any reboot actions pending for more than six hours are marked as failed and associated data is cleaned up in the database.
+For more information on scheduling reboot actions, see <<_s5_sdc_provisioning_powermgnt>>. 
+
+menu:sandbox-cleanup-default:[]::
+cleans up menu:sandbox[]
+configuration files and channels that are older than the menu:sandbox_lifetime[]
+configuration parameter (3 days by default). Sandbox files are those imported from systems or files under development.
+For more information, see <<_s5_sdc_configuration_add_files>>
+
+menu:session-cleanup-default:[]::
+cleans up stale Web interface sessions, typically data that is temporarily stored when a user logs in and then closes the browser before logging out. 
+
+menu:ssh-push-default:[]::
+prompts clients to check in with {susemgr}
+via SSH if they are configured with a menu:SSH Push[]
+contact method. 
+
+[[_ref.webui.admin.status]]
+== menu:Admin[] > menu:Task Engine Status[]
+
+
+This is a status report of the various tasks running by the {susemgr}
+task engine. 
+image::admin_task_status_last_execution.png[]
+
+
+Next to the task name you find the date and time of the last execution and the status. 
+
+[[_ref.webui.admin.logs]]
+== menu:Admin[] > menu:Show Tomcat Logs[]
+
+
+Here the {susemgr}
+Admin user has access to the Tomcat log file located at [path]``/var/log/rhn/rhn_web_ui.log``
+.
+No {rootuser}
+ privileges are required. 
+image::admin_show_tomcat_logs.png[]

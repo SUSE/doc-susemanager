@@ -1,0 +1,190 @@
+:sectnums!:
+
+[appendix]
+[[_advanced.topics.app.ports]]
+= Ports
+
+
+
+[[_advanced.topics.app.ports.server]]
+== {susemgr} Server
+
+
+Some ports are only relevant if you actually run the related service on the {susemgr}
+server. 
+
+.Ports to Open on {susemgr}Server
+67::
+Inbound / TCP/UDP / DHCP 
++
+Required when {susemgr}
+is configured as a DHCP server for systems requesting IP addresses. 
+
+69::
+Inbound / TCP/UDP / TFTP 
++
+Used when {susemgr}
+is configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems. 
+
+80::
+Inbound / TCP / HTTP 
++
+All {webui}
+, client, and proxy server requests travel via HTTP or HTTPS. 
+
+80::
+Outbound / TCP / HTTP 
++
+Used to contact {scc}
+/{ncc}
+. 
+
+443::
+Inbound / TCP / HTTPS 
++
+All {webui}
+, client, and proxy server requests travel via HTTP or HTTPS. 
+
+443::
+Outbound / TCP / HTTPS 
++
+{susemgr}
+uses this port to reach {scc}
+(unless running in a disconnected mode with RMT or SMT{mdash}
+as described in <<_disconnect_setup>>). 
+
+5222::
+Inbound / TCP / osad 
++
+When you wish to push actions to clients this port is required by the [systemitem]``osad``
+daemon running on your client systems. 
+
+5269::
+Inbound/Outbound / TCP / jabberd 
++
+Needed if you push actions to or via a {susemgrproxy}
+. 
+
+4505::
+Inbound / TCP / salt 
++
+Required by the Salt-master to accept communication requests via TCP from minions. 
+
+4506::
+Inbound / TCP / salt 
++
+Required by the Salt-master to accept communication requests via TCP from minions. 
+
+25151::
+TCP 
++
+Cobbler. 
+
+.Internally Used Ports on {susemgr}Server
+2828::
+Internal /  
++
+satellite-search API, used by the RHN application in Tomcat and Taskomatic.
+
+2829::
+Internal /  
++
+Taskomatic API, used by the RHN application in Tomcat. 
+
+6868::
+Internal 
++
+Auditlog-keeper to database. 
+
+6888::
+Internal 
++
+Auditlog-keeper API, used by the RHN application in Tomcat. 
+
+8005::
+Internal 
++
+Tomcat shutdown port. 
+
+8009::
+Internal 
++
+Tomcat to Apache HTTPD (AJP). 
+
+8080::
+Internal 
++
+Tomcat to Apache HTTPD (HTTP). 
+
+9080::
+Internal 
++
+salt-api, used by the RHN application in Tomcat and Taskomatic. 
+
+32000::
+Internal / TCP 
++
+Port for a TCP connection to the Java Virtual Machine (JVM) that runs Taskomatic and the search (satellite-search). 
+
+.Ephemeral Ports
+[NOTE]
+====
+Anything from port 32768 on (more exactly, what you can see with [command]``cat
+    /proc/sys/net/ipv4/ip_local_port_range``) is an ephemeral port, typically used as the receiving end of a TCP connection.
+So if process A opens a TCP connection to process B (for example, port 22), then A chooses an arbitrary source TCP port to match with destination port 22. 
+====
+
+[[_advanced.topics.app.ports.proxy]]
+== {susemgr} Proxy Server
+
+
+
+.Ports to Open on {susemgr}Proxy Server
+22::
+Inbound /  
++
+Required when using ssh-push or ssh-push-tunnel contact methods.
+Check-in on clients connected to a SUSE Manager Proxy will be initiated on the SUSE Manager Server and "`hop through`"
+through to clients. 
+
+80::
+Outbound /  
++
+Used to reach {susemgr}
+. 
+
+5222::
+Inbound / TCP 
++
+For push actions and connections issued by [systemitem]``osad``
+running on the client systems. 
+
+5269::
+Inbound/Outbound / TCP
++
+For push actions with the server. 
+
+[[_advanced.topics.app.ports.client]]
+== {susemgr} Client
+
+
+
+.Ports to Open on {susemgr}Client
+22::
+Inbound / SSH 
++
+Required when using ssh-push or ssh-push-tunnel contact methods. 
+
+80::
+Outbound
++
+To reach the {susemgr}
+server or {susemgrproxy}
+server. 
+
+5222::
+Outbound / TCP 
++
+For push actions with the server or proxy server. 
+
+:sectnums:

@@ -1,0 +1,126 @@
+[[_advanced.topics.adding.vmware.esxi.host]]
+= Inventorying vCenter/vSphere ESXi Hosts with {susemgr}
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+
+== Introduction
+
+
+Foreign virtual hosts (such as vCenter and vSphere ESXi) can be inventoried using the menu:Virtual Host Manager[]
+.
+From the vSphere Client you can define roles and permissions for vCenter and vSphere ESXi users allowing vSphere objects and resources to be imported and inventoried by {susemgr}
+.
+Objects and resources are then displayed as foreign hosts on the {susemgr}menu:Systems[Virtual Systems]
+ page.
+
+The following sections will guide you through: 
+
+* Requirements
+* Overview of permissions and roles
+* Adding vCenter and vSphere ESXi hosts to SUSE Manager
+
+
+== Requirements
+
+
+The following table displays the default API communication port and required access rights for inventorying objects and resources.
+
+[cols="1,1", options="header"]
+|===
+| Ports / Permissions
+| Description
+
+
+|
+
+443
+|
+
+Default port that SUSE Manager uses to access the ESXi API for obtaining infrastructure data
+
+|
+
+read-only
+|
+
+All vCenter/ESXi objects and resources that should be inventoried by the Virtual Host Manager should be at least assigned the _read-only_ role.
+Mark objects and resources with _no-access_ to exclude them from the inventory.
+|===
+
+== Permissions and Roles Overview
+
+
+The following section will guide you through assigning user permissions and roles in vCenter/ESXi.
+
+A user is someone who has been authorized access to an ESXi host.
+The Virtual Host Manager (located on the SUSE Manager server) will inventory ESXi data defined by assigned roles and permissions on a user account. 
+
+For example: The user John has been assigned the _read-only_ access role to all servers and datacenters in his company with one exception.
+Johns account has been assigned the _no-access_ role on the company's __Financial Database server __.
+You decide to use Johns user account and add the ESXi host to SUSE Manager.
+During the inventory the__
+                Financial Database server__ will be excluded.
+
+Keep user access roles in mind when planning to add ESXi hosts to SUSE manager.
+It is important to understand that SUSE Manager will not inventory any objects or resources assigned with the no-access role on any user account.
+
+.User Roles/Permissions
+[TIP]
+====
+When planning to add new ESXi hosts to SUSE Manager, ask yourself the following question:
+
+_Have users assigned to a host been provided with the required roles and
+                    permissions for objects and resources that should be inventoried by SUSE
+                    Manager?_
+====
+
+== Adding New Users and Assigning Roles
+
+
+See the official vSphere documentation on adding new users and assigning roles.
+
+* https://pubs.vmware.com/vsphere-50/index.jsp#com.vmware.vsphere.security.doc_50/GUID-D7AEC653-EBC8-4573-B990-D8E58742F8ED.html[Authentication and User Management]
+
+
+== Inventorying vCenter/vSphere ESXi Hosts
+
+
+The following procedure will guide you through inventorying a VSphere ESXi host with {susemgr}
+.
+
+
+. From the {susemgr}{webui} select menu:Systems[] and then menu:Virtual Host Managers[] from the left navigation bar. 
+. From the upper right corner of the menu:Virtual Host Managers[] page select menu:Add VMware-based Virtual Host Manager[] .
+. From the menu:Add a VMware-based Virtual Host Manager[] page fill the following fields with your ESXi host data:
+** Label: Custom name for your Virtual Host Manager
+** Hostname: FQDN or host IP address
+** Port: Default ESXi API port
+** Username: ESXi user
++
+
+IMPORTANT: 
+Remember that only objects and resources which match a users defined role will be inventoried.
+Set the users role on objects and resources you want inventoried to _read-only_
+** Password: ESXi users password
+
++
+image::systems_virtual_host_managers_vmware.png[]
+. Click the menu:Add Virtual Host Manager[] button.
+. From the menu:Virtual Host Managers[] page select the newly added Virtual Host manager.
+. From the Virtual Host Managers menu:Properties[] page select menu:Refresh data from this Virtual Host Manager.[]
++
+
+IMPORTANT: 
+If you do not refresh the data from a new Virtual Host Manager, host data will not be inventoried and therefore will not be displayed under menu:Systems[Virtual Systems]
+. 
+. View inventoried ESXi host objects and resources by selecting menu:Systems[Virtual Systems] .
+
+ifdef::showremarks[]
+#
+Create a short section defining a virthostmgr-user then assign the correct
+            role.#
+endif::showremarks[]
