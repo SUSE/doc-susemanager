@@ -109,7 +109,9 @@ This implies that zypper can contact the server only if the tunnel is open. This
 . execute a synchronous salt-ssh call via the API
 . remove the temporary Roster file
 
-See also: https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/services/impl/SaltSSHService.java[SaltSSHService.callSyncSSH]
+*Additional Information:*
+
+https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/services/impl/SaltSSHService.java[SaltSSHService.callSyncSSH]
 
 == Bootstrap Process Sequence
 
@@ -166,7 +168,7 @@ The following image provides an overview of the Salt SSH bootstrap process.
 .Salt SSH Bootstrap Process
 image::salt-ssh-bootstrap-process.png[]
 
-See also:
+*Additional Information:*
 
 * https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/controllers/utils/RegularMinionBootstrapper.java[SSHMinionBootstrapper.java]
 
@@ -247,7 +249,83 @@ The following example uses the ProxyCommand option with two proxies over an ssh-
 
 image::salt-ssh-push-push-tunnel-sequence.png[]
 
-See also:
+*Additional Information:*
 
 * https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/services/impl/SaltSSHService.java[SaltSSHService.sshProxyCommandOption]
 
+
+== Users and SSH Key Management
+
+In order to connect to a proxy the parent server/proxy uses a specific user called `mgrsshtunnel`.
+
+The ssh config `/etc/ssh/sshd_config` of the proxy will force the execution of ``/usr/sbin/mgr-proxy-ssh-force-cmd` when `mgrsshtunnel` connects.
+
+``/usr/sbin/mgr-proxy-ssh-force-cmd` is a simple shell script that allows only the execution of `scp`, `ssh` or `cat` commands.
+
+The connection to the proxy or minion is authorized using ssh keys in the following way:
+
+. The server connects to the minion and to the first proxy using the key in ``/srv/susemanager/salt/salt_ssh/mgr_ssh_id`.
+
+. Each proxy has its own key pair in ``/home/mgrsshtunnel/.ssh/id_susemanager_ssh_push`.
+
+. Each proxy authorizes the key of the parent proxy or server.
+
+. The minion authorized its own key.
+
+.Salt SSH Key Authorization Process
+image::salt-ssh-push-ssh-keys.png[]
+
+*Additional Information:*
+
+* https://github.com/SUSE/spacewalk/blob/Manager/proxy/proxy/mgr-proxy-ssh-force-cmd[mgr-proxy-ssh-force-cmd]
+
+== Repository access via proxy
+
+For both ssh-push and ssh-push-tunnel the minion connects to the proxy to retrieve packages and repo data.
+
+The difference is how the connection works:
+
+* In case of ssh-push, zypper or yum connect directly to the proxy using http(s). This assumes there's not firewall between the minion and the proxy that would block http connections initiated by the minion.
+
+image::salt-ssh-push-repo-access.png[]
+
+* In case of ssh-push-tunnel, the http connection to the proxy is redirected through a reverse ssh tunnel.
+
+image::salt-ssh-push-tunnel-repo-access.png[]
+
+== Proxy setup
+
+When the `spacewalk-proxy` package is installed on the proxy the user `mgrsshtunnel` is created if it doesn't already exist.
+
+During the initial configuration with `configure-proxy.sh` the following happens:
+
+. Generate a ssh key pair or import an existing one
+
+. Retrieve the ssh key of the parent server/proxy in order to authorize it on the proxy
+
+. Configure the `sshd` of the proxy to restrict the user `mgrsshtunnel`
+
+This configuration is done by the `mgr-proxy-ssh-push-init` script. This is called from `configure-proxy.sh` and the user doesn't have to invoke it manually.
+
+Retrieving the parent key is done by calling an HTTP endpoint on the parent server or proxy.
+
+. First `https//$PARENT/pub/id_susemanager_ssh_push.pub` is tried. If the parent is proxy this will return the public ssh key of that proxy.
+
+. If a `404` is received then it's assumed the parent is a server not a proxy and `https://$PARENT/rhn/manager/download/saltssh/pubkey` is tried.
+
+.. If ``/srv/suseemanager/salt/salt_ssh/mgr_ssh_id.pub` already exists on the server it's returned
+
+.. If the public key doesn't exist (because `salt-ssh` has not been invoked yet) generate the key by calling the `mgrutil.ssh_keygen` runner
+
+[NOTE]
+salt-ssh generates a key pair the first time it is invoked in ``/srv/suseemanager/salt/salt_ssh/mgr_ssh_id`. The previous sequence is needed in case a proxy is configured before salt-ssh was invoked for the first time.
+
+*Additional Information:*
+
+* https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/controllers/SaltSSHController.java[com.suse.manager.webui.controllers.SaltSSHController]
+
+* https://github.com/SUSE/spacewalk/blob/Manager/susemanager-utils/susemanager-sls/modules/runners/mgrutil.py[mgrutil.ssh_keygen]
+
+* https://github.com/SUSE/spacewalk/blob/Manager/proxy/proxy/mgr-proxy-ssh-push-init[mgr-proxy-ssh-push-init]
+
+* https://github.com/SUSE/spacewalk/blob/Manager/proxy/proxy/spacewalk-proxy.spec[spacewalk-proxy.spec]
