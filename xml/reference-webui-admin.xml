@@ -36,7 +36,7 @@
    server, organization credentials, and &suse; products.
   </para>
 
-  <variablelist>
+  <variablelist xml:id="vl.webui.admin.wizard">
    <varlistentry>
     <term><guimenu>HTTP Proxy:</guimenu>
     </term>
@@ -115,7 +115,9 @@
      </itemizedlist>
     </listitem>
    </varlistentry>
-   <varlistentry>
+   <!-- status info: "sync failed" with a push button for
+        re-synchronizing the product -->
+   <varlistentry xml:id="vle.webui.admin.wizard.products">
     <term><guimenu>SUSE Products:</guimenu>
     </term>
     <listitem>
@@ -135,12 +137,56 @@
      </informalfigure>
      <para>
       The products displayed are directly linked to your organization
-      credentials and your &suse; subscriptions. Product extentions and
-      modules are shown when you select the corresponding base product
-      or click the plus sign to its left. After you have made your
-      selection, click <guimenu>Add products</guimenu>. This equals
-      running <command>mgr-sync add products</command> or
+      credentials and your &suse; subscriptions. Product extension and
+      module lists are shown when you click the arrow sign to the left
+      of the product description.  This is a cascading mechanism and
+      allows to unfold several levels according to the integration of
+      the extensions and modules in the base product.
+     </para>
+     <para>
+      With the toogle button labled <guimenu>with recommended</guimenu>
+      at the right end of a row of a base product, you can enable that
+      recommended extensions and modules are automatically selected for
+      synchronization.  Even with <guimenu>with recommended</guimenu> enabled,
+      you can uncheck parts of the product you are not interested in.
+      Recommended parts are labeled accordingly.  You cannot disable
+      required parts.
+     </para>
+     <para>
+      If you click the <guimenu>Channels</guimenu> icon in a row of a
+      product, a popup lists the underlying channels (repositories) that
+      build the product.
+     </para>
+     <para>
+      In the row above the product listing two filter options are
+      available:
+     </para>
+     <itemizedlist>
+      <listitem>
+       <para>
+        Search by the product description.  The filter limits the search
+        on the base products.
+       </para>
+      </listitem>
+      <listitem>
+       <para>
+        Filter by architecture.  Click in the search field (or press
+        <keycap>Enter</keycap>) and then select from drop-down menu.
+        You can repeat this as often as wanted.  To remove an
+        architecture either click the <quote>x</quote> symbol (or press
+        <keycap>Backspace</keycap>).
+       </para>
+      </listitem>
+     </itemizedlist>
+     <para>
+       After you have made your selection, click <guimenu>Add
+      products</guimenu> in the upper right area. This equals running
+      <command>mgr-sync add products</command> or
       <command>mgr-sync</command> without any argument.
+     </para>
+     <para>
+      At the right in a dedicated pane, you can see the progress of the
+      synchronization process.
      </para>
      <note>
       <title>Synchronization Time</title>
@@ -152,19 +198,18 @@
      <important>
       <title>If Synchronization Fails</title>
       <para>
-       SUSE does not automatically trust 3rd party GPG keys. Should a reposync
-       fail you can detect if an untrusted GPG key is the root cause by viewing
-       log files located in:
+       SUSE does not automatically trust 3rd party GPG keys. If a reposync
+       fails check if an untrusted GPG key is the cause by viewing
+       the log files located in:
       </para>
 <screen>/var/log/rhn/reposync</screen>
       <para>
        Look for lines similar to the following:
       </para>
 <screen>['/usr/bin/spacewalk-repo-sync', '--channel', 'sle-12-sp1-ga-desktop-
-      nvidia-driver-x86_64', '--type', 'yum', '--non-interactive']
-    ChannelException: The GPG key for this repository is not part of
-      the keyring.
-    Please run spacewalk-repo-sync in interactive mode to import it.</screen>
+nvidia-driver-x86_64', '--type', 'yum', '--non-interactive']
+ChannelException: The GPG key for this repository is not part of the keyring.
+Please run spacewalk-repo-sync in interactive mode to import it.</screen>
      </important>
      <para>
       Alternatively, you can add listed channels right away by clicking the
