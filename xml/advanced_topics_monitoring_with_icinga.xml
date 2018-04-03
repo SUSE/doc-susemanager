@@ -62,9 +62,7 @@ systemctl start postgresql.service</screen>
             </step>
             <step>
                 <para>Create the database and user for Icinga:</para>
-                <screen>&prompt.root;su - postgres
- 
- >psql
+                <screen>>psql
  postgres=# ALTER USER postgres WITH PASSWORD '&lt;newpassword&gt;';
  postgres=# CREATE USER icinga;
  postgres=# ALTER USER icinga WITH PASSWORD 'icinga';
@@ -130,12 +128,12 @@ host    all             all             ::1/128                 trust
             </step>
             <step>
                 <para>Enable and start all required services:</para>
-                <screen># systemctl enable icinga.service
-# systemctl start icinga.service
-# systemctl enable ido2db.service
-# systemctl start ido2db.service
-# systemctl enable apache2.service
-# systemctl start apache2.service</screen>
+                <screen>systemctl enable icinga.service
+systemctl start icinga.service
+systemctl enable ido2db.service
+systemctl start ido2db.service
+systemctl enable apache2.service
+systemctl start apache2.service</screen>
             </step>
             <step>
                 <para>Login to the WebGUI at: <link xlink:href="http://localhost/icinga"/>.</para>
@@ -348,10 +346,10 @@ define servicegroup {
         <procedure>
             <title>Monitoring Running Systemd Services</title>
             <step>
-                <para>Create a new plugin file called <filename>check_systemd.sh</filename> in
+                <para>As root create a new plugin file called <filename>check_systemd.sh</filename> in
                         <filename>/usr/lib/nagios/plugins/</filename> on your &susemgr;
                     server:</para>
-                <screen>&prompt.root;vi /usr/lib/nagios/plugins/ check_systemd.sh</screen>
+                <screen>vi /usr/lib/nagios/plugins/ check_systemd.sh</screen>
             </step>
             <step>
                 <para>For this example you will use an opensource community script to monitor
