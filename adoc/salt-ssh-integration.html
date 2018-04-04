@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.6.1">
+<meta name="generator" content="Asciidoctor 1.5.6.2">
 <title>Salt SSH Integration</title>
 <style>
 /*! normalize.css v2.1.2 | MIT License | git.io/normalize */
@@ -769,12 +769,87 @@ p { margin-bottom: 1.25rem; }
   .show-for-print { display: inherit !important; } }
 
 </style>
+<!-- Generate a nice TOC -->
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tocify/1.9.0/javascripts/jquery.tocify.min.js"></script>
+<!-- We do not need the tocify CSS because the asciidoc CSS already provides most of what we neeed -->
+<!-- another comment -->
+<style>
+.tocify-header {
+    font-style: normal;
+}
+
+.tocify-subheader {
+    font-style: normal;
+    font-size: 90%;
+}
+
+.tocify ul {
+    margin: 0;
+ }
+
+.tocify-focus {
+    color: #7a2518;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tocify-focus > a {
+    color: #7a2518;
+}
+</style>
+
+<script type="text/javascript">
+    $(function () {
+        // Add a new container for the tocify toc into the existing toc so we can re-use its
+        // styling
+        $("#toc").append("<div id='generated-toc'></div>");
+        $("#generated-toc").tocify({
+            extendPage: true,
+            context: "#content",
+            highlightOnScroll: true,
+            hideEffect: "slideUp",
+            // Use the IDs that asciidoc already provides so that TOC links and intra-document
+            // links are the same. Anything else might confuse users when they create bookmarks.
+            hashGenerator: function(text, element) {
+                return $(element).attr("id");
+            },
+            // Smooth scrolling doesn't work properly if we use the asciidoc IDs
+            smoothScroll: false,
+            // Set to 'none' to use the tocify classes
+            theme: "none",
+            // Handle book (may contain h1) and article (only h2 deeper)
+            selectors: $( "#content" ).has( "h1" ).size() > 0 ? "h1,h2,h3,h4,h5" : "h2,h3,h4,h5",
+            ignoreSelector: ".discrete"
+        });
+
+        // Switch between static asciidoc toc and dynamic tocify toc based on browser size
+        // This is set to match the media selectors in the asciidoc CSS
+        // Without this, we keep the dynamic toc even if it is moved from the side to preamble
+        // position which will cause odd scrolling behavior
+        var handleTocOnResize = function() {
+            if ($(document).width() < 768) {
+                $("#generated-toc").hide();
+                $(".sectlevel0").show();
+                $(".sectlevel1").show();
+            }
+            else {
+                $("#generated-toc").show();
+                $(".sectlevel0").hide();
+                $(".sectlevel1").hide();
+            }
+        }
+
+        $(window).resize(handleTocOnResize);
+        handleTocOnResize();
+    });
+</script>
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
 <h1>Salt SSH Integration</h1>
 <div id="toc" class="toc2">
-<div id="toctitle">Table of Contents</div>
+<div id="toctitle">Topics</div>
 <ul class="sectlevel1">
 <li><a href="#ssh-push-overview">SSH Push Overview</a></li>
 <li><a href="#salt-ssh-integration">Salt SSH Integration</a>
@@ -792,6 +867,9 @@ p { margin-bottom: 1.25rem; }
 <li><a href="#_salt_ssh_call_sequence_via_proxy">Salt SSH Call Sequence via Proxy</a></li>
 </ul>
 </li>
+<li><a href="#_users_and_ssh_key_management">Users and SSH Key Management</a></li>
+<li><a href="#_repository_access_via_proxy">Repository access via proxy</a></li>
+<li><a href="#_proxy_setup">Proxy setup</a></li>
 </ul>
 </div>
 </div>
@@ -978,7 +1056,10 @@ p { margin-bottom: 1.25rem; }
 </ol>
 </div>
 <div class="paragraph">
-<p>See also: <a href="https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/services/impl/SaltSSHService.java">SaltSSHService.callSyncSSH</a></p>
+<p><strong>Additional Information:</strong></p>
+</div>
+<div class="paragraph">
+<p><a href="https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/services/impl/SaltSSHService.java">SaltSSHService.callSyncSSH</a></p>
 </div>
 </div>
 </div>
@@ -1106,12 +1187,12 @@ p { margin-bottom: 1.25rem; }
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="../images/src/adoc-images/salt-ssh-bootstrap-process.png" alt="salt ssh bootstrap process">
+<img src="adoc-images/salt-ssh-bootstrap-process.png" alt="salt ssh bootstrap process">
 </div>
 <div class="title">Figure 1. Salt SSH Bootstrap Process</div>
 </div>
 <div class="paragraph">
-<p>See also:</p>
+<p><strong>Additional Information:</strong></p>
 </div>
 <div class="ulist">
 <ul>
@@ -1139,7 +1220,7 @@ p { margin-bottom: 1.25rem; }
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="../images/src/adoc-images/salt-ssh-proxy-multi-hop.png" alt="salt ssh proxy multi hop">
+<img src="adoc-images/salt-ssh-proxy-multi-hop.png" alt="salt ssh proxy multi hop">
 </div>
 <div class="title">Figure 2. Salt SSH Proxy Multiple Hops</div>
 </div>
@@ -1156,7 +1237,7 @@ p { margin-bottom: 1.25rem; }
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="../images/src/adoc-images/salt-ssh-proxycommand.png" alt="salt ssh proxycommand">
+<img src="adoc-images/salt-ssh-proxycommand.png" alt="salt ssh proxycommand">
 </div>
 </div>
 <div class="admonitionblock note">
@@ -1211,7 +1292,7 @@ In this example netcat (nc) is used to pipe port 22 of the target host into the 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="../images/src/adoc-images/salt-ssh-push-push-plain-sequence.png" alt="salt ssh push push plain sequence">
+<img src="adoc-images/salt-ssh-push-push-plain-sequence.png" alt="salt ssh push push plain sequence">
 </div>
 </div>
 </div>
@@ -1251,11 +1332,11 @@ In this example netcat (nc) is used to pipe port 22 of the target host into the 
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="../images/src/adoc-images/salt-ssh-push-push-tunnel-sequence.png" alt="salt ssh push push tunnel sequence">
+<img src="adoc-images/salt-ssh-push-push-tunnel-sequence.png" alt="salt ssh push push tunnel sequence">
 </div>
 </div>
 <div class="paragraph">
-<p>See also:</p>
+<p><strong>Additional Information:</strong></p>
 </div>
 <div class="ulist">
 <ul>
@@ -1268,10 +1349,176 @@ In this example netcat (nc) is used to pipe port 22 of the target host into the 
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_users_and_ssh_key_management"><a class="anchor" href="#_users_and_ssh_key_management"></a><a class="link" href="#_users_and_ssh_key_management">Users and SSH Key Management</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In order to connect to a proxy the parent server/proxy uses a specific user called <code>mgrsshtunnel</code>.</p>
+</div>
+<div class="paragraph">
+<p>The ssh config <code>/etc/ssh/sshd_config</code> of the proxy will force the execution of <code>`/usr/sbin/mgr-proxy-ssh-force-cmd</code> when <code>mgrsshtunnel</code> connects.</p>
+</div>
+<div class="paragraph">
+<p><code>`/usr/sbin/mgr-proxy-ssh-force-cmd</code> is a simple shell script that allows only the execution of <code>scp</code>, <code>ssh</code> or <code>cat</code> commands.</p>
+</div>
+<div class="paragraph">
+<p>The connection to the proxy or minion is authorized using ssh keys in the following way:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The server connects to the minion and to the first proxy using the key in <code>`/srv/susemanager/salt/salt_ssh/mgr_ssh_id</code>.</p>
+</li>
+<li>
+<p>Each proxy has its own key pair in <code>`/home/mgrsshtunnel/.ssh/id_susemanager_ssh_push</code>.</p>
+</li>
+<li>
+<p>Each proxy authorizes the key of the parent proxy or server.</p>
+</li>
+<li>
+<p>The minion authorized its own key.</p>
+</li>
+</ol>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="adoc-images/salt-ssh-push-ssh-keys.png" alt="salt ssh push ssh keys">
+</div>
+<div class="title">Figure 3. Salt SSH Key Authorization Process</div>
+</div>
+<div class="paragraph">
+<p><strong>Additional Information:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/SUSE/spacewalk/blob/Manager/proxy/proxy/mgr-proxy-ssh-force-cmd">mgr-proxy-ssh-force-cmd</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_repository_access_via_proxy"><a class="anchor" href="#_repository_access_via_proxy"></a><a class="link" href="#_repository_access_via_proxy">Repository access via proxy</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For both ssh-push and ssh-push-tunnel the minion connects to the proxy to retrieve packages and repo data.</p>
+</div>
+<div class="paragraph">
+<p>The difference is how the connection works:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>In case of ssh-push, zypper or yum connect directly to the proxy using http(s). This assumes there&#8217;s not firewall between the minion and the proxy that would block http connections initiated by the minion.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="adoc-images/salt-ssh-push-repo-access.png" alt="salt ssh push repo access">
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>In case of ssh-push-tunnel, the http connection to the proxy is redirected through a reverse ssh tunnel.</p>
+</li>
+</ul>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="adoc-images/salt-ssh-push-tunnel-repo-access.png" alt="salt ssh push tunnel repo access">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_proxy_setup"><a class="anchor" href="#_proxy_setup"></a><a class="link" href="#_proxy_setup">Proxy setup</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When the <code>spacewalk-proxy</code> package is installed on the proxy the user <code>mgrsshtunnel</code> is created if it doesn&#8217;t already exist.</p>
+</div>
+<div class="paragraph">
+<p>During the initial configuration with <code>configure-proxy.sh</code> the following happens:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Generate a ssh key pair or import an existing one</p>
+</li>
+<li>
+<p>Retrieve the ssh key of the parent server/proxy in order to authorize it on the proxy</p>
+</li>
+<li>
+<p>Configure the <code>sshd</code> of the proxy to restrict the user <code>mgrsshtunnel</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>This configuration is done by the <code>mgr-proxy-ssh-push-init</code> script. This is called from <code>configure-proxy.sh</code> and the user doesn&#8217;t have to invoke it manually.</p>
+</div>
+<div class="paragraph">
+<p>Retrieving the parent key is done by calling an HTTP endpoint on the parent server or proxy.</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>First <code>https//$PARENT/pub/id_susemanager_ssh_push.pub</code> is tried. If the parent is proxy this will return the public ssh key of that proxy.</p>
+</li>
+<li>
+<p>If a <code>404</code> is received then it&#8217;s assumed the parent is a server not a proxy and <code><a href="https://$PARENT/rhn/manager/download/saltssh/pubkey" class="bare">https://$PARENT/rhn/manager/download/saltssh/pubkey</a></code> is tried.</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>If <code>/srv/suseemanager/salt/salt_ssh/mgr_ssh_id.pub</code> already exists on the server it&#8217;s returned</p>
+</li>
+<li>
+<p>If the public key doesn&#8217;t exist (because <code>salt-ssh</code> has not been invoked yet) generate the key by calling the <code>mgrutil.ssh_keygen</code> runner</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+salt-ssh generates a key pair the first time it is invoked in
+<code>/srv/suseemanager/salt/salt_ssh/mgr_ssh_id</code>. The previous sequence is needed in case a proxy is configured before salt-ssh was invoked for the first time.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><strong>Additional Information:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/controllers/SaltSSHController.java">com.suse.manager.webui.controllers.SaltSSHController</a></p>
+</li>
+<li>
+<p><a href="https://github.com/SUSE/spacewalk/blob/Manager/susemanager-utils/susemanager-sls/modules/runners/mgrutil.py">mgrutil.ssh_keygen</a></p>
+</li>
+<li>
+<p><a href="https://github.com/SUSE/spacewalk/blob/Manager/proxy/proxy/mgr-proxy-ssh-push-init">mgr-proxy-ssh-push-init</a></p>
+</li>
+<li>
+<p><a href="https://github.com/SUSE/spacewalk/blob/Manager/proxy/proxy/spacewalk-proxy.spec">spacewalk-proxy.spec</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-22 08:18:23 CET
+Last updated 2018-04-03 15:30:54 CEST
 </div>
 </div>
 </body>
