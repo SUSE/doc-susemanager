@@ -72,22 +72,19 @@ All packages on the RHEL media will be mirrored into a child channel located und
 +
 
 ----
-{prompt.root}
-mkdir -p /srv/www/htdocs/pub/rhel
+{prompt.root}mkdir -p /srv/www/htdocs/pub/rhel
 ----
 . Mount the ISO: 
 +
 
 ----
-{prompt.root}
-mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel
+{prompt.root}mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel
 ----
 . Start [command]``spacewalk-repo-sync`` to synchronize packages: 
 +
 
 ----
-{prompt.root}
-spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
+{prompt.root}spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
 Repo URL: https://127.0.0.1/pub/rhel/Server/
 Packages in repo:              3690
 Packages already synced:          0
@@ -151,8 +148,7 @@ mgr-create-bootstrap-repo RHEL_activation_channel_key
 +
 
 ----
-{prompt.root}
-cp bootstrap.sh res7-bootstrap.sh
+{prompt.root}cp bootstrap.sh res7-bootstrap.sh
 ----
 
 
@@ -166,23 +162,19 @@ The following procedure will guide you through registering a Salt minion using t
 +
 
 ----
-wget --no-check-certificate https://`server`
-/pub/bootstrap/res7-bootstrap.sh
+wget --no-check-certificate https://`server`/pub/bootstrap/res7-bootstrap.sh
 ----
 . Add the appropriate res-gpg-pubkey-#####-#####.key to the `ORG_GPG_KEY` key parameter, comma delimited in your [command]``res7-bootstrap.sh`` script. These are located on your {susemgr} server at: 
 +
 
 ----
-http://`server`
-/pub/
+http://`server`/pub/
 ----
 . Make the [command]``res7-bootstrap.sh`` script executable and run it. This will install necessary Salt packages from the bootstrap repository and start the Salt minion service: 
 +
 
 ----
-{prompt.root}
-chmod +x res7-bootstrap.sh{prompt.root}
-./res7-boostrap.sh
+{prompt.root}chmod +x res7-bootstrap.sh{prompt.root}./res7-boostrap.sh
 ----
 . From the {susemgr}{webui} select menu:Salt[Keys] and accept the new minion's key. 
 
@@ -206,31 +198,25 @@ The following procedure will guide you through the registration of a Salt minion
 +
 
 ----
-yum-config-manager --add-repo https://`server`
-/pub/repositories/res/7/bootstrap
+yum-config-manager --add-repo https://`server`/pub/repositories/res/7/bootstrap
 ----
 . Install the [package]#salt-minion# package: 
 +
 
 ----
-{prompt.root}
-yum install salt-minion
+{prompt.root}yum install salt-minion
 ----
 . Edit the Salt minion configuration file to point to the {susemgr} server: 
 +
 
 ----
-{prompt.root}
-mkdir /etc/salt/minion.d{prompt.root}
-echo "master:`server_fqdn`
-" > /etc/salt/minion.d/susemanager.conf
+{prompt.root}mkdir /etc/salt/minion.d{prompt.root}echo "master:`server_fqdn`" > /etc/salt/minion.d/susemanager.conf
 ----
 . Start the minion service: 
 +
 
 ----
-{prompt.root}
-systemctl start salt-minion
+{prompt.root}systemctl start salt-minion
 ----
 . From the {susemgr}{webui} select the menu:Salt[Keys] and accept the new minion's key. 
 
@@ -262,13 +248,7 @@ Keep in mind {suse}
 +
 
 ----
-{prompt.root}
-spacewalk-common-channels -u admin -p`secret`
--a x86_64 'centos7'{prompt.root}
-spacewalk-common-channels -u admin -p`secret`
--a x86_64 'centos7-updates'{prompt.root}
-spacewalk-common-channels -u admin -p`secret`
--a x86_64 'spacewalk26-client-centos7'
+{prompt.root}spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7'{prompt.root}spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7-updates'{prompt.root}spacewalk-common-channels -u admin -p`secret`-a x86_64 'spacewalk26-client-centos7'
 ----
 +
 
@@ -347,44 +327,36 @@ wiki, linked from the [ref]_Quick
 +
 
 ----
-{prompt.root}
-yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/
+{prompt.root}yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/
 ----
 . Import the repo key: 
 +
 
 ----
-{prompt.root}
-rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key
+{prompt.root}rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key
 ----
 . Check if there is a different repository that contains Salt. If there is more than one repository listed disable the repository that contains Salt apart from the OBS one. 
 +
 
 ----
-{prompt.root}
-yum list --showduplicates salt
+{prompt.root}yum list --showduplicates salt
 ----
 . Install the Salt minion: 
 +
 
 ----
-{prompt.root}
-yum install salt salt-minion
+{prompt.root}yum install salt salt-minion
 ----
 . Change the Salt configuration to point to the {susemgr} server: 
 +
 
 ----
-{prompt.root}
-mkdir -p /etc/salt/minion.d{prompt.root}
-echo "master:`server_fqdn`
-" > /etc/salt/minion.d/susemanager.conf
+{prompt.root}mkdir -p /etc/salt/minion.d{prompt.root}echo "master:`server_fqdn`" > /etc/salt/minion.d/susemanager.conf
 ----
 . Restart the minion 
 +
 
 ----
-{prompt.root}
-systemctl restart salt-minion
+{prompt.root}systemctl restart salt-minion
 ----
 . Proceed to menu:Salt[Keys] from the {webui} and accept the minion's key. 

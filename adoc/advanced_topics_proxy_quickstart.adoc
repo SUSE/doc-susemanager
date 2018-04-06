@@ -221,8 +221,7 @@ Make sure the [path]``suma_proxy``
  pattern version 2.5.1.3 or later is installed using the following command on the proxy: 
 
 ----
-{prompt.root}
-zypper in -t pattern suma_proxy
+{prompt.root}zypper in -t pattern suma_proxy
 ----
 
 
@@ -255,14 +254,7 @@ As {rootuser}
 server or chained proxy named as [replaceable]``PARENT``: 
 
 ----
-{prompt.root}
-cd /root/ssl-build{prompt.root}
-scp root@`PARENT`
-:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .{prompt.root}
-scp root@`PARENT`
-:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .{prompt.root}
-scp root@`PARENT`
-:/root/ssl-build/rhn-ca-openssl.cnf .
+{prompt.root}cd /root/ssl-build{prompt.root}scp root@`PARENT`:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .{prompt.root}scp root@`PARENT`:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .{prompt.root}scp root@`PARENT`:/root/ssl-build/rhn-ca-openssl.cnf .
 ----
 
 .Known Limitation
@@ -404,8 +396,7 @@ or alternatively:
 +
 
 ----
-/etc/salt/minion.d/`name`
-.conf
+/etc/salt/minion.d/`name`.conf
 ----
 . Add the FQDN to the minion file:
 +
@@ -418,15 +409,13 @@ Save and restart the salt-minion service with:
 +
 
 ----
-{prompt.root}
-systemctl restart salt-minion
+{prompt.root}systemctl restart salt-minion
 ----
 . On the proxy, accept the new minion key with:
 +
 
 ----
-{prompt.root}
-salt-key -a 'minion'
+{prompt.root}salt-key -a 'minion'
 ----
 +
 The minion will now connect to the proxy exclusively for Salt operations and normal HTTP package downloads.
@@ -453,7 +442,7 @@ To view available options type [command]``mgr-bootstrap
 +
 
 ----
-#``mgr-bootstrap --activation-keys=key-string``
+# ``mgr-bootstrap --activation-keys=key-string``
 ----
 . Optionally edit the resulting bootstrap script. Execute the bootstrap script on the clients as described in <<_connect.first.client>>. 
 
@@ -492,19 +481,19 @@ server.
 +
 
 ----
-#``zypper in susemanager-tftpsync``
+# ``zypper in susemanager-tftpsync``
 ----
 . On the {susemgrproxy} server install [package]#susemanager-tftpsync-recv# : 
 +
 
 ----
-#``zypper in susemanager-tftpsync-recv``
+# ``zypper in susemanager-tftpsync-recv``
 ----
 . Run the [command]``configure-tftpsync.sh`` setup script and enter the requested information: 
 +
 
 ----
-#``configure-tftpsync.sh``
+# ``configure-tftpsync.sh``
 ----
 +
 It asks for hostname and IP address of the {susemgr}
@@ -514,13 +503,13 @@ Additionally, it asks for the tftpboot directory on the proxy.
 +
 
 ----
-#``configure-tftpsync.sh FQDN_of_Proxy_Server``
+# ``configure-tftpsync.sh FQDN_of_Proxy_Server``
 ----
 . To initiate an initial synchronization on the SUSE Manager Server run: 
 +
 
 ----
-#``cobbler sync``
+# ``cobbler sync``
 ----
 +
 Also can also be done after each a change within Cobbler that needs to be synchronized immediately.
@@ -538,8 +527,7 @@ To enable systems to find the PXE boot on the {susemgrproxy}
 server add the following to the DHCP configuration for the zone containing the systems to be provisioned: 
 
 ----
-next-server:`IP_Address_of_SUSE_Manager_Proxy_Server`
-filename: "pxelinux.0"
+next-server:`IP_Address_of_SUSE_Manager_Proxy_Server`filename: "pxelinux.0"
 ----
 
 [[_advanced.topics.proxy.migration3]]
@@ -837,8 +825,7 @@ Use the following auto-installation as template and create the auto-installation
       <script>
         <filename>migration_fix_script.sh</filename>
         <chrooted config:type="boolean">true</chrooted>
-        <source>
-<![CDATA[ ln -sf /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT /etc/pki/trust/anchors/
+        <source><![CDATA[ ln -sf /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT /etc/pki/trust/anchors/
 /usr/sbin/update-ca-certificates ]]>
 </source>
       </script>

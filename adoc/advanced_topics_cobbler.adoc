@@ -105,13 +105,8 @@ For example:
 
 ----
 allow booting;
-allow bootp; <1>
-class "PXE" <2>
-{
-match if substring(option vendor-class-identifier, 0, 9) = "PXEClient"; <3>
-next-server 192.168.2.1; <4>
-filename "pxelinux.0"; <5>
-}
+allow bootp; <1>class "PXE" <2>{
+match if substring(option vendor-class-identifier, 0, 9) = "PXEClient"; <3>next-server 192.168.2.1; <4>filename "pxelinux.0"; <5>}
 ----
 
 
@@ -154,8 +149,7 @@ To edit the network XML description with [command]``virsh``, proceed as follow:
 +
 
 ----
-{prompt.root}
-virsh net-dumpxml --inactive network > network.xml
+{prompt.root}virsh net-dumpxml --inactive network > network.xml
 ----
 . Open the XML dump file (here [path]``network.xml`` ) with a text editor and add a `bootp` statement within the `<dhcp>` element: 
 +
@@ -167,8 +161,7 @@ virsh net-dumpxml --inactive network > network.xml
 +
 
 ----
-{prompt.root}
-virsh net-define network.xml
+{prompt.root}virsh net-define network.xml
 ----
 
 
@@ -244,8 +237,7 @@ Server, install the package [systemitem]``susemanager-tftpsync``
 : 
 
 ----
-{prompt.root}
-zypper install susemanager-tftpsync
+{prompt.root}zypper install susemanager-tftpsync
 ----
 
 
@@ -254,8 +246,7 @@ systems, install the package [systemitem]``susemanager-tftpsync-recv``
 : 
 
 ----
-{prompt.root}
-zypper install susemanager-tftpsync-recv
+{prompt.root}zypper install susemanager-tftpsync-recv
 ----
 
 ==== Configuring {susemgrproxy}
@@ -278,8 +269,7 @@ Execute [path]``configure-tftpsync.sh``
  Server: 
 
 ----
-{prompt.root}
-configure-tftpsync.sh proxy1.example.com proxy2.example.com
+{prompt.root}configure-tftpsync.sh proxy1.example.com proxy2.example.com
 ----
 
 
@@ -318,8 +308,7 @@ If content, start the {susemgr}
 server with the following command: 
 
 ----
-{prompt.root}
-/usr/sbin/spacewalk-service start
+{prompt.root}/usr/sbin/spacewalk-service start
 ----
 
 [WARNING]
@@ -346,10 +335,7 @@ interface, refer to <<_ref.webui.systems.autoinst.distribution>>.
 To create a distribution from the command line, use [command]``cobbler`` as follows: 
 
 ----
-{prompt.root}
-cobbler distro add --name=`string`
---kernel=`path`
---initrd=`path`
+{prompt.root}cobbler distro add --name=`string`--kernel=`path`--initrd=`path`
 ----
 
 
@@ -378,8 +364,7 @@ interface, refer to <<_ref.webui.systems.autoinst.profiles>>.
 Use [command]``cobbler`` to create profiles on the command line: 
 
 ----
-{prompt.root}
-cobbler profile add --name=string --distro=string [--kickstart=url] \
+{prompt.root}cobbler profile add --name=string --distro=string [--kickstart=url] \
   [--virt-file-size=gigabytes] [--virt-ram=megabytes]
 ----
 
@@ -418,8 +403,7 @@ interface, refer to <<_s4_sm_system_details_kick>>.
 The following command adds a system to the Cobbler configuration: 
 
 ----
-{prompt.root}
-cobbler system add --name=string --profile=string \
+{prompt.root}cobbler system add --name=string --profile=string \
   --mac-address=AA:BB:CC:DD:EE:FF
 ----
 
@@ -465,8 +449,7 @@ However, templates differ from standard Kickstart files in their use of variable
 For example, a standard Kickstart file may have a networking section similar to the following: 
 
 ----
-{prompt.root}
-network --device=eth0 --bootproto=static --ip=192.168.100.24 \
+{prompt.root}network --device=eth0 --bootproto=static --ip=192.168.100.24 \
   --netmask=255.255.255.0 --gateway=192.168.100.1 --nameserver=192.168.100.2
 ----
 
@@ -474,8 +457,7 @@ network --device=eth0 --bootproto=static --ip=192.168.100.24 \
 In a Kickstart template file, the networking section would rather look like this: 
 
 ----
-{prompt.root}
-network --device=$net_dev --bootproto=static --ip=$ip_addr \
+{prompt.root}network --device=$net_dev --bootproto=static --ip=$ip_addr \
   --netmask=255.255.255.0 --gateway=$my_gateway --nameserver=$my_nameserver
 ----
 
@@ -578,8 +560,7 @@ If you have created a virtual machine profile as documented in <<_advanced.topic
 For example, create a Cobbler profile with the following command: 
 
 ----
-{prompt.root}
-cobbler add profile --name=virtualfileserver \
+{prompt.root}cobbler add profile --name=virtualfileserver \
   --distro=sles12-x86_64-server --virt-file-size=20 --virt-ram=1000
 ----
 
@@ -590,8 +571,7 @@ This profile is for a fileserver running {sls}{nbsp}
 To find the name of the virtual guest system profile, run the following [command]``koan`` command: 
 
 ----
-{prompt.root}
-koan --server=hostname --list-profiles
+{prompt.root}koan --server=hostname --list-profiles
 ----
 
 
@@ -601,8 +581,7 @@ This command lists all the available profiles created with [command]``cobbler
 Start creating the image file and the installation of the virtual guest system: 
 
 ----
-{prompt.root}
-koan --virt --server=cobbler-server.example.com \
+{prompt.root}koan --virt --server=cobbler-server.example.com \
   --profile=virtualfileserver --virtname=marketingfileserver
 ----
 
@@ -619,8 +598,7 @@ Once the installation of the virtual guest is complete, it can be used as any ot
 [command]``koan`` can replace a still running system with a new installation from the available Cobbler profiles by executing the following command __on the system to be reinstalled__: 
 
 ----
-{prompt.root}
-koan --replace-self --server=hostname --profile=name
+{prompt.root}koan --replace-self --server=hostname --profile=name
 ----
 
 
@@ -643,8 +621,7 @@ Depending on Cobbler related systemd settings (see [path]``/usr/lib/systemd/syst
 ====
 
 ----
-{prompt.root}
-cobbler buildiso --iso=/path/to/boot.iso
+{prompt.root}cobbler buildiso --iso=/path/to/boot.iso
 ----
 
 
@@ -652,8 +629,7 @@ The boot ISO includes all profiles and systems by default.
 Limit these profiles and systems using the [option]``--profiles`` and [option]``--systems`` options. 
 
 ----
-{prompt.root}
-cobbler buildiso --systems="system1,system2,system3" \
+{prompt.root}cobbler buildiso --systems="system1,system2,system3" \
   --profiles="profile1,profile2,profile3"
 ----
 
