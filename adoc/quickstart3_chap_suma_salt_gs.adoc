@@ -49,11 +49,11 @@ Salt calls are defined by three main properties:
 # salt '`target`'`function`[`arguments`]
 ----
 
-Target::
+Target:::
 Use the second property in a Salt call to define a target machine.
 Specify the minion or group of minions you would like to run a function on. 
 
-General Targeting::
+General Targeting::::
 List available grains on all minions: 
 +
 
@@ -67,7 +67,7 @@ Ping a specific minion:
 ----
 # salt 'web1.example.com' test.ping
 ----
-Glob Targeting::
+Glob Targeting::::
 Ping all minions using a domain: 
 +
 
@@ -81,20 +81,20 @@ Display the OS name of all minions with the label ``webserver``:
 ----
 # salt 'webserver*' grains.item oscodename
 ----
-List Targeting::
+List Targeting::::
 +
 
 ----
 # salt -L 'webserver.example.com,db.example.com' test.ping
 ----
-Regular Expression Targeting::
+Regular Expression Targeting::::
 You may use PCRE-compliant regular expressions: 
 +
 
 ----
 # salt -E '(?!web)' test.ping
 ----
-IP Address Targeting::
+IP Address Targeting::::
 List minion IP addresses: 
 +
 
@@ -116,17 +116,14 @@ Ping all minions on a subnet:
 # salt -S 172.31.0.0/16 test.ping
 ----
 +
-
 .Lookup a Subnet Using the [command]``ip`` Command
-[TIP]
-====
-You can use the [command]``ip`` command to find the subnet mask in the format of ``192.168.1.1/24``: 
+TIP: You can use the [command]``ip`` command to find the subnet mask in the format of ``192.168.1.1/24``: 
 
 ----
 # ip -o -f inet addr show | awk '/scope global/ {print $4}'
 ----
-====
-Function::
+
+Function:::
 Once you have specified a target, provide the function you would like to call.
 Functions also accept arguments.
 These are space-delimited.
@@ -137,7 +134,7 @@ For example:
 salt '*' cmd.run 'echo "Hello: $FIRST_NAME"' env='{FIRST_NAME: "John"}'
 ----
 
-Locating Additional Minion Functions::
+Locating Additional Minion Functions::::
 Find more functions which can be called on minions by running: 
 +
 
@@ -146,7 +143,7 @@ salt '*' sys.doc
 ----
 +
 A full list of callable functions are located here: https://docs.saltstack.com/en/2015.8/ref/modules/all/index.html
-Arguments::
+Arguments:::
 Provides the extra data needed by a function you are calling.
 The command `pkg.install` requires an argument specifying a package to install. {yast}
 has been selected for installation.
@@ -193,16 +190,13 @@ Once written, states are applied to target systems automating the process of man
 For more information on states, see https://docs.saltstack.com/en/latest/topics/tutorials/starting_states.html.
 +
 
-
-.Upating Salt
-[WARNING]
-====
-Do not update [package]#salt#
+.Updating Salt
+WARNING: Do not update [package]#salt#
  itself using Salt states.
 First update all other system packages using Salt states then update [package]#salt#
  as a separate stand-alone step from the {susemgr}{webui}
 . 
-====
+
 Pillar::
 Pillars unlike grains are created on the master.
 Pillar files contain information about a minion or group of minions.
@@ -216,22 +210,16 @@ Minions may use beacons to hook into many types of system proceses for constant 
 Once a targeted monitored activity occurs an event is sent on the Salt event bus that may be used to trigger a reactor.
 +
 
-
 .Enabling Beacons
-[IMPORTANT]
-====
-To work with beacons on Salt minions the package python-pyinotify must be installed for SUSE systems.
+IMPORTANT: To work with beacons on Salt minions the package python-pyinotify must be installed for SUSE systems.
 For RES systems install python-inotify.
 This package is not installed automatically during the salt minion package installation.
-====
-+
 
++
 .Peer Communication with salt-broker
-[NOTE]
-====
-The salt-broker acts like a switch and not like a hub, therefore Peer communication will only work for minions behind the same broker/Proxy.
+NOTE: The salt-broker acts like a switch and not like a hub, therefore Peer communication will only work for minions behind the same broker/Proxy.
 For more information on Salt and peer communication see: https://docs.saltstack.com/en/latest/ref/peer.html
-====
+
 [[_salt.gs.guide.useful.salt.commands]]
 == Useful Salt Commands
 
@@ -347,12 +335,9 @@ It is shipped and updated together with {susemgr}
 and includes certificate setup and common state logic that will be applied to packages and channels. 
 +
 
-
 .Non-editable Directory
-[WARNING]
-====
-You should not edit or add custom Salt data to this directory. 
-====
+WARNING: You should not edit or add custom Salt data to this directory. 
+
 [path]``/srv/susemanager/salt``::
 This directory is created by {susemgr}
 and contains assigned channels and packages for minions, groups, and organizations.
@@ -361,12 +346,9 @@ A good analogy for this directory would be the {susemgr}
 database translated into Salt directives. 
 +
 
-
 .Non-editable Directory
-[WARNING]
-====
-You should not edit or add custom Salt data to this directory. 
-====
+WARNING: You should not edit or add custom Salt data to this directory. 
+
 [path]``/srv/salt``::
 The directory [path]``/srv/salt``
 is for your custom state data, salt modules etc. {susemgr}
@@ -375,12 +357,9 @@ However the state data placed here affects the Highstate of minions and is merge
 . 
 +
 
-
 .Editable Directory
-[TIP]
-====
-Place your custom Salt data here. 
-====
+TIP: Place your custom Salt data here. 
+
 [[_salt.gs.guide.salt.file.locations.pillar.roots]]
 === pillar_roots
 
@@ -394,12 +373,9 @@ It is shipped and updated together with {susemgr}
 . 
 +
 
-
 .Non-editable Directory
-[WARNING]
-====
-You should not edit or add custom Salt data to this directory. 
-====
+WARNING: You should not edit or add custom Salt data to this directory. 
+
 [path]``/srv/pillar``::
 {susemgr}
 by default does not touch or do anything with this directory.
@@ -407,12 +383,9 @@ However the custom pillar data placed here is merged with the pillar result crea
 . 
 +
 
-
 .Editable Directory
-[TIP]
-====
-Place your custom Salt pillar data here. 
-====
+TIP: Place your custom Salt pillar data here. 
+
 == Install the SUSE Manager Locale Formula
 
 
@@ -426,7 +399,6 @@ The following section provides guidance on installing and using SUSE provided Sa
 zypper install locale-formula
 ----
 +
-
 NOTE: This installs the package contents to [path]``/usr/share/susemanager/formulas/{metadata,states}``
 . After installing the RPM, log in to the {susemgr}{webui} . 
 . Browse to the menu:System Details[] page of any minion you would like to apply the formula to. 
@@ -471,7 +443,6 @@ salt '$your_minion' pillar.items
 salt '$your_minion' state.highstate
 ----
 +
-
 NOTE: You can also apply the highstate from the previous formula tab from the {susemgr}{webui}
 by clicking menu:Apply Highstate[]
 . 

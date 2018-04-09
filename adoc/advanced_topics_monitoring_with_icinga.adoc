@@ -93,7 +93,6 @@ host    all             all             ::1/128                 trust
 #host    replication     postgres        ::1/128                 ident
 ----
 +
-
 .Placement of Authentication Settings
 IMPORTANT: Ensure the local entries for icinga authentication settings are placed above all other local entries or you will get an error when configuring the database schema.
 The entries in [path]``pg_hba.conf``
@@ -120,8 +119,8 @@ vi /etc/icinga/ido2db.cfg
  db_port=5432
 ----
 +
-
-.Open Firewall Port`IMPORTANT: Allow port 5432` through your firewall or you will not be able to access the WebGUI.
+.Open Firewall Port
+IMPORTANT: Allow port `5432` through your firewall or you will not be able to access the WebGUI.
 . Create an icinga admin account for logging into the web interface:
 +
 
@@ -181,12 +180,12 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$
 Variable definitions:
 +
 
-server_port::
+server_port:::
 The variable `server_port` defines the port nrpe will listen on.
 The default port is 5666.
 This port must be opened in your firewall.
 
-nrpe_user::
+nrpe_user:::
 The variables `nrpe_user` and `nrpe_group` control the user and group IDs that nrpe will run under. {susemgr}
 probes need access to the database, therefore nrpe requires access to database credentials stored in [path]``/etc/rhn/rhn.conf``
 .
@@ -194,16 +193,16 @@ There are multiple ways to achieve this.
 You may add the user `nagios` to the group `www` (this is already done for other IDs such as tomcat); alternatively you can simply have nrpe run with the effective group ID `www` in [path]``/etc/rhn/rhn.conf``
 .
 
-allowed_hosts::
+allowed_hosts:::
 The variable `allowed_hosts` defines which hosts nrpe will accept connections from.
 Enter the FQDN or IP address of your Icinga server here.
 
-dont_blame_nrpe::
+dont_blame_nrpe:::
 The use of variable `dont_blame_nrpe` is unavoidable in this example. `nrpe` commands by default will not allow arguments being passed due to security reasons.
 However, in this example you should pass the name of the host you want information on to nrpe as an argument.
 This action is only possible when setting the variable to 1.
 
-command[check_systemd.sh]::
+command[check_systemd.sh]:::
 You need to define the command(s) that nrpe can run on {susemgr}
 .
 To add a new nrpe command specify a command call by adding `command` followed by square brackets containing the actual nagios/icinga plugin name.
@@ -422,7 +421,6 @@ exit $STATE_OK
 +
 A current version of this script can be found at: https://github.com/melmorabity/nagios-plugin-systemd-service/blob/master/check_systemd_service.sh
 +
-
 .Non-supported 3rd Party Plugin
 WARNING: The script used in this example is an external script and is not supported by {suse}
 .
