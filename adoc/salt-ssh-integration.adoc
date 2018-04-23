@@ -1,0 +1,140 @@
+= Salt SSH Integration
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+:sectanchors:
+:sectlinks:
+:imagesdir: ../images/src/png
+:homepage: https://github.com/SUSE/doc-susemanager
+:toc:
+:toc-placement!:
+:version: Version 1, 2018-03-20
+
+{version}
+
+The following topic provides an overview of the https://docs.saltstack.com/en/latest/topics/ssh/[Salt SSH] integration with SUSE Manager. This integration adds support for both ssh-push and ssh-push-tunnel connections for Salt minions.
+
+toc::[]
+
+[#ssh-push-overview]
+== SSH Push Overview
+
+Like the traditional stack, Salt minions may use an ssh connection to manage minions in place of https://docs.saltstack.com/en/latest/topics/transports/zeromq.html[Zeromq]. This additional functionality is based on Salt SSH. Salt SSH enables you to execute salt commands and states via ssh without ever needing to install a salt-minion.
+
+When the server executes an action on a minion an ssh connection is made on demand. This connection differs from the always-connected mode used by minions managed via Zeromq.
+
+In SUSE Manager there are two ssh-push methods. In both use cases the server initiates an ssh connection to the minion in order to execute a Salt call using `salt-ssh`. The difference in the two methods is how `zypper/_yum_`  initially connects to the server repositories:
+
+
+[#zypper-connection-methods]
+.zypper Connection Methods:
+ssh-push::
+zypper works as usual. The http(s) connection to the server is created directly.
+
+ssh-push-tunnel::
+The server creates an http(s) connection through an ssh tunnel. The http(s) connection initiated by `zypper` is redirected through the tunnel by means of `/etc/hosts` aliasing (see below). This method should be used for in place firewall setups that block http(s) connections from a minion to the server.
+
+
+[#salt-ssh-integration]
+== Salt SSH Integration
+
+As with all Salt calls, SUSE Manager invokes `salt-ssh` via the `salt-api`.
+
+Salt SSH relies on a Roster to obtain details such as hostname, ports, and ssh parameters of an ssh minion. SUSE Manager keeps these details in the database and makes them available to Salt by generating a temporary Roster file for each salt-ssh call. The location of the temporary Roster file is supplied to salt-ssh using the `--roster-file= option`.
+
+[#authentication-types]
+=== Authentication
+
+salt-ssh supports both password and key authentication. SUSE Manager uses both methods:
+
+[#password-and-key-authentication]
+.Password and Key Authentication:
+
+Bootstrapping Authentication::
+Password authentication is used only when bootstrapping. During the bootstrap step the key of the server is not authorized on the minion and therefore a password must be utilized for a connection to be made. The password is used transiently in a temporary roster file used for bootstrapping. This password is not stored.
+
+Common Salt Call Authentication::
+All other common salt calls use key authentication. During the bootstrap step the ssh key of the server is authorized on the minion (added to a minion's `~/.ssh/authorized_keys` file). Therefore subsequent calls no longer require a password.
+
+
+
+=== User Account for salt-ssh Calls
+
+The user for `salt-ssh` calls made by SUSE Manager is taken from the `ssh_push_sudo_user` setting. The default value of this is `root`.
+
+If the value of `ssh_push_sudo_user` is not `root` then the `--sudo` options of `salt-ssh` are used.
+
+== SSH Push Tunnel HTTP(s) Redirection
+
+For the `ssh-push-tunnel` method the traffic originating from zypper/yum has to be redirected through an ssh tunnel in order to bypass any firewall blocking a direct connection from the minion to the server.
+
+This is achieved by using port `1233` in the repo url:
+
+----
+https://suma-server:1233/repourl...
+----
+
+Next alias the suma-server hostname to localhost in /etc/hosts:
+
+----
+127.0.0.1       localhost    suma-server
+----
+
+The server creates a reverse ssh tunnel that connects `localhost:1233` on the minion to `suma-server:443` (`ssh ... -R 1233:suma-server:443`)
+
+The result is that zypper/yum will actually connect to `localhost:1233` which is then forwarded to `suma-server:443` via the ssh tunnel.
+
+This implies that zypper can contact the server only if the tunnel is open. This happens only when the servers executes an action on the minion. Manual zypper operations that require server connectivity are not possible in this case.
+
+== SUSE Manager Salt SSH Call Sequence
+
+. Prepare the Salt Roster for the call
+.. Create remote port forwarding option IF the contact method is ssh-push-tunnel
+.. Compute the ProxyCommand IF the minion is connected through a proxy
+.. create Roster content:
+* hostname
+* user
+* port
+* remote_port_forwards: the remote port forwarding ssh option
+* ssh_options: other ssh options:
+** ProxyCommand if the minion connects through a SUMA proxy
+* timeout: default 180s
+* minion_opts:
+** master: set to the minion id if contact method is ssh-push-tunnel
+. create a temporary Roster file
+. execute a synchronous salt-ssh call via the API
+. remove the temporary Roster file
+
+See also: https://github.com/SUSE/spacewalk/blob/Manager/java/code/src/com/suse/manager/webui/services/impl/SaltSSHService.java[SaltSSHService.callSyncSSH]
+
+== Bootstrap Process Sequence
+
+Bootstrapping minions uses salt-ssh under the hood. This happens for both regular and ssh minion.
+
+The bootstrap sequence is a bit different than the regular salt-ssh call:
+
+. For a regular minion generate and pre-authorize the Salt key of the minion
+
+. If this is an ssh minion and a proxy was selected retrieve the ssh public key of the proxy using the mgrutil.chain_ssh_cmd runner. The runner copies the public key of the proxy to the server using ssh. If needed it can chain multiple ssh commands to reach the proxy across multiple hops.
+
+. Generate pillar data for bootstrap. Pillar data contains:
+
+mgr_server:: The hostname of the SUSE Manager server
+
+minion_id:: The hostname of the minion to bootstrap
+
+contact_method:: The connection type
+
+mgr_sudo_user:: The user for salt-ssh
+
+activation_key:: If selected
+
+minion_pub:: The public minion key that was pre-authorized
+
+minion_pem:: The private minion key that was pre-authorized
+
+proxy_pub_key:: The public ssh key that was retrieved from the proxy if the target is an ssh minion and a proxy was selected
