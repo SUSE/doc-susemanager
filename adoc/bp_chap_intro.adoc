@@ -1,0 +1,377 @@
+[[_mgr.conceptual.overview]]
+= Introduction
+:doctype: book
+:sectnums:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+
+
+This document targets system administrators. 
+
+== What's Covered in this Guide?
+
+
+This document describes {suse}
+recommended best practices for {susemgr}
+.
+This information has been collected from a large number of successful {susemgr}
+real world implementations and includes feedback provided by product management, sales and engineering. 
+
+include::common_version_info.adoc[leveloffset=2]
+
+
+This chapter will discuss the following topics: 
+
+* Prerequisites 
+* Network Requirements 
+* Hardware Requirements 
+
+
+== Prerequisites
+
+.Purchased Registration Keys
+During initial setup {susemgr}
+will request a product [systemitem]``Registration Key``
+.
+This key will be provided to you after purchasing the product.
+You can find your key located under your {scc}
+ account.
+Log-in with your {scc}
+ credentials or register for a new account. {mdash}https://scc.suse.com
+
+.Evaluation Keys
+If you wish to run a test system (non-production) a 60 day evaluation key may be obtained.
+On the {susemgr}
+product page click __TRY SUSE
+    MANAGER__.
+The evaluation key limits the number of systems that may be registered with SUSE Manager to 10. {mdash}https://www.suse.com/products/suse-manager/
+
+.SCC Organization Credentials
+During setup you will also be asked to enter your {scc}[systemitem]``Organization Credentials``
+. 
+
+.Users and Passwords
+During both the {sle}
+installation and setup of {susemgr}
+several users and passwords will be created: 
+
+* {sle} root user account 
+* PostgreSQL database user and password 
+* Certificate of Authority password 
+* {susemgr} administrator user and password 
+
+
+.Safe Passwords
+[TIP]
+====
+Maintain security by creating safe passwords.
+Store passwords within a secure location.
+Use the following guidelines when creating your passwords. 
+
+* At least 8 characters long 
+* Should contain uppercase characters [command]``A B C``
+* Should contain lowercase characters [command]``a b c``
+* Should contain numbers [command]``1 2 3``
+* Should contain symbols [command]``~ ! @ #``
+
+====
+
+[[_bp.chapt.intro.network.requires]]
+== Network Requirements
+
+{susemgr}
+and {susemgrproxy}
+both contact several external addresses in order to maintain updates and subscriptions.
+The following lists provide the up-to-date hostnames for each service requiring permission when used in combination with corporate firewall and content filters. 
+
+.{scc}Hostnames (Required)
+* https://scc.suse.com
+* https://updates.suse.com
+
+
+.{ncc}Hostnames (Legacy)
+* https://secure-www.novell.com
+* https://nu.novell.com
+
+
+For {susemgr}
+to function properly it requires the following pre-configured components within your network. 
+
+.Websocket Support
+[IMPORTANT]
+====
+If SUSE Manager is accessed via an HTTP proxy (Squid, etc) the proxy must support websocket connections. 
+====
+
+.Networking Hardware
+The following table provides networking hardware info.
+As {susemgr}
+will likely be managing a large number of systems (quite possibly numbering in hundreds or even thousands), networking hardware which increases bandwidth will become increasingly more important. 
+
+[cols="1,1", options="header"]
+|===
+| 
+       
+        Hardware
+       
+      
+| 
+       
+        Recommended
+       
+      
+
+
+|
+
+100Mbits/s Link 
+|
+
+Non-production test server 
+
+|
+
+1Gb/s Link + 
+|
+
+Production Server 
+|===
+
+.DHCP Server
+The purpose of the Dynamic Host Configuration Protocol (DHCP) is to assign network settings centrally (from a server) rather than configuring them locally on each and every workstation.
+A host configured to use DHCP does not have control over its own static address.
+It is enabled to configure itself completely and automatically according to directions from the server.
+A DHCP server supplies not only the IP address and the netmask, but also the host name, domain name, gateway, and name server addresses for the client to use.
+For more information on configuring DHCP see also: 
+
+* https://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_dhcp.html
+
+
+.FQDN
+DNS assists in assigning an IP address to one or more names and assigning a name to an IP address.
+In Linux, this conversion is usually carried out by a special type of software known as bind.
+The machine that takes care of this conversion is called a __name server__.
+The names make up a hierarchical system in which each name component is separated by a period.
+The name hierarchy is, however, independent of the IP address hierarchy described above.
+Consider a complete name, such as jupiter.example.com, written in the format hostname.domain.
+A full name, referred to as a _fully qualified domain name_ (FQDN), consists of a host name and a domain name (example.com). For more information on configuring a name server see also: 
+
+* https://www.suse.com/documentation/sles-12/book_sle_admin/data/sec_basicnet_nameres.html
+
+
+.DNS Server
+DNS (domain name system) is required for resolving domain names and host names into IP addresses.
+For example, the IP address 192.168.2.100 could be assigned to the host name jupiter.
+In the case of {susemgr}
+the DNS server must be resolvable both via DNS and reverse lookup.
+For more information on configuring DNS see also: 
+
+* https://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_dns.html
+
+
+.Microsoft NT Lan Manager Compatibility
+[IMPORTANT]
+====
+Microsoft NT Lan Manager can be configured for use with basic authentication and will work with {susemgr}
+but authentication using native (NTLM) Microsoft protocols is not supported. 
+====
+
+.Open Port List
+During the setup process of {susemgr}
+all required ports will be opened automatically.
+The following tables provide you with an overview of ports which are used by {susemgr}
+. 
+[[_tab.install.ports.server]]
+.Required Server Ports
+[cols="1,1", options="header"]
+|===
+| 
+       
+        Port
+       
+      
+| 
+       
+        Description
+       
+      
+
+|
+
+67 
+|
+
+Required when {susemgr}
+is configured as a DHCP server for systems requesting IP addresses. 
+
+|
+
+69 
+|
+
+Used when {susemgr}
+is configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems. 
+
+|
+
+80 
+|
+
+Used to contact {scc}
+.
+All WebGUI, client, and proxy server requests travel via http or https. 
+
+|
+
+443 
+|
+
+All WebGUI, client, and proxy server requests via http or https and {susemgr}
+uses this port for {scc}
+inbound traffic. 
+
+|
+
+5222 
+|
+
+When you wish to push actions to clients this port is required by the [systemitem]``osad``
+ daemon running on your client systems 
+
+|
+
+5269 
+|
+
+Needed if you push actions to or via a {susemgrproxy}
+. 
+
+|
+
+4505 
+|
+
+Required by the Salt-master to accept communication requests via TCP from minions.
+Inbound. 
+
+|
+
+4506 
+|
+
+Required by the Salt-master to accept communication requests via TCP from minions.
+Inbound. 
+|===
+
+
+For more information, see <<_advanced.topics.app.ports.server>>. 
+
+.Denying External Network Access
+[TIP]
+====
+When your network requires denying external network access to and from {susemgr}
+, an RMT or SMT Server may be registered against {susemgr}
+.
+The RMT or SMT server can then be used to synchronize the necessary {suse}
+repositories.
+For more information on utilizing an RMT or SMT Server, see: <<_disconnect_setup>>. 
+====
+
+.Blocking Port 80
+[NOTE]
+====
+Port 80 may be blocked as traffic is automatically redirected through port 443.
+It should be noted you will lose redirection.
+Keep in mind you will need additional ports open when using traditional clients in combination with [systemitem]``osad``
+ (XMPP TCP 5222). 
+====
+
+== Hardware Recommendations
+
+
+This section provides tested production recommendations for small to mid size networks that will be managed by {susemgr}
+. 
+
+[cols="1,1", options="header"]
+|===
+| 
+       
+        Hardware
+       
+      
+| 
+       
+        Recommended
+       
+      
+
+
+|
+
+CPU 
+|
+
+Multi-core 64bit CPU (x86_64, ppc64le). 
+
+|
+
+RAM 
+|
+
+Minimum 4{nbsp}
+GB+ for test server 
+
+Minimum 16{nbsp}
+GB+ for base installation 
+
+Minimum 32{nbsp}
+GB+ for a production server 
+
+|
+
+Free Disk Space 
+|
+
+Minimum 100{nbsp}
+GB for root partition 
+
+Minimum 50{nbsp}
+GB for [path]``/var/lib/pgsql``
+
+Minimum 50{nbsp}
+GB per SUSE product + 200 GB per Red Hat product [path]``/var/spacewalk``
+|===
+
+.Advised Number of CPUs
+Review the following list for CPU recommendations. 
+
+* Connecting 200 systems or less to {susemgr} : 4 CPUs 
+* Connecting 500 systems or less to {susemgr} : 4-8 CPUs 
+* When implementing RHEL channels: 8 CPUs 
+
+
+.Disk Space
+{susemgr}
+stores information in several directories.
+For these directories it is strongly recommend that you create separate file-systems or use an NFS share.
+During installation one VG will be created that contains all disks selected during installation.
+Therefore the first disk should be large enough to contain the OS.
+Normally 20GB - 50GB is sufficient.
+A 50 GB partition would be the recommended size.
+The following directories should be created on a separate file-system. 
+
+* `/var/spacewalk` This directory will contain all rpm's. Each RPM will be stored only once. The needed size will depend on the number of channels and type of channels that will be downloaded. The general rule would be that per SUSE Service Pack (including SUSE RedHat Expanded Support) around 50 GB should be enough. An extra 150 GB for RES/CentOS repositories should be added on top. If other non-enterprise distributions (eg OpenSUSE) are added,  calculated 50 GB per distribution. This directory could also be stored on an NFS share. 
+* `/var/lib/pgsql` This directory contains the PostgreSQL database. Recommended is to create a file-system of 50 GB. This volume should be monitored, because a full file-system where the database is running on can cause unexpected errors (and this even months after it happened). 
+* `/srv/tftpboot` If PXE/cobbler is used, this directory will contain the images (initrd and linux) for all created auto-installation profiles. Each image is around 50 MB. Depending on the number of profiles a decision has to be made if it would be useful to move this directory to a separate file-system. 
+* `/var/log` As SUSE Manager writes a large number of logs, it is recommended to create a separate file-system for /var/log. The size should be around 20 GB. 
+* ``/var/spacewalk/db_backup``For the backup of the PostgreSQL database, it is recommended the create a separate directory. As the database can be rather large, it is advised to mount it on a separate file-system. A safe estimate would be to provide twice space as for the directory created for ``/var/lib/pqsql``. 
+
+
+.Supported Databases
+{susemgr}
+ 3 and later no longer provides support for an external Oracle database.
+The default database is an embedded PostgreSQL.
+During {susemgr}
+setup the database will be created and configured. 
