@@ -14,5 +14,4 @@ perl -p -i -e 's/([^\$])\{(\w+)\}/\1\&$2\;/g' asciidoctor/$1
 # make .ent files available
 cp xml/*ent asciidoctor/xml
 daps -m asciidoctor/xml/$NAME.xml --styleroot /usr/share/xml/docbook/stylesheet/suse2013-ns html
-ln -sf ../../../../../adoc/images asciidoctor/build/MAIN-manager/html/MAIN-manager/images
-
+ln -sf ../../../../../adoc/images asciidoctor/build/MAIN-manager/html/MAIN-manager
