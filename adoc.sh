@@ -4,6 +4,7 @@ export NAME=`basename $FILE .xml`
 echo "Converting $NAME"
 rm -rf asciidoctor
 docbookrx --strict xml/$NAME.xml
+mkdir -p adoc
 mv xml/*adoc adoc
 #asciidoctor -b html -d book -D asciidoctor/html xml/$NAME.adoc
 asciidoctor -b docbook5 -d book -D asciidoctor/xml adoc/$NAME.adoc
@@ -13,5 +14,6 @@ sed -i '2i <!DOCTYPE set [ <!ENTITY % entities SYSTEM "entity-decl.ent"> %entiti
 perl -p -i -e 's/([^\$])\{(\w+)\}/\1\&$2\;/g' asciidoctor/$1
 # make .ent files available
 cp xml/*ent asciidoctor/xml
-daps -m asciidoctor/xml/$NAME.xml --styleroot /usr/share/xml/docbook/stylesheet/suse2013-ns html
-ln -sf ../../../../../adoc/images asciidoctor/build/MAIN-manager/html/MAIN-manager
+daps -m asciidoctor/xml/$NAME.xml --verbosity=0 --styleroot /usr/share/xml/docbook/stylesheet/suse2013-ns html
+rm -rf asciidoctor/build/$NAME/html/$NAME/images
+ln -sf ../../../../../adoc/images asciidoctor/build/$NAME/html/$NAME
