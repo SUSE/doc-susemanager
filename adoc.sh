@@ -13,7 +13,7 @@ sed -i '2i <!DOCTYPE set [ <!ENTITY % entities SYSTEM "entity-decl.ent"> %entiti
 # replace {foo} (but not ${foo}) with &foo;
 perl -p -i -e 's/([^\$])\{(\w+)\}/\1\&$2\;/g' asciidoctor/$FILE
 # make .ent files available
-cp xml/*ent asciidoctor/xml
+cp entities/*ent asciidoctor/xml
 daps -m asciidoctor/xml/$NAME.xml --verbosity=0 --styleroot /usr/share/xml/docbook/stylesheet/suse2013-ns html
 rm -rf asciidoctor/build/$NAME/html/$NAME/images
 ln -sf ../../../../../adoc/images asciidoctor/build/$NAME/html/$NAME
