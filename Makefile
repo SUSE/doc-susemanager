@@ -48,6 +48,12 @@ quick-pdf:
 online-docs:
 	daps -vvv -d DC-create-all --force online-docs
 
+dist: xml
+	mkdir -p images/src
+	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/*.png .)
+	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/*.svg .)
+	daps -d DC-create-all-adoc package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc
+
 package: package/doc-susemanager-develop.tar.bz2
 #add origin in front of develop to build for jenkins
 package/doc-susemanager-develop.tar.bz2:
