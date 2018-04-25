@@ -1,10 +1,27 @@
 
 all: html pdf
 
-html:
-	daps -d DC-create-all html
+xml: xml/MAIN-manager.xml
 
-pdf:
+xml/MAIN-manager.xml: adoc/*.adoc
+	asciidoctor -b docbook5 -d book -D xxml adoc/MAIN-manager.adoc
+	# insert ENTITY
+	sed -i '2i <!DOCTYPE set [ <!ENTITY % entities SYSTEM "entity-decl.ent"> %entities; ]>' xxml/MAIN-manager.xml
+	# replace {foo} (but not ${foo}) with &foo;
+	perl -p -i -e 's/([^\$$])\{(\w+)\}/\1\&$$2\;/g' xxml/MAIN-manager.xml
+	# make .ent files available
+	(cd xxml; ln -s ../entities/*ent .)
+	mv xxml xml
+
+#daps -m xml/$NAME.xml --verbosity=0 --styleroot /usr/share/xml/docbook/stylesheet/suse2013-ns html
+#rm -rf build/$NAME/html/$NAME/images
+#ln -sf ../../../../adoc/images build/$NAME/html/$NAME
+
+html: xml
+	daps -d DC-create-all html
+	(cd build/create-all/html/create-all; rm -rf images; ln -sf ../../../../adoc/images .)
+
+pdf: xml
 	daps -d DC-create-all pdf
 
 advanced:
@@ -39,4 +56,7 @@ package/doc-susemanager-develop.tar.bz2:
 clean:
 	rm -rf package/doc-susemanager-develop.tar.bz2
 	rm -rf package/*~
-
+	rm -rf images
+	rm -rf xml
+	rm -rf xxml
+	rm -rf build
