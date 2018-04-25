@@ -10,7 +10,8 @@ xml/MAIN-manager.xml: adoc/*.adoc
 	# replace {foo} (but not ${foo}) with &foo;
 	perl -p -i -e 's/([^\$$])\{(\w+)\}/\1\&$$2\;/g' xxml/MAIN-manager.xml
 	# make .ent files available
-	(cd xxml; ln -s ../entities/*ent .)
+	(cd xxml; ln -sf ../entities/*ent .)
+	rm -rf xml
 	mv xxml xml
 
 #daps -m xml/$NAME.xml --verbosity=0 --styleroot /usr/share/xml/docbook/stylesheet/suse2013-ns html
