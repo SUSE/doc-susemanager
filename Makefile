@@ -1,7 +1,12 @@
 
 all: html pdf
 
-xml: xml/MAIN-manager.xml
+xml: xml/MAIN-manager.xml images
+
+images: adoc/images/*
+	mkdir -p images/src
+	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/*.png .)
+	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/*.svg .)
 
 xml/MAIN-manager.xml: adoc/*.adoc
 	asciidoctor -b docbook5 -d book -D xxml adoc/MAIN-manager.adoc
@@ -50,9 +55,6 @@ online-docs:
 	daps -vvv -d DC-create-all --force online-docs
 
 dist: xml
-	mkdir -p images/src
-	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/*.png .)
-	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/*.svg .)
 	daps -d DC-create-all-adoc package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc
 
 package: package/doc-susemanager-develop.tar.bz2
