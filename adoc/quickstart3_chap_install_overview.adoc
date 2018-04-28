@@ -79,7 +79,9 @@ Distribution Management::
 {susemgr} may be integrated within your network infrastructure in multiple ways.
 In this guide you will perform the following steps for an initial test setup.
 
+// TODO: This section is outdated, bring it up-to-date
 * Install {sls} with {susemgr} as an extension
+* Setup SUSE Manager Server via YaST
 * Register {susemgr} with SCC (SUSE Customer Center)
 * Synchronize a repository channel for use with both traditional clients and Salt minions
 * Create an authentication key to act as an ID for the synced repository channel
@@ -228,13 +230,7 @@ If {susemgr} will also push to a {susemgr} proxy, you must allow inbound connect
 | 69   | Inbound          | Used when configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems
 | 80   | Outbound         | Used to contact {scc}
 | 443  | Inbound          | All WebUI, traditional client, and proxy server requests and {susemgr} uses this port for {scc} inbound traffic
-| 443  | Outbound         | {susemgr} uses this port to reach {scc} unless running in disconnected mode with RMT or SMT as described here:
-ifndef::env-github[]
-<<_disconnect_setup>>
-endif::[]
-ifdef::env-github[]
-<<bp_chap_choosing_dist_scheme.adoc#bp-dist-scheme, Disconnected Setup>>
-endif::[]
+| 443  | Outbound         | {susemgr} uses this port to reach {scc} unless running in disconnected mode with RMT or SMT
 | 4505 | Inbound          | Required by the Salt-master to accept communication requests via TCP from minions
 | 4506 | Inbound          | Required by the Salt-master to accept communication requests via TCP from minions
 | 5222 | Inbound          | When you wish to push actions to clients this port is required by the _osad_ daemon running on the client systems
@@ -242,10 +238,17 @@ endif::[]
 |      | Outbound         | Squid HTTP proxy for outgoing connections. It could be any port you configure
 |===
 
-For more information, see:
+For more information on disconnected setup and ports, see:
+ifndef::env-github[]
+* <<_disconnect_setup>>
+endif::[]
 ifdef::env-github[]
-<<advanced_topics_ports.adoc#at-ports, Firewall Ports>>
+* <<bp_chap_choosing_dist_scheme.adoc#bp-dist-scheme, Disconnected Setup>>
+endif::[]
+
+ifdef::env-github[]
+* <<advanced_topics_ports.adoc#at-ports, Firewall Ports>>
 endif::[]
 ifndef::env-github[]
-<<_advanced.topics.app.ports.server>>
+* <<_advanced.topics.app.ports.server>>
 endif::[]
