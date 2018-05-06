@@ -1,116 +1,141 @@
 [[_ref.webui.admin]]
 = Admin
+ifdef::env-github,backend-html5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:linkattrs:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Linux Enterprise
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:susemgr: SUSE Manager
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:saltversion: 2018.3.0
+:webui: WebUI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+endif::[]
+// Asciidoctor Front Matter
 :doctype: book
-:sectnums:
+:sectlinks:
 :toc: left
 :icons: font
 :experimental:
 :sourcedir: .
-:imagesdir: ./images
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
 :imagesdir: images
 
 
-The menu:Admin[]
- pages allows {susemgr}
- customers to manage the basic configuration, including creating and managing multiple organizations.
-Only the {susemgr}
- administrator can access the menu:Admin[]
- pages.
+The menu:Main Menu[Admin] pages allows {susemgr} customers to manage the basic configuration, including creating and managing multiple organizations.
+Only the {susemgr} administrator can access the menu:Main Menu[Admin] pages.
+
 
 [[_ref.webui.admin.wizard]]
-== menu:Admin[] > menu:Setup Wizard[]
+== menu:Main Menu[Admin > Setup Wizard]
 
+Setting up {susemgr} typically requires some extra steps after installation for common configuration tasks.
 
-Setting up {susemgr}
-typically requires some extra steps after installation for common configuration tasks.
-
-The menu:Setup Wizard[]
- link is displayed when the {susemgr}
- Web interface is used for the fist time and can be accessed later at any time by clicking menu:Admin[Setup Wizard]
-.
-On the three tabs configure the HTTP proxy server, organization credentials, and {suse}
- products.
+The menu:Main Menu[Admin > Setup Wizard] link is displayed when the {susemgr} {webui} is used for the fist time and can be accessed later at any time by clicking menu:Main Menu[Admin > Setup Wizard].
+On the three tabs configure the HTTP proxy server, organization credentials, and {suse} products.
 
 menu:HTTP Proxy:[]::
-Configure a proxy server that {susemgr}
-will use to access SCC ({suse}
-Customer Center) and other remote servers here.
+If needed configure a proxy server that {susemgr} will use to access SCC ({suse} Customer Center) and other remote servers here.
+Use `hostname:port` syntax in the menu:Hostname[] field if the proxy port is not 8080.
+Clearing the fields disables proxy.
 +
-
 
 image::admin_proxy_settings.png[scaledwidth=80%]
 +
-Use `hostname:port` syntax in the menu:Hostname[]
-field if the proxy port is not 8080.
-Clearing the fields disables proxy.
 
 menu:Organization Credentials:[]::
-Click menu:Add a new credential[]
-and enter user name and password to allow a user to access SCC.
+Select menu:Admin[Setup Wizard > Organization Credentials > Add a new credential] then enter user name and password to give another organization/user access to {SCC}.
 +
-
 
 image::admin_organization_credentials.png[scaledwidth=80%]
 +
+
 After saving, a new credential card will be displayed.
 Buttons below the credential card allow you to:
-** see the credential validation status (green tick or red cross icon). To re-check the credential with SCC, click the icon;
-** set the primary credentials for inter-server synchronization (yellow star icon);
-** list the subscriptions related to a certain credential (list icon);
-** edit the credential (pencil icon);
-** delete the credential (trash can icon).
+
+* Check credential validation status (green tick or red cross icon).
+To re-check the credential with SCC, click the icon.
+* Set the primary credentials for inter-server synchronization (yellow star icon).
+* List the subscriptions related to a certain credential (list icon).
+* Edit the credential (pencil icon).
+* Delete the credential (trash can icon).
+
 
 [[_vle.webui.admin.wizard.products]]
-menu:SUSE Products:[]::
-On the menu:Main Menu[Admin > SUSE Products]
-page, select product-specific channels you are entitled to.
+menu:Main Menu[Admin > SUSE Products]::
+On the menu:Main Menu[Admin > SUSE Products] page, select product-specific channels you are entitled to.
 +
 
 image::admin_suse_products.png[scaledwidth=80%]
 +
-The products displayed are directly linked to your organization credentials and your {suse}
-subscriptions.
-Product extension and module lists are shown when you click the arrow sign to the left of the product description.
+
+The products displayed are directly linked to your organization credentials and your {suse} subscriptions.
+Product extension and module lists are shown when you click the btn:[arrow] to the left of the product description.
 This is a cascading mechanism and allows to unfold several levels according to the integration of the extensions and modules in the base product.
 +
-Products based on SUSE Linux Enterprise 15 or higher have a toggle button named menu:include recommended[]
-.
+
+Products based on SUSE Linux Enterprise 15 or higher have a toggle button named btn:[include recommended].
 When the toogle button is enabled on a base product, recommended extensions and modules are automatically selected for synchronization.
-Once the menu:include recommended[]
-option is enabled, you may uncheck product child channels you are not interested in syncing.
+Once the btn:[include recommended] button is enabled, you may uncheck product child channels you are not interested in syncing.
 Recommended channels are labeled accordingly.
 You cannot disable required channels.
 +
-If you click the menu:Channels[]
-icon in a row of a product, a popup lists the underlying channels (repositories) that build the product.
+
+If you click the menu:Channels[] icon in a row of a product, a popup lists the underlying channels (repositories) that build the product.
 +
+
 In the row above the product listing two filter options are available:
-** Search by the product description. The filter limits the search on the base products.
-** Filter by architecture. Click in the search field (or press kbd:[Enter] ) and then select from drop-down menu. You can repeat this as often as wanted. To remove an architecture either click the "`x`" symbol (or press kbd:[Backspace] ).
 
-+
-After you have made your selection, click menu:Add products[]
-in the upper right area.
-This equals running [command]``mgr-sync add products`` or [command]``mgr-sync`` without any argument.
-+
-At the right in a dedicated pane, you can see the progress of the synchronization process.
+* Search by the product description. The filter limits the search to base products.
+* Filter by architecture.
+Click in the search field (or press kbd:[Enter] ) and then select from drop-down menu.
+You can repeat this as often as necessary.
+To remove an architecture either click the "`x`" symbol (or press kbd:[Backspace] ).
 +
 
+Once you have made your selection(s), click btn:[Add products] in the upper right area.
+This is equivalent to running [command]``mgr-sync add products`` or [command]``mgr-sync`` without any arguments.
++
+
+View the synchronization progress in the status bar field to the right.
++
+
+[NOTE]
 .Synchronization Time
-NOTE: Channel synchronization will start and might take several hours.
-When finished the corresponding channels can be used in {susemgr}
-.
+====
+Channel synchronization will start and might take several hours.
+When finished the corresponding channels can be used in {susemgr}.
+====
 +
 
-
-+
+[IMPORTANT]
 .If Synchronization Fails
-IMPORTANT: SUSE does not automatically trust 3rd party GPG keys.
+====
+SUSE does not automatically trust 3rd party GPG keys.
 If a reposync fails check if an untrusted GPG key is the cause by viewing the log files located in:
 
 ----
@@ -125,91 +150,69 @@ nvidia-driver-x86_64', '--type', 'yum', '--non-interactive']
 ChannelException: The GPG key for this repository is not part of the keyring.
 Please run spacewalk-repo-sync in interactive mode to import it.
 ----
+====
 +
 
-
-+
-Alternatively, you can add listed channels right away by clicking the menu:Add this product[]
-button in the status column.
+Alternatively, you can add listed channels right away by clicking the menu:Add this product[] button in the status column.
 A progress bar will be displayed.
 The main product will expand, and now you can select add-on products belonging to the product that is currently added.
-To check for required channels, click the list icon in the menu:Channels[]
-column.
-When a product is downloaded and ready to use, the state will change to menu:Finished[]
-.
-
+To check for required channels, click the list icon in the menu:Channels[] column.
+When a product is downloaded and ready to use, the state will change to menu:Finished[].
 
 [[_ref.webui.admin.org]]
-== menu:Admin[] > menu:Organizations[]
+== menu:Main Menu[Admin > Organizations]
 
-
-The organizations feature allows {susemgr}
-administrators to create and manage multiple organizations across {susemgr}
-.
+The organizations feature allows {susemgr} administrators to create and manage multiple organizations across {susemgr}.
 Administrators can control an organization's access to system management tasks.
 
-
 image::admin_list_organizations.png[scaledwidth=80%]
-
 
 If you click the name of an organization, the Organization Details page appears.
 
 [[_s2_sattools_org_details_details]]
-=== menu:Organization Details[] > menu:Details[]
+=== menu:Organizations[Organization Details]
 
-
-The menu:Organization Details[]
- page lists the details of the selected organization.
-
+The menu:Organization[Organization Details] page lists the details of the selected organization.
 
 image::admin_organization_details.png[scaledwidth=80%]
 
+The following details are available:
 
-The following details are avialable:
-
-* menu:Organization Name[] : String (between 3 and 128 characters). This is the only value that you can change here. When done, confirm with clicking the menu:Update Organization[] button.
-* menu:Organization ID[] : Number
-* menu:Active Users[] : Number. Clicking this number will open the menu:Users[] tab. For more information, see <<_s2_sattools_org_details_users>>.
-* menu:Systems[] : Number
-* menu:System Groups[] : Number
-* menu:Activation Keys[] : Number
-* menu:Autoinstallation Profiles[] : Number
-* menu:Configuration Channels[] : Number
-
+* menu:Organization Details[Organization Name] : String (between 3 and 128 characters).
+This is the only value that you can change here.
+When done, confirm with clicking the btn:[Update Organization] button.
+* menu:Organization Details[Organization ID] : Number
+* menu:Organization Details[Active Users] : Number. Clicking this number will open the menu:Organization Details[Users] tab. For more information, see <<_s2_sattools_org_details_users>>.
+* menu:Organization Details[Systems] : Number
+* menu:Organization Details[System Groups] : Number
+* menu:Organization Details[Activation Keys] : Number
+* menu:Organization Details[Autoinstallation Profiles] : Number
+* menu:Organization Details[Configuration Channels] : Number
 
 [[_s2_sattools_org_details_users]]
-=== menu:Organization Details[] > menu:Users[]
-
+=== menu:Organization Details[Users]
 
 List of all the users of an organization.
 
-
 image::admin_organization_users.png[scaledwidth=80%]
-
 
 You can modify the user details if you belong to that organization and have organization administrator privileges.
 For more information, see <<_ref.webui.admin.users>>.
 
 [[_s2_sattools_org_details_trust]]
-=== menu:Organization Details[] > menu:Trust[]
-
+=== menu:Organization Details[Trust]
 
 Here establish trust between organizations.
 
-
 image::admin_organization_trusts.png[scaledwidth=80%]
 
-
 Such a trust allows sharing contents and migrate systems between these two organizations.
-You may add a trust by checking the box next to an organization (or remove a trust by unchecking it) and clicking the menu:Modify Trusts[]
- button.
+You may add a trust by checking the box next to an organization (or remove a trust by unchecking it) and clicking the menu:Modify Trusts[] button.
 
 [[_s2_sattools_org_details_conf]]
-=== menu:Organization Details[] > menu:Configuration[]
+=== menu:Organization Details[Configuration]
 
-
-Here you enable the Organization Administrator to manage Organization configuration, configure the organization to use staged contents ("`pre-fetching`"
- packages, etc.), set up software crash reporting, and upload of SCAP files.
+Allow the Organization Administrator to manage Organization configuration, configure the organization to use staged contents ("`pre-fetching`" packages, etc.), set up software crash reporting, and upload of SCAP files.
 
 
 image::admin_organization_configuration.png[scaledwidth=80%]
