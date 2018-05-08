@@ -35,6 +35,7 @@ ifdef::env-github,backend-html5[]
 :sle: SUSE Linux Enterprise
 :slsa: SLES
 :suse: SUSE
+:ay: AutoYaST
 endif::[]
 // Asciidoctor Front Matter
 :doctype: book
@@ -1112,41 +1113,30 @@ For example, the higher-ranked channel may have an [path]``httpd.conf`` file tha
 [[_s4_sm_system_details_kick]]
 === System Details >  Provisioning  [Management]
 
+The menu:Provisioning[] tab and its subtabs allow you to schedule and monitor AutoYaST or Kickstart installations and to restore a system to its previous state.
 
-The menu:Provisioning[]
- tab and its subtabs allow you to schedule and monitor {ay}
- or Kickstart installations and to restore a system to its previous state.
-
-.Available for Clients Using the "`Traditional`"Method
 [NOTE]
+.Available for Clients Using the "`Traditional`"Method
 ====
-The note menu:Provisioning[]
- tab will be available when adding a client using the "`traditional`"
- method (system type ``management``). Using Salt the menu:Provisioning[]
- tab will not be available (system type ``salt``).
+The note menu:Provisioning[] tab will be available when adding a client using the "`traditional`" method (system type ``management``). Using Salt the menu:Provisioning[] tab will not be available (system type ``salt``).
 ====
 
-{ay}
-is a {sle}
-and Kickstart is a Red Hat utility{mdash}
-both allow you to automate the reinstallation of a system.
+{ay} is a {sle} and Kickstart is a Red Hat utility - both allow you to automate the reinstallation of a system.
 Snapshot rollbacks provide the ability to revert certain changes on the system.
 You can roll back a set of RPM packages, but rolling back across multiple update levels is not supported.
 Both features are described in the sections that follow.
 
+
+
 [[_s5_sdc_provisioning_kickstart]]
 ==== System Details  >  Provisioning  >  Autoinstallation
 
-The menu:Schedule[]
- subtab allows you to configure and schedule an autoinstallation for this system.
+The menu:Schedule[] subtab allows you to configure and schedule an autoinstallation for this system.
 For background information about autoinstallation, see <<_ref.webui.systems.autoinst>>.
-
 
 image::system_details_traditional_provisioning_schedule_wizard.png[scaledwidth=80%]
 
-
-In the menu:Schedule[]
- subtab, schedule the selected system for autoinstallation.
+In the menu:Schedule[] subtab, schedule the selected system for autoinstallation.
 Choose from the list of available profiles.
 
 [NOTE]
@@ -1155,109 +1145,79 @@ You must first create a profile before it appears on this subtab.
 If you have not created any profiles, refer to <<_ref.webui.systems.autoinst.profiles.create>> before scheduling an autoinstallation for a system.
 ====
 
-
-To alter autoinstallation settings, click the menu:Advanced Configuration[]
- button.
+To alter autoinstallation settings, click the menu:Advanced Configuration[] button.
 Configure the network connection and post-installation networking information.
 You can aggregate multiple network interfaces into a single logical "bonded" interface.
-In menu:Kernel Options[]
- specify kernel options to be used during autoinstallation. menu:Post Kernel Options[]
- are used after the installation is complete and the system is booting for the first time.
+In menu:Kernel Options[] specify kernel options to be used during autoinstallation. menu:Post Kernel Options[] are used after the installation is complete and the system is booting for the first time.
 Configure package profile synchronization.
 
-Select a time for the autoinstallation to begin and click menu:Schedule Autoinstall and Finish[]
- for all changes to take effect and to schedule the autoinstallation.
+Select a time for the autoinstallation to begin and click menu:Schedule Autoinstall and Finish[] for all changes to take effect and to schedule the autoinstallation.
 
-Alternatively, click menu:Create PXE Installation Configuration[]
- to create a Cobbler system record.
+Alternatively, click menu:Create PXE Installation Configuration[] to create a Cobbler system record.
 The selected autoinstallation profile will be used to automatically install the configured distribution next time that particular system boots from PXE.
-In this case {susemgr}
- and its network must be properly configured to allow boot using PXE.
+In this case {susemgr} and its network must be properly configured to allow boot using PXE.
 
 [NOTE]
 ====
-Any settings changed on the menu:Advanced Configuration[]
- page will be ignored when creating a PXE installation configuration for Cobbler.
+Any settings changed on the menu:Advanced Configuration[] page will be ignored when creating a PXE installation configuration for Cobbler.
 ====
 
 
-The menu:Variables[]
- subtab can be used to create Kickstart variables, which substitute values in Kickstart files.
+The menu:Variables[] subtab can be used to create Kickstart variables, which substitute values in Kickstart files.
 To define a variable, create a name-value pair ([replaceable]``name/value``) in the text box.
 
-For example, to {kickstart}
-a system that joins the network of a specific organization (for example the Engineering department) you can create a profile variable to set the IP address and the gateway server address to a variable that any system using that profile will use.
-Add the following line to the menu:Variables[]
- text box:
+For example, to {kickstart} a system that joins the network of a specific organization (for example the Engineering department) you can create a profile variable to set the IP address and the gateway server address to a variable that any system using that profile will use.
+Add the following line to the menu:Variables[] text box:
 
 ----
 IPADDR=192.168.0.28
 GATEWAY=192.168.0.1
 ----
 
-
 To use the system variable, use the name of the variable in the profile instead of the value.
-For example, the [option]``network`` portion of a {kickstart}
- file could look like the following:
+For example, the [option]``network`` portion of a {kickstart} file could look like the following:
 
 ----
 network --bootproto=static --device=eth0 --onboot=on --ip=$IPADDR \
   --gateway=$GATEWAY
 ----
 
-
 The [option]``$IPADDR`` will be ``192.168.0.28``, and the [option]``$GATEWAY`` will be ``192.168.0.1``.
 
 [NOTE]
 ====
-There is a hierarchy when creating and using variables in {kickstart}
-files.
-System {kickstart}
-variables take precedence over profile variables, which in turn take precedence over distribution variables.
-Understanding this hierarchy can alleviate confusion when using variables in {kickstart}
-s.
+There is a hierarchy when creating and using variables in {kickstart} files.
+System {kickstart} variables take precedence over profile variables, which in turn take precedence over distribution variables.
+Understanding this hierarchy can alleviate confusion when using variables in {kickstart}.
 ====
 
-
 Using variables are one part of the larger Cobbler infrastructure for creating templates that can be shared between multiple profiles and systems.
-For more information about Cobbler and {kickstart}
-templates, refer to <<_advanced.topics.cobbler>>.
+For more information about Cobbler and {kickstart} templates, refer to <<_advanced.topics.cobbler>>.
 
 [[_s5_sdc_provisioning_powermgnt]]
 ==== System Details  >  Provisioning  >  Power Management
 
-{susemgr}
-allows you to power on, off, and reboot systems via the IPMI protocol if the systems are IPMI-enabled.
-
+{susemgr} allows you to power on, off, and reboot systems via the IPMI protocol if the systems are IPMI-enabled.
 
 image::system_details_traditional_provisioning_power_management.png[scaledwidth=80%]
 
-
-You need a fully patched {susemgr}
-installation.
-To use any power management functionality, IPMI configuration details must be added to {susemgr}
-.
-First select the target system on the systems list, then select menu:Provisioning[Power
-     Management]
-.
-On the displayed configuration page, edit all required fields (marked with a red asterisk) and click menu:Save[]
-.
+You need a fully patched {susemgr} installation.
+To use any power management functionality, IPMI configuration details must be added to {susemgr}.
+First select the target system on the systems list, then select menu:Provisioning[Power Management].
+On the displayed configuration page, edit all required fields (marked with a red asterisk) and click menu:Save[].
 
 Systems can be powered on, off, or rebooted from the configuration page via corresponding buttons.
 Note that any configuration change is also saved in the process.
-The menu:Save and Get Status[]
- button can also be used to query for the system's power state.
-If configuration details are correct, a row is displayed with the current power status ("on" or "off"). If a power management operation succeeds on a system, it will also be noted in its menu:Events[History]
- subtab.
+The menu:Save and Get Status[] button can also be used to query for the system's power state.
+If configuration details are correct, a row is displayed with the current power status ("on" or "off").
+If a power management operation succeeds on a system, it will also be noted in its menu:Events[History] subtab.
 
 Power management functionalities can also be used from the system set manager to operate on multiple systems at the same time.
 Specifically, you can change power management configuration parameters or apply operations (power on, off, reboot) to multiple systems at once:
 
-
 . Add the respective systems to the system set manager as described in <<_ref.webui.systems.ssm>>.
 . Click menu:Manage[] (in the upper right corner), then menu: Provisioning[Power Management Configuration] to change one or more configuration parameters for all systems in the set. Note that any field left blank will not alter the configuration parameter in selected systems.
 . When all configuration parameters are set correctly, click menu:Manage[] , then menu:Provisioning[Power Management Operations] to power on, off or reboot systems from the set.
-
 
 To check that a power operation was executed correctly, click menu:System Set Manager[Status]
  on the left-hand menu, then click the proper line in the list.
