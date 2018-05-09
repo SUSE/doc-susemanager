@@ -57,7 +57,7 @@ In addition to the SUSE Manager Web interface, SUSE Manager offers two command l
 There is a complementary Actions Control tool used to enable and disable configuration management on client systems.
 To use these tools they must be installed.
 
-To work with these tools install them from the SUSE Manager Tools child channel.
+To work with *mgrcfg-manager*, *mgrcfg-client* and *mgrcfg-actions*, install the following tools from the SUSE Manager Tools child channel.
 
 ----
 zypper in rhncfg-client rhncfg-manager rhncfg-actions
@@ -70,6 +70,9 @@ When a configuration file is deployed via SUSE Manager, a backup of the previous
 The backup retains its filename but has a _.rhn-cfg-backup_ extension appended.
 ====
 
+
+
+[_cli-mgr-actions-control]
 === Actions Control (mgr-actions-control)
 
 The Actions Control (mgr-actions-control) application is used to enable and disable configuration management on a system.
@@ -139,7 +142,51 @@ A common option is [command]``mgr-actions-control --enable-all``.
 
 
 
+[_cli-mgrcfg-client-tool]
+=== Configuration Client (mgrcfg-client)
 
+The Configuration Client (mgrcfg-client) is installed on and run from an individual client system to gain knowledge about how SUSE Manager deploys configuration files to the client.
+
+The Configuration Client offers these primary modes: list, get, channels, diff, and verify.
+
+==== Listing Config Files
+
+To list the configuration files for the machine and the labels of the config channels containing them, issue the command:
+
+----
+mgrcfg-client list
+----
+
+The output resembles the following list (“DoFoS” is a shortcut for “D or F or S”, which means “Directory”, “File”, or “Something else”(?)):
+
+----
+DoFoS   Config Channel      File
+F      config-channel-17   /etc/example-config.txt
+F      config-channel-17   /var/spool/aalib.rpm
+F      config-channel-14   /etc/rhn/rhn.conf
+----
+
+These configuration files apply to your system.
+However, there may be duplicate files present in other channels.
+For example, issue the following command:
+
+----
+mgrcfg-manager list config-channel-14
+----
+
+and observe the following output:
+
+----
+Files in config channel 'config-channel-14'
+/etc/example-config.txt /etc/rhn/rhn.conf
+----
+
+You may wonder why the second version of [path]``/etc/example-config.txt`` in *config-channel-14* does not apply to the client system.
+The rank of the [path]``/etc/example-config.txt`` file in *config-channel-17* was higher than that of the same file in *config-channel-14*.
+As a result, the version of the configuration file in config-channel-14 is not deployed for this system, therefore mgrcfg-client command does not list the file.
+
+
+[_syncing-suse-mgr-repositories-scc]
 === Syncing SUSE Manager Repositories from SCC (mgr-sync)
 
 [command]``mgr-sync`` should be used if SUSE Manager is connected to SUSE Customer Center (SCC).
