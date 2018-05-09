@@ -1,0 +1,250 @@
+[[_command.line.tools]]
+= SUSE Manager Command Line Tools
+ifdef::env-github,backend-html5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:linkattrs:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Linux Enterprise
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:susemgr: SUSE Manager
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:saltversion: 2018.3.0
+:webui: WebUI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+:ay: AutoYaST
+endif::[]
+// Asciidoctor Front Matter
+:doctype: book
+:sectlinks:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:imagesdir: images
+
+== Command Line Tools and Packages
+
+In addition to the SUSE Manager Web interface, SUSE Manager offers two command line tools for managing (Traditional) system configuration files :
+
+
+* The Configuration Client
+* The Configuration Manager
+
+There is a complementary Actions Control tool used to enable and disable configuration management on client systems.
+To use these tools they must be installed.
+
+To work with these tools install them from the SUSE Manager Tools child channel.
+
+----
+zypper in rhncfg-client rhncfg-manager rhncfg-actions
+----
+
+[TIP]
+.Configuration File Backups
+====
+When a configuration file is deployed via SUSE Manager, a backup of the previous file including its full path is stored in the [path]``/var/lib/rhncfg/backups/``.
+The backup retains its filename but has a _.rhn-cfg-backup_ extension appended.
+====
+
+=== Actions Control (mgr-actions-control)
+
+The Actions Control (mgr-actions-control) application is used to enable and disable configuration management on a system.
+Client systems cannot be managed in this fashion by default.
+This tool allows SUSE Manager administrators to enable or disable specific modes of allowable actions such as:
+
+* Deploying a configuration file on the system
+* Uploading a file from the system
+* Using the diff command to find out what is currently managed on a system with what is available
+* Running remote commands
+
+These various modes are enabled/disabled by placing/removing files and directories in the /etc/sysconfig/rhn/allowed-actions/ directory. Due to the default permissions of the /etc/sysconfig/rhn/ directory, Actions Control has to be run by someone with root access.
+
+==== General command line options
+
+There is a manpage available, as for most command line tools.
+First, decide which scheduled actions should be enabled for use by system administrators.
+The following options enable the various scheduled action modes:
+
+--enable-deploy::
+Allow mgrcfg-client to deploy files.
+
+--enable-diff::
+Allow mgrcfg-client to diff files.
+
+--enable-upload::
+Allow mgrcfg-client to upload files.
+
+--enable-mtime-upload::
+Allow mgrcfg-client to upload mtime (file modification time).
+
+--enable-all::
+Allow mgrcfg-client to do everything.
+
+--enable-run::
+Enable running scripts.
+
+--disable-deploy::
+Disable deployment.
+
+--disable-diff::
+Prohibit diff use.
+
+--disable-upload::
+No file uploads allowed.
+
+--disable-mtime-upload::
+Disable mtime upload.
+
+--disable-all::
+Disable all options.
+
+--disable-run::
+No scripts allowed to run.
+
+--report::
+Report whether modes are enabled or disabled.
+
+-f, --force::
+Force the operation without asking first.
+
+-h, --help::
+Show help message and exit.
+
+Once a mode is set, your system is ready for configuration management through SUSE Manager.
+A common option is [command]``mgr-actions-control --enable-all``.
+
+
+
+
+=== Syncing SUSE Manager Repositories from SCC (mgr-sync)
+
+[command]``mgr-sync`` should be used if SUSE Manager is connected to SUSE Customer Center (SCC).
+With [command]``mgr-sync`` you may add or synchronize products and channels.
+The [command]``mgr-sync`` command also enables and refreshes SCC data.
+
+This tool requires that SCC is enabled by running [command]``mgr-sync enable-scc`` first (Enabled by default in {susemgr} 2.1 and greater).
+
+[IMPORTANT]
+.Admin credentials
+====
+[command]``mgr-sync`` now requires the username/password of a *SUSE Manager administrator*.
+Most functions are available as part of the public API.
+====
+
+mgr-sync provides a command structure with sub-commands similar to git or osc.
+For a complete list of command line option, see the mgr-sync manpage (man mgr-sync).
+Basic actions are:
+
+----
+mgr-sync enable-scc
+
+mgr-sync list channel(s)|product(s)|credentials
+mgr-sync add  channel(s)|product(s)|credentials
+mgr-sync delete  credentials
+
+mgr-sync refresh [--refresh-channels] [--from-mirror MIRROR]
+----
+
+See the following examples.
+
+List channels::
++
+
+----
+mgr-sync list channels
+----
+
+Add a channel::
++
+
+----
+mgr-sync add channel LABEL
+----
+
+List products::
++
+
+----
+mgr-sync list products
+----
+
+Add a product::
++
+
+----
+mgr-sync add product
+----
+
+Refresh the data::
++
+
+----
+mgr-sync refresh
+----
+
+Refresh data and schedule a reposync for all installed vendor channels::
++
+
+----
+mgr-sync refresh --refresh-channels
+----
+
+List SCC credentials::
++
+
+----
+mgr-sync list credentials
+----
+
+Add new SCC credentials::
++
+
+[TIP]
+.Credentails
+====
+There can be one primary credential only.
+This is username/password used first when retrieving the list of available channels and packages.
+====
++
+
+----
+mgr-sync add credentials
+----
+
+Add SCC primary credentials::
++
+
+----
+mgr-sync add credentials --primary
+----
+
+Delete SCC credentials::
++
+
+----
+mgr-sync delete credentials
+----
