@@ -1,4 +1,4 @@
-[[at.command.line.tools]]
+[[suse.mgr.command.line.tools]]
 = SUSE Manager Command Line Tools
 ifdef::env-github,backend-html5[]
 //Admonitions
@@ -80,7 +80,7 @@ The backup retains its filename but has a _.rhn-cfg-backup_ extension appended.
 
 
 
-[[cli.mgr.actions.control]]
+[[mgr.actions.control]]
 == Actions Control (mgr-actions-control)
 
 The Actions Control (*mgr-actions-control*) application is used to enable and disable configuration management on a system.
@@ -151,7 +151,7 @@ A common option is [command]``mgr-actions-control --enable-all``.
 
 
 
-[[cli.mgrcfg.client.tool]]
+[[mgrcfg.client.tool]]
 == Configuration Client (mgrcfg-client)
 
 The Configuration Client (mgrcfg-client) is installed on and run from an individual client system to gain knowledge about how SUSE Manager deploys configuration files to the client.
@@ -225,6 +225,206 @@ Refer to Section “System Details” (Chapter 4, Systems, ↑User Guide) for in
 
 [[viewing.config.channels]]
 === Viewing Config Channels
+
+To view the labels and names of the config channels that apply to the system, issue the command:
+
+----
+mgrcfg-client channels
+----
+
+You should see output resembling:
+
+----
+Config channels:
+Label                   Name
+-----                   ----
+config-channel-17       config chan 2
+config-channel-14       config chan 1
+----
+
+The list of options available for [command]``mgrcfg-client get``:
+
+--topdir=TOPDIR::
+Make all file operations relative to this string.
++
+
+--exclude=EXCLUDE::
+Exclude a file from being deployed with get.
+May be used multiple times.
++
+
+-h, --help::
+Show help message and exit.
+
+[[diff.between.config.files]]
+=== Differentiating between Config Files
+
+To view the differences between the config files deployed on the system and those stored by SUSE Manager, issue the command:
+
+----
+mgrcfg-client diff
+----
+
+The output resembles the following:
+
+----
+rhncfg-client diff
+--- /etc/test
++++ /etc/test 2013-08-28 00:14:49.405152824 +1000
+@@ -1 +1,2 @@
+This is the first line
++This is the second line added
+----
+
+In addition, you can include the [option]``--topdir`` option to compare config files with those located in an arbitrary (and unused) location on the client system, like this:
+
+----
+# mgrcfg-client diff --topdir /home/test/blah/
+/usr/bin/diff: /home/test/blah/etc/example-config.txt: No such file or directory
+/usr/bin/diff: /home/test/blah/var/spool/aalib.rpm: No such file or directory
+----
+
+
+[[verify.config.files]]
+=== Verifying Config Files
+
+To quickly determine if client configuration files are different from those associated with it via SUSE Manager, issue the command:
+
+----
+mgrcfg-client verify
+----
+
+The output resembles the following:
+
+----
+modified /etc/example-config.txt /var/spool/aalib.rpm
+----
+
+The file [filename]``example-config.txt`` is locally modified, while [package]``aalib.rpm`` is not.
+
+The list of the options available for mgrcfg-client verify:
+
+-v, --verbose::
+Increase the amount of output detail.
+Display differences in the mode, owner, and group permissions for the specified config file.
+
+-o, --only::
+Only show differing files.
+
+-h, --help::
+Show help message and exit.
+
+
+
+[[the.configuration.manager]]
+== Configuration Manager (mgrcfg-manager)
+
+The Configuration Manager (*mgrcfg-manager*) is designed to maintain SUSE Manager's central repository of config files and channels, not those located on client systems.
+This tool offers a command line alternative to the configuration management features in the SUSE Manager Web interface.
+Additionally, some or all of the related maintenance tasks can be scripted.
+
+To use the command line interface, configuration administrators require a SUSE Manager account (username and password) with the appropriate permission set.
+The username may be specified in [path]``/etc/sysconfig/rhn/rhncfg-manager.conf`` or in the [option]``[rhncfg-manager]`` section of [path]``~/.rhncfgrc``.
+
+When the Configuration Manager is run as *root*, it attempts to pull in needed configuration values from the Red Hat Update Agent.
+When run as a user other than root, you may have to change the [path]``~/.rhncfgrc`` configuration file.
+The session file is cached in [path]``~/.rhncfg-manager-session`` to avoid having to log in for every command.
+
+The default timeout for the Configuration Manager is 30 minutes.
+To adjust this, add the [option]``server.session_lifetime`` option and a new value to the [path]``/etc/rhn/rhn.conf`` file on the server running the manager.
+For example set the time out to *120 minutes*:
+
+----
+server.session_lifetime = 120
+----
+
+The Configuration Manager offers the following primary *modes*:
+
+* add
+* create-channel
+* diff
+* diff-revisions
+* download-channel
+* get
+* list
+* list-channels
+* remove
+* remove-channel
+* revisions
+* update
+* upload-channel
+
+Each mode offers its own set of options, which can be displayed by issuing the following command:
+
+----
+mgrcfg-manager mode --help
+----
+
+Replace mode with the name of the mode whose options you want to see:
+
+----
+mgrcfg-manager diff-revisions --help
+----
+
+
+
+[[creating.a.config.channel]]
+=== Creating a Config Channel
+
+To create a config channel for your organization, issue the command:
+
+----
+mgrcfg-manager create-channel channel-label
+----
+
+If prompted for your SUSE Manager username and password, provide them.
+Once you have created a config channel, use the remaining modes listed above to populate and maintain that channel.
+
+
+
+[[adding.files.to.a.config.channel]]
+=== Adding Files to a Config Channel
+
+To add a file to a config channel, specify the channel label and the local file to be uploaded:
+
+----
+mgrcfg-manager add --channel=channel-label /path/to/file
+----
+
+In addition to the required channel label and the path to the file, you can use the available options for modifying the file during its addition.
+For instance, you can alter the path and file name by including the [option]``--dest-file`` option in the command:
+
+----
+mgrcfg-manager add --channel=channel-label \
+  --dest-file=/new/path/to/file.txt/path/to/file
+----
+
+The output resembles the following:
+
+----
+Pushing to channel example-channel
+Local file >/path/to/file -> remote file /new/path/to/file.txt
+----
+
+The list of options available for mgrcfg-manager add:
+
+-c CHANNEL --channel=CHANNEL::
+Upload files in this config channel.
+
+-d DEST_FILE --dest-file=DEST_FILE::
+Upload the file as this path.
+
+--delim-start=DELIM_START::
+Start delimiter for variable interpolation.
+
+--delim-end=DELIM_END::
+End delimiter for variable interpolation.
+
+-i, --ignore-missing::
+Ignore missing local files.
+
+-h, --help::
+Show help message and exit.
 
 [[_syncing.suse.mgr.repositories.scc]]
 == Syncing SUSE Manager Repositories from SCC (mgr-sync)
