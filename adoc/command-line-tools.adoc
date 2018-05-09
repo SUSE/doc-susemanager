@@ -426,6 +426,327 @@ Ignore missing local files.
 -h, --help::
 Show help message and exit.
 
+
+[TIP]
+.Max File size
+====
+By default, the maximum file size for configuration files is 128KB.
+If you need to change that value, find or create the following line in the [path]``/etc/rhn/rhn.conf`` file:
+
+----
+web.maximum_config_file_size=128
+----
+
+Change the value from 128 to whatever limit you need in kilobytes.
+====
+
+
+[[diff.between.latest.config.files]]
+=== Differentiating between Latest Config Files
+
+To view the differences between the config files on disk and the latest revisions in a channel, issue the command:
+
+----
+mgrcfg-manager diff --channel=channel-label --dest-file=/path/to/file.txt \
+/local/path/to/file
+----
+
+You should see output resembling:
+
+----
+--- /tmp/dest_path/example-config.txt config_channel: example-channel revision: 1
++++ /home/test/blah/hello_world.txt 2003-12-14 19:08:59.000000000 -0500
+@@ -1 +1 @@
+-foo
++hello, world
+----
+
+The list of options available for [command]``mgrcfg-manager diff``:
+
+-c CHANNEL, --channel=CHANNEL::
+Get file(s) from this config channel.
+
+-r REVISION, --revision=REVISION::
+Use this revision.
+
+-d DEST_FILE, --dest-file=DEST_FILE::
+Upload the file at this path.
+
+-t TOPDIR, --topdir=TOPDIR::
+Make all files relative to this string.
+
+-h, --help::
+Show help message and exit.
+
+
+
+[[diff.between.various.versions]]
+=== Differentiating between Various Versions
+
+To compare different versions of a file across channels and revisions, use the *-r* flag to indicate which revision of the file should be compared and the *-n* flag to identify the two channels to be checked.
+Specify only one file name here since you are comparing the file against another version of itself.
+For example:
+
+----
+mgrcfg-manager diff-revisions -n=channel-label1 -r=1 \
+  -n=channel-label2 -r=1 \
+  /path/to/file.txt
+----
+
+The output resembles the following:
+
+----
+--- /tmp/dest_path/example-config.txt 2004-01-13 14:36:41 \
+config channel: example-channel2 revision: 1
+--- /tmp/dest_path/example-config.txt 2004-01-13 14:42:42 \
+config channel: example-channel3 revision: 1
+@@ -1 +1,20 @@
+-foo
++blah
++-----BEGIN PGP SIGNATURE-----
++Version: GnuPG v1.0.6 (GNU/Linux)
++Comment: For info see http://www.gnupg.org
++
++iD8DBQA9ZY6vse4XmfJPGwgRAsHcAJ9ud9dabUcdscdcqB8AZP7e0Fua0NmKsdhQCeOWHX
++VsDTfen2NWdwwPaTM+S+Cow=
++=Ltp2
++-----END PGP SIGNATURE-----
+----
+
+The list of options available for [command]``mgrcfg-manager diff-revisions``:
+
+-c CHANNEL, --channel=CHANNEL::
+Use this config channel.
+
+-r REVISION, --revision=REVISION::
+Use this revision.
+
+-h, --help::
+Show help message and exit.
+
+
+
+[[downloading.all.files.in.a.channel]]
+=== Downloading All Files in a Channel
+
+To download all the files in a channel to disk, create a directory and issue the following command:
+
+----
+mgrcfg-manager download-channel channel-label --topdir .
+----
+
+The output resembles the following:
+
+----
+Copying /tmp/dest_path/example-config.txt -> \
+blah2/tmp/dest_path/example-config.txt
+----
+
+The list of options available for mgrcfg-manager download-channel:
+
+-t TOPDIR, --topdir=TOPDIR::
+Directory to which all the file paths are relative. This option must be set.
+
+-h, --help::
+Show help message and exit.
+
+
+
+[[getting.the.contents.of.a.file]]
+=== Getting the Contents of a File
+
+To direct the contents of a particular file to stdout, issue the command:
+
+----
+mgrcfg-manager get --channel=channel-label \
+/tmp/dest_path/example-config.txt
+----
+
+You should see the contents of the file as the output.
+
+
+
+[[listing.all.files.in.a.channel]]
+=== Listing All Files in a Channel
+
+To list all the files in a channel, issue the command:
+
+----
+mgrcfg-manager list channel-label
+----
+
+You should see output resembling:
+
+----
+Files in config channel `example-channel3':
+/tmp/dest_path/example-config.txt
+----
+
+The list of the options available for mgrcfg-manager get:
+
+-c CHANNEL, --channel=CHANNEL::
+Get file(s) from this config channel.
+
+-t TOPDIR, --topdir=TOPDIR::
+Directory to which all files are relative.
+
+-r REVISION, --revision=REVISION::
+Get this file revision.
+
+-h, --help::
+Show help message and exit.
+
+
+
+[[listing.all.config.channels]]
+=== Listing All Config Channels
+To list all of your organization's configuration channels, issue the command:
+
+----
+mgrcfg-manager list-channels
+----
+
+The output resembles the following:
+
+----
+Available config channels:
+example-channel example-channel2 example-channel3 config-channel-14 config-channel-17
+----
+
+[NOTE]
+====
+This does not list *local_override* or *server_import* channels.
+====
+
+
+[[removing.a.file.from.a.channel]]
+=== Removing a File from a Channel
+To remove a file from a channel, issue the command:
+
+----
+mgrcfg-manager remove --channel=channel-label /tmp/dest_path/example-config.txt
+----
+
+If prompted for your SUSE Manager username and password, provide them.
+
+The list of the options available for mgrcfg-manager remove:
+
+-c CHANNEL, --channel=CHANNEL::
+Remove files from this config channel.
+
+-t TOPDIR, --topdir=TOPDIR::
+Directory to which all files are relative.
+
+-h, --help::
+Show help message and exit.
+
+
+
+[[deleting.a.config.channel]]
+=== Deleting a Config Channel
+
+To remove a config channel in your organization, issue the command:
+
+----
+mgrcfg-manager remove-channel channel-label
+----
+
+The output resembles the following:
+
+----
+Removing config channel example-channel
+Config channel example-channel removed
+----
+
+
+
+[[determine.the.number.of.file.revisions]]
+===  Determining the Number of File Revisions
+
+To find out how many revisions (from *1 to N* where N is an integer greater than 0) of a file/path are in a channel, issue the following command:
+
+----
+mgrcfg-manager revisions channel-label /tmp/dest_path/example-config.txt
+----
+
+The output resembles the following:
+
+----
+Analyzing files in config channel example-channel \
+/tmp/dest_path/example-config.txt: 1
+----
+
+
+
+[[update.a.file.in.a.channel]]
+=== Updating a File in a Channel
+
+To create a new revision of a file in a channel (or to add the first revision to that channel if none existed before for the given path), issue the following command:
+
+----
+mgrcfg-manager update --channel=channel-label \
+--dest-file=/path/to/file.txt /local/path/to/file
+----
+
+The output resembles the following:
+
+----
+Pushing to channel example-channel:
+Local file example-channel /tmp/local/example-config.txt -> \
+remote file /tmp/dest_path/example-config.txt
+----
+
+The list of the options available for mgrcfg-manager update:
+
+-c CHANNEL, --channel=CHANNEL::
+Upload files in this config channel.
+
+-d DEST_FILE, --dest-file=DEST_FILE::
+Upload the file to this path.
+
+-t TOPDIR, --topdir=TOPDIR::
+Directory to which all files are relative.
+
+--delim-start=DELIM_START::
+Start delimiter for variable interpolation.
+
+--delim-end=DELIM_END::
+End delimiter for variable interpolation.
+
+-h, --help::
+Show help message and exit.
+
+
+
+[[uploading.multiple.files.at.once]]
+=== Uploading Multiple Files at Once
+
+To upload multiple files to a config channel from a local disk at once, issue the command:
+
+----
+mgrcfg-manager upload-channel --topdir=topdir channel-label
+----
+
+The output resembles the following:
+
+----
+Using config channel example-channel4
+Uploading /tmp/ola_world.txt from blah4/tmp/ola_world.txt
+----
+
+The list of the options available for mgrcfg-manager upload-channel:
+
+-t TOPDIR, --topdir=TOPDIR::
+Directory all the file paths are relative to.
+
+-c CHANNEL, --channel=CHANNEL::
+List of channels the config info will be uploaded into channels delimited by ','. Example: --channel=foo,bar,baz.
+
+-h, --help::
+Show help message and exit.
+
+
+
 [[_syncing.suse.mgr.repositories.scc]]
 == Syncing SUSE Manager Repositories from SCC : mgr-sync
 
@@ -533,4 +854,74 @@ Delete SCC credentials::
 
 ----
 mgr-sync delete credentials
+----
+
+
+
+[[configure.suse.manager.database.smdba]]
+==  Configuring SUSE Manager's Database : smdba
+
+SUSE Manager provides the smdba command for managing the installed database.
+It is the successor of [package]``db-control``, which is now *unsupported*.
+
+The smdba command works on local databases only, not remote.
+This utility allows you to do several administrative tasks like backing up and restoring the database.
+It also allows you to create, verify, restore backups, obtaining database status, and restart the database if necessary.
+The smdba command supports *PostgreSQL*.
+
+Find basic information about *smdba* in the *smdba manpage*.
+
+[NOTE]
+.Restart Spacewalk Services When Connection is Lost
+====
+If you have stopped or restarted the database, Spacewalk services can lose their connections. In such a case, run the following command:
+
+----
+spacewalk-service restart
+----
+====
+
+
+
+[[smdba.control.options]]
+=== Control Options
+
+Depending on the database installed, smdba provides several subcommands:
+
+.Available Options on a Machine with a PostgreSQL Database
+----
+backup-hot      Enable continuous archiving backup
+backup-restore  Restore the SUSE Manager Database from backup.
+backup-status   Show backup status.
+db-start        Start the SUSE Manager Database.
+db-status       Show database status.
+db-stop         Stop the SUSE Manager Database.
+space-overview  Show database space report.
+space-reclaim   Free disk space from unused object in tables and indexes.
+space-tables    Show space report for each table.
+system-check    Common backend healthcheck.
+----
+
+For a list of available commands on your particular appliance, call smdba help.
+To display the help message for a specific subcommand, call [command]``smdba COMMAND help``.
+
+
+
+[[starting.and.stopping.the.database]]
+=== Starting and Stopping the Database
+There are three commands to start, stop, or get the status of the database.
+Use the following commands:
+
+----
+# smdba db-status
+Checking database core...       online
+# smdba db-stop
+Stopping the SUSE Manager database...
+Stopping listener:     done
+Stopping core:         done
+# smdba db-status
+Checking database core...       offline
+# smdba db-start
+Starting listener:     done
+Starting core...       done
 ----
