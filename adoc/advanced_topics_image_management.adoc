@@ -12,8 +12,12 @@
 == Image Building Overview
 
 {susemgr}
-enables system administrators to build containers, create Image Stores, and manage Image Profiles.
-The following sections target administrators familiar with containers, registry services, and assocaited terminology.
+enables system administrators to build containers, system and virtual images, create Image Stores, and manage Image Profiles.
+
+{susemgr} support two distinct build systems:
+
+* Dockerfile
+* Kiwi image building system
 
 
 image::image-building.png[scaledwidth=80%]
@@ -38,18 +42,24 @@ For additional information on setting up Portus as a registry provider, see the:
 +
 
 
-
 For more information on Containers or CaaS Platform review the following links:
 
 * https://www.suse.com/documentation/sles-12/book_sles_docker/data/book_sles_docker.html[SUSE Linux Enterprise Server 12 SP3 Docker Guide]
 * https://www.suse.com/documentation/suse-caasp-2/[SUSE CaaS Platform 2 Documentation]
 
+The Kiwi image building feature is available for Salt minions running {sls} 12.
+The following requirements should be met before following this guide:
+
+* You will need an existing Kiwi image configuration files and configuration scripts (Example scripts are provided in the following sections) accessible in one of following ways
+  ** Git repository
+  ** HTTP hosted tar ball
+  ** local build host directory
 
 [[_at.images.buildhost]]
 == Creating a Build Host
 
 
-To build container images with {susemgr}
+To build all kinds of images with {susemgr}
 , you will need to create and configure a build host.
 Build hosts are Salt minions running SLES 12 or later.
 The following steps will guide you though the initial configuration for a build host.
@@ -59,9 +69,9 @@ perform the following steps to configure a build host.
 
 
 . Select a minion that will be designated as a build host from the menu:Systems[Overview] page. 
-. From the menu:System Details[] page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enable `SLE-Module-Containers12-Pool` and ``SLE-Module-Containers12-Updates``. Confirm by clicking menu:Change Subscriptions[] . 
-. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``Container Build Host`` and confirm by selecting menu:Update Properties[] . 
-. Install all required packaged by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[] . Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line. 
+..  Container build hosts needs subscription update: From the menu:System Details[] page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enable `SLE-Module-Containers12-Pool` and ``SLE-Module-Containers12-Updates``. Confirm by clicking menu:Change Subscriptions[] . 
+. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``Container Build Host`` for containers, or menu:Add-on System Type[]``OS Image Build Host`` for Kiwi based images and confirm by selecting menu:Update Properties[] .
+. Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[] . Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line. 
 
 
 [[_at.images.buildchannels]]
@@ -85,7 +95,15 @@ For more information, see <<_bp.key.managment>>.
 == Creating an Image Store
 
 
-Define a location to store all of your images by creating an Image Store. 
+Define a location to store all of your images by creating an Image Store.
+
+.Image stores for Kiwi build type
+[NOTE]
+====
+Image stores for Kiwi build type, used to build system, virtual and other images, are not supported yet.
+
+Images are always stored in [path]``/srv/www/os-image/<organization id>``
+====
 
 
 image::images_image_stores.png[scaledwidth=80%]
@@ -125,8 +143,8 @@ image::images_image_profiles.png[scaledwidth=80%]
 
 image::images_image_create_profile.png[scaledwidth=80%]
 . Provide a name for the `Image Profile` by filling in the menu:Label[] field.
-. Use a `Dockerfile` as the default `Image Type`
-. Use the dropdown to select your registry from the `Target Image Store` field. 
+. Use a `Dockerfile` or `Kiwi` as the default `Image Type`
+. Use the dropdown to select your registry from the `Target Image Store` field in case of `Dockerfile` image type. 
 . Enter a Github or Gitlab repositiory URL (http/https/token authentication) in the menu:Path[] field using one of the following formats: 
 
 .Github Path Options
@@ -179,7 +197,7 @@ https://gitlab-ci-token:<AUTHENTICATION_TOKEN>@gitlab.example.com/USER/project.g
 +
 .Specifying a Github or Gitlab Branch
 IMPORTANT: If a branchname is not specified the `master` branch will be used by default.
-If a `folder` is not specified a `Dockerfile` is expected to be in the root directory of the Github or Gitlab checkout. 
+If a `folder` is not specified a image sources (`Dockerfile` or Kiwi sources) are expected to be in the root directory of the Github or Gitlab checkout. 
 +
 
 . Select an `Activation Key` (Activation Keys ensure images using a profile are assigned to the correct channel and packages).
@@ -263,6 +281,18 @@ If these packages remain uninstalled, your images will still build, but the pack
 . 
 ====
 
+=== Example of Kiwi source
+
+Kiwi source consists of at least `config.xml` file, usually `config.sh` and `images.sh` files are present as well. Sources can also contain files
+to be implanted in final image under `root` subdirectory.
+
+For all information regarding Kiwi build system please see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation]
+[TODO]
+====
+!!!!!!!!!!!! add link to published JeOS sources
+====
+
+
 [[_at.images.image.building]]
 == Building an Image
 
@@ -278,7 +308,7 @@ image::images_image_build.png[scaledwidth=80%]
 
 .Procedure: Build an Image
 . For this example select menu:Images[Build] . 
-. Add a different tag name if you want a version other than the default ``latest``. 
+. Add a different tag name if you want a version other than the default ``latest`` (Only relevant to Containers). 
 . Select the menu:Build Profile[] and a menu:Build Host[]
 +
 .Profile Summary
