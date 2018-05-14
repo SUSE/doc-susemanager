@@ -1,4 +1,4 @@
-[[_preparing.and.registering.clients]]
+[[preparing.and.registering.clients]]
 = Registering Clients
 ifdef::env-github,backend-html5[]
 //Admonitions
@@ -53,7 +53,7 @@ Is an end-to-end data-center automation tool which may also be used outside the 
 Managed systems can coexist using both *traditional* and *Salt* frameworks.
 This functionality provides a safe learning environment when switching to *Salt* while you continue to maintain existing deployments.
 
-[[_create.act.keys]]
+[[create.act.keys]]
 == Creating Activation Keys
 
 The following procedure will guide you through creating the activation keys for your test channels.
@@ -63,7 +63,7 @@ Activation keys define the number of software entitlements, channels, and groups
 This information is passed on to all systems registered with said key.
 Each activation key is bound to the organization for which it has been created.
 
-[[_create.activation.keys]]
+[[create.activation.keys]]
 .Procedure: Creating Activation Keys
 . As the administrator login to the {susemgr} {webui}.
 . Switch to menu:Systems[Activation Keys].
@@ -80,22 +80,22 @@ image::systems_create_activation_key.png[scaledwidth=80%]
 WARNING: For all {suse}
 Products do not use commas within the key string.
 Red Hat Products require commas.
-For more information, see <<_ref.webui.systems.activ_keys>>.
+For more information, see <<ref.webui.systems.activ_keys>>.
 +
 
 . Select the {sle} channel that was added during
 ifdef::env-github,backend-html5[]
-<<quickstart3_chap_suma_setup_with_yast.adoc#gs-syncing-wiht-scc, Synchronizing with SCC>>
+<<quickstart3_chap_sumasetup_with_yast.adoc#gs-syncing-wiht-scc, Synchronizing with SCC>>
 endif::[]
 ifndef::env-github,backend-html5[]
-<<_proc.quickstart.first.channel.sync>>
+<<proc.quickstart.first.channel.sync>>
 endif::[]
 from the menu:Activation Key Details[Base Channels] drop down.
 . For this guide leave menu:Activation Key Details[Contact Method] set to default.
 . menu:Activation Key Details[Universal Default] should remain unchecked. Click btn:[Create Activation Key] to complete creation of the activation key.
 
 
-[[_create.tools.repository]]
+[[create.tools.repository]]
 == Creating the {susemgr} Tools Repository
 
 In this section you will create a tools repository on the {susemgr} Server for providing client tools.
@@ -147,10 +147,10 @@ mgr-create-bootstrap-repo -c SLE-version-x86_64
 This repository is suitable for both Server and Desktop of {sle}
 .
 
-[[_registering.clients.traditional]]
+[[registering.clients.traditional]]
 == Registering Traditional Clients
 
-[[_generate.bootstrap.script]]
+[[generate.bootstrap.script]]
 === Generating a Bootstrap Script
 
 
@@ -180,9 +180,9 @@ Some of these methods will be covered in the [ref]_Best Practices Guide_ and wil
 
 The following procedure will guide you through generating a bootstrap script.
 
-[[_create.boot.script]]
+[[create.boot.script]]
 .Procedure: Creating a Bootstrap Script
-. From the {susemgr} {webui}, browse to menu:Main Menu[Admin > Manager Configuration > Bootstrap Script]. For more information, see <<_s3_sattools_config_bootstrap>>.
+. From the {susemgr} {webui}, browse to menu:Main Menu[Admin > Manager Configuration > Bootstrap Script]. For more information, see <<s3-sattools-config-bootstrap>>.
 . Uncheck menu:SUSE Manager Configuration - Bootstrap[Bootstrap Script > Bootstrap using Salt].
 Use default settings and click the btn:[Update] button.
 +
@@ -208,19 +208,19 @@ cd /srv/www/htdocs/pub/bootstrap
 The bootstrap script is also available at [path]``https://example.com/pub/bootstrap/bootstrap.sh``
 .
 
-<<_modify.bootstrap.script>> will cover copying and modifying your bootstrap template for use with each client.
+<<modify.bootstrap.script>> will cover copying and modifying your bootstrap template for use with each client.
 
-[[_modify.bootstrap.script]]
+[[modify.bootstrap.script]]
 === Editing the Bootstrap Script
 
 
-In this section you will copy and modify the template bootstrap script you created from <<_generate.bootstrap.script>>.
+In this section you will copy and modify the template bootstrap script you created from <<generate.bootstrap.script>>.
 
 A minimal requirement when modifying a bootstrap script for use with {susemgr} is the inclusion of an activation key.
 Depending on your organizations security requirements it is strongly recommended to include one or more (GPG) keys (for example, your organization key, and package signing keys).
 For this tutorial you will be registering with the activation keys created in the previous section.
 
-[[_mod.bootstrap.script]]
+[[mod.bootstrap.script]]
 .Procedure: Modifying the Bootstrap Script
 . Login as root from the command line on your {susemgr} server.
 . Navigate to the bootstrap directory with:
@@ -256,7 +256,7 @@ ORG_GPG_KEY=
 ----
 
 . Once you have completed your modifications save the file and repeat this procedure for the second bootstrap script.
-Proceed to <<_connect.first.client>>.
+Proceed to <<connect.first.client>>.
 
 
 
@@ -268,12 +268,12 @@ All keys created for channels are listed on this page.
 You must enter the full name of the key you wish to use in the bootstrap script exactly as presented in the key field.
 ====
 
-[[_connect.first.client]]
+[[connect.first.client]]
 === Connecting Clients
 
 This section covers connecting your clients to {susemgr} with the modified bootstrap script.
 
-[[_run.bootstrap.script]]
+[[run.bootstrap.script]]
 .Procedure: Running the Bootstrap Script
 . From your {susemgr} Server command line as root navigate to the following directory:
 +
@@ -293,17 +293,17 @@ cat MODIFIED-SCRIPT.SH \
 . The script will execute and proceed to download the required dependencies located in the repositories directory you created earlier.
 Once the script has finished running, log in to the {webui} and click menu:Systems[Overview] to see the new client listed.
 
-This concludes the bootstrap section of this guide. <<_preparing.and.registering.clients.salt>> will go over registering Salt minions for use with {susemgr}.
+This concludes the bootstrap section of this guide. <<preparing.and.registering.clients.salt>> will go over registering Salt minions for use with {susemgr}.
 
-[[_preparing.and.registering.clients.salt]]
+[[preparing.and.registering.clients.salt]]
 == Registering Salt Clients
 
 There are currently three methods for registering Salt minions.
 The following section describes the first method and uses a bootstrap repository.
 The second method is to create a bootstrap script using [command]``mgr-bootstrap``.
-Bootstrapping Salt minions with [command]``mgr-bootstrap`` is performed in the same manner as bootstrapping traditional clients; for more information, see <<_registering.clients.traditional>>.
+Bootstrapping Salt minions with [command]``mgr-bootstrap`` is performed in the same manner as bootstrapping traditional clients; for more information, see <<registering.clients.traditional>>.
 The third method is performed from the {susemgr}{webui}
-; find this method located in <<_ref.webui.systems.bootstrapping>>.
+; find this method located in <<ref.webui.systems.bootstrapping>>.
 
 .Deprecation Warning
 [IMPORTANT]
@@ -314,7 +314,7 @@ To bootstrap a Salt minion call [command]``mgr-bootstrap`` from the command line
 
 
 The following section assumes you have created a SUSE Manager tools repository.
-You can review creating a tools repository in <<_create.tools.repository>>.
+You can review creating a tools repository in <<create.tools.repository>>.
 
 
 [WARNING]

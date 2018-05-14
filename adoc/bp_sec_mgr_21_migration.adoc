@@ -1,4 +1,4 @@
-[[_bp.chap.mgr.migration]]
+[[bp.chap.mgr.migration]]
 = {susemgr} Migration from Version 2.1 to Version 3
 
 
@@ -30,7 +30,7 @@ The migration involves dumping the whole database on the source machine and rest
 Also all of the channels and packages need to be copied to the new machine, so expect the whole migration to take several hours, 
 ====
 
-[[_bp.sec.mgr.migration.prereq]]
+[[bp.sec.mgr.migration.prereq]]
 == Prerequisites
 
 .Latest Updates
@@ -78,26 +78,26 @@ This is a small test installation; for bigger installations the ratio might be b
 , the directory will be created if it does not exist yet.
 If you want the dump to be stored somewhere else, change the definition of the variable [var]``$TMPDIR`` on the beginning of the script to suit your needs. 
 
-[[_bp.sec.mgr.migration.setup.target]]
+[[bp.sec.mgr.migration.setup.target]]
 == Setup the Target Machine
 
 
 To prepare the target machine (with the example host name ``suma30``) proceed as follows: 
 
-[[_proc.mgr.migration.setup.target]]
+[[proc.mgr.migration.setup.target]]
 .Procedure: Setup Target Machine
 . On the target machine install {sls} 12 SP2 including the extension product "`{susemgr}`" . 
 +
 .Background Information on Required Target Machine
 IMPORTANT: It is actually required to install version 12 SP2 on the target machine.
 On that version you will upgrade the PostgreSQL database from version_9.4 to 9.6.
-For more information about the PostgreSQL upgrade, see <<_sp.migration.postgresql>>. 
+For more information about the PostgreSQL upgrade, see <<sp.migration.postgresql>>. 
 +
 
-. Initiate [command]``yast2 susemanager_setup`` as you would normally do for an installation of {susemgr} . 
+. Initiate [command]``yast2 susemanagersetup`` as you would normally do for an installation of {susemgr} . 
 + 
 For more information about installing {susemgr}
-, see <<_sles.installation.within.kvm.jeos>>. 
+, see <<sles.installation.within.kvm.jeos>>. 
 . On the first {susemgr} setup screen, ensure that menu:Migrate a SUSE Manager compatible server[] is marked instead of menu:Set up SUSE Manager from scratch[] . 
 . On the second screen, enter the name of the source system as menu:Hostname of source SUSE Manager Server[] as well as the domain name. Also enter the database credentials of the source system. 
 . On the next screen, you will need to specify the IP address of the {susemgr} 3 target system. Normally this value should be pre-set to the correct value and you only should need to press kbd:[Enter] . Only in the case of multiple IP addresses you might need to specify the one that should be used during migration. 
@@ -123,9 +123,9 @@ After all the data has been gathered, {yast}
 will terminate. 
 
 
-The actual migration will not start automatically but needs to be triggered manually as outlined in <<_bp.sec.mgr.migration.performing>>. 
+The actual migration will not start automatically but needs to be triggered manually as outlined in <<bp.sec.mgr.migration.performing>>. 
 
-[[_bp.sec.mgr.migration.performing]]
+[[bp.sec.mgr.migration.performing]]
 == Performing the Migration
 
 
@@ -136,7 +136,7 @@ A migration is performed by excecuting the following command:
 ----
 
 
-This command reads the data gathered during <<_proc.mgr.migration.setup.target>>, sets up {susemgr}
+This command reads the data gathered during <<proc.mgr.migration.setup.target>>, sets up {susemgr}
  onto a new target machine and transfers all of the data from the source machine.
 As several operations need to be performed on the source machine via SSH, you will be prompted once for the root password of the source machine.
 A temporary SSH key named `migration-key` is created and installed on the source machine, so you need to give the {rootuser}
@@ -164,7 +164,7 @@ For big installations this can take up to several hours.
 You should also account for the time it takes to copy all the package data to the new machine.
 Depending on your network infrastructure and hardware, this can also take a significant amount of time. 
 
-[[_bp.sec.mgr.migration.speedup]]
+[[bp.sec.mgr.migration.speedup]]
 == Speeding up the Migration
 
 
@@ -181,7 +181,7 @@ On large installations transfering the database (which involves dumping the data
 During the database transfer no write operations should occurr therefore the migration script will shutdown running {susemgr}
 database services running on the source machine. 
 
-[[_bp.sec.mgr.migration.pkg.extern]]
+[[bp.sec.mgr.migration.pkg.extern]]
 == Packages on External Storage
 
 
@@ -200,7 +200,7 @@ Analogue handling for [path]``/srv/www/htdocs/pub``
 In general, all needed files and directories, not copied by the migration tool, should be copied to the new server manually. 
 ====
 
-[[_bp.sec.mgr.migration.trouble]]
+[[bp.sec.mgr.migration.trouble]]
 == Troubleshooting a Broken {webui} after Migration
 
 
@@ -213,7 +213,7 @@ If you experience this issue reload the page.
 For example, in Firefox pressing the key combination kbd:[Ctrl+F5]
  should resume normal functionality. 
 
-[[_bp.sec.mgr.migration.example]]
+[[bp.sec.mgr.migration.example]]
 == Example Session
 
 

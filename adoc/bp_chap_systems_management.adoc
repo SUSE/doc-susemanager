@@ -1,4 +1,4 @@
-[[_bp.systems.management]]
+[[bp.systems.management]]
 = Contact Methods
 :doctype: book
 :sectnums:
@@ -21,10 +21,10 @@ The following sections provide a starting point for selecting a method which bes
 [NOTE]
 ====
 This chapter is only relevant for traditional clients as Salt clients (minions) utilize a Salt specific contact method.
-For general information about Salt clients, see <<_salt.gs.guide.intro>>. 
+For general information about Salt clients, see <<salt.gs.guide.intro>>. 
 ====
 
-[[_bp.contact.methods.rhnsd]]
+[[bp.contact.methods.rhnsd]]
 == Default (the {susemgr} Daemon rhnsd)
 
 
@@ -93,7 +93,7 @@ You can view the status of rhnsd by typing the command [command]``systemctl stat
      rhnsd`` as {rootuser}
 . 
 
-[[_bp.contact.methods.ssh.push]]
+[[bp.contact.methods.ssh.push]]
 == Push via SSH
 
 
@@ -128,7 +128,7 @@ All items left of the [systemitem]``Taskomatic``
 image::sshpush-taigon.png[scaledwidth=80%]
 
 
-[[_bp.contact.methods.ssh.push.requirements]]
+[[bp.contact.methods.ssh.push.requirements]]
 === Configuring the Server for Push via SSH
 
 
@@ -159,7 +159,7 @@ Set [systemitem]``taskomatic.ssh_push_workers``
 taskomatic.ssh_push_workers = number
 ----
 
-[[_bp.contact.methods.ssh.push.sudo]]
+[[bp.contact.methods.ssh.push.sudo]]
 === Using sudo with Push via SSH
 
 
@@ -175,10 +175,10 @@ The packages [path]``spacewalk-taskomatic >= 2.1.165.19``
  are required for using sudo with Push via SSH. 
 ====
 
-[[_pro.bp.contact.methods.ssh.push.sudo]]
+[[pro.bp.contact.methods.ssh.push.sudo]]
 .Procedure: Configuring sudo
 
-[[_pro.bp.contact.methods.ssh.push.sudo.user]]
+[[pro.bp.contact.methods.ssh.push.sudo.user]]
 . Set the following parameter on the server located in [path]``/etc/rhn/rhn.conf`` . 
 +
 
@@ -187,7 +187,7 @@ ssh_push_sudo_user =`user`
 ----
 +
 The server will use sudo to ssh as the configured [replaceable]``user``. 
-. You must create the user specified in <<_pro.bp.contact.methods.ssh.push.sudo.user>> on each of your clients and the following parameters should be commented out within each client's [path]``/etc/sudoers`` file: 
+. You must create the user specified in <<pro.bp.contact.methods.ssh.push.sudo.user>> on each of your clients and the following parameters should be commented out within each client's [path]``/etc/sudoers`` file: 
 +
 
 ----
@@ -239,7 +239,7 @@ Because your clients cannot reach the server without using the Push via SSH cont
 For registration of systems which should be managed via the Push via SSH tunnel contact method, it is required to use an activation key that is configured to use this method.
 Normal [systemitem]``Push via SSH``
  is unable to reach the server.
-For managing activation keys, see <<_bp.key.managment>>. 
+For managing activation keys, see <<bp.key.managment>>. 
 
 Run the following command as {rootuser}
 on the server to register a client: 
@@ -269,7 +269,7 @@ To verify the Push via SSH tunnel connection manually, run the following command
 # ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443`client`zypper ref
 ----
 
-[[_bp.contact.methods.ssh.push.api.support]]
+[[bp.contact.methods.ssh.push.api.support]]
 === API Support for Push via SSH
 
 
@@ -308,7 +308,7 @@ Existing activation keys can also be edited via API to use the Push via SSH cont
 client.activationkey.setDetails(key, '1-mykey', {'contact_method' : 'ssh-push'})
 ----
 
-[[_bp.contact.methods.ssh.push.proxy.support]]
+[[bp.contact.methods.ssh.push.proxy.support]]
 === Proxy Support with Push via SSH
 
 
@@ -324,7 +324,7 @@ This can be achieved by executing the following command from the server:
 {prompt.root}mgr-ssh-push-init --client`proxy`
 ----
 
-[[_bp.contact.methods.saltssh.push]]
+[[bp.contact.methods.saltssh.push]]
 == Push via Salt SSH
 
 
@@ -335,7 +335,7 @@ server directly to regularly checking in and, for example, fetch package updates
 [NOTE]
 ====
 This feature is not related to Push via SSH for the traditional clients.
-For Push via SSH, see <<_bp.contact.methods.ssh.push>>. 
+For Push via SSH, see <<bp.contact.methods.ssh.push>>. 
 ====
 
 === Overview
@@ -378,7 +378,7 @@ To bootstrap a Salt SSH system, proceed as follows:
 
 
 . Open the menu:Bootstrap Minions[] dialog in the Web UI (menu:Systems[Bootstrapping] ). 
-. Fill out the required fields. Select an menu:Activation Key[] with the menu:Push via SSH[] contact method configured. For more information about activation keys, see <<_ref.webui.systems.activ_keys>>. 
+. Fill out the required fields. Select an menu:Activation Key[] with the menu:Push via SSH[] contact method configured. For more information about activation keys, see <<ref.webui.systems.activ_keys>>. 
 . Check the menu:Manage system completely via SSH[] option. 
 . Confirm with clicking the menu:Bootstrap[] button. 
 
@@ -398,7 +398,7 @@ There are two kinds of parameters for Push via Salt SSH:
 ** Activation key 
 ** Password {mdash} used only for bootstrapping, not saved anywhere; all future SSH sessions are authorized via a key/certificate pair 
 * Persistent parameters {mdash} configured {susemgr} -wide: 
-** sudo user {mdash} same as in <<_bp.contact.methods.ssh.push.sudo>>. 
+** sudo user {mdash} same as in <<bp.contact.methods.ssh.push.sudo>>. 
 
 
 === Action Execution
@@ -427,7 +427,7 @@ For more information, see
 * https://docs.saltstack.com/en/latest/topics/ssh/
 
 
-[[_bp.contact.methods.osad]]
+[[bp.contact.methods.osad]]
 == osad
 
 
@@ -491,7 +491,7 @@ The following procedure enables use of [systemitem]``osad``
 For this communication method to work SSL is mandatory.
 If SSL certificates are not available, the daemon on your client systems will fail to connect.
 Make sure your firewall rules are set to allow for the required ports.
-For more information, see <<_tab.install.ports.server>>. 
+For more information, see <<tab.install.ports.server>>. 
 ====
 
 .Procedure: Enabling osa-dispatcher on {susemgr}and osad on Clients
@@ -501,7 +501,7 @@ For more information, see <<_tab.install.ports.server>>.
 ----
 systemctl start osa-dispatcher
 ----
-. Install the [systemitem]``osad`` package on all client systems allowing communication to the osa-dispatcher on {susemgr} . The package can be found in the Tools child channel. For more information about child channels, see <<_s3_sm_channel_list_child>>. 
+. Install the [systemitem]``osad`` package on all client systems allowing communication to the osa-dispatcher on {susemgr} . The package can be found in the Tools child channel. For more information about child channels, see <<s3-sm-channel-list-child>>. 
 +
 .osad conflicts with osa-dispatcher
 WARNING: Do _not_ install the [systemitem]``osad``
