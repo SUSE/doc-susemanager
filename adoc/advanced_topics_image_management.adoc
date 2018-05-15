@@ -8,7 +8,7 @@
 :sourcedir: .
 :imagesdir: ./images
 
-[[_at.image.overview]]
+[[_at.images.overview]]
 == Image Building Overview
 
 {susemgr}
@@ -20,11 +20,12 @@ enables system administrators to build containers, system and virtual images, cr
 * Kiwi image building system
 
 
+== Container images
+
 image::image-building.png[scaledwidth=80%]
 
-
-[[_at.image.requirements]]
-== Requirements
+[[_at.images.docker.requirements]]
+=== Requirements
 
 
 The containers feature is available for Salt minions running {sls}
@@ -47,16 +48,8 @@ For more information on Containers or CaaS Platform review the following links:
 * https://www.suse.com/documentation/sles-12/book_sles_docker/data/book_sles_docker.html[SUSE Linux Enterprise Server 12 SP3 Docker Guide]
 * https://www.suse.com/documentation/suse-caasp-2/[SUSE CaaS Platform 2 Documentation]
 
-The Kiwi image building feature is available for Salt minions running {sls} 12.
-The following requirements should be met before following this guide:
-
-* You will need an existing Kiwi image configuration files and configuration scripts (Example scripts are provided in the following sections) accessible in one of following ways
-  ** Git repository
-  ** HTTP hosted tar ball
-  ** local build host directory
-
-[[_at.images.buildhost]]
-== Creating a Build Host
+[[_at.images.docker.buildhost]]
+=== Creating a Build Host
 
 
 To build all kinds of images with {susemgr}
@@ -65,24 +58,23 @@ Build hosts are Salt minions running SLES 12 or later.
 The following steps will guide you though the initial configuration for a build host.
 
 From the {susemgr}{webui}
-perform the following steps to configure a build host. 
+perform the following steps to configure a build host.
 
 
 . Select a minion that will be designated as a build host from the menu:Systems[Overview] page. 
-..  Container build hosts needs subscription update: From the menu:System Details[] page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enable `SLE-Module-Containers12-Pool` and ``SLE-Module-Containers12-Updates``. Confirm by clicking menu:Change Subscriptions[] . 
-. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``Container Build Host`` for containers, or menu:Add-on System Type[]``OS Image Build Host`` for Kiwi based images and confirm by selecting menu:Update Properties[] .
-. Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[] . Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line. 
+. From the menu:System Details[] page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enable `SLE-Module-Containers12-Pool` and ``SLE-Module-Containers12-Updates``. Confirm by clicking menu:Change Subscriptions[] .
+. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``Container Build Host`` and confirm by selecting menu:Update Properties[] .
+. Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[] . Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line .
 
 
-[[_at.images.buildchannels]]
-== Define Container Build Channels with an Activation Key
+[[_at.images.docker.buildchannels]]
+==== Define Container Build Channels with an Activation Key
 
 
 Create an activation key associated with the channel that your images will use. 
 
 
 image::systems_create_activation_key.png[scaledwidth=80%]
-
 
 
 . From the left navigation menu select menu:Systems[Activation Keys] . 
@@ -92,22 +84,14 @@ image::systems_create_activation_key.png[scaledwidth=80%]
 
 For more information, see <<_bp.key.managment>>. 
 
-== Creating an Image Store
+[[_at.images.docker.imagestore]]
+=== Creating an Image Store
 
 
 Define a location to store all of your images by creating an Image Store.
 
-.Image stores for Kiwi build type
-[NOTE]
-====
-Image stores for Kiwi build type, used to build system, virtual and other images, are not supported yet.
-
-Images are always stored in [path]``/srv/www/os-image/<organization id>``
-====
-
 
 image::images_image_stores.png[scaledwidth=80%]
-
 
 
 . From the left navigation menu select menu:Images[Stores] . 
@@ -126,8 +110,8 @@ registry.example.com
 . Click menu:Create[] to add the new ``Image Store``. 
 
 
-[[_at.images.profile]]
-== Creating an Image Profile
+[[_at.images.docker.profile]]
+=== Creating an Image Profile
 
 
 Manage Image Profiles from the Image Profile page. 
@@ -143,7 +127,7 @@ image::images_image_profiles.png[scaledwidth=80%]
 
 image::images_image_create_profile.png[scaledwidth=80%]
 . Provide a name for the `Image Profile` by filling in the menu:Label[] field.
-. Use a `Dockerfile` or `Kiwi` as the default `Image Type`
+. Use a `Dockerfile` as the `Image Type`
 . Use the dropdown to select your registry from the `Target Image Store` field in case of `Dockerfile` image type. 
 . Enter a Github or Gitlab repositiory URL (http/https/token authentication) in the menu:Path[] field using one of the following formats: 
 
@@ -209,6 +193,7 @@ NOTE: When you associate an activation key with an image profile you are ensurin
 . Click the menu:Create[] button. 
 
 
+[[_at.images.docker.sourceexample]]
 === Example Dockerfile and add_packages Script
 
 
@@ -277,24 +262,12 @@ To inspect images and provide the package and product list of a container to the
 you are required to install [package]#python#
  and [package]#python-xml#
  within the container.
-If these packages remain uninstalled, your images will still build, but the package and product list will be unavailable from the {webui}
-. 
-====
-
-=== Example of Kiwi source
-
-Kiwi source consists of at least `config.xml` file, usually `config.sh` and `images.sh` files are present as well. Sources can also contain files
-to be implanted in final image under `root` subdirectory.
-
-For all information regarding Kiwi build system please see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation]
-[TODO]
-====
-!!!!!!!!!!!! add link to published JeOS sources
+If these packages remain uninstalled, your images will still build, but the package and product list will be unavailable from the {webui}.
 ====
 
 
-[[_at.images.image.building]]
-== Building an Image
+[[_at.images.docker.building]]
+=== Building an Image
 
 
 There are two ways to build an image.
@@ -320,8 +293,8 @@ When you have selected a build profile detailed information about the selected p
 . To schedule a build click the menu:Build[] button. 
 
 
-[[_at.images.image.importing]]
-== Importing an Image
+[[_at.images.docker.importing]]
+=== Importing an Image
 
 
 You can import and inspect arbitrary images.
@@ -362,12 +335,163 @@ is scheduled right away.
 When processed find the imported image in the images list.
 You can recognize it because of a different icon in the Build column, which means that the image is imported (see screenshot below). The status icon for the imported image can also be seen on the overview tab for the image. 
 
-== Listing Images Available for Building
+[[_at.images.docker.troubleshooting]]
+=== Troubleshooting
+
+
+The following are some known pitfalls when working with images.
+
+* HTTPS certificates to access the registry or the git repositories should be deployed to the minion by a custom state file.
+* SSH git access with docker is currently unsupported. You may test it, but SUSE will not provide support.
+* If the [package]#python# and [package]#python-xml# packages are not installed within your images during the build process, Salt cannot run within the container and reporting of installed packages or products will fail. This will result in an unknown update status.
+
+[[_at.images.kiwi]]
+== KIWI image building system
+
+[[_at.images.kiwi.requirements]]
+=== Requirements
+
+The Kiwi image building feature is available for Salt minions running {sls} 12.
+The following requirements should be met before following this guide:
+
+* You will need an existing Kiwi image configuration files and configuration scripts (Example scripts are provided in the following sections) accessible in one of following ways
+  ** Git repository
+  ** HTTP hosted tar ball
+  ** local build host directory
+
+[[_at.images.kiwi.buildhost]]
+=== Creating a Build Host
+
+
+To build all kinds of images with {susemgr}, you will need to create and configure a build host.
+Build hosts are Salt minions running SLES 12 or later.
+The following steps will guide you though the initial configuration for a build host.
+
+From the {susemgr}{webui} perform the following steps to configure a build host.
+
+
+. Select a minion that will be designated as a build host from the menu:Systems[Overview] page.
+. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``OS Image Build Host`` and confirm by selecting menu:Update Properties[] .
+. Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[] . Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line .
+
+
+[[_at.images.kiwi.buildchannels]]
+==== Define Container Build Channels with an Activation Key
+
+
+Create an activation key associated with the channel that your images will use.
+
+
+image::systems_create_activation_key.png[scaledwidth=80%]
+
+
+. From the left navigation menu select menu:Systems[Activation Keys] .
+. Click menu:Create Key[] .
+. Enter a menu:Description[] , a menu:Key[] name, Use the drop-down box to select the menu:Base Channel[] that should be associated with this key. Confirm with menu:Create Activation Key[] .
+
+
+For more information, see <<_bp.key.managment>>.
+
+[[_at.images.kiwi.imagestore]]
+=== Image Store
+
+.Image stores for Kiwi build type
+[NOTE]
+====
+Image stores for Kiwi build type, used to build system, virtual and other images, are not supported yet.
+
+Images are always stored in [path]``/srv/www/os-image/<organization id>``
+====
+
+
+[[_at.images.kiwi.profile]]
+=== Creating an Image Profile
+
+
+Manage Image Profiles from the Image Profile page.
+
+
+image::images_image_profiles.png[scaledwidth=80%]
+
+
+.Procedure: Create an Image Profile
+. To create an image profile select menu:Image[Profiles] and click menu:Create[] .
++
+
+
+image::images_image_create_profile.png[scaledwidth=80%]
+. Provide a name for the `Image Profile` by filling in the menu:Label[] field.
+. Use `Kiwi` as the `Image Type`
+. Image store is automatically selected
+. Enter a path to the source in the menu:Path[] field using one of the following formats:
+.. Git URI
+.. HTTPS tarball
+.. Path to build host local directory
+. Select an `Activation Key` (Activation Keys ensure images using a profile are assigned to the correct channel and packages).
++
+.Relationship Between Activation Keys and Image Profiles
+NOTE: When you associate an activation key with an image profile you are ensuring any image using the profile will use the correct software channel and any packages in the channel.
++
+
+. Click the menu:Create[] button.
+
+
+[[_at.images.kiwi.sourceexample]]
+=== Example of Kiwi source
+
+Kiwi source consists of at least `config.xml` file, usually `config.sh` and `images.sh` files are present as well. Sources can also contain files
+to be implanted in final image under `root` subdirectory.
+
+For all information regarding Kiwi build system please see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation]
+[TODO]
+====
+!!!!!!!!!!!! add link to published JeOS sources
+====
+
+
+[[_at.images.kiwi.building]]
+=== Building an Image
+
+
+There are two ways to build an image.
+You can select menu:Images[Build]
+ from the left navigation bar, or click the build icon in the menu:Images[Profiles]
+ list.
+
+
+image::images_image_build.png[scaledwidth=80%]
+
+
+.Procedure: Build an Image
+. For this example select menu:Images[Build] .
+. Add a different tag name if you want a version other than the default ``latest`` (Only relevant to Containers).
+. Select the menu:Build Profile[] and a menu:Build Host[]
++
+.Profile Summary
+NOTE: Notice the menu:Profile Summary[]
+ to the right of the build fields.
+When you have selected a build profile detailed information about the selected profile will show up in this area.
++
+
+. To schedule a build click the menu:Build[] button.
+
+
+[[_at.images.kiwi.troubleshooting]]
+=== Troubleshooting
+
+
+The following are some known pitfalls when working with images.
+
+* HTTPS certificates to access the registry or the git repositories should be deployed to the minion by a custom state file.
+* Importing of the KIWI based images is not supported.
+
+[[_at.images.listing]]
+== Listing Image Profiles Available for Building
 
 
 To list images availabe for building select menu:Images[Images]
 .
-A list of all images will be displayed. 
+A list of all images will be displayed.
 
 
 image::images_list_images.png[scaledwidth=80%]
@@ -377,21 +501,12 @@ Displayed data about images includes an image menu:Name[]
 , its menu:Version[]
  and the build menu:Status[]
 .
-You will also see an images update status with a listing of possible patch/package updates that are available for the image. 
+You will also see an images update status with a listing of possible patch/package updates that are available for the image.
 
 Clicking the menu:Details[]
- button on an image will provide a detailed view including an exact list of relevant patches and a list of all packages installed within the image. 
+ button on an image will provide a detailed view including an exact list of relevant patches and a list of all packages installed within the image.
 
 [NOTE]
 ====
-The patch and package list is only available if the inspect state after a build was successful. 
+The patch and package list is only available if the inspect state after a build was successful.
 ====
-
-== Troubleshooting
-
-
-The following are some known pitfalls when working with images. 
-
-* HTTPS certificates to access the registry or the git repositories should be deployed to the minion by a custom state file.
-* SSH git access with docker is currently unsupported. You may test it, but SUSE will not provide support.
-* If the [package]#python# and [package]#python-xml# packages are not installed within your images during the build process, Salt cannot run within the container and reporting of installed packages or products will fail. This will result in an unknown update status. 
