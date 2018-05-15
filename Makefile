@@ -28,7 +28,7 @@ html: xml
 	(cd build/create-all/html/create-all; rm -rf images; ln -sf ../../../../adoc/images .)
 
 pdf: xml
-	daps -vvv -d DC-create-all pdf
+	daps -d DC-create-all pdf
 
 advanced:
 	daps -d DC-susemanager-advanced-topics pdf
