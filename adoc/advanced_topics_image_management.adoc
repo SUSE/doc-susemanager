@@ -1,20 +1,58 @@
 [[at.images]]
 = Image Building and Management
+ifdef::env-github,backend-html5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:linkattrs:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Linux Enterprise
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:susemgr: SUSE Manager
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:saltversion: 2018.3.0
+:webui: WebUI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+:ay: AutoYaST
+endif::[]
+// Asciidoctor Front Matter
 :doctype: book
-:sectnums:
+:sectlinks:
 :toc: left
 :icons: font
 :experimental:
 :sourcedir: .
-:imagesdir: ./images
+:imagesdir: images
+
 
 [[at.image.overview]]
 == Image Building Overview
 
-{susemgr}
-enables system administrators to build containers, system and virtual images, create Image Stores, and manage Image Profiles.
+{susemgr} enables system administrators to build containers, system and virtual images, create Image Stores, and manage Image Profiles.
 
-{susemgr} support two distinct build systems:
+{susemgr} supports two distinct build systems:
 
 * Dockerfile
 * Kiwi image building system
@@ -51,8 +89,7 @@ For more information on Containers or CaaS Platform review the following links:
 [[at.images.buildhost]]
 === Creating a Build Host
 
-To build all kinds of images with {susemgr}
-, you will need to create and configure a build host.
+To build all kind of images with {susemgr}, you will need to create and configure a build host.
 Build hosts are Salt minions running SLES 12 or later.
 The following steps will guide you though the initial configuration for a build host.
 
@@ -61,9 +98,9 @@ perform the following steps to configure a build host.
 
 
 . Select a minion that will be designated as a build host from the menu:Systems[Overview] page. 
-. From the menu:System Details[] page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enable `SLE-Module-Containers12-Pool` and ``SLE-Module-Containers12-Updates``. Confirm by clicking menu:Change Subscriptions[] .
-. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``Container Build Host`` and confirm by selecting menu:Update Properties[] .
-. Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[] . Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line .
+. From the menu:System Details[] page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enable ``SLE-Module-Containers12-Pool`` and ``SLE-Module-Containers12-Updates``. Confirm by clicking btn:[Change Subscriptions].
+. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[] ``Container Build Host`` and confirm by selecting btn:[Update Properties].
+. Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[]. Alternatively apply a Highstate from the command line by executing `state.highstate` from command line of the {susemgr} server.
 
 
 [[at.images.buildchannels]]
@@ -75,14 +112,14 @@ Create an activation key associated with the channel that your images will use.
 image::systems_create_activation_key.png[scaledwidth=80%]
 
 
-. From the left navigation menu select menu:Systems[Activation Keys] . 
-. Click menu:Create Key[] . 
-. Enter a menu:Description[] , a menu:Key[] name, Use the drop-down box to select the menu:Base Channel[] that should be associated with this key. Confirm with menu:Create Activation Key[] . 
+. From the left navigation menu select menu:Systems[Activation Keys]. 
+. Click menu:Create Key[]. 
+. Enter a menu:Description[] , a menu:Key[] name, Use the drop-down box to select the menu:Base Channel[] that should be associated with this key. Confirm with menu:Create Activation Key[]. 
 
 
 For more information, see <<bp.key.managment>>. 
 
-[[_at.images.docker.imagestore]]
+[[at.images.docker.imagestore]]
 === Creating an Image Store
 
 
@@ -92,13 +129,13 @@ Define a location to store all of your images by creating an Image Store.
 image::images_image_stores.png[scaledwidth=80%]
 
 
-. From the left navigation menu select menu:Images[Stores] . 
+. From the left navigation menu select menu:Images[Stores]. 
 . Click menu:Create[] to create a new store. 
 +
 
 
 image::images_image_stores_create.png[scaledwidth=80%]
-. {susemgr} currently provides support only for the `Registry`menu:Store Type[] . Define a name for the image store in the menu:Label[] field. 
+. {susemgr} currently provides support only for the `Registry`menu:Store Type[]. Define a name for the image store in the menu:Label[] field. 
 . Provide the path to your image registry by filling in the menu:URI[] field. The FQDN of the container registry host (whether internal or external) is sufficient. 
 +
 
@@ -118,7 +155,7 @@ image::images_image_profiles.png[scaledwidth=80%]
 
 
 .Procedure: Create an Image Profile
-. To create an image profile select menu:Image[Profiles] and click menu:Create[] . 
+. To create an image profile select menu:Image[Profiles] and click menu:Create[]. 
 +
 
 
@@ -190,7 +227,7 @@ NOTE: When you associate an activation key with an image profile you are ensurin
 . Click the menu:Create[] button. 
 
 
-[[_at.images.docker.sourceexample]]
+[[at.images.docker.sourceexample]]
 === Example Dockerfile and add_packages Script
 
 
@@ -275,7 +312,7 @@ image::images_image_build.png[scaledwidth=80%]
 
 
 .Procedure: Build an Image
-. For this example select menu:Images[Build] . 
+. For this example select menu:Images[Build]. 
 . Add a different tag name if you want a version other than the default ``latest`` (Only relevant to Containers). 
 . Select the menu:Build Profile[] and a menu:Build Host[]
 +
@@ -329,7 +366,7 @@ is scheduled right away.
 When processed find the imported image in the images list.
 You can recognize it because of a different icon in the Build column, which means that the image is imported (see screenshot below). The status icon for the imported image can also be seen on the overview tab for the image. 
 
-[[_at.images.docker.troubleshooting]]
+[[at.images.docker.troubleshooting]]
 === Troubleshooting
 
 
@@ -339,10 +376,10 @@ The following are some known pitfalls when working with images.
 * SSH git access with docker is currently unsupported. You may test it, but SUSE will not provide support.
 * If the [package]#python# and [package]#python-xml# packages are not installed within your images during the build process, Salt cannot run within the container and reporting of installed packages or products will fail. This will result in an unknown update status.
 
-[[_at.images.kiwi]]
+[[at.images.kiwi]]
 == KIWI image building system
 
-[[_at.images.kiwi.requirements]]
+[[at.images.kiwi.requirements]]
 === Requirements
 
 The Kiwi image building feature is available for Salt minions running {sls} 12.
@@ -353,7 +390,7 @@ The following requirements should be met before following this guide:
   ** HTTP hosted tar ball
   ** local build host directory
 
-[[_at.images.kiwi.buildhost]]
+[[at.images.kiwi.buildhost]]
 === Creating a Build Host
 
 
@@ -365,11 +402,11 @@ From the {susemgr}{webui} perform the following steps to configure a build host.
 
 
 . Select a minion that will be designated as a build host from the menu:Systems[Overview] page.
-. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``OS Image Build Host`` and confirm by selecting menu:Update Properties[] .
-. Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[] . Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line .
+. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``OS Image Build Host`` and confirm by selecting menu:Update Properties[].
+. Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[]. Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line .
 
 
-[[_at.images.kiwi.buildchannels]]
+[[at.images.kiwi.buildchannels]]
 ==== Define Container Build Channels with an Activation Key
 
 
@@ -379,14 +416,14 @@ Create an activation key associated with the channel that your images will use.
 image::systems_create_activation_key.png[scaledwidth=80%]
 
 
-. From the left navigation menu select menu:Systems[Activation Keys] .
-. Click menu:Create Key[] .
-. Enter a menu:Description[] , a menu:Key[] name, Use the drop-down box to select the menu:Base Channel[] that should be associated with this key. Confirm with menu:Create Activation Key[] .
+. From the left navigation menu select menu:Systems[Activation Keys].
+. Click menu:Create Key[].
+. Enter a menu:Description[] , a menu:Key[] name, Use the drop-down box to select the menu:Base Channel[] that should be associated with this key. Confirm with menu:Create Activation Key[].
 
 
 For more information, see <<_bp.key.managment>>.
 
-[[_at.images.kiwi.imagestore]]
+[[at.images.kiwi.imagestore]]
 === Image Store
 
 .Image stores for Kiwi build type
@@ -398,7 +435,7 @@ Images are always stored in [path]``/srv/www/os-image/<organization id>``
 ====
 
 
-[[_at.images.kiwi.profile]]
+[[at.images.kiwi.profile]]
 === Creating an Image Profile
 
 
@@ -409,7 +446,7 @@ image::images_image_profiles.png[scaledwidth=80%]
 
 
 .Procedure: Create an Image Profile
-. To create an image profile select menu:Image[Profiles] and click menu:Create[] .
+. To create an image profile select menu:Image[Profiles] and click menu:Create[].
 +
 
 
@@ -430,7 +467,7 @@ NOTE: When you associate an activation key with an image profile you are ensurin
 . Click the menu:Create[] button.
 
 
-[[_at.images.kiwi.sourceexample]]
+[[at.images.kiwi.sourceexample]]
 === Example of Kiwi source
 
 Kiwi source consists of at least `config.xml` file, usually `config.sh` and `images.sh` files are present as well. Sources can also contain files
@@ -443,7 +480,7 @@ For all information regarding Kiwi build system please see https://doc.opensuse.
 ====
 
 
-[[_at.images.kiwi.building]]
+[[at.images.kiwi.building]]
 === Building an Image
 
 
@@ -457,7 +494,7 @@ image::images_image_build.png[scaledwidth=80%]
 
 
 .Procedure: Build an Image
-. For this example select menu:Images[Build] .
+. For this example select menu:Images[Build].
 . Add a different tag name if you want a version other than the default ``latest`` (Only relevant to Containers).
 . Select the menu:Build Profile[] and a menu:Build Host[]
 +
@@ -470,7 +507,7 @@ When you have selected a build profile detailed information about the selected p
 . To schedule a build click the menu:Build[] button.
 
 
-[[_at.images.kiwi.troubleshooting]]
+[[at.images.kiwi.troubleshooting]]
 === Troubleshooting
 
 
@@ -479,7 +516,7 @@ The following are some known pitfalls when working with images.
 * HTTPS certificates to access the registry or the git repositories should be deployed to the minion by a custom state file.
 * Importing of the KIWI based images is not supported.
 
-[[_at.images.listing]]
+[[at.images.listing]]
 == Listing Image Profiles Available for Building
 
 
