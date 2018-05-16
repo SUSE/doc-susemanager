@@ -1,6 +1,6 @@
-[[_sles.installation.within.kvm.jeos]]
+[[sles.installation.within.kvm.jeos]]
 = JeOS Installation
-ifdef::env-github[]
+ifdef::env-github,backend-html5[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
 :important-caption: :heavy_exclamation_mark:
@@ -35,9 +35,8 @@ endif::[]
 :sourcedir: .
 :imagesdir: images
 
-[[_quickstart.sect.kvm.settings]]
+[[quickstart.sect.kvm.settings]]
 == Virtual Machine Manager (virt-manager) Settings
-
 
 This chapter provides the required (KVM) settings for installation of {sle} Just Enough Operating System (JeOS) 12 as the base for {susemgr}.
 A kernel virtual machine (KVM) combined with Virtual Machine Manager (_virt-manager_) will be used as a sandbox for your first installation.
@@ -61,17 +60,10 @@ In the following table replace _version_ with the actual product version string.
 | Memory:             | 4096 MB
 | CPU's:              | 2
 | Storage Format:     |_.qcow2_ 24 GB (Default) JeOS Root Partition
-| Virtual Disks:
-
-VirtIO Disk 2
-
-VirtIO Disk 3
-
-VirtIO Disk 4         | 101 GB for [path]``/var/spacewalk``
-
-                        50 GB for [path]``/var/lib/pgsql``
-
-                        4 GB for swap
+| Virtual Disks:      |
+| VirtIO Disk 2       | 101 GB for [path]``/var/spacewalk``
+| VirtIO Disk 3       | 50 GB for [path]``/var/lib/pgsql``
+| VirtIO Disk 4       | 4 GB for swap
 | Name:               | test-setup
 | Network             |Bridge _br0_
 |===
@@ -82,9 +74,8 @@ VirtIO Disk 4         | 101 GB for [path]``/var/spacewalk``
 For more information on virtualization, see: https://www.suse.com/documentation/sles-12/singlehtml/book_virt/book_virt.html[SUSE Linux Enterprise Virtualization Guide]
 ====
 
-[[_jeos.kvm.settings]]
+[[jeos.kvm.settings]]
 == JeOS KVM Settings
-
 
 Create 3 additional virtual disks required for the {susemgr} storage partitions.
 
@@ -93,7 +84,7 @@ Create 3 additional virtual disks required for the {susemgr} storage partitions.
 . Configure RAM and number of CPUs (At least 4 GB RAM and 2 CPUs).
 . Name your KVM machine and select the menu:Customize configuration before install[] check box.
 . Select the btn:[Add Hardware] button and create three new virtual disks with the following specifications.
-These disks will be partitioned and mounted in <<_proc.jeos.susemgr.prep>>.
+These disks will be partitioned and mounted in <<proc.jeos.susemgr.prep>>.
 +
 
 [cols="1,1,1", options="header"]
@@ -106,7 +97,6 @@ These disks will be partitioned and mounted in <<_proc.jeos.susemgr.prep>>.
 
 . Click menu:Begin Installation[] and your new VM will boot from the JeOS image.
 
-
 Proceed through the basic JeOS installation prompts until you reach the command line.
 
 .Root Password
@@ -116,10 +106,10 @@ During the basic installation prompts you are asked to enter the root password.
 Select a strong password and then in the next message box btn:[Confirm root Password].
 ====
 
-[[_jeos.susemgr.prep]]
+[[jeos.susemgr.prep]]
 == Preparing JeOS for {susemgr}
 
-[[_proc.jeos.susemgr.prep]]
+[[proc.jeos.susemgr.prep]]
 .Procedure: Preparing JeOS for {susemgr}Installation
 . Register with SCC:
 +
@@ -151,7 +141,7 @@ zypper in -t package yast2-storage
 | VirtIO Disk 4        | [path]``swap``           | 4 GB         | swap
 |===
 
-. {slsa} by default uses the BTRFS file system. A mount point is created automatically for [path]``/var/lib/pgsql/`` (even when not installed). This must be removed or commented out from the [path]``/etc/fstab`` entries. As {rootuser} edit [path]``/etc/fstab`` and comment out or remove the line:
+. {slsa} by default uses the BTRFS file system. A mount point is created automatically for [path]``/var/lib/pgsql/`` (even when not installed). This must be removed or commented out from the [path]``/etc/fstab`` entries. As root edit [path]``/etc/fstab`` and comment out or remove the line:
 +
 
 ----
@@ -176,8 +166,8 @@ zypper in -t pattern suma_server
 
 For proceeding with {susemgr} setup, see:
 ifdef::env-github[]
-<<quickstart3_chap_suma_setup_with_yast.adoc#gs-setup-with-yast, SUSE Manager Setup via YaST>>
+<<quickstart3_chap_sumasetup_with_yast.adoc#gs-setup-with-yast, SUSE Manager Setup via YaST>>
 endif::[]
 ifndef::env-github[]
-<<_suma.setup.with.yast.sumasetup>>
+<<suma-setup-with-yast-sumasetup#suma-setup-with-yast-sumasetup, Setup SUSE Manager with YaST>>
 endif::[]

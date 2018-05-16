@@ -1,45 +1,74 @@
-[[_salt.gs.guide.introduction]]
+[[salt.gs.guide.introduction]]
 = Getting Started with Salt
+ifdef::env-github,backend-html5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Linux Enterprise
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:susemgr: SUSE Manager
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:webui: WebUI
+:saltversion: 2018.3.0
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+endif::[]
+// Asciidoctor Front Matter
 :doctype: book
-:sectnums:
+:sectlinks:
 :toc: left
 :icons: font
 :experimental:
 :sourcedir: .
 :imagesdir: images
 
-[[_salt.gs.guide.intro]]
+
+[[salt.gs.guide.intro]]
 == Introduction
 
 
-This chapter provides an introduction to using the new Salt features added in {susemgr}
- 3.
-This chapter assumes you have completed all former sections within the {mgrgetstart}
-.
-You should have a running {susemgr}
-server and at least one on-boarded Salt minion to complete the sections of this chapter.
-If you find yourself stuck at any point refer to the [ref]_SaltStack Get
-    Started_
- tutorial located at https://docs.saltstack.com/en/getstarted/fundamentals/index.html.
+This section introduces you to the new Salt features added in {susemgr} 3.
+This chapter assumes you have completed all previous Getting Started sections.
+At a minimum have the following setup:
 
-.Use More than One Minion
-[TIP]
+* A freshly installed {susemgr} server with a main admin account and a synced product channel
+* Preferably two registered Salt minions to experiment with.
+
+If you find yourself stuck at any point refer to the [ref]_SaltStack Get Started_ tutorial located at https://docs.saltstack.com/en/getstarted/fundamentals/index.html.
+
+[NOTE]
 ====
-Connecting two or more minions during your testing is considered best practice.
-This will allow you to target individual minions using Salt and experiment with the power of its targeting features.
-====
-
-
 This guide does not attempt to cover all that Salt has to offer.
-This guide is a primer for using Salt with {susemgr}
-.
+This guide is a primer for using Salt with {susemgr}.
 For comprehensive Salt documentation, see https://docs.saltstack.com/en/latest/contents.html.
+====
 
-The current version of Salt in {susemgr}
-is ``2016.3.x``.
-For additional covering the major differences between Salt version `2015.11.x` and `2016.3.x` review the following release notes: https://docs.saltstack.com/en/latest/topics/releases/2015.8.0.htmlhttps://docs.saltstack.com/en/latest/topics/releases/2016.3.0.html
+The current version of Salt in {susemgr} is {saltversion}.
 
-[[_salt.gs.guide.testing.first.minion]]
+
+[[salt.gs.guide.testing.first.minion]]
 == Understanding Salt Calls
 
 Salt Calls::
@@ -47,11 +76,11 @@ Salt calls are defined by three main properties:
 +
 
 ----
-# salt '`target`'`function`[`arguments`]
+salt 'target' <function> [arguments]
 ----
 
 Target:::
-Use the second property in a Salt call to define a target machine.
+Use the second property in a Salt call to target a single machine or group of machines.
 Specify the minion or group of minions you would like to run a function on.
 
 General Targeting::::
@@ -59,85 +88,88 @@ List available grains on all minions:
 +
 
 ----
-# salt '*' grains.ls
+salt '*' grains.ls
 ----
 +
 Ping a specific minion:
 +
 
 ----
-# salt 'web1.example.com' test.ping
+salt 'web1.example.com' test.ping
 ----
 Glob Targeting::::
 Ping all minions using a domain:
 +
 
 ----
-# salt '*example.com' test.ping
+salt '*example.com' test.ping
 ----
 +
 Display the OS name of all minions with the label ``webserver``:
 +
 
 ----
-# salt 'webserver*' grains.item oscodename
+salt 'webserver*' grains.item oscodename
 ----
 List Targeting::::
 +
 
 ----
-# salt -L 'webserver.example.com,db.example.com' test.ping
+salt -L 'webserver.example.com,db.example.com' test.ping
 ----
 Regular Expression Targeting::::
 You may use PCRE-compliant regular expressions:
 +
 
 ----
-# salt -E '(?!web)' test.ping
+salt -E '(?!web)' test.ping
 ----
 IP Address Targeting::::
 List minion IP addresses:
 +
 
 ----
-# salt '*' network.ip_addrs
+salt '*' network.ip_addrs
 ----
 +
 Ping a specific minion IP address:
 +
 
 ----
-# salt -S '172.31.60.74' test.ping
+salt -S '172.31.60.74' test.ping
 ----
 +
 Ping all minions on a subnet:
 +
 
 ----
-# salt -S 172.31.0.0/16 test.ping
+salt -S 172.31.0.0/16 test.ping
 ----
 +
+
 .Lookup a Subnet Using the [command]``ip`` Command
-TIP: You can use the [command]``ip`` command to find the subnet mask in the format of ``192.168.1.1/24``:
+[TIP]
+====
+You can use the [command]``ip`` command to find the subnet mask in the format of ``192.168.1.1/24``:
 
 ----
-# ip -o -f inet addr show | awk '/scope global/ {print $4}'
+ip -o -f inet addr show | awk '/scope global/ {print $4}'
 ----
+====
+
 +
 
-
-Function:::
+Function::
 Once you have specified a target, provide the function you would like to call.
 Functions also accept arguments.
-These are space-delimited.
-For example:
+Arguments are space-delimited, for example:
 +
 
 ----
 salt '*' cmd.run 'echo "Hello: $FIRST_NAME"' env='{FIRST_NAME: "John"}'
 ----
 
-Locating Additional Minion Functions::::
+Locating Additional Minion Functions:::
 Find more functions which can be called on minions by running:
 +
 
@@ -149,16 +181,14 @@ A full list of callable functions are located here: https://docs.saltstack.com/e
 
 Arguments:::
 Provides the extra data needed by a function you are calling.
-The command `pkg.install` requires an argument specifying a package to install. {yast}
-has been selected for installation.
-For example:
+The command `pkg.install` requires an argument specifying a package to install. {yast} has been selected for installation, for example:
 +
 
 ----
-# salt '*' pkg.install yast2
+salt '*' pkg.install yast2
 ----
 
-[[_salt.gs.guide.term.overview]]
+[[salt.gs.guide.term.overview]]
 == Common Salt Terminology
 
 Grains::
@@ -176,14 +206,14 @@ List all available grains with the `grains.ls` function:
 +
 
 ----
-# salt '*' grains.ls
+salt '*' grains.ls
 ----
 +
 List collected grain system data by using the `grains.items` function:
 +
 
 ----
-# salt '*' grains.items
+salt '*' grains.items
 ----
 +
 For more information on grains, see https://docs.saltstack.com/en/latest/topics/grains/.
@@ -195,14 +225,13 @@ Once written, states are applied to target systems automating the process of man
 For more information on states, see https://docs.saltstack.com/en/latest/topics/tutorials/starting_states.html.
 +
 
-.Upating Salt
-WARNING: Do not update [package]#salt#
- itself using Salt states.
-First update all other system packages using Salt states then update [package]#salt#
- as a separate stand-alone step from the {susemgr}{webui}
-.
+[WARNING]
+.Updating Salt
+====
+Do not update [package]#salt# itself using Salt states.
+First update all other system packages using Salt states then update [package]#salt# as a separate stand-alone step from the {susemgr}{webui}.
+====
 +
-
 
 Pillar::
 Pillars unlike grains are created on the master.
@@ -223,55 +252,56 @@ For RES systems install python-inotify.
 This package is not installed automatically during the salt minion package installation.
 +
 
-
-+
+[NOTE]
 .Peer Communication with salt-broker
-NOTE: The salt-broker acts like a switch and not like a hub, therefore Peer communication will only work for minions behind the same broker/Proxy.
+====
+The salt-broker acts like a switch and not like a hub, therefore Peer communication will only work for minions behind the same broker/Proxy.
 For more information on Salt and peer communication see: https://docs.saltstack.com/en/latest/ref/peer.html
+====
 +
 
 
-
-[[_salt.gs.guide.useful.salt.commands]]
+[[salt.gs.guide.useful.salt.commands]]
 == Useful Salt Commands
 
 
 The following list provides several useful Salt commands.
 
-[command]``salt-run``::
+salt-run::
 Print a list of all minions that are up:
 +
 
 ----
-# salt-run manage.up
+salt-run manage.up
 ----
 +
 Print a list of all minions that are down:
 +
 
 ----
-# salt-run manage.down
+salt-run manage.down
 ----
 +
 Print a list with the current status of all Salt minions:
 +
 
 ----
-# salt-run manage.status
+salt-run manage.status
 ----
 +
 Check the version of Salt running on the master and active minions:
 +
 
 ----
-# salt-run manage.versions
+salt-run manage.versions
 ----
-[command]``salt-cp``::
+
+salt-cp::
 Copy a file to a minion or set of minions.
 +
 
 ----
-# salt-cp '*' foo.conf /root
+salt-cp '*' foo.conf /root
 ----
 +
 For more information, see https://docs.saltstack.com/en/latest/ref/cli/salt-cp.html.
@@ -281,24 +311,22 @@ List public keys:
 +
 
 ----
-# salt-key -l
+salt-key -l
 ----
 salt-key -A::
 Accept all pending keys:
 +
 
 ----
-# salt-key -A
+salt-key -A
 ----
 
-[[_salt.gs.guide.salt.file.locations]]
+[[salt.gs.guide.salt.file.locations]]
 == Salt File Locations and Structure
 
 
-The following screen describes Salt file structures and their locations used by the {susemgr}
-server.
-These files are listed in [path]``/etc/salt/master.d/susemanager.conf``
-:
+The following screen describes Salt file structures and their locations used by the {susemgr} server.
+These files are listed in [path]``/etc/salt/master.d/susemanager.conf``:
 
 ----
 # Configure different file roots
@@ -326,89 +354,80 @@ master_tops:
   mgr_master_tops: True
 ----
 
-
-The following tips should be kept in mind when working with [path]``/etc/salt/master.d/susemanager.conf``
-.
+The following tips should be kept in mind when working with [path]``/etc/salt/master.d/susemanager.conf``.
 
 * Files listed are searched in the order they appear.
 * The first file found is called.
 
-
-[[_salt.gs.guide.salt.file.locations.file.roots]]
+[[salt.gs.guide.salt.file.locations.file.roots]]
 === file_roots
 
-{susemgr}
-as the Salt master reads its state data from three specific file root directories.
+{susemgr} as the Salt master reads its state data from three specific file root directories.
 
-[path]``/usr/share/susemanager/salt``::
-This directory is created by {susemgr}
-and its content generated by the `/usr/share/susemanager/modules/tops/mgr_master_tops.py` python module:
-+
-It is shipped and updated together with {susemgr}
-and includes certificate setup and common state logic that will be applied to packages and channels.
+/usr/share/susemanager/salt::
+This directory is created by {susemgr} and its content generated by the `/usr/share/susemanager/modules/tops/mgr_master_tops.py` python module.
+It is shipped and updated together with {susemgr} and includes certificate setup and common state logic that will be applied to packages and channels.
 +
 
-.Non-editable Directory
-WARNING: You should not edit or add custom Salt data to this directory.
+[WARNING]
+.Do Not Edit
+====
+You should not edit or add custom Salt data to this directory.
+====
 +
 
-
-[path]``/srv/susemanager/salt``::
-This directory is created by {susemgr}
-and contains assigned channels and packages for minions, groups, and organizations.
+/srv/susemanager/salt::
+This directory is created by {susemgr} and contains assigned channels and packages for minions, groups, and organizations.
 These files will be overwritten and regenerated.
-A good analogy for this directory would be the {susemgr}
-database translated into Salt directives.
+A good analogy for this directory would be the SUSE Manager database translated into Salt directives.
 +
 
-.Non-editable Directory
-WARNING: You should not edit or add custom Salt data to this directory.
+[WARNING]
+.Do Not Edit
+====
+You should not edit or add custom Salt data to this directory.
+====
 +
 
-
-[path]``/srv/salt``::
-The directory [path]``/srv/salt``
-is for your custom state data, salt modules etc. {susemgr}
-does not touch or do anything with this directory.
-However the state data placed here affects the Highstate of minions and is merged with the result generated by {susemgr}
-.
+/srv/salt::
+The directory [path]``/srv/salt`` is for your custom state data, salt modules etc.
+SUSE Manager does not perform any actions on this directory.
+However the state data placed here affects the Highstate of minions and is merged with the result generated by {susemgr}.
 +
 
-.Editable Directory
-TIP: Place your custom Salt data here.
-+
+[NOTE]
+.Editable
+====
+Place custom Salt data here.
+====
 
-
-
-[[_salt.gs.guide.salt.file.locations.pillar.roots]]
+[[salt.gs.guide.salt.file.locations.pillar.roots]]
 === pillar_roots
 
-{susemgr}
-as the Salt master reads its pillar data from two specific pillar root directories.
+{susemgr} as the Salt master reads its pillar data from two specific pillar root directories.
 
-[path]``/usr/share/susemanager/pillar``::
-This directory is generated by {susemgr}
-.
-It is shipped and updated together with {susemgr}
-.
+/usr/share/susemanager/pillar::
+This directory is generated by {susemgr}.
+It is shipped and updated together with {susemgr}.
 +
 
-.Non-editable Directory
-WARNING: You should not edit or add custom Salt data to this directory.
+[WARNING]
+.Do Not Edit
+====
+You should not edit or add custom Salt data to this directory.
+====
 +
 
-
-[path]``/srv/pillar``::
-{susemgr}
-by default does not touch or do anything with this directory.
-However the custom pillar data placed here is merged with the pillar result created by {susemgr}
-.
+/srv/pillar::
+{susemgr} by default does not touch or do anything with this directory.
+However the custom pillar data placed here is merged with the pillar result created by {susemgr}.
 +
 
+[TIP]
 .Editable Directory
-TIP: Place your custom Salt pillar data here.
-+
-
+====
+Place your custom Salt pillar data here.
+====
 
 
 == Install the SUSE Manager Locale Formula
@@ -427,12 +446,19 @@ zypper install locale-formula
 NOTE: This installs the package contents to [path]``/usr/share/susemanager/formulas/{metadata,states}``
 +
 
-. After installing the RPM, log in to the {susemgr}{webui} .
-. Browse to the menu:System Details[] page of any minion you would like to apply the formula to.
-. On the menu:System Details[] page of the minion you will see a new menu:Formulas[] tab. Select it to view a list of installed formulas.
-. In the menu:Formulas[] listing select menu:Locale[] and click menu:Save[] .
-. A new tab will appear next to the menu:Formula[] subtab. Select the new menu:Locale[] tab.
-. The menu:Locale[] tab contains options for setting the language, keyboard layout, timezone, and whether hardware clock is set to UTC. Select the desired options and click menu:Save[] .
+. After installing the RPM, log in to the {susemgr} {webui}.
+
+. Browse to the menu:Main Menu[System Details] page of any minion you would like to apply the formula to.
+
+. On the menu:Main Menu[System Details] page you will see a new btn:[Formulas] tab.
+Select it to view a list of installed formulas.
+
+. From the btn:[Formulas] list select menu:Formulas[Locale] and click btn:[Save].
+
+. A new tab will appear next to the menu:Formula[Locale] subtab. Select the new menu:Formulas[Locale] tab.
+
+. The menu:Formalas[Locale] tab contains options for setting the language, keyboard layout, timezone, and whether hardware clock is set to UTC. Select the desired options and click btn:[Save].
+
 . Run the following command to verify pillar settings. The output has been truncated.
 +
 
@@ -463,6 +489,7 @@ salt '$your_minion' pillar.items
            CET
     ...
 ----
+
 . Apply this state to your minion by applying the highstate from the command line with:
 +
 
@@ -470,6 +497,8 @@ salt '$your_minion' pillar.items
 salt '$your_minion' state.highstate
 ----
 +
-NOTE: You can also apply the highstate from the previous formula tab from the {susemgr}{webui}
-by clicking menu:Apply Highstate[].
 
+[NOTE]
+====
+You can also apply the highstate from the previous formula tab from the {susemgr} {webui} by clicking menu:System Details[States > Apply Highstate].
+====

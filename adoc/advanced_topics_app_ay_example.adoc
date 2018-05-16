@@ -1,19 +1,58 @@
-:sectnums!:
 
 [appendix]
-[[_advanced.topics.app.ay.example_simple]]
-= Minimalist {ay} Profile for Automated Installations and Useful Enhancements
+[[advanced.topics.app.ay.example-simple]]
+= Minimalist AutoYaST Profile for Automated Installations and Useful Enhancements
+
+ifdef::env-github,backend-html5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:linkattrs:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Linux Enterprise
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:susemgr: SUSE Manager
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:saltversion: 2018.3.0
+:webui: WebUI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+:ay: AutoYaST
+endif::[]
+// Asciidoctor Front Matter
+:doctype: book
+:sectlinks:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:imagesdir: images
 
 
-The following {ay}
-profile will install a {sls}
-system with all default installation options including a default network configuration with DHCP.
-After the installation is completed, a bootstrap script located on the {susemgr}
-server will be executed in order to register the freshly installed system with {susemgr}
-.
-You need to adjust the IP address of the {susemgr}
-server, the name of the bootstrap script and the {rootuser}
-password according to your needs in the following lines: 
+The following {ay} profile will install a {sls} system with all default installation options including a default network configuration with DHCP.
+After the installation is completed, a bootstrap script located on the {susemgr} server will be executed in order to register the freshly installed system with {susemgr}.
+You need to adjust the IP address of the {susemgr} server, the name of the bootstrap script and the root password according to your needs in the following lines:
 
 ----
 <user>
@@ -25,9 +64,7 @@ password according to your needs in the following lines:
 <location>http://`192.168.1.1`/pub/bootstrap/`my_bootstrap.sh`</location>
 ----
 
-
-The complete {ay}
-file: 
+The complete {ay} file:
 
 ----
 <?xml version="1.0"?>
@@ -47,7 +84,7 @@ file:
    <patterns config:type="list">
     <pattern>base</pattern>
    </patterns>
- </software> 
+ </software>
  <users config:type="list">
   <user>
    <encrypted config:type="boolean">false</encrypted>
@@ -80,7 +117,7 @@ file:
 ----
 
 
-Use the following enhancement fragment to add child channels: 
+Use the following enhancement fragment to add child channels:
 
 ----
 <add-on>
@@ -97,12 +134,12 @@ Use the following enhancement fragment to add child channels:
 </add-on>
 ----
 
-
 Replace [replaceable]``channel-label`` and [replaceable]``distribution-label`` with actual labels such as `sles11-sp1-updates-x86_64` and `sles11-sp2-x86_64` (the distribution label must correspond to the Autoinstallable Distribution!), and set the variables (``$c_server``, etc.) according to your environment.
-For information about variables, see <<_s4_sm_system_kick_dist_variables>>. 
+For information about variables, see <<s4-sm-system-kick-dist-variables>>.
 
-.Add the Updates Channel
+
 [IMPORTANT]
+.Add the Updates Channel
 ====
 It is required to add the updates tools channel to the <add-on> AutoYaST snippet section.
 This ensures your systems are provided with an up-to-date version of libzypp.
@@ -119,5 +156,3 @@ See the following example where the (DISTRIBUTION_NAME) is replaced with the nam
   </listentry>
 ----
 ====
-
-:sectnums:
