@@ -1,0 +1,1336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE appendix
+[
+  <!ENTITY % entities SYSTEM "entity-decl.ent">
+    %entities;
+]>
+<!-- Converted by suse-upgrade version 1.1 -->
+<?xml-stylesheet href="urn:x-suse:xslt:profiling:docbook50-profile.xsl" 
+ type="text/xml"
+ title="Profiling step"?>
+<appendix xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:id="ap-cli-config-tools">
+ <title>Command Line Configuration Management Tools</title>
+ <info/><indexterm>
+ <primary>configuration management</primary>
+ <secondary>command line tools</secondary></indexterm>
+ <para>
+  In addition to the &susemgr; Web interface, &susemgr; offers two
+  command line tools for managing system configuration files: the
+  Configuration Client and the Configuration Manager. There is a
+  complementary Actions Control tool used to enable and disable
+  configuration management on client systems. If you do not yet have these
+  tools installed, they can be found in the <guimenu>&susemgr;
+  Tools</guimenu> child channel for your operating system (package names
+  are: <systemitem>rhncfg-client</systemitem>,
+  <systemitem>rhncfg-manager</systemitem>, and
+  <systemitem>rhncfg-actions</systemitem>).
+ </para>
+ <note>
+  <title>Tip</title>
+  <para>
+   Whenever a configuration file is deployed via &susemgr;, a backup of
+   the previous file including its full path is stored in the
+   <filename>/var/lib/rhncfg/backups/</filename> directory on the affected
+   system. The backup retains its filename but has a
+   <filename>.rhn-cfg-backup</filename> extension appended.
+  </para>
+ </note>
+ <sect1 xml:id="s1-cli-actions-control">
+<!--status="debranded"-->
+
+  <title>Actions Control (<command>mgr-actions-control</command>)</title><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>mgr-actions-control</secondary></indexterm>
+
+  <para>
+   The Actions Control (<command>mgr-actions-control</command>) application
+   is used to enable and disable configuration management on a system.
+   Client systems cannot be managed in this fashion by default. This tool
+   allows &susemgr; administrators to enable or disable specific modes of
+   allowable actions such as: <emphasis>deploying</emphasis> a configuration
+   file on the system, <emphasis>uploading</emphasis> a file from the
+   system, using the <command>diff</command> command to find out what is
+   currently managed on a system with what is available, or running
+   <emphasis>remote commands</emphasis>. These various modes are
+   enabled/disabled by placing/removing files and directories in the
+   <filename>/etc/sysconfig/rhn/allowed-actions/</filename> directory. Due
+   to the default permissions of the
+   <filename>/etc/sysconfig/rhn/</filename> directory, Actions Control has
+   to be run by someone with root access.
+  </para>
+
+  <sect2 xml:id="s2-cli-actions-control">
+<!--status="debranded"-->
+   <title>General command line options</title>
+   <para>
+    There is a manpage available, as for most command line tools. First,
+    decide which scheduled actions should be enabled for use by system
+    administrators. The following options enable the various scheduled
+    action modes:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>--enable-deploy</option>
+     </term>
+     <listitem>
+      <para>
+       Allow <command>mgrcfg-client</command> to deploy files.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--enable-diff</option>
+     </term>
+     <listitem>
+      <para>
+       Allow <command>mgrcfg-client</command> to diff files.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--enable-upload</option>
+     </term>
+     <listitem>
+      <para>
+       Allow <command>mgrcfg-client</command> to upload files.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--enable-mtime-upload</option>
+     </term>
+     <listitem>
+      <para>
+       Allow <command>mgrcfg-client</command> to upload mtime (file
+       modification time).
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--enable-all</option>
+     </term>
+     <listitem>
+      <para>
+       Allow <command>mgrcfg-client</command> to do everything.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--enable-run</option>
+     </term>
+     <listitem>
+      <para>
+       Enable running scripts.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--disable-deploy</option>
+     </term>
+     <listitem>
+      <para>
+       Disable deployment.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--disable-diff</option>
+     </term>
+     <listitem>
+      <para>
+       Prohibit diff use.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--disable-upload</option>
+     </term>
+     <listitem>
+      <para>
+       No file uploads allowed.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--disable-mtime-upload</option>
+     </term>
+     <listitem>
+      <para>
+       Disable mtime upload.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--disable-all</option>
+     </term>
+     <listitem>
+      <para>
+       Disable all options.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--disable-run</option>
+     </term>
+     <listitem>
+      <para>
+       No scripts allowed to run.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--report</option>
+     </term>
+     <listitem>
+      <para>
+       Report whether modes are enabled or disabled.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-f, --force</option>
+     </term>
+     <listitem>
+      <para>
+       Force the operation without asking first.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <para>
+    Once a mode is set, your system is ready for configuration management
+    through &susemgr;. A common option is <command>mgr-actions-control
+    --enable-all</command>.
+   </para>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="s1-cli-config-client">
+<!--status="debranded"-->
+
+  <title>Configuration Client (<command>mgrcfg-client</command>)</title><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>mgrcfg-client
+  </secondary></indexterm>
+
+  <para>
+   As the name implies, the Configuration Client
+   (<command>mgrcfg-client</command>) is installed on and run from an
+   individual client system to gain knowledge about how &susemgr; deploys
+   configuration files to the client.
+  </para>
+
+  <para>
+   The Configuration Client offers these primary modes: list, get, channels,
+   diff, and verify.
+  </para>
+
+  <sect2 xml:id="s2-cli-config-client-list">
+<!--status="debranded"-->
+   <title>Listing Config Files</title>
+   <para>
+    To list the configuration files for the machine and the labels of the
+    config channels containing them, issue the command:
+   </para>
+<screen>mgrcfg-client list</screen>
+   <para>
+<!-- bnc#733327 -->
+    The output resembles the following list (<quote>DoFoS</quote> is a
+    shortcut for <quote>D or F or S</quote>, which means
+    <quote>Directory</quote>, <quote>File</quote>, or <quote>Something
+    else</quote>(?)):
+   </para>
+<screen>DoFoS   Config Channel      File
+F      config-channel-17   /etc/example-config.txt
+F      config-channel-17   /var/spool/aalib.rpm
+F      config-channel-14   /etc/rhn/rhn.conf</screen>
+   <para>
+    These configuration files apply to your system. However, there may be
+    duplicate files present in other channels. For example, issue the
+    following command:
+   </para>
+<screen>mgrcfg-manager list <replaceable>config-channel-14</replaceable></screen>
+   <para>
+    and observe the following output:
+   </para>
+<screen>Files in config channel 'config-channel-14'
+/etc/example-config.txt /etc/rhn/rhn.conf</screen>
+   <para>
+    You may wonder why the second version of
+    <filename>/etc/example-config.txt</filename> in
+    <command>config-channel-14</command> does not apply to the client
+    system. The rank of the <filename>/etc/example-config.txt</filename>
+    file in <command>config-channel-17</command> was higher than that of the
+    same file in <command>config-channel-14</command>. As a result, the
+    version of the configuration file in
+    <command>config-channel-14</command> is not deployed for this system,
+    therefore <command>mgrcfg-client</command> command does not list the
+    file.
+   </para>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-client-get">
+<!--status="debranded"-->
+   <title>Getting a Config File</title>
+   <para>
+    To download the most relevant configuration file for the machine, issue
+    the command:
+   </para>
+<screen>mgrcfg-client get /etc/example-config.txt</screen>
+   <para>
+    You should see output resembling:
+   </para>
+<screen>Deploying /etc/example-config.txt</screen>
+   <para>
+    View the contents of the file with <command>less</command> or another
+    pager. Note that the file is selected as the most relevant based on the
+    rank of the config channel containing it. This is accomplished within
+    the <guimenu>Configuration</guimenu> tab of the <guimenu>System
+    Details</guimenu> page. Refer to <xref linkend="s3-sm-system-details"/>
+    for instructions.
+   </para>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-client-channels">
+<!--status="debranded"-->
+   <title>Viewing Config Channels</title>
+   <para>
+    To view the labels and names of the config channels that apply to the
+    system, issue the command:
+   </para>
+<screen>mgrcfg-client channels</screen>
+   <para>
+    You should see output resembling:
+   </para>
+<screen>Config channels:
+Label                   Name
+-----                   ----
+config-channel-17       config chan 2
+config-channel-14       config chan 1</screen>
+   <para>
+    The list of options available for <command>mgrcfg-client get</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>--topdir=TOPDIR</option>
+     </term>
+     <listitem>
+      <para>
+       Make all file operations relative to this string.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--exclude=EXCLUDE</option>
+     </term>
+     <listitem>
+      <para>
+       Exclude a file from being deployed with <command>get</command>. May
+       be used multiple times.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-client-diff">
+<!--status="debranded"-->
+   <title>Differentiating between Config Files</title>
+   <para>
+    To view the differences between the config files deployed on the system
+    and those stored by &susemgr;, issue the command:
+   </para>
+<screen>mgrcfg-client diff</screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>
+rhncfg-client diff
+--- /etc/test
++++ /etc/test 2013-08-28 00:14:49.405152824 +1000
+@@ -1 +1,2 @@
+This is the first line
++This is the second line added
+</screen>
+   <para>
+    In addition, you can include the <option>--topdir</option> option to
+    compare config files with those located in an arbitrary (and unused)
+    location on the client system, like this:
+   </para>
+<screen># mgrcfg-client diff --topdir /home/test/blah/
+/usr/bin/diff: /home/test/blah/etc/example-config.txt: No such file or directory
+/usr/bin/diff: /home/test/blah/var/spool/aalib.rpm: No such file or directory</screen>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-client-verify">
+<!--status="debranded"-->
+   <title>Verifying Config Files</title>
+   <para>
+    To quickly determine if client configuration files are different from
+    those associated with it via &susemgr;, issue the command:
+   </para>
+<screen>mgrcfg-client verify</screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>modified /etc/example-config.txt /var/spool/aalib.rpm 
+</screen>
+   <para>
+    The file <filename>example-config.txt</filename> is locally modified,
+    while <filename>aalib.rpm</filename> is not.
+   </para>
+   <para>
+    The list of the options available for <command>mgrcfg-client
+    verify</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-v, --verbose</option>
+     </term>
+     <listitem>
+      <para>
+       Increase the amount of output detail. Display differences in the
+       mode, owner, and group permissions for the specified config file.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-o, --only</option>
+     </term>
+     <listitem>
+      <para>
+       Only show differing files.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="s1-cli-config-mgr">
+<!--status="rfc"-->
+
+  <title>Configuration Manager (<command>mgrcfg-manager</command>)</title><indexterm>
+
+  <primary>reactivating</primary>
+
+  <secondary>mgrcfg-manager</secondary></indexterm>
+
+  <para>
+   The Configuration Manager (<command>mgrcfg-manager</command>) is designed
+   to maintain &susemgr;'s central repository of config files and
+   channels, not those located on client systems. This tool offers a command
+   line alternative to the configuration management features in the
+   &susemgr; Web interface. Additionally, some or all of the related
+   maintenance tasks can be scripted.
+  </para>
+
+  <para>
+   To use the command line interface, configuration administrators require a
+   &susemgr; account (username and password) with the appropriate
+   permission set. The username may be specified in
+   <filename>/etc/sysconfig/rhn/rhncfg-manager.conf</filename> or in the
+   [rhncfg-manager] section of <filename>~/.rhncfgrc</filename>.
+  </para>
+
+  <para>
+   <remark role="needinfo">
+    2011-01-31 - ke: mgrcfg-manager's interaction with Red Hat Update Agent?
+   </remark>
+   When the Configuration Manager is run as root, it attempts to pull in
+   needed configuration values from the Red Hat Update Agent. When run as a
+   user other than root, you may have to change the
+   <filename>~/.rhncfgrc</filename> configuration file. The session file is
+   cached in <filename>~/.rhncfg-manager-session</filename> to avoid having
+   to log in for every command.
+  </para>
+
+  <para>
+   The default timeout for the Configuration Manager is 30 minutes. To alter
+   this, add the <option>server.session_lifetime</option> option and a new
+   value to the <filename>/etc/rhn/rhn.conf</filename> file on the server
+   running the manager, for example set the time out to 120 minutes:
+  </para>
+
+<screen>server.session_lifetime = 120</screen>
+
+  <para>
+   The Configuration Manager offers these primary modes: add,
+   create-channel, diff, diff-revisions, download-channel, get, list,
+   list-channels, remove, remove-channel, revisions, update, and
+   upload-channel.
+  </para>
+
+  <para>
+   Each mode offers its own set of options, which can be displayed by
+   issuing the following command:
+  </para>
+
+<screen>mgrcfg-manager <replaceable>mode</replaceable> --help</screen>
+
+  <para>
+   Replace <replaceable>mode</replaceable> with the name of the mode whose
+   options you want to see:
+  </para>
+
+<screen>mgrcfg-manager diff-revisions --help</screen>
+
+  <para>
+   Find a list of options for the add mode in
+   <xref linkend="s2-cli-config-mgr-add"/>.
+  </para>
+
+  <sect2 xml:id="s2-cli-config-mgr-create">
+<!--status="debranded"-->
+   <title>Creating a Config Channel</title>
+   <para>
+    To create a config channel for your organization, issue the command:
+   </para>
+<screen>mgrcfg-manager create-channel <replaceable>channel-label</replaceable></screen>
+   <para>
+    If prompted for your &susemgr; username and password, provide them.
+<!-- The output resembles the following: -->
+   </para>
+<!-- FIXME: check the output -->
+<!-- <screen>Red Hat Network username: rhn-user Password: Creating config channel <replaceable>channel-label</replaceable> Config channel <replaceable>channel-label</replaceable> created 
+</screen>
+-->
+   <para>
+    Once you have created a config channel, use the remaining modes listed
+    above to populate and maintain that channel.
+   </para>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-add">
+<!--status="debranded"-->
+   <title>Adding Files to a Config Channel</title>
+   <para>
+    To add a file to a config channel, specify the channel label and the
+    local file to be uploaded:
+   </para>
+<screen>mgrcfg-manager add --channel=<replaceable>channel-label</replaceable> <replaceable>/path/to/file</replaceable></screen>
+   <para>
+    In addition to the required channel label and the path to the file, you
+    can use the available options for modifying the file during its
+    addition. For instance, you can alter the path and file name by
+    including the <option>--dest-file</option> option in the command:
+   </para>
+<screen>mgrcfg-manager add --channel=<replaceable>channel-label</replaceable> \
+  --dest-file=<replaceable>/new/path/to/file.txt</replaceable><replaceable>/path/to/file</replaceable></screen>
+   <para>
+    The output resembles the following:
+   </para>
+<!-- FIXME: check the output! -->
+<screen>Pushing to channel example-channel
+Local file &gt;/path/to/file -&gt; remote file /new/path/to/file.txt</screen>
+   <para>
+    The list of options available for <command>mgrcfg-manager add</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-c CHANNEL --channel=CHANNEL</option>
+     </term>
+     <listitem>
+      <para>
+       Upload files in this config channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-d DEST_FILE --dest-file=DEST_FILE</option>
+     </term>
+     <listitem>
+      <para>
+       Upload the file as this path.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--delim-start=DELIM_START</option>
+     </term>
+     <listitem>
+      <para>
+       Start delimiter for variable interpolation.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--delim-end=DELIM_END</option>
+     </term>
+     <listitem>
+      <para>
+       End delimiter for variable interpolation.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-i, --ignore-missing</option>
+     </term>
+     <listitem>
+      <para>
+       Ignore missing local files.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry os="hidden">
+     <term>
+      <remark>emap: omitted selinux entry.</remark>
+     </term>
+     <listitem>
+      <para/>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+   <note>
+    <para>
+     By default, the maximum file size for configuration files is 128KB. If
+     you need to change that value, find or create the following line in the
+     <filename>/etc/rhn/rhn.conf</filename> file:
+    </para>
+<screen>web.maximum_config_file_size=128</screen>
+    <para>
+     Change the value from 128 to whatever limit you want in kilo bytes.
+    </para>
+   </note>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-diff">
+<!--status="debranded"-->
+   <title>Differentiating between Latest Config Files</title>
+   <para>
+    To view the differences between the config files on disk and the latest
+    revisions in a channel, issue the command:
+   </para>
+<screen>mgrcfg-manager diff --channel=<replaceable>channel-label</replaceable> --dest-file=<replaceable>/path/to/file.txt</replaceable> \
+<replaceable>/local/path/to/file</replaceable></screen>
+   <para>
+    You should see output resembling:
+   </para>
+<screen>
+--- /tmp/dest_path/example-config.txt config_channel: example-channel revision: 1
++++ /home/test/blah/hello_world.txt 2003-12-14 19:08:59.000000000 -0500
+@@ -1 +1 @@
+-foo
++hello, world</screen>
+   <para>
+    The list of options available for <command>mgrcfg-manager
+    diff</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-c CHANNEL, --channel=CHANNEL</option>
+     </term>
+     <listitem>
+      <para>
+       Get file(s) from this config channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-r REVISION, --revision=REVISION</option>
+     </term>
+     <listitem>
+      <para>
+       Use this revision.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-d DEST_FILE, --dest-file=DEST_FILE</option>
+     </term>
+     <listitem>
+      <para>
+       Upload the file at this path.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-t TOPDIR, --topdir=TOPDIR</option>
+     </term>
+     <listitem>
+      <para>
+       Make all files relative to this string.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-diff-ver">
+<!--status="debranded"-->
+   <title>Differentiating between Various Versions</title>
+   <para>
+    To compare different versions of a file across channels and revisions,
+    use the <option>-r</option> flag to indicate which revision of the file
+    should be compared and the <option>-n</option> flag to identify the two
+    channels to be checked. Refer to <xref linkend="s2-cli-config-mgr-rev"/>
+    for related instructions. Specify only one file name here since you are
+    comparing the file against another version of itself. For example:
+   </para>
+<screen>mgrcfg-manager diff-revisions -n=<replaceable>channel-label1</replaceable> -r=<replaceable>1</replaceable> \
+  -n=<replaceable>channel-label2</replaceable> -r=<replaceable>1</replaceable> \
+  <replaceable>/path/to/file.txt</replaceable></screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>--- /tmp/dest_path/example-config.txt 2004-01-13 14:36:41 \
+config channel: example-channel2 revision: 1
+--- /tmp/dest_path/example-config.txt 2004-01-13 14:42:42 \
+config channel: example-channel3 revision: 1
+@@ -1 +1,20 @@
+-foo
++blah
++-----BEGIN PGP SIGNATURE-----
++Version: GnuPG v1.0.6 (GNU/Linux)
++Comment: For info see http://www.gnupg.org
++
++iD8DBQA9ZY6vse4XmfJPGwgRAsHcAJ9ud9dabUcdscdcqB8AZP7e0Fua0NmKsdhQCeOWHX
++VsDTfen2NWdwwPaTM+S+Cow=
++=Ltp2
++-----END PGP SIGNATURE-----</screen>
+   <para>
+    The list of options available for <command>mgrcfg-manager
+    diff-revisions</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-c CHANNEL, --channel=CHANNEL</option>
+     </term>
+     <listitem>
+      <para>
+       Use this config channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-r REVISION, --revision=REVISION</option>
+     </term>
+     <listitem>
+      <para>
+       Use this revision.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-download">
+<!--status="debranded"-->
+   <title>Downloading All Files in a Channel</title>
+   <para>
+    To download all the files in a channel to disk, create a directory and
+    issue the following command:
+   </para>
+<screen>mgrcfg-manager download-channel <replaceable>channel-label</replaceable> --topdir . </screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>Copying /tmp/dest_path/example-config.txt -&gt; \
+blah2/tmp/dest_path/example-config.txt</screen>
+   <para>
+    The list of options available for <command>mgrcfg-manager
+    download-channel</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-t TOPDIR, --topdir=TOPDIR</option>
+     </term>
+     <listitem>
+      <para>
+       Directory to which all the file paths are relative. This option must
+       be set.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-get">
+<!--status="debranded"-->
+   <title>Getting the Contents of a File</title>
+   <para>
+    To direct the contents of a particular file to stdout, issue the
+    command:
+   </para>
+<screen>mgrcfg-manager get --channel=<replaceable>channel-label</replaceable> \
+/tmp/dest_path/example-config.txt </screen>
+   <para>
+    You should see the contents of the file as output.
+   </para>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-list">
+<!--status="debranded"-->
+   <title>Listing All Files in a Channel</title>
+   <para>
+    To list all the files in a channel, issue the command:
+   </para>
+<screen>mgrcfg-manager list <replaceable>channel-label</replaceable></screen>
+   <para>
+    You should see output resembling:
+   </para>
+<screen>Files in config channel `example-channel3':
+/tmp/dest_path/example-config.txt</screen>
+   <para>
+    The list of the options available for <command>mgrcfg-manager
+    get</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-c CHANNEL, --channel=CHANNEL</option>
+     </term>
+     <listitem>
+      <para>
+       Get file(s) from this config channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-t TOPDIR, --topdir=TOPDIR</option>
+     </term>
+     <listitem>
+      <para>
+       Directory to which all files are relative.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-r REVISION, --revision=REVISION</option>
+     </term>
+     <listitem>
+      <para>
+       Get this file revision.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-list-chan">
+<!--status="debranded"-->
+   <title>Listing All Config Channels</title>
+   <para>
+    To list all of your organization's configuration channels, issue the
+    command:
+   </para>
+<screen>mgrcfg-manager list-channels</screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>Available config channels:
+example-channel example-channel2 example-channel3 config-channel-14 config-channel-17</screen>
+   <para>
+    Note that this does not list <option>local_override</option> or
+    <option>server_import</option> channels.
+   </para>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-remove-file">
+<!--status="debranded"-->
+   <title>Removing a File from a Channel</title>
+   <para>
+    To remove a file from a channel, issue the command:
+   </para>
+<screen>mgrcfg-manager remove --channel=<replaceable>channel-label</replaceable> /tmp/dest_path/example-config.txt</screen>
+   <para>
+    If prompted for your &susemgr; username and password, provide them.
+<!-- You should
+    see output resembling:-->
+   </para>
+<!-- FIXME: check output
+<screen>Red Hat Network username: rhn-user Password: Removing from config channel example-channel3 /tmp/dest_path/example-config.txt removed 
+</screen>
+-->
+   <para>
+    The list of the options available for <command>mgrcfg-manager
+    remove</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-c CHANNEL, --channel=CHANNEL</option>
+     </term>
+     <listitem>
+      <para>
+       Remove files from this config channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-t TOPDIR, --topdir=TOPDIR</option>
+     </term>
+     <listitem>
+      <para>
+       Directory to which all files are relative.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-remove-chan">
+<!--status="debranded"-->
+   <title>Deleting a Config Channel</title>
+   <para>
+    To remove a config channel in your organization, issue the command:
+   </para>
+<screen>mgrcfg-manager remove-channel <replaceable>channel-label</replaceable></screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>Removing config channel example-channel
+Config channel example-channel removed </screen>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-rev">
+<!--status="debranded"-->
+   <title>Determining the Number of File Revisions</title>
+   <para>
+    To find out how many revisions (from 1 to N where N is an integer
+    greater than 0) of a file/path are in a channel, issue the following
+    command:
+   </para>
+<screen>mgrcfg-manager revisions <replaceable>channel-label</replaceable> /tmp/dest_path/example-config.txt</screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>Analyzing files in config channel example-channel \
+/tmp/dest_path/example-config.txt: 1</screen>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-update">
+<!--status="debranded"-->
+   <title>Updating a File in a Channel</title>
+   <para>
+    To create a new revision of a file in a channel (or to add the first
+    revision to that channel if none existed before for the given path),
+    issue the following command:
+   </para>
+<screen>mgrcfg-manager update --channel=<replaceable>channel-label</replaceable> \
+--dest-file=<replaceable>/path/to/file.txt</replaceable> <replaceable>/local/path/to/file</replaceable></screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>Pushing to channel example-channel:
+Local file example-channel /tmp/local/example-config.txt -&gt; \
+remote file /tmp/dest_path/example-config.txt</screen>
+   <remark>emap 2011-03-22: Does it make sense to use 'dest_path' in
+  both paths?</remark>
+   <remark role="generic">
+2011-04-01 - ke: I changed it.  Sb must check the real output...
+</remark>
+   <para>
+    The list of the options available for <command>mgrcfg-manager
+    update</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-c CHANNEL, --channel=CHANNEL</option>
+     </term>
+     <listitem>
+      <para>
+       Upload files in this config channel.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-d DEST_FILE, --dest-file=DEST_FILE</option>
+     </term>
+     <listitem>
+      <para>
+       Upload the file to this path.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-t TOPDIR, --topdir=TOPDIR</option>
+     </term>
+     <listitem>
+      <para>
+       Directory to which all files are relative.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--delim-start=DELIM_START</option>
+     </term>
+     <listitem>
+      <para>
+       Start delimiter for variable interpolation.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>--delim-end=DELIM_END</option>
+     </term>
+     <listitem>
+      <para>
+       End delimiter for variable interpolation.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-mgr-upload">
+<!--status="debranded"-->
+   <title>Uploading Multiple Files at Once</title>
+   <para>
+    To upload multiple files to a config channel from a local disk at once,
+    issue the command:
+   </para>
+<screen>mgrcfg-manager upload-channel --topdir=<replaceable>topdir</replaceable> <replaceable>channel-label</replaceable></screen>
+   <para>
+    The output resembles the following:
+   </para>
+<screen>Using config channel example-channel4
+Uploading /tmp/ola_world.txt from blah4/tmp/ola_world.txt</screen>
+   <para>
+    The list of the options available for <command>mgrcfg-manager
+    upload-channel</command>:
+   </para>
+   <variablelist>
+    <varlistentry>
+     <term><option>-t TOPDIR, --topdir=TOPDIR</option>
+     </term>
+     <listitem>
+      <para>
+       Directory all the file paths are relative to.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-c CHANNEL, --channel=CHANNEL</option>
+     </term>
+     <listitem>
+      <para>
+       List of channels the config info will be uploaded into channels
+       delimited by ','. Example: <option>--channel=foo,bar,baz</option>.
+      </para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><option>-h, --help</option>
+     </term>
+     <listitem>
+      <para>
+       Show help message and exit.
+      </para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </sect2>
+ </sect1>
+ <sect1 xml:id="s1-cli-config-scc-sync">
+<!-- bnc# -->
+
+  <title>Syncing &susemgr; Repositories from SCC (<command>mgr-sync</command>)</title><indexterm>
+
+  <primary>mgr-sync</primary></indexterm>
+
+  <para>
+   <command>mgr-sync</command> is the new tool replacing
+   <command>mgr-ncc-sync</command>. <command>mgr-sync</command> must be
+   used, if &susemgr; is connected to &scc; (SCC). With
+   <command>mgr-sync</command> you add or synchronize products and channels.
+   It also enables and refreshes SCC data. This tool requires that SCC is
+   enabled by running <command>mgr-sync enable-scc</command> first.
+  </para>
+
+  <para>
+   <command>mgr-sync</command> has a new command structure using
+   sub-commands similar to <command>git</command> or <command>osc</command>.
+   For a complete list of command line option, see the
+   <literal>mgr-sync</literal> manpage (<command>man mgr-sync</command>).
+   Basic actions are:
+  </para>
+
+<screen>mgr-sync enable-scc
+
+mgr-sync list channel(s)|product(s)|credentials
+mgr-sync add  channel(s)|product(s)|credentials
+mgr-sync delete  credentials
+
+mgr-sync refresh [--refresh-channels] [--from-mirror <replaceable>MIRROR</replaceable>]</screen>
+
+  <para>
+   Here are some usage examples. List channels:
+  </para>
+
+<screen>mgr-sync list channels</screen>
+
+  <para>
+   Add a channel:
+  </para>
+
+<screen>mgr-sync add channel <replaceable>LABEL</replaceable></screen>
+
+  <para>
+   List products:
+  </para>
+
+<screen>mgr-sync list products</screen>
+
+  <para>
+   Add a product:
+  </para>
+
+<screen>mgr-sync add product</screen>
+
+  <para>
+   Refresh the data:
+  </para>
+
+<screen>mgr-sync refresh</screen>
+
+  <para>
+   Refresh the data and schedule reposync of all installed vendor channels:
+  </para>
+
+<screen>mgr-sync refresh --refresh-channels</screen>
+
+  <para>
+   <command>mgr-sync</command> now requires username/password of a
+   <quote>&susemgr; administrator</quote>. Most of the functions are
+   available as a public API now.
+  </para>
+
+  <para>
+   List SCC credentials:
+  </para>
+
+<screen>mgr-sync list credentials</screen>
+
+  <para>
+   Add new SCC credentials:
+  </para>
+
+<screen>mgr-sync add credentials</screen>
+
+  <para>
+   To add SCC primary credentials:
+  </para>
+
+<screen>mgr-sync add credentials --primary</screen>
+
+  <para>
+   There can be one primary credential only. This is username/password used
+   first when retrieving the list of available channels and packages.
+  </para>
+
+  <para>
+   Delete SCC credentials:
+  </para>
+
+<screen>mgr-sync delete credentials</screen>
+ </sect1>
+ 
+ <sect1 xml:id="s1-cli-config-smdb">
+  <title>Configuring &susemgr;'s Database (smdba)</title>
+
+<!-- Move partially to this location; see bnc#809954 --><indexterm>
+
+  <primary>smdba</primary></indexterm>
+
+  <para>
+   &susemgr; provides the <command>smdba</command> command for managing
+   the installed database. It is the successor of
+   <command>db-control</command>, which is not supported anymore.
+  </para>
+
+  <para>
+   The <command>smdba</command> command works on local databases only, not
+   remote. This utility allows you to do several administrative tasks like
+   backing up and restoring the database, everything from creating,
+   verifying, and restoring backups to obtaining the database status, and
+   restart the database if necessary. The <command>smdba</command> command
+   supports postgresql; and Oracle databases.
+  </para>
+
+  <para>
+   Find basic information about <command>smdba</command> in the
+   <literal>smdba</literal> manpage.
+  </para>
+
+  <note>
+   <title>Restart Spacewalk Services When Connection is Lost</title>
+   <para>
+    If you have stopped or restarted the database, it can happen that the
+    Spacewalk services lost their connections. In such a case, run the
+    following command:
+   </para>
+<screen>spacewalk-service restart</screen>
+  </note>
+
+  <sect2 xml:id="s2-cli-config-smdb.options">
+   <title>Control Options</title>
+   <para>
+    Depending on the database installed, <command>smdba</command> provides
+    several subcommands:
+   </para>
+   <example xml:id="ex.cli-config-smdb.ora">
+    <title>Available Options on a Machine with an Oracle Database</title>
+<screen>backup-list       List of available backups.
+backup-restore    Restore the SUSE Manager Database from backup.
+db-start          Start SUSE Manager database.
+db-status         Get SUSE Database running status.
+db-stop           Stop SUSE Manager database.
+listener-restart  Restart SUSE Database Listener.
+listener-start    Start the SUSE Manager Database listener.
+listener-status   Show database status.
+listener-stop     Stop the SUSE Manager Database listener.
+space-overview    Show database space report.
+space-reclaim     Free disk space from unused object in tables
+                  and indexes.
+space-tables      Show space report for each table.
+stats-overview    Show tables with stale or empty statistics.
+stats-refresh     Gather statistics on SUSE Manager Database
+                  database objects.
+system-check      Common backend healthcheck.</screen>
+   </example>
+   <example xml:id="ex.cli-config-smdb.psql">
+<!-- bsc#883396 -->
+    <title>Available Options on a Machine with a postgresql Database</title>
+<screen>backup-check            Check the consistency of the backup.
+backup-hot              Perform hot backup on running database.
+backup-list             List of available backups.
+backup-purge            Purge all backups. Useful after successfull reliable
+                        recover from the disaster.
+backup-restore          Restore the SUSE Manager database from backup.
+db-check                Check full connection to the database.
+db-start                Start SUSE Manager database.
+db-status               Display SUSE Manager database runtime status.
+db-stop                 Stop SUSE Manager database.
+listener-restart        Restart SUSE Manager database listener.
+listener-start          Start the SUSE Manager database listener.
+listener-status         Show database status.
+listener-stop           Stop the SUSE Manager database listener.
+space-overview          Show database space report.
+space-reclaim           Free disk space from unused object in tables and
+                        indexes.
+space-tables            Show space report for each table.
+stats-overview          Show tables with stale or empty statistics.
+stats-refresh           Gather statistics on SUSE Manager database objects.
+system-check            Common backend healthcheck.</screen>
+   </example>
+   <para>
+    For a list of available commands on your particular appliance, call
+    <command>smdba help</command>. Each subcommand can contain different
+    options depending on the database used. To display the help message for
+    a specific subcommand, call <command>smdba</command>
+    <replaceable>COMMAND</replaceable> help.
+   </para>
+  </sect2>
+
+  <sect2 xml:id="s2-cli-config-smdb.start-and-stop">
+   <title>Starting and Stopping the Database</title>
+   <para>
+    There are three commands to start, stop, or get the status of the
+    database. These commands work with both databases. Use the following
+    commands:
+   </para>
+<screen># <command>smdba</command> db-status
+Checking database core...       online
+# <command>smdba</command> db-stop
+Stopping the SUSE Manager database...
+Stopping listener:     done
+Stopping core:         done
+# <command>smdba</command> db-status
+Checking database core...       offline
+# <command>smdba</command> db-start
+Starting listener:     done
+Starting core...       done</screen>
+  </sect2>
+ </sect1>
+</appendix>
