@@ -406,9 +406,34 @@ From the {susemgr}{webui} perform the following steps to configure a build host.
 . From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``OS Image Build Host`` and confirm by selecting menu:Update Properties[].
 . Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[]. Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line .
 
+.{susemgr} web server public certificate RPM
+[NOTE]
+====
+Build host provisioning copies {susemgr} certificate RPM to the build host. This certificate is used for access to repositories provided by {susemgr}.
+
+RPM is generated during {susemgr} installation, or manually by calling `mgr-package-rpm-certificate-osimage` script.
+
+RPM with certificate is stored in salt accessible directory as `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
+
+This RPM is then provided in build host local repository `/var/lib/Kiwi/repo`.
+
+Make sure your build source Kiwi configuration contains `rhn-org-trusted-ssl-cert-osimage` as required package in `bootstrap` section.
+
+.config.xml
+[source,xml]
+----
+...
+  <packages type="bootstrap">
+    ...
+    <package name="rhn-org-trusted-ssl-cert-osimage" bootinclude="true"/>
+  </packages>
+...
+----
+
+====
 
 [[at.images.kiwi.buildchannels]]
-==== Define Container Build Channels with an Activation Key
+==== Define Kiwi Build Channels with an Activation Key
 
 
 Create an activation key associated with the channel that your images will use.
@@ -451,7 +476,7 @@ image::images_image_profiles.png[scaledwidth=80%]
 +
 
 
-image::images_image_create_profile.png[scaledwidth=80%]
+image::images_image_create_profile_kiwi.png[scaledwidth=80%]
 . Provide a name for the `Image Profile` by filling in the menu:Label[] field.
 . Use `Kiwi` as the `Image Type`
 . Image store is automatically selected
@@ -467,6 +492,47 @@ NOTE: When you associate an activation key with an image profile you are ensurin
 
 . Click the menu:Create[] button.
 
+.Source format options
+** Git/HTTP(S) URL to repository
++
+
+URL to Git repository containing sources of image to be build. Depending on the layout of repository URL can be simple:
++
+----
+https://github.com/SUSE/manager-build-profiles
+----
++
+
+Which branch should be checked out can be specified after `#` character. In this example it is `master` branch:
++
+----
+https://github.com/SUSE/manager-build-profiles#master
+----
++
+
+Which directory contain image sources can be specified after `:` character. In this example it is `POS_Image_JeOS6/jeos-6.0.0`:
++
+----
+https://github.com/SUSE/manager-build-profiles#master:POS_Image_JeOS6/jeos-6.0.0
+----
+
+** HTTP(S) URL to tarball
++
+
+URL to tar archive, compressed or uncompressed, hosted on webserver.
++
+----
+https://myimagesourceserver.example.org/MyKiwiImage.tar.gz
+----
+
+** Path to the directory on build host
++
+
+Enter path to the directory with Kiwi build system sources. This directory must be present on selected build host.
++
+----
+/var/lib/Kiwi/MyKiwiImage
+----
 
 [[at.images.kiwi.sourceexample]]
 === Example of Kiwi source
@@ -475,10 +541,62 @@ Kiwi source consists of at least `config.xml` file, usually `config.sh` and `ima
 to be implanted in final image under `root` subdirectory.
 
 For all information regarding Kiwi build system please see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation]
-[TODO]
+
+[NOTE]
 ====
-!!!!!!!!!!!! add link to published JeOS sources
+{suse} provides fex examples of fully functional image sources at https://github.com/SUSE/manager-build-profiles[SUSE/manager-build-profiles] public GitHub repository.
 ====
+
+.Example of JeOS config.xml
+[source, xml]
+----
+<?xml version="1.0" encoding="utf-8"?>
+
+<image schemaversion="6.1" name="POS_Image_JeOS6">
+    <description type="system">
+        <author>Admin User</author>
+        <contact>noemail@example.com</contact>
+        <specification>SUSE Linux Enterprise 12 SP3 JeOS</specification>
+    </description>
+    <preferences>
+        <version>6.0.0</version>
+        <packagemanager>zypper</packagemanager>
+        <bootsplash-theme>SLE</bootsplash-theme>
+        <bootloader-theme>SLE</bootloader-theme>
+
+        <locale>en_US</locale>
+        <keytable>us.map.gz</keytable>
+        <timezone>Europe/Berlin</timezone>
+        <hwclock>utc</hwclock>
+
+        <rpm-excludedocs>true</rpm-excludedocs>
+        <type boot="saltboot/suse-SLES12" bootloader="grub2" checkprebuilt="true" compressed="false" filesystem="ext3" fsmountoptions="acl" fsnocheck="true" image="pxe" kernelcmdline="quiet"></type>
+    </preferences>
+    <!--    CUSTOM REPOSITORY -->
+    <repository type="rpm-dir">
+      <source path="this://repo"/>
+    </repository>
+    -->
+    <packages type="image">
+        <package name="patterns-sles-Minimal"/>
+        <package name="aaa_base-extras"/> <!-- wouldn't be SUSE without that ;-) -->
+        <package name="kernel-default"/>
+        <package name="salt-minion"/>
+        ...
+    </packages>
+    <packages type="bootstrap">
+        ...
+        <package name="sles-release"/>
+        <package name="rhn-org-trusted-ssl-certosimage" bootinclude="true"/>
+
+    </packages>
+    <packages type="delete">
+        <package name="mtools"/>
+        <package name="initviocons"/>
+        ...
+    </packages>
+</image>
+----
 
 
 [[at.images.kiwi.building]]
@@ -512,9 +630,22 @@ When you have selected a build profile detailed information about the selected p
 === Troubleshooting
 
 
+Building of image consists of several dependend steps. When build fails, investigation of salt states results can help with identification of the source of failure.
+Usual checks when build fails:
+
+* Build host can access build sources
+* There is enough disk space for image on both build host and {susemgr}
+* Activation key has correct channels associated
+* Valid build sources are used
+
+
+[[at.images.kiwi.limitations]]
+=== Limitations
+
+
 The following are some known pitfalls when working with images.
 
-* HTTPS certificates to access the registry or the git repositories should be deployed to the minion by a custom state file.
+* HTTPS certificates to access the HTTP sources or Git repositories should be deployed to the minion by a custom state file.
 * Importing of the KIWI based images is not supported.
 
 [[at.images.listing]]
