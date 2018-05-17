@@ -1,5 +1,47 @@
 [[advanced.topics.virtualization]]
 = Virtualization
+ifdef::env-github,backend-html5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:linkattrs:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Enterprise Linux
+:rhela: RHEL
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:susemgr: SUSE Manager
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:saltversion: 2018.3.0
+:webui: WebUI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:sled: SUSE Linux Enterprise Desktop
+:sleda: SLED
+:suse: SUSE
+:ay: AutoYaST
+:kickstart: Kickstart
+endif::[]
+// Asciidoctor Front Matter
 :doctype: book
 :sectnums:
 :toc: left
@@ -210,11 +252,47 @@ Kickstart profiles can also be created from scratch with {susemgr}
 
 A minimalist {ay}
 profile including a script for registering the client with {susemgr}
-is listed in <<advanced.topics.app.ay.example-simple>>.
+is listed in
+ifdef::env-github,backend-html5[]
+<<advanced_topics_app_ay_example.adoc#advanced.topics.app.ay.example-simple, AutoYaST Profile Example>>.
+endif::[]
+ifndef::env-github,backend-html5[]
+<<advanced.topics.app.ay.example-simple>>.
+endif::[]
 For more information, examples and HOWTOs on {ay}
  profiles, refer to [ref]_SUSE Linux Enterprise AutoYaST_
  (https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html). For more information on {kickstart}
  profiles, refer to your RedHat documentation.
+
+
+==== {sle} 15 Systems
+
+You need the installation media to setup the distribution.  Starting with version 15, there is only one installation media.  You will use the same one for {slsa}, {sleda}, and all the other {sle} 15 based products.
+
+In the {ay} profile specify which product is to be installed.
+For installing {sls} use the following snippet in [path]``autoyast.xml``:
+
+----
+<products config:type="list">
+  <listentry>SLES</listentry>
+</products>
+----
+
+Then then specify all the required modules as ``add-on`` in [path]``autoyast.xml``. This is a minimal ``SLE-Product-SLES15-Pool`` selection that will result in a working
+installation and can be managed by {susemgr}:
+
+* SLE-Manager-Tools15-Pool
+* SLE-Manager-Tools15-Updates
+* SLE-Module-Basesystem15-Pool
+* SLE-Module-Basesystem15-Updates
+* SLE-Product-SLES15-Updates
+
+It is also recommended to add the following modules:
+
+* SLE-Module-Server-Applications15-Pool
+* SLE-Module-Server-Applications15-Updates
+
+
 
 [[sec.virtualzation.autoinstall.req-mgr.profile.upload]]
 ===== Uploading an Autoinstallation Profile
