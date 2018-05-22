@@ -115,8 +115,8 @@ image::systems_create_activation_key.png[scaledwidth=80%]
 
 
 . From the left navigation menu select menu:Systems[Activation Keys]. 
-. Click menu:Create Key[]. 
-. Enter a menu:Description[] , a menu:Key[] name, Use the drop-down box to select the menu:Base Channel[] that should be associated with this key. Confirm with menu:Create Activation Key[]. 
+. Click btn:[Create Key]. 
+. Enter a [guimenu]``Description] , a [guimenu]``Key`` name. Use the drop-down menu to select the [guimenu]``Base Channel`` that should be associated with this key. Confirm with btn:[Create Activation Key]. 
 
 
 For more information, see <<bp.key.managment>>. 
@@ -175,12 +175,12 @@ image::images_image_create_profile.png[scaledwidth=80%]
 +
 [NOTE]
 ====
-Only lower case alfanumeric characters are permitted as container label.
-In case your container image tag is in format such as `myproject/myimage`, make sure your <<at.images.docker.imagestore,Image store registry>> URI contains `/myproject` suffix.
+Only lower case alphanumeric characters are permitted as container label.
+In case your container image tag is a format such as `myproject/myimage`, make sure your <<at.images.docker.imagestore,Image store registry>> URI contains the `/myproject` suffix.
 ====
 
 . Use a `Dockerfile` as the `Image Type`
-. Use the dropdown to select your registry from the `Target Image Store` field in case of `Dockerfile` image type. 
+. Use the drop-down menu to select your registry from the `Target Image Store` field in case of `Dockerfile` image type. 
 . Enter a Github or Gitlab repository URL (http/https/token authentication) in the menu:Path[] field using one of the following formats:
 
 .Github Path Options
@@ -397,9 +397,9 @@ The following are some known pitfalls when working with images.
 [[at.images.kiwi]]
 == OS Images
 
-OS Images are build by Kiwi image system. These can be of various types - PXE, QCOW2, LiveCD images and others.
+OS Images are build by the Kiwi image system. They can be of various types: PXE, QCOW2, LiveCD images, and others.
 
-For all information regarding Kiwi build system please see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation]
+For more information about the Kiwi build system, see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation]
 
 [[at.images.kiwi.requirements]]
 === Requirements
@@ -431,15 +431,14 @@ From the {susemgr}{webui} perform the following steps to configure a build host.
 .{susemgr} web server public certificate RPM
 [NOTE]
 ====
-Build host provisioning copies {susemgr} certificate RPM to the build host. This certificate is used for access to repositories provided by {susemgr}.
+Build host provisioning copies the {susemgr} certificate RPM to the build host. This certificate is used for access to repositories provided by {susemgr}.
 
-.Certificate is packaged in RPM by `mgr-package-rpm-certificate-osimage` package script:
-* Package script is called automatically during new {susemgr} installation.
-* Upgrade scenario will (on upgrade of package `spacewalk-certs-tools`) call package script with default values.
+.Certificate is packaged in RPM by the `mgr-package-rpm-certificate-osimage` package script:
+* The package script is called automatically during a new {susemgr} installation.
+* The upgrade scenario will (on upgrade of package `spacewalk-certs-tools`) call the package script with default values.
 +
 
-However if certificate path was changed or unavailable, it is required to call package script manually with option
-`--ca-cert-full-path <path_to_certificate>` after upgrade procedure is completed.
+However if the certificate path was changed or unavailable, it is required to call the package script manually with the option `--ca-cert-full-path <path_to_certificate>` after the upgrade procedure is completed.
 +
 
 .Package script call example
@@ -448,16 +447,16 @@ However if certificate path was changed or unavailable, it is required to call p
 /usr/sbin/mgr-package-rpm-certificate-osimage --ca-cert-full-path /root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT
 ----
 
-RPM with certificate is stored in salt accessible directory as `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
+The RPM package with the certificate is stored in a salt accessible directory such as `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 
-RPM with certificate is also provided in build host local repository `/var/lib/Kiwi/repo`.
+The RPM package with the certificate is also provided in the local build host repository `/var/lib/Kiwi/repo`.
 
 ====
 
 [IMPORTANT]
-.RPM with {susemgr} certificate must be specified in build source
+.The RPM Package with the {susemgr} Certificate Must Be Specified in the Build Source
 ====
-Make sure your build source Kiwi configuration contains `rhn-org-trusted-ssl-cert-osimage` as required package in `bootstrap` section.
+Make sure your build source Kiwi configuration contains `rhn-org-trusted-ssl-cert-osimage` as a required package in the `bootstrap` section.
 
 .config.xml
 [source,xml]
@@ -536,57 +535,56 @@ image::images_image_create_profile_kiwi.png[scaledwidth=80%]
 NOTE: When you associate an activation key with an image profile you are ensuring any image using the profile will use the correct software channel and any packages in the channel.
 +
 
-. Click the menu:Create[] button.
+. Click the btn:[Create] button.
 
 .Source format options
-** Git/HTTP(S) URL to repository
+** Git/HTTP(S) URL to the repository
 +
 
-URL to Git repository containing sources of image to be build. Depending on the layout of repository URL can be simple:
+URL to the Git repository containing the sources of the image to be build. Depending on the layout of the repository the URL can be:
 +
 ----
 https://github.com/SUSE/manager-build-profiles
 ----
 +
 
-Which branch should be checked out can be specified after `#` character. In this example it is `master` branch:
+Which branch should be checked out can be specified after the `#` character. In this example it is the `master` branch:
 +
 ----
 https://github.com/SUSE/manager-build-profiles#master
 ----
 +
 
-Which directory contain image sources can be specified after `:` character. In this example it is `POS_Image_JeOS6/jeos-6.0.0`:
+Which directory contains the image sources can be specified after the `:` character. In this example it is `POS_Image_JeOS6/jeos-6.0.0`:
 +
 ----
 https://github.com/SUSE/manager-build-profiles#master:POS_Image_JeOS6/jeos-6.0.0
 ----
 
-** HTTP(S) URL to tarball
+** HTTP(S) URL to the tarball
 +
 
-URL to tar archive, compressed or uncompressed, hosted on webserver.
+URL to the tar archive, compressed or uncompressed, hosted on the webserver.
 +
 ----
 https://myimagesourceserver.example.org/MyKiwiImage.tar.gz
 ----
 
-** Path to the directory on build host
+** Path to the directory on the build host
 +
 
-Enter path to the directory with Kiwi build system sources. This directory must be present on selected build host.
+Enter the path to the directory with the Kiwi build system sources. This directory must be present on the selected build host.
 +
 ----
 /var/lib/Kiwi/MyKiwiImage
 ----
 
 [[at.images.kiwi.sourceexample]]
-=== Example of Kiwi source
+=== Example of Kiwi sources
 
-Kiwi source consists of at least `config.xml` file, usually `config.sh` and `images.sh` files are present as well. Sources can also contain files
-to be implanted in final image under `root` subdirectory.
+Kiwi sources consist at least of `config.xml`. Usually `config.sh` and `images.sh` are present as well. Sources can also contain files to be installed in the final image under the `root` subdirectory.
 
-For all information regarding Kiwi build system please see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation]
+For information about the Kiwi build system, see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation].
 
 [NOTE]
 ====
@@ -678,17 +676,17 @@ When you have selected a build profile detailed information about the selected p
 === Troubleshooting
 
 
-Building of image consists of several dependent steps. When build fails, investigation of salt states results can help with identification of the source of failure.
-Usual checks when build fails:
+Building of image consists of several dependent steps. When the build fails, investigation of salt states results can help with identifying the source of failure.
+Usual checks when the build fails:
 
-* Build host can access build sources
-* There is enough disk space for image on both build host and {susemgr}
-* Activation key has correct channels associated
+* The build host can access the build sources
+* There is enough disk space for image on both the build host and the {susemgr} server
+* The activation key has correct channels associated
 * Valid build sources are used
-* RPM with {susemgr} public certificate is up to date and available at `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
+* The RPM package with the {susemgr} public certificate is up to date and available at `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 +
 
-See <<at.images.kiwi.buildhost>> on how to refresh public certificate RPM.
+See <<at.images.kiwi.buildhost>> on how to refresh a public certificate RPM.
 
 
 [[at.images.kiwi.limitations]]
@@ -704,7 +702,7 @@ The following are some known pitfalls when working with images.
 == Listing Image Profiles Available for Building
 
 
-To list images available for building select menu:Images[Images]
+To list images available for building select menu:Main Menu[Images[mages]
 .
 A list of all images will be displayed.
 
@@ -723,5 +721,5 @@ Clicking the menu:Details[]
 
 [NOTE]
 ====
-The patch and package list is only available if the inspect state after a build was successful.
+The patch and the package list is only available if the inspect state after a build was successful.
 ====
