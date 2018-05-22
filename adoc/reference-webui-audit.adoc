@@ -47,47 +47,38 @@ endif::[]
 :imagesdir: images
 
 
-Select menu:Audit[]
- from the left navigation menu to audit your managed systems.
+Select menu:Main Menu[Audit] to audit your managed systems.
+
+
 
 [[ref.webui.audit.cve]]
 == CVE Audit
 
-(((CVE audit,SUSE Manager data)))
-
-
-The menu:CVE Audit[]
- page will display a list of client systems with their patch status regarding a given CVE (Common Vulnerabilities and Exposures) number.
-
+The menu:Main Menu[Audit > CVE Audit] page will display a list of client systems with their patch status regarding a given CVE (Common Vulnerabilities and Exposures) number.
 
 image::audit_cve_audit.png[scaledwidth=80%]
+
 
 
 [[s1-cve-usage]]
 === Normal Usage
 
-
 Proceed as follows if you want to verify that a client system has received a given CVE patch:
 
-
 . Make sure that the CVE data is up-to-date. For more information, see <<sec-cve-maint>>.
-. Click menu:Audit[CVE Audit] in the left navigation menu to open the menu:CVE Audit[] page.
-. Input a 13-char CVE identifier in the menu:CVE Number[] field. The year setting will be automatically adjusted. Alternatively, set the year manually and add the last four digits.
+. Click menu:Main Menu[Audit > CVE Audit] to open the [guimenu]``CVE Audit`` page.
+. Input a 13-char CVE identifier in the [guimenu]``CVE Number`` field. The year setting will be automatically adjusted. Alternatively, set the year manually and add the last four digits.
 . Optionally, uncheck the patch statuses you are not interested in.
-. Click menu:Audit systems[] .
+. Click [guimenu]``Audit systems``.
 
-
-Performing this procedure will result in a list of client systems, where each system comes with a menu:Patch Status[]
- belonging to the given CVE identifier.
+Performing this procedure will result in a list of client systems, where each system comes with a [guimenu]``Patch Status`` belonging to the given CVE identifier.
 Possible statuses are:
 
 image:patch-status-affected-patch-inapplicable.png[[red],scaledwidth=1em] -- Affected, patches are available in channels that are not assigned:::
-The system is affected by the vulnerability and {susemgr}
-has one or more patches for it, but at this moment, the channels offering the patches are not assigned to the system.
+The system is affected by the vulnerability and {susemgr} has one or more patches for it, but at this moment, the channels offering the patches are not assigned to the system.
 
 image:patch-status-affected-patch-applicable.png[[orange],scaledwidth=1em] -- Affected, at least one patch available in an assigned channel:::
-The system is affected by the vulnerability, {susemgr}
-has at least one patch for it in a channel that is directly assigned to the system.
+The system is affected by the vulnerability, {susemgr} has at least one patch for it in a channel that is directly assigned to the system.
 
 image:patch-status-not-affected.png[[grey],scaledwidth=1em] -- Not affected:::
 The system does not have any packages installed that are patchable. 
@@ -95,75 +86,62 @@ The system does not have any packages installed that are patchable.
 image:patch-status-patched.png[[green],scaledwidth=1em] -- Patched:::
 A patch has already been installed. 
 
-
 In other words, it can mean the following:
 
 * More than one patch might be needed to fix a certain vulnerability. 
-* The image:patch-status-affected-patch-applicable.png[[orange],scaledwidth=1em] state is displayed when {susemgr} has at least one patch in an assigned channel. This might mean that, after installing such patch, others might be needed{mdash} users should double check the CVE Audit page after applying a patch to be sure that their systems are not affected anymore. 
-
+* The image:patch-status-affected-patch-applicable.png[[orange],scaledwidth=1em] state is displayed when {susemgr} has at least one patch in an assigned channel.
+This might mean that, after installing such a patch, others might be needed—users should double check the CVE Audit page after applying a patch to be sure that their systems are not affected anymore. 
 
 For a more precise definitions of these states, see <<sec-cve-tips>>.
 
-.Unknown CVE Number
+
 [NOTE]
+.Unknown CVE Number
 ====
-If the CVE number is not known to {susemgr}
-, an error message is displayed because {susemgr}
-cannot collect and display any audit data.
+If the CVE number is not known to {susemgr}, an error message is displayed because {susemgr} cannot collect and display any audit data.
 ====
 
-
-For each system, the menu:Next Action[]
- column contains suggestions on the steps to take to address the vulnerabilities.
+For each system, the [guimenu]``Next Action`` column contains suggestions on the steps to take to address the vulnerabilities.
 Under these circumstances it is either sensible to install a certain patch or assign a new channel.
-If applicable, a list of "`candidate`"
- channels or patches is displayed for your convenience.
+If applicable, a list of "`candidate`" channels or patches is displayed for your convenience.
 
-You can also assign systems to a menu:System Set[]
- for further batch processing.
+You can also assign systems to a [guimenu]``System Set`` for further batch processing.
+
+
 
 === API Usage
-
 
 An API method called `audit.listSystemsByPatchStatus` is available to run CVE audits from custom scripts.
 Details on how to use it are available in the API guide.
 
+
+
 [[sec-cve-maint]]
 === Maintaining CVE Data
 
-
 To produce correct results, CVE Audit must periodically refresh the data needed for the search in the background.
 By default, the refresh is scheduled at 11:00 PM every night.
-It is recommended to run such a refresh right after the {susemgr}
-installation to get proper results immediately instead of waiting until the next day.
+It is recommended to run such a refresh right after the {susemgr} installation to get proper results immediately instead of waiting until the next day.
 
-
-. In the Web interface, click menu:Admin[Task Schedules] in the left navigation menu.
+. In the Web interface, click menu:Main Menu[Admin > Task Schedules].
 . Click the `cve-server-channels-default` schedule link.
 . Click the `cve-server-channels-bunch` link.
-. Click the menu:Single Run Schedule[] button.
+. Click the btn:[Single Run Schedule] button.
 . After some minutes, refresh the page and check that the scheduled run status is ``FINISHED``.
 
+A direct link is also available on the menu:Main Main[Audit > CVE Audit] page ([guimenu]``extra CVE data update``).
 
-A direct link is also available on the menu:CVE Audit[]
- page (menu:extra CVE data update[]
-).
+
 
 [[sec-cve-tips]]
 === Tips and Background Information
 
-
-Audit results are only correct if the assignment of channels to systems did not change since the last scheduled refresh (normally at 11:00 PM every night). If a CVE audit is needed and channels were assigned or unassigned to any system during the day, a manual run is recommended.
+Audit results are only correct if the assignment of channels to systems did not change since the last scheduled refresh (normally at 11:00 PM every night).
+If a CVE audit is needed and channels were assigned or unassigned to any system during the day, a manual run is recommended.
 For more information, see <<sec-cve-maint>>.
 
-Systems are called "`affected`"
-, "`not affected`"
- or "`patched`"
- not in an absolute sense, but based on information available to {susemgr}
-.
-This implies that concepts such as "`being
-    affected by a vulnerability`"
- have particular meanings in this context.
+Systems are called "`affected`", "`not affected`" or "`patched`" not in an absolute sense, but based on information available to {susemgr}.
+This implies that concepts such as "`being affected by a vulnerability`" have particular meanings in this context.
 The following definitions apply:
 
 System affected by a certain vulnerability:::
@@ -176,62 +154,52 @@ System patched for a certain vulnerability:::
 A system which has an installed package with version equal to or greater than the version of the same package in a relevant patch marked for the vulnerability.
 
 Relevant patch:::
-A patch known by {susemgr}
-in a relevant channel.
+A patch known by {susemgr} in a relevant channel.
 
 Relevant channel:::
-A channel managed by {susemgr}
-, which is either assigned to the system, the original of a cloned channel which is assigned to the system, a channel linked to a product which is installed on the system or a past or future service pack channel for the system.
-
+A channel managed by {susemgr}, which is either assigned to the system, the original of a cloned channel which is assigned to the system, a channel linked to a product which is installed on the system or a past or future service pack channel for the system.
 
 A notable consequence of the above definitions is that results can be incorrect in cases of unmanaged channels, unmanaged packages, or non-compliant systems.
 
-[[ref.webui.audit.subscription]]
-== menu:Subscription Matching[]
 
+
+[[ref.webui.audit.subscription]]
+== [guimenu]``Subscription Matching``
 
 To match subscriptions with your systems use the Subscription Matcher tool.
 
-The menu:Edit Virtual Host Managers[]
- link in the upper right corner will take you to the menu:Systems[Virtual Host Managers]
- overview.
+The [guimenu]``Edit Virtual Host Managers`` link in the upper right corner will take you to the menu:Main Menu[Systems > Virtual Host Managers] overview.
 For more information about Virtual Host Managers, see <<ref.webui.systems.virt_host_managers>>.
 
-
 image::audit_subscription_matching.png[scaledwidth=80%]
-
 
 It gathers information about systems, subscriptions and pinned matches (fixed customer defined subscriptions to systems mapping) as input and returns the best possible match according to the SUSE Terms and Conditions.
 The Subscription Matcher ([command]``subscription-matcher``) is also able to write CSV Reports.
 
-* The menu:Subscriptions Report[] provides subscriptions report data when used
-* The menu:Unmatched Products Report[] provides information on products and their systems when a match to a subscription cannot be found
-* The menu:Error Report[] provides a list of errors raised during the matching process
+* The [guimenu]``Subscriptions Report`` provides subscriptions report data when used
+* The [guimenu]``Unmatched Products Report`` provides information on products and their systems when a match to a subscription cannot be found
+* The [guimenu]``Error Report`` provides a list of errors raised during the matching process
+
+Selecting menu:Main Menu[Audit > Subscription Matching] from the left navigation menu will provide you with an overview of all results generated by the Subscription Matcher.
 
 
-Selecting menu:Audit[Subscription
-   Matching]
- from the left navigation menu will provide you with an overview of all results generated by the Subscription Matcher.
-
-.Subscription Matcher Accuracy
 [IMPORTANT]
+.Subscription Matcher Accuracy
 ====
 This tool's goal is to help provide visual coverage on current subscription use and support reporting.
-The Subscription Matcher is excellent at matching systems and products registered with {susemgr}
-, however any systems, products or environments which are not found in the database will remain unmatched.
+The Subscription Matcher is excellent at matching systems and products registered with {susemgr}, however any systems, products or environments which are not found in the database will remain unmatched.
 This tool is not intended to act as a replacement for auditing.
 Auditing should always take precedence over subscription matching.
 ====
 
-=== menu:Subscription Matching[] > menu:Subscriptions[]
 
+
+=== menu:Main Menu[Audit > Subscription Matching > Subscriptions]
 
 The Subscription Matching overview provides subscription part numbers, product descriptions, policies, matched total subscriptions used and remaining, and the start and end dates of subscriptions.
 
 .Subscription Matching Overview
-
 image::smatching-overview.png[scaledwidth=80%]
-
 
 Part Number::
 Identifier of a particular product
@@ -265,98 +233,72 @@ Start date of the subscription
 End Date::
 End date of the subscription
 
-
 === Subscription Matcher Reports
 
-{susemgr}
-automatically generates up-to-date nightly status reports by matching your {suse}
-subscriptions with all your registered systems.
-These reports are stored in [path]``/var/lib/spacewalk/subscription-matcher``
- and provided in CSV format.
+{susemgr} automatically generates up-to-date nightly status reports by matching your {suse} subscriptions with all your registered systems.
+These reports are stored in [path]``/var/lib/spacewalk/subscription-matcher`` and provided in CSV format.
 These CSV files may be opened with a spreadsheet application such as LibreOffice Calc.
 
-If you want to schedule these reports to be produced at different times, or at a certain frequency or schedule a one time completion you can perform this task by editing the Taskomatic settings for the gatherer-matcher located in the {webui}
-at menu:Admin[Task Schedules > gatherer-matcher-default]
-.
-
+If you want to schedule these reports to be produced at different times, or at a certain frequency or schedule a one time completion you can perform this task by editing the Taskomatic settings for the gatherer-matcher located in the {webui} at menu:Main Menu[Admin > Task Schedules > gatherer-matcher-default].
 
 image::audit_subscription_matching_gatherer_matcher_default.png[scaledwidth=80%]
 
 
+
 [[ref.webui.audit.submatch.unmatched.systems]]
-=== menu:Subscription Matching[] > menu:Unmatched Products[]
+=== menu:Main Menu[Audit > Subscription Matching > Unmatched Products]
 
-
-Selecting the menu:Subscription Matching[Unmatched Products]
- tab provides an overview of all systems the matcher could not find in the database or which were not registered with {susemgr}
-.
-The menu:Unmatched Products[]
- overview contains product names and the number of systems which remain unmatched with known installed products.
+Selecting the menu:Main Menu[Subscription Matching > Unmatched Products] tab provides an overview of all systems the matcher could not find in the database or which were not registered with {susemgr}.
+The [guimenu]``Unmatched Products`` overview contains product names and the number of systems which remain unmatched with known installed products.
 
 .Unmatched Products
-
 image::audit_subscription_matching_unmatched_products.png[scaledwidth=80%]
-
 
 Show System List::
 Select to open and display a list of all systems which were detected with an installed product but remain unmatched with a subscription.
 
 
-[[ref.webui.audit.submatch.sub.pinning]]
-=== menu:Subscription Matching[] > menu:Pins[]
 
+[[ref.webui.audit.submatch.sub.pinning]]
+=== menu:Main Menu[Audit > Subscription Matching] > Pins]
 
 The subscription pinning feature allows a user to instruct the subscription matcher to favor matching a specific subscription with a given system or group of systems.
 This is achieved by creating pins.
 Each pin contains information about the preferred subscription-system match.
 
-
 image::audit_subscription_matching_pins.png[scaledwidth=80%]
 
 
-.Respecting Pins
 [NOTE]
+.Respecting Pins
 ====
 In some cases the algorithm may determine that a specific pin cannot be respected, depending on the subscription's availability and applicability rules, in this case it will be shown as not satisfied.
 ====
 
-
 The pins table displays a list of all pins.
-Items in the list contain the status of pins, which can be ``satisfied``, `not
-    satisfied` and ``pending next run``.
+Items in the list contain the status of pins, which can be ``satisfied``, `not    satisfied` and ``pending next run``.
 
 * A pin is `satisfied` if its system and subscription was matched in the last matcher run.
 * A pin is `not satisfied` if its system and subscription was _not_ matched in the last matcher run. This can happen, for example, if the pin violates terms and conditions for subscriptions.
 * A pin is in the `pending next run` state when it needs a new matcher run to be taken into account. After the new run, the pin will become either `satisfied` or ``not satisfied``.
 
-
 .Subscription Pinning
-
 image::sm-pins.png[scaledwidth=80%]
 
-
-Click the menu:Add a Pin[]
- button to open the menu:Available Systems[]
- window.
+Click the btn:[Add a Pin] button to open the [guimenu]``Available Systems`` window.
 You may filter systems by name and select a system for the matcher to pin manually.
 
 .Add a Pin
-
 image::add-pin.png[scaledwidth=80%]
 
+Within the menu:Subscriptions Available for Selected System[] window click the menu:Save Pin[] button to raise priority for subscription use on the selected system.
 
-Within the menu:Subscriptions Available for Selected System[]
- window click the menu:Save Pin[]
- button to raise priority for subscription use on the selected system.
+
 
 [[ref.webui.audit.submatch.submatch.messages]]
-=== menu:Subscription Matching[] > menu:Messages[]
+=== menu:Main Menu[Audit > Subscription Matching > Messages]
 
-
-You can review all messages related to menu:Subscription Matching[]
- from the menu:Subscription
-    Matching[Messages]
- overview.
+You can review all messages related to [guimenu]``Subscription Matching`` from the menu:Main Menu[Audit > Subscription Matching > Messages] overview.
 
 The following status messages can be displayed.
 
@@ -373,19 +315,14 @@ Unknown CPU Count::
 System has an unknown number of sockets, assuming 16.
 You can try fixing this by scheduling hardware refresh for affected system.
 
-
-
 image::audit_subscription_matching_messages.png[scaledwidth=80%]
+
 
 
 [[ref.webui.audit.openscap]]
 == OpenSCAP
 
-
-If you click menu:Audit[OpenSCAP > All
-   Scans]
- in the left navigation menu, an overview of the {openscap}
- Scans appears.
+If you click menu:Main Menu[Audit > OpenSCAP > All Scans], an overview of the {openscap} Scans appears.
 SCAP (Security Content Automation Protocol) is a framework to maintain the security of enterprise systems.
 It mainly performs the following tasks:
 
@@ -393,19 +330,9 @@ It mainly performs the following tasks:
 * Checking system security configuration settings
 * Examining systems for signs of compromise
 
+For a description of the {webui} dialogs, see <<s2-openscap-suma-pages>>.
 
-For a description of the {webui}
-dialogs, see <<s2-openscap-suma-pages>>.
-
-For instructions and tips on how to best use OpenSCAP with {susemgr}
-, refer to <<ch-openscap>>.
+For instructions and tips on how to best use OpenSCAP with {susemgr}, refer to <<ch-openscap>>.
 To learn more about OpenSCAP, see the project home page at http://open-scap.org.
 
 include::manager_reference_openscap.adoc[leveloffset=1]
-
-
-ifdef::backend-docbook[]
-[index]
-== Index
-// Generated automatically by the DocBook toolchain.
-endif::backend-docbook[]
