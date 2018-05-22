@@ -433,12 +433,30 @@ From the {susemgr}{webui} perform the following steps to configure a build host.
 ====
 Build host provisioning copies {susemgr} certificate RPM to the build host. This certificate is used for access to repositories provided by {susemgr}.
 
-RPM is generated during {susemgr} installation, or manually by calling `mgr-package-rpm-certificate-osimage` script.
+.Certificate is packaged in RPM by `mgr-package-rpm-certificate-osimage` package script:
+* Package script is called automatically during new {susemgr} installation.
+* Upgrade scenario will (on upgrade of package `spacewalk-certs-tools`) call package script with default values.
++
+
+However if certificate path was changed or unavailable, it is required to call package script manually with option
+`--ca-cert-full-path <path_to_certificate>` after upgrade procedure is completed.
++
+
+.Package script call example
+[source,bash]
+----
+/usr/sbin/mgr-package-rpm-certificate-osimage --ca-cert-full-path /root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT
+----
 
 RPM with certificate is stored in salt accessible directory as `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 
-This RPM is then provided in build host local repository `/var/lib/Kiwi/repo`.
+RPM with certificate is also provided in build host local repository `/var/lib/Kiwi/repo`.
 
+====
+
+[IMPORTANT]
+.RPM with {susemgr} certificate must be specified in build source
+====
 Make sure your build source Kiwi configuration contains `rhn-org-trusted-ssl-cert-osimage` as required package in `bootstrap` section.
 
 .config.xml
@@ -667,6 +685,10 @@ Usual checks when build fails:
 * There is enough disk space for image on both build host and {susemgr}
 * Activation key has correct channels associated
 * Valid build sources are used
+* RPM with {susemgr} public certificate is up to date and available at `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
++
+
+See <<at.images.kiwi.buildhost>> on how to refresh public certificate RPM.
 
 
 [[at.images.kiwi.limitations]]
