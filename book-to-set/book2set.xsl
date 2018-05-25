@@ -15,14 +15,17 @@
 
   Author:
     Thomas Schraitle <toms@suse.de>, May 2018
+    Joseph Cayouette <jcayouette@suse.de>, May 2018
 
 -->
+
 <xsl:stylesheet version="1.0" xmlns="http://docbook.org/ns/docbook"
   xmlns:d="http://docbook.org/ns/docbook" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes="d">
 
   <xsl:param name="mappingfile">mapping.xml</xsl:param>
   <xsl:variable name="mapping" select="document($mappingfile)"/>
+  <xsl:output encoding="UTF-8"/>
 
   <!-- Match Atributes-->
   <xsl:template match="node() | @*" name="copy">
@@ -31,9 +34,12 @@
     </xsl:copy>
   </xsl:template>
 
-  <!-- Match book and exchange with set -->
+  <!-- Match book and exchange with set and add attributes -->
   <xsl:template match="d:book">
-    <set>
+    <set xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude">
+      <xsl:attribute name="xml:id">set.mgr</xsl:attribute>
+      <xsl:attribute name="version">5.0</xsl:attribute>
+      <xsl:attribute name="xml:lang">en</xsl:attribute>
       <xsl:if test="$mapping/*/set">
         <xsl:copy-of select="$mapping/*/set/node()"/>
       </xsl:if>
@@ -73,20 +79,20 @@
       <xsl:apply-templates select="node()"/>
     </guimenu>
   </xsl:template>
-  
+
   <!-- Replace guimenuitem with guimenu -->
   <xsl:template match="d:guimenuitem">
     <guimenu>
       <xsl:apply-templates select="node()"/>
     </guimenu>
   </xsl:template>
-  
-  <!-- Replace programlisting with screen --> 
+
+  <!-- Replace programlisting with screen -->
   <xsl:template match="d:programlisting">
     <screen>
       <xsl:apply-templates select="node()"/>
     </screen>
   </xsl:template>
 
-</xsl:stylesheet>
 
+</xsl:stylesheet>
