@@ -235,11 +235,12 @@ In this example netcat (nc) is used to pipe port 22 of the target host into the 
 
 . Additionally the ProxyCommand uses ssh to create a connection from the server to the minion through the proxies.
 
+
+[#at-twin-proxies-and-ssh-push]
 ==== Twin Proxies and SSH Push
+
 The following example uses the ProxyCommand option with two proxies and the usual ssh-push method:
 
-.Twin Proxies and ssh-push
-[source,bash]
 ----
 # 1
 /usr/bin/ssh -i /srv/susemanager/salt/salt_ssh/mgr_ssh_id -o StrictHostKeyChecking=no -o User=mgrsshtunnel  proxy1
@@ -247,18 +248,20 @@ The following example uses the ProxyCommand option with two proxies and the usua
 /usr/bin/ssh -i /var/lib/spacewalk/mgrsshtunnel/.ssh/id_susemanager_ssh_push -o StrictHostKeyChecking=no -o User=mgrsshtunnel -W minion:22  proxy2
 ----
 
+
 .Steps
 . connect from the server to the first proxy
-
 . connect from the first proxy to the second and forward standard input/output on the client to minion:22 using the -W option.
 
 image::salt-ssh-push-push-plain-sequence.png[]
 
+
+[#at-twin-proxies-and-ssh-push-tunnel]
 ==== Twin Proxies and SSH Push Tunnel
 
 The following example uses the ProxyCommand option with two proxies over an ssh-push-tunnel connection:
 
-[source, bash]
+
 ----
 # 1
 /usr/bin/ssh -i /srv/susemanager/salt/salt_ssh/mgr_ssh_id -o User=mgrsshtunnel  proxy1
@@ -272,11 +275,8 @@ The following example uses the ProxyCommand option with two proxies over an ssh-
 
 .Steps
 . Connect from the server to the first proxy.
-
 . Connect from the first proxy to the second.
-
 . connect from the second proxy to the minion and open an reverse tunnel (-R 1233:proxy2:443) from the minion to the https port on the second proxy.
-
 . Connect from the minion to itself and forward the std i/o of the server to the ssh port of the minion (-W minion:22). This is equivalent to ssh ... proxy2 netcat minion 22 and is needed because ssh doesn't allow to have both the reverse tunnel (-R 1233:proxy2:443) and the standard i/o forwarding (-W minion:22) in the same command.
 
 image::salt-ssh-push-push-tunnel-sequence.png[]
