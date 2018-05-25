@@ -414,25 +414,41 @@ guests, which are managed by [library]``libvirt``
 ** Download the bootstrap script from `susemanager.example.com/pub/bootstrap/bootstrap.sh` to the {vmhost} .
 ** Edit the bootstrap script according to your needs. The minimal requirement is to include the activation key for the {vmhost} (see <<sec.virtualzation.autoinstall.req-mgr.keys>> for details). We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).
 ** Execute the bootstrap script to register the {vmhost} .
-. {empty}
 +
+
+
+[[sec.virtualization.autoinstall.req_vmhost.salt]]
+===== {vmhost} setup on Salt clients.
+
+
+If the {vmhost} is registered as a Salt minion, a final configuration step is needed in order to gather all the guest VMs defined on the {vmhost}:
+
+
+. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[] ``Virtualization Host`` and confirm by selecting btn:[Update Properties].
+. Schedule a Hardware Refresh. From the system's details page select menu:System Details[Hardware] and click on btn:[Schedule Hardware Refresh].
+
+
+[[sec.virtualization.autoinstall.req_vmhost.traditional]]
+===== {vmhost} setup on Traditional clients.
+
+
 Once the registration process is finished and all packages have been installed, enable the [daemon]``osad``
 (Open Source Architecture Daemon). On a {sls}
 system this can be achieved by running the following commands as user {rootuser}
 :
-+
+
 
 ----
 systemctl stop rhnsd
 systemctl disable rhnsd
 ----
-+
+
 
 ----
 systemctl enable osad
 systemctl start osad
 ----
-+
+
 .[daemon]``osad``Together with [daemon]``rhnsd``
 IMPORTANT: The [daemon]``rhnsd``
  daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
@@ -448,7 +464,6 @@ The [daemon]``osad``
  and commands are instantly executed.
 Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [daemon]``rhnsd``
  you can only schedule for a time in the future plus up to four hours).
-+
 
 
 
