@@ -55,8 +55,8 @@ Centrally-managed files are available to multiple systems; locally-managed files
 .Differences of System Types
 [NOTE]
 ====
-Configuration Managment is available for both client system types, traditionally managed clients ([Management]) and Salt minions ([Salt]).  Some traditional features are not suitable for Salt minions, and thus not available and excluded from the {webui}
-.
+Configuration Managment is available for both client system types, traditionally managed clients ([Management]) and Salt minions ([Salt]).
+Some traditional features are not suitable for Salt minions, and thus not available and excluded from the {webui}.
 ====
 
 == Configuration Management for Salt
@@ -65,11 +65,10 @@ Configuration Managment is available for both client system types, traditionally
 Configuration Management is now enabled for Salt.
 The following matrix provides both supported and unsupported configuration management features.
 
-.Missing {webui}Options
+.Missing {webui} Options
 [IMPORTANT]
 ====
-Several {webui}
-tabs will be missing for Salt Configuration Management.
+Several {webui} tabs will be missing for Salt Configuration Management.
 These features are not suitable for Salt minions.
 ====
 
@@ -87,39 +86,40 @@ These features are not suitable for Salt minions.
 | Configuration Macros | Unsupported
 |===
 
+
+
 [[ref.webui.config.preparing]]
 == Preparing Systems for Configuration Management [Management]
 
-(((changing email address,system preparation)))
 
 
-To manage a traditional client's configuration with {susemgr}
-, it must have the appropriate tools and the [path]``config-enable``
- file installed.
-These tools will be available if you installed the system with the configuration management functionality using {ay}
- or Kickstart.
+To manage a traditional client's configuration with {susemgr}, it must have the appropriate tools and the [path]``config-enable`` file installed.
+These tools will be available if you installed the system with the configuration management functionality using {ay} or Kickstart.
 If not, they can be found in the Tools child channel for your distribution.
-Download and install the latest [path]``rhncfg*``
- packages:
+Download and install the latest [path]``rhncfg*`` packages:
 
 * [path]``rhncfg`` -- the base libraries and functions needed by all [path]``rhncfg-*`` packages,
-* [path]``rhncfg-actions`` -- the RPM package required to run configuration actions scheduled via {susemgr} ,
+* [path]``rhncfg-actions`` -- the RPM package required to run configuration actions scheduled via {susemgr},
 * [path]``rhncfg-client`` -- the RPM package with a command line interface to the client features of the Configuration Management system,
 * [path]``rhncfg-management`` -- the RPM package with a command line interface used to manage {susemgr} configuration.
 
 
-Installation of these packages can also be accomplished during bootstrapping if you enable menu:Configuration File Deployment[]
- on the menu:Details[]
- page of the activation key after creating that activation key.
-For more information about activation keys, see <<s3-sm-system-keys-manage>>.
+Installation of these packages can also be accomplished during bootstrapping if you enable [guimenu]``Configuration File Deployment`` on the [guimenu]``Details`` page of the activation key after creating that activation key.
+For more information about activation keys, see 
+ifndef::env-github,backend-html5[]
+<<s3-sm-system-keys-manage>>.
+endif::[]
+ifdef::env-github,backend-html5[]
+<<reference-webui-systems.adoc#s3-sm-system-keys-manage, Activation Keys>>.
+endif::[]
+
+
 
 [[ref.webui.config.overview]]
 == Overview
 
 
-The menu:Configuration Overview[]
- page shows all of the configuration files that are managed by your organization in {susemgr}
-.
+The [guimenu]``Configuration Overview`` page shows all of the configuration files that are managed by your organization in {susemgr}.
 
 
 image::configuration_overview.png[scaledwidth=80%]
@@ -132,64 +132,50 @@ The panel provides quick information about your configuration files.
 Click the blue text to the right to display relevant systems, channel details, or configuration files.
 
 Configuration Actions::
-menu:Configuration Actions[]
+[guimenu]``Configuration Actions``
 offers direct access to the most common configuration management tasks.
 Deploy, compare, or create files on your systems.
 
 Recently Modified Configuration Files::
 The list shows which files have changed when and to which channel they belong.
 If no files have been changed, no list appears.
-Click the name of a file to see its menu:Details[]
+Click the name of a file to see its [guimenu]``Details``
 page.
-Click the channel name to see its menu:Channel Details[]
-page.
+Click the channel name to see its [guimenu]``Channel Details`` page.
 +
 File types that can appear here:
-* image:spacewalk-icon-software-channels.svg[Spacewalk Icon Software Channels,scaledwidth=1.6em]
- -- Centrally-managed configuration file provided by a global
-       configuration channel.
-* image:fa-desktop.svg[FA Desktop,scaledwidth=1.6em]
- -- [Management] Locally-managed configuration file, maybe overriding a
-       centrally-managed file.
-* image:spacewalk-icon-sandbox.svg[Spacewalk Icon Sandbox,scaledwidth=1.6em]
- -- [Management] Sandbox configuration file.
+* image:spacewalk-icon-software-channels.svg[Spacewalk Icon Software Channels,scaledwidth=1.6em] -- Centrally-managed configuration file provided by a global configuration channel.
+* image:fa-desktop.svg[FA Desktop,scaledwidth=1.6em] -- [Management] Locally-managed configuration file, maybe overriding a centrally-managed file.
+* image:spacewalk-icon-sandbox.svg[Spacewalk Icon Sandbox,scaledwidth=1.6em] -- [Management] Sandbox configuration file.
 
 Recently Scheduled Configuration File Deployments::
 Each scheduled action is listed along with the status of the action.
 Any scheduled configuration task, from enabling configuration management on a system to deploying a specific configuration file, is displayed.
 Here you can quickly assess if all tasks have been successfully carried out or fix any problems.
-Clicking the blue text displays the menu:System Details[Schedule]
-page for the specified system.
+Clicking the blue text displays the menu:System Details[Schedule] page for the specified system.
+
 
 
 [[ref.webui.config.channels]]
 == Configuration Channels
 
-(((actions,create)))
+As mentioned above, {susemgr} manages both central and local configuration channels and files.
+Central configuration management allows you to deploy configuration files to multiple systems (both traditional clients ([Management]) and Salt minions ([Salt])).
+Local configuration management is available for traditional clients ([Management]) only and allows you to specify overrides or configuration files that are not changed by subscribing the system to a central channel.
 
-
-As mentioned above, {susemgr}
-manages both central and local configuration channels and files.
-Central configuration management allows you to deploy configuration files to multiple systems (both traditional clients ([Management]) and Salt minions ([Salt])). Local configuration management is available for traditional clients ([Management]) only and allows you to specify overrides or configuration files that are not changed by subscribing the system to a central channel.
-
-A "`state channel`"
- is a type of a configuration channel but for Salt minion only.
-For a state channel, the [path]``init.sls``
- file is not auto-generated, the user creates and edits it.
-Additionally, state channels can contain arbitrary configuration files that could be referenced from within the [path]``init.sls``
- file.
+A "`state channel`" is a type of a configuration channel but for Salt minion only.
+For a state channel, the [path]``init.sls`` file is not auto-generated, the user creates and edits it.
+Additionally, state channels can contain arbitrary configuration files that could be referenced from within the [path]``init.sls`` file.
 Therefore, state channels effectively replace custom states.
 
 .Referencing Configuration Files with Organization ID
 [NOTE]
 ====
 You must reference configuration files with the `salt://` prefix, the organization ID, and the channel name.
-For example, to reference [path]``/etc/motd``
- use:
+For example, to reference [path]``/etc/motd`` use:
 
 ----
-file.managed:
-  - source: salt://manager_org_1/`channel_name`/etc/motd
+file.managed:  - source: salt://manager_org_1/`channel_name`/etc/motd
 ----
 ====
 
@@ -197,26 +183,22 @@ file.managed:
 Central configuration or state channels must be created via the links on this page.
 
 Click the name of the configuration channel to see the details page for that channel.
-If you click the number of files in the channel, you are taken to the menu:List/Remove Files[]
- page of that channel.
-If you click the number of systems subscribed to the configuration channel, you are taken to the menu:Systems[Subscribed
-   Systems]
- page for that channel.
+If you click the number of files in the channel, you are taken to the [guimenu]``List/Remove Files`` page of that channel.
+If you click the number of systems subscribed to the configuration channel, you are taken to the menu:Configuration Channel Details[Systems > Subscribed   Systems] page for that channel.
 
 To create a new central configuration channel:
 
 [[proc.config.channels.create.cfgch]]
 .Procedure: Creating Central Configuration Channel
-. Click the menu:Create Config Channel[] link in the upper right corner of this screen.
+. Click the [guimenu]``Create Config Channel`` link in the upper right corner of this screen.
 . Enter a name for the channel.
 . Enter a label for the channel. This field must contain only alphanumeric characters, "-", "_", and ".".
 . Enter a mandatory description for the channel that allows you to distinguish it from other channels. No character restrictions apply.
-. Click the menu:Create Config Channel[] button to create the new channel.
-. The following page is a subset of the menu:Channel Details[] page and has three tabs: menu:Overview[] , menu:Add Files[] , and menu:Systems[] . The menu:Channel Details[] page is discussed in <<config-config-channels-channel-details>>.
+. Click the btn:[Create Config Channel] button to create the new channel.
+. The following page is a subset of the [guimenu]``Channel Details`` page and has three tabs: [guimenu]``Overview`` , [guimenu]``Add Files`` , and [guimenu]``Systems`` . The [guimenu]``Channel Details`` page is discussed in <<config-config-channels-channel-details>>.
 
 
-To create a new state channel with an [path]``init.sls``
- file:
+To create a new state channel with an [path]``init.sls`` file:
 
 [[proc.config.channels.create.statech]]
 .Procedure: Creating State Channel [Salt]
@@ -226,7 +208,7 @@ To create a new state channel with an [path]``init.sls``
 . Enter a mandatory description for the channel that allows you to distinguish it from other channels. No character restrictions apply.
 . Enter the menu:SLS Contents[] for the [path]``init.sls`` file.
 . Click the menu:Create Config Channel[] button to create the new channel.
-. The following page is a subset of the menu:Channel Details[] page and has three tabs: menu:Overview[] , menu:List/Remove Files[] , menu:Add Files[] , and menu:Systems[] . The menu:Channel Details[] page is discussed in <<config-config-channels-channel-details>>.List/Remove Files
+. The following page is a subset of the menu:Channel Details[] page and has three tabs: menu:Overview[] , menu:List/Remove Files[] , menu:Add Files[] , and menu:Systems[] . The menu:Channel Details[] page is discussed in <<config-config-channels-channel-details>>.
 
 
 [[config-config-channels-channel-details]]
@@ -340,8 +322,7 @@ Both centrally-managed and locally-managed files can be reached from sub-pages.
 .Maximum Size for Configuration Files
 [NOTE]
 ====
-By default, the maximum file size for configuration files is 128 KB (131072 bytes). {suse}
-supports a configuration file size up to 1 MB; larger values are not guaranteed to work.
+By default, the maximum file size for configuration files is 128 KB (131072 bytes). {suse} supports a configuration file size up to 1 MB; larger values are not guaranteed to work.
 ====
 
 
@@ -350,8 +331,7 @@ ifdef::showremarks[]
     stay here. #
 endif::showremarks[]
 
-To change the file size limit, edit all the following files on the {susemgr}
- server and edit or add the following variables:
+To change the file size limit, edit all the following files on the {susemgr} server and edit or add the following variables:
 
 ----
 # /usr/share/rhn/config-defaults/rhn_web.conf
@@ -383,16 +363,10 @@ Locally-managed files supersede centrally-managed files.
 For more information about locally-managed files, see <<configuration-files-local>>.
 
 This page lists all files currently stored in your central configuration channel.
-Click the menu:Path[]
- of a file to see its menu:Details[]
- tab.
-Click the name of the menu:Configuration Channel[]
- to see the channel's menu:Overview[]
- tab.
-Clicking menu:Systems Subscribed[]
- shows you all systems currently subscribed to the channel containing that file.
-Click menu:Systems Overriding[]
- to see all systems that have a local (or override) version of the configuration file.
+Click the menu:Path[] of a file to see its menu:Details[] tab.
+Click the name of the menu:Configuration Channel[] to see the channel's menu:Overview[] tab.
+Clicking menu:Systems Subscribed[] shows you all systems currently subscribed to the channel containing that file.
+Click menu:Systems Overriding[] to see all systems that have a local (or override) version of the configuration file.
 The centrally-managed file will not be deployed to those systems.
 
 [[configuration-files-local]]
@@ -406,11 +380,9 @@ If a system is subscribed to a configuration channel with a given file and addit
 
 The list of all local (override) configuration files for your systems includes the local configuration channels and the sandbox channel for each Provisioning-entitled system.
 
-Click the menu:Path[]
- of the file to see its menu:Config File Details[]
+Click the menu:Path[] of the file to see its menu:Config File Details[]
 .
-Click the name of the system to which it belongs to see its menu:System Details[Configuration > Overview]
- page.
+Click the name of the system to which it belongs to see its menu:System Details[Configuration > Overview] page.
 
 [[s3-sm-file-macros]]
 === Including Macros in your Configuration Files
@@ -420,8 +392,7 @@ Click the name of the system to which it belongs to see its menu:System Details[
 
 Being able to store one file and share identical configurations is useful, but what if you have many variations of the same configuration file? What do you do if you have configuration files that differ only in system-specific details, such as host name and MAC address?
 
-Traditional file management would require to upload and distribute each file separately, even if the distinction is nominal and the number of variations is in the hundreds or thousands. {susemgr}
-addresses this by allowing the inclusion of macros, or variables, within the configuration files it manages.
+Traditional file management would require to upload and distribute each file separately, even if the distinction is nominal and the number of variations is in the hundreds or thousands. {susemgr} addresses this by allowing the inclusion of macros, or variables, within the configuration files it manages.
 In addition to variables for custom system information, the following standard macros are supported:
 ifdef::showremarks[]
 # 2010-12-21 - ke: will "rhn" stay here? 2010-12-28 - ke: see bug
@@ -444,13 +415,9 @@ rhn.system.net_interface.driver_module(eth_device)
 ----
 
 
-To use this powerful feature, either upload or create a configuration file via the menu:Configuration Channel Details[]
- page.
-Then open its menu:Configuration File Details[]
- page and include the supported macros of your choice.
-Ensure that the delimiters used to offset your variables match those set in the menu:Macro Start Delimiter[]
- and menu:Macro End Delimiter[]
- fields and do not conflict with other characters in the file.
+To use this powerful feature, either upload or create a configuration file via the menu:Configuration Channel Details[] page.
+Then open its menu:Configuration File Details[] page and include the supported macros of your choice.
+Ensure that the delimiters used to offset your variables match those set in the menu:Macro Start Delimiter[] and menu:Macro End Delimiter[] fields and do not conflict with other characters in the file.
 We recommend that the delimiters be two characters in length and must not contain the percent (``%``) symbol.
 
 For example, you may have a file applicable to all of your servers that differs only in IP address and host name.
@@ -467,10 +434,7 @@ ifdef::showremarks[]
 # 2010-12-21 - ke: will "rhn" stay here? #
 endif::showremarks[]
 
-Upon delivery of the file to individual systems, whether through a scheduled action in the {susemgr}
- Web interface or at the command line with the {susemgr}
- Configuration Client ([command]``mgrcfg-client``), the variables will be replaced with the host name and IP address of the system as recorded in {susemgr}
-'s system profile.
+Upon delivery of the file to individual systems, whether through a scheduled action in the {susemgr} Web interface or at the command line with the {susemgr} Configuration Client ([command]``mgrcfg-client``), the variables will be replaced with the host name and IP address of the system as recorded in {susemgr} 's system profile.
 In the above example configuration file the deployed version resembles the following:
 
 ----
@@ -503,8 +467,7 @@ asset={@ rhn.system.custom_info(asset) = 'Asset #' @}
 
 This default is overridden by the value on any system containing it.
 
-Using the {susemgr}
-Configuration Manager ([command]``mgrcfg-manager``) will not translate or alter files, as this tool is system agnostic. [command]``mgrcfg-manager`` does not depend on system settings.
+Using the {susemgr} Configuration Manager ([command]``mgrcfg-manager``) will not translate or alter files, as this tool is system agnostic. [command]``mgrcfg-manager`` does not depend on system settings.
 Binary files cannot be interpolated.
 
 [[ref.webui.config.systems]]
@@ -512,26 +475,19 @@ Binary files cannot be interpolated.
 
 
 This page displays status information about your system in relation to configuration.
-There are two sub-pages: menu:Managed Systems[]
- and menu:Target Systems[]
+There are two sub-pages: menu:Managed Systems[] and menu:Target Systems[]
 .
 
 [[config-systems-managed]]
 === Managed Systems
 
 
-By default the menu:Configuration[Managed Systems]
- page is displayed.
+By default the menu:Configuration[Managed Systems] page is displayed.
 The listed systems have been fully prepared for configuration file deployment.
 The number of locally- and centrally-managed files is displayed.
-Clicking the name of a system shows its menu:System
-    Details[Configuration > Overview]
- page.
-Clicking the number of local files takes you to the menu:System Details[Configuration > View/Modify Files > Locally-Managed Files]
- page, where you manage which local (override) files apply to the system.
-Clicking the number of centrally-managed files takes you to the menu:System Details[Configuration > Manage Configuration Channels > List/Unsubscribe
-    from Channels]
- page.
+Clicking the name of a system shows its menu:System    Details[Configuration > Overview] page.
+Clicking the number of local files takes you to the menu:System Details[Configuration > View/Modify Files > Locally-Managed Files] page, where you manage which local (override) files apply to the system.
+Clicking the number of centrally-managed files takes you to the menu:System Details[Configuration > Manage Configuration Channels > List/Unsubscribe    from Channels] page.
 Here you unsubscribe from any channels you want.
 
 [[config-systems-target]]
@@ -541,10 +497,8 @@ Here you unsubscribe from any channels you want.
 Here you see the systems either not prepared for configuration file deployment or not yet subscribed to a configuration channel.
 The table has three columns.
 The first identifies the system name, the second shows whether the system is prepared for configuration file deployment, and the third lists the steps necessary to prepare the system.
-To prepare a system, check the box to the left of the profile name then click the menu:Enable SUSE Manager Configuration Management[]
- button.
-All of the preparatory steps that can be automatically performed are scheduled by {susemgr}
-.
+To prepare a system, check the box to the left of the profile name then click the menu:Enable SUSE Manager Configuration Management[] button.
+All of the preparatory steps that can be automatically performed are scheduled by {susemgr}.
 
 [NOTE]
 ====
