@@ -52,7 +52,7 @@ quick-pdf:
 
 # Target for www.suse.com/documentation
 online-docs:
-	daps -vvv -d DC-create-all --force online-docs
+	daps -d DC-create-all --force online-docs
 
 dist: xml
 	daps -d DC-create-all-adoc package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc
