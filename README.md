@@ -5,7 +5,7 @@
 
 ### Introduction
 This is the source for the official SUSE Manager documentation update.
-During the SUSE Manager 3.0 update we condensed and reworked the six original SUSE Manager documentation books into four shiny new manuals. 
+Documents may be view on github as rendered adoc sources. Start viewing by browsing to [adoc/MAIN-manager.adoc]
 
 
 --
@@ -17,6 +17,9 @@ For more details on SUSE Manager documentation please visit our wiki: [SUSE Mana
 --
 ### Contributing
 
-See `IN_PROGRESS 2017-10-19 contribution guide`
+Update: 6.6.2018
+- [X] Move from db5 sources to adoc
+- [X] Create an adoc getting started guide (see wiki)
+
 
 
