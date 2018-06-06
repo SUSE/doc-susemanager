@@ -5,7 +5,7 @@
 
 ### Introduction
 This is the source for the official SUSE Manager documentation update.
-Documents may be view on github as rendered adoc sources. Start viewing by browsing to [adoc/MAIN-manager.adoc]
+Documents may be view on github as rendered adoc sources. Start viewing by browsing to [MAIN-manager.adoc](https://github.com/SUSE/doc-susemanager/blob/develop/adoc/MAIN-manager.adoc)
 
 
 --
