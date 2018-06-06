@@ -219,16 +219,16 @@ Keep the server monitored in order to identify possible issues early.
 [[optimizing.big.tuning]]
 === Tuning Proposals
 
-{suse} proposes the following tuning settingsin a big scale {susemgr} deployment:
+{suse} proposes the following tuning settings in a big scale {susemgr} deployment:
 
-* Increase Tomcat memory to face a long queue of Salt return results.
-Items in the Salt return queue might accumulate in a short time: Set 8 GiB instead of the current default 1 GiB.
-* Several RHN parameters should be changed from their defaults:
-** The number of Taskomatic workers should be increased, and thus parallelizing work on a high number of separate jobs (onboarding, staging).
-** Quartz should check for runnable jobs more frequently to reduce latency (onboarding, staging, Action execution).
-** Tomcat's Salt return result workers should be increased, and thus parallelizing work on a high number of Salt return results (patching).
-** The number of PostgreSQL connections available to Java applications (Tomcat, Taskomatic) should increase accordingly.
-Otherwise extra workers will starve waiting for a connection.
-** Salt's presence ping timeouts should be increased because responses might come back later than the defaults.
-* Salt master worker threads should be increased to 100 from 15, and thus parallelizing more requests (otherwise Tomcat and Taskomatic workers will starve waiting for the API to do something).
-* Increasing the number of Salt master worker threads more requires more RAM and does not bring benefits. Apache maximum request time should be increased.
+* Increase the maximum Tomcat heap memory to face a potentially long queue of Salt return results. Set 8 GiB instead of the current default 1 GiB: parameter [parameter]``Xmx1G`` in [path]``/etc/tomcat/tomcat.conf`` (affects onboarding and Action execution).
+* Increase the number of Taskomatic workers, allowing to parallelize work on a high number of separate jobs. Set parameter [parameter]``org.quartz.threadPool.threadCount = 100`` in [path]``/etc/rhn/rhn.conf`` (affects onboarding and staging).
+* Allow Taskomatic to check for runnable jobs more frequently to reduce latency. Set parameter [parameter]``org.quartz.scheduler.idleWaitTime = 1000`` in [path]``/etc/rhn/rhn.conf`` (affects onboarding, staging and Action execution).
+* Increase Tomcat's Salt return result workers to allow parallelizing work on a high number of Salt return results. Set parameter [parameter]``java.message_queue_thread_pool_size = 100`` in [path]``/etc/rhn/rhn.conf`` (affects patching).
+* Increase the number of PostgreSQL connections available to Java applications (Tomcat, Taskomatic) according to the previous parameters, otherwise extra workers will starve waiting for a connection. Set parameter [parameter]``hibernate.c3p0.max_size = 150`` in [path]``/etc/rhn/rhn.conf`` (affects all minion operations). Make sure enough PostgreSQL connections are configured before changing this parameter {mdash} refer to ``smdba system-check autotuning --help`` to get automatic tuning of the PostgreSQL configuration file while changing the number of available connections. Additional manual tuning is usually not necessary but might be required depending on scale and exact use cases.
+* Increase Salt's presence ping timeouts if responses might come back later than the defaults. Set parameters [parameter]``salt_presence_ping_timeout = 20`` and [parameter]``salt_presence_ping_timeout = 20`` in [path]``/etc/rhn/rhn.conf`` (affects all minion operations).
+* Increase the Salt master worker threads allowing to parallelize more requests (otherwise Tomcat and Taskomatic workers will starve waiting for the Salt API). Set parameter [parameter]``worker_threads: 100`` in [path]``/etc/salt/master.d/susemanager.conf`` (affects onboarding and patching).
+
+Note that increasing the number of Postgres connections and Salt workers will require more RAM, make sure the {susemgr} server is monitored and swap is never used.
+
+Also note the above settings should be regarded as guidelines{mdash}they have been tested to be safe but care should be exercised when changing them, and consulting support is highly recommended.
