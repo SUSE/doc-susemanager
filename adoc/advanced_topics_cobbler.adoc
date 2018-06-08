@@ -51,26 +51,24 @@ endif::[]
 [[at.introduction.cobbler]]
 == Introduction
 
-{susemgr} features the Cobbler server that allows administrators to centralize their system installation and provisioning infrastructure.
-Cobbler is an installation server that provides various methods of performing unattended system installations, whether it be server, workstation, or guest systems in a full or para-virtualized setup.
+{susemgr} features the Cobbler server, which allows administrators to centralize system installation and provisioning infrastructure.
+Cobbler is an installation server that provides various methods of performing unattended system installations.
+It can be used on server, workstation, or guest systems, in full or para-virtualized environments.
 
-Cobbler offers several tools to assist in pre-installation guidance, automated installation file management, installation environment management, and more.
-This section explains supported features of Cobbler, which include:
+Cobbler offers several tools for pre-installation guidance, automated installation file management, installation environment management, and more.
+This section explains some of the supported features of Cobbler, including:
 
-* Installation environment analysis using the [command]``cobbler check`` command,
-* Multi-site installation server configuration with [command]``cobbler replicate``,
-+
+* Installation environment analysis using the [command]``cobbler check`` command
+* Multi-site installation server configuration using the [command]``cobbler replicate`` command
+* Virtual machine guest installation automation with the [command]``koan`` client-side tool
+* Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command (for {susemgr} systems with x86_64 architecture)
 
-* Virtual machine guest installation automation with the [command]``koan`` client-side tool,
-* Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command for {susemgr} systems with x86_64 architecture.
-+
-
-For more detailed upstream documentation on Cobbler, see http://cobbler.github.io/manuals/.
+For more detailed Cobbler documentation, see http://cobbler.github.io/manuals/.
 
 [IMPORTANT]
 .Supported Cobbler Functions
 ====
-{suse} only support those Cobbler functions that are either listed within our formal documentation or available via the Web Interface and API.
+{suse} only support those Cobbler functions that are either listed within our formal documentation or available via the web interface and API.
 ====
 
 
@@ -78,18 +76,16 @@ For more detailed upstream documentation on Cobbler, see http://cobbler.github.i
 [[advanced.topics.cobbler.reqs]]
 == Cobbler Requirements
 
-To use Cobbler as a PXE boot server, follow these guidelines:
-
-* For system installation with PXE, you must have a TFTP server installed and configured. By default, {susemgr} installs such a TFTP server.
-* To PXE boot systems for installation, you must either set up a DHCP server for Cobbler PXE booting or have access to your network's DHCP server. Edit [path]``/etc/dhcp.conf`` to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
+To use Cobbler for system installation with PXE, you will require a TFTP server. {susemgr} installs a TFTP server by default.
+To PXE boot systems, you will require a DHCP server, or have access to a network DHCP server. Edit the [path]``/etc/dhcp.conf`` configuration file to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
 
 
 [IMPORTANT]
 .Correct Hostname Configuration
 ====
-When onboarding bare metal systems using the pxe-default-image, it's important to ensure all systems to be on-board have unique hostnames.
-Otherwise, if you later assign a provisioning profile to it, the new configuration file will overwrite the configuration settings for any system with the duplicate hostname.
 Cobbler uses hostnames as a unique key for each system.
+If you are using the [option]``pxe-default-image`` to onboard baremetal systems, make sure every system has a unique hostname.
+Non-unique hostnames will cause all systems with the same hostname to have the configuration filess overwritten when a provisioning profile is assigned.
 ====
 
 
@@ -97,17 +93,17 @@ Cobbler uses hostnames as a unique key for each system.
 [[advanced.topics.cobbler.reqs.settings]]
 === Configuring Cobbler with /etc/cobbler/settings
 
-Cobbler configuration is mainly done in the [path]``/etc/cobbler/settings`` file.
-With the default settings unchanged, Cobbler runs as intended.
-All configurable settings are explained in detail in the [path]``/etc/cobbler/settings`` file with regard to how they affect functionality of Cobbler and whether it is recommended for users to adjust values to their environment.
+Cobbler configuration is primarily managed using the [path]``/etc/cobbler/settings`` file.
+Cobbler will run with the default settings unchanged.
+All configurable settings are explained in detail in the [path]``/etc/cobbler/settings`` file, including information on each setting, and recommendations.
 
 
 [NOTE]
 .Supported Languages
 ====
-If {susemgr} complains about language '``en``' was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the lang in [path]``/etc/cobbler/settings`` or add a proper value such as ``en_US``.
+If {susemgr} complains that language ``en`` was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the [option]``lang`` parameter in the [path]``/etc/cobbler/settings`` file, or add a valid parameter such as ``en_US``.
 
-For background info, see https://www.suse.com/support/kb/doc?id=7018334.
+For more on this topic, see https://www.suse.com/support/kb/doc?id=7018334
 ====
 
 
@@ -115,15 +111,15 @@ For background info, see https://www.suse.com/support/kb/doc?id=7018334.
 [[advanced.topics.cobbler.req.dhcp]]
 === Cobbler and DHCP
 
-Cobbler supports bare-metal automated installation of systems configured to perform network boots using a PXE boot server.
-To properly implement a Cobbler installation server, administrators need to either have administrative access to the network's DHCP server or set up DHCP on the Cobbler server itself.
+Cobbler uses DHCP to automate baremetal installations from a PXE boot server.
+You must have administrative access to the network's DHCP server, or be able to configure DHCP directly on the the Cobbler server.
 
 
 
 [[advanced.topics.cobbler.reqs.dhcp.notmanaged]]
 ==== Configuring an Existing DHCP Server
 
-If you have a DHCP server deployed on another system in the network, you will need administrative access to the DHCP server to edit the DHCP configuration file so that it points to the Cobbler server and PXE boot image.
+If you have existing DHCP server, you will need to edit the DHCP configuration file so that it points to the Cobbler server and PXE boot image.
 
 As root on the DHCP server, edit the [path]``/etc/dhcpd.conf`` file and append a new class with options for performing PXE boot installation.
 For example:
@@ -148,9 +144,9 @@ filename "pxelinux.0";} <5>
 [[advanced.topics.cobbler.reqs.dhcp.kvm]]
 ==== Setting up PXE Boot in KVM
 
-Not necessarily for production, but for lab or demo environments you can alternativly set up PXE boot in KVM.
-Such a configuration can replace the `next-server` setting on a DHCP server explained in <<advanced.topics.cobbler.reqs.dhcp.notmanaged>>.
-To edit the network XML description with [command]``virsh``, proceed as follow:
+It is possible to set up PXE booting in KVM, however we do not recommend you use this method for production systems.
+This method can replace the [guilabel]``next-server`` setting on a DHCP server, as described in <<advanced.topics.cobbler.reqs.dhcp.notmanaged>>.
+Edit the network XML description with [command]``virsh``:
 
 . Produce an XML dump of the current description:
 +
@@ -159,21 +155,21 @@ To edit the network XML description with [command]``virsh``, proceed as follow:
 virsh net-dumpxml --inactive network > network.xml
 ----
 
-. Open the XML dump file (here [path]``network.xml`` ) with a text editor and add a `bootp` statement within the `<dhcp>` element:
+. Open the XML dump file at [path]``network.xml`` with a text editor and add a [systemitem]``bootp`` parameter within the [systemitem]``<dhcp>``` element:
 +
 
 ----
 <bootp file='/pxelinux.0' server='192.168.100.153'/>
 ----
 
-. Install the edited description:
+. Install the updated description:
 +
 
 ----
 virsh net-define network.xml
 ----
 
-Or try the `net-edit` subcommand that does some error checking.
+Alternatively, use the [command]``net-edit`` subcommand, which will also perform some error checking.
 
 
 
