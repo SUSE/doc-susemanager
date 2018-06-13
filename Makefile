@@ -1,15 +1,29 @@
 
-all: html pdf
+PRODUCTNAME=
 
-xml: xml/MAIN-manager.xml images
+uyuni:
+	$(eval PRODUCTNAME = Uyuni)
 
-images: adoc/images/*
+suma:
+	$(eval PRODUCTNAME = SUSE Manager)
+
+xml-suma: xml/MAIN-manager.xml suma-images
+
+xml-uyuni: xml/MAIN-manager.xml uyuni-images
+
+suma-images: adoc/images/suma/*
 	mkdir -p images/src
-	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/*.png .)
-	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/*.svg .)
+	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/suma/*.png .)
+	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/suma/*.svg .)
 
+uyuni-images: adoc/images/uyuni/*
+	mkdir -p images/src
+	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/uyuni/*.png .)
+	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/uyuni/*.svg .)
+
+# SUSE Manager asciidoctor processing instructions and entity linking
 xml/MAIN-manager.xml: adoc/*.adoc
-	asciidoctor -b docbook5 -d book -D xxml adoc/MAIN-manager.adoc
+	asciidoctor -a productname='$(PRODUCTNAME)' -b docbook5 -d book -D xxml adoc/MAIN-manager.adoc
 	# insert ENTITY
 	sed -i '2i <!DOCTYPE set [ <!ENTITY % entities SYSTEM "entity-decl.ent"> %entities; ]>' xxml/MAIN-manager.xml
 	# replace {foo} (but not ${foo}) with &foo;
@@ -19,49 +33,81 @@ xml/MAIN-manager.xml: adoc/*.adoc
 	rm -rf xml
 	mv xxml xml
 
-#daps -m xml/$NAME.xml --verbosity=0 --styleroot /usr/share/xml/docbook/stylesheet/suse2013-ns html
-#rm -rf build/$NAME/html/$NAME/images
-#ln -sf ../../../../adoc/images build/$NAME/html/$NAME
+# run book-to-set stylesheet on xml/MAIN-manager.xml this allows creation of single books
+suma-book-to-set: clean suma-dist
+	echo "Copying Main file into book-to-set/ ..."
+	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
+	echo "Making entities available ..."
+	(cd book-to-set; ln -sf ../entities/*ent .)
+	echo "Converting unsupported db5 tags to supported geekodoc subset tags..."
+	cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml
+	echo "Renaming and moving test.xml to xml/MAIN-manager.xml ..."
+	mv book-to-set/test.xml book-to-set/xml/MAIN-manager.xml
+	echo "Validating resulting Main file ..."
+	cd book-to-set/; daps -m xml/MAIN-manager.xml validate
+	echo "Copying processed Main file to primary build path ..."
+	cp book-to-set/xml/MAIN-manager.xml xml/MAIN-manager.xml
 
-html: xml
+# TODO: Add additional DC files for uyuni so we can setup a make all scenario for building both SUMA/Uyuni docs and pdf files.
+#all: suma-html suma-pdf suma-dist uyuni-html uyuni-pdf uyuni-dist
+
+# Build Uyuni docs and link images to the uyuni folder
+uyuni-html: uyuni xml-uyuni
+	daps -d DC-create-all-uyuni html
+	(cd build/create-all/html/create-all; rm -rf images; ln -sf ../../../../adoc/images/uyuni .)
+
+# Build SUMA docs and link images to the suma folder
+suma-html: suma xml-suma
 	daps -d DC-create-all html
-	(cd build/create-all/html/create-all; rm -rf images; ln -sf ../../../../adoc/images .)
+	(cd build/create-all/html/create-all; rm -rf images; ln -sf ../../../../adoc/images/suma/ .)
 
-pdf: xml
+# Make SUMA Packages for OBS
+suma-dist: xml-suma
+	daps -vvv -d DC-create-all package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc
+
+# Make Uyuni Packages for OBS
+uyuni-dist: xml-uyuni
+	daps -vvv -d DC-create-all-uyuni package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc
+
+#### Build SUMA PDF ####
+suma-pdf: xml-suma
 	daps -d DC-create-all pdf
 
-advanced:
+suma-advanced-pdf: xml-suma
 	daps -d DC-susemanager-advanced-topics pdf
 
-best-practices:
+suma-best-practices-pdf: xml-suma
 	daps -d DC-susemanager-best-practices pdf
 
-getting-started:
+suma-getting-started-pdf:
 	daps -d DC-susemanager-getting-started pdf
 
-reference:
+suma-reference-pdf:
 	daps -d DC-susemanager-reference pdf
 
-quick: quick-html quick-pdf
+#### Build Uyuni PDF ####
+uyuni-pdf: xml
+	daps -d DC-create-all-uyuni pdf
 
-quick-html:
-	daps -d DC-susemanager-quick html
+uyuni-advanced-pdf:
+	daps -d DC-uyuni-advanced-topics- pdf
 
-quick-pdf:
-	daps -d DC-susemanager-quick pdf
+uyuni-best-practices-pdf:
+	daps -d DC-uyuni-best-practices pdf
+
+uyuni-getting-started-pdf:
+	daps -d DC-uyuni-getting-started pdf
+
+uyuni-reference-pdf:
+	daps -d DC-uyuni-reference pdf
 
 # Target for www.suse.com/documentation
-online-docs:
-	daps -d DC-create-all --force online-docs
+suma-online-docs:
+	daps -d DC-create-all online-docs
 
-dist: xml
-	daps -d DC-create-all-adoc package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc
+uyuni-online-docs:
+	daps -d DC-create-all-uyuni --force online-docs
 
-package: package/doc-susemanager-develop.tar.bz2
-#add origin in front of develop to build for jenkins
-package/doc-susemanager-develop.tar.bz2:
-	git archive --format=tar --prefix=doc-susemanager-develop/ origin/develop > package/doc-susemanager-develop.tar 
-	bzip2 package/doc-susemanager-develop.tar
 clean:
 	rm -rf package/doc-susemanager-develop.tar.bz2
 	rm -rf package/*~

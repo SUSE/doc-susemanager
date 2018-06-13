@@ -20,9 +20,8 @@ ifdef::env-github,backend-html5[]
 :rhel: Red Hat Linux Enterprise
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
-// SUSE Manager Entities
-:susemgr: SUSE Manager
-:susemgrproxy: SUSE Manager Proxy
+// {productname} Entities
+:susemgrproxy: {productname} Proxy
 :productnumber: 3.2
 :saltversion: 2018.3.0
 :webui: WebUI
@@ -51,7 +50,7 @@ endif::[]
 [[at.introduction.cobbler]]
 == Introduction
 
-{susemgr} features the Cobbler server that allows administrators to centralize their system installation and provisioning infrastructure.
+{productname} features the Cobbler server that allows administrators to centralize their system installation and provisioning infrastructure.
 Cobbler is an installation server that provides various methods of performing unattended system installations, whether it be server, workstation, or guest systems in a full or para-virtualized setup.
 
 Cobbler offers several tools to assist in pre-installation guidance, automated installation file management, installation environment management, and more.
@@ -62,7 +61,7 @@ This section explains supported features of Cobbler, which include:
 +
 
 * Virtual machine guest installation automation with the [command]``koan`` client-side tool,
-* Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command for {susemgr} systems with x86_64 architecture.
+* Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command for {productname} systems with x86_64 architecture.
 +
 
 For more detailed upstream documentation on Cobbler, see http://cobbler.github.io/manuals/.
@@ -80,7 +79,7 @@ For more detailed upstream documentation on Cobbler, see http://cobbler.github.i
 
 To use Cobbler as a PXE boot server, follow these guidelines:
 
-* For system installation with PXE, you must have a TFTP server installed and configured. By default, {susemgr} installs such a TFTP server.
+* For system installation with PXE, you must have a TFTP server installed and configured. By default, {productname} installs such a TFTP server.
 * To PXE boot systems for installation, you must either set up a DHCP server for Cobbler PXE booting or have access to your network's DHCP server. Edit [path]``/etc/dhcp.conf`` to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
 
 
@@ -105,7 +104,7 @@ All configurable settings are explained in detail in the [path]``/etc/cobbler/se
 [NOTE]
 .Supported Languages
 ====
-If {susemgr} complains about language '``en``' was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the lang in [path]``/etc/cobbler/settings`` or add a proper value such as ``en_US``.
+If {productname} complains about language '``en``' was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the lang in [path]``/etc/cobbler/settings`` or add a proper value such as ``en_US``.
 
 For background info, see https://www.suse.com/support/kb/doc?id=7018334.
 ====
@@ -209,7 +208,7 @@ Or try the `net-edit` subcommand that does some error checking.
 [[advanced.topics.cobbler.reqs.tftp]]
 === Xinetd and TFTP
 
-{susemgr} uses the [daemon]``atftpd`` daemon, but it can also operate with Xinetd/TFTP.
+{productname} uses the [daemon]``atftpd`` daemon, but it can also operate with Xinetd/TFTP.
 The [daemon]``atftpd`` is installed by default as the recommended method for providing PXE services.
 Usually, you do not have to change its configuration, but if you have to, use the {yast} Sysconfig Editor.
 
@@ -224,15 +223,15 @@ Start {yast} and use menu:System[Services Manager] to configure the [daemon]``Xi
 
 
 [[advanced.topics.cobbler.reqs.sync.tftp]]
-=== Syncing TFTP Contents to SUSE Manager Proxies
+=== Syncing TFTP Contents to {productname} Proxies
 
-It is possible to sync cobbler generated TFTP contents to {susemgr} Proxies to perform PXE booting via these proxies.
+It is possible to sync cobbler generated TFTP contents to {productname} Proxies to perform PXE booting via these proxies.
 
 
 
 ==== Installation
 
-On the {susemgr} Server as root, install the package [systemitem]``susemanager-tftpsync``:
+On the {productname} Server as root, install the package [systemitem]``susemanager-tftpsync``:
 
 ----
 zypper install susemanager-tftpsync
@@ -251,15 +250,15 @@ zypper install susemanager-tftpsync-recv
 
 Execute [path]``configure-tftpsync.sh`` on the {susemgrproxy} systems.
 
-This setup script asks for hostnames and IP addresses of the {susemgr} server and the proxy.
+This setup script asks for hostnames and IP addresses of the {productname} server and the proxy.
 Additionally, it asks for the `tftpboot` directory on the proxy.
 For more information, see the output of [command]``configure-tftpsync.sh --help``.
 
 
 
-==== Configuring {susemgr} Server
+==== Configuring {productname} Server
 
-As root execute [path]``configure-tftpsync.sh`` on {susemgr} Server:
+As root execute [path]``configure-tftpsync.sh`` on {productname} Server:
 
 ----
 configure-tftpsync.sh proxy1.example.com proxy2.example.com
@@ -286,7 +285,7 @@ In case you reinstall an already configured proxy and want to push all files aga
 
 ==== Requirements
 
-The {susemgr} Server must be able to access the {susemgrproxy} systems directly.
+The {productname} Server must be able to access the {susemgrproxy} systems directly.
 Push via proxies is not possible.
 
 
@@ -296,7 +295,7 @@ Push via proxies is not possible.
 
 Before starting the cobbler service, run a check on the cobbler service to make sure that all the prerequisites are configured according to the organization's needs with the [command]``cobbler check`` command.
 
-If content, start the {susemgr} server with the following command:
+If content, start the {productname} server with the following command:
 
 ----
 /usr/sbin/spacewalk-service start
@@ -304,10 +303,10 @@ If content, start the {susemgr} server with the following command:
 
 [WARNING]
 ====
-Do not start or stop the [command]``cobblerd`` service independent of the {susemgr} service.
+Do not start or stop the [command]``cobblerd`` service independent of the {productname} service.
 Doing so may cause errors and other issues.
 
-Always use [command]``/usr/sbin/spacewalk-service`` to start or stop {susemgr}.
+Always use [command]``/usr/sbin/spacewalk-service`` to start or stop {productname}.
 ====
 
 
@@ -321,7 +320,7 @@ If all Cobbler prerequisites have been met and Cobbler is running, you can use t
 Make installation files such as the kernel image and the initrd image available on the Cobbler server.
 Then add a distribution to Cobbler, using either the Web interface or the command line tools.
 
-For information about creating and configuring {ay} or Kickstart distributions from the {susemgr} interface, refer to <<ref.webui.systems.autoinst.distribution>>.
+For information about creating and configuring {ay} or Kickstart distributions from the {productname} interface, refer to <<ref.webui.systems.autoinst.distribution>>.
 
 To create a distribution from the command line, use the [command]``cobbler`` command as root:
 
@@ -351,7 +350,7 @@ Profiles are the core unit of provisioning and there must be at least one Cobble
 For example, two profiles might be created for a Web server and a desktop configuration.
 While both profiles use the same distribution, the profiles are for different installation types.
 
-For information about creating and configuring Kickstart and {ay} profiles in the {susemgr} interface, refer to <<ref.webui.systems.autoinst.profiles>>.
+For information about creating and configuring Kickstart and {ay} profiles in the {productname} interface, refer to <<ref.webui.systems.autoinst.profiles>>.
 
 Use the [command]``cobbler`` command as root to create profiles from the command line:
 
@@ -393,7 +392,7 @@ They are useful when system-specific Kickstart templating is required or to esta
 If a client is intended for a certain role, system records should be created for it.
 ====
 
-For information about creating and configuring automated installation from the {susemgr} interface, refer to <<s4-sm-system-details-kick>>.
+For information about creating and configuring automated installation from the {productname} interface, refer to <<s4-sm-system-details-kick>>.
 
 Run the following command as root to add a system to the Cobbler configuration:
 
@@ -419,10 +418,10 @@ For more options, such as setting hostname or IP addresses, refer to the Cobbler
 [[advanced.topics.cobbler.templates]]
 == Using Cobbler Templates
 
-The {susemgr} Web interface facilitates creating variables for use with Kickstart distributions and profiles.
+The {productname} Web interface facilitates creating variables for use with Kickstart distributions and profiles.
 To create a Kickstart profile variable, refer to <<s4-sm-system-kick-details-variables>>.
 
-Kickstart variables are part of an infrastructural change in {susemgr} to support templating in Kickstart files.
+Kickstart variables are part of an infrastructural change in {productname} to support templating in Kickstart files.
 Kickstart templates are files describing how to build actual Kickstart files rather than creating specific Kickstarts.
 
 These templates are shared by various profiles and systems that have their own variables and corresponding values.

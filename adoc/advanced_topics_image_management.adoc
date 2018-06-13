@@ -20,9 +20,7 @@ ifdef::env-github,backend-html5[]
 :rhel: Red Hat Linux Enterprise
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
-// SUSE Manager Entities
-:susemgr: SUSE Manager
-:susemgrproxy: SUSE Manager Proxy
+:susemgrproxy: {productname} Proxy
 :productnumber: 3.2
 :saltversion: 2018.3.0
 :webui: WebUI
@@ -52,11 +50,11 @@ endif::[]
 [[at.images.overview]]
 == Image Building Overview
 
-{susemgr} enables system administrators to build containers, system, and virtual images.
-{susemgr} helps with creating Image Stores and managing Image Profiles.
+{productname} enables system administrators to build containers, system, and virtual images.
+{productname} helps with creating Image Stores and managing Image Profiles.
 
 ifndef::draft[]
-{susemgr} supports two distinct build types:
+{productname} supports two distinct build types:
 
 * Dockerfile
 * Kiwi image system
@@ -103,11 +101,11 @@ For more information on Containers or CaaS Platform review the following links:
 [[at.images.docker.buildhost]]
 === Creating a Build Host
 
-To build all kind of images with {susemgr}, you will need to create and configure a build host.
+To build all kind of images with {productname}, you will need to create and configure a build host.
 Build hosts are Salt minions running SLES 12 or later.
 The following steps will guide you though the initial configuration for a build host.
 
-From the {susemgr}{webui}
+From the {productname}{webui}
 perform the following steps to configure a build host.
 
 
@@ -115,7 +113,7 @@ perform the following steps to configure a build host.
 . From the menu:System Details[] page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enable ``SLE-Module-Containers12-Pool`` and ``SLE-Module-Containers12-Updates``. Confirm by clicking btn:[Change Subscriptions].
 . From the menu:System Details[Properties] page, enable the menu:Add-on System Type[] ``Container Build Host`` and confirm by selecting btn:[Update Properties].
 . Install all required packages by applying the Highstate. From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[].
-Alternatively apply a Highstate from the command line by executing `state.highstate` from command line of the {susemgr} server.
+Alternatively apply a Highstate from the command line by executing `state.highstate` from command line of the {productname} server.
 
 
 
@@ -148,7 +146,7 @@ image::images_image_stores.png[scaledwidth=80%]
 
 image::images_image_stores_create.png[scaledwidth=80%]
 
-. {susemgr} currently provides support only for the `Registry`menu:Store Type[]. Define a name for the image store in the menu:Label[] field.
+. {productname} currently provides support only for the `Registry`menu:Store Type[]. Define a name for the image store in the menu:Label[] field.
 . Provide the path to your image registry by filling in the menu:URI[] field.
 The FQDN of the container registry host (whether internal or external) is sufficient.
 +
@@ -270,9 +268,9 @@ A Dockerfile and any associated scripts should be stored within an internal or e
 [IMPORTANT]
 .Required Dockerfile Lines
 ====
-The following basic Dockerfile lines provide access to a specific repository version served by SUSE manager.
-The following example Dockerfile is used by SUSE Manager to trigger a build job on a build host minion.
-These ARGS ensure that the image built is associated with the desired repo version served by SUSE Manager.
+The following basic Dockerfile lines provide access to a specific repository version served by {productname}.
+The following example Dockerfile is used by {productname} to trigger a build job on a build host minion.
+These ARGS ensure that the image built is associated with the desired repo version served by {productname}.
 These ``ARG``s also allow you to build image versions of SLES which may differ from the version of SLES used by the build host itself.
 
 For example: The `ARG repo` and echo to the repository file creates and then injects the correct path into the repo file for the desired channel version.
@@ -284,7 +282,7 @@ _The repository version is determined by the activation key that you assigned to
 FROM registry.example.com/sles12sp2
 MAINTAINER Tux Administrator "tux@example.com"
 
-### Begin: These lines Required for use with SUSE Manager
+### Begin: These lines Required for use with {productname}
 
 ARG repo
 ARG cert
@@ -298,7 +296,7 @@ RUN update-ca-certificates
 # Add the repository path to the image
 RUN echo "$repo" > /etc/zypp/repos.d/susemanager:dockerbuild.repo
 
-### End: These lines required for use with SUSE Manager
+### End: These lines required for use with {productname}
 
 # Add the package script
 ADD add_packages.sh /root/add_packages.sh
@@ -324,7 +322,7 @@ zypper --non-interactive in python python-xml aaa_base aaa_base-extras net-tools
 [NOTE]
 .Packages Required for Inspecting Your Images
 ====
-To inspect images and provide the package and product list of a container to the {susemgr} {webui} you are required to install [package]#python# and [package]#python-xml# within the container.
+To inspect images and provide the package and product list of a container to the {productname} {webui} you are required to install [package]#python# and [package]#python-xml# within the container.
 If these packages remain uninstalled, your images will still build, but the package and product list will be unavailable from the {webui}.
 ====
 
@@ -387,7 +385,7 @@ The activation key provides the path to the software channel that the image will
 +
 For confirmation, click menu:Import[].
 
-At this point, the entry for the image is created in the database and an Inspect Image action on {susemgr} is scheduled right away.
+At this point, the entry for the image is created in the database and an Inspect Image action on {productname} is scheduled right away.
 
 When processed find the imported image in the images list.
 You can recognize it because of a different icon in the Build column, which means that the image is imported (see screenshot below).
@@ -435,11 +433,11 @@ The following requirements should be met before following this guide:
 [[at.images.buildhost]]
 === Creating a Build Host
 
-To build all kinds of images with {susemgr}, you will need to create and configure a build host.
+To build all kinds of images with {productname}, you will need to create and configure a build host.
 Build hosts are Salt minions running SLES 12 or later.
 The following steps will guide you though the initial configuration for a build host.
 
-From the {susemgr}{webui} perform the following steps to configure a build host.
+From the {productname}{webui} perform the following steps to configure a build host.
 
 . Select a minion that will be designated as a build host from the menu:Systems[Overview] page.
 . From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``OS Image Build Host`` and confirm by selecting menu:Update Properties[].
@@ -447,17 +445,17 @@ From the {susemgr}{webui} perform the following steps to configure a build host.
 Confirm by clicking btn:[Change Subscriptions].
 . Install all required packages by applying the Highstate.
 From the system's details page select menu:States[Highstate] and select menu:Apply Highstate[].
-Alternatively apply a Highstate from the command line by executing `state.highstate` from the SUSE Manager Server command line .
+Alternatively apply a Highstate from the command line by executing `state.highstate` from the {productname} Server command line .
 
 [NOTE]
-.{susemgr} web server public certificate RPM
+.{productname} web server public certificate RPM
 ====
-Build host provisioning copies the {susemgr} certificate RPM to the build host.
-This certificate is used for access to repositories provided by {susemgr}.
+Build host provisioning copies the {productname} certificate RPM to the build host.
+This certificate is used for access to repositories provided by {productname}.
 
 .Certificate is packaged in RPM by the `mgr-package-rpm-certificate-osimage` package script:
 
-* The package script is called automatically during a new {susemgr} installation.
+* The package script is called automatically during a new {productname} installation.
 * The upgrade scenario will (on upgrade of package `spacewalk-certs-tools`) call the package script with default values.
 +
 
@@ -476,7 +474,7 @@ The RPM package with the certificate is also provided in the local build host re
 ====
 
 [IMPORTANT]
-.The RPM Package with the {susemgr} Certificate Must Be Specified in the Build Source
+.The RPM Package with the {productname} Certificate Must Be Specified in the Build Source
 ====
 Make sure your build source Kiwi configuration contains `rhn-org-trusted-ssl-cert-osimage` as a required package in the `bootstrap` section.
 
@@ -660,8 +658,8 @@ For information about the Kiwi build system, see https://doc.opensuse.org/projec
     <packages type="bootstrap">
         ...
         <package name="sles-release"/>
-        <!-- this certificate package is required to access SUSE Manager repositories
-             and is provided by SUSE Manager automatically -->
+        <!-- this certificate package is required to access {productname} repositories
+             and is provided by {productname} automatically -->
         <package name="rhn-org-trusted-ssl-cert-osimage" bootinclude="true"/>
 
     </packages>
@@ -709,10 +707,10 @@ When the build fails, investigation of salt states results can help with identif
 Usual checks when the build fails:
 
 * The build host can access the build sources
-* There is enough disk space for image on both the build host and the {susemgr} server
+* There is enough disk space for image on both the build host and the {productname} server
 * The activation key has correct channels associated
 * Valid build sources are used
-* The RPM package with the {susemgr} public certificate is up to date and available at `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
+* The RPM package with the {productname} public certificate is up to date and available at `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 +
 
 See <<at.images.kiwi.buildhost>> on how to refresh a public certificate RPM.
