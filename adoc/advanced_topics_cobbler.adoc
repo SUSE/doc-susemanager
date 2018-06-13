@@ -51,26 +51,24 @@ endif::[]
 [[at.introduction.cobbler]]
 == Introduction
 
-{susemgr} features the Cobbler server that allows administrators to centralize their system installation and provisioning infrastructure.
-Cobbler is an installation server that provides various methods of performing unattended system installations, whether it be server, workstation, or guest systems in a full or para-virtualized setup.
+{susemgr} features the Cobbler server, which allows administrators to centralize system installation and provisioning infrastructure.
+Cobbler is an installation server that provides various methods of performing unattended system installations.
+It can be used on server, workstation, or guest systems, in full or para-virtualized environments.
 
-Cobbler offers several tools to assist in pre-installation guidance, automated installation file management, installation environment management, and more.
-This section explains supported features of Cobbler, which include:
+Cobbler offers several tools for pre-installation guidance, automated installation file management, installation environment management, and more.
+This section explains some of the supported features of Cobbler, including:
 
-* Installation environment analysis using the [command]``cobbler check`` command,
-* Multi-site installation server configuration with [command]``cobbler replicate``,
-+
+* Installation environment analysis using the [command]``cobbler check`` command
+* Multi-site installation server configuration using the [command]``cobbler replicate`` command
+* Virtual machine guest installation automation with the [command]``koan`` client-side tool
+* Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command (for {susemgr} systems with x86_64 architecture)
 
-* Virtual machine guest installation automation with the [command]``koan`` client-side tool,
-* Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command for {susemgr} systems with x86_64 architecture.
-+
-
-For more detailed upstream documentation on Cobbler, see http://cobbler.github.io/manuals/.
+For more detailed Cobbler documentation, see http://cobbler.github.io/manuals/.
 
 [IMPORTANT]
 .Supported Cobbler Functions
 ====
-{suse} only support those Cobbler functions that are either listed within our formal documentation or available via the Web Interface and API.
+{suse} only support those Cobbler functions that are either listed within our formal documentation or available via the web interface and API.
 ====
 
 
@@ -78,18 +76,16 @@ For more detailed upstream documentation on Cobbler, see http://cobbler.github.i
 [[advanced.topics.cobbler.reqs]]
 == Cobbler Requirements
 
-To use Cobbler as a PXE boot server, follow these guidelines:
-
-* For system installation with PXE, you must have a TFTP server installed and configured. By default, {susemgr} installs such a TFTP server.
-* To PXE boot systems for installation, you must either set up a DHCP server for Cobbler PXE booting or have access to your network's DHCP server. Edit [path]``/etc/dhcp.conf`` to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
+To use Cobbler for system installation with PXE, you will require a TFTP server. {susemgr} installs a TFTP server by default.
+To PXE boot systems, you will require a DHCP server, or have access to a network DHCP server. Edit the [path]``/etc/dhcp.conf`` configuration file to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
 
 
 [IMPORTANT]
 .Correct Hostname Configuration
 ====
-When onboarding bare metal systems using the pxe-default-image, it's important to ensure all systems to be on-board have unique hostnames.
-Otherwise, if you later assign a provisioning profile to it, the new configuration file will overwrite the configuration settings for any system with the duplicate hostname.
 Cobbler uses hostnames as a unique key for each system.
+If you are using the [option]``pxe-default-image`` to onboard baremetal systems, make sure every system has a unique hostname.
+Non-unique hostnames will cause all systems with the same hostname to have the configuration filess overwritten when a provisioning profile is assigned.
 ====
 
 
@@ -97,17 +93,17 @@ Cobbler uses hostnames as a unique key for each system.
 [[advanced.topics.cobbler.reqs.settings]]
 === Configuring Cobbler with /etc/cobbler/settings
 
-Cobbler configuration is mainly done in the [path]``/etc/cobbler/settings`` file.
-With the default settings unchanged, Cobbler runs as intended.
-All configurable settings are explained in detail in the [path]``/etc/cobbler/settings`` file with regard to how they affect functionality of Cobbler and whether it is recommended for users to adjust values to their environment.
+Cobbler configuration is primarily managed using the [path]``/etc/cobbler/settings`` file.
+Cobbler will run with the default settings unchanged.
+All configurable settings are explained in detail in the [path]``/etc/cobbler/settings`` file, including information on each setting, and recommendations.
 
 
 [NOTE]
 .Supported Languages
 ====
-If {susemgr} complains about language '``en``' was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the lang in [path]``/etc/cobbler/settings`` or add a proper value such as ``en_US``.
+If {susemgr} complains that language ``en`` was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the [option]``lang`` parameter in the [path]``/etc/cobbler/settings`` file, or add a valid parameter such as ``en_US``.
 
-For background info, see https://www.suse.com/support/kb/doc?id=7018334.
+For more on this topic, see https://www.suse.com/support/kb/doc?id=7018334.
 ====
 
 
@@ -115,15 +111,15 @@ For background info, see https://www.suse.com/support/kb/doc?id=7018334.
 [[advanced.topics.cobbler.req.dhcp]]
 === Cobbler and DHCP
 
-Cobbler supports bare-metal automated installation of systems configured to perform network boots using a PXE boot server.
-To properly implement a Cobbler installation server, administrators need to either have administrative access to the network's DHCP server or set up DHCP on the Cobbler server itself.
+Cobbler uses DHCP to automate baremetal installations from a PXE boot server.
+You must have administrative access to the network's DHCP server, or be able to configure DHCP directly on the the Cobbler server.
 
 
 
 [[advanced.topics.cobbler.reqs.dhcp.notmanaged]]
 ==== Configuring an Existing DHCP Server
 
-If you have a DHCP server deployed on another system in the network, you will need administrative access to the DHCP server to edit the DHCP configuration file so that it points to the Cobbler server and PXE boot image.
+If you have existing DHCP server, you will need to edit the DHCP configuration file so that it points to the Cobbler server and PXE boot image.
 
 As root on the DHCP server, edit the [path]``/etc/dhcpd.conf`` file and append a new class with options for performing PXE boot installation.
 For example:
@@ -148,9 +144,9 @@ filename "pxelinux.0";} <5>
 [[advanced.topics.cobbler.reqs.dhcp.kvm]]
 ==== Setting up PXE Boot in KVM
 
-Not necessarily for production, but for lab or demo environments you can alternativly set up PXE boot in KVM.
-Such a configuration can replace the `next-server` setting on a DHCP server explained in <<advanced.topics.cobbler.reqs.dhcp.notmanaged>>.
-To edit the network XML description with [command]``virsh``, proceed as follow:
+It is possible to set up PXE booting in KVM, however we do not recommend you use this method for production systems.
+This method can replace the [guilabel]``next-server`` setting on a DHCP server, as described in <<advanced.topics.cobbler.reqs.dhcp.notmanaged>>.
+Edit the network XML description with [command]``virsh``:
 
 . Produce an XML dump of the current description:
 +
@@ -159,21 +155,21 @@ To edit the network XML description with [command]``virsh``, proceed as follow:
 virsh net-dumpxml --inactive network > network.xml
 ----
 
-. Open the XML dump file (here [path]``network.xml`` ) with a text editor and add a `bootp` statement within the `<dhcp>` element:
+. Open the XML dump file at [path]``network.xml`` with a text editor and add a [systemitem]``bootp`` parameter within the [systemitem]``<dhcp>``` element:
 +
 
 ----
 <bootp file='/pxelinux.0' server='192.168.100.153'/>
 ----
 
-. Install the edited description:
+. Install the updated description:
 +
 
 ----
 virsh net-define network.xml
 ----
 
-Or try the `net-edit` subcommand that does some error checking.
+Alternatively, use the [command]``net-edit`` subcommand, which will also perform some error checking.
 
 
 
@@ -209,14 +205,13 @@ Or try the `net-edit` subcommand that does some error checking.
 [[advanced.topics.cobbler.reqs.tftp]]
 === Xinetd and TFTP
 
-{susemgr} uses the [daemon]``atftpd`` daemon, but it can also operate with Xinetd/TFTP.
-The [daemon]``atftpd`` is installed by default as the recommended method for providing PXE services.
+{susemgr} uses the [daemon]``atftpd`` daemon, but it can also use Xinetd and TFTP.
+The [daemon]``atftpd`` daemon is the recommended method for PXE serviices, and is installed by default.
 Usually, you do not have to change its configuration, but if you have to, use the {yast} Sysconfig Editor.
 
-Xinetd is a daemon that manages a suite of services, including TFTP, the FTP server used for transferring the boot image to a PXE client.
+The [daemon]``Xinetd`` daemon manages a suite of services including TFTP, the FTP server used for transferring the boot image to a PXE client.
 
-To configure TFTP, you must first enable the service via Xinetd.
-To do this, edit the [path]``/etc/xinetd.d/tftp`` file as {rootuser} and change the [option]``disable = yes`` line to ``disable = no``.
+To configure TFTP, enable the service via Xinetd by editing the [path]``/etc/xinetd.d/tftp`` file as the root user and change the [option]``disable = yes`` line to ``disable = no``.
 
 Before TFTP can serve the [path]``pxelinux.0`` boot image, you must start the Xinetd service.
 Start {yast} and use menu:System[Services Manager] to configure the [daemon]``Xinetd`` daemon.
@@ -226,20 +221,20 @@ Start {yast} and use menu:System[Services Manager] to configure the [daemon]``Xi
 [[advanced.topics.cobbler.reqs.sync.tftp]]
 === Syncing TFTP Contents to SUSE Manager Proxies
 
-It is possible to sync cobbler generated TFTP contents to {susemgr} Proxies to perform PXE booting via these proxies.
+It is possible to synchronize Cobbler-generated TFTP contents to {susemgr} proxies to perform PXE booting using proxies.
 
 
 
 ==== Installation
 
-On the {susemgr} Server as root, install the package [systemitem]``susemanager-tftpsync``:
+On the {susemgr} Server as the root user, install the [systemitem]``susemanager-tftpsync`` package:
 
 ----
 zypper install susemanager-tftpsync
 ----
 
 
-On the {susemgrproxy} systems as root, install the package [systemitem]``susemanager-tftpsync-recv``:
+On the {susemgrproxy} systems as the root user , install the [systemitem]``susemanager-tftpsync-recv`` package:
 
 ----
 zypper install susemanager-tftpsync-recv
@@ -259,7 +254,7 @@ For more information, see the output of [command]``configure-tftpsync.sh --help`
 
 ==== Configuring {susemgr} Server
 
-As root execute [path]``configure-tftpsync.sh`` on {susemgr} Server:
+As the root user, execute [path]``configure-tftpsync.sh`` on {susemgr} Server:
 
 ----
 configure-tftpsync.sh proxy1.example.com proxy2.example.com
@@ -279,7 +274,7 @@ You must always provide the full list of proxy systems.
 [NOTE]
 .Reinstalling a Configured Proxy
 ====
-In case you reinstall an already configured proxy and want to push all files again you must remove the cache file [path]``/var/lib/cobbler/pxe_cache.json`` before you can call [command]``cobbler sync`` again.
+If you reinstall an already configured proxy and want to push all the files again you must remove the cache file at [path]``/var/lib/cobbler/pxe_cache.json`` before you can call [command]``cobbler sync`` again.
 ====
 
 
@@ -287,16 +282,16 @@ In case you reinstall an already configured proxy and want to push all files aga
 ==== Requirements
 
 The {susemgr} Server must be able to access the {susemgrproxy} systems directly.
-Push via proxies is not possible.
+You cannot push using a proxy.
 
 
 
 [[advanced.topics.cobbler.reqs.service]]
 === Syncing and Starting the Cobbler Service
 
-Before starting the cobbler service, run a check on the cobbler service to make sure that all the prerequisites are configured according to the organization's needs with the [command]``cobbler check`` command.
+Before starting the Cobbler service, run a check to make sure that all the prerequisites are configured according to your requirements using the [command]``cobbler check`` command.
 
-If content, start the {susemgr} server with the following command:
+If configuration is correct, start the {susemgr} server with this command:
 
 ----
 /usr/sbin/spacewalk-service start
@@ -361,22 +356,22 @@ cobbler profile add --name=string --distro=string [--kickstart=url] \
 ----
 
 [option]``--name=``[replaceable]``string``::
-The unique label for the profile, such as `sles12webserver` or ``sles12workstation``.
+A unique label for the profile, such as `sles12webserver` or ``sles12workstation``.
 
 [option]``--distro=``[replaceable]``string``::
-Specifies the distribution that will be used for this particular profile.
+The distribution that will be used for this profile.
 For adding distributions, see <<advanced.topics.cobbler.adddistro>>.
 
 [option]``--kickstart=``[replaceable]``url``::
-Specifies the location of the Kickstart file (if available).
+The location of the Kickstart file (if available).
 
 [option]``--virt-file-size=``[replaceable]``gigabytes``::
-Allows you to set the size of the virtual guest file image.
-The default is 5 GB.
+The size of the virtual guest file image (in gigabytes).
+The default is 5{nbsp}GB.
 
 [option]``--virt-ram=``[replaceable]``megabytes``::
-Specifies how many MB of physical RAM a virtual guest can consume.
-The default is 512 MB.
+The maximum amount of physical RAM a virtual guest can consume (in megabytes).
+The default is 512{nbsp}MB.
 
 
 
@@ -384,18 +379,18 @@ The default is 512 MB.
 == Adding a System to Cobbler
 
 Once the distributions and profiles for Cobbler have been created, add systems to Cobbler.
-System records map a piece of hardware on a client with the cobbler profile assigned to run on it.
+System records map a piece of hardware on a client with the Cobbler profile assigned to run on it.
 
 [NOTE]
 ====
-If you are provisioning via [command]``koan`` and PXE menus alone, it is not required to create system records.
+If you are provisioning using [command]``koan`` and PXE menus alone, it is not required to create system records.
 They are useful when system-specific Kickstart templating is required or to establish that a specific system should always get specific content installed.
 If a client is intended for a certain role, system records should be created for it.
 ====
 
 For information about creating and configuring automated installation from the {susemgr} interface, refer to <<s4-sm-system-details-kick>>.
 
-Run the following command as root to add a system to the Cobbler configuration:
+Run this command as the root user to add a system to the Cobbler configuration:
 
 ----
 cobbler system add --name=string --profile=string \
@@ -410,7 +405,7 @@ cobbler system add --name=string --profile=string \
 Specifies the name of one of the profiles added in <<advanced.topics.cobbler.addprofile>>.
 
 [option]``--mac-address=``[replaceable]``AA:BB:CC:DD:EE:FF``::
-Allows systems with the specified MAC address automatically being provisioned to the profile associated with the system record when they are being installed.
+Allows systems with the specified MAC address to automatically be provisioned to the profile associated with the system record when they are being installed.
 
 For more options, such as setting hostname or IP addresses, refer to the Cobbler manpage ([command]``man cobbler``).
 
@@ -419,20 +414,19 @@ For more options, such as setting hostname or IP addresses, refer to the Cobbler
 [[advanced.topics.cobbler.templates]]
 == Using Cobbler Templates
 
-The {susemgr} Web interface facilitates creating variables for use with Kickstart distributions and profiles.
-To create a Kickstart profile variable, refer to <<s4-sm-system-kick-details-variables>>.
+The {susemgr} web interface allows you to create variables for use with Kickstart distributions and profiles.
+For more information on creating Kickstart profile variables, refer to <<s4-sm-system-kick-details-variables>>.
 
-Kickstart variables are part of an infrastructural change in {susemgr} to support templating in Kickstart files.
-Kickstart templates are files describing how to build actual Kickstart files rather than creating specific Kickstarts.
-
-These templates are shared by various profiles and systems that have their own variables and corresponding values.
+Kickstart variables are part of an infrastructure change in {susemgr} to support templating in Kickstart files.
+Kickstart templates are files that describe how to build Kickstart files, rather than creating specific Kickstarts.
+The templates are shared by various profiles and systems that have their own variables and corresponding values.
 These variables modify the templates and a template engine parses the template and variable data into a usable Kickstart file.
 Cobbler uses an advanced template engine called Cheetah that provides support for templates, variables, and snippets.
 
 Advantages of using templates include:
 
 * Robust features that allow administrators to create and manage large amounts of profiles or systems without duplication of effort or manually creating Kickstarts for every unique situation.
-* While templates can become complex and involve loops, conditionals and other enhanced features and syntax, you can keep them simple by creating Kickstart files without such complexity.
+* While templates can become complex and involve loops, conditionals and other enhanced features and syntax, you can also create simpler Kickstart files without such complexity.
 
 
 
@@ -442,26 +436,26 @@ Advantages of using templates include:
 Kickstart templates can have static values for certain common items such as PXE image file names, subnet addresses, and common paths such as [path]``/etc/sysconfig/network-scripts/``.
 However, templates differ from standard Kickstart files in their use of variables.
 
-For example, a standard Kickstart file may have a networking section similar to the following:
+For example, a standard Kickstart file may have a networking section similar to this:
 
 ----
 network --device=eth0 --bootproto=static --ip=192.168.100.24 \
   --netmask=255.255.255.0 --gateway=192.168.100.1 --nameserver=192.168.100.2
 ----
 
-In a Kickstart template file, the networking section would rather look like this:
+In a Kickstart template file, the networking section would look like this instead:
 
 ----
 network --device=$net_dev --bootproto=static --ip=$ip_addr \
   --netmask=255.255.255.0 --gateway=$my_gateway --nameserver=$my_nameserver
 ----
 
-These variables will be substituted with the values set in your Kickstart profile variables or in your system detail variables.
-If the same variables are defined in both the profile and the system detail, then the system detail variable takes precedence.
+These variables are substituted with the values set in your Kickstart profile variables or in your system detail variables.
+If the same variable is defined in both the profile and the system detail, then the system detail variable takes precedence.
 
 [NOTE]
 ====
-The template for the autoinstallation has syntax rules, using punctuation symbols.
+The template for the autoinstallation has syntax rules which relies on punctuation symbols.
 To avoid clashes, they need to be properly treated.
 ====
 
@@ -469,7 +463,7 @@ In case the autoinstallation scenario contains any shell script using variables 
 
 If the variable named `example` is defined in the autoinstallation snippet, the templating engine will evaluate `$example` with its content.
 If there is no such variable, the content will be left unchanged.
-Escaping the kbd:[$] symbol will prevent the templating engine to perform its evaluation as an internal variable.
+Escaping the kbd:[$] symbol will prevent the templating engine from evaluating the symbol as an internal variable.
 Long scripts or strings can be escaped by wrapping them with the `\#raw` and `\#end raw` directives.
 For example:
 
@@ -482,7 +476,7 @@ done
 #end raw
 ----
 
-Also, pay attention to similar scenarios like the following:
+Also, pay attention to scenarios like this:
 
 ----
 #start some section (this is a comment)
@@ -535,7 +529,7 @@ Wherever you invoke that function, the Cheetah parser will substitute the functi
 [[advanced.topics.cobbler.koan]]
 == Using Koan
 
-Whether you are provisioning guests on a virtual machine or reinstalling a new distribution on a running system, koan works in conjunction with Cobbler to provision systems.
+Whether you are provisioning guests on a virtual machine or reinstalling a new distribution on a running system, Koan works in conjunction with Cobbler to provision systems.
 
 
 
@@ -550,8 +544,8 @@ cobbler add profile --name=virtualfileserver \
   --distro=sles12-x86_64-server --virt-file-size=20 --virt-ram=1000
 ----
 
-This profile is for a fileserver running {sls}{nbsp} 12 with a 20 GB guest image size and allocated 1 GB of system RAM.
-To find the name of the virtual guest system profile, run the following [command]``koan`` command:
+This profile is for a fileserver running {sls}{nbsp}12 with a 20{nbsp}GB guest image size and allocated 1{nbsp}GB of system RAM.
+To find the name of the virtual guest system profile, use the [command]``koan`` command:
 
 ----
 koan --server=hostname --list-profiles
@@ -559,14 +553,14 @@ koan --server=hostname --list-profiles
 
 This command lists all the available profiles created with [command]``cobbler profile add``.
 
-Start creating the image file and the installation of the virtual guest system:
+Create the image file, and begin installation of the virtual guest system:
 
 ----
 koan --virt --server=cobbler-server.example.com \
   --profile=virtualfileserver --virtname=marketingfileserver
 ----
 
-The command specifies that a virtual guest system be created from the Cobbler server (hostname [server]``cobbler-server.example.com``) using the `virtualfileserver` profile.
+This command specifies that a virtual guest system be created from the Cobbler server (hostname [server]``cobbler-server.example.com``) using the `virtualfileserver` profile.
 The [option]``virtname`` option specifies a label for the virtual guest, which by default is the system's MAC address.
 
 Once the installation of the virtual guest is complete, it can be used as any other virtual guest system.
@@ -582,7 +576,7 @@ Once the installation of the virtual guest is complete, it can be used as any ot
 koan --replace-self --server=hostname --profile=name
 ----
 
-This command, running on the system to be replaced, will start the provisioning process and replace its own system using the profile in [option]``--profile=name`` on the Cobbler server specified in [option]``--server=hostname``.
+This command, running on the system to be replaced, will start the provisioning process and replace the system with the profile in [option]``--profile=name`` on the Cobbler server specified in [option]``--server=hostname``.
 
 
 
@@ -590,14 +584,14 @@ This command, running on the system to be replaced, will start the provisioning 
 == Building ISOs with Cobbler
 
 Some environments might lack PXE support.
-The cobbler buildiso command provides functionality to create a boot ISO image containing a set of distributions and kernels, and a menu similar to PXE network installations.
+The Cobbler [command]``buildiso`` command creates a ISO boot image containing a set of distributions and kernels, and a menu similar to PXE network installations.
 Define the name and output location of the boot ISO using the [option]``--iso`` option.
 
 
 [NOTE]
 .ISO Build Directory
 ====
-Depending on Cobbler related systemd settings (see [path]``/usr/lib/systemd/system/cobblerd.service``) writing ISO images to public [path]``tmp`` directories will not work.
+Depending on Cobbler-related systemd settings (see [path]``/usr/lib/systemd/system/cobblerd.service``) writing ISO images to public [path]``tmp`` directories will not work.
 ====
 
 ----
