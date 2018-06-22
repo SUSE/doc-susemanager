@@ -402,6 +402,53 @@ If limiting operations to less than a few minutes, you risk aborting perfectly n
 timeout =`number`
 ----
 
+
+
+[[bp.troubleshooting.package.inconsistency]]
+== Client/Server Package Inconsistency
+
+
+In some cases, updates are available in the web interface, but not appearing on the client.
+If you schedule an update on the client, it will fail with an error stating that no updates are available.
+This can be caused by a metadata regeneration problem, or because update packages have been locked.
+
+The notice that updates are available will appear immediately, but new metadata is only generated on the server after synchronizing.
+In this case, an inconsistency can occur if taskomatic crashes, or because taskomatic is still running and creating new metadata.
+
+To address this issue, check the [path]``/var/log/rhn/rhn_taskomatic_daemon.log`` file to determine if any processess are still running, or an exception which could indicate a crash.
+In the case of a crash, restart taskomatic.
+
+Check package locks and exclude lists to determine if packages are locked or excluded on the client:
+
+On Expanded Support Platform, check [path]``/etc/yum.conf`` and search for ``exclude=``.
+
+On SUSE Linux Enterprise Server, use the [command]``zypper locks`` command.
+
+
+
+[[bp.troubleshooting.Corrupt.Repo.Data]]
+== Corrupted Repository Data
+
+
+If the information in [path]``/var/cache/rhn/repodata/sles11-sp2-updates-x86_64`` becomes out of date, it will cause problems with updating the server.
+The repository data file can be regenerated using the [command]``spacemd`` command:
+
+
+.Procedure: Rebuild repodata file
+. Remove all files from [path]``/var/cache/rhn/repodata/sles11-sp2-updates-x86_64``
+. Regenerate the file with `spacecmd softwarechannel_regenerateyumcache sles11-sp2-updates-x86_64`
+
+
+
+[[bp.troubleshooting.Local.Issuer.Certificate]]
+== Unable to Get Local Issuer Certificate
+
+
+Some older bootstrap scripts will will create a link to the local certificate in the wrong place, which can cause problems with zypper returning an ``Unrecognized error`` about the local issuer certificate.
+In this case, ensure that the link to the local issuer certificate has been created in [path]``/etc/ssl/certs/``, and consider updating your bootstrap scripts.
+
+
+
 ifdef::backend-docbook[]
 [index]
 == Index
