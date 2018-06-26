@@ -87,6 +87,22 @@ suma-getting-started-pdf:
 suma-reference-pdf:
 	daps -d DC-susemanager-reference pdf; time
 
+#### Build SUMA HTML ####
+suma-html: xml-suma
+	daps -d DC-create-all html; time
+
+suma-advanced-html: xml-suma
+	daps -d DC-susemanager-advanced-topics html; time
+
+suma-best-practices-html: xml-suma
+	daps -d DC-susemanager-best-practices html; time
+
+suma-getting-started-html:
+	daps -d DC-susemanager-getting-started html; time
+
+suma-reference-html:
+	daps -d DC-susemanager-reference html; time
+
 #### Build Uyuni PDF ####
 uyuni-pdf: xml
 	daps -d DC-create-all-uyuni pdf; time
