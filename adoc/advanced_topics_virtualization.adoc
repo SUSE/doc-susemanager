@@ -1,6 +1,6 @@
 [[advanced.topics.virtualization]]
 = Virtualization
-ifdef::env-github,backend-html5[]
+ifdef::env-github,backend-html5,backend-docbook5[]
 //Admonitions
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -18,6 +18,7 @@ ifdef::env-github,backend-html5[]
 :x86_64: x86_64
 // Rhel Entities
 :rhel: Red Hat Enterprise Linux
+:rhela: RHEL
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
@@ -34,8 +35,11 @@ ifdef::env-github,backend-html5[]
 :sls: SUSE Linux Enterprise Server
 :sle: SUSE Linux Enterprise
 :slsa: SLES
+:sled: SUSE Linux Enterprise Desktop
+:sleda: SLED
 :suse: SUSE
 :ay: AutoYaST
+:kickstart: Kickstart
 endif::[]
 // Asciidoctor Front Matter
 :doctype: book
@@ -45,70 +49,35 @@ endif::[]
 :experimental:
 :sourcedir: .
 :imagesdir: images
+:sleda: SLED
 
-[abstract]
---
 
-ifdef::showremarks[]
-#emap: any changes with regard to virtualization. Methods are quite different to RH.#
-endif::showremarks[]
-{susemgr}
- allows you to autoinstall and manage {xen}
- and {kvm}{vmguest}
-s on a registered {vmhost}
-.
-To autoinstall a {vmguest}
-, an autoinstallable distribution and an autoinstallation profile ({ay}
- or {kickstart}
-) need to exist on {susemgr}
-. {vmguest}
-s registered with {susemgr}
- can be managed like "`regular`"
- machines.
-In addition, basic {vmguest}
- management tasks such as (re)starting and stopping or changing processor and memory allocation can be carried out using {susemgr}
-.
 
-_The following documentation is valid in the context of
-    traditional clients.  Salt minions must be treated differently:
-    autoinstallation is still not supported and libvirt hosts are
-    supported read-only._
---
-:doctype: book
-:sectnums:
-:toc: left
-:icons: font
-:experimental:
-:imagesdir: ./images
+{susemgr} allows you to autoinstall and manage {xen} and {kvm}{vmguest}s on a registered {vmhost}.
+To autoinstall a {vmguest}, an autoinstallable distribution and an autoinstallation profile ({ay} or {kickstart}) need to exist on {susemgr}.
+{vmguest}s registered with {susemgr} can be managed like "`regular`" machines.
+In addition, basic {vmguest}management tasks such as (re)starting and stopping or changing processor and memory allocation can be carried out using {susemgr}.
+
+The following documentation is valid in the context of traditional clients.
+Salt minions must be treated differently:
+
+* Autoinstallation is still not supported and libvirt hosts are supported as read-only.
 
 .Limitation to Xen and KVM Guests
 [WARNING]
 ====
-Autoinstalling and managing {vmguest}
-s via {susemgr}
-is limited to {xen}
-and {kvm}
-guests. {susemgr}
-uses [library]``libvirt``
- for virtual machine management.
-Currently, virtual machines from other virtualization solutions such as VMware* or VirtualBox*, are recognized as {vmguest}
-s, but cannot be managed from within {susemgr}
-.
+Autoinstalling and managing {vmguest}s via {susemgr} is limited to {xen} and {kvm} guests.
+{susemgr} uses [library]``libvirt`` for virtual machine management.
+Currently, virtual machines from other virtualization solutions such as VMware* or VirtualBox*, are recognized as {vmguest}s, but cannot be managed from within {susemgr}.
 ====
+
+
 
 [[sec.virtualization.autoinstall]]
 == Autoinstalling {vmguest} s
 
-
-With {susemgr}
-you can automatically deploy {xen}
-and {kvm}{vmguest}
-s using {ay}
-or {kickstart}
-profiles.
-It is also possible to automatically register the {vmguest}
-s, so they can immediately be managed by {susemgr}
-.
+With {susemgr} you can automatically deploy {xen} and {kvm} {vmguest}s using {ay} or {kickstart} profiles.
+It is also possible to automatically register the {vmguest}s, so they can immediately be managed by {susemgr}.
 
 [[sec.virtualization.autoinstall.req_mgr]]
 === Requirements on {susemgr}
@@ -248,11 +217,47 @@ Kickstart profiles can also be created from scratch with {susemgr}
 
 A minimalist {ay}
 profile including a script for registering the client with {susemgr}
-is listed in <<advanced.topics.app.ay.example-simple>>.
+is listed in
+ifdef::env-github,backend-html5[]
+<<advanced_topics_app_ay_example.adoc#advanced.topics.app.ay.example-simple, AutoYaST Profile Example>>.
+endif::[]
+ifndef::env-github,backend-html5[]
+<<advanced.topics.app.ay.example-simple>>.
+endif::[]
 For more information, examples and HOWTOs on {ay}
  profiles, refer to [ref]_SUSE Linux Enterprise AutoYaST_
  (https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html). For more information on {kickstart}
  profiles, refer to your RedHat documentation.
+
+
+==== {sle} 15 Systems
+
+You need the installation media to setup the distribution.  Starting with version 15, there is only one installation media.  You will use the same one for {slsa}, {sleda}, and all the other {sle} 15 based products.
+
+In the {ay} profile specify which product is to be installed.
+For installing {sls} use the following snippet in [path]``autoyast.xml``:
+
+----
+<products config:type="list">
+  <listentry>SLES</listentry>
+</products>
+----
+
+Then then specify all the required modules as ``add-on`` in [path]``autoyast.xml``. This is a minimal ``SLE-Product-SLES15-Pool`` selection that will result in a working
+installation and can be managed by {susemgr}:
+
+* SLE-Manager-Tools15-Pool
+* SLE-Manager-Tools15-Updates
+* SLE-Module-Basesystem15-Pool
+* SLE-Module-Basesystem15-Updates
+* SLE-Product-SLES15-Updates
+
+It is also recommended to add the following modules:
+
+* SLE-Module-Server-Applications15-Pool
+* SLE-Module-Server-Applications15-Updates
+
+
 
 [[sec.virtualzation.autoinstall.req-mgr.profile.upload]]
 ===== Uploading an Autoinstallation Profile
@@ -414,25 +419,41 @@ guests, which are managed by [library]``libvirt``
 ** Download the bootstrap script from `susemanager.example.com/pub/bootstrap/bootstrap.sh` to the {vmhost} .
 ** Edit the bootstrap script according to your needs. The minimal requirement is to include the activation key for the {vmhost} (see <<sec.virtualzation.autoinstall.req-mgr.keys>> for details). We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).
 ** Execute the bootstrap script to register the {vmhost} .
-. {empty}
 +
+
+
+[[sec.virtualization.autoinstall.req_vmhost.salt]]
+==== {vmhost} setup on Salt clients
+
+
+If the {vmhost} is registered as a Salt minion, a final configuration step is needed in order to gather all the guest VMs defined on the {vmhost}:
+
+
+. From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type`` ``Virtualization Host`` and confirm with btn:[Update Properties].
+. Schedule a Hardware Refresh. On the menu:System Details[Hardware] page click btn:[Schedule Hardware Refresh].
+
+
+[[sec.virtualization.autoinstall.req_vmhost.traditional]]
+==== {vmhost} setup on Traditional clients
+
+
 Once the registration process is finished and all packages have been installed, enable the [daemon]``osad``
 (Open Source Architecture Daemon). On a {sls}
 system this can be achieved by running the following commands as user {rootuser}
 :
-+
+
 
 ----
 systemctl stop rhnsd
 systemctl disable rhnsd
 ----
-+
+
 
 ----
 systemctl enable osad
 systemctl start osad
 ----
-+
+
 .[daemon]``osad``Together with [daemon]``rhnsd``
 IMPORTANT: The [daemon]``rhnsd``
  daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
@@ -448,7 +469,6 @@ The [daemon]``osad``
  and commands are instantly executed.
 Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [daemon]``rhnsd``
  you can only schedule for a time in the future plus up to four hours).
-+
 
 
 
@@ -519,8 +539,9 @@ Web interface if the following requirements are met:
 
 * {vmhost} must be a {kvm} or {xen} host.
 * [daemon]``libvirtd`` must be running on {vmhost} .
-* {vmhost} and {vmguest} must be registered with {susemgr} .
+* {vmhost} must be registered with {susemgr}.
 
+In addition, if you want to see the profile of the {vmguest}, install packages, etc., you must also register it with {susemgr}.
 
 All actions can be triggered in the {susemgr}
 Web interface from the menu:Virtualization[]

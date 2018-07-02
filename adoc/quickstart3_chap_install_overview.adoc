@@ -1,6 +1,6 @@
 [[quickstart.chapt.overview.requirements]]
 = Introduction
-ifdef::env-github,backend-html5[]
+ifdef::env-github,backend-html5,backend-docbook5[]
 //Admonitions
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -19,9 +19,7 @@ ifdef::env-github,backend-html5[]
 :rhel: Red Hat Linux Enterprise
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
-//SUSE Manager
-:susemgr: SUSE Manager
-:susemgrproxy: SUSE Manager Proxy
+:susemgrproxy: {productname} Proxy
 :productnumber: 3.2
 //SUSE, SLES and JeOS
 :sles-version: 12
@@ -32,6 +30,8 @@ ifdef::env-github,backend-html5[]
 :sle: SUSE Linux Enterprise
 :slsa: SLES
 :suse: SUSE
+:productname: SUSE Manager
+:susemgr: SUSE Manager
 endif::[]
 //Asciidoctor Front Matter
 :doctype: book
@@ -44,11 +44,11 @@ endif::[]
 :imagesdir: images
 
 
-This quick-start provides guidance on setting up {susemgr} server with KVM.
-You will learn the fundamentals of managing both traditional {susemgr} clients and Salt clients.
+This quick-start provides guidance on setting up {productname} server with KVM.
+You will learn the fundamentals of managing both traditional {productname} clients and Salt clients.
 This guide is intended for system administrators.
 
-ifdef::env-github[]
+ifdef::env-github,backend-html5[]
 <<common_version_info.adoc#common-version-info, Version Info>>
 endif::[]
 
@@ -57,42 +57,42 @@ include::common_version_info.adoc[leveloffset=1]
 endif::[]
 
 [[quickstart.sect.introduction]]
-== What is {susemgr}?
+== What is {productname}?
 
-{susemgr} lets you manage large sets of Linux systems and keep them up to date.
+{productname} lets you manage large sets of Linux systems and keep them up to date.
 It provides automated software management, asset management, and system provisioning.
-{susemgr} is a solution for organizations requiring absolute control of maintenance and package deployment on their servers.
-{susemgr} allows administrators to maintain a high level of security while facilitating and advancing an organizations system life-cycle requirements.
+{productname} is a solution for organizations requiring absolute control of maintenance and package deployment on their servers.
+{productname} allows administrators to maintain a high level of security while facilitating and advancing an organizations system life-cycle requirements.
 
 Salt::
-The inclusion of _Salt_ in {susemgr} 3 provides powerful event-driven configuration and management capabilities for fine grained control of any modern infrastructure.
+The inclusion of _Salt_ in {productname} provides powerful event-driven configuration and management capabilities for fine grained control of any modern infrastructure.
 
 Salt-master::
-{susemgr} takes a commanding role as a Salt-master capable of orchestrating thousands of Salt-minions ({susemgr} Clients) via remote execution.
+{productname} takes a commanding role as a Salt-master capable of orchestrating thousands of Salt-minions ({productname} Clients) via remote execution.
 
 Distribution Management::
-{susemgr} is fully compatible with Red Hat Satellite Server and offers seamless management of both {sle} and {rhel} client systems.
+{productname} is fully compatible with Red Hat Satellite Server and offers seamless management of both {sle} and {rhel} client systems.
 
 [[quickstart.sect.bird.eye.view]]
 == Overview
 
-{susemgr} may be integrated within your network infrastructure in multiple ways.
+{productname} may be integrated within your network infrastructure in multiple ways.
 In this guide you will perform the following steps for an initial test setup.
 
 // TODO: This section is outdated, bring it up-to-date
-* Install {sls} with {susemgr} as an extension
-* Setup SUSE Manager Server via YaST
-* Register {susemgr} with SCC (SUSE Customer Center)
+* Install {sls} with {productname} as an extension
+* Setup {productname} Server via YaST
+* Register {productname} with SCC (SUSE Customer Center)
 * Synchronize a repository channel for use with both traditional clients and Salt minions
 * Create an authentication key to act as an ID for the synced repository channel
 * Add the new authentication key to a bootstrap template script and connect a traditional client
-* Register a Salt minion with {susemgr} (salt-master) and assign it a channel with an authentication key
+* Register a Salt minion with {productname} (salt-master) and assign it a channel with an authentication key
 
 [[quickstart.sect.prerequisites.install]]
 == Prerequisites for Installation
 
 This guide requires that you have created an account with SCC ({scc}).
-During installation of both {sls} ({slsa}) and {susemgr}, SCC credentials will be requested and you must enter them to receive the latest packages and updates.
+During installation of both {sls} ({slsa}) and {productname}, SCC credentials will be requested and you must enter them to receive the latest packages and updates.
 The following procedure will guide you through obtaining your SCC _Organizational Credentials_.
 
 [[creating.scc.account.mgr]]
@@ -102,7 +102,7 @@ The following procedure will guide you through obtaining your SCC _Organizationa
 . Log in to your new SCC account.
 . Under the btn:[Management tools] widget select btn:[Manage Users].
 . Click the btn:[Organization Credentials] tab.
-. Keep this information handy during {susemgr} setup.
+. Keep this information handy during {productname} setup.
 
 == Obtaining Installation Media
 
@@ -127,11 +127,11 @@ Both methods of installation will be covered in this guide.
 [[quickstart.sect.software.requirements]]
 == Hardware Requirements
 
-Review the following table for {susemgr} hardware and software requirements.
+Review the following table for {productname} hardware and software requirements.
 For installation on {zseries}, see:
 
-ifdef::env-github[]
-* <<advanced_topics_suma3_zsystems.adoc#at-zsystems, SUSE Manager and {zseries}>>
+ifdef::env-github,backend-html5[]
+* <<advanced_topics_suma3_zsystems.adoc#at-zsystems, {productname} and {zseries}>>
 endif::[]
 ifndef::env-github[]
 * <<art.suma.install.zsystems>>
@@ -147,24 +147,24 @@ endif::[]
 |                          | _Production Server_ Minimum 32 GB
 | Disk Space:              | [path]``/`` _(root) The default JeOS root partition size of 24 GB is sufficient for this guide_
 |                          | [path]``/var/lib/pgsql`` Minimum 50 GB
-|                          | [path]``/var/spacewalk`` Minimum 50 GB per SUSE product and 200 GB per Red Hat product
+|                          | [path]``/var/spacewalk`` Minimum 50 GB per SUSE product and 250 GB per Red Hat product
 |===
 
 == Base Host Operating System
 
-SUSE Manager {productnumber} is based on {slsa} {sles-version} {sp-version} as the host operating system.
+{productname} {productnumber} is based on {slsa} {sles-version} {sp-version} as the host operating system.
 
 [[mgr.supported.client.systems]]
 == Supported Client Systems
 
-Clients with the following operating systems are supported for registration with {susemgr}.
+Clients with the following operating systems are supported for registration with {productname}.
 If you plan on using the new Salt features, ensure your clients are supported.
 
 .Supported Versions and SP Levels
 [NOTE]
 ====
-Client operating system versions and SP levels must be under general support (normal or LTSS) to be supported with {susemgr}.
-For details on the Expanded Support Lifecycle and minor {rhel} release versions, see https://www.suse.com/lifecycle``{sle} Server with Expanded Support`` .
+Client operating system versions and SP levels must be under general support (normal or LTSS) to be supported with {productname}.
+For details on supported product versions, see https://www.suse.com/lifecycle.
 ====
 
 [cols="1,1,1,1", options="header"]
@@ -172,11 +172,11 @@ For details on the Expanded Support Lifecycle and minor {rhel} release versions,
 |===
 | Operating Systems                                    | Architecture                                 | Traditional Clients | Salt Clients
 | {sle} 11 SP4                                         | {x86}, {x86}_64, {ipf}, IBM {ppc}, {zseries} | Supported           | Supported
-| {sle} 12 SP1, SP2, SP3                               | {x86}_64, IBM {ppc}({ppc64le}), {zseries}    | Supported           | Supported
+| {sle} 12 SP3                                         | {x86}_64, IBM {ppc}({ppc64le}), {zseries}, ARM | Supported         | Supported
+| {sle} 15                                             | {x86}_64, IBM {ppc}({ppc64le}), {zseries}, ARM | Supported         | Supported
 |_Latest minor release {rhnminrelease6}_               | {x86}, {x86}_64                              | Supported           | Supported
-|_Latest minor release {rhnminrelease7}_               | {x86}, {x86}_64                              | Supported           | Supported
-| Novell Open Enterprise Server 11, SP1, SP2, SP3 LTSS | {x86}, {x86}_64                              | Supported           | Supported
-| Open Enterprise Server 2015, 2015 SP1, 2018          | {x86}, {x86}_64                              | Supported           | Supported
+|_Latest minor release {rhnminrelease7}_               | {x86}_64                                     | Supported           | Supported
+| Open Enterprise Server 2015, 2015 SP1, 2018          | {x86}_64                                     | Supported           | Supported
 |===
 
 [[mgr.additional.requirements]]
@@ -187,11 +187,11 @@ To successfully complete this guide some network requirements must be met.
 The following section will walk you through these requirements.
 
 
-Fully Qualified Domain Name (FQDN):: The {susemgr} server must resolve its FQDN correctly or cookies will not work properly on the WebUI.
+Fully Qualified Domain Name (FQDN):: The {productname} server must resolve its FQDN correctly or cookies will not work properly on the WebUI.
 
 * https://www.suse.com/documentation/sles-12/book_sle_admin/data/sec_basicnet_yast.html#sec_basicnet_yast_change_host[SUSE Linux Enterprise Server Documentation - Configuring Host Name and DNS]
 
-Hostname and IP Address:: To ensure that the {susemgr} domain name can be resolved by its clients, both server and client machines must be connected to a working Domain Name System (DNS) server.
+Hostname and IP Address:: To ensure that the {productname} domain name can be resolved by its clients, both server and client machines must be connected to a working Domain Name System (DNS) server.
 This guide assumes the required infrastructure exists within your environment.
 For more information on setting up a (DNS) server see:
 
@@ -207,30 +207,30 @@ For more information on configuring a proxy for access to {scc} during a {sle} i
 .Naming Your Server
 [IMPORTANT]
 ====
-The hostname of {susemgr} must not contain uppercase letters as this may cause _jabberd_ to fail.
-Choose the hostname of your {susemgr} server carefully.
+The hostname of {productname} must not contain uppercase letters as this may cause _jabberd_ to fail.
+Choose the hostname of your {productname} server carefully.
 Although changing the server name is possible, it is a complex process and unsupported.
 ====
 
 == Firewall Port Rules
 
-In a production environment {susemgr} server and its clients should always utilize firewall rules.
+In a production environment {productname} server and its clients should always utilize firewall rules.
 The following table provides an overview of required ports.
 
-Traditional client systems connect to {susemgr} via port 443.
-In addition, enabling push actions from {susemgr} to client systems, requires inbound connections on port 5222.
-If {susemgr} will also push to a {susemgr} proxy, you must allow inbound connections on port 5269.
+Traditional client systems connect to {productname} via port 443.
+In addition, enabling push actions from {productname} to client systems, requires inbound connections on port 5222.
+If {productname} will also push to a {productname} proxy, you must allow inbound connections on port 5269.
 
 [[tab.install.ports.server1]]
-.Required Ports on {susemgr} Server
+.Required Ports on {productname} Server
 [cols="1,1,1", options="header"]
 |===
 | Port | Direction        | Reason
 | 67   | Inbound          | Required when configured as a DHCP server for systems requesting IP addresses
 | 69   | Inbound          | Used when configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems
 | 80   | Outbound         | Used to contact {scc}
-| 443  | Inbound          | All WebUI, traditional client, and proxy server requests and {susemgr} uses this port for {scc} inbound traffic
-| 443  | Outbound         | {susemgr} uses this port to reach {scc} unless running in disconnected mode with RMT or SMT
+| 443  | Inbound          | All WebUI, traditional client, and proxy server requests and {productname} uses this port for {scc} inbound traffic
+| 443  | Outbound         | {productname} uses this port to reach {scc} unless running in disconnected mode with RMT or SMT
 | 4505 | Inbound          | Required by the Salt-master to accept communication requests via TCP from minions
 | 4506 | Inbound          | Required by the Salt-master to accept communication requests via TCP from minions
 | 5222 | Inbound          | When you wish to push actions to clients this port is required by the _osad_ daemon running on the client systems

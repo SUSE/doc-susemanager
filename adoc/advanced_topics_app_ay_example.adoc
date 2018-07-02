@@ -3,7 +3,7 @@
 [[advanced.topics.app.ay.example-simple]]
 = Minimalist AutoYaST Profile for Automated Installations and Useful Enhancements
 
-ifdef::env-github,backend-html5[]
+ifdef::env-github,backend-html5,backend-docbook5[]
 //Admonitions
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -23,8 +23,6 @@ ifdef::env-github,backend-html5[]
 :rhel: Red Hat Linux Enterprise
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
-// SUSE Manager Entities
-:susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
 :saltversion: 2018.3.0
@@ -50,9 +48,9 @@ endif::[]
 :imagesdir: images
 
 
-The following {ay} profile will install a {sls} system with all default installation options including a default network configuration with DHCP.
-After the installation is completed, a bootstrap script located on the {susemgr} server will be executed in order to register the freshly installed system with {susemgr}.
-You need to adjust the IP address of the {susemgr} server, the name of the bootstrap script and the root password according to your needs in the following lines:
+The {ay} profile in this section installs a {sls} system with all default installation options including a default network configuration using DHCP.
+After the installation is finished, a bootstrap script located on the {susemgr} server is executed in order to register the freshly installed system with {susemgr}.
+You need to adjust the IP address of the {susemgr} server, the name of the bootstrap script, and the root password according to your environment:
 
 ----
 <user>
@@ -117,7 +115,7 @@ The complete {ay} file:
 ----
 
 
-Use the following enhancement fragment to add child channels:
+Use this enhancement fragment to add child channels:
 
 ----
 <add-on>
@@ -134,7 +132,7 @@ Use the following enhancement fragment to add child channels:
 </add-on>
 ----
 
-Replace [replaceable]``channel-label`` and [replaceable]``distribution-label`` with actual labels such as `sles11-sp1-updates-x86_64` and `sles11-sp2-x86_64` (the distribution label must correspond to the Autoinstallable Distribution!), and set the variables (``$c_server``, etc.) according to your environment.
+Replace [replaceable]``channel-label`` and [replaceable]``distribution-label`` with the correct labels (such as `sles11-sp1-updates-x86_64` and `sles11-sp2-x86_64`). Ensure that the distribution label corresponds to the Autoinstallable Distribution. Set the variables (such as ``$c_server``) according to your environment.
 For information about variables, see
 ifdef::env-github,backend-html5[]
 <<reference-webui-systems-autoinstallation.adoc#s4-sm-system-kick-dist-variables, Autoinstallable Distribution Variables>>.
@@ -146,10 +144,10 @@ endif::[]
 [IMPORTANT]
 .Add the Updates Channel
 ====
-It is required to add the updates tools channel to the <add-on> AutoYaST snippet section.
-This ensures your systems are provided with an up-to-date version of libzypp.
-Without the inclusion of an updates channel you will encounter 400 errors.
-See the following example where the (DISTRIBUTION_NAME) is replaced with the name of the autoinstallation distribution created previously in menu:Systems[Autoinstallation > Distributions]
+It is required that you add the updates tools channel to the <add-on> AutoYaST snippet section.
+This ensures your systems are provided with an up-to-date version of the `libzypp` package.
+If you do not include the updates tools channel, you will encounter `400` errors.
+In this example, the (DISTRIBUTION_NAME) is replaced with the name of the autoinstallation distribution, as created previously, from menu:Systems[Autoinstallation > Distributions]
 
 ----
 <listentry>

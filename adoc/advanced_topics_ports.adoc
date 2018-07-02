@@ -1,5 +1,5 @@
 
-ifdef::env-github,backend-html5[]
+ifdef::env-github,backend-html5,backend-docbook5[]
 //Admonitions
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -19,9 +19,7 @@ ifdef::env-github,backend-html5[]
 :rhel: Red Hat Enterprise Linux
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
-// SUSE Manager Entities
-:susemgr: SUSE Manager
-:susemgrproxy: SUSE Manager Proxy
+:susemgrproxy: {productname} Proxy
 :productnumber: 3.2
 :saltversion: 2018.3.0
 :webui: WebUI
@@ -45,194 +43,198 @@ endif::[]
 :sourcedir: .
 :imagesdir: images
 [appendix]
+
+
+
 [[advanced.topics.app.ports]]
 = Ports
 
 
 
 [[advanced.topics.app.ports.server]]
-== {susemgr} Server
+== {productname} Server
 
+Some ports are only relevant if you actually run the related service on the {productname} server.
 
-Some ports are only relevant if you actually run the related service on the {susemgr}
-server. 
-
-.Ports to Open on {susemgr}Server
+.Ports to Open on {productname}Server
 67::
-Inbound / TCP/UDP / DHCP 
+Inbound / TCP/UDP / DHCP
 +
-Required when {susemgr}
-is configured as a DHCP server for systems requesting IP addresses. 
+
+Required when {productname} is configured as a DHCP server for systems requesting IP addresses.
 
 69::
-Inbound / TCP/UDP / TFTP 
+Inbound / TCP/UDP / TFTP
 +
-Used when {susemgr}
-is configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems. 
+Used when {productname} is configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems.
 
 80::
-Inbound / TCP / HTTP 
+Inbound / TCP / HTTP
 +
-All {webui}
-, client, and proxy server requests travel via HTTP or HTTPS. 
+
+All {webui}, client, and proxy server requests travel via HTTP or HTTPS.
 
 80::
-Outbound / TCP / HTTP 
+Outbound / TCP / HTTP
 +
-Used to contact {scc}
-/{ncc}
-. 
+
+Used to contact {scc}/{ncc}.
 
 443::
-Inbound / TCP / HTTPS 
+Inbound / TCP / HTTPS
 +
-All {webui}
-, client, and proxy server requests travel via HTTP or HTTPS. 
+
+All {webui}, client, and proxy server requests travel via HTTP or HTTPS.
 
 443::
-Outbound / TCP / HTTPS 
+Outbound / TCP / HTTPS
 +
-{susemgr}
-uses this port to reach {scc}
-(unless running in a disconnected mode with RMT or SMT{mdash}
-as described in <<disconnect-setup>>). 
+
+{productname} uses this port to reach {scc}(unless running in a disconnected mode with RMT or SMT{mdash} as described in <<disconnect-setup>>).
 
 5222::
-Inbound / TCP / osad 
+Inbound / TCP / osad
 +
-When you wish to push actions to clients this port is required by the [systemitem]``osad``
-daemon running on your client systems. 
+
+When you wish to push actions to clients this port is required by the [systemitem]``osad`` daemon running on your client systems.
 
 5269::
-Inbound/Outbound / TCP / jabberd 
+Inbound/Outbound / TCP / jabberd
 +
-Needed if you push actions to or via a {susemgrproxy}
-. 
+
+Needed if you push actions to or via a {susemgrproxy}.
 
 4505::
-Inbound / TCP / salt 
+Inbound / TCP / salt
 +
-Required by the Salt-master to accept communication requests via TCP from minions. 
+
+Required by the Salt-master to accept communication requests via TCP from minions.
 
 4506::
-Inbound / TCP / salt 
+Inbound / TCP / salt
 +
-Required by the Salt-master to accept communication requests via TCP from minions. 
+
+Required by the Salt-master to accept communication requests via TCP from minions.
 
 25151::
-TCP 
+TCP
 +
-Cobbler. 
 
+For cobbler.
 
-.Internally Used Ports on {susemgr}Server
+.Internally Used Ports on {productname}Server
 2828::
-Internal /  
+Internal /
 +
-satellite-search API, used by the RHN application in Tomcat and Taskomatic.
+
+Satellite-search API, used by the RHN application in Tomcat and Taskomatic.
 
 2829::
-Internal /  
+Internal /
 +
-Taskomatic API, used by the RHN application in Tomcat. 
+
+Taskomatic API, used by the RHN application in Tomcat.
 
 6868::
-Internal 
+Internal
 +
-Auditlog-keeper to database. 
+
+Auditlog-keeper to database.
 
 6888::
-Internal 
+Internal
 +
-Auditlog-keeper API, used by the RHN application in Tomcat. 
+
+Auditlog-keeper API, used by the RHN application in Tomcat.
 
 8005::
-Internal 
+Internal
 +
-Tomcat shutdown port. 
+
+Tomcat shutdown port.
 
 8009::
-Internal 
+Internal
 +
-Tomcat to Apache HTTPD (AJP). 
+
+Tomcat to Apache HTTPD (AJP).
 
 8080::
-Internal 
+Internal
 +
-Tomcat to Apache HTTPD (HTTP). 
+
+Tomcat to Apache HTTPD (HTTP).
 
 9080::
-Internal 
+Internal
 +
-salt-api, used by the RHN application in Tomcat and Taskomatic. 
+
+Salt-API, used by the RHN application in Tomcat and Taskomatic.
 
 32000::
-Internal / TCP 
+Internal / TCP
 +
-Port for a TCP connection to the Java Virtual Machine (JVM) that runs Taskomatic and the search (satellite-search). 
 
+Port for a TCP connection to the Java Virtual Machine (JVM) that runs Taskomatic and the search (satellite-search).
 
-.Ephemeral Ports
 [NOTE]
+.Ephemeral Ports
 ====
-Anything from port 32768 on (more exactly, what you can see with [command]``cat
-    /proc/sys/net/ipv4/ip_local_port_range``) is an ephemeral port, typically used as the receiving end of a TCP connection.
-So if process A opens a TCP connection to process B (for example, port 22), then A chooses an arbitrary source TCP port to match with destination port 22. 
+Anything from port 32768 on (more exactly, what you can see with [command]``cat /proc/sys/net/ipv4/ip_local_port_range``) is an ephemeral port, typically used as the receiving end of a TCP connection.
+So if process A opens a TCP connection to process B (for example, port 22), then A chooses an arbitrary source TCP port to match with destination port 22.
 ====
+
+
 
 [[advanced.topics.app.ports.proxy]]
-== {susemgr} Proxy Server
+== {productname} Proxy Server
 
-
-
-.Ports to Open on {susemgr}Proxy Server
+.Ports to Open on {productname}Proxy Server
 22::
-Inbound /  
+Inbound /
 +
+
 Required when using ssh-push or ssh-push-tunnel contact methods.
-Check-in on clients connected to a SUSE Manager Proxy will be initiated on the SUSE Manager Server and "`hop through`"
-through to clients. 
+Check-in on clients connected to a {productname} Proxy will be initiated on the {productname} Server and "`hop through`" through to clients.
 
 80::
-Outbound /  
+Outbound /
 +
-Used to reach {susemgr}
-. 
+
+Used to reach {productname}.
 
 5222::
-Inbound / TCP 
+Inbound / TCP
 +
-For push actions and connections issued by [systemitem]``osad``
-running on the client systems. 
+
+For push actions and connections issued by [systemitem]``osad`` running on the client systems.
 
 5269::
 Inbound/Outbound / TCP
 +
-For push actions with the server. 
+
+For push actions with the server.
+
 
 
 [[advanced.topics.app.ports.client]]
-== {susemgr} Client
+== {productname} Client
 
-
-
-.Ports to Open on {susemgr}Client
+.Ports to Open on {productname}Client
 22::
-Inbound / SSH 
+Inbound / SSH
 +
-Required when using ssh-push or ssh-push-tunnel contact methods. 
+
+Required when using ssh-push or ssh-push-tunnel contact methods.
 
 80::
 Outbound
 +
-To reach the {susemgr}
-server or {susemgrproxy}
-server. 
+
+To reach the {productname} server or {susemgrproxy} server.
 
 5222::
-Outbound / TCP 
+Outbound / TCP
 +
-For push actions with the server or proxy server. 
 
-
-:sectnums:
+For push actions with the server or proxy server.
