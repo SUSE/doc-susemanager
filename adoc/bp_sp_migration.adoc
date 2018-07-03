@@ -52,13 +52,9 @@ endif::[]
 [[bp.sp.migration.sp.intro]]
 == Service Pack Migration Introduction
 
-You can upgrade the underlying operating system and also migrate {susemgr} server from one patch level to the other (SP migration) or from one version to the next.
-This works for migrating {susemgr} server 3.0 to version 3.1, or version 3.1 to version {productnumber}.
-For migrating version 3.0 to version 3.1, see the product documentation coming with {susemgr} 3.1:
-
-----
-https://www.suse.com/documentation/suse-manager-3/
-----
+You can upgrade the underlying operating system and also migrate {susemgr}
+server from one patch level to the other (SP migration) or from one version to the next.
+This works for migrating {susemgr} server 3.0 or version 3.1 to version {productnumber}.
 
 For migrating from version 2.1 to 3.0, see <<bp.chap.mgr.migration>>.
 
@@ -67,15 +63,16 @@ For migrating from version 2.1 to 3.0, see <<bp.chap.mgr.migration>>.
 [[bp.sp.migration.sp]]
 == Service Pack Migration
 
-SUSE Manager uses {sls} 12 as its underlying operating system.
-Therefore Service Pack migration (for example, from version 12 SP1 to 12 SP3) may be performed in the same way as a typical {slsa} migration.
+SUSE Manager utilizes {sls} 12 as its underlying operating system.
+Therefore Service Pack migration (for example, from version 12 SP1 to 12 SP3) may be performed in the same way as a typical SLES migration.
 
-.Upgrading PostgreSQL to Version 9.6 Before Migrating to SLES12 SP3
+.Upgrading PostgreSQL to Version 9.6 before Migrating to SLES12 SP3
 [WARNING]
 ====
-Before migrating the underlying system to {sle} 12 SP3 you must upgrade PostgreSQL to version 9.6.
+Before migrating the underlying system to {sle}
+12 SP3 you must upgrade PostgreSQL to version 9.6.
 
-The migration needs PostgreSQL 9.4 and 9.6 installed in parallel and PostgreSQL 9.4 is only available in {sle} 12 SP2.
+The migration needs PostgreSQL 9.4 and 9.6 installed in parallel and PostgreSQL 9.4 is only available in SLES 12 SP2.
 For more information, see <<sp.migration.postgresql>>.
 ====
 
@@ -100,7 +97,7 @@ PostgreSQL 9.4 is only available in SLES 12 SP2.
 
 Before starting the update, prepare an up-to-date backup of your database.
 
-On existing installations of {susemgr} Server 3.1 you must migrate from PostgreSQL 9.4 to version 9.6.
+On existing installations of {susemgr} Server 3.1 you must run to migrate from PostgreSQL 9.4 to version 9.6.
 
 ----
 /usr/lib/susemanager/bin/pg-migrate.sh
@@ -108,17 +105,17 @@ On existing installations of {susemgr} Server 3.1 you must migrate from Postgre
 
 During the upgrade your {susemgr} Server will not be accessible.
 
-The upgrade will create a copy of the database under [path]``/var/lib/pgsql`` and thus needs sufficient disk space to hold two copies (versions 9.4 and 9.6) of the database.
-Because it does a full copy of the database, it also needs considerable time depending on the size of the database and the I/O speed of the storage system.
+The upgrade will create a copy of the database under [path]``/var/lib/pgsql`` and thus needs sufficient disk space to hold two copies (9.4 and 9.6) of the database.
+Because it does a full copy of the database, it also needs considerable time depending on the size of the database and the IO speed of the storage system.
 
-If your system is short on disk space you can do a fast, in-place upgrade by running
+If your system is short on disk space you can do an fast, in-place upgrade by running
 
 ----
 /usr/lib/susemanager/bin/pg-migrate.sh fast
 ----
 
-The fast upgrade usually only takes a few minutes and uses no additional disk space.
-However, if the upgrade fails, you will need to restore the database from a backup.
+The fast upgrade usually only takes minutes and no additional disk space.
+However, in case of failure you need to restore the database from a backup.
 
 For more information, see https://wiki.microfocus.com/index.php?title=SUSE_Manager/postgresql96.
 
@@ -127,35 +124,35 @@ For more information, see https://wiki.microfocus.com/index.php?title=SUSE_Manag
 [[update.suse.manager]]
 == Updating {susemgr}
 
-This section provides information on performing regular updates and running a [command]``spacewalk-schema-upgrade`` on your PostgreSQL database.
+This section provides information on performing regular updates and running a [command]``spacewalk-schema-upgrade`` on your postgresql database.
 
 .Procedure: Updating {susemgr}
-. As the {rootuser} user, stop Spacewalk services:
+. As the {rootuser} user stop Spacewalk services:
 +
 
 ----
 spacewalk-service stop
 ----
-. Apply the latest patches:
+. Apply latest patches with:
 +
 
 ----
 zypper patch
 ----
-. You will be informed if a new database schema was included in the latest patch. Ensure the database service is running:
+. You will be informed if a new database schema was included in the latest patch. Ensure the database is started with:
 +
 
 ----
 rcpostgresql start
 ----
-. Perform the upgrade:
+. Perform the upgrade with:
 +
 
 ----
 spacewalk-schema-upgrade
 ----
 
-. Restart Spacewalk services:
+. Start Spacewalk services again with:
 +
 
 ----
@@ -176,14 +173,9 @@ Restart these applications.
 
 
 [[bp.sp.migration.version]]
-== Migrating {susemgr} version 3.1 to 3.2
+== Migrating {susemgr} version 3.0 to 3.1
 
 The migration can either be done with the Online Migration tool ({yast}) or with the Zypper command line tool.
-
-.Requirements
-{susemgr} {productnumber} requires {slsa} 12 SP3, with PostgreSQL version 9.6.
-Check the release notes for more information about these requirements.
-If you want to upgrade from an earlier version of {susemgr}, check the relevant product documentation.
 
 [NOTE]
 .Reduce Installation Size
@@ -234,7 +226,15 @@ Restart {yast} , otherwise the newly installed module will not be shown in the c
 It is recommended to install all updates before proceeding.
 
 . If more than one migration target is available for your system, select one from the list.
-In case you are still on {sls} 12 SP1 or SP2, {slsa} 12 will be upgraded to SP3, while selecting menu:SUSE Manager Server 3.1[] as a migration target.
++
+
+image::yast_migration_target31.png[scaledwidth=90%]
+
+. Update the {susemgr} database schema ([command]``spacewalk-schema-upgrade``).
+. Make sure {susemgr} is up and running ([command]``spacewalk-service start``).
+
+
+After finishing the migration procedure {susemgr} 3.1 on {sls} 12 (SP2 or) SP3 is available to be used.
 
 
 
@@ -257,7 +257,40 @@ To perform the migration with Zypper on the command-line, use the [command]``zyp
 Running the update from within a GNOME session is not recommended.
 This does not apply when being logged in from a remote machine (unless you are running a VNC session with GNOME).
 
-. The [command]``zypper migration`` subcommand show possible migration targets and a summary.
+. The [command]``zypper migration`` subcommand show possible migration targets and a summary:
++
+
+----
+# zypper migration
+Executing 'zypper  refresh'
+
+Repository 'SLES12-SP1 12.1-0' is up to date.
+Repository 'SLES12-SP1-Pool' is up to date.
+Repository 'SLES12-SP1-Updates' is up to date.
+Repository 'SUSE-Manager-Server-3.0-Pool' is up to date.
+Repository 'SUSE-Manager-Server-3.0-Updates' is up to date.
+All repositories have been refreshed.
+
+Executing 'zypper  --no-refresh patch-check --updatestack-only'
+
+Loading repository data...
+Reading installed packages...
+0 patches needed (0 security patches)
+
+Available migrations:
+
+    1 | SUSE Linux Enterprise Server 12 SP3 x86_64
+        SUSE Manager Server 3.1 x86_64
+
+    2 | SUSE Linux Enterprise Server 12 SP3 x86_64
+        SUSE Manager Server 3.0 x86_64 (already installed)
+
+    3 | SUSE Linux Enterprise Server 12 SP2 x86_64
+        SUSE Manager Server 3.1 x86_64
+
+    4 | SUSE Linux Enterprise Server 12 SP2 x86_64
+        SUSE Manager Server 3.0 x86_64 (already installed)
+----
 +
 
 In case of trouble, resolve the following issues first:
@@ -268,12 +301,12 @@ In case of trouble, resolve the following issues first:
 It is recommended to install all updates before proceeding.
 
 . If more than one migration target is available for your system, select one from the list (specify the number).
-In case you are still on {sls} 12 SP1 or SP2, {slsa} 12 will be upgraded to SP3, while selecting menu:SUSE Manager Server 3.1[] as a migration target.
+In case you are still on {sls} 12 SP1 or SP2, SLES 12 will be upgraded to (SP2 or) SP3, while selecting menu:SUSE Manager Server 3.1[] as a migration target.
 
 . Read the notification and update the {susemgr} database schema as described ([command]``spacewalk-schema-upgrade``).
 
 . Make sure {susemgr} is up and running ([command]``spacewalk-service start``).
 
-After finishing the migration procedure {susemgr} 3.2 on {slsa} 12 SP3 is available to be used.
+After finishing the migration procedure {susemgr} 3.1 on {sls} 12 (SP2 or) SP3 is available to be used.
 
 include::bp_sec_mgr_21_migration.adoc[leveloffset=1]
