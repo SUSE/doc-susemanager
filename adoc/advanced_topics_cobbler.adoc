@@ -83,7 +83,7 @@ To PXE boot systems, you will require a DHCP server, or have access to a network
 .Correct Hostname Configuration
 ====
 Cobbler uses hostnames as a unique key for each system.
-If you are using the [option]``pxe-default-image`` to onboard baremetal systems, make sure every system has a unique hostname.
+If you are using the [option]``pxe-default-image`` to onboard bare metal systems, make sure every system has a unique hostname.
 Non-unique hostnames will cause all systems with the same hostname to have the configuration filess overwritten when a provisioning profile is assigned.
 ====
 
@@ -110,7 +110,7 @@ For more on this topic, see https://www.suse.com/support/kb/doc?id=7018334.
 [[advanced.topics.cobbler.req.dhcp]]
 === Cobbler and DHCP
 
-Cobbler uses DHCP to automate baremetal installations from a PXE boot server.
+Cobbler uses DHCP to automate bare metal installations from a PXE boot server.
 You must have administrative access to the network's DHCP server, or be able to configure DHCP directly on the the Cobbler server.
 
 
@@ -608,4 +608,83 @@ cobbler buildiso --systems="system1,system2,system3" \
 [NOTE]
 ====
 Building ISOs with the [command]``cobbler buildiso`` command is supported for all architectures except the {zsystems} architecture.
+====
+
+
+
+[[advanced.topics.cobbler.baremetal]]
+== Bare Metal Provisioning
+
+Systems that have not yet been provisioned are called bare metal systems.
+You can provision bare metal systems using Cobbler.
+Once a bare metal system has been provisioned in this way, it will appear in the [guilabel]``Systems`` list, where you can perform regular provisioning with autoinstallation, for a completely unattended installation.
+
+
+[[advanced.topics.cobbler.baremetal.requirements]]
+=== Bare Metal Provisioning System Requirements
+
+To successfully provision a bare metal system, you will require a fully patched {susemgr} server, version 2.1 or higher.
+
+The system to be provisioned must have x86_64 architecture, with at least 1&#160;GB RAM, and be capable of PXE booting.
+
+The server uses TFTP to provision the bare metal client, so the appropriate port and networks must be configured correctly in order for provisioning to be successful. In particular, ensure that you have a DHCP server, and have set the [option]``next-server`` parameter to the {susemgr} server IP address or hostname.
+
+
+[[advanced.topics.cobbler.baremetal.enabling]]
+=== Enabling Bare Metal Systems Management
+
+Bare metal systems management can be enabled or disabled in the {webui} by clicking menu:Admin[SUSE Manager Configuration > Bare-metal systems].
+
+[NOTE]
+====
+New systems are added to the organization of the administrator who enabled the bare metal systems management feature. To change the organization, log in as an Administrator of the required organization, and re-enable the feature.
+====
+
+Once the feature has been enabled, any bare metal system connected to the server network will be automatically added to the organization when it is powered on.
+The process can take a few minutes, and the system will automatically shut down once it is complete.
+After the reboot, the system will appear in the [guilabel]``Systems`` list.
+Click on the name of the system to see basic information, or go to the [guilabel]``Properties``, [guilabel]``Notes``, and [guilabel]``Hardware`` tabs for more details.
+You can migrate bare metal systems to other organizations if required, using the [guilabel]``Migrate`` tab.
+
+
+[[advanced.topics.cobbler.baremetal.provisioning]]
+=== Provisioning Bare Metal Systems
+
+Provisioning bare metal systems is similar to provisioning other systems, and can be done using the [guilabel]``Provisioning`` tab.
+However, you will not be able to schedule provisioning, it will happen automatically as soon as the system is configured and powered on.
+
+[NOTE]
+.Bare Metal and System Set Manager
+====
+System Set Manager can be used with bare metal systems, although not all features will be available, because bare metal systems do not have an operating system installed.
+This limitation also applies to mixed sets that contain bare metal systems; all features will be re-enabled if the bare metal systems are removed from the set.
+====
+
+
+[[advanced.topics.cobbler.baremetal.troubleshooting]]
+=== Troubleshooting Bare Metal Systems
+
+If a bare metal system on the network is not automatically added to the [guilabel]``Systems`` list, check these things first:
+
+* You must have the [path]``pxe-default-image`` package installed.
+* File paths and parameters must be configured correctly. Check that the [path]``vmlinuz0`` and [path]``initrd0.img`` files, which are provided by [path]``pxe-default-image``, are in the locations specified in the [path]``rhn.conf`` configuration file.
+* Ensure the networking equipment connecting the bare metal system to the {susemgr} server is working correctly, and that you can reach the {susemgr} server IP address from the server.
+* The bare metal system to be provisioned must have PXE booting enabled in the boot sequence, and must not be attempting to boot an operating system.
+* The DHCP server must be responding to DHCP requests during boot. Check the PXE boot messages to ensure that:
+** the DHCP server is assigning the expected IP address
+** the DHCP server is assigning the the {susemgr} server IP address as [option]``next-server`` for booting.
+* Ensure Cobbler is running, and that the Discovery feature is enabled.
+
+If you see a blue Cobbler menu shortly after booting, discovery has started.
+If it does not complete successfully, temporarily disable automatic shutdown in order to help diagnose the problem. To disable automatic shutdown:
+
+. Select [option]``pxe-default-profile`` in the Cobbler menu with the arrow keys, and press the Tab key before the timer expires.
+. Add the kernel boot parameter [option]``spacewalk-finally=running`` using the integrated editor, and press Enter to continue booting.
+. Enter a shell with the username [option]``root`` and password [option]``linux`` to continue debugging.
+
+[IMPORTANT]
+.Duplicate profiles
+====
+Due to a technical limitation, it is not possible to reliably distinguish a new bare metal system from a system that has previously been discovered.
+Therefore, we recommended that you do not power on bare metal systems multiple times, as this will result in duplicate profiles.
 ====
