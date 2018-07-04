@@ -107,7 +107,10 @@ From the {susemgr} {webui} perform these steps to configure a build host.
 . From the [guimenu]``System Details`` page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enabling [guimenu]``SLE-Module-Containers12-Pool`` and [guimenu]``SLE-Module-Containers12-Updates``. Confirm by clicking btn:[Change Subscriptions].
 . From the menu:System Details[Properties] page, enable [guimenu]``Add-on System Type`` and ``Container Build Host`` and confirm by clicking btn:[Update Properties].
 . Install all required packages by applying ``Highstate``. From the system's details page select menu:States[Highstate] and click [guimenu]``Apply Highstate``.
-Alternatively, you can apply ``Highstate`` from the command line by executing [command]``state.highstate`` on the {susemgr} server.
+Alternatively apply the Highstate from the {productname} Server command line:
+----
+salt '$your_minion' state.highstate
+----
 
 
 
@@ -405,59 +408,70 @@ This will result in an ``unknown`` update status.
 OS Images are build by the Kiwi image system.
 They can be of various types: PXE, QCOW2, LiveCD images, and others.
 
-For more information about the Kiwi build system, see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation]
+For more information about the Kiwi build system, see the https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation].
+
+
 
 [[at.images.kiwi.enablement]]
 === Enabling OS Image Building
 
-OS Image building is disabled by default. You can enable it by modifying `/etc/rhn/rhn.conf` and adding:
+OS Image building is disabled by default. You can enable it in `/etc/rhn/rhn.conf` by adding:
 
 ./etc/rhn/rhn.conf
 [source]
 ----
-...
 # If true, OS Image building feature will be enabled
 java.kiwi_os_image_building_enabled = true
-...
 ----
 
-Then restart the Spacewalk service with `spacewalk-service restart`.
+Then restart the Spacewalk service:
+
+----
+spacewalk-service restart
+----
 
 [[at.images.kiwi.requirements]]
 === Requirements
 
-The Kiwi image building feature is available for Salt minions running {sls} 12.
-The following requirements should be met before following this guide:
+The Kiwi image building feature is available for Salt minions running {sls}{mdash}12 or later.
 
-* You will need an existing Kiwi image configuration files and configuration scripts (Example scripts are provided in the following sections) accessible in one of following ways
-  ** Git repository
-  ** HTTP hosted tar ball
-  ** local build host directory
+
+Kiwi image configuration files and configuration scripts must be accessible in one of following ways:
+
+* Git repository
+* HTTP hosted tar ball
+* local build host directory
+
+Example scripts are provided in the following sections.
 
 
 
 [[at.images.kiwi.buildhost]]
 === Creating a Build Host
 
-To build all kinds of images with {productname}, you will need to create and configure a build host.
+To build all kinds of images with {productname}, create and configure a build host.
 Build hosts are Salt minions running SLES 12 or later.
 The following steps will guide you though the initial configuration for a build host.
 
-From the {productname} {webui} perform the following steps to configure a build host.
+From the {productname} {webui} perform the following steps to configure a build host:
 
-. Select a minion that will be designated as a build host from the menu:Systems[Overview] page.
-. From the menu:System Details[Properties] page, enable the menu:Add-on System Type[]``OS Image Build Host`` and confirm by selecting menu:Update Properties[].
-. From the menu:Software[Software Channels] page, enable ``SLE-Manager-Tools12-Pool`` and ``SLE-Manager-Tools12-Updates``.
-Confirm by clicking btn:[Change Subscriptions].
+. Select a minion that will be designated as a build host from the menu:Main Menu[Systems > Overview] page.
+. From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type`` [guimenu]``OS Image Build Host`` and confirm with btn:[Update Properties].
+. From the menu:Main Menu[Software > Software Channels] page, enable ``SLE-Manager-Tools12-Pool`` and ``SLE-Manager-Tools12-Updates``.
+Confirm with btn:[Change Subscriptions].
 . Install all required packages by applying the Highstate.
 From the system's details page select menu:States[Highstate] and click btn:[Apply Highstate].
-Alternatively apply a Highstate from the command line by executing `state.highstate` from the {productname} Server command line.
+Alternatively apply the Highstate from the {productname} Server command line:
+----
+salt '$your_minion' state.highstate
+----
+
 
 [NOTE]
-.{productname} web server public certificate RPM
+.{productname} Web Server Public Certificate RPM
 ====
 Build host provisioning copies the {productname} certificate RPM to the build host.
-This certificate is used for access to repositories provided by {productname}.
+This certificate is used for accessing repositories provided by {productname}.
 
 .Certificate is packaged in RPM by the `mgr-package-rpm-certificate-osimage` package script:
 
