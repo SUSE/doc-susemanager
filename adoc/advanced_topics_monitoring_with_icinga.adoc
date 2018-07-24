@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -66,12 +67,12 @@ Icinga packages are found in the ``SLE-Manager-Tools{sles-version}-Updates x86_6
 [TIP]
 .Icinga Installation Location
 ====
-Do not install Icinga on the {susemgr} server.
+Do not install Icinga on the {productname} server.
 Install Icinga on a stand-alone {sle} client.
 ====
 
 .Procedure: Installation and Basic Configuration
-. Register the new client with {susemgr} and subscribe it to the {susemgr} client and update channels.
+. Register the new client with {productname} and subscribe it to the {productname} client and update channels.
 SLES {sles-version} and later include these channels by default.
 . Install the required Icinga packages on the new client:
 +
@@ -202,12 +203,12 @@ This concludes setup and initial configuration of Icinga.
 [[at.icinga.nrpe.quickstart]]
 == Icinga and NRPE Quickstart
 
-The following sections provides an overview on monitoring your {susemgr} server using Icinga.
-You will add {susemgr} as a host to Icinga and use a Nagios script/plugin to monitor running services via `NRPE` (Nagios Remote Plugin Executor).
+The following sections provides an overview on monitoring your {productname} server using Icinga.
+You will add {productname} as a host to Icinga and use a Nagios script/plugin to monitor running services via `NRPE` (Nagios Remote Plugin Executor).
 This section does not attempt to cover all monitoring solutions Icinga has to offer but should help you get started.
 
-.Procedure: Adding {susemgr}to Icinga for Monitoring
-. On your {susemgr} server install the required packages:
+.Procedure: Adding {productname}to Icinga for Monitoring
+. On your {productname} server install the required packages:
 +
 
 ----
@@ -244,7 +245,7 @@ The default port is 5666.
 This port must be opened in your firewall.
 
 nrpe_user:::
-The variables `nrpe_user` and `nrpe_group` control the user and group IDs that nrpe will run under. {susemgr}
+The variables `nrpe_user` and `nrpe_group` control the user and group IDs that nrpe will run under. {productname}
 probes need access to the database, therefore nrpe requires access to database credentials stored in [path]``/etc/rhn/rhn.conf``.
 There are multiple ways to achieve this.
 You may add the user `nagios` to the group `www` (this is already done for other IDs such as tomcat); alternatively you can simply have nrpe run with the effective group ID `www` in [path]``/etc/rhn/rhn.conf``.
@@ -260,12 +261,12 @@ However, in this example you should pass the name of the host you want informati
 This action is only possible when setting the variable to 1.
 
 command[check_systemd.sh]:::
-You need to define the command(s) that nrpe can run on {susemgr}.
+You need to define the command(s) that nrpe can run on {productname}.
 To add a new nrpe command specify a command call by adding `command` followed by square brackets containing the actual nagios/icinga plugin name.
-Next define the location of the script to be called on your {susemgr} server.
+Next define the location of the script to be called on your {productname} server.
 Finally the variable `$ARG1$` will be replaced by the actual host the Icinga server would like information about.
 In the example above, the command is named ``check_systemd.sh``.
-You can specify any name you like but keep in mind the command name is the actual script stored in [path]``/usr/lib/nagios/plugins/`` on your {susemgr} server.
+You can specify any name you like but keep in mind the command name is the actual script stored in [path]``/usr/lib/nagios/plugins/`` on your {productname} server.
 This name must also match your probe definition on the Icinga server.
 _This will be described in greater detail later in the chapter. The check_systemd.sh script/plugin will also be provided in a later section._
 
@@ -365,7 +366,7 @@ systemctl restart icinga
 === Creating Icinga Servicegroups
 
 You can create logical groupings of services as well.
-For example if you would like to create a group of essential {susemgr} services which are running define them within a [path]``servicegroups.cfg`` file placed in [path]``/etc/icinga/conf.d/``:
+For example if you would like to create a group of essential {productname} services which are running define them within a [path]``servicegroups.cfg`` file placed in [path]``/etc/icinga/conf.d/``:
 
 ----
 #Servicegroup 1
@@ -405,10 +406,10 @@ systemctl restart icinga
 [[at.monitoring.systemd.services]]
 == Monitoring Systemd Services
 
-The following section provides information on monitoring uptime of critical {susemgr} services.
+The following section provides information on monitoring uptime of critical {productname} services.
 
 .Procedure: Monitoring Running Systemd Services
-. As root create a new plugin file called [path]``check_systemd.sh`` in [path]``/usr/lib/nagios/plugins/`` on your {susemgr} server:
+. As root create a new plugin file called [path]``check_systemd.sh`` in [path]``/usr/lib/nagios/plugins/`` on your {productname} server:
 +
 
 ----
@@ -498,7 +499,7 @@ command[check_systemd.sh]=/usr/lib/nagios/plugins/check_systemd.sh $ARG1$
 ----
 +
 
-This will allow the Icinga server to call the plugin via nrpe on {susemgr}.
+This will allow the Icinga server to call the plugin via nrpe on {productname}.
 . Provide proper permissions by adding the script to the sudoers file:
 +
 
@@ -530,7 +531,7 @@ define command {
 }
 ----
 
-. Now you will add the following critical services to be montitored to your {susemgr} host file:
+. Now you will add the following critical services to be montitored to your {productname} host file:
 ** auditlog-keeper.service
 ** jabberd.service
 ** spacewalk-wait-for-jabberd.service
@@ -547,7 +548,7 @@ define command {
 ** spacewalk-wait-for-taskomatic.service
 +
 
-On your Icinga server add the following service blocks to your {susemgr} host file [path]``susemanager.cfg`` file located in [path]``/etc/icinga/conf.d/``.
+On your Icinga server add the following service blocks to your {productname} host file [path]``susemanager.cfg`` file located in [path]``/etc/icinga/conf.d/``.
 (This configuration file was created in the previous section __Adding a Host to Icinga__.)
 +
 
@@ -734,11 +735,11 @@ systemctl restart icinga
 [[at.using.the.check.suma.patches.plugin]]
 == Using the check_suma_patches Plugin
 
-You can use the [path]``check_suma_patches`` plugin to check if any machines connected to {susemgr} as clients require a patch or an update.
+You can use the [path]``check_suma_patches`` plugin to check if any machines connected to {productname} as clients require a patch or an update.
 The following procedure will guide you through the setup of the check_suma_patches plugin.
 
 .Procedure: Setup check_suma_patches
-. On your {susemgr} server open [path]``/etc/nrpe.cfg`` and add the following lines:
+. On your {productname} server open [path]``/etc/nrpe.cfg`` and add the following lines:
 +
 
 ----
@@ -756,7 +757,7 @@ define command{
 }
 ----
 
-. On your Icinga server open any of your {susemgr} client host configration files located at [path]``/etc/icinga/conf.d/clients.cfg`` and add the following service definition:
+. On your Icinga server open any of your {productname} client host configration files located at [path]``/etc/icinga/conf.d/clients.cfg`` and add the following service definition:
 +
 
 ----
@@ -798,7 +799,7 @@ You can use the [path]``check_suma_lastevent`` plugin to display the last action
 The following procedure will guide you through the setup of the check_suma_patches plugin.
 
 .Procedure: Setup check_suma_lastevent
-. On your {susemgr} server open [path]``/etc/nrpe.cfg`` and add the following lines:
+. On your {productname} server open [path]``/etc/nrpe.cfg`` and add the following lines:
 +
 
 ----
@@ -832,7 +833,7 @@ define service{
 ** `OK:Last action completed successfully`
 ** `Warning: Action is currently in progress`
 ** `Critical:Last action failed`
-** `Unspecified:The host cannot be found in the {susemgr} database or the host name is not unique`
+** `Unspecified:The host cannot be found in the {productname} database or the host name is not unique`
 
 This concludes setup of the `check_suma_lastevent` plugin.
 

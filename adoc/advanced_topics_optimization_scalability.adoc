@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -163,9 +164,9 @@ In this context, a big scale compromises 1000 minions or more.
 [[optimizing.big.general]]
 === General Recommendations
 
-{suse} recommends the following in a big scale {susemgr} deployment:
+{suse} recommends the following in a big scale {productname} deployment:
 
-* {susemgr} servers should have at least 8 recent {x86} cores, 32 GiB of RAM, and, most important, fast I/O devices such as at least an SSD (2 SSDs in RAID-0 are strongly recommended).
+* {productname} servers should have at least 8 recent {x86} cores, 32 GiB of RAM, and, most important, fast I/O devices such as at least an SSD (2 SSDs in RAID-0 are strongly recommended).
 * Proxies with many minions (hundreds) should have at least 2 recent {x86} cores and 16 GiB of RAM.
 * Use one {susemgrproxy} per 500-1000 clients.
 Keep into account that download time depends on network capacity.
@@ -188,9 +189,9 @@ Size of updates * Number of minions / Theoretical download speed / 60
 * Depending on hardware you can accept hundreds of minion keys.
 * Plan time for onboarding minions{mdash} at least one hour per 1000 minions.
 * It is not recommended onboarding more than approx.
-1000 minions directly to the {susemgr} server{mdash} proxies should be used instead.
+1000 minions directly to the {productname} server{mdash} proxies should be used instead.
 This is because every minion can use up to 3 TCP connections simultaneously, and too many TCP connections can cause performance issues.
-* If the following error appears in output of [command]``dmesg``, you probably have an excessive number of minions attached to a single {susemgr} server or proxy for the ARP cache to contain all of their addresses:
+* If the following error appears in output of [command]``dmesg``, you probably have an excessive number of minions attached to a single {productname} server or proxy for the ARP cache to contain all of their addresses:
 +
 
 ----
@@ -219,7 +220,7 @@ Keep the server monitored in order to identify possible issues early.
 [[optimizing.big.tuning]]
 === Tuning Proposals
 
-{suse} proposes the following tuning settings in a big scale {susemgr} deployment:
+{suse} proposes the following tuning settings in a big scale {productname} deployment:
 
 * Increase the maximum Tomcat heap memory to face a potentially long queue of Salt return results. Set 8 GiB instead of the current default 1 GiB: parameter [parameter]``Xmx1G`` in [path]``/etc/sysconfig/tomcat`` (affects onboarding and Action execution).
 * Increase the number of Taskomatic workers, allowing to parallelize work on a high number of separate jobs. Set parameter [parameter]``org.quartz.threadPool.threadCount = 100`` in [path]``/etc/rhn/rhn.conf`` (affects onboarding and staging).
@@ -230,6 +231,6 @@ Keep the server monitored in order to identify possible issues early.
 * Increase the Salt master worker threads allowing to parallelize more requests (otherwise Tomcat and Taskomatic workers will starve waiting for the Salt API). Set parameter [parameter]``worker_threads: 100`` in [path]``/etc/salt/master.d/susemanager.conf`` (affects onboarding and patching).
 * Disable daily comparison of configuration files. Click on menu:Admin[Task Schedules], then on the btn:[compare-configs-default] link, then on the btn:[Disable Schedule] button and finally on btn:[Delete Schedule].
 
-Note that increasing the number of Postgres connections and Salt workers will require more RAM, make sure the {susemgr} server is monitored and swap is never used.
+Note that increasing the number of Postgres connections and Salt workers will require more RAM, make sure the {productname} server is monitored and swap is never used.
 
 Also note the above settings should be regarded as guidelines{mdash}they have been tested to be safe but care should be exercised when changing them, and consulting support is highly recommended.

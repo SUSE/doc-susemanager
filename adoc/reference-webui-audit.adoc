@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -75,10 +76,10 @@ Performing this procedure will result in a list of client systems, where each sy
 Possible statuses are:
 
 image:patch-status-affected-patch-inapplicable.png[scaledwidth=1em] Red - Affected, patches are available in channels that are not assigned:::
-The system is affected by the vulnerability and {susemgr} has one or more patches for it, but at this moment, the channels offering the patches are not assigned to the system.
+The system is affected by the vulnerability and {productname} has one or more patches for it, but at this moment, the channels offering the patches are not assigned to the system.
 
 image:patch-status-affected-patch-applicable.png[scaledwidth=1em] Orange - Affected, at least one patch available in an assigned channel:::
-The system is affected by the vulnerability, {susemgr} has at least one patch for it in a channel that is directly assigned to the system.
+The system is affected by the vulnerability, {productname} has at least one patch for it in a channel that is directly assigned to the system.
 
 image:patch-status-not-affected.png[scaledwidth=1em] Grey - Not affected:::
 The system does not have any packages installed that are patchable.
@@ -89,7 +90,7 @@ A patch has already been installed.
 In other words, it can mean the following:
 
 * More than one patch might be needed to fix a certain vulnerability.
-* The image:patch-status-affected-patch-applicable.png[scaledwidth=1em] Orange - state is displayed when {susemgr} has at least one patch in an assigned channel.
+* The image:patch-status-affected-patch-applicable.png[scaledwidth=1em] Orange - state is displayed when {productname} has at least one patch in an assigned channel.
 This might mean that, after installing such a patch, others might be needed—users should double check the CVE Audit page after applying a patch to be sure that their systems are not affected anymore.
 
 For a more precise definitions of these states, see <<sec-cve-tips>>.
@@ -97,7 +98,7 @@ For a more precise definitions of these states, see <<sec-cve-tips>>.
 [NOTE]
 .Unknown CVE Number
 ====
-If the CVE number is not known to {susemgr}, an error message is displayed because {susemgr} cannot collect and display any audit data.
+If the CVE number is not known to {productname}, an error message is displayed because {productname} cannot collect and display any audit data.
 ====
 
 For each system, the [guimenu]``Next Action`` column contains suggestions on the steps to take to address the vulnerabilities.
@@ -121,7 +122,7 @@ Details on how to use it are available in the API guide.
 
 To produce correct results, CVE Audit must periodically refresh the data needed for the search in the background.
 By default, the refresh is scheduled at 11:00 PM every night.
-It is recommended to run such a refresh right after the {susemgr} installation to get proper results immediately instead of waiting until the next day.
+It is recommended to run such a refresh right after the {productname} installation to get proper results immediately instead of waiting until the next day.
 
 . In the Web interface, click menu:Main Menu[Admin > Task Schedules].
 . Click the `cve-server-channels-default` schedule link.
@@ -140,7 +141,7 @@ Audit results are only correct if the assignment of channels to systems did not 
 If a CVE audit is needed and channels were assigned or unassigned to any system during the day, a manual run is recommended.
 For more information, see <<sec-cve-maint>>.
 
-Systems are called "`affected`", "`not affected`" or "`patched`" not in an absolute sense, but based on information available to {susemgr}.
+Systems are called "`affected`", "`not affected`" or "`patched`" not in an absolute sense, but based on information available to {productname}.
 This implies that concepts such as "`being affected by a vulnerability`" have particular meanings in this context.
 The following definitions apply:
 
@@ -154,10 +155,10 @@ System patched for a certain vulnerability:::
 A system which has an installed package with version equal to or greater than the version of the same package in a relevant patch marked for the vulnerability.
 
 Relevant patch:::
-A patch known by {susemgr} in a relevant channel.
+A patch known by {productname} in a relevant channel.
 
 Relevant channel:::
-A channel managed by {susemgr}, which is either assigned to the system, the original of a cloned channel which is assigned to the system, a channel linked to a product which is installed on the system or a past or future service pack channel for the system.
+A channel managed by {productname}, which is either assigned to the system, the original of a cloned channel which is assigned to the system, a channel linked to a product which is installed on the system or a past or future service pack channel for the system.
 
 A notable consequence of the above definitions is that results can be incorrect in cases of unmanaged channels, unmanaged packages, or non-compliant systems.
 
@@ -187,7 +188,7 @@ Selecting menu:Main Menu[Audit > Subscription Matching] from the left navigation
 .Subscription Matcher Accuracy
 ====
 This tool's goal is to help provide visual coverage on current subscription use and support reporting.
-The Subscription Matcher is excellent at matching systems and products registered with {susemgr}, however any systems, products or environments which are not found in the database will remain unmatched.
+The Subscription Matcher is excellent at matching systems and products registered with {productname}, however any systems, products or environments which are not found in the database will remain unmatched.
 This tool is not intended to act as a replacement for auditing.
 Auditing should always take precedence over subscription matching.
 ====
@@ -235,7 +236,7 @@ End date of the subscription
 
 === Subscription Matcher Reports
 
-{susemgr} automatically generates up-to-date nightly status reports by matching your {suse} subscriptions with all your registered systems.
+{productname} automatically generates up-to-date nightly status reports by matching your {suse} subscriptions with all your registered systems.
 These reports are stored in [path]``/var/lib/spacewalk/subscription-matcher`` and provided in CSV format.
 These CSV files may be opened with a spreadsheet application such as LibreOffice Calc.
 
@@ -248,7 +249,7 @@ image::audit_subscription_matching_gatherer_matcher_default.png[scaledwidth=80%]
 [[ref.webui.audit.submatch.unmatched.systems]]
 === menu:Main Menu[Audit > Subscription Matching > Unmatched Products]
 
-Selecting the menu:Main Menu[Subscription Matching > Unmatched Products] tab provides an overview of all systems the matcher could not find in the database or which were not registered with {susemgr}.
+Selecting the menu:Main Menu[Subscription Matching > Unmatched Products] tab provides an overview of all systems the matcher could not find in the database or which were not registered with {productname}.
 The [guimenu]``Unmatched Products`` overview contains product names and the number of systems which remain unmatched with known installed products.
 
 .Unmatched Products
@@ -331,7 +332,7 @@ It mainly performs the following tasks:
 
 For a description of the {webui} dialogs, see <<s2-openscap-suma-pages>>.
 
-For instructions and tips on how to best use OpenSCAP with {susemgr}, refer to <<ch-openscap>>.
+For instructions and tips on how to best use OpenSCAP with {productname}, refer to <<ch-openscap>>.
 To learn more about OpenSCAP, see the project home page at http://open-scap.org.
 
 include::manager_reference_openscap.adoc[leveloffset=1]

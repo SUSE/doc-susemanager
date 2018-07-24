@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -47,7 +48,7 @@ endif::[]
 :imagesdir: images
 
 
-Only Configuration Administrators or {susemgr} Administrators see the menu:Main Menu[Configuration] pages.
+Only Configuration Administrators or {productname} Administrators see the menu:Main Menu[Configuration] pages.
 
 On this configuration pages, manage systems with configuration files, channels offering configuration files, and configartion files themselves.
 Centrally-managed files are available to multiple systems; locally-managed files are available to individual systems only.
@@ -93,15 +94,15 @@ These features are not suitable for Salt minions.
 
 
 
-To manage a traditional client's configuration with {susemgr}, it must have the appropriate tools and the [path]``config-enable`` file installed.
+To manage a traditional client's configuration with {productname}, it must have the appropriate tools and the [path]``config-enable`` file installed.
 These tools will be available if you installed the system with the configuration management functionality using {ay} or Kickstart.
 If not, they can be found in the Tools child channel for your distribution.
 Download and install the latest [path]``rhncfg*`` packages:
 
 * [path]``rhncfg`` -- the base libraries and functions needed by all [path]``rhncfg-*`` packages,
-* [path]``rhncfg-actions`` -- the RPM package required to run configuration actions scheduled via {susemgr},
+* [path]``rhncfg-actions`` -- the RPM package required to run configuration actions scheduled via {productname},
 * [path]``rhncfg-client`` -- the RPM package with a command line interface to the client features of the Configuration Management system,
-* [path]``rhncfg-management`` -- the RPM package with a command line interface used to manage {susemgr} configuration.
+* [path]``rhncfg-management`` -- the RPM package with a command line interface used to manage {productname} configuration.
 
 
 Installation of these packages can also be accomplished during bootstrapping if you enable [guimenu]``Configuration File Deployment`` on the [guimenu]``Details`` page of the activation key after creating that activation key.
@@ -119,7 +120,7 @@ endif::[]
 == Overview
 
 
-The [guimenu]``Configuration Overview`` page shows all of the configuration files that are managed by your organization in {susemgr}.
+The [guimenu]``Configuration Overview`` page shows all of the configuration files that are managed by your organization in {productname}.
 
 
 image::configuration_overview.png[scaledwidth=80%]
@@ -157,7 +158,7 @@ Clicking the blue text displays the menu:System Details[Schedule] page for the s
 [[ref.webui.config.channels]]
 == Configuration Channels
 
-As mentioned above, {susemgr} manages both central and local configuration channels and files.
+As mentioned above, {productname} manages both central and local configuration channels and files.
 Central configuration management allows you to deploy configuration files to multiple systems (both traditional clients ([Management]) and Salt minions ([Salt])).
 Local configuration management is available for traditional clients ([Management]) only and allows you to specify overrides or configuration files that are not changed by subscribing the system to a central channel.
 
@@ -308,7 +309,7 @@ ifdef::showremarks[]
     stay here. #
 endif::showremarks[]
 
-To change the file size limit, edit all the following files on the {susemgr} server and edit or add the following variables:
+To change the file size limit, edit all the following files on the {productname} server and edit or add the following variables:
 
 ----
 # /usr/share/rhn/config-defaults/rhn_web.conf
@@ -373,7 +374,7 @@ Click the name of the system to which it belongs to see its menu:System Details[
 
 Being able to store one file and share identical configurations is useful, but what if you have many variations of the same configuration file? What do you do if you have configuration files that differ only in system-specific details, such as host name and MAC address?
 
-Traditional file management would require to upload and distribute each file separately, even if the distinction is nominal and the number of variations is in the hundreds or thousands. {susemgr} addresses this by allowing the inclusion of macros, or variables, within the configuration files it manages.
+Traditional file management would require to upload and distribute each file separately, even if the distinction is nominal and the number of variations is in the hundreds or thousands. {productname} addresses this by allowing the inclusion of macros, or variables, within the configuration files it manages.
 In addition to variables for custom system information, the following standard macros are supported:
 ifdef::showremarks[]
 # 2010-12-21 - ke: will "rhn" stay here? 2010-12-28 - ke: see bug
@@ -414,7 +415,7 @@ ifdef::showremarks[]
 # 2010-12-21 - ke: will "rhn" stay here? #
 endif::showremarks[]
 
-Upon delivery of the file to individual systems, whether through a scheduled action in the {susemgr} Web interface or at the command line with the {susemgr} Configuration Client ([command]``mgrcfg-client``), the variables will be replaced with the host name and IP address of the system as recorded in {susemgr}'s system profile.
+Upon delivery of the file to individual systems, whether through a scheduled action in the {productname} Web interface or at the command line with the {productname} Configuration Client ([command]``mgrcfg-client``), the variables will be replaced with the host name and IP address of the system as recorded in {productname}'s system profile.
 In the above example configuration file the deployed version resembles the following:
 
 ----
@@ -447,7 +448,7 @@ asset={@ rhn.system.custom_info(asset) = 'Asset #' @}
 
 This default is overridden by the value on any system containing it.
 
-Using the {susemgr} Configuration Manager ([command]``mgrcfg-manager``) will not translate or alter files, as this tool is system agnostic. [command]``mgrcfg-manager`` does not depend on system settings.
+Using the {productname} Configuration Manager ([command]``mgrcfg-manager``) will not translate or alter files, as this tool is system agnostic. [command]``mgrcfg-manager`` does not depend on system settings.
 Binary files cannot be interpolated.
 
 
@@ -483,7 +484,7 @@ Here you see the systems either not prepared for configuration file deployment o
 The table has three columns.
 The first identifies the system name, the second shows whether the system is prepared for configuration file deployment, and the third lists the steps necessary to prepare the system.
 To prepare a system, check the box to the left of the profile name then click the btn:[Enable SUSE Manager Configuration Management] button.
-All of the preparatory steps that can be automatically performed are scheduled by {susemgr}.
+All of the preparatory steps that can be automatically performed are scheduled by {productname}.
 
 [NOTE]
 ====
