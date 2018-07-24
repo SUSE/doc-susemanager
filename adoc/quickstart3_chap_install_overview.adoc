@@ -11,7 +11,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 //System Architecture
 :zseries: z Systems
 :ppc: POWER
-:ppc64le: ppc64le
+:ppc64le: IBM Power PC
 :ipf : Itanium
 :x86: x86
 :x86_64: x86_64
@@ -129,7 +129,7 @@ Both methods of installation will be covered in this guide.
 [[quickstart.sect.software.requirements]]
 == Hardware Requirements
 
-Review the following table for {productname} hardware and software requirements.
+Review the following table for {productname} hardware and software requirements on {x86_64} and {ppc64le} architecture.
 For installation on {zseries}, see:
 
 ifdef::env-github,backend-html5[]
@@ -140,16 +140,29 @@ ifndef::env-github[]
 endif::[]
 
 [cols="1,1", options="header"]
-.Hardware Requirements
+.Hardware Requirements for {x86_64} Architecture
 |===
 | Hardware                 | Recommended
-| CPU                      | Multi-core 64-bit CPU (x86_64, IBM {ppc})
-| RAM:                     | _Test Server_ Minimum 4 GB
-|                          | _Base Installation_ Minimum 16 GB
-|                          | _Production Server_ Minimum 32 GB
+| CPU                      | Multi-core 64-bit CPU
+| RAM:                     | _Test Server_ Minimum 8{nbsp}GB
+|                          | _Base Installation_ Minimum 16{nbsp}GB
+|                          | _Production Server_ Minimum 32{nbsp}GB
 | Disk Space:              | [path]``/`` _(root) The default JeOS root partition size of 24 GB is sufficient for this guide_
-|                          | [path]``/var/lib/pgsql`` Minimum 50 GB
-|                          | [path]``/var/spacewalk`` Minimum 50 GB per SUSE product and 250 GB per Red Hat product
+|                          | [path]``/var/lib/pgsql`` Minimum 50{nbsp}GB
+|                          | [path]``/var/spacewalk`` Minimum 50{nbsp}GB per SUSE product and 250{nbsp}GB per Red Hat product
+|===
+
+[cols="1,1", options="header"]
+.Hardware Requirements for IBM POWER8 or POWER9 Architecture
+|===
+| Hardware                 | Recommended
+| CPU                      | Minimum 4 dedicated cores
+| RAM:                     | _Test Server_ Minimum 8{nbsp}GB
+|                          | _Base Installation_ Minimum 16{nbsp}GB
+|                          | _Production Server_ Minimum 32{nbsp}GB
+| Disk Space:              | [path]``/`` Minimum 100{nbsp}GB
+|                          | [path]``/var/lib/pgsql`` Minimum 50{nbsp}GB
+|                          | [path]``/var/spacewalk`` Minimum 50{nbsp}GB per SUSE product and 250{nbsp}GB per Red Hat product
 |===
 
 == Base Host Operating System
@@ -174,8 +187,8 @@ For details on supported product versions, see https://www.suse.com/lifecycle.
 |===
 | Operating Systems                                    | Architecture                                 | Traditional Clients | Salt Clients
 | {sle} 11 SP4                                         | {x86}, {x86}_64, {ipf}, IBM {ppc}, {zseries} | Supported           | Supported
-| {sle} 12 SP3                                         | {x86}_64, IBM {ppc}({ppc64le}), {zseries}, ARM | Supported         | Supported
-| {sle} 15                                             | {x86}_64, IBM {ppc}({ppc64le}), {zseries}, ARM | Supported         | Supported
+| {sle} 12 SP3                                         | {x86}_64, IBM {ppc} ({ppc64le}), {zseries}, ARM | Supported         | Supported
+| {sle} 15                                             | {x86}_64, IBM {ppc} ({ppc64le}), {zseries}, ARM | Supported         | Supported
 |_Latest minor release {rhnminrelease6}_               | {x86}, {x86}_64                              | Supported           | Supported
 |_Latest minor release {rhnminrelease7}_               | {x86}_64                                     | Supported           | Supported
 | Open Enterprise Server 2015, 2015 SP1, 2018          | {x86}_64                                     | Supported           | Supported
@@ -224,20 +237,20 @@ In addition, enabling push actions from {productname} to client systems, require
 If {productname} will also push to a {productname} proxy, you must allow inbound connections on port 5269.
 
 [[tab.install.ports.server1]]
-.Required Ports on {productname} Server
+.Required Server Ports
 [cols="1,1,1", options="header"]
 |===
-| Port | Direction        | Reason
-| 67   | Inbound          | Required when configured as a DHCP server for systems requesting IP addresses
-| 69   | Inbound          | Used when configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems
-| 80   | Outbound         | Used to contact {scc}
-| 443  | Inbound          | All WebUI, traditional client, and proxy server requests and {productname} uses this port for {scc} inbound traffic
-| 443  | Outbound         | {productname} uses this port to reach {scc} unless running in disconnected mode with RMT or SMT
-| 4505 | Inbound          | Required by the Salt-master to accept communication requests via TCP from minions
-| 4506 | Inbound          | Required by the Salt-master to accept communication requests via TCP from minions
-| 5222 | Inbound          | When you wish to push actions to clients this port is required by the _osad_ daemon running on the client systems
-| 5269 | Inbound/Outbound | Needed if you push actions to or via a {susemgrproxy}
-|      | Outbound         | Squid HTTP proxy for outgoing connections. It could be any port you configure
+| Port | Protocol | Description
+| 22   | TCP      | SSH
+| 67   | UDP      | DHCP
+| 69   | UDP      | TFTP, used to support PXE services
+| 80   | TCP      | HTTP, used in some bootstrap cases
+| 123  | UDP      | NTP time service
+| 443  | TCP      | HTTPS, used for {webui}, client, Proxy server, and API traffic
+| 4505 | TCP      | Salt, used by the Salt-master to accept communication requests from minions
+| 4506 | TCP      | Salt, used by the Salt-master to accept communication requests from minions
+| 5222 | TCP      | XMPP client, used for communications with the [systemitem]``osad`` daemon on traditional client systems
+| 5269 | TCP      | XMPP server, used for pushing actions to {susemgrproxy}
 |===
 
 For more information on disconnected setup and port configuration, see:

@@ -1,5 +1,5 @@
 [[art.suma.install.zsystems]]
-= {productname} on IBM {zsystems}
+= {susemgr} on IBM {zseries}
 ifdef::env-github,backend-html5,backend-docbook5[]
 //Admonitions
 :tip-caption: :bulb:
@@ -165,25 +165,19 @@ This section overviews these requirements.
 The guest z/VM should be provided with a static IP address and hostname as these cannot be easily changed after initial setup.
 The hostname should contain less than 8 characters.
 
-For more information on {productname}
-additional requirements, see https://www.suse.com/documentation/suse-manager-3/book_suma_best_practices/data/mgr_conceptual_overview.html.
+For more information on {productname} additional requirements, see https://www.suse.com/documentation/suse-manager-3/book_suma_best_practices/data/mgr_conceptual_overview.html.
 
-You are required to calculate sufficient disk storage for {productname}
-before running:
-
-----
-yast2 susemanagersetup
-----
+You will need to ensure you have sufficient disk storage for {productname}
+before running [command]``yast2 susemanagersetup``.
 
 
-The following information will help fulfill these requirements.
+This section explains these requirements in more detail.
 
 .{productname}Default Volume Groups and Disk Space
 [WARNING]
 ====
-By default the file system of {productname}
-including the embedded database and patch directories will reside within the root volume.
-While adjustments are possible once installation has completed it becomes the administrators responsibility to specify and monitor these adjustments.
+By default the file system of {productname}, including the embedded database and patch directories, reside within the root volume.
+While adjustments are possible once installation is complete, it is the administrator's responsibility to specify and monitor these adjustments.
 
 If your {productname} runs out of disk space, this can have a severe impact on its database and file structure.
 Preparing storage requirements in accordance with this section will aid in preventing these harmful effects.
@@ -192,25 +186,20 @@ A full recovery is only possible with a previous backup or a new {productname} i
 ====
 
 .Required Storage Devices
-* An additional disk is required for database storage.
+An additional disk is required for database storage.
 This should be an [systemitem]``zFCP`` or [systemitem]``DASD`` device as these are preferred for use with [systemitem]``HYPERPAV``.
-This disk should fulfill the following requirements
-+
+The disk should fulfill the following requirements:
 
-At least 50 GB for
-+
+* At least 50{nbsp}GB for [path]``/var/lib/pgsql``
+* At least 50{nbsp}GB for each SUSE product in [path]``/var/spacewalk``
+* At least 100{nbsp}GB for each Red Hat product in [path]``/var/spacewalk``
 
-----
-/var/lib/pgsql
-----
-+
-Minimum 50{nbsp}
-GB per SUSE product + 100 GB per Red Hat product
-+
 
-----
-/var/spacewalk
-----
+.Reclaiming Disk Space
+If you need to reclaim more disk space, try these suggestions:
+
+* Remove custom channels (you cannot remove official SUSE channels)
+* Use the [command]``spacewalk-data-fsck --help`` command to compare the spacewalk database to the filesystem and remove entries if either is missing.
 
 
 == SLES {sles-version}{sp-version} Installation and the {productname} Extension

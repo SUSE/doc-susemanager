@@ -192,17 +192,19 @@ The following tables provide you with an overview of ports which are used by {su
 
 [[tab.install.ports.server]]
 .Required Server Ports
-[cols="1,1", options="header"]
+[cols="1,1,1", options="header"]
 |===
-| Port | Description
-| 67   | Required when {susemgr} is configured as a DHCP server for systems requesting IP addresses.
-| 69   | Used when {susemgr} is configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems.
-| 80   | Used to contact {scc}. All WebGUI, client, and proxy server requests travel via http or https.
-| 443  | All WebGUI, client, and proxy server requests via http or https and {susemgr} uses this port for {scc} inbound traffic.
-| 5222 | When you wish to push actions to clients this port is required by the [systemitem]``osad`` daemon running on client systems.
-| 5269 | Needed if you push actions to or via a {susemgrproxy}.
-| 4505 | Required by the Salt-master to accept communication requests via TCP from minions. Inbound.
-| 4506 | Required by the Salt-master to accept communication requests via TCP from minions. Inbound.
+| Port | Protocol | Description
+| 22   | TCP      | SSH
+| 67   | UDP      | DHCP
+| 69   | UDP      | TFTP, used to support PXE services
+| 80   | TCP      | HTTP, used in some bootstrap cases
+| 123  | UDP      | NTP time service
+| 443  | TCP      | HTTPS, used for {webui}, client, Proxy server, and API traffic
+| 4505 | TCP      | Salt, used by the Salt-master to accept communication requests from minions
+| 4506 | TCP      | Salt, used by the Salt-master to accept communication requests from minions
+| 5222 | TCP      | XMPP client, used for communications with the [systemitem]``osad`` daemon on traditional client systems
+| 5269 | TCP      | XMPP server, used for pushing actions to {susemgrproxy}
 |===
 
 For more information, see <<advanced.topics.app.ports.server#at-ports, Port Listing>>.

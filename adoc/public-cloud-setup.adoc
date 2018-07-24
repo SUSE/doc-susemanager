@@ -371,10 +371,73 @@ If your cloud framework recommends to add an fstab entry, add the following line
 [[registration-of-cloned-systems]]
 == Registration of Cloned Systems
 
-{susemgr}
-treats systems (instances) with the same system ID as one.
-This implies that one instance will mask another if the instances have the same system ID.
-This situation occurs by launching multiple instances from the same image or when an image has been created from a running instance.
-Thus prior to registering a new instance complete step 5.1 or 5.2,  depending on the distribution on the following wiki.
+{susemgr} cannot distinguish between different instances that use the same system ID.
+If you register a second instance with the same system ID as a previous instance, {susemgr} will overwrite the original system data with the new system data.
+This can occur when you launch multiple instances from the same image, or when an image is created from a running instance.
+However, it is possible to clone systems and register them successfully by deleting the cloned system's ID, and generating a new ID.
 
-http://wiki.novell.com/index.php/SUSE_Manager/Register_Clones
+
+.Procedure: Registering Cloned Systems
+. Clone the system using your preferred hypervisor's cloning mechanism.
+. On the cloned system, change the hostname and IP addresses, and check the [path]``/etc/hosts`` file to ensure you have the right host entries.
+. Stop the [command]``rhnsd`` daemon with [command]``/etc/init.d/rhnsd stop`` or [command]``rcosad stop``.
+. For {slsa} 11 or {rhel} 5 or 6 clients, run these commands:
++
+----
+# rm /var/lib/dbus/machine-id
+# dbus-uuidgen --ensure
+----
++
+. For {slsa} 12 or {rhel} 7 clients, run these commands:
++
+----
+# rm /etc/machine-id
+# rm /var/lib/dbus/machine-id
+# dbus-uuidgen --ensure
+# systemd-machine-id-setup
+----
++
+. If you are using Salt, then you will also need to run these commands:
++
+----
+# service salt-minion stop
+# rm -rf /var/cache/salt
+----
++
+. If you are using a traditional registered system, clean up the working files with this command:
++
+----
+# rm -f /etc/sysconfig/rhn/{osad-auth.conf,systemid}
+----
+
+The bootstrap should now run with a new system ID, rather than a duplicate.
+
+
+If you are onboarding Salt minion clones, then you will also need to check if they have the same Salt minion ID.
+You will need to delete the minion ID on each cloned minion, using the [command]``rm`` command.
+Each operating system type stores this file in a slightly different location, check the table for the appropriate command.
+
+
+.Minion ID File Location
+Each operating system stores the minion ID file in a slightly different location, check the table for the appropriate command.
+
+[cols="1,1", options="header"]
+|===
+| Operating System | Commands
+| {slsa} 12        | [command]``rm /etc/salt/minion_id``
+
+                     [command]``rm  -f /etc/zypp/credentials.d/{SCCcredentials,NCCcredentials}``
+| {slsa} 11        | [command]``rm /etc/salt/minion_id``
+
+                     [command]``suse_register -E``
+| {slsa} 10        | [command]``rm -rf /etc/{zmd,zypp}``
+
+                     [command]``rm -rf /var/lib/zypp/``
+                     Do not delete [path]``/var/lib/zypp/db/products/``
+
+                     [command]``rm -rf /var/lib/zmd/``
+| {rhel} 5, 6, 7   | [command]`` rm  -f /etc/NCCcredentials``
+|===
+
+
+Once you have deleted the minion ID file, re-run the bootstrap script, and restart the minion to see the cloned system in {susemgr} with the new ID.
