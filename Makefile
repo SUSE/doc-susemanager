@@ -88,8 +88,8 @@ suma-reference-pdf:
 	daps -d DC-susemanager-reference pdf; time
 
 #### Build SUMA HTML ####
-suma-html: xml-suma
-	daps -d DC-create-all html; time
+#suma-html: xml-suma
+#	daps -d DC-create-all html; time
 
 suma-advanced-html: xml-suma
 	daps -d DC-susemanager-advanced-topics html; time
