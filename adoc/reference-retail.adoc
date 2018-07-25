@@ -23,34 +23,25 @@ It allows administrators to configure network topologies of selected servers, bu
 2. layer consists of one or more servers providing local network services and boot server services. These servers are generally referred to as branch servers
 3. layer consists of deployed machines e.g. point of sale machines. These machines are generally referred to as terminals
 
+=== Generic installation workflow
+
+This is a checklist of tasks to prepare generic {smr} stack:
+
+1. install and configure central {susemgr} server
+2. install {smr} related pattern? formula? TODO: PM,PrjM
+3. install and configure SLES12SP3 to be used as a build host
+- register build host to {susemgr} using salt
+- set build host as a OS Image build host in {susemgr} web user interface and apply highstate
+4. install and configure branch server
+- register branch server to {susemgr} using salt
+5. assign and configure branch server formulas
+
 === Generic Workflow
 Having installed and configured {smr} infrastructure, generic workflow is as follows:
 
 1. build image to be deployed on terminals
-+
-Standard OS Image building feature of {susemgr} is used. Images are built from customized Kiwi templates, as a starting point see https://github.com/SUSE/manager-build-profiles/tree/master/OSImage[SUSE provided OS Image templates].
-+
-Adapt these templates to contain all required software, branding, configurations. Refer to https://doc.opensuse.org/projects/kiwi/doc/[Kiwi  Image System documentation] for details how to work with Kiwi templates.
-+
-If you are creating Kiwi template from scratch, please make sure `image/preferences/type` elements attribute `boot` is set to `saltboot/suse-SLES12`
-+
-Once the image is build, it will be automatically transferred to {susemgr} server
-
 2. synchronize images from {susemgr} server to branch servers
-+
-Synchronization is done by applying salt state 'image-sync'
-+
-.Example of image synchronization call:
-[source, bash]
-----
-salt $branch_server_id state.apply image-sync
-----
-
 3. boot terminal
-+
-During first terminal boot salt minion id and fingerprint will be presented on the screen. Depending on the configuration, accepting terminal key on {susemgr} may be required. Accept the terminal key only when information provided on terminal screen match those in {susemgr} menu:Main Menu[Salt > Keys]
-+
-Terminal will now continue booting, download the image from branch server and deploy it on the machine. Then proceeds to boot deployed image
 
 === Servers and their roles
 
@@ -82,11 +73,21 @@ Branch server does not manage network, may or may not provide DHCP and DNS servi
 
 == Hardware requirements
 
-* Central {susemgr}: check relevant {susemgr} documentation
-* Branch servers: check relevant SUSE Manager Proxy documentation
-* Build hosts: only x86_64 architecture is supported by {smr}
-* Terminals: only x86_64 architecture is supported by {smr}
-* Images: only x86_64 architecture is supported by {smr}
+* Central {susemgr}:
++
+check relevant {susemgr} documentation
+* Branch servers:
++
+check relevant SUSE Manager Proxy documentation
+* Build hosts:
++
+only x86_64 architecture is supported by {smr}
+* Terminals:
++
+only x86_64 architecture is supported by {smr}
+* Images:
++
+only x86_64 architecture is supported by {smr}
 
 === Network Requirements
 
@@ -100,15 +101,50 @@ Branch server requires a WAN connection where central {susemgr} server is reacha
 * Terminals require LAN connection to branch shared or dedicated network
 //TODO add wifi support once done
 
-
 == Installation
 
 == Images
 
+=== Preparing customized image
+
+=== Building
+Standard OS Image building feature of {susemgr} is used. Images are built from customized Kiwi templates, as a starting point see https://github.com/SUSE/manager-build-profiles/tree/master/OSImage[SUSE provided OS Image templates].
+
+Adapt these templates to contain all required software, branding, configurations. Refer to https://doc.opensuse.org/projects/kiwi/doc/[Kiwi  Image System documentation] for details how to work with Kiwi templates.
+
+If you are creating Kiwi template from scratch, please make sure `image/preferences/type` elements attribute `boot` is set to `saltboot/suse-SLES12`
+
+Once the image is build, it will be automatically transferred to {susemgr} server
+
 == Branch server configuration
 
+// Formulas
+// Dedicated NET vs shared NET
+=== Images synchronization
+
+Synchronization is done by applying salt state 'image-sync'
+
+.Example of image synchronization call:
+[source, bash]
+----
+salt $branch_server_id state.apply image-sync
+----
+
 == Image deployment configuration and terminal deployment
+=== Partitioning and Image assignement for specific hardware type
+// HWTYPE paritioning and image assignement
+
+=== Partitioning and Image assignement for specific machine
+
+// Terminal booting
+=== First terminal boot
+
+During first terminal boot salt minion id and fingerprint will be presented on the screen. Depending on the configuration, accepting terminal key on {susemgr} may be required.
+
+IMPORTANT: Accept the terminal key only when information provided on terminal screen match those in {susemgr} menu:Main Menu[Salt > Keys]
+
+Terminal will now continue booting, download the image from branch server and deploy it on the machine. Then proceeds to boot deployed image
 
 == Scenarios
 
-// Dedicated NET vs shared NET
+
