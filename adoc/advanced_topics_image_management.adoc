@@ -107,7 +107,8 @@ From the {susemgr} {webui} perform these steps to configure a build host.
 . From the [guimenu]``System Details`` page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enabling [guimenu]``SLE-Module-Containers12-Pool`` and [guimenu]``SLE-Module-Containers12-Updates``. Confirm by clicking btn:[Change Subscriptions].
 . From the menu:System Details[Properties] page, enable [guimenu]``Add-on System Type`` and ``Container Build Host`` and confirm by clicking btn:[Update Properties].
 . Install all required packages by applying ``Highstate``. From the system's details page select menu:States[Highstate] and click [guimenu]``Apply Highstate``.
-Alternatively apply the Highstate from the {productname} Server command line:
+Alternatively, apply the Highstate from the {productname} Server command line:
++
 ----
 salt '$your_minion' state.highstate
 ----
@@ -415,10 +416,8 @@ For more information about the Kiwi build system, see the https://doc.opensuse.o
 [[at.images.kiwi.enablement]]
 === Enabling OS Image Building
 
-OS Image building is disabled by default. You can enable it in `/etc/rhn/rhn.conf` by adding:
+OS Image building is disabled by default. You can enable it in `/etc/rhn/rhn.conf` by setting:
 
-./etc/rhn/rhn.conf
-[source]
 ----
 # If true, OS Image building feature will be enabled
 java.kiwi_os_image_building_enabled = true
@@ -441,6 +440,7 @@ Kiwi image configuration files and configuration scripts must be accessible in o
 * HTTP hosted tar ball
 * local build host directory
 
+// FIXME: Provide better reference
 Example scripts are provided in the following sections.
 
 [[at.images.kiwi.buildhost]]
@@ -459,12 +459,18 @@ image::os-image-build-host.png[scaledwidth=80%]
 +
 . From the menu:System Details[Software > Software Channels] page, enable ``SLE-Manager-Tools12-Pool`` and ``SLE-Manager-Tools12-Updates`` (or a later version).
 Finally schedule and click btn:[Confirm].
-. Install all required packages by applying the highstate.
+. Install Kiwi and all required packages by applying the highstate.
 From the system's details page select menu:States[Highstate] and click btn:[Apply Highstate].
-Alternatively apply the Highstate from the {productname} Server command line:
+Alternatively, apply the Highstate from the {productname} Server command line:
++
 ----
 salt '$your_minion' state.highstate
 ----
+
+// FIXME: shall we also mention: ?
+//. Prepare build subdirectories in the build host for OS Image building (in /var/lib/Kiwi)
+//. Copy SUSE Manager’s CA certificate onto the OS Image build host
+//. Install openSSH and configure passwordless login (via SSH keys) for the salt user into the OS image build host
 
 
 [NOTE]
@@ -516,18 +522,14 @@ Make sure your build source Kiwi configuration contains `rhn-org-trusted-ssl-cer
 ==== Define Kiwi Build Channels with an Activation Key
 
 Create an activation key associated with the channel that your images will use.
-
-[NOTE]
-====
 Activation keys are mandatory for OS Image building.
-====
 
 image::systems_create_activation_key.png[scaledwidth=80%]
 
-. From the left navigation menu select menu:Systems[Activation Keys].
-. Click menu:Create Key[].
-. Enter a menu:Description[] , a menu:Key[] name, Use the drop-down box to select the menu:Base Channel[] that should be associated with this key.
-. Confirm with menu:Create Activation Key[].
+. In the {webui}, select menu:Main Menu[Systems > Activation Keys].
+. Click [guimenu]``Create Key``.
+. Enter a [guimenu]``Description``, a [guimenu]``Key`` name, and use the drop-down box to select the [guimenu]``Base Channel`` that should be associated with this key.
+. Confirm with btn:[Create Activation Key].
 
 For more information, see <<bp.key.managment>>.
 
@@ -551,24 +553,24 @@ Images are always stored in [path]``/srv/www/os-images/<organization id>`` and a
 [[at.images.kiwi.profile]]
 === Creating an Image Profile
 
-Manage Image Profiles from the Image Profile page.
+Manage Image Profiles in the {webui}.
 
 image::images_image_profiles.png[scaledwidth=80%]
 
 .Procedure: Create an Image Profile
-. To create an image profile select menu:Image[Profiles] and click menu:Create[].
+. To create an image profile select from menu:Main Menu[Images > Images > Profiles] and click btn:[Create].
 +
 
 image::images_image_create_profile_kiwi.png[scaledwidth=80%]
 
-. Provide a name for the `Image Profile` by filling in the menu:Label[] field.
-. Use `Kiwi` as the `Image Type`
-. Image store is automatically selected
-. Enter a path to the source in the menu:Path[] field using one of the following formats:
+. In the [guimenu]``Label`` field, provide a name for the `Image Profile`.
+. Use `Kiwi` as the [guimenu]``Image Type``.
+. Image store is automatically selected.
+. Enter a [guimenu]``Config URL`` to the directory containing the Kiwi configuration files:
 .. Git URI
 .. HTTPS tarball
 .. Path to build host local directory
-. Select an `Activation Key` (Activation Keys ensure images using a profile are assigned to the correct channel and packages).
+. Select an [guimenu]``Activation Key``. Activation Keys ensure that images using a profile are assigned to the correct channel and packages.
 +
 
 [NOTE]
@@ -578,7 +580,8 @@ When you associate an activation key with an image profile you are ensuring any 
 ====
 +
 
-. Click the btn:[Create] button.
+. Confirm with the btn:[Create] button.
+
 
 .Source format options
 ** Git/HTTP(S) URL to the repository
@@ -598,7 +601,7 @@ https://github.com/SUSE/manager-build-profiles#master
 ----
 +
 
-Which directory contains the image sources can be specified after the `:` character. In this example it is `POS_Image_JeOS6/jeos-6.0.0`:
+Which directory contains the image sources can be specified after the `:` character. In this example it is `OSImage/POS_Image-JeOS6`:
 +
 ----
 https://github.com/SUSE/manager-build-profiles#master:OSImage/POS_Image-JeOS6
@@ -632,12 +635,9 @@ Kiwi sources consist at least of `config.xml`.
 Usually `config.sh` and `images.sh` are present as well.
 Sources can also contain files to be installed in the final image under the `root` subdirectory.
 
-For information about the Kiwi build system, see https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation].
+For information about the Kiwi build system, see the https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation].
 
-[NOTE]
-====
-{suse} provides examples of fully functional image sources at https://github.com/SUSE/manager-build-profiles[SUSE/manager-build-profiles] public GitHub repository.
-====
+{suse} provides examples of fully functional image sources at the https://github.com/SUSE/manager-build-profiles[SUSE/manager-build-profiles] public GitHub repository.
 
 .Example of JeOS config.xml
 // ###example-script-1###
@@ -699,25 +699,25 @@ For information about the Kiwi build system, see https://doc.opensuse.org/projec
 === Building an Image
 
 There are two ways to build an image.
-You can select menu:Images[Build] from the left navigation bar, or click the build icon in the menu:Images[Profiles] list.
+In the {webui}, you can select menu:Main Menu[Images > Build], or click the build icon in the menu:Main Menu[Images > Profiles] list.
 
 image::images_image_build.png[scaledwidth=80%]
 
 .Procedure: Build an Image
-. For this example select menu:Images[Build].
+. For this example, select menu:Main Menu[Images > Build].
 . Add a different tag name if you want a version other than the default ``latest`` (Only relevant to Containers).
-. Select the menu:Build Profile[] and a menu:Build Host[]
+. Select the [guimenu]``Image Profile`` and a [guimenu]``Build Host``.
 +
 
 [NOTE]
 .Profile Summary
 ====
-Notice the menu:Profile Summary[] to the right of the build fields.
+Notice the [guimenu]``Profile Summary`` to the right of the build fields.
 When you have selected a build profile detailed information about the selected profile will show up in this area.
 ====
 +
 
-. To schedule a build click the menu:Build[] button.
+. To schedule a build click the btn:[Build] button.
 
 
 [[at.images.kiwi.inspection]]
@@ -745,8 +745,8 @@ When the build fails, investigation of salt states results can help with identif
 Usual checks when the build fails:
 
 * The build host can access the build sources
-* There is enough disk space for image on both the build host and the {productname} server
-* The activation key has correct channels associated
+* There is enough disk space for the image on both the build host and the {productname} server
+* The activation key has the correct channels associated
 * Valid build sources are used
 * The RPM package with the {productname} public certificate is up to date and available at `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 +
@@ -760,7 +760,7 @@ See <<at.images.kiwi.buildhost>> on how to refresh a public certificate RPM.
 
 The following are some known pitfalls when working with images.
 
-* HTTPS certificates to access the HTTP sources or Git repositories should be deployed to the minion by a custom state file or configured manually by end user
+* HTTPS certificates to access the HTTP sources or Git repositories should be deployed to the minion by a custom state file or configured manually by the user.
 * Importing of the Kiwi based images is not supported.
 
 
@@ -768,13 +768,13 @@ The following are some known pitfalls when working with images.
 [[at.images.listing]]
 == Listing Image Profiles Available for Building
 
-To list images available for building select menu:Main Menu[Images[mages].
+To list images available for building select menu:Main Menu[Images > Images].
 A list of all images will be displayed.
 
 image::images_list_images.png[scaledwidth=80%]
 
-Displayed data about images includes an image menu:Name[], its menu:Version[] and the build menu:Status[].
-You will also see an images update status with a listing of possible patch/package updates that are available for the image.
+Displayed data about images includes an image [guimenu]``Name``, its [guimenu]``Version`` and the build [guimenu]``Status``.
+You will also see the image update status with a listing of possible patch and package updates that are available for the image.
 
 Clicking the btn:[Details] button on an image will provide a detailed view including an exact list of relevant patches and a list of all packages installed within the image.
 
