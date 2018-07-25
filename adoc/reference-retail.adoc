@@ -1,0 +1,114 @@
+:smr: SUSE Manager for Retail
+:susemgr: SUSE Manager
+
+= {smr}
+
+== Introduction
+
+This document provides overview about {smr} solution and guidance on setting up complete {smr} stack.
+
+== What is {smr}
+
+{smr} is an extension of {susemgr} specifically addressing needs of organizations requiring automated image based deployment of servers, workstations, point of sale terminals and other devices.
+It allows administrators to configure network topologies of selected servers, build PXE based OS images and manage the deployment and provisioning of target machines.
+
+{smr} is a spiritual successor of SUSE Linux Enterprise Point of Sale product with similar architecture design and target users.
+
+== Architecture
+
+//TODO: picture
+{smr} employs three layer architecture design:
+
+1. layer consists of central {susemgr} server and one or more build hosts
+2. layer consists of one or more servers providing local network services and boot server services. These servers are generally referred to as branch servers
+3. layer consists of deployed machines e.g. point of sale machines. These machines are generally referred to as terminals
+
+=== Generic Workflow
+Having installed and configured {smr} infrastructure, generic workflow is as follows:
+
+1. build image to be deployed on terminals
++
+Standard OS Image building feature of {susemgr} is used. Images are built from customized Kiwi templates, as a starting point see https://github.com/SUSE/manager-build-profiles/tree/master/OSImage[SUSE provided OS Image templates].
++
+Adapt these templates to contain all required software, branding, configurations. Refer to https://doc.opensuse.org/projects/kiwi/doc/[Kiwi  Image System documentation] for details how to work with Kiwi templates.
++
+If you are creating Kiwi template from scratch, please make sure `image/preferences/type` elements attribute `boot` is set to `saltboot/suse-SLES12`
++
+Once the image is build, it will be automatically transferred to {susemgr} server
+
+2. synchronize images from {susemgr} server to branch servers
++
+Synchronization is done by applying salt state 'image-sync'
++
+.Example of image synchronization call:
+[source, bash]
+----
+salt $branch_server_id state.apply image-sync
+----
+
+3. boot terminal
++
+During first terminal boot salt minion id and fingerprint will be presented on the screen. Depending on the configuration, accepting terminal key on {susemgr} may be required. Accept the terminal key only when information provided on terminal screen match those in {susemgr} menu:Main Menu[Salt > Keys]
++
+Terminal will now continue booting, download the image from branch server and deploy it on the machine. Then proceeds to boot deployed image
+
+=== Servers and their roles
+
+==== Central {susemgr}
+Central {susemgr} server contains the information about infrastructure, network topologies, inventory necessary to automate image deployment and day to day operations of branches and terminals. These data includes, but are not limited to, database entries of registered systems, salt pillar data about build images, image assignments, partitioning, network setup, network services, etc.
+
+==== Build host
+Build host can be arbitrary SLES12SP3 based server or virtual machine. This server is used to build OS Images in secure manner. See <<advanced_topics_image_management.adoc#at.images.kiwi.buildhost>>
+
+==== Branch server
+Branch servers are usually located near terminals i.e. in individual stores or branch offices. Provide necessary services for PXE boot and acts as an image cache, salt broker, rpm proxy. Depending on the configuration Branch server can also manage local networking, provide DHCP and DNS service.
+
+=== Branch network topologies
+
+//TODO: pictures
+{smr} supports two modes of operation for Branch server:
+
+1. branch server has a dedicated network interface card, 3rd. layer machines are using isolated internal branch network.
++
+Branch server is managing internal network, provides DHCP, DNS, PXE, FTP and TFTP services.
+
+2. branch server shares one network with 3rd. layer machines and connection to {susemgr} central server.
++
+Branch server does not manage network, may or may not provide DHCP and DNS services, however acts as a PXE boot server and provides FTP and TFTP services.
+
+== Prerequisites for Installation
+
+//TODO: SCC info, media info
+
+== Hardware requirements
+
+* Central {susemgr}: check relevant {susemgr} documentation
+* Branch servers: check relevant SUSE Manager Proxy documentation
+* Build hosts: only x86_64 architecture is supported by {smr}
+* Terminals: only x86_64 architecture is supported by {smr}
+* Images: only x86_64 architecture is supported by {smr}
+
+=== Network Requirements
+
+* Central {susemgr} server requires reasonably fast WAN connect
+* Branch server
++
+Branch server requires a WAN connection where central {susemgr} server is reachable
++
+** In case of shared network, router/firewall filtering DHCP requests from shared network to WAN must be present
+** In case of dedicated network, branch server requires at least two network interfaces. One connected to WAN with reachable central {susemgr} and the second connected to internal branch LAN
+* Terminals require LAN connection to branch shared or dedicated network
+//TODO add wifi support once done
+
+
+== Installation
+
+== Images
+
+== Branch server configuration
+
+== Image deployment configuration and terminal deployment
+
+== Scenarios
+
+// Dedicated NET vs shared NET
