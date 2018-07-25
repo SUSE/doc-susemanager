@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -96,14 +97,16 @@ This section provides tips on {rhel} channel management.
 === Mirroring RHEL Media into a Channel
 
 
-The following procedure guides you through setup of the RHEL media as a {susemgr} channel.
-All packages on the RHEL media will be mirrored into a child channel located under {rhel} 5/6/7 distribution per architecture.
+
+The following procedure guides you through setup of the RHEL media as a {productname} channel.
+All packages on the RHEL media will be mirrored into a child channel located under RES 5/6/7 distribution per architecture.
 
 .Procedure: Mirroring RHEL Media into a Channel
-. Create a new Channel by log in to the {webui} and selecting menu:Main Menu[Software > Manage Software Channels > Create Channel].
-. Fill in basic channel details and add the channel as a child to the corresponding {rhel} 5/6/7 distribution channel per architecture from SCC. The base parent channel should contain zero packages.
-. Modify the {rhel} 5/6/7 activation key to include this new child channel.
-. As {rootuser} on the {susemgr} command line copy the ISO to the [path]``/tmp`` directory.
+. Create a new Channel by log in to the {webui} and selecting menu:Channels[Manage Software Channels > Create Channel] .
+. Fill in basic channel details and add the channel as a child to the corresponding RES 5/6/7 distribution channel per architecture from SCC. The base parent channel should contain zero packages.
+. Modify the RES 5/6/7 activation key to include this new child channel.
+. As {rootuser} on the {productname} command line copy the ISO to the [path]``/tmp`` directory.
+
 . Create a directory to contain the media content:
 +
 
@@ -139,7 +142,7 @@ Packages to sync:              [...]
 [...]
 ----
 
-. When the channel has completed the synchronization process you can use the channel as any normal {susemgr} channel.
+. When the channel has completed the synchronization process you can use the channel as any normal {productname} channel.
 
 
 Attempting to synchronize the repository will sometimes fail with this error:
@@ -157,10 +160,11 @@ To troubleshoot this error, look at the HTTP protocol to determine if [command]`
 
 
 
-=== Registering {rhel} Salt Minions with {susemgr}
 
+=== Registering RES Salt Minions with {productname}
 
-This section will guide you through registering RHEL minions with {susemgr}.
+This section will guide you through registering RHEL minions with {productname}.
+
 This section assumes you have updated your server to the latest patch level.
 
 ==== Synchronizing Appropriate {rhel} Channels
@@ -183,7 +187,8 @@ Ensure you have the corresponding {rhel} product enabled and required channels h
 ====
 To check if a channel has finished synchronizing you can do one of the following:
 
-* From the {webui} browse to menu:Main Menu[Admin > Setup Wizard] and select the [guimenu]``SUSE Products`` tab. Here you will find a percent completion bar for each product.
+* From the {productname}{webui} browse to menu:Admin[Setup Wizard] and select the menu:SUSE Products[] tab. Here you will find a percent completion bar for each product.
+
 * Alternatively, you may check the synchronization log file located under [path]``/var/log/rhn/reposync/channel-label.log`` using cat or the tailf command. Keep in mind that base channels can contain multiple child channels. Each of these child channels will generate its own log during the synchronization progress. Do not assume a channel has finished synchronizing until you have checked all relevant log files including base and child channels.
 
 ====
@@ -217,13 +222,13 @@ mgr-create-bootstrap-repo RHEL_activation_channel_key
 The following procedure will guide you through registering a Salt minion using the bootstrap script.
 
 .Procedure: Registration Using the Bootstrap Script
-. For your new minion download the bootstrap script from the {susemgr} server:
+. For your new minion download the bootstrap script from the {productname} server:
 +
 
 ----
 wget --no-check-certificate https://`server`/pub/bootstrap/res7-bootstrap.sh
 ----
-. Add the appropriate res-gpg-pubkey-#####-#####.key to the `ORG_GPG_KEY` key parameter, comma delimited in your [command]``res7-bootstrap.sh`` script. These are located on your {susemgr} server at:
+. Add the appropriate res-gpg-pubkey-#####-#####.key to the `ORG_GPG_KEY` key parameter, comma delimited in your [command]``res7-bootstrap.sh`` script. These are located on your {productname} server at:
 +
 
 ----
@@ -235,7 +240,9 @@ http://`server`/pub/
 ----
 {prompt.root}chmod +x res7-bootstrap.sh{prompt.root}./res7-boostrap.sh
 ----
-. From the {webui} select menu:Main Menu[Salt > Keys] and accept the new minion's key.
+
+. From the {productname} {webui} select menu:Salt[Keys] and accept the new minion's key.
+
 
 
 .Troubleshooting Bootstrap
@@ -265,7 +272,7 @@ yum-config-manager --add-repo https://`server`/pub/repositories/res/7/bootstrap
 ----
 {prompt.root}yum install salt-minion
 ----
-. Edit the Salt minion configuration file to point to the {susemgr} server:
+. Edit the Salt minion configuration file to point to the {productname} server:
 +
 
 ----
@@ -277,18 +284,20 @@ yum-config-manager --add-repo https://`server`/pub/repositories/res/7/bootstrap
 ----
 {prompt.root}systemctl start salt-minion
 ----
-. From the {webui} select the menu:Main Menu[Salt > Keys] and accept the new minion's key.
+
+. From the {productname} {webui} select the menu:Salt[Keys] and accept the new minion's key.
+
 
 
 [[bp.expanded-support.centos_repos.trad]]
 == Preparing Channels and Repositories for CentOS Traditional Clients
 
+This following section provides an example procedure for configuring CentOS channels and repositories and finally registering a CentOS client with {productname}.
 
-This following section provides an example procedure for configuring CentOS channels and repositories and finally registering a CentOS client with {susemgr}.
 These steps will be identical for Scientific Linux and Fedora.
 
 .Procedure: Preparing Channels and Repositories
-. As {rootuser} install [package]#spacewalk-utils# on your {susemgr} server:
+. As {rootuser} install [package]#spacewalk-utils# on your {productname} server:
 +
 
 ----
@@ -320,8 +329,8 @@ If a channel is not listed, check the latest version here for updates: https://g
 ** Spacewalk key: http://spacewalk.redhat.com/yum/RPM-GPG-KEY-spacewalk-2015
 ** Red Hat keys: http://www.redhat.com/contact/security-response-team/gpg-keys.html
 . Install and setup a CentOS 7 client with the default installation packages.
-. Ensure the client machine can resolve itself and your {susemgr} server via DNS. Validate that there is an entry in [path]``/etc/hosts`` for the real IP address of the client.
-. Create an activation key (``centos7``) on the {susemgr} server that points to the correct parent/child channels, including the CentOS base repo, updates, and Spacewalk client.
+. Ensure the client machine can resolve itself and your {productname} server via DNS. Validate that there is an entry in [path]``/etc/hosts`` for the real IP address of the client.
+. Create an activation key (``centos7``) on the {productname} server that points to the correct parent/child channels, including the CentOS base repo, updates, and Spacewalk client.
 
 
 Now prepare the bootstrap script.
@@ -362,7 +371,7 @@ service osad restart
 
 
 [[bp.expanded-support.centos_salt]]
-== Registering CentOS Salt Minions with {susemgr}
+== Registering CentOS Salt Minions with {productname}
 
 
 The following procedure will guide you through registering a CentOS Minion.
@@ -370,8 +379,11 @@ The following procedure will guide you through registering a CentOS Minion.
 .Support for CentOS Patches
 [WARNING]
 ====
-CentOS uses patches originating from CentOS is not officially supported by {suse}.
-See the matrix of {susemgr} clients on the main page of the {susemgr} wiki, linked from the [ref]_Quick Links_ section: https://wiki.microfocus.com/index.php?title=SUSE_Manager
+
+CentOS uses patches originating from CentOS is not officially supported by {suse}
+.
+See the matrix of {productname} clients on the main page of the {productname} wiki, linked from the [ref]_Quick Links_ section: https://wiki.microfocus.com/index.php?title=SUSE_Manager
+
 ====
 
 .Procedure: Register a CentOS 7 Minion
@@ -399,7 +411,7 @@ See the matrix of {susemgr} clients on the main page of the {susemgr} wiki, link
 ----
 {prompt.root}yum install salt salt-minion
 ----
-. Change the Salt configuration to point to the {susemgr} server:
+. Change the Salt configuration to point to the {productname} server:
 +
 
 ----

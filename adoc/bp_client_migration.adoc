@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -46,7 +47,7 @@ endif::[]
 :sourcedir: .
 :imagesdir: images
 
-{susemgr} supports you with upgrading SLE clients to the latest version or SP (service pack).
+{productname} supports you with upgrading SLE clients to the latest version or SP (service pack).
 Upgrading from SLE 12, SLE 12 SP1, or SP2 to SLE 12 SP3 or later (when available) is straight forward.
 Upgrading from SLE 11 SPx to SLE 12 SP3 or later (when available) requires some additional steps, but can be automated.
 
@@ -77,7 +78,7 @@ The matching update channels such as [systemitem]``SLE-Manager-Tools12-Updates``
 ====
 
 .Procedure: Migrating {sle}12 Client to SP3
-. Direct your browser to the {susemgr}{webui} where your client is registered, and login.
+. Direct your browser to the {productname} {webui} where your client is registered, and login.
 . On the menu:Systems[All] page select your client system from the table.
 +
 
@@ -150,12 +151,9 @@ and {ay}
 
 [IMPORTANT]
 ====
-Only perform this migration on client systems managed by {susemgr}
-servers.
-For upgrading the {susemgr}
-server itself, see <<bp.sp.migration>>.
-This is a viable method for major version upgrades such as an upgrade from {sle}
- 11 to 12.
+Only perform this migration on client systems managed by {productname} servers.
+For upgrading the {productname} server itself, see <<bp.sp.migration>>.
+This is a viable method for major version upgrades such as an upgrade from {sle} 11 to 12.
 ====
 
 
@@ -164,22 +162,20 @@ Perform the following steps:
 [[bp.proc.client.migration.sle11.prep]]
 .Procedure: System Upgrade Preparation
 
-NOTE: Make sure your {susemgr}
-and all the clients you want to upgrade have installed all available updates, including the {susemgr}
-tools.
+NOTE: Make sure your {productname} and all the clients you want to upgrade have installed all available updates, including the {productname} tools.
 This is absolutely necessary, otherwise the system upgrade will fail.
 +
 
-. On the {susemgr} server, create a local tree with the SLES 12 SP3 installation sources. This is needed for booting the clients into the installation or upgrade scenario. For example, download the ISO image of the DVD1 with the installation sources and mount the ISO image as [path]``/mnt/sles12-sp3`` :
+. On the {productname} server, create a local tree with the SLES 12 SP3 installation sources. This is needed for booting the clients into the installation or upgrade scenario. For example, download the ISO image of the DVD1 with the installation sources and mount the ISO image as [path]``/mnt/sles12-sp3`` :
 +
 
 ----
 mkdir /mnt/sles12-sp3
 mount -o loop`DVD1`.iso /mnt/sles12-sp3
 ----
-. Create an auto-installation distribution: For all distributions you want to perform a system upgrade, you need to create a SLE 12 SP3 distribution in {susemgr} . Use the following steps to create one:
+. Create an auto-installation distribution: For all distributions you want to perform a system upgrade, you need to create a SLE 12 SP3 distribution in {productname}. Use the following steps to create one:
 +
-** In the {susemgr} Web interface, click menu:Systems[Autoinstallation > Distributions] .
+** In the {productname} {webui}, click menu:Systems[Autoinstallation > Distributions].
 ** Enter a menu:Distribution Label[] for your distribution (for example, use ``summer2017``) as a label and specify the menu:Tree Path[] , which is the root directory of the {sls} 12 SP3 installation sources (for example, in this case [path]``/mnt/sles12-sp3`` ). As the menu:Base Channel[] use the update target distribution "`SLES12-SP3-Pool for x86_64`" .
 ** Confirm with menu:Create Autoinstallable Distribution[] .
 
@@ -237,12 +233,9 @@ For example, watch progress in [path]``/var/log/rhn/reposync/sles12-sp3-pool-x86
 . Go to the system via menu:Systems[] and click the name of the system. Then on the systems details page, click menu:Provisioning[Autoinstallation > Schedule] , and choose the {ay} XML profile you have uploaded in <<bp.proc.client.migration.sle11.prep>>, <<st.maintenance-migration.upload>>.
 . Click menu:Schedule Autoinstallation and Finish[] .
 +
-Next time the machine asks the {susemgr}
-server for jobs, it will receive a reinstallation job which fetches kernel and initrd and writes a new [path]``/boot/grub/menu.lst``
-(containing pointers to the new kernel and initrd).
+Next time the machine asks the {productname} server for jobs, it will receive a reinstallation job which fetches kernel and initrd and writes a new [path]``/boot/grub/menu.lst`` (containing pointers to the new kernel and initrd).
 +
-When the machine boots, it will use the {grub}
-configuration and boots the new kernel with its initrd.
+When the machine boots, it will use the {grub} configuration and boots the new kernel with its initrd.
 No PXE boot is required for this process.
 A shutdown of the machine is initiated as well, effectively 3 minutes after the job was fetched.
 

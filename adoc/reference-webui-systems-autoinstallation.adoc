@@ -22,6 +22,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -55,10 +56,10 @@ In the following section, {ay} and {ay} features apply for {sle} client systems 
 For {rhela} systems, use Kickstart and Kickstart features.
 ====
 
-{ay} and Kickstart configuration files allow administrators to create an environment for automating otherwise time-consuming system installations, such as multiple servers or workstations. {ay} files have to be uploaded to be managed with {susemgr}.
-Kickstart files can be created, modified, and managed within the {susemgr} Web interface.
+{ay} and Kickstart configuration files allow administrators to create an environment for automating otherwise time-consuming system installations, such as multiple servers or workstations. {ay} files have to be uploaded to be managed with {productname}.
+Kickstart files can be created, modified, and managed within the {productname} Web interface.
 
-{susemgr} also features the Cobbler installation server.
+{productname} also features the Cobbler installation server.
 For more information on Cobbler, see
 ifndef::env-github,backend-html5[]
 <<advanced.topics.cobbler>>.
@@ -67,7 +68,7 @@ ifdef::env-github,backend-html5[]
 <<advanced_topics_cobbler.adoc#advanced.topics.cobbler, Cobbler>>.
 endif::[]
 
-{susemgr} provides an interface for developing Kickstart and {ay} profiles that can be used to install {rhel} or {sle} on either new or already-registered systems automatically according to certain specifications.
+{productname} provides an interface for developing Kickstart and {ay} profiles that can be used to install {rhel} or {sle} on either new or already-registered systems automatically according to certain specifications.
 
 .Autoinstallation Overview
 
@@ -142,7 +143,7 @@ endif::showremarks[]
 
 
 * A DHCP server is not required for {ay}, but it can make things easier. If you are using static IP addresses, you should select static IP while developing your {ay} profile.
-* Host the {ay} distribution trees via HTTP, properly provided by {susemgr}.
+* Host the {ay} distribution trees via HTTP, properly provided by {productname}.
 * If conducting a so-called bare-metal {ay} installation, provide the following settings:
 ** Configure DHCP to assign the required networking parameters and the bootloader program location.
 ** In the bootloader configuration file, specify the kernel and appropriate kernel options to be used.
@@ -177,9 +178,9 @@ ifdef::showremarks[]
 endif::showremarks[]
 
 
-While you can schedule a registered system to be installed by {ay} with a new operating system and package profile, you can also automatically install a system that is not registered with {susemgr}, or does not yet have an operating system installed.
+While you can schedule a registered system to be installed by {ay} with a new operating system and package profile, you can also automatically install a system that is not registered with {productname}, or does not yet have an operating system installed.
 One common method of doing this is to create a bootable CD-ROM that is inserted into the target system.
-When the system is rebooted or switched on, it boots from the CD-ROM, loads the {ay} configuration from your {susemgr}, and proceeds to install {sls} according to the {ay} profile you have created.
+When the system is rebooted or switched on, it boots from the CD-ROM, loads the {ay} configuration from your {productname}, and proceeds to install {sls} according to the {ay} profile you have created.
 
 To use the CD-ROM, boot the system and type `autoyast` at the prompt (assuming you left the label for the {ay}  boot as ``autoyast``). When you press kbd:[Enter], the {ay}  installation begins.
 
@@ -208,7 +209,7 @@ In addition to CD-ROM-based installations, {ay} installation through a Pre-Boot 
 This is less error-prone than CDs, enables {ay} installation from bare metal, and integrates with existing PXE/DHCP environments.
 
 To use this method, make sure your systems have network interface cards (NIC) that support PXE, install and configure a PXE server, ensure DHCP is running, and place the installation repository on an HTTP server for deployment.
-Finally upload the {ay} profile via the Web interface to the {susemgr} server.
+Finally upload the {ay} profile via the Web interface to the {productname} server.
 Once the {ay} profile has been created, use the URL from the menu:Autoinstallation Overview[] page, as for CD-ROM-based installations.
 
 To obtain specific instructions for conducting PXE {ay} installation, refer to the _Using PXE Boot_ section of the [ref]_SUSE Linux Enterprise Deployment Guide_.
@@ -283,9 +284,9 @@ For instance, before creating Kickstart profiles, you may consider:
 === Building Bootable Kickstart ISOs
 
 
-While you can schedule a registered system to be kickstarted to a new operating system and package profile, you can also {kickstart} a system that is not registered with {susemgr} or does not yet have an operating system installed.
+While you can schedule a registered system to be kickstarted to a new operating system and package profile, you can also {kickstart} a system that is not registered with {productname} or does not yet have an operating system installed.
 One common method of doing this is to create a bootable CD-ROM that is inserted into the target system.
-When the system is rebooted, it boots from the CD-ROM, loads the {kickstart} configuration from your {susemgr}, and proceeds to install {rhel} according to the Kickstart profile you have created.
+When the system is rebooted, it boots from the CD-ROM, loads the {kickstart} configuration from your {productname}, and proceeds to install {rhel} according to the Kickstart profile you have created.
 
 To do this, copy the contents of [path]``/isolinux`` from the first CD-ROM of the target distribution.
 Then edit the [path]``isolinux.cfg`` file to default to 'ks'. Change the 'ks' section to the following template:
@@ -348,7 +349,7 @@ To obtain specific instructions for conducting PXE {kickstart}s, refer to the _P
 
 [NOTE]
 ====
-Running the Network Booting Tool, as described in the Red Hat Enterprise Linux 4: System Administration Guide, select "HTTP" as the protocol and include the domain name of the {susemgr} in the Server field if you intend to use it to distribute the installation files.
+Running the Network Booting Tool, as described in the Red Hat Enterprise Linux 4: System Administration Guide, select "HTTP" as the protocol and include the domain name of the {productname} in the Server field if you intend to use it to distribute the installation files.
 ====
 
 
@@ -394,7 +395,7 @@ For creating distributions, see <<ref.webui.systems.autoinst.distribution>>.
 +
 
 . Select an [guimenu]``Kickstartable Tree`` for this profile. The [guimenu]``Kickstartable Tree`` drop-down menu is only populated if one or more distributions have been created for the selected base channel (see <<ref.webui.systems.autoinst.distribution>>).
-. Instead of selecting a specific tree, you can also check the box [guimenu]``Always use the newest Tree for this base channel``. This setting lets {susemgr} automatically pick the latest tree that is associated with the specified base channels. If you add new trees later, {susemgr} will always keep the most recently created or modified.
+. Instead of selecting a specific tree, you can also check the box [guimenu]``Always use the newest Tree for this base channel``. This setting lets {productname} automatically pick the latest tree that is associated with the specified base channels. If you add new trees later, {productname} will always keep the most recently created or modified.
 . Select the [guimenu]``Virtualization Type`` from the drop-down menu.
 +
 NOTE: If you do not intend to use the Kickstart profile to create virtual guest systems, you can leave the drop-down at the default [guimenu]``None`` choice.
@@ -409,8 +410,8 @@ For {kickstart} to work properly, the following packages should be present in it
 
 To resolve this issue:
 
-* Make sure that the Tools software channel for the Kickstart profile's base channel is available to your organization. If it is not, you must request entitlements for the Tools software channel from the {susemgr} administrator.
-* Make sure that the Tools software channel for this Kickstart profile's base channel is available to your {susemgr} as a child channel.
+* Make sure that the Tools software channel for the Kickstart profile's base channel is available to your organization. If it is not, you must request entitlements for the Tools software channel from the {productname} administrator.
+* Make sure that the Tools software channel for this Kickstart profile's base channel is available to your {productname} as a child channel.
 * Make sure that [package]``rhn-kickstart`` and associated packages corresponding to this {kickstart} are available in the Tools child channel.
 
 
@@ -419,7 +420,7 @@ On this tab and the other subtabs, nearly every option for the new Kickstart pro
 
 Once created, you can access the Kickstart profile by downloading it from the [guimenu]``Autoinstallation Details`` page by clicking the [guimenu]``Autoinstallation File`` subtab and clicking the [guimenu]``Download Autoinstallation File`` link.
 
-If the Kickstart file is _not_ managed by {susemgr}, you can access it via the following URL:
+If the Kickstart file is _not_ managed by {productname}, you can access it via the following URL:
 
 ----
 http://`my.manager.server`/ks/dist/ks-rhel-`ARCH`-`VARIANT`-`VERSION`
@@ -468,7 +469,7 @@ Consult the [guimenu]``Partitioning`` tab to verify any new or changed settings.
 On this page, you can make the following changes to the operating system that the Kickstart profile installs:
 
 Change the base channel::
-Select from the available base channels. {susemgr} administrators see a list of all base channels that are currently synced to the {susemgr}.
+Select from the available base channels. {productname} administrators see a list of all base channels that are currently synced to the {productname}.
 
 Child Channels::
 Subscribe to available child channels of the base channel, such as the Tools channel.
@@ -478,8 +479,8 @@ Use the drop-down menu to choose from available trees associated with the base c
 
 Always use the newest Tree for this base channel.::
 Instead of selecting a specific tree, you can also check the box menu:Always use the newest Tree for this base channel.[]
-This setting lets {susemgr} automatically pick the latest tree that is associated with the specified base channels.
-If you add new trees later, {susemgr} will always keep the most recently created or modified.
+This setting lets {productname} automatically pick the latest tree that is associated with the specified base channels.
+If you add new trees later, {productname} will always keep the most recently created or modified.
 
 Software URL (File Location)::
 The exact location from which the Kickstart tree is mounted.
@@ -565,7 +566,7 @@ You can associate an IP range to an autoinstallation profile by clicking on menu
 ==== Autoinstallation Details >  Bare Metal Autoinstallation
 
 
-This subtab provides the information necessary to Kickstart systems that are not currently registered with {susemgr}.
+This subtab provides the information necessary to Kickstart systems that are not currently registered with {productname}.
 Using the on-screen instructions, you may either autoinstall systems using boot media (CD-ROM) or by IP address.
 
 
@@ -622,7 +623,7 @@ Refer to <<ref.webui.systems.autoinst.preserve>> for information on how to creat
 ==== System Details >  GPG & SSL
 
 From this subtab, select the GPG keys and/or SSL certificates to be exported to the kickstarted system during the %post section of the {kickstart}.
-For {susemgr} customers, this list includes the SSL Certificate used during the installation of {susemgr}.
+For {productname} customers, this list includes the SSL Certificate used during the installation of {productname}.
 
 [NOTE]
 ====
@@ -714,7 +715,7 @@ To create a Kickstart script, perform the following procedure:
 
 [NOTE]
 ====
-{susemgr} supports the inclusion of separate files within the Partition Details section of the Kickstart profile.
+{productname} supports the inclusion of separate files within the Partition Details section of the Kickstart profile.
 For instance, you may dynamically generate a partition file based on the machine type and number of disks at {kickstart} time.
 This file can be created via [option]``%pre`` script and placed on the system, such as [path]``/tmp/part-include``.
 Then you can call for that file by entering the following line in the Partition Details field of the menu:System Details[Partitioning] tab:
@@ -745,8 +746,8 @@ Click the [guimenu]``Upload Kickstart/Autoyast File`` link from the menu:Systems
 
 
 . In the first line, enter a profile [guimenu]``Label`` for the automated installation. This label[] drop-down menu is only populated if one or more distributions have been created for the selected base channel (see <<ref.webui.systems.autoinst.distribution>>).
-. Instead of selecting a specific tree, you can also check the box [guimenu]``Always use the newest Tree`` for this base channel. This setting lets {susemgr} automatically pick the latest tree that is associated with the specified base channels. If you add new trees later, {susemgr} will always keep the most recently created or modified.
-. Select the [guimenu]``Virtualization Type`` from the drop-down menu. For more information about virtualization, refer to 
+. Instead of selecting a specific tree, you can also check the box [guimenu]``Always use the newest Tree`` for this base channel. This setting lets {productname} automatically pick the latest tree that is associated with the specified base channels. If you add new trees later, {productname} will always keep the most recently created or modified.
+. Select the [guimenu]``Virtualization Type`` from the drop-down menu. For more information about virtualization, refer to
 ifndef::env-github,backend-html5[]
 <<advanced.topics.virtualization>>.
 endif::[]
@@ -787,7 +788,7 @@ Click either the range or the profile name to access different tabs of the [guim
 
 
 Lists keys and certificates available for inclusion in {kickstart} profiles and provides a means to create new ones.
-This is especially important for customers of {susemgr} or the Proxy Server because systems kickstarted by them must have the server key imported into {susemgr} and associated with the relevant {kickstart} profiles.
+This is especially important for customers of {productname} or the Proxy Server because systems kickstarted by them must have the server key imported into {productname} and associated with the relevant {kickstart} profiles.
 Import it by creating a new key here and then make the profile association in the [guimenu]``GPG and SSL keys`` subtab of the [guimenu]``Autoinstallation Details`` page.
 
 To create a key or certificate, click the [guimenu]``Create Stored Key/Cert`` link in the upper-right corner of the page.
@@ -796,7 +797,7 @@ A unique description is required.
 
 [IMPORTANT]
 ====
-The GPG key you upload to {susemgr} must be in ASCII format.
+The GPG key you upload to {productname} must be in ASCII format.
 Using a GPG key in binary format causes anaconda, and therefore the {kickstart} process, to fail.
 ====
 
@@ -814,7 +815,7 @@ The [guimenu]``Distributions`` page does not display distributions already provi
 They can be found within the [guimenu]``Distribution`` drop-down menu of the [guimenu]``Autoinstallation Details`` page.
 
 Before creating a distribution, you must make an installation data available, as described in the [ref]_SUSE Linux Enterprise Deployment Guide_ (https://www.suse.com/documentation/sles-12/singlehtml/book_sle_deployment/book_sle_deployment.html) or, respectively, the _Kickstart Installations_ chapter of the [ref]_Red Hat Enterprise Linux System Administration Guide_.
-This tree must be located in a local directory on the {susemgr} server.
+This tree must be located in a local directory on the {productname} server.
 ====
 
 .Procedure: Creating a Distribution for Autoinstallation
@@ -912,13 +913,13 @@ Refer to <<ref.webui.systems.autoinst.profiles.create>> for precise steps.
 == Autoinstallation >  Autoinstallation Snippets
 
 
-Use snippets to store common blocks of code that can be shared across multiple Kickstart or {ay} profiles in {susemgr}.
+Use snippets to store common blocks of code that can be shared across multiple Kickstart or {ay} profiles in {productname}.
 
 [[s4-sm-system-kick-snippet-default]]
 === Autoinstallation  >  Autoinstallation Snippets  >  Default Snippets
 
 
-Default snippets coming with {susemgr} are not editable.
+Default snippets coming with {productname} are not editable.
 You can use a snippet, if you add the [guimenu]``Snippet Macro`` statement such as `$SNIPPET('spacewalk/sles_register_script')` to your autoinstallation profile.
 This is an {ay} profile example:
 
