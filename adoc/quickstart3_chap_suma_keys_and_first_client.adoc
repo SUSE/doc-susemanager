@@ -20,6 +20,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -45,11 +46,11 @@ endif::[]
 
 == Introduction
 
-Releases prior to {susemgr} 2.1 were shipped with a *traditional* client management framework (which is still fully supported today).
+Releases prior to {productname} 2.1 were shipped with a *traditional* client management framework (which is still fully supported today).
 SUSE Manager 3 and later include the Salt framework in addition to the *traditional* framework.
 
 Salt::
-Is an end-to-end data-center automation tool which may also be used outside the scope of {susemgr} to introduce reactive, real-time orchestration, and configuration management.
+Is an end-to-end data-center automation tool which may also be used outside the scope of {productname} to introduce reactive, real-time orchestration, and configuration management.
 Managed systems can coexist using both *traditional* and *Salt* frameworks.
 This functionality provides a safe learning environment when switching to *Salt* while you continue to maintain existing deployments.
 
@@ -65,7 +66,7 @@ Each activation key is bound to the organization for which it has been created.
 
 [[create.activation.keys]]
 .Procedure: Creating Activation Keys
-. As the administrator login to the {susemgr} {webui}.
+. As the administrator login to the {productname} {webui}.
 . Switch to menu:Systems[Activation Keys].
 . Click the btn:[Create Key] link at the upper right corner.
 +
@@ -96,9 +97,9 @@ from the menu:Activation Key Details[Base Channels] drop down.
 
 
 [[create.tools.repository]]
-== Creating the {susemgr} Tools Repository
+== Creating the {productname} Tools Repository
 
-In this section you will create a tools repository on the {susemgr} Server for providing client tools.
+In this section you will create a tools repository on the {productname} Server for providing client tools.
 The client tools repository contains packages for installing Salt on minions as well as required packages for registering traditional clients during the bootstrapping procedure.
 These packages will be installed from the newly generated repository during the registration process.
 In the following procedure you will create the {sle} tools repository.
@@ -141,7 +142,7 @@ mgr-create-bootstrap-repo -l SLE-`version`-x86_64
 ----
 mgr-create-bootstrap-repo -c SLE-version-x86_64
 ----
-. {susemgr} will create and add the client tools to the newly created [path]``repositories`` directory located at [path]``/srv/www/htdocs/pub/repositories/`` .
+. {productname} will create and add the client tools to the newly created [path]``repositories`` directory located at [path]``/srv/www/htdocs/pub/repositories/`` .
 
 
 This repository is suitable for both Server and Desktop of {sle}
@@ -155,7 +156,7 @@ This repository is suitable for both Server and Desktop of {sle}
 
 
 This section goes over generating a template bootstrap script which will be copied and modified for use with "`traditional`" clients.
-Traditional clients register with {susemgr} via a bootstrap script executed on the client which deploys all necessary packages to it.
+Traditional clients register with {productname} via a bootstrap script executed on the client which deploys all necessary packages to it.
 The bootstrap script contains parameters which assigns a client system to its base channel.
 Two of these important parameters are:
 
@@ -166,14 +167,14 @@ Two of these important parameters are:
 [NOTE]
 .Using the --traditional [option]
 ====
-As of {susemgr} 3.1 the [command]``--traditional`` option must be used if creating a bootstrap script from the command line via the [command]``mgr-bootstrap`` command for traditional clients.
+As of {productname} 3.1 the [command]``--traditional`` option must be used if creating a bootstrap script from the command line via the [command]``mgr-bootstrap`` command for traditional clients.
 Generated bootstrap scripts target Salt minions by default.
 ====
 
 [NOTE]
 .Bootstrap Scripting Best Practices
 ====
-It is possible to use various methods to register clients for use with {susemgr} in mass using bootstrap.
+It is possible to use various methods to register clients for use with {productname} in mass using bootstrap.
 Using batch scripts for mass registration of both VM and Bare Metal machines is a possibility.
 Some of these methods will be covered in the [ref]_Best Practices Guide_ and will be added as examples at a later time.
 ====
@@ -191,7 +192,7 @@ The following procedure will guide you through generating a bootstrap script.
 
 [[create.boot.script]]
 .Procedure: Creating a Bootstrap Script
-. From the {susemgr} {webui}, browse to menu:Main Menu[Admin > Manager Configuration > Bootstrap Script]. For more information, see <<s3-sattools-config-bootstrap>>.
+. From the {productname} {webui}, browse to menu:Main Menu[Admin > Manager Configuration > Bootstrap Script]. For more information, see <<s3-sattools-config-bootstrap>>.
 . Uncheck menu:SUSE Manager Configuration - Bootstrap[Bootstrap Script > Bootstrap using Salt].
 Use default settings and click the btn:[Update] button.
 +
@@ -225,13 +226,13 @@ The bootstrap script is also available at [path]``https://example.com/pub/bootst
 
 In this section you will copy and modify the template bootstrap script you created from <<generate.bootstrap.script>>.
 
-A minimal requirement when modifying a bootstrap script for use with {susemgr} is the inclusion of an activation key.
+A minimal requirement when modifying a bootstrap script for use with {productname} is the inclusion of an activation key.
 Depending on your organizations security requirements it is strongly recommended to include one or more (GPG) keys (for example, your organization key, and package signing keys).
 For this tutorial you will be registering with the activation keys created in the previous section.
 
 [[mod.bootstrap.script]]
 .Procedure: Modifying the Bootstrap Script
-. Login as root from the command line on your {susemgr} server.
+. Login as root from the command line on your {productname} server.
 . Navigate to the bootstrap directory with:
 +
 
@@ -280,11 +281,11 @@ You must enter the full name of the key you wish to use in the bootstrap script 
 [[connect.first.client]]
 === Connecting Clients
 
-This section covers connecting your clients to {susemgr} with the modified bootstrap script.
+This section covers connecting your clients to {productname} with the modified bootstrap script.
 
 [[run.bootstrap.script]]
 .Procedure: Running the Bootstrap Script
-. From your {susemgr} Server command line as root navigate to the following directory:
+. From your {productname} Server command line as root navigate to the following directory:
 +
 
 ----
@@ -302,7 +303,7 @@ cat MODIFIED-SCRIPT.SH \
 . The script will execute and proceed to download the required dependencies located in the repositories directory you created earlier.
 Once the script has finished running, log in to the {webui} and click menu:Systems[Overview] to see the new client listed.
 
-This concludes the bootstrap section of this guide. <<preparing.and.registering.clients.salt>> will go over registering Salt minions for use with {susemgr}.
+This concludes the bootstrap section of this guide. <<preparing.and.registering.clients.salt>> will go over registering Salt minions for use with {productname}.
 
 [[preparing.and.registering.clients.salt]]
 == Registering Salt Clients
@@ -311,7 +312,7 @@ There are currently three methods for registering Salt minions.
 The following section describes the first method and uses a bootstrap repository.
 The second method is to create a bootstrap script using [command]``mgr-bootstrap``.
 Bootstrapping Salt minions with [command]``mgr-bootstrap`` is performed in the same manner as bootstrapping traditional clients; for more information, see <<registering.clients.traditional>>.
-The third method is performed from the {susemgr}{webui}
+The third method is performed from the {productname} {webui}
 ; find this method located in <<ref.webui.systems.bootstrapping>>.
 
 .Deprecation Warning
@@ -366,7 +367,7 @@ Use `HTTP` instead to avoid errors.
 ----
 zypper in salt-minion
 ----
-. Modify the minion configuration file to point to the fully qualified domain name ([replaceable]``FQDN``) of the {susemgr} server (master):
+. Modify the minion configuration file to point to the fully qualified domain name ([replaceable]``FQDN``) of the {productname} server (master):
 +
 
 ----
@@ -395,3 +396,17 @@ systemctl restart salt-minion
 
 Your newly registered minion should now show up within the {webui} under menu:Salt[Keys].
 Accept the [guimenu]``pending`` key to begin management.
+
+If you have used your hypervisor clone utility, and attempted to register the cloned Salt client, you might get this error:
+
+----
+We're sorry, but the system could not be found.
+----
+
+This is caused by the new, cloned, system having the same machine ID as an existing, registered, system.
+You can adjust this manually to correct the error and register the cloned system successfully.
+For more information and instructions, see:
+
+ifdef::env-github,backend-html5[]
+* <<bp.chapt.suma3.troubleshooting#bp.chapt.suma3.troubleshooting.registering.cloned.salt.systems>>
+endif::[]

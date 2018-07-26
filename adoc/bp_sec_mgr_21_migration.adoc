@@ -1,5 +1,5 @@
 [[bp.chap.mgr.migration]]
-= {susemgr} Migration from Version 2.1 to Version 3
+= {productname} Migration from Version 2.1 to Version 3
 ifdef::env-github,backend-html5,backend-docbook5[]
 //Admonitions
 :tip-caption: :bulb:
@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -49,10 +50,7 @@ endif::[]
 
 
 
-The migration from {susemgr}
- 2.1 to {susemgr}
- 3 works quite the same as a migration from Red Hat Satellite to {susemgr}
-.
+The migration from {productname} 2.1 to {productname} 3 works in the same way as a migration from Red Hat Satellite to {productname}.
 The migration happens from the original machine to a new one.
 There is no in-place migration.
 While this has the drawback that you temporarily need two machines, it also has the advantage that the original machine will remain fully functional in case something goes wrong.
@@ -83,20 +81,16 @@ Also all of the channels and packages need to be copied to the new machine, so e
 .Latest Updates
 [WARNING]
 ====
-The source machine needs to run {susemgr}
- 2.1 with all the latest updates applied.
+The source machine needs to run {productname} 2.1 with all the latest updates applied.
 Before starting the migration process, make sure that the machine is up to date and all updates have been installed sucessfully.
 ====
 
 
 Only machines running with the embedded PostgreSQL database may be migrated in one go.
-For the migration of an Oracle based installation, a two-step migration is required: First the installation needs to get migrated from Oracle to PostgreSQL (by means of a separate tool) and afterwards the migration to {susemgr}
- 3 can be performed as documented here.
+For the migration of an Oracle based installation, a two-step migration is required: First the installation needs to get migrated from Oracle to PostgreSQL (by means of a separate tool) and afterwards the migration to {productname} 3 can be performed as documented here.
 
-{susemgr}
- 3 does no longer support {ncc}
-but only SCC ({scc}
-). Therefore, you can migrate a machine only after it has been switched to SCC.
+{productname} 3 no longer supports {ncc} but only SCC ({scc}).
+Therefore, you can migrate a machine only after it has been switched to SCC.
 The migration script will check if the installation has already been switched to SCC and will terminate if this is not the case.
 Switch to SCC on the source machine and repeat the migration.
 During migration the database from the source machine needs to get dumped and this dump needs to be temporarily stored on the target system.
@@ -133,7 +127,7 @@ To prepare the target machine (with the example host name ``suma30``) proceed as
 
 [[proc.mgr.migration.setup.target]]
 .Procedure: Setup Target Machine
-. On the target machine install {sls} 12 SP2 including the extension product "`{susemgr}`" .
+. On the target machine install {sls} 12 SP2 including the extension product "`{productname}`" .
 +
 .Background Information on Required Target Machine
 IMPORTANT: It is actually required to install version 12 SP2 on the target machine.
@@ -141,17 +135,15 @@ On that version you will upgrade the PostgreSQL database from version_9.4 to 9.6
 For more information about the PostgreSQL upgrade, see <<sp.migration.postgresql>>.
 +
 
-. Initiate [command]``yast2 susemanagersetup`` as you would normally do for an installation of {susemgr} .
+. Initiate [command]``yast2 susemanagersetup`` as you would normally do for an installation of {productname}.
 +
-For more information about installing {susemgr}
-, see <<sles.installation.within.kvm.jeos>>.
-. On the first {susemgr} setup screen, ensure that menu:Migrate a SUSE Manager compatible server[] is marked instead of menu:Set up SUSE Manager from scratch[] .
+For more information about installing {productname}, see <<sles.installation.within.kvm.jeos>>.
+. On the first {productname} setup screen, ensure that menu:Migrate a SUSE Manager compatible server[] is marked instead of menu:Set up SUSE Manager from scratch[] .
 . On the second screen, enter the name of the source system as menu:Hostname of source SUSE Manager Server[] as well as the domain name. Also enter the database credentials of the source system.
-. On the next screen, you will need to specify the IP address of the {susemgr} 3 target system. Normally this value should be pre-set to the correct value and you only should need to press kbd:[Enter] . Only in the case of multiple IP addresses you might need to specify the one that should be used during migration.
+. On the next screen, you will need to specify the IP address of the {productname} 3 target system. Normally this value should be pre-set to the correct value and you only should need to press kbd:[Enter] . Only in the case of multiple IP addresses you might need to specify the one that should be used during migration.
 +
 .Faking the Host Name
-IMPORTANT: During the migration process, the target system will fake its host name to be the same as the source system, this is necessary as the host name of a {susemgr}
-installation is vital and should not be changed once set.
+IMPORTANT: During the migration process, the target system will fake its host name to be the same as the source system, this is necessary as the host name of a {productname} installation is vital and should not be changed once set.
 Therefore do not be confused when logging in to your systems during migration; they both will present you with the same host name.
 +
 
@@ -159,8 +151,7 @@ Therefore do not be confused when logging in to your systems during migration; t
 +
 .Database Parameters
 IMPORTANT: Specify the database parameters using the same database parameters as the source system is recommended.
-At least, using the the same database credentials as when creating the source or original {susemgr}
-database is mandatory.
+At least, using the the same database credentials as when creating the source or original {productname} database is mandatory.
 +
 
 
@@ -183,8 +174,7 @@ A migration is performed by excecuting the following command:
 ----
 
 
-This command reads the data gathered during <<proc.mgr.migration.setup.target>>, sets up {susemgr}
- onto a new target machine and transfers all of the data from the source machine.
+This command reads the data gathered during <<proc.mgr.migration.setup.target>>, sets up {productname} onto a new target machine and transfers all of the data from the source machine.
 As several operations need to be performed on the source machine via SSH, you will be prompted once for the root password of the source machine.
 A temporary SSH key named `migration-key` is created and installed on the source machine, so you need to give the {rootuser}
  password only once.
@@ -193,8 +183,7 @@ Ideally, this is all you will need to do.
 
 Depending on the size of the installation, the actual migration will take up to several hours.
 Once finished, you will be prompted to shutdown the source machine, re-configure the network of the target machine to use the same IP address and host name as the original machine and restart it.
-It should now be a fully functional replacement for your previous {susemgr}
- 2.1 installation.
+It should now be a fully functional replacement for your previous {productname} 2.1 installation.
 The following numbers illustrate the runtime for dumping and importing a small database:
 
 ----
@@ -225,8 +214,7 @@ This command may be run at any time and your current server will remain fully fu
 Once the migration has been initiated only data changed since running [command]``mgr-setup -r`` will need to be transferred which will significantly reduces downtime.
 
 On large installations transfering the database (which involves dumping the database onto the source machine and then importing the dump onto the target system) will still take some time.
-During the database transfer no write operations should occurr therefore the migration script will shutdown running {susemgr}
-database services running on the source machine.
+During the database transfer no write operations should occur therefore the migration script will shut down any {productname} database services running on the source machine.
 
 [[bp.sec.mgr.migration.pkg.extern]]
 == Packages on External Storage

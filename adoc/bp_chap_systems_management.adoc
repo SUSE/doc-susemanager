@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -48,10 +49,8 @@ endif::[]
 
 == Selecting a Contact Method
 
-{susemgr}
-provides several methods for communication between client and server.
-All commands your {susemgr}
-server sends its clients to do will be routed through one of them.
+{productname} provides several methods for communication between client and server.
+All commands your {productname} server sends its clients to do will be routed through one of them.
 Which one you select will depend on your network infrastructure.
 The following sections provide a starting point for selecting a method which best suits your network environment.
 
@@ -63,12 +62,10 @@ For general information about Salt clients, see <<salt.gs.guide.intro>>.
 ====
 
 [[bp.contact.methods.rhnsd]]
-== Default (the {susemgr} Daemon rhnsd)
+== Default (the {productname} Daemon rhnsd)
 
 
-The {susemgr}
-daemon ([command]``rhnsd``) runs on client systems and periodically connects with {susemgr}
- to check for new updates and notifications.
+The {productname} daemon ([command]``rhnsd``) runs on client systems and periodically connects with {productname} to check for new updates and notifications.
 The daemon, which runs in the background, is started by [systemitem]``rhnsd.service``
 .
 By default, it will check every 4 hours for new actions, therefore it may take some time for your clients to begin updating after actions have been scheduled for them.
@@ -77,8 +74,7 @@ To check for updates, [systemitem]``rhnsd``
  runs the external [systemitem]``mgr_check``
  program located in [path]``/usr/sbin/``
 .
-This is a small application that establishes the network connection to {susemgr}
-.
+This is a small application that establishes the network connection to {productname}.
 The SUSE Manager daemon does not listen on any network ports or talk to the network directly.
 All network activity is done via the [systemitem]``mgr_check``
  utility.
@@ -86,27 +82,25 @@ All network activity is done via the [systemitem]``mgr_check``
 .Auto accepting (EULAs)
 [WARNING]
 ====
-When new packages or updates are installed on the client via {susemgr}
-, any licenses (EULAs) requiring agreement before installation are automatically accepted.
+When new packages or updates are installed on the client using {productname}, any end user licence agreements (EULAs) are automatically accepted.
+To review a package EULA, open the package detail page in the {webui}.
 ====
 
 
 This figure provides an overview of the default [systemitem]``rhnsd``
  process path.
 All items left of the [systemitem]``Python XMLRPC server``
- block represent processes running on a {susemgr}
- client.
+ block represent processes running on a {productname} client.
 
 .rhnsd Contact Method
 
 image::rhnsd-taigon.png[scaledwidth=80]
 
 
-=== Configuring {susemgr} rhnsd Daemon
+=== Configuring {productname} rhnsd Daemon
 
 
-The {susemgr}
-daemon can be configured by editing the file on the client:
+The {productname} daemon can be configured by editing the file on the client:
 
 ----
 /etc/sysconfig/rhn/rhnsd
@@ -135,16 +129,11 @@ You can view the status of rhnsd by typing the command [command]``systemctl stat
 == Push via SSH
 
 
-Push via SSH is intended to be used in environments where your clients cannot reach the {susemgr}
-server directly to regularly check in and, for example, fetch package updates.
+Push via SSH is intended to be used in environments where your clients cannot reach the {productname} server directly to regularly check in and, for example, fetch package updates.
 
-In detail, this feature enables a {susemgr}
-located within an internal network to manage clients located on a "`Demilitarized Zone`"
- (DMZ) outside of the firewall protected network.
-Due to security reasons, no system on a DMZ is authorized to open a connection to the internal network and therefore your {susemgr}
- server.
-The solution is to configure Push via SSH which utilizes an encrypted tunnel from your {susemgr}
- server on the internal network to the clients located on the DMZ.
+In detail, this feature enables a {productname} located within an internal network to manage clients located on a "`Demilitarized Zone`" (DMZ) outside of the firewall protected network.
+Due to security reasons, no system on a DMZ is authorized to open a connection to the internal network and therefore your {productname} server.
+The solution is to configure Push via SSH which utilizes an encrypted tunnel from your {productname} server on the internal network to the clients located on the DMZ.
 After all actions/events are executed, the tunnel is closed.
 The server will contact the clients in regular intervals (using SSH) to check in and perform all actions and events.
 
@@ -158,8 +147,7 @@ This includes re-installation of systems using the provisioning module.
 
 The following figure provides an overview of the Push via SSH process path.
 All items left of the [systemitem]``Taskomatic``
- block represent processes running on a {susemgr}
- client.
+ block represent processes running on a {productname} client.
 
 .Push via SSH Contact Method
 
@@ -253,8 +241,7 @@ export PATH
 
 
 As your clients cannot reach the server, you will need to register your clients from the server.
-A tool for performing registration of clients from the server is included with {susemgr}
-and is called [command]``mgr-ssh-push-init``.
+A tool for performing registration of clients from the server is included with {productname} and is called [command]``mgr-ssh-push-init``.
 This tool expects a client's hostname or IP address and the path to a valid bootstrap script located in the server's filesystem for registration as parameters.
 
 .Specifying Ports for Tunneling before Registering Clients
@@ -296,12 +283,9 @@ Registration is optional since it can also be done from within the client in thi
 ----
 
 
-When using the Push via SSH tunnel contact method, the client is configured to connect {susemgr}
-via the high ports mentioned above (see [path]``/etc/sysconfig/rhn/up2date``
-). Tools like [command]``rhn_check`` and [command]``zypper`` will need an active SSH session with the proper port forwarding options in order to access the {susemgr}
- API.
-To verify the Push via SSH tunnel connection manually, run the following command on the {susemgr}
- server:
+When using the Push via SSH tunnel contact method, the client is configured to connect {productname} via the high ports mentioned above (see [path]``/etc/sysconfig/rhn/up2date``
+). Tools like [command]``rhn_check`` and [command]``zypper`` will need an active SSH session with the proper port forwarding options in order to access the {productname} API.
+To verify the Push via SSH tunnel connection manually, run the following command on the {productname} server:
 
 ----
 # ssh -i /root/.ssh/id_susemanager -R high port: susemanager :443`client`zypper ref
@@ -350,8 +334,7 @@ client.activationkey.setDetails(key, '1-mykey', {'contact_method' : 'ssh-push'})
 === Proxy Support with Push via SSH
 
 
-It is possible to use Push via SSH to manage systems that are connected to the {susemgr}
-server via a proxy.
+It is possible to use Push via SSH to manage systems that are connected to the {productname} server via a proxy.
 To register a system, run [systemitem]``mgr-ssh-push-init``
  on the proxy system for each client you wish to register.
 Update your proxy with the latest packages to ensure the registration tool is available.
@@ -366,8 +349,7 @@ This can be achieved by executing the following command from the server:
 == Push via Salt SSH
 
 
-Push via Salt SSH is intended to be used in environments where your Salt clients cannot reach the {susemgr}
-server directly to regularly checking in and, for example, fetch package updates.
+Push via Salt SSH is intended to be used in environments where your Salt clients cannot reach the {productname} server directly to regularly checking in and, for example, fetch package updates.
 
 .Push via SSH
 [NOTE]
@@ -387,8 +369,7 @@ Salt provides "`Salt SSH`"
  ([command]``salt-ssh``), a feature to manage clients from a server.
 It works without installing Salt related software on clients.
 Using Salt SSH there is no need to have minions connected to the Salt master.
-Using this as a {susemgr}
- connect method, this feature provides similar functionality for Salt clients as the traditional Push via SSH feature for traditional clients.
+Using this as a {productname} connect method, this feature provides similar functionality for Salt clients as the traditional Push via SSH feature for traditional clients.
 
 This feature allows:
 
@@ -398,7 +379,7 @@ This feature allows:
 
 === Requirements
 
-* SSH daemon must be running on the remote system and reachable by the [systemitem]``salt-api`` daemon (typically running on the {susemgr} server).
+* SSH daemon must be running on the remote system and reachable by the [systemitem]``salt-api`` daemon (typically running on the {productname} server).
 * Python must be available on the remote system (Python must be supported by the installed Salt). Currently: python 2.6.
 
 
@@ -421,10 +402,8 @@ To bootstrap a Salt SSH system, proceed as follows:
 . Confirm with clicking the menu:Bootstrap[] button.
 
 
-Now the system will be bootstrapped and registered in {susemgr}
-.
-If done successfully, it will appear in the menu:Systems[]
- list.
+Now the system will be bootstrapped and registered in {productname}.
+If done successfully, it will appear in the menu:Systems[] list.
 
 === Configuration
 
@@ -435,7 +414,7 @@ There are two kinds of parameters for Push via Salt SSH:
 ** Host
 ** Activation key
 ** Password {mdash} used only for bootstrapping, not saved anywhere; all future SSH sessions are authorized via a key/certificate pair
-* Persistent parameters {mdash} configured {susemgr} -wide:
+* Persistent parameters {mdash} configured {productname}-wide:
 ** sudo user {mdash} same as in <<bp.contact.methods.ssh.push.sudo>>.
 
 
@@ -469,8 +448,7 @@ For more information, see
 == osad
 
 
-The default contact method between {susemgr}
-and its clients is [systemitem]``rhnsd``
+The default contact method between {productname} and its clients is [systemitem]``rhnsd``
 .
 When using the [systemitem]``rhnsd``
  daemon the client will contact the server every 4 hours and then execute a scheduled action on clients.
@@ -482,22 +460,16 @@ Alternatively, you may configure [systemitem]``osad``
 
 .osad
 A client-side service that responds to pings and runs [command]``mgr_check`` when directed by the [systemitem]``osa-dispatcher``
- running on {susemgr}
-.
+ running on {productname}.
 
 .osa-dispatcher
-A service running on {susemgr}
-that checks the database to determine if a client running [systemitem]``osad``
+A service running on {productname} that checks the database to determine if a client running [systemitem]``osad``
  needs to be pinged or is required to run [command]``mgr_check``, then sends a message telling the client to do so.
 
 .jabberd
-A daemon that runs on {susemgr}
-and uses the [systemitem]``XMPP``
- protocol. [systemitem]``osad``
- and [systemitem]``osa-dispatcher``
- both connect to this daemon. [systemitem]``jabberd``
- also handles authentication when using [systemitem]``osad``
-.
+A daemon that runs on {productname} and uses the [systemitem]``XMPP`` protocol.
+[systemitem]``osad`` and [systemitem]``osa-dispatcher`` both connect to this daemon.
+[systemitem]``jabberd`` also handles authentication when using [systemitem]``osad``.
 
 
 The following figure represents the osad contact method.
@@ -510,18 +482,17 @@ image::osad.png[scaledwidth=80%]
 
 
 .How it Works
-* On {susemgr} the [systemitem]``osa-dispatcher`` periodically runs a query which checks to see if there are any clients overdue for a ping.
-* If an overdue client is found, a message is sent via [systemitem]``jabberd`` to the [systemitem]``osad`` instances running on all clients registered with your {susemgr} server. The [systemitem]``osad`` instances respond to the ping through the [systemitem]``jabberd`` deamon running in the background on your {susemgr} Server. [systemitem]``osa-dispatcher`` receives the response, and marks the client as 'online'.
+* On {productname} the [systemitem]``osa-dispatcher`` periodically runs a query which checks to see if there are any clients overdue for a ping.
+* If an overdue client is found, a message is sent via [systemitem]``jabberd`` to the [systemitem]``osad`` instances running on all clients registered with your {productname} server. The [systemitem]``osad`` instances respond to the ping through the [systemitem]``jabberd`` deamon running in the background on your {productname} Server. [systemitem]``osa-dispatcher`` receives the response, and marks the client as 'online'.
 * If [systemitem]``osa-dispatcher`` fails to receive a response from an [systemitem]``osad`` instance in a certain amount of time, the client is marked 'offline'.
-* [systemitem]``osa-dispatcher`` also periodically executes a select on the database to check all {susemgr} clients which have actions that need to be executed. If an action is found, a message is sent through [systemitem]``jabberd`` to [systemitem]``osad`` which then executes [command]``mgr_check`` on the client. [command]``mgr_check`` then takes over performing the actual action.
+* [systemitem]``osa-dispatcher`` also periodically executes a select on the database to check all {productname} clients which have actions that need to be executed. If an action is found, a message is sent through [systemitem]``jabberd`` to [systemitem]``osad`` which then executes [command]``mgr_check`` on the client. [command]``mgr_check`` then takes over performing the actual action.
 
 
-=== Configuring and Enabling osad
+=== Configuring and Enabling OSAD
 
 
-The following procedure enables use of [systemitem]``osad``
- with {susemgr}
-.
+The following procedure enables use of [systemitem]``osad`` with {productname}.
+
 
 .Enabling SSL
 [IMPORTANT]
@@ -532,24 +503,20 @@ Make sure your firewall rules are set to allow for the required ports.
 For more information, see <<tab.install.ports.server>>.
 ====
 
-.Procedure: Enabling osa-dispatcher on {susemgr}and osad on Clients
-. On your {susemgr} server use the following command as {rootuser} to start the [systemitem]``osa-dispatcher`` service:
+.Procedure: Enabling osa-dispatcher on {productname} and OSAD on Clients
+. On your {productname} server use the following command as {rootuser} to start the [systemitem]``osa-dispatcher`` service:
 +
 
 ----
 systemctl start osa-dispatcher
 ----
-. Install the [systemitem]``osad`` package on all client systems allowing communication to the osa-dispatcher on {susemgr}.
+. Install the [systemitem]``osad`` package on all client systems allowing communication to the osa-dispatcher on {productname}.
 The package can be found in the Tools child channel.
 +
 
 .osad conflicts with osa-dispatcher
-WARNING: Do _not_ install the [systemitem]``osad``
- client package on your {susemgr}
- server.
-The [systemitem]``osad``
- client service conflicts with [systemitem]``osa-dispatcher``
- server package.
+WARNING: Do _not_ install the [systemitem]``osad`` client package on your {productname} server.
+The [systemitem]``osad`` client service conflicts with [systemitem]``osa-dispatcher`` server package.
 +
 
 . When [systemitem]``osad`` has been installed, start the service on your client systems. As {rootuser} enter:
@@ -562,13 +529,10 @@ systemctl start osad
 Like other services, osa-dispatcher and osad accept ``stop``, ``restart``, and `status` commands as well.
 
 
-This feature depends on the client systems recognizing the fully qualified domain name (FQDN) of {susemgr}
-.
+This feature depends on the client systems recognizing the fully qualified domain name (FQDN) of {productname}.
 The client systems use this name and not the IP address of the server when configuring the YaST Online Update.
 
-Now when you schedule actions from {susemgr}
-on any of the osad enabled systems, the task will be carried out immediately rather than after a client checks in using [systemitem]``rhnsd``
-.
+Now when you schedule actions from {productname} on any of the osad enabled systems, the task will be carried out immediately rather than after a client checks in using [systemitem]``rhnsd``.
 
 === osad Configuration and Logging Files
 
@@ -581,7 +545,7 @@ For reference the configuration files and logs are found in the following locati
 .osa-dispatcher
 [systemitem]``osa-dispatcher``
  is configured via the [path]``rhn.conf``
- file located on the {susemgr}
+ file located on the {productname}
  at:
 
 ----
@@ -595,10 +559,8 @@ All parameters for configuring osa-dispatcher are located under this section hea
 # OSA configuration #
 ----
 
-.osad
-[systemitem]``osad``
- configuration files are located on all {susemgr}
- clients at:
+.OSAD
+[systemitem]``osad`` configuration files are located on all {productname} clients at:
 
 ----
 /etc/sysconfig/rhn/osad.conf
@@ -606,8 +568,7 @@ All parameters for configuring osa-dispatcher are located under this section hea
 ----
 
 
-For troubleshooting [systemitem]``osad``
- the log file is located in:
+For troubleshooting [systemitem]``osad`` the log file is located in:
 
 ----
 /var/log/osad

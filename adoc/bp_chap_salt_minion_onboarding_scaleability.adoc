@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
+:productname:
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -106,8 +107,7 @@ If some of the minions are down during this process, the workflow continues as f
 . In case of reaching `gather_job_timeout` without having any response from the minion (neither for the initial [command]``test.ping`` nor for the [command]``find_job`` job), Salt master will return with only the gathered responses from the responding minions.
 
 
-By default, {susemgr}
-globally sets `timeout` and `gather_job_timeout` to 120 seconds.
+By default, {productname} globally sets `timeout` and `gather_job_timeout` to 120 seconds.
 So, in the worst case, a Salt call targeting unreachable minions will end up _with 240 seconds of waiting_ until getting a response.
 
 [[bp.chap.salt.minion.scaleability.timeouts.presence]]
@@ -117,8 +117,7 @@ So, in the worst case, a Salt call targeting unreachable minions will end up _wi
 In order to prevent waiting until timeouts are reached when some minions are down, {suse}
 introduced a so-called "presence mechanism" for Salt minions.
 
-This presence mechanism checks for unreachable Salt minions when {susemgr}
-is performing synchronous calls to these minions, and it excludes unreachable minions from that call.
+This presence mechanism checks for unreachable Salt minions when {productname} is performing synchronous calls to these minions, and it excludes unreachable minions from that call.
 Synchronous calls are going to be displaced in favor of asynchronous calls but currently still being used during some workflows.
 
 The presence mechanism triggers a Salt [command]``test.ping`` with a custom and fixed short Salt timeout values.
@@ -128,9 +127,7 @@ This way, we can quickly detect which targeted minions are unreachable, and then
 
 === Overriding Salt Presence Timeout Values
 
-{susemgr}
-administrators can increase or decrease default presence ping timeout values by removing the comment markers (``\#``) and setting the desired values for `salt_presence_ping_timeout` and `salt_presence_ping_gather_job_timeout` options in [path]``/etc/rhn/rhn.conf``
-:
+{productname} administrators can increase or decrease default presence ping timeout values by removing the comment markers (``\#``) and setting the desired values for `salt_presence_ping_timeout` and `salt_presence_ping_gather_job_timeout` options in [path]``/etc/rhn/rhn.conf``:
 
 ----
 # SUSE Manager presence timeouts for Salt minions
@@ -144,9 +141,7 @@ administrators can increase or decrease default presence ping timeout values by 
 Salt SSH minions are slightly different that regular minions (zeromq). Salt SSH minions do not use Salt PUB/RET channels but a wrapper Salt command inside of an SSH call.
 Salt `timeout` and `gather_job_timeout` are not playing a role here.
 
-{susemgr}
-defines a timeout for SSH connections in [path]``/etc/rhn/rhn.conf``
-:
+{productname} defines a timeout for SSH connections in [path]``/etc/rhn/rhn.conf``:
 
 ----
 # salt_ssh_connect_timeout = 180
@@ -154,5 +149,4 @@ defines a timeout for SSH connections in [path]``/etc/rhn/rhn.conf``
 
 
 The presence ping mechanism is also working with SSH minions.
-In this case, {susemgr}
-will use `salt_presence_ping_timeout` to override the default timeout value for SSH connections.
+In this case, {productname} will use `salt_presence_ping_timeout` to override the default timeout value for SSH connections.
