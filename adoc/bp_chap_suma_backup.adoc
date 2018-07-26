@@ -21,7 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // SUSE Manager Entities
-:productname:
+:productname: 
 :susemgr: SUSE Manager
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
@@ -84,13 +84,15 @@ Since [path]``/var/spacewalk/``
 
 If you are running SUSE Manager in a disconnected setup [path]``/var/spacewalk/``__must__ be backed up.
 
-Backing up only these files and directories requires reinstalling the {productname} RPMs and re-registering {productname}
+Backing up only these files and directories requires reinstalling the {susemgr}
+RPMs and re-registering {susemgr}
 .
 In addition, packages need to be resynchronized using the [command]``mgr-sync`` tool.
 Finally, you have to reinstall the [path]``/root/ssl-build/rhn-org-httpd-ssl-key-pair-MACHINE_NAME-VER-REL.noarch.rpm``
 .
 
-Another method is to back up all the files and directories mentioned above but reinstall the {productname} without re-registering it.
+Another method is to back up all the files and directories mentioned above but reinstall the {susemgr}
+without re-registering it.
 During the installation, cancel or skip the registration and SSL certificate generation sections.
 
 The most comprehensive method is to back up the entire machine.
@@ -98,7 +100,8 @@ This saves time in downloading and reinstalling but requires additional disk spa
 
 [NOTE]
 ====
-Regardless of the backup method used, when restoring {productname} from a backup, you must run the following command to schedule the recreation of search indexes the next time the [command]``rhn-search`` service is started:
+Regardless of the backup method used, when restoring {susemgr}
+from a backup, you must run the following command to schedule the recreation of search indexes the next time the [command]``rhn-search`` service is started:
 
 ----
 rcrhn-search cleanindex
@@ -106,63 +109,52 @@ rcrhn-search cleanindex
 ====
 
 [[config.suma.database.smdba]]
-== Administering The SUSE Manager Database with (smdba)
+== Administering the Database with smdba
 
-{productname}
-provides the [command]``smdba`` command for managing the installed database.
+The [command]``smdba`` tool is used for managing a local PostgreSQL database.
+It allows you to back up and restore your database, and manage backups.
+It can also be used to check the status of your database, and perform administration tasks, such as restarting.
 
-The [command]``smdba`` command works on local databases only, not remote.
-This utility allows you to do several administrative tasks like backing up and restoring the database, everything from creating, verifying, and restoring backups to obtain the database status and restart the database if necessary.
-The [command]``smdba`` command supports postgres databases.
+[NOTE]
+====
+The [command]``smdba`` tool works with local PostgreSQL databases only, it will not work with remotely accessed databases, or Oracle databases.
+====
 
-.Running [command]``smdba`` Relies on [command]``sudo``Enablement
 [IMPORTANT]
 ====
-Running [command]``smdba`` relies on proper [command]``sudo`` configuration. [command]``sudo`` allows you to invoke [command]``smdba`` as a regular user and thus, you are save from executing unwanted system changes.
-
-For example, to allow the user [username]``admin``
- (the "`administrative UID`"
-) to execute [command]``smdba`` commands, and thus manipulating the underlying database with the "`operative
-                    UID`"
-, make sure something as follows is configured in [path]``/etc/sudoers``
-:
+The [command]``smdba`` tool requires [command]``sudo`` access, in order to execute system changes.
+Ensure you have enabled [command]``sudo`` access for the [username]``admin`` user before you begin, by checking the [path]``/etc/sudoers`` file for this line:
 
 ----
 admin   ALL=(postgres) /usr/bin/smdba
 ----
 
-With these settings [username]``admin``
- user will be allowed to access the target database account (``oracle`` or ``postgres``).
-
-For configuring [command]``sudo`` and its security implications, see the `sudo` and `sudoers` manpages and the extensive comments in the [path]``/etc/sudoers``
- configuration file.
 ====
 
 
-Find basic information about [command]``smdba`` in the `smdba` manpage.
+[[bp.sect.backup.smdba.admin]]
+== Administering Your Database with smdba
 
-.Restart Spacewalk Services When Connection is Lost
-[NOTE]
-====
-If you have stopped or restarted the database, Spacewalk services connections may be interrupted.
-In such a case, execute the following command:
-
-----
-``spacewalk-service`` restart
-----
-====
-
-[[config-smdb.start-and-stop]]
-== Starting and Stopping the Database
-
-
-There are three commands to start, stop, or retrieve the status of the database.
-These commands work with both databases.
-Use the following commands:
+Check the runtime status of your database with the [command]``smdba db-status`` command.
+This command will return either ``online`` or ``offline``:
 
 ----
 smdba db-status
 Checking database core...       online
+----
+
+To check the full connection to the database, use the [command]``smdba db-check`` command.
+Depending on your environment, this command will report on the status of listeners, in addition to connectivity status.
+
+----
+smdba db-check
+----
+
+Starting and stopping the database can be performed with [command]``smdba db-start`` and [command]``smdba db-stop``
+
+----
+smdba db-start
+Starting core...       done
 ----
 
 ----
@@ -171,111 +163,103 @@ Stopping the SUSE Manager database...
 Stopping core:         done
 ----
 
-----
-smdba db-status
-Checking database core...       offline
-----
-
-----
-smdba db-start
-Starting core...       done
-----
-
-[[config-smdb.create-backup]]
-== Backing up the Database
-
-smdba::
-The [command]``smdba`` command performs a __continuous
-archiving backup__.
-
-Hot Backup::
-The term hot backup refers to a backup performed when both the database and SUSE Manager are running.
-
-Cold Backup::
-The term cold backup refers to a backup performed when both the database and SUSE Manager services are shutdown.
+[[bp.sect.backup.smdba.performbackup]]
+== Database Backup with smdba
 
 
-.Database Backup Space Requirements
-[IMPORTANT]
-====
-For both a running/hot database backup or an automated backup of the database using cron you must have at least 3 times the amount of space of the current database.
-Check current database space usage with [command]``df -h`` on [path]``/var/lib/pgsql/``
-.
-====
+The [command]``smdba`` tool performs a continuous archiving backup.
+This backup method combines a log of every change made to the database during the current session, with a more traditional series of backup files.
+When a crash occurs, the database state is first restored from the most recent backup file on disk, then the log of the current session is replayed, to bring the database back to a current state.
+A continuous archiving backup can be performed whether the database and {productname} is running (hot) or shut down (cold).
+
+This method of backing up is stable and generally creates consistent snapshots, however it can take up a lot of storage space.
+Ensure you have at least three times the current database size of space available for backups.
+You can check your current database space usage by navigating to [path]``/var/lib/pgsql/`` and running [command]``df -h``.
 
 
-To perform a hot database backup for postgresql, do the following:
 
-.Procedure: Performing a Hot Backup
-. Allocate permanent space on your remote storage, which you use for general backups (NAS, iSCSI target, etc.). For example:
-+
-
-----
-/var/spacewalk/db-backup
-----
-+
-.Backup on NFS Share
-NOTE: A backup from the SUSE Manager server is not required when the mount point for [path]``/var/spacewalk``
- is on an NFS share.
-+
+=== Performing a Cold Database Backup
 
 
-+
-This directory should always be the same and never change.
-It will be a permanent target to store new backups and restore from it during a disaster recovery.
-. Create a directory with the correct permissions in your target directory, e.g., with using [command]``sudo``:
-+
-
-----
-sudo -u postgres mkdir /var/spacewalk/db-backup
-----
-+
-Alternatively, as {rootuser}
-:
-+
-
-----
-install -d -o postgres /var/spacewalk/db-backup
-----
-+
-Or:
-+
-
-----
-mkdir /var/spacewalk/db-backup
-chown postgres:postgres /var/spacewalk/db-backup
-----
-. If you want to create a backup for the first time, run:
-+
-
-----
-``smdba`` backup-hot --enable=on --backup-dir=/var/spacewalk/db-backup
-----
-+
-This command performs a restart of the postgresql database.
-If you want to renew the basic backup, use the same command.
-. Perform the hot database backup:
-+
-
-----
-smdba backup-hot --backup-dir=/var/spacewalk/db-backup
-...
-----
-+
-If the command exits without any errors, find the backup files in your [path]``/mnt/backup/database``
-directory.
+A cold, or offline, database backup occurs when the service is completely shut down at the time of the backup.
+This method can reduce the risk of incomplete backups, but does require significant downtime.
+We recommend that you perform a cold backup after initial installation and configuration, and then at weekly or monthly intervals during operation, but rely on hot backups for daily or hourly intervals.
+Additionally, we recommend that you consider backing up your database to an NFS share location, which can itself be backed up.
 
 
-.Performing a Cold Backup
-[TIP]
-====
+<!-- TODO: Fixme LKB -->
 When using smdba, you should never require a cold backup.
 You may perform a cold backup once after initial SUSE Manager installation and configuration. {suse}
 recommends creating a full-backup once a month or weekly and an additional incremental backup for single days.
 Moving [path]``/var/spacewalk``
  to an NFS share that is centrally backed-up, will save you alot of time when a restore is required.
 The NFS share may also be used during the migration from SUSE Manager 2.1 to SUSE Manager 3.
-====
+
+
+<!-- TODO: Fixme LKB -->
+.Procedure: Performing a Cold Backup
+. Step 1
+. Step 2
+. FIXME
+
+
+
+=== Performing a Hot Database Backup
+
+
+A hot, or dynamic, database backup occurs when the service continues normal operation while the backup occurs.
+This method can sometimes result in data loss or conflicts, and can effect database performance while the operation is underway.
+However, hot backups also enable much finer-grained archives, and can often result in seamless restoration from failure, in addition to maintaining uptime.
+We recommend that you perform a hot backup on daily or hourly intervals, to serve as a more complete record between cold backups.
+Additionally, we recommend that you consider backing up your database to an NFS share location, which can itself be backed up.
+
+
+.Procedure: Performing a Hot Backup
+. Allocate permanent storage space for your backup. In this procedure, we will be using an NFS share located at [path]``/var/spacewalk/``.
+This will become a permanent target for your backup, so ensure it will remain accessible by your server at all times.
+. In your backup location, create a directory for the backup:
++
+
+----
+sudo -u postgres mkdir /var/spacewalk/db-backup
+----
++
+
+Or, as root:
++
+
+----
+install -d -o postgres /var/spacewalk/db-backup
+----
+
+. Ensure you have the correct permissions set on the backup location:
++
+
+----
+chown postgres:postgres /var/spacewalk/db-backup
+----
++
+
+. To run a backup for the first time, run the [command]``smdba backup-hot`` command with the [command]``enable`` option set.
+This will create the backup in the specified directory, and restart the database:
++
+
+----
+smdba backup-hot --enable=on --backup-dir=/var/spacewalk/db-backup
+----
++
+
+. After the initial hot backup has occurred, you can run subsequent hot backups without requiring a database restart:
++
+
+----
+smdba backup-hot --backup-dir=/var/spacewalk/db-backup
+----
++
+
+. Check that the backup files exist in the [path]``/mnt/backup/database`` directory, to ensure that your backup has been successful.
+
+
 
 [[smdba.automatic.backup.with.cron]]
 == Automatic Backup with cron
@@ -368,7 +352,8 @@ Because [command]``smdba`` makes automatic running database backups, it allows r
 == Archive Log Settings
 
 
-In {productname} with an embedded database, archive logging is enabled by default.
+In {susemgr}
+with an embedded database, archive logging is enabled by default.
 This feature allows the database management tool [command]``smdba`` to perform hot backups.
 
 With archive log enabled, even more data is stored on the hard disk:
@@ -441,7 +426,7 @@ For example if your database storage space is running low.
 The following procedure will guide you through moving the database to a new location for use by SUSE Manager.
 
 .Procedure: Moving the Database
-. The default storage location for {productname} is: [path]``/var/lib/pgsql/`` . You would like to move it, for example to: [path]``/storage/postgres/`` . To begin, stop the running database with:
+. The default storage location for {susemgr} is: [path]``/var/lib/pgsql/`` . You would like to move it, for example to: [path]``/storage/postgres/`` . To begin, stop the running database with:
 +
 
 ----
