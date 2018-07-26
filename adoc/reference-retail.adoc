@@ -1,12 +1,58 @@
-:smr: SUSE Manager for Retail
-:susemgr: SUSE Manager
-
+[[ref.retail]]
 = {smr}
+ifdef::env-github,backend-html5,backend-docbook5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+:linkattrs:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Enterprise Linux
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:susemgr: SUSE Manager
+:susemgrproxy: SUSE Manager Proxy
+:smr: SUSE Manager for Retail
+:productnumber: 3.2
+:saltversion: 2018.3.0
+:webui: WebUI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+:ay: AutoYaST
+endif::[]
+// Asciidoctor Front Matter
+:doctype: book
+:sectlinks:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:imagesdir: images
 
+[[ref.retail.intro]]
 == Introduction
 
 This document provides overview about {smr} solution and guidance on setting up complete {smr} stack.
 
+[[ref.retail.whatis]]
 == What is {smr}
 
 {smr} is an extension of {susemgr} specifically addressing needs of organizations requiring automated image based deployment of servers, workstations, point of sale terminals and other devices.
@@ -14,6 +60,7 @@ It allows administrators to configure network topologies of selected servers, bu
 
 {smr} is a spiritual successor of SUSE Linux Enterprise Point of Sale product with similar architecture design and target users.
 
+[[ref.retail.architecture]]
 == Architecture
 
 //TODO: picture
@@ -23,6 +70,7 @@ It allows administrators to configure network topologies of selected servers, bu
 2. layer consists of one or more servers providing local network services and boot server services. These servers are generally referred to as branch servers
 3. layer consists of deployed machines e.g. point of sale machines. These machines are generally referred to as terminals
 
+[[ref.retail.generic.installation]]
 === Generic installation workflow
 
 This is a checklist of tasks to prepare generic {smr} stack:
@@ -36,6 +84,7 @@ This is a checklist of tasks to prepare generic {smr} stack:
 - register branch server to {susemgr} using salt
 5. assign and configure branch server formulas
 
+[[ref.retail.generic.usage]]
 === Generic Workflow
 Having installed and configured {smr} infrastructure, generic workflow is as follows:
 
@@ -43,17 +92,22 @@ Having installed and configured {smr} infrastructure, generic workflow is as fol
 2. synchronize images from {susemgr} server to branch servers
 3. boot terminal
 
+[[ref.retail.server.roles]]
 === Servers and their roles
 
+[[ref.retail.server.suma]]
 ==== Central {susemgr}
 Central {susemgr} server contains the information about infrastructure, network topologies, inventory necessary to automate image deployment and day to day operations of branches and terminals. These data includes, but are not limited to, database entries of registered systems, salt pillar data about build images, image assignments, partitioning, network setup, network services, etc.
 
+[[ref.retail.server.build_host]]
 ==== Build host
 Build host can be arbitrary SLES12SP3 based server or virtual machine. This server is used to build OS Images in secure manner. See <<advanced_topics_image_management.adoc#at.images.kiwi.buildhost>>
 
+[[ref.retail.server.branch]]
 ==== Branch server
 Branch servers are usually located near terminals i.e. in individual stores or branch offices. Provide necessary services for PXE boot and acts as an image cache, salt broker, rpm proxy. Depending on the configuration Branch server can also manage local networking, provide DHCP and DNS service.
 
+[[ref.retail.branch.network.options]]
 === Branch network topologies
 
 //TODO: pictures
@@ -67,10 +121,7 @@ Branch server is managing internal network, provides DHCP, DNS, PXE, FTP and TFT
 +
 Branch server does not manage network, may or may not provide DHCP and DNS services, however acts as a PXE boot server and provides FTP and TFTP services.
 
-== Prerequisites for Installation
-
-//TODO: SCC info, media info
-
+[[ref.retail.hardware]]
 == Hardware requirements
 
 * Central {susemgr}:
@@ -89,6 +140,7 @@ only x86_64 architecture is supported by {smr}
 +
 only x86_64 architecture is supported by {smr}
 
+[[ref.retail.network]]
 === Network Requirements
 
 * Central {susemgr} server requires reasonably fast WAN connect
@@ -101,8 +153,51 @@ Branch server requires a WAN connection where central {susemgr} server is reacha
 * Terminals require LAN connection to branch shared or dedicated network
 //TODO add wifi support once done
 
+[[ref.retail.installation]]
 == Installation
 
+//TODO: how we will install it? Is there a pattern for it?
+[[ref.retail.installation.suma]]
+=== Installation of central {susemgr} server
+
+1. Refer to <<quickstart3_chap_install_overview.adoc>> how to install underlying {susemgr}.
+2. Make sure {smr} formulas are installed.
++
+{smr} formulas consists of several packages that are available from {susemgr} media
++
+.{smr} formula packages
+----
+bind-formula
+branch-network-formula
+dhcpd-formula
+image-sync-formula
+pxe-formula
+tftp-formula
+vsftpd-formula
+----
++
+If any package is missing, install missing package using `zypper` call
++
+[source,sh]
+----
+zypper install $package_name
+----
++
+and synchronize salt filesystem and salt modules
++
+[source,sh]
+----
+salt-run fileserver.update
+salt '*' saltutil.sync_all
+----
+
+[[ref.retail.installation.branch]]
+=== Installation of branch servers
+
+//TODO: change to proxy once ready
+Branch servers are installed as regular SLES12SP3 system registered to {susemgr} via salt minion.
+
+[[ref.retail.images]]
 == Images
 
 === Preparing customized image
@@ -116,10 +211,107 @@ If you are creating Kiwi template from scratch, please make sure `image/preferen
 
 Once the image is build, it will be automatically transferred to {susemgr} server
 
+[[ref.retail.branch.config]]
 == Branch server configuration
 
-// Formulas
-// Dedicated NET vs shared NET
+This section assumes:
+
+- central {susemgr} is installed and configured
+- {smr} formulas are present on central {susemgr}
+- branch server is installed and registered using salt in central {susemgr}
+
+Branch server can be configured in many different ways. In this guide two widely used options are presented.
+
+[[ref.retail.config.dedicated]]
+=== Branch server with dedicated LAN for terminals
+
+In this configuration, Branch server has at least two network interfaces. One network interface connected to WAN with the central {susemgr} server reachable. The other network interface is connected to isolated LAN which terminals are connected to.
+
+Branch server is the provider of DHCP, DNS, TFTP, PXE and FTP services. These services are configured by respective {smr} formulas. Enable these formulas for selected Branch server in {susemgr} web user interface. For information how to do so, refer to <<bp_chap_getting_started_with_salt_formulas.adoc#best.practice.salt.formulas.using>>.
+
+==== Branch Network formula for dedicated LAN
+
+This formula configures networking of Branch server.
+
+- Keep `Dedicated Nic` checked
+- Enter name of the network device which is connected to the internal LAN
+- Static IP address to be assigned to Branch server on internal LAN
+- Network mask of the internal LAN
+- Check `Enable route` if you want Branch server to route traffic from internal LAN to WAN
+- Check `Enable NAT` if you want Branch server to translate addresses from internal LAN to WAN
+- Select DNS forwarder mode. Select `bind` to ensure Branch provided DNS can resolve WAN domain names
+- Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
+- Server directory specify working directory for {smr}
+- Server directory user and group specify directory owner and group of {smr} working directory
+
+==== DHCPD
+
+This formula configures DHCP service at Branch server
+
+[IMPORTANT]
+.Generic configuration
+====
+- Listen interface must be the same entered in `Branch Network` formula
+- Domain Name Servers must be configured to point to Branch server
+====
+
+[IMPORTANT]
+.Subnet configuration
+====
+- Branch static IP address must be reachable from Network provided by DHCP service
+- Next server must be configured to point to Branch server
+- Be sure configured ranges match configured network and netmask
+====
+
+If terminals MAC addresses are known beforehand, host configuration can be specified for static IP address assignment.
+
+If Branch server acts as a router for internal LAN, `router` option must point to Branch server.
+
+Now continue at <<ref.retail.config.common>>
+
+[[ref.retail.config.shared]]
+=== Branch server with shared network for terminals
+
+In this configuration, Branch server has only one network interface card which is connected to network used to connect to central {susemgr} as well as to terminals.
+
+Branch server is provider of DNS, TFTP, PXE and FTP services. DHCP may or may not be provided by branch server.
+
+[IMPORTANT]
+====
+If DHCP service is not provided by Branch server, external DHCP configuration must contain:
+
+- `next-server` option must point to the Branch server for PXE boot to work
+- `filename` option must correctly identify network boot program (by default `/boot/pxelinux`)
+- `domain-name-servers` option must point to the Branch server for correct host name resolution
+====
+
+==== Branch Network formula for shared network
+
+This formula configures networking of Branch server.
+
+- Keep `Dedicated Nic` unchecked
+- Select which services should be enabled on Branch server's firewall.
++
+IMPORTANT: DNS, TFTP and FTP services should be enabled on Branch server's firewall.
+- Select DNS forwarder mode. Select `bind` to ensure Branch provided DNS can resolve WAN domain names
+- Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
+- Server directory specify working directory for {smr}
+- Server directory user and group specify directory owner and group of {smr} working directory
+
+Now continue at <<ref.retail.config.common>>
+
+[[ref.retail.config.common]]
+=== Common Branch server configuration
+
+==== DNS
+
+==== TFTP
+
+==== PXE
+
+==== VSFTP
+
+[[ref.retail.image.sync]]
 === Images synchronization
 
 Synchronization is done by applying salt state 'image-sync'
@@ -130,7 +322,9 @@ Synchronization is done by applying salt state 'image-sync'
 salt $branch_server_id state.apply image-sync
 ----
 
+[[ref.retail.saltboot]]
 == Image deployment configuration and terminal deployment
+
 === Partitioning and Image assignement for specific hardware type
 // HWTYPE paritioning and image assignement
 
