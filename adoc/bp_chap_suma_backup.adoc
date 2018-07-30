@@ -77,6 +77,7 @@ If you are running {productname} in a disconnected setup [path]``/var/spacewalk/
 
 If you want to only back up the required files and directories, use this list:
 
+* [path]``/var/spacewalk/``
 * [path]``/etc/sysconfig/rhn/``
 * [path]``/etc/rhn/``
 * [path]``/etc/sudoers``
@@ -194,7 +195,7 @@ We recommend you run a manual database backup immediately after installation, or
 
 [NOTE]
 ====
-When [command]``smdba`` is run for the first time, or if you have changed the location of the database, it will need to reboot your database after performing the archive.
+When [command]``smdba`` is run for the first time, or if you have changed the location of the backup, it will need to restart your database before performing the archive.
 This will result in a small amount of downtime.
 Note that regular database backups will not require any downtime.
 ====
@@ -227,19 +228,11 @@ chown postgres:postgres /var/spacewalk/db-backup
 +
 
 . To run a backup for the first time, run the [command]``smdba backup-hot`` command with the [command]``enable`` option set.
-This will create the backup in the specified directory, and restart the database:
+This will create the backup in the specified directory, and, if necessary, restart the database:
 +
 
 ----
 smdba backup-hot --enable=on --backup-dir=/var/spacewalk/db-backup
-----
-+
-
-. After the initial hot backup has occurred, you can run subsequent hot backups without requiring a database restart:
-+
-
-----
-smdba backup-hot --backup-dir=/var/spacewalk/db-backup
 ----
 +
 
