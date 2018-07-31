@@ -76,10 +76,10 @@ It allows administrators to configure network topologies of selected servers, bu
 This is a checklist of tasks to prepare generic {smr} stack:
 
 1. install and configure central {susemgr} server
-2. install {smr} related pattern? formula? TODO: PM,PrjM
+2. install {smr} pattern on central {susemgr} server
 3. install and configure SLES12SP3 to be used as a build host
 - register build host to {susemgr} using salt
-- set build host as a OS Image build host in {susemgr} web user interface and apply highstate
+- set build host as an OS Image build host in {susemgr} web user interface and apply highstate
 4. install and configure branch server
 - register branch server to {susemgr} using salt
 5. assign and configure branch server formulas
@@ -161,7 +161,8 @@ Branch server requires a WAN connection where central {susemgr} server is reacha
 === Installation of central {susemgr} server
 
 1. Refer to <<quickstart3_chap_install_overview.adoc>> how to install underlying {susemgr}.
-2. Make sure {smr} formulas are installed.
+2. Install {smr} pattern
+3. Make sure all {smr} formulas are installed.
 +
 {smr} formulas consists of several packages that are available from {susemgr} media
 +
@@ -190,6 +191,27 @@ and synchronize salt filesystem and salt modules
 salt-run fileserver.update
 salt '*' saltutil.sync_all
 ----
+
+When all packages are present on central {susemgr} server `saltboot` runner needs to be manually configured by providing `Salt` API access to {susemgr} system.
+
+[source,ini]
+./etc/salt/master.d/spacewalk.conf
+----
+spacewalk:
+    localhost:
+        username: $administration_user
+        password: $administration_password
+----
+
+In order to avoid putting overall {susemgr} administration credentials to the configuration files, any administration account for given organization is sufficient. 
+
+[IMPORTANT]
+====
+To finish configuration of central {susemgr} server, restart of salt master service is required.
+Restart salt master service now.
+
+`systemctl restart salt-master`
+====
 
 [[ref.retail.installation.branch]]
 === Installation of branch servers
@@ -325,10 +347,59 @@ salt $branch_server_id state.apply image-sync
 [[ref.retail.saltboot]]
 == Image deployment configuration and terminal deployment
 
-=== Partitioning and Image assignement for specific hardware type
+This section expects:
+- configured central {susemgr}
+- configured branch server
+- `saltboot` PXE image
+
+In order to deploy a terminal, several more configuration steps are required:
+
+- create a hardware type group for terminal hardware type
+- assign and configure `saltboot` formula for given {susemgr} group
+
+Before terminal is booted and registered for the first time, there is no system entry in {susemgr} database. For this reason, hardware type groups are used to determine what image should be deployed on specific terminal.
+
+Each terminal has a specific hardware type. This hardware type is constructed from SMBios information provided by terminal hardware and contain information about the manufacturer and product name.
+
+[NOTE]
+.Hardware type construction
+====
+Hardware type is a concatenation of system manufacturer and system product name using `-` as a delimiter.
+====
+
+=== Hardware type groups
+
+Hardware type groups are regular {susemgr} system groups with two important details.
+
+- Hardware type group follows very specific naming
+- Saltboot formula is assigned and configured
+
+[IMPORTANT]
+.Hardware type group naming
+====
+Hardware type groups follows naming:
+
+- prefix "HWTYPE:"
+- appendix is  hardware type of the terminals
+- any spaces or non alphanumeric characters are removed (except delimiters `_`, `-`)
+
+Example for system manufacturer 'POS Vendor' and system product name 'Terminal 1'. The resulting hardware type group is **HWTYPE:POSVendor-Terminal1**.
+====
+
+=== Saltboot formula
+Once the correct hardware type group is created, `saltboot` formula must be enabled and configured for this group. Refer to <<bp_chap_getting_started_with_salt_formulas.adoc#best.practice.salt.formulas.using>> how to work with {susemgr} formulas.
+
+This formula specifies partitioning and image to deploy for given terminal hardware type.
+// TODO: picture
+
+
+
+=== Partitioning and Image assignment for specific hardware type
 // HWTYPE paritioning and image assignement
 
-=== Partitioning and Image assignement for specific machine
+=== Partitioning and Image assignment for specific machine
+
+
 
 // Terminal booting
 === First terminal boot
