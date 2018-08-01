@@ -24,6 +24,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :saltversion: 2018.3.0
 :webui: WebUI
 // SUSE Product Entities
+:productname:  
 :sles-version: 12
 :sp-version: SP3
 :jeos: JeOS
@@ -72,7 +73,7 @@ Used when {productname} is configured as a PXE server and allows installation an
 Inbound / TCP / HTTP
 +
 
-All {webui}, client, and proxy server requests travel via HTTP or HTTPS.
+Client and proxy server requests travel via HTTP or HTTPS.
 
 80::
 Outbound / TCP / HTTP
@@ -90,7 +91,7 @@ All {webui}, client, and proxy server requests travel via HTTP or HTTPS.
 Outbound / TCP / HTTPS
 +
 
-{productname} uses this port to reach {scc}(unless running in a disconnected mode with RMT or SMT{mdash} as described in <<disconnect-setup>>).
+{productname} uses this port to reach {scc} (unless running in a disconnected mode with RMT or SMT{mdash}as described in <<disconnect-setup>>).
 
 5222::
 Inbound / TCP / osad
@@ -109,12 +110,17 @@ Inbound / TCP / salt
 +
 
 Required by the Salt-master to accept communication requests via TCP from minions.
+The connection is initiated by the minion and remains open to allow the master to send commands.
+This port uses a publish/subscribe topology; the minion subscribes to notifications from the master.
 
 4506::
 Inbound / TCP / salt
 +
 
 Required by the Salt-master to accept communication requests via TCP from minions.
+The connection is initiated by the minion and is open only when needed.
+Usually, minions will open this port when they have to report results to the master, such as when a command received on port 4505 has finished.
+This port uses a request/response topology; the minion sends requests to the master.
 
 25151::
 TCP
@@ -122,7 +128,7 @@ TCP
 
 For cobbler.
 
-.Internally Used Ports on {productname}Server
+.Internally Used Ports on {productname} Server
 2828::
 Internal /
 +
@@ -185,6 +191,14 @@ So if process A opens a TCP connection to process B (for example, port 22), then
 ====
 
 
+This image is a graphical representation of the ports used in {productname}:
+
+image::ports_diagram.png[]
+
+Port 80 (http) is not used to serve the {webui}, and is closed in most installations.
+Port 80 is used temporarily for some bootstrap repositories and automated installations.
+
+
 
 [[advanced.topics.app.ports.proxy]]
 == {productname} Proxy Server
@@ -220,7 +234,7 @@ For push actions with the server.
 [[advanced.topics.app.ports.client]]
 == {productname} Client
 
-.Ports to Open on {productname}Client
+.Ports to Open on {productname} Client
 22::
 Inbound / SSH
 +

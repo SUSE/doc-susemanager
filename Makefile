@@ -13,6 +13,7 @@ xml-uyuni: xml/MAIN-manager.xml uyuni-images
 
 suma-images: adoc/images/suma/*
 	@ccecho result "Linking suma images to DAPS expected image directories..."
+	sleep 1
 	mkdir -p images/src
 	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/suma/*.png .)
 	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/suma/*.svg .)
@@ -61,7 +62,7 @@ uyuni-html: uyuni xml-uyuni
 # Build SUMA docs and link images to the suma folder
 suma-html: suma xml-suma
 	daps -d DC-create-all html
-	(cd build/create-all/html/create-all; rm -rf images; ln -sf ../../../../adoc/images/suma/ .)
+	(cd build/create-all/html/create-all; ln -sf ../../../../../adoc/images/suma .)
 
 # Make SUMA Packages for OBS
 suma-dist: xml-suma
@@ -88,8 +89,8 @@ suma-reference-pdf:
 	daps -d DC-susemanager-reference pdf; time
 
 #### Build SUMA HTML ####
-suma-html: xml-suma
-	daps -d DC-create-all html; time
+#suma-html: xml-suma
+#	daps -d DC-create-all html; time
 
 suma-advanced-html: xml-suma
 	daps -d DC-susemanager-advanced-topics html; time

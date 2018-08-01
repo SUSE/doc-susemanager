@@ -21,6 +21,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
 // {productname} Entities
+:productname:
 :susemgrproxy: {productname} Proxy
 :productnumber: 3.2
 :saltversion: 2018.3.0
@@ -50,7 +51,7 @@ endif::[]
 [[at.introduction.cobbler]]
 == Introduction
 
-{susemgr} features the Cobbler server, which allows administrators to centralize system installation and provisioning infrastructure.
+{productname} features the Cobbler server, which allows administrators to centralize system installation and provisioning infrastructure.
 Cobbler is an installation server that provides various methods of performing unattended system installations.
 It can be used on server, workstation, or guest systems, in full or para-virtualized environments.
 
@@ -60,7 +61,7 @@ This section explains some of the supported features of Cobbler, including:
 * Installation environment analysis using the [command]``cobbler check`` command
 * Multi-site installation server configuration using the [command]``cobbler replicate`` command
 * Virtual machine guest installation automation with the [command]``koan`` client-side tool
-* Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command (for {susemgr} systems with x86_64 architecture)
+* Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command (for {productname} systems with x86_64 architecture)
 
 For more detailed Cobbler documentation, see http://cobbler.github.io/manuals/.
 
@@ -75,7 +76,7 @@ For more detailed Cobbler documentation, see http://cobbler.github.io/manuals/.
 [[advanced.topics.cobbler.reqs]]
 == Cobbler Requirements
 
-To use Cobbler for system installation with PXE, you will require a TFTP server. {susemgr} installs a TFTP server by default.
+To use Cobbler for system installation with PXE, you will require a TFTP server. {productname} installs a TFTP server by default.
 To PXE boot systems, you will require a DHCP server, or have access to a network DHCP server. Edit the [path]``/etc/dhcp.conf`` configuration file to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
 
 
@@ -100,7 +101,7 @@ All configurable settings are explained in detail in the [path]``/etc/cobbler/se
 [NOTE]
 .Supported Languages
 ====
-If {susemgr} complains that language ``en`` was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the [option]``lang`` parameter in the [path]``/etc/cobbler/settings`` file, or add a valid parameter such as ``en_US``.
+If {productname} complains that language ``en`` was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the [option]``lang`` parameter in the [path]``/etc/cobbler/settings`` file, or add a valid parameter such as ``en_US``.
 
 For more on this topic, see https://www.suse.com/support/kb/doc?id=7018334.
 ====
@@ -204,7 +205,7 @@ Alternatively, use the [command]``net-edit`` subcommand, which will also perform
 [[advanced.topics.cobbler.reqs.tftp]]
 === Xinetd and TFTP
 
-{susemgr} uses the [daemon]``atftpd`` daemon, but it can also use Xinetd and TFTP.
+{productname} uses the [daemon]``atftpd`` daemon, but it can also use Xinetd and TFTP.
 The [daemon]``atftpd`` daemon is the recommended method for PXE serviices, and is installed by default.
 Usually, you do not have to change its configuration, but if you have to, use the {yast} Sysconfig Editor.
 
@@ -220,13 +221,13 @@ Start {yast} and use menu:System[Services Manager] to configure the [daemon]``Xi
 [[advanced.topics.cobbler.reqs.sync.tftp]]
 === Syncing TFTP Contents to {productname} Proxies
 
-It is possible to synchronize Cobbler-generated TFTP contents to {susemgr} proxies to perform PXE booting using proxies.
+It is possible to synchronize Cobbler-generated TFTP contents to {productname} proxies to perform PXE booting using proxies.
 
 
 
 ==== Installation
 
-On the {susemgr} Server as the root user, install the [systemitem]``susemanager-tftpsync`` package:
+On the {productname} Server as the root user, install the [systemitem]``susemanager-tftpsync`` package:
 
 ----
 zypper install susemanager-tftpsync
@@ -253,7 +254,7 @@ For more information, see the output of [command]``configure-tftpsync.sh --help`
 
 ==== Configuring {productname} Server
 
-As the root user, execute [path]``configure-tftpsync.sh`` on {susemgr} Server:
+As the root user, execute [path]``configure-tftpsync.sh`` on {productname} Server:
 
 ----
 configure-tftpsync.sh proxy1.example.com proxy2.example.com
@@ -280,7 +281,7 @@ If you reinstall an already configured proxy and want to push all the files agai
 
 ==== Requirements
 
-The {susemgr} Server must be able to access the {susemgrproxy} systems directly.
+The {productname} Server must be able to access the {susemgrproxy} systems directly.
 You cannot push using a proxy.
 
 
@@ -290,7 +291,7 @@ You cannot push using a proxy.
 
 Before starting the Cobbler service, run a check to make sure that all the prerequisites are configured according to your requirements using the [command]``cobbler check`` command.
 
-If configuration is correct, start the {susemgr} server with this command:
+If configuration is correct, start the {productname} server with this command:
 
 ----
 /usr/sbin/spacewalk-service start
@@ -413,10 +414,10 @@ For more options, such as setting hostname or IP addresses, refer to the Cobbler
 [[advanced.topics.cobbler.templates]]
 == Using Cobbler Templates
 
-The {susemgr} web interface allows you to create variables for use with Kickstart distributions and profiles.
+The {productname} web interface allows you to create variables for use with Kickstart distributions and profiles.
 For more information on creating Kickstart profile variables, refer to <<s4-sm-system-kick-details-variables>>.
 
-Kickstart variables are part of an infrastructure change in {susemgr} to support templating in Kickstart files.
+Kickstart variables are part of an infrastructure change in {productname} to support templating in Kickstart files.
 Kickstart templates are files that describe how to build Kickstart files, rather than creating specific Kickstarts.
 The templates are shared by various profiles and systems that have their own variables and corresponding values.
 These variables modify the templates and a template engine parses the template and variable data into a usable Kickstart file.
@@ -623,11 +624,11 @@ Once a bare metal system has been provisioned in this way, it will appear in the
 [[advanced.topics.cobbler.baremetal.requirements]]
 === Bare Metal Provisioning System Requirements
 
-To successfully provision a bare metal system, you will require a fully patched {susemgr} server, version 2.1 or higher.
+To successfully provision a bare metal system, you will require a fully patched {productname} server, version 2.1 or higher.
 
 The system to be provisioned must have x86_64 architecture, with at least 1&#160;GB RAM, and be capable of PXE booting.
 
-The server uses TFTP to provision the bare metal client, so the appropriate port and networks must be configured correctly in order for provisioning to be successful. In particular, ensure that you have a DHCP server, and have set the [option]``next-server`` parameter to the {susemgr} server IP address or hostname.
+The server uses TFTP to provision the bare metal client, so the appropriate port and networks must be configured correctly in order for provisioning to be successful. In particular, ensure that you have a DHCP server, and have set the [option]``next-server`` parameter to the {productname} server IP address or hostname.
 
 
 [[advanced.topics.cobbler.baremetal.enabling]]
@@ -668,11 +669,11 @@ If a bare metal system on the network is not automatically added to the [guilabe
 
 * You must have the [path]``pxe-default-image`` package installed.
 * File paths and parameters must be configured correctly. Check that the [path]``vmlinuz0`` and [path]``initrd0.img`` files, which are provided by [path]``pxe-default-image``, are in the locations specified in the [path]``rhn.conf`` configuration file.
-* Ensure the networking equipment connecting the bare metal system to the {susemgr} server is working correctly, and that you can reach the {susemgr} server IP address from the server.
+* Ensure the networking equipment connecting the bare metal system to the {productname} server is working correctly, and that you can reach the {productname} server IP address from the server.
 * The bare metal system to be provisioned must have PXE booting enabled in the boot sequence, and must not be attempting to boot an operating system.
 * The DHCP server must be responding to DHCP requests during boot. Check the PXE boot messages to ensure that:
 ** the DHCP server is assigning the expected IP address
-** the DHCP server is assigning the the {susemgr} server IP address as [option]``next-server`` for booting.
+** the DHCP server is assigning the the {productname} server IP address as [option]``next-server`` for booting.
 * Ensure Cobbler is running, and that the Discovery feature is enabled.
 
 If you see a blue Cobbler menu shortly after booting, discovery has started.

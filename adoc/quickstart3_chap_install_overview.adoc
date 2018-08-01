@@ -11,7 +11,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 //System Architecture
 :zseries: z Systems
 :ppc: POWER
-:ppc64le: ppc64le
+:ppc64le: IBM Power PC
 :ipf : Itanium
 :x86: x86
 :x86_64: x86_64
@@ -19,9 +19,12 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :rhel: Red Hat Linux Enterprise
 :rhnminrelease6: Red Hat Enterprise Linux Server 6
 :rhnminrelease7: Red Hat Enterprise Linux Server 7
+:productname: SUSE Manager
+:susemgr: SUSE Manager
 :susemgrproxy: {productname} Proxy
 :productnumber: 3.2
 //SUSE, SLES and JeOS
+:productname:  
 :sles-version: 12
 :sp-version: SP3
 :jeos: JeOS
@@ -30,8 +33,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :sle: SUSE Linux Enterprise
 :slsa: SLES
 :suse: SUSE
-:productname: SUSE Manager
-:susemgr: SUSE Manager
+
 endif::[]
 //Asciidoctor Front Matter
 :doctype: book
@@ -44,8 +46,10 @@ endif::[]
 :imagesdir: images
 
 
-This quick-start provides guidance on setting up {productname} server with KVM.
-You will learn the fundamentals of managing both traditional {productname} clients and Salt clients.
+
+This Getting Started Guide provides guidance on setting up {productname} server with KVM.
+You will learn the fundamentals of managing both traditional and Salt clients.
+
 This guide is intended for system administrators.
 
 ifdef::env-github,backend-html5[]
@@ -57,43 +61,53 @@ include::common_version_info.adoc[leveloffset=1]
 endif::[]
 
 [[quickstart.sect.introduction]]
-== What is {productname}?
+== Introduction to {productname}
 
-{productname} lets you manage large sets of Linux systems and keep them up to date.
-It provides automated software management, asset management, and system provisioning.
-{productname} is a solution for organizations requiring absolute control of maintenance and package deployment on their servers.
-{productname} allows administrators to maintain a high level of security while facilitating and advancing an organizations system life-cycle requirements.
+{productname} is a solution for organizations that require absolute control over maintenance and package deployment on their servers.
+It lets you manage large sets of Linux systems and keep them up to date, with automated software management, asset management, and system provisioning.
+{productname} allows you to maintain a high level of security while effectively managing system life-cycle requirements.
 
-Salt::
-The inclusion of _Salt_ in {productname} provides powerful event-driven configuration and management capabilities for fine grained control of any modern infrastructure.
+{productname} uses _Salt_ to provide event-driven configuration and management control.
+The Salt-master orchestrates thousands of Salt-minions ({productname} Clients) using remote execution.
 
-Salt-master::
-{productname} takes a commanding role as a Salt-master capable of orchestrating thousands of Salt-minions ({productname} Clients) via remote execution.
-
-Distribution Management::
 {productname} is fully compatible with Red Hat Satellite Server and offers seamless management of both {sle} and {rhel} client systems.
 
-[[quickstart.sect.bird.eye.view]]
-== Overview
+{productname} can be integrated with your network infrastructure in multiple ways.
+This book will guide you through an initial proof-of-concept setup, using these steps:
 
-{productname} may be integrated within your network infrastructure in multiple ways.
-In this guide you will perform the following steps for an initial test setup.
+. Install an operating system (either JeOS or {slsa}) for use with {productname}
+. Install {productname} Server
+. Register {productname} with {scc}
+. Perform initial setup of your {productname} Server
+. Register a traditional client
+. Register a Salt minion
 
-// TODO: This section is outdated, bring it up-to-date
-* Install {sls} with {productname} as an extension
-* Setup {productname} Server via YaST
-* Register {productname} with SCC (SUSE Customer Center)
-* Synchronize a repository channel for use with both traditional clients and Salt minions
-* Create an authentication key to act as an ID for the synced repository channel
-* Add the new authentication key to a bootstrap template script and connect a traditional client
-* Register a Salt minion with {productname} (salt-master) and assign it a channel with an authentication key
 
-[[quickstart.sect.prerequisites.install]]
+
+[[quickstart.sect.prereq]]
 == Prerequisites for Installation
 
-This guide requires that you have created an account with SCC ({scc}).
-During installation of both {sls} ({slsa}) and {productname}, SCC credentials will be requested and you must enter them to receive the latest packages and updates.
-The following procedure will guide you through obtaining your SCC _Organizational Credentials_.
+Before you begin your installation, ensure you have fulfilled these prerequisites:
+
+* Current {scc} organization credentials
+* Access to installation media for your chosen operating system
+* Your environment meets the hardware and networking requirements
+* You understand the supported client operating systems
+
+
+This section contains more information on each of these prerequisites.
+
+[NOTE]
+====
+{productname} {productnumber} is based on {slsa} {sles-version} {sp-version} as the host operating system.
+====
+
+
+[[quickstart.sect.prereq.scc]]
+=== Obtaining your SUSE Customer Center Credentials
+
+You will need to create an account with {scc} before you install {sls} and {productname}.
+To obtain your {scc} credentials:
 
 [[creating.scc.account.mgr]]
 .Procedure: Obtaining Your SCC Organization Credentials
@@ -102,32 +116,30 @@ The following procedure will guide you through obtaining your SCC _Organizationa
 . Log in to your new SCC account.
 . Under the btn:[Management tools] widget select btn:[Manage Users].
 . Click the btn:[Organization Credentials] tab.
-. Keep this information handy during {productname} setup.
-
-== Obtaining Installation Media
-
-After logging into your SCC account, you can find the installation images provided at the following addresses.
-
-Select one and continue reading:
-
-* Just Enough Operating System (JeOS) 290 MB  https://www.suse.com/products/server/jeos/[JeOS - Media Download]
-* {slsa} DVD image 3 GB https://www.suse.com/products/server/download/[SUSE Linux Enterprise Server - Media Download]
-
-.Just Enough Operating System (JeOS) vs. Full Media Image
-[NOTE]
-====
-The {slsa} JeOS image provides the quickest route for setup of a test environment.
-The JeOS image total size is about 290 MB.
-The alternative would be the 3 GB {slsa} DVD image.
-Both installation media are appropriate, but depend upon available bandwidth or your application needs.
-Both methods of installation will be covered in this guide.
-====
+. Record your login information for use during {productname} setup.
 
 
-[[quickstart.sect.software.requirements]]
-== Hardware Requirements
 
-Review the following table for {productname} hardware and software requirements.
+[[quickstart.sect.prereq.installmedia]]
+=== Obtaining Installation Media
+
+This book describes installation methods for both {jeos} and {sls}.
+The {jeos} image provides the quickest installation and setup, and is suitable for a test or proof of concept installation.
+Alternatively, {sls} provides a more robust installation, which requires a larger initial download.
+Choose your preferred operating system based on the type of environment you want to install, and the amount of bandwidth and time you have available.
+
+You can find installation images for {jeos} and {slsa} in your {scc} account.
+Log in, then navigate to the URL for your chosen operating system:
+
+* https://www.suse.com/products/server/jeos/[JeOS - Media Download]
+* https://www.suse.com/products/server/download/[SUSE Linux Enterprise Server - Media Download]
+
+
+
+[[quickstart.sect.prereq.hardware]]
+=== Hardware Requirements
+
+This table outlines hardware and software requirements on {x86_64} and {ppc64le} architecture.
 For installation on {zseries}, see:
 
 ifdef::env-github,backend-html5[]
@@ -138,70 +150,47 @@ ifndef::env-github[]
 endif::[]
 
 [cols="1,1", options="header"]
-.Hardware Requirements
+.Hardware Requirements for {x86_64} Architecture
 |===
 | Hardware                 | Recommended
-| CPU                      | Multi-core 64-bit CPU (x86_64, IBM {ppc})
-| RAM:                     | _Test Server_ Minimum 4 GB
-|                          | _Base Installation_ Minimum 16 GB
-|                          | _Production Server_ Minimum 32 GB
+| CPU                      | Multi-core 64-bit CPU
+| RAM:                     | _Test Server_ Minimum 8{nbsp}GB
+|                          | _Base Installation_ Minimum 16{nbsp}GB
+|                          | _Production Server_ Minimum 32{nbsp}GB
 | Disk Space:              | [path]``/`` _(root) The default JeOS root partition size of 24 GB is sufficient for this guide_
-|                          | [path]``/var/lib/pgsql`` Minimum 50 GB
-|                          | [path]``/var/spacewalk`` Minimum 50 GB per SUSE product and 250 GB per Red Hat product
+|                          | [path]``/var/lib/pgsql`` Minimum 50{nbsp}GB
+|                          | [path]``/var/spacewalk`` Minimum 50{nbsp}GB per SUSE product and 250{nbsp}GB per Red Hat product
 |===
 
-== Base Host Operating System
-
-{productname} {productnumber} is based on {slsa} {sles-version} {sp-version} as the host operating system.
-
-[[mgr.supported.client.systems]]
-== Supported Client Systems
-
-Clients with the following operating systems are supported for registration with {productname}.
-If you plan on using the new Salt features, ensure your clients are supported.
-
-.Supported Versions and SP Levels
-[NOTE]
-====
-Client operating system versions and SP levels must be under general support (normal or LTSS) to be supported with {productname}.
-For details on supported product versions, see https://www.suse.com/lifecycle.
-====
-
-[cols="1,1,1,1", options="header"]
-.Supported Client Systems
+[cols="1,1", options="header"]
+.Hardware Requirements for IBM POWER8 or POWER9 Architecture
 |===
-| Operating Systems                                    | Architecture                                 | Traditional Clients | Salt Clients
-| {sle} 11 SP4                                         | {x86}, {x86}_64, {ipf}, IBM {ppc}, {zseries} | Supported           | Supported
-| {sle} 12 SP3                                         | {x86}_64, IBM {ppc}({ppc64le}), {zseries}, ARM | Supported         | Supported
-| {sle} 15                                             | {x86}_64, IBM {ppc}({ppc64le}), {zseries}, ARM | Supported         | Supported
-|_Latest minor release {rhnminrelease6}_               | {x86}, {x86}_64                              | Supported           | Supported
-|_Latest minor release {rhnminrelease7}_               | {x86}_64                                     | Supported           | Supported
-| Open Enterprise Server 2015, 2015 SP1, 2018          | {x86}_64                                     | Supported           | Supported
+| Hardware                 | Recommended
+| CPU                      | Minimum 4 dedicated cores
+| RAM:                     | _Test Server_ Minimum 8{nbsp}GB
+|                          | _Base Installation_ Minimum 16{nbsp}GB
+|                          | _Production Server_ Minimum 32{nbsp}GB
+| Disk Space:              | [path]``/`` Minimum 100{nbsp}GB
+|                          | [path]``/var/lib/pgsql`` Minimum 50{nbsp}GB
+|                          | [path]``/var/spacewalk`` Minimum 50{nbsp}GB per SUSE product and 250{nbsp}GB per Red Hat product
 |===
 
-[[mgr.additional.requirements]]
-== Network Requirements
 
 
-To successfully complete this guide some network requirements must be met.
-The following section will walk you through these requirements.
+[[quickstart.sect.prereq.network]]
+=== Network Requirements
+
+This section details the networking and port requirements for {productname}.
 
 
 Fully Qualified Domain Name (FQDN):: The {productname} server must resolve its FQDN correctly or cookies will not work properly on the WebUI.
+For more information about configuring the hostname and DNS, see https://www.suse.com/documentation/sles-12/book_sle_admin/data/sec_basicnet_yast.html#sec_basicnet_yast_change_host[SUSE Linux Enterprise Server Documentation - Configuring Host Name and DNS]
 
-* https://www.suse.com/documentation/sles-12/book_sle_admin/data/sec_basicnet_yast.html#sec_basicnet_yast_change_host[SUSE Linux Enterprise Server Documentation - Configuring Host Name and DNS]
+Hostname and IP Address:: To ensure that the {productname} domain name can be resolved by its clients, both server and client machines must be connected to a working DNS server.
+For more information about setting up a DNS server, see https://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_dns.html[SUSE Linux Enterprise Server Documentation - The Domain Name System]
 
-Hostname and IP Address:: To ensure that the {productname} domain name can be resolved by its clients, both server and client machines must be connected to a working Domain Name System (DNS) server.
-This guide assumes the required infrastructure exists within your environment.
-For more information on setting up a (DNS) server see:
-
-
-* https://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_dns.html[SUSE Linux Enterprise Server Documentation - The Domain Name System]
-
-Using a Proxy When Installing from {sle} Media:: If you are on an internal network and do not have access to {scc}, you can setup and use a proxy during a {sle} installation.
-For more information on configuring a proxy for access to {scc} during a {sle} installation see:
-
-* https://www.suse.com/documentation/sled-12/singlehtml/book_sle_deployment/book_sle_deployment.html#sec.i.yast2.start.parameters.proxy[SUSE Linux Enterprise Server Documentation -  Using a Proxy During Installation]
+Using a Proxy When Installing from {sle} Media:: If you are on an internal network and do not have access to {scc}, you can set up and use a proxy during installation.
+For more information about configuring a proxy for access to {scc} during a {sle} installation, see https://www.suse.com/documentation/sled-12/singlehtml/book_sle_deployment/book_sle_deployment.html#sec.i.yast2.start.parameters.proxy[SUSE Linux Enterprise Server Documentation -  Using a Proxy During Installation]
 
 
 .Naming Your Server
@@ -212,30 +201,26 @@ Choose the hostname of your {productname} server carefully.
 Although changing the server name is possible, it is a complex process and unsupported.
 ====
 
-== Firewall Port Rules
 
-In a production environment {productname} server and its clients should always utilize firewall rules.
-The following table provides an overview of required ports.
+In a production environment, {productname} server and its clients should always use a firewall.
+This table gives an overview of required ports, to be used when you are setting up your firewall rules.
 
-Traditional client systems connect to {productname} via port 443.
-In addition, enabling push actions from {productname} to client systems, requires inbound connections on port 5222.
-If {productname} will also push to a {productname} proxy, you must allow inbound connections on port 5269.
 
 [[tab.install.ports.server1]]
-.Required Ports on {productname} Server
+.Required Server Ports
 [cols="1,1,1", options="header"]
 |===
-| Port | Direction        | Reason
-| 67   | Inbound          | Required when configured as a DHCP server for systems requesting IP addresses
-| 69   | Inbound          | Used when configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems
-| 80   | Outbound         | Used to contact {scc}
-| 443  | Inbound          | All WebUI, traditional client, and proxy server requests and {productname} uses this port for {scc} inbound traffic
-| 443  | Outbound         | {productname} uses this port to reach {scc} unless running in disconnected mode with RMT or SMT
-| 4505 | Inbound          | Required by the Salt-master to accept communication requests via TCP from minions
-| 4506 | Inbound          | Required by the Salt-master to accept communication requests via TCP from minions
-| 5222 | Inbound          | When you wish to push actions to clients this port is required by the _osad_ daemon running on the client systems
-| 5269 | Inbound/Outbound | Needed if you push actions to or via a {susemgrproxy}
-|      | Outbound         | Squid HTTP proxy for outgoing connections. It could be any port you configure
+| Port | Protocol | Description
+| 22   | TCP      | SSH
+| 67   | UDP      | DHCP
+| 69   | UDP      | TFTP, used to support PXE services
+| 80   | TCP      | HTTP, used in some bootstrap cases
+| 123  | UDP      | NTP time service
+| 443  | TCP      | HTTPS, used for {webui}, client, Proxy server, and API traffic
+| 4505 | TCP      | Salt, used by the Salt-master to accept communication requests from minions
+| 4506 | TCP      | Salt, used by the Salt-master to accept communication requests from minions
+| 5222 | TCP      | XMPP client, used for communications with the [systemitem]``osad`` daemon on traditional client systems
+| 5269 | TCP      | XMPP server, used for pushing actions to {susemgrproxy}
 |===
 
 For more information on disconnected setup and port configuration, see:
@@ -253,3 +238,30 @@ endif::[]
 ifndef::env-github[]
 * <<advanced.topics.app.ports.server>>
 endif::[]
+
+
+[[quickstart.sect.prereq.clientos]]
+=== Supported Client Systems
+
+Supported operating systems for traditional and Salt clients are listed in this table.
+
+[mgr.supported.clients]
+[cols="1,1,1,1", options="header"]
+.Supported Client Systems
+|===
+| Operating Systems                                    | Architecture                                 | Traditional Clients | Salt Clients
+| {sle} 11 SP4                                         | {x86}, {x86}_64, {ipf}, IBM {ppc}, {zseries} | Supported           | Supported
+| {sle} 12 SP3                                         | {x86}_64, IBM {ppc} ({ppc64le}), {zseries}, ARM | Supported         | Supported
+| {sle} 15                                             | {x86}_64, IBM {ppc} ({ppc64le}), {zseries}, ARM | Supported         | Supported
+|_Latest minor release {rhnminrelease6}_               | {x86}, {x86}_64                              | Supported           | Supported
+|_Latest minor release {rhnminrelease7}_               | {x86}_64                                     | Supported           | Supported
+| Open Enterprise Server 2015, 2015 SP1, 2018          | {x86}_64                                     | Supported           | Supported
+|===
+
+
+.Supported Versions and SP Levels
+[NOTE]
+====
+Client operating system versions and SP levels must be under general support (normal or LTSS) to be supported with {productname}.
+For details on supported product versions, see https://www.suse.com/lifecycle.
+====
