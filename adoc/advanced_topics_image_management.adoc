@@ -72,10 +72,10 @@ image::image-building.png[scaledwidth=80%]
 === Requirements
 
 The containers feature is available for Salt minions running {sls} 12 or later.
-The following requirements should be met before following this guide:
+Before you begin, ensure your environment meets these requirements:
 
-* You will need an existing external GitHub or internal GitLab Repository containing a Dockerfile and configuration scripts (example scripts are provided in the following sections).
-* Portus or another image registry that has been properly configured.
+* An existing external GitHub or internal GitLab repository containing a Dockerfile and configuration scripts (example scripts are provided in this chapter).
+* A properly configured image registry.
 +
 
 [NOTE]
@@ -106,8 +106,8 @@ From the {susemgr} {webui} perform these steps to configure a build host.
 . Select a minion to be designated as a build host from the menu:Systems[Overview] page.
 . From the [guimenu]``System Details`` page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enabling [guimenu]``SLE-Module-Containers12-Pool`` and [guimenu]``SLE-Module-Containers12-Updates``. Confirm by clicking btn:[Change Subscriptions].
 . From the menu:System Details[Properties] page, enable [guimenu]``Add-on System Type`` and ``Container Build Host`` and confirm by clicking btn:[Update Properties].
-. Install all required packages by applying ``Highstate``. From the system's details page select menu:States[Highstate] and click [guimenu]``Apply Highstate``.
-Alternatively, apply the Highstate from the {productname} Server command line:
+. Install all required packages by applying ``Highstate``. From the system details page select menu:States[Highstate] and click [guimenu]``Apply Highstate``.
+Alternatively, apply Highstate from the {productname} Server command line:
 +
 ----
 salt '$your_minion' state.highstate
@@ -406,7 +406,7 @@ This will result in an ``unknown`` update status.
 [[at.images.kiwi]]
 == OS Images
 
-OS Images are build by the Kiwi image system.
+OS images are built by the Kiwi image system.
 They can be of various types: PXE, QCOW2, LiveCD images, and others.
 
 For more information about the Kiwi build system, see the https://doc.opensuse.org/projects/kiwi/doc/[Kiwi documentation].
@@ -416,14 +416,13 @@ For more information about the Kiwi build system, see the https://doc.opensuse.o
 [[at.images.kiwi.enablement]]
 === Enabling OS Image Building
 
-OS Image building is disabled by default. You can enable it in `/etc/rhn/rhn.conf` by setting:
+OS image building is disabled by default. You can enable it in `/etc/rhn/rhn.conf` by setting:
 
 ----
-# If true, OS Image building feature will be enabled
 java.kiwi_os_image_building_enabled = true
 ----
 
-Then restart the Spacewalk service:
+Restart the Spacewalk service to pick up the changes:
 
 ----
 spacewalk-service restart
@@ -432,13 +431,13 @@ spacewalk-service restart
 [[at.images.kiwi.requirements]]
 === Requirements
 
-The Kiwi image building feature is available for Salt minions running {sls}{mdash}12 or later.
+The Kiwi image building feature is available for Salt minions running {sls}{nbsp}12 or later.
 
-Kiwi image configuration files and configuration scripts must be accessible in one of following ways:
+Kiwi image configuration files and configuration scripts must be accessible in one of these locations:
 
 * Git repository
-* HTTP hosted tar ball
-* local build host directory
+* HTTP hosted tarball
+* Local build host directory
 
 // FIXME: Provide better reference
 Example scripts are provided in the following sections.
@@ -447,21 +446,21 @@ Example scripts are provided in the following sections.
 === Creating a Build Host
 
 To build all kinds of images with {productname}, create and configure a build host.
-Build hosts are Salt minions running SLES 12 or later.
-The following steps will guide you though the initial configuration for a build host.
+Build hosts are Salt minions running {sls}{nbsp}12 or later.
+This procedure will guide you though the initial configuration for a build host.
 
-From the {productname} {webui} perform the following steps to configure a build host:
+From the {productname} {webui} perform these steps to configure a build host:
 
 . Select a minion that will be designated as a build host from the menu:Main Menu[Systems > Overview] page.
-. From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type`` [guimenu]``OS Image Build Host`` and confirm with btn:[Update Properties].
+. From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type:`` [guimenu]``OS Image Build Host`` and confirm with btn:[Update Properties].
 +
 image::os-image-build-host.png[scaledwidth=80%]
 +
 . From the menu:System Details[Software > Software Channels] page, enable ``SLE-Manager-Tools12-Pool`` and ``SLE-Manager-Tools12-Updates`` (or a later version).
-Finally schedule and click btn:[Confirm].
-. Install Kiwi and all required packages by applying the highstate.
-From the system's details page select menu:States[Highstate] and click btn:[Apply Highstate].
-Alternatively, apply the Highstate from the {productname} Server command line:
+Schedule and click btn:[Confirm].
+. Install Kiwi and all required packages by applying Highstate.
+From the system details page select menu:States[Highstate] and click btn:[Apply Highstate].
+Alternatively, apply Highstate from the {productname} Server command line:
 +
 ----
 salt '$your_minion' state.highstate
@@ -473,20 +472,17 @@ salt '$your_minion' state.highstate
 //. Install openSSH and configure passwordless login (via SSH keys) for the salt user into the OS image build host
 
 
-[NOTE]
+
 .{productname} Web Server Public Certificate RPM
-====
 Build host provisioning copies the {productname} certificate RPM to the build host.
 This certificate is used for accessing repositories provided by {productname}.
 
-.Certificate is packaged in RPM by the `mgr-package-rpm-certificate-osimage` package script:
+The certificate is packaged in RPM by the `mgr-package-rpm-certificate-osimage` package script.
+The package script is called automatically during a new {productname} installation.
 
-* The package script is called automatically during a new {productname} installation.
-* The upgrade scenario will (on upgrade of package `spacewalk-certs-tools`) call the package script with default values.
-+
+When you upgrade the `spacewalk-certs-tools` package, the upgrade scenario will call the package script using the default values.
+However if the certificate path was changed or unavailable, you will need to call the package script manually using `--ca-cert-full-path <path_to_certificate>` after the upgrade procedure has finished.
 
-However if the certificate path was changed or unavailable, it is required to call the package script manually with the option `--ca-cert-full-path <path_to_certificate>` after the upgrade procedure is completed.
-+
 
 .Package script call example
 [source,bash]
@@ -494,10 +490,10 @@ However if the certificate path was changed or unavailable, it is required to ca
 /usr/sbin/mgr-package-rpm-certificate-osimage --ca-cert-full-path /root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT
 ----
 
-The RPM package with the certificate is stored in a salt accessible directory such as `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
+The RPM package with the certificate is stored in a salt-accessible directory such as `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 
-The RPM package with the certificate is also provided in the local build host repository `/var/lib/Kiwi/repo`.
-====
+The RPM package with the certificate is provided in the local build host repository `/var/lib/Kiwi/repo`.
+
 
 [IMPORTANT]
 .The RPM Package with the {productname} Certificate Must Be Specified in the Build Source
@@ -528,7 +524,7 @@ image::systems_create_activation_key.png[scaledwidth=80%]
 
 . In the {webui}, select menu:Main Menu[Systems > Activation Keys].
 . Click [guimenu]``Create Key``.
-. Enter a [guimenu]``Description``, a [guimenu]``Key`` name, and use the drop-down box to select the [guimenu]``Base Channel`` that should be associated with this key.
+. Enter a [guimenu]``Description``, a [guimenu]``Key`` name, and use the drop-down box to select a [guimenu]``Base Channel`` to associate with the key.
 . Confirm with btn:[Create Activation Key].
 
 For more information, see <<bp.key.managment>>.
@@ -538,7 +534,9 @@ For more information, see <<bp.key.managment>>.
 [[at.images.kiwi.imagestore]]
 === Image Store
 
-OS images can require  a significant amount of storage space.  Therefore it is recommended that the OS image store is located on a partition of its own or on a Btrfs subvolume, different from root partition. The default location of the image store is [path]``/srv/www/os-images``.
+OS images can require  a significant amount of storage space.
+Therefore, we recommended that the OS image store is located on a partition of its own or on a btrfs subvolume, separate from the root partition.
+By default, the image store will be located at [path]``/srv/www/os-images``.
 
 [NOTE]
 .Image stores for Kiwi build type
@@ -553,7 +551,7 @@ Images are always stored in [path]``/srv/www/os-images/<organization id>`` and a
 [[at.images.kiwi.profile]]
 === Creating an Image Profile
 
-Manage Image Profiles in the {webui}.
+Manage Image Profiles using the {webui}.
 
 image::images_image_profiles.png[scaledwidth=80%]
 
@@ -570,7 +568,7 @@ image::images_image_create_profile_kiwi.png[scaledwidth=80%]
 .. Git URI
 .. HTTPS tarball
 .. Path to build host local directory
-. Select an [guimenu]``Activation Key``. Activation Keys ensure that images using a profile are assigned to the correct channel and packages.
+. Select an [guimenu]``Activation Key``. Activation keys ensure that images using a profile are assigned to the correct channel and packages.
 +
 
 [NOTE]
@@ -587,21 +585,24 @@ When you associate an activation key with an image profile you are ensuring any 
 ** Git/HTTP(S) URL to the repository
 +
 
-URL to the Git repository containing the sources of the image to be build. Depending on the layout of the repository the URL can be:
+URL to the Git repository containing the sources of the image to be built.
+Depending on the layout of the repository the URL can be:
 +
 ----
 https://github.com/SUSE/manager-build-profiles
 ----
 +
 
-Which branch should be checked out can be specified after the `#` character. In this example it is the `master` branch:
+You can specify a branch after the `#` character in the URL.
+In this example, we use the `master` branch:
 +
 ----
 https://github.com/SUSE/manager-build-profiles#master
 ----
 +
 
-Which directory contains the image sources can be specified after the `:` character. In this example it is `OSImage/POS_Image-JeOS6`:
+You can specify a directory that contains the image sources after the `:` character.
+In this example, we use `OSImage/POS_Image-JeOS6`:
 +
 ----
 https://github.com/SUSE/manager-build-profiles#master:OSImage/POS_Image-JeOS6
@@ -698,32 +699,33 @@ For information about the Kiwi build system, see the https://doc.opensuse.org/pr
 [[at.images.kiwi.building]]
 === Building an Image
 
-There are two ways to build an image.
-In the {webui}, you can select menu:Main Menu[Images > Build], or click the build icon in the menu:Main Menu[Images > Profiles] list.
+There are two ways to build an image using the {webui}.
+Either select menu:Main Menu[Images > Build], or click the build icon in the menu:Main Menu[Images > Profiles] list.
 
 image::images_image_build.png[scaledwidth=80%]
 
 .Procedure: Build an Image
-. For this example, select menu:Main Menu[Images > Build].
-. Add a different tag name if you want a version other than the default ``latest`` (Only relevant to Containers).
+. Select menu:Main Menu[Images > Build].
+. Add a different tag name if you want a version other than the default ``latest`` (applies only to containers).
 . Select the [guimenu]``Image Profile`` and a [guimenu]``Build Host``.
 +
 
 [NOTE]
 .Profile Summary
 ====
-Notice the [guimenu]``Profile Summary`` to the right of the build fields.
+A [guimenu]``Profile Summary`` is displayed to the right of the build fields.
 When you have selected a build profile detailed information about the selected profile will show up in this area.
 ====
 +
 
-. To schedule a build click the btn:[Build] button.
+. To schedule a build, click the btn:[Build] button.
 
 
 [[at.images.kiwi.inspection]]
 === Image Inspection and Salt Integration
 
-After the image is successfuly built, the inspection phase is executed. During the inspection phase {susemgr} collects information about the image:
+After the image is successfully built, the inspection phase begins.
+During the inspection phase {susemgr} collects information about the image:
 
 * List of packages installed in the image
 * Checksum of the image
@@ -731,8 +733,9 @@ After the image is successfuly built, the inspection phase is executed. During t
 
 [NOTE]
 ====
-If the built image type is `PXE` Salt pillar will also be generated. Image pillars are stored in the `/srv/susemanager/pillar_data/images/` directory and the Salt subsystem can access details about the generated image.
-Details include information where the pillar is located and provided, image checksums, information needed for network boot, and more.
+If the built image type is `PXE`, a Salt pillar will also be generated.
+Image pillars are stored in the `/srv/susemanager/pillar_data/images/` directory and the Salt subsystem can access details about the generated image.
+Details include where the pillar is located and provided, image checksums, information needed for network boot, and more.
 
 The generated pillar is available to all connected minions.
 ====
@@ -740,28 +743,28 @@ The generated pillar is available to all connected minions.
 [[at.images.kiwi.troubleshooting]]
 === Troubleshooting
 
-Building of image consists of several dependent steps.
-When the build fails, investigation of salt states results can help with identifying the source of failure.
+Building an image requires of several dependent steps.
+When the build fails, investigation of salt states results can help you to identify the source of the failure.
 Usual checks when the build fails:
 
 * The build host can access the build sources
 * There is enough disk space for the image on both the build host and the {productname} server
-* The activation key has the correct channels associated
-* Valid build sources are used
+* The activation key has the correct channels associated with it
+* The build sources used are valid
 * The RPM package with the {productname} public certificate is up to date and available at `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 +
 
-See <<at.images.kiwi.buildhost>> on how to refresh a public certificate RPM.
+For more on how to refresh a public certificate RPM, see <<at.images.kiwi.buildhost>>.
 
 
 
 [[at.images.kiwi.limitations]]
 === Limitations
 
-The following are some known pitfalls when working with images.
+The section contains some known issues when working with images.
 
-* HTTPS certificates to access the HTTP sources or Git repositories should be deployed to the minion by a custom state file or configured manually by the user.
-* Importing of the Kiwi based images is not supported.
+* HTTPS certificates used to access the HTTP sources or Git repositories should be deployed to the minion by a custom state file, or configured manually.
+* Importing Kiwi-based images is not supported.
 
 
 
