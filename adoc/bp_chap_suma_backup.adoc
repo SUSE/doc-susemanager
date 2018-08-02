@@ -64,55 +64,58 @@ Running out of space can result in backups failing, so check this often.
 == Backing up {productname}
 
 
-The most comprehensive and simplest method to back up your {productname} installation is to back up the entire [path]``/var/spacewalk/`` directory.
+The most comprehensive method for backing up your {productname} installation is to back up the relevant files and directories.
 This can save you time in administering your backup, and can be faster to reinstall and re-synchronize in the case of failure.
-However, this method requires additional disk space and will take longer to perform the backup.
-The [path]``/var/spacewalk/packages/NULL/`` directory is primarily a duplicate of the package repository.
-In the case of failure, re-synchronize your installation with the [command]``mgr-sync`` tool.
+However, this method requires significant disk space and could take a long time to perform the backup.
 
-[NOTE]
-====
-If you are running {productname} in a disconnected setup [path]``/var/spacewalk/``__must__ be backed up.
-====
 
 If you want to only back up the required files and directories, use this list:
 
-* [path]``/var/spacewalk/``
-* [path]``/etc/sysconfig/rhn/``
-* [path]``/etc/rhn/``
-* [path]``/etc/sudoers``
-* [path]``/srv/www/htdocs/pub/``
-* [path]``/var/spacewalk/packages/``
-** Each item within this directory represents an organization using custom RPMs, ensure you back up each of them
-* [path]``/root/.gnupg/``
-* [path]``/root/ssl-build/``
-* [path]``/etc/dhcp.conf``
-* [path]``/srv/tftpboot/``
+[NOTE]
+====
+To make this process simpler, and more comprehensive, we recommend backing up the entire [path]``/etc`` and [path]``/root`` directories, not just the ones specified here.
+====
+
+
 * [path]``/etc/cobbler/``
-* [path]``/var/lib/cobbler/``
-* [path]``/var/lib/rhn/kickstarts/``
-* [path]``/srv/www/cobbler``
+* [path]``/etc/dhcp.conf``
+* [path]``/etc/fstab`` and any ISO mountpoints you require.
+* [path]``/etc/rhn/``
+* [path]``/etc/salt``
+* [path]``/etc/sudoers``
+* [path]``/etc/sysconfig/rhn/``
+* [path]``/root/.gnupg/``
 * [path]``/root/.ssh``
 ** This file exists if you are using an SSH tunnel or SSH [command]``push``. You will also need to have saved a copy of the ``id-susemanager`` key.
+* [path]``/root/ssl-build/``
+* [path]``/srv/pillar``
+* [path]``/srv/salt``
+* [path]``/srv/tftpboot/``
+* [path]``/srv/www/cobbler``
+* [path]``/srv/www/htdocs/pub/``
+* [path]``/var/lib/cobbler/``
+* [path]``/var/lib/rhn/kickstarts/``
+* [path]``/var/spacewalk/``
 * Any directories containing custom data (such as scripts, Kickstart profiles, AutoYaST, and custom RPMs).
-* [path]``/etc/fstab`` and any ISO mountpoints you require.
+
 
 [IMPORTANT]
 ====
 You will also need to back up your database, which you can do by copying [path]``/var/spacewalk/db-backup`` or by using the [command]``smdba`` tool, which is explained later in this chapter.
 ====
 
-If you have backed up only these files and directories, to recover from failure you will need to re-install {productname}, and re-synchronize your installation with the [command]``mgr-sync`` tool.
-You can choose to re-register your product, or skip the registration and SSL certificate generation sections.
-Finally, reinstall the [path]``/root/ssl-build/rhn-org-httpd-ssl-key-pair-MACHINE_NAME-VER-REL.noarch.rpm`` package.
-
-
-Regardless of the backup method you choose, when you restore from a backup, use this command to schedule the re-creation of search indexes next time the [command]``rhn-search`` service is started:
-
+.Procedure: Restore from a Manual Backup
+. Re-install {productname}
+. Re-synchronize your installation with the [command]``mgr-sync`` tool.
+. You can choose to re-register your product, or skip the registration and SSL certificate generation sections.
+. Re-install the [path]``/root/ssl-build/rhn-org-httpd-ssl-key-pair-MACHINE_NAME-VER-REL.noarch.rpm`` package.
+. Schedule the re-creation of search indexes next time the [command]``rhn-search`` service is started:
++
 ----
 rcrhn-search cleanindex
 ----
 
+. If you did not have [path]``/var/spacewalk/packages/`` in your backup, but the source repository still exists, you can restore it by performing a complete channel synchronization.
 
 
 [[bp.sect.backup.smdba.admin]]
