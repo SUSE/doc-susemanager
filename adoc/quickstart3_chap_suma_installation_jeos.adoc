@@ -78,7 +78,7 @@ For more information on virtualization, see: https://www.suse.com/documentation/
 [[jeos.kvm.settings]]
 == JeOS KVM Settings
 
-Create 3 additional virtual disks required for the {productname} storage partitions.
+Create three additional virtual disks required for the {productname} storage partitions.
 
 .Procedure: Creating the Required Partitions with KVM
 . Create a new virtual machine using the downloaded JeOS KVM image and select menu:Import existing disk image[] .
@@ -91,9 +91,9 @@ These disks will be partitioned and mounted in <<proc.jeos.susemgr.prep>>.
 [cols="1,1,1", options="header"]
 |===
 | VirtIO Storage Disks | Name      | Sizing
-| VirtIO Disk 2        | spacewalk | 101 GB
-| VirtIO Disk 3        | pgsql     | 50 GB
-| VirtIO Disk 4        | swap      | 4 GB
+| VirtIO Disk 2        | spacewalk | 101{nbsp}GB
+| VirtIO Disk 3        | pgsql     | 50{nbsp}GB
+| VirtIO Disk 4        | swap      | 4{nbsp}GB
 |===
 
 . Click menu:Begin Installation[] and your new VM will boot from the JeOS image.
@@ -137,12 +137,15 @@ zypper in -t package yast2-storage
 [cols="1,1,1,1", options="header"]
 |===
 | VirtIO Storage Disks | Name                     | Storage Size | File System Type
-| VirtIO Disk 2        | [path]``/var/spacewalk`` | 101 GB       | XFS
-| VirtIO Disk 3        | [path]``/var/lib/pgsql`` | 50 GB        | XFS
-| VirtIO Disk 4        | [path]``swap``           | 4 GB         | swap
+| VirtIO Disk 2        | [path]``/var/spacewalk`` | 101{nbsp}GB  | XFS
+| VirtIO Disk 3        | [path]``/var/lib/pgsql`` | 50{nbsp}GB   | XFS
+| VirtIO Disk 4        | [path]``swap``           | 4{nbsp}GB    | swap
 |===
 
-. {slsa} by default uses the BTRFS file system. A mount point is created automatically for [path]``/var/lib/pgsql/`` (even when not installed). This must be removed or commented out from the [path]``/etc/fstab`` entries. As root edit [path]``/etc/fstab`` and comment out or remove the line:
+. {slsa} by default uses the BTRFS file system.
+A mount point is created automatically for [path]``/var/lib/pgsql/`` (even when not installed).
+This must be removed or commented out from the [path]``/etc/fstab`` entries.
+As root, edit [path]``/etc/fstab`` and comment out or remove the line:
 +
 
 ----
@@ -151,10 +154,10 @@ zypper in -t package yast2-storage
 +
 
 [WARNING]
-.Removing the `pgsql` in the[path]``/etc/fstab``Entry
+.Remove [command]``pgsql`` from the fstab Configuration File
 ====
-If you do not remove this line from fstab the first time you shutdown the server you will lose your database.
-This occurs because you will have duplicate entries in the fstab. _Updated tools shipped with recent SPs will no longer require human intervention._
+If you do not remove this line from fstab the first time you shut down the server you will lose your database.
+This occurs because you will have duplicate entries in the fstab file. _Updated tools shipped with recent SPs will no longer require human intervention._
 ====
 +
 
