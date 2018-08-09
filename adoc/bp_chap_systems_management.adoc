@@ -445,145 +445,113 @@ For more information, see
 
 
 [[bp.contact.methods.osad]]
-== osad
+== OSAD
 
 
-The default contact method between {productname} and its clients is [systemitem]``rhnsd``
-.
-When using the [systemitem]``rhnsd``
- daemon the client will contact the server every 4 hours and then execute a scheduled action on clients.
-Depending on your network environment [systemitem]``rhnsd``
- may not suit your requirements.
-Alternatively, you may configure [systemitem]``osad``
- for use with registered client systems enabling immediate execution of scheduled actions. [systemitem]``osad``
- consists of three components:
+OSAD is an alternative contact method between {productname} and its clients.
+By default, {productname} uses [systemitem]``rhnsd``, which contacts the server every four hours to execute scheduled actions.
+OSAD allows registered client systems to execute scheduled actions immediately.
 
-.osad
-A client-side service that responds to pings and runs [command]``mgr_check`` when directed by the [systemitem]``osa-dispatcher``
- running on {productname}.
+OSAD has several distinct components:
 
-.osa-dispatcher
-A service running on {productname} that checks the database to determine if a client running [systemitem]``osad``
- needs to be pinged or is required to run [command]``mgr_check``, then sends a message telling the client to do so.
+* The [systemitem]``osa-dispatcher`` service runs on the server, and uses database checks  to determine if clients need to be pinged, or if actions need to be executed.
+* The [systemitem]``osad`` service runs on the client. It responds to pings from [systemitem]``osa-dispatcher`` and runs [command]``mgr_check`` to execute actions when directed to do so.
+* The [systemitem]``jabberd`` service is a daemon that uses the [systemitem]``XMPP`` protocol for communication between the client and the server.
+The [systemitem]``jabberd`` service also handles authentication.
+* The [command]``mgr_check`` tool runs on the client to execute actions.
+It is triggered by communication from the [systemitem]``osa-dispatcher`` service.
 
-.jabberd
-A daemon that runs on {productname} and uses the [systemitem]``XMPP`` protocol.
-[systemitem]``osad`` and [systemitem]``osa-dispatcher`` both connect to this daemon.
-[systemitem]``jabberd`` also handles authentication when using [systemitem]``osad``.
-
-
+////
+Note: I've commented this out, because the diagram is pretty ugly, and I'm not sure it adds value to the text -LKB
 The following figure represents the osad contact method.
-All items left of the [systemitem]``osa-dispatcher``
- block represent running processes on the client.
+All items left of the [systemitem]``osa-dispatcher`` block represent running processes on the client.
 
 .osad Contact Method
 
 image::osad.png[scaledwidth=80%]
+////
+
+The [systemitem]``osa-dispatcher`` periodically runs a query to check when clients last showed network activity.
+If it finds a client that has not shown activity recently, it will use [systemitem]``jabberd`` to ping all [systemitem]``osad`` instances running on all clients registered with your {productname} server.
+The [systemitem]``osad`` instances respond to the ping using [systemitem]``jabberd``, which is running in the background on the server.
+When the [systemitem]``osa-dispatcher`` receives the response, it marks the client as online.
+If the [systemitem]``osa-dispatcher`` fails to receive a response within a certain period of time, it marks the client as offline.
+
+When you schedule actions on an OSAD-enabled system, the task will be carried out  immediately.
+The [systemitem]``osa-dispatcher`` periodically checks clients for actions that need to be executed.
+If an outstanding action is found, it uses [systemitem]``jabberd`` to execute [command]``mgr_check`` on the client, which will then execute the action.
 
 
-.How it Works
-* On {productname} the [systemitem]``osa-dispatcher`` periodically runs a query which checks to see if there are any clients overdue for a ping.
-* If an overdue client is found, a message is sent via [systemitem]``jabberd`` to the [systemitem]``osad`` instances running on all clients registered with your {productname} server. The [systemitem]``osad`` instances respond to the ping through the [systemitem]``jabberd`` deamon running in the background on your {productname} Server. [systemitem]``osa-dispatcher`` receives the response, and marks the client as 'online'.
-* If [systemitem]``osa-dispatcher`` fails to receive a response from an [systemitem]``osad`` instance in a certain amount of time, the client is marked 'offline'.
-* [systemitem]``osa-dispatcher`` also periodically executes a select on the database to check all {productname} clients which have actions that need to be executed. If an action is found, a message is sent through [systemitem]``jabberd`` to [systemitem]``osad`` which then executes [command]``mgr_check`` on the client. [command]``mgr_check`` then takes over performing the actual action.
+
+=== Enabling and Configuring OSAD
 
 
-=== Configuring and Enabling OSAD
+This section covers enabling the [systemitem]``osa-dispatcher`` and [systemitem]``osad`` services, and performing initial setup.
 
+OSAD clients use the fully qualified domain name (FQDN) of the server to communicate with the [systemitem]``osa-dispatcher`` service.
 
-The following procedure enables use of [systemitem]``osad`` with {productname}.
-
-
-.Enabling SSL
-[IMPORTANT]
-====
-For this communication method to work SSL is mandatory.
+SSL is required for [systemitem]``osad`` communication.
 If SSL certificates are not available, the daemon on your client systems will fail to connect.
-Make sure your firewall rules are set to allow for the required ports.
+Make sure your firewall rules are set to allow the required ports.
 For more information, see <<tab.install.ports.server>>.
-====
 
-.Procedure: Enabling osa-dispatcher on {productname} and OSAD on Clients
-. On your {productname} server use the following command as {rootuser} to start the [systemitem]``osa-dispatcher`` service:
+
+.Procedure: Enabling OSAD
+. On your {productname} server, as the root user, start the [systemitem]``osa-dispatcher`` service:
 +
 
 ----
 systemctl start osa-dispatcher
 ----
-. Install the [systemitem]``osad`` package on all client systems allowing communication to the osa-dispatcher on {productname}.
-The package can be found in the Tools child channel.
-+
 
-.osad conflicts with osa-dispatcher
-WARNING: Do _not_ install the [systemitem]``osad`` client package on your {productname} server.
-The [systemitem]``osad`` client service conflicts with [systemitem]``osa-dispatcher`` server package.
-+
+. On each client machine, install the [systemitem]``osad`` package from the [systemitem]``Tools`` child channel.
+The [systemitem]``osad`` package should be installed on clients only.
+If you install the [systemitem]``osad`` package on your {productname} Server, it will conflict with the [systemitem]``osa-dispatcher`` package.
 
-. When [systemitem]``osad`` has been installed, start the service on your client systems. As {rootuser} enter:
+. On the client systems, as the root user, start the [systemitem]``osad`` service:
 +
 
 ----
 systemctl start osad
 ----
 +
-Like other services, osa-dispatcher and osad accept ``stop``, ``restart``, and `status` commands as well.
+Because [systemitem]``osad`` and [systemitem]``osa-dispatcher`` are run as services, you can use standard commands to manage them, including [command]``stop``, [command]``restart``, and [command]``status``.
 
 
-This feature depends on the client systems recognizing the fully qualified domain name (FQDN) of {productname}.
-The client systems use this name and not the IP address of the server when configuring the YaST Online Update.
+.Configuration and Log Files
 
-Now when you schedule actions from {productname} on any of the osad enabled systems, the task will be carried out immediately rather than after a client checks in using [systemitem]``rhnsd``.
-
-=== osad Configuration and Logging Files
+Each OSAD component is configured by local configuration files.
+We recommend you keep the default configuration parameters for all OSAD components.
 
 
-Each component of [systemitem]``osad``
- is configured via local configuration files.
-Changing default parameters is not recommended.
-For reference the configuration files and logs are found in the following locations.
-
-.osa-dispatcher
-[systemitem]``osa-dispatcher``
- is configured via the [path]``rhn.conf``
- file located on the {productname}
- at:
-
-----
-/etc/rhn/rhn.conf
-----
+[cols="1,1,1", options="header"]
+|===
+| Component                        | Location | Path to Configuration File
+| [systemitem]``osa-dispatcher``   | Server   | [path]``/etc/rhn/rhn.conf`` Section: [systemitem]``OSA configuration``
+| [systemitem]``osad``             | Client   | [path]``/etc/sysconfig/rhn/osad.conf`` [path]``/etc/syseconfig/rhn/up2date``
+| [systemitem]``osad``  log file   | Client   | [path]``/var/log/osad``
+| [systemitem]``jabberd`` log file | Both     | [path]``/var/log/messages``
+|===
 
 
-All parameters for configuring osa-dispatcher are located under this section heading:
+.Troubleshooting OSAD
 
-----
-# OSA configuration #
-----
+If your OSAD clients cannot connect to the server, or if the [systemitem]``jabberd`` service takes a lot of time responding to port 5552, it could be because you have exceeded the open file count.
 
-.OSAD
-[systemitem]``osad`` configuration files are located on all {productname} clients at:
+Every client needs one always-open TCP connection to the server, which consumes a single file handler.
+If the number of file handlers currently open exceeds the maximum number of files that [systemitem]``jabberd`` is allowed to use, [systemitem]``jabberd`` will queue the requests, and refuse connections.
+
+To resolve this issue, you can increase the file limits for [systemitem]``jabberd`` by editing the [path]``/etc/security/limits.conf`` configuration file and adding these lines:
 
 ----
-/etc/sysconfig/rhn/osad.conf
-/etc/syseconfig/rhn/up2date
+jabbersoftnofile5100
+jabberhardnofile6000
 ----
 
+Calculate the limits required for your environment by adding 100 to the number of clients for the soft limit, and 1000 to the current number of clients for the soft limit.
+In the example above, we have assumed 500 current clients, so the soft limit is 5100, and the hard limit is 6000.
 
-For troubleshooting [systemitem]``osad`` the log file is located in:
-
-----
-/var/log/osad
-----
-
-
-The location of this log file is configurable via the [path]``osad.conf``
- file.
-
-.jabberd
-Configuration of [systemitem]``jabberd``
- goes beyond the scope of this document.
-The [systemitem]``jabberd``
- log file is located at:
+You will also need to update the [systemitem]``max_fds`` parameter in the [path]``/etc/jabberd/c2s.xml`` file with your chosen hard limit:
 
 ----
-/var/log/messages
-----
+<max_fds>6000</max_fds>
