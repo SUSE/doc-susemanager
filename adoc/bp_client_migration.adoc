@@ -66,8 +66,8 @@ The same applies for other supported products based on {sle} 12.
 [NOTE]
 ====
 For generally supported {sle} upgrade paths, see  https://www.suse.com/documentation/sles-15/book_sle_upgrade/data/sec_upgrade-paths_supported.html ({slea} {upgrade}, Chapter "`Supported Upgrade Paths to SLE 15`").
-+
-As you can see, it is important that you migrate the client to the latest available SP first.  In the case of SLE 12, this is currently SP3 (August 2018).
+It is important that you migrate the client to the latest available SP first.
+In the case of SLE 12, this is currently SP3 (August 2018).
 ====
 
 
@@ -78,7 +78,7 @@ The process is controlled by {yast} and {ay}, not by [command]``zypper`` command
 
 [IMPORTANT]
 ====
-Only perform this migration on client systems managed by {productname} servers.
+Only perform this migration procedure on client systems managed by {productname} servers.
 For upgrading the {productname} server itself, see <<bp.sp.migration>>.
 This is a viable method for major version upgrades such as an upgrade from {sle} 12 to 15.
 ====
@@ -89,9 +89,8 @@ Perform the following steps:
 [[bp.proc.client.migration.sle.prep]]
 .Procedure: System Upgrade Preparation
 
-NOTE: Make sure your {productname} and all the clients you want to upgrade have installed all available updates, including the {productname} tools.
+Make sure your {productname} and all the clients you want to upgrade have installed all available updates, including the {productname} tools.
 This is absolutely necessary, otherwise the system upgrade will fail.
-+
 
 . On the {productname} server, create a local tree with the SLE 15 installation sources. This is needed for booting the clients into the installation or upgrade scenario. For example, download the ISO image of the DVD1 with the installation sources and mount the ISO image as [path]``/mnt/sle15``.
 +
@@ -101,9 +100,8 @@ mkdir /mnt/sle15
 mount -o loop DVD1.iso /mnt/sle15
 ----
 . Create an auto-installation distribution: For all distributions you want to perform a system upgrade, you need to create a SLE 15 distribution in {productname}. Use the following steps to create one:
-+
 ** In the {productname} {webui}, click menu:Main Menu[Systems > Autoinstallation > Distributions].
-** Enter a [guimenu]``Distribution Label`` for your distribution (for example, use ``autumn2018``) as a label and specify the [guimenu]``Tree Path``, which is the root directory of the {sls} 15 installation sources (for example, in this case [path]``/mnt/sle15``). As the [guimenu]``Base Channel`` use the update target distribution "`SLE-Product-SLES15-Pool for x86_64`".
+** Enter a [guimenu]``Distribution Label`` for your distribution (for example, use ``autumn2018``) as a label and specify the [guimenu]``Tree Path``, which is the root directory of the {sls} 15 installation sources (for example, in this case [path]``/mnt/sle15``). As the [guimenu]``Base Channel`` use the update target distribution [systemitem]``SLE-Product-SLES15-Pool for x86_64``.
 ** Confirm with [guimenu]``Create Autoinstallable Distribution``.
 +
 For more information about Autoinstallation, see <<ref.webui.systems.autoinst>>.
@@ -111,18 +109,15 @@ For more information about Autoinstallation, see <<ref.webui.systems.autoinst>>.
 +
 In order to switch from the old SLE 12 SP3 base channel to the new SLE 15 channel, you need an activation key.
 Use the following steps to create it:
-+
-** Go to menu:Main Menu[Systems > Activation Keys] and click [guimenu]``Create Key``.
 
-[[st.maintenance-migration.activationkey]]
+** Go to menu:Main Menu[Systems > Activation Keys] and click [guimenu]``Create Key``.
 ** Enter a description for your key.
 ** Enter a key or leave it blank to generate an automatic key.
 ** If you want to limit the usage, enter your value in the [guimenu]``Usage`` text field.
-** Select the "`SLE-Product-SLES15-Pool for x86_64`" base channel.
-** Decide about [guimenu]``Add-On System Types``.
+** Select the [systemitem]``SLE-Product-SLES15-Pool for x86_64`` base channel.
+** Decide about [guimenu]``Add-On System Types``.  If in doubt, see https://www.suse.com/documentation/sles-15/book_quickstarts/data/art_modules.html ({slea} Modules & Extensions Quick Start).
 ** Click btn:[Create Activation Key].
 ** Click the [guimenu]``Child Channels`` tab and select the required channels. Finish with btn:[Update Key].
-[[st.maintenance-migration.upload]]
 . Upload an {ay} profile.
 +
 ** Create an {ay} XML file according to <<ap-sample-autoinst-system-upgrade>>.
@@ -132,12 +127,13 @@ For more information about {ay}, see <<ref.webui.systems.autoinst.ay_intro>>.
 ** Paste the XML content in the text area or select the file to upload. Click btn:[Create].
 ** Add `autoupgrade=1` in the [guimenu]``Kernel Options`` of the [guimenu]``Details`` tab and click btn:[Update].
 ** Switch to the [guimenu]``Variable`` tab.
-** Enter in the text field `registration_key=` and the key from <<st.maintenance-migration.activationkey>>.
+** Enter in the text field `registration_key=` and the key from the preparation above.
 ** Click btn:[Update Variables].
 
 
 After you have successfully finished the previous procedure, everything is prepared for an upgrade.
 To upgrade a system, continue with <<bp.proc.client.migration.sle.upgrade>>.
+
 [[bp.proc.client.migration.sle.upgrade]]
 .Procedure: Upgrading {sle} 12 SPx to version 15
 
@@ -146,10 +142,11 @@ WARNING: Before successfully initializing the product migration, make sure that 
 For the upgrade to {sle} 15, at least the [systemitem]``SLE-Product-SLES15-Pool`` base channel with the [systemitem]``SLE-Manager-Tools15-Pool`` child channel for your architecture is required.
 The matching update channels such as [systemitem]``SLE-Manager-Tools15-Updates`` and [systemitem]``SLE-Product-SLES15-Updates`` are recommended.
 // Checkit:
-For example, watch progress in [path]``/var/log/rhn/reposync/sles15-pool-x86_64.log``.
 +
+Watch the mirroring progress in [path]``/var/log/rhn/reposync/sles15-pool-x86_64.log``.
 
-. Go to the system via menu:Main Menu[Systems] and click the name of the system. Then click menu:System Details[Provisioning > Autoinstallation > Schedule], and choose the {ay} XML profile you have uploaded in <<bp.proc.client.migration.sle.prep>>, <<st.maintenance-migration.upload>>.
+
+. Go to the system via menu:Main Menu[Systems] and click the name of the system. Then click menu:System Details[Provisioning > Autoinstallation > Schedule], and choose the {ay} XML profile you have uploaded above.
 . Click btn:[Schedule Autoinstallation and Finish].
 +
 Next time the machine asks the {productname} server for jobs, it will receive a reinstallation job which fetches kernel and initrd and writes a new [path]``/boot/grub/menu.lst`` (containing pointers to the new kernel and initrd).
