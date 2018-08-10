@@ -131,25 +131,24 @@ E.g.:
             ... other sls files ...
 ----
 
-[[bp.chapt.config.mgr.pillar.data.exposed.susemgr]]
-== Pillar Data Exposed by {productname}
+[[bp.chapt.config.mgr.pillar.data]]
+== Pillar Data
 
 
-SUSE Manager exposes a small amount of internal data like group membership, organization membership and file roots as pillars which can be used with custom sls states.
-These are managed by {productname}
-or by the user.
+SUSE Manager exposes a small amount of internal data as Pillars which can be used with custom {sls} states.
+Data that is exposed includes group membership, organization membership, and file roots.
+These are managed either automatically by {productname}, or manually by the user.
 
-To avoid hard-coding organization id's within sls files, a pillar entry is added for each organization:
+To avoid hard-coding organization IDs within {sls} files, a pillar entry is added for each organization:
 
 ----
 org-files-dir: relative_path_to_files
 ----
 
 
-This file will be available for all minions which belong to this organization.
+The specified file is available for all minions which belong to the organization.
 
-The following represents a Pillar example located in [path]``/etc/motd``
-:
+This is an example of a Pillar located at [path]``/etc/motd``:
 
 ----
 file.managed:
@@ -157,4 +156,47 @@ file.managed:
     - user: root
     - group: root
     - mode: 644
+----
+
+
+
+[[bp.sect.groupstates]]
+== Group States
+
+Pillar data can be used to perform bulk actions, like applying all assigned states to minions within the group.
+This section contains some example of bulk actions that you can take using group states.
+
+In order to perform these actions, you will need to determine the ID of the group that you want to manipulate.
+You can determine the Group ID by using the [command]``spacecmd`` command:
+
+----
+spacecmd group_details
+----
+
+In these examples we will use an example Group ID of [systemitem]``GID``.
+
+
+To apply all states assigned to the group:
+
+----
+salt -I 'group_ids:GID' state.apply custom.group_GID
+----
+
+
+To apply any state (whether or not it is assigned to the group):
+
+----
+salt -I 'group_ids:GID' state.apply ``state``
+----
+
+To apply a custom state:
+
+----
+salt -I 'group_ids:2130' state.apply manager_org_1.``customstate``
+----
+
+Apply the high state to all minions in the group:
+
+----
+salt -I 'group_ids:GID' state.apply
 ----
