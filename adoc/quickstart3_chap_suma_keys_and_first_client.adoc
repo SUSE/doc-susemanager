@@ -188,8 +188,8 @@ image::mgr_configuration_bootstrap_trad.png[scaledwidth=80%]
 [WARNING]
 .Using SSL
 ====
-It is not recommended that you clear the [guimenu]``Enable SSL`` checkbox in the {webui}, or set `USING_SSL=0` in the bootstrap script.
-If you disable SSL, the registration process will not complete successfully unless you manage custom CA certificates.
+Unchecking menu:Enable SSL[] in the {webui} or setting `USING_SSL=0` in the bootstrap script is not recommended.
+If you disable SSL nevertheless you will need to manage custom CA certificates to be able to run the registration process successfully.
 ====
 +
 
@@ -235,7 +235,7 @@ cp bootstrap.sh bootstrap-sles12.sh
 
 . Open [path]``sles12.sh`` for modification.
 Scroll down and modify both lines marked in green.
-Comment out `exit 1` with a hash mark (`\#`) to activate the script, then enter the name of the key for this script in the `ACTIVATION_KEYS=` field:
+You must comment out `exit 1` with a hash mark (``\#``) to activate the script and then enter the name of the key for this script in the `ACTIVATION_KEYS=` field as follows:
 +
 
 ----
@@ -331,10 +331,11 @@ Note that even if you do not select a date and time, the lock might not deactiva
 == Registering Salt Clients
 
 There are currently three methods for registering Salt minions.
-The following section describes the first method and uses a bootstrap repository.
-The second method is to create a bootstrap script using [command]``mgr-bootstrap``.
-Bootstrapping Salt minions with [command]``mgr-bootstrap`` is performed in the same manner as bootstrapping traditional clients; for more information, see <<registering.clients.traditional>>.
-The third method is performed from the {productname} {webui}; find this method located in <<ref.webui.systems.bootstrapping>>.
+This section describes the first method and uses a bootstrap repository.
+The second method uses bootstrap script, and is described in <<registering.clients.traditional>>.
+The third method uses the {webui}, and is described in <<ref.webui.systems.bootstrapping>>.
+
+You can also use these methods to change existing traditional clients into Salt minions.
 
 
 The following section assumes you have created a SUSE Manager tools repository.
@@ -355,7 +356,8 @@ In the following rare scenario:
 ====
 
 
-Once you have fully synchronized a base channel from the {webui} for clients to obtain software sources (for example: [path]``SLES12-SP3-Pool_for_x86_64``), register a Salt minion:
+Once you have fully synced a base channel from the {webui}
+for clients to obtain software sources from, for example: `SLES12-SP3-Pool_for_x86_64` perform the following procedure to register a Salt minion.
 
 .Procedure: Registering Salt Minions
 . On your minion as {rootuser} enter the following command:
@@ -369,8 +371,8 @@ zypper ar http://`FQDN.SUSE.Manager.com`/pub/repositories/sle/12/3/bootstrap/ \
 
 [NOTE]
 ====
-Do not use HTTPS.
-Use HTTP instead to avoid errors.
+Do not use ``HTTPS``.
+Use `HTTP` instead to avoid errors.
 ====
 +
 
