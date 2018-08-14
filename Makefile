@@ -104,6 +104,10 @@ suma-getting-started-html:
 suma-reference-html:
 	daps -d DC-susemanager-reference html; time
 
+#### Retail
+retail-getting-started-html:
+	daps -d DC-retail-getting-started html; time
+
 #### Build Uyuni PDF ####
 uyuni-pdf: xml
 	daps -d DC-create-all-uyuni pdf; time
