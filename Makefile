@@ -45,8 +45,9 @@ book-to-set-suma: clean suma xml-suma
 	@ccecho result "Making entities available ..."
 	(cd book-to-set; ln -sf ../entities/*ent .)
 	@ccecho result "Converting unsupported db5 tags to supported geekodoc subset tags..."
-	cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml
+	(cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml)
 	@ccecho result "Renaming and moving test.xml to xml/MAIN-manager.xml ..."
+	mkdir -p book-to-set/xml
 	mv book-to-set/test.xml book-to-set/xml/MAIN-manager.xml
 	@ccecho result "Validating resulting Main file ..."
 	cd book-to-set/; daps -m xml/MAIN-manager.xml validate
