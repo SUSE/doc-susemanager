@@ -38,8 +38,8 @@ xml/MAIN-manager.xml: adoc/*.adoc
 	rm -rf xml
 	mv xxml xml
 
-# run book-to-set stylesheet on xml/MAIN-manager.xml this allows creation of single books
-book-to-set: clean suma-dist
+# run book-to-set stylesheet first on xml/MAIN-manager.xml this allows creation of single books, next run make suma-getting-started-html to created both the single and chunked version of a book
+book-to-set-suma: clean suma xml-suma 
 	@ccecho result "Copying Main file into book-to-set/ ..."
 	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
 	@ccecho result "Making entities available ..."
@@ -65,7 +65,7 @@ suma-html: suma xml-suma
 	(cd build/create-all/html/create-all; ln -sf ../../../../../adoc/images/suma .)
 
 # Make SUMA Packages for OBS
-suma-dist: xml-suma
+suma-dist: suma xml-suma
 	daps -vvv -d DC-create-all package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc; time
 
 # Make Uyuni Packages for OBS
@@ -94,15 +94,19 @@ suma-reference-pdf:
 
 suma-advanced-html: xml-suma
 	daps -d DC-susemanager-advanced-topics html; time
+	daps -d DC-susemanager-advanced-topics html --single; time
 
 suma-best-practices-html: xml-suma
 	daps -d DC-susemanager-best-practices html; time
+	daps -d DC-susemanager-best-practices html --single; time
 
 suma-getting-started-html:
 	daps -d DC-susemanager-getting-started html; time
+	daps -d DC-susemanager-getting-started html --single; time
 
 suma-reference-html:
 	daps -d DC-susemanager-reference html; time
+	daps -d DC-susemanager-reference html --single; time
 
 #### Build Uyuni PDF ####
 uyuni-pdf: xml
