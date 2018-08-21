@@ -7,9 +7,9 @@ uyuni:
 suma:
 	$(eval PRODUCTNAME = SUSE Manager)
 
-xml-suma: xml/MAIN-manager.xml suma-images
+xml-suma: suma xml/MAIN-manager.xml suma-images
 
-xml-uyuni: xml/MAIN-manager.xml uyuni-images
+xml-uyuni: uyuni xml/MAIN-manager.xml uyuni-images
 
 suma-images: adoc/images/suma/*
 	@ccecho result "Linking suma images to DAPS expected image directories..."

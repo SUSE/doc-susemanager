@@ -813,11 +813,12 @@ For additional information, see:
 [[best.practice.salt.formulas.susemgr]]
 == Salt Formulas Coming with {susemgr}
 
+For general information, see the `Salt Formulas installation and usage instructions` at https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html.
 
 === Domain Name System (Bind)
 
-With the bind formula you configure a Domain Name System (DNS) server.
-For more information about the bind formula, see the [path]``README.rst`` file on the {productname} server: [path]``/usr/share/susemanager/formulas/metadata/bind/README.rst``.
+With the bind formula you set up and configure a Domain Name System (DNS) server.
+For technical information about the bind formula, see the [path]``README.rst`` file on the {productname} server: [path]``/usr/share/susemanager/formulas/metadata/bind/README.rst``.
 
 DNS is needed to resolve the domain names and host names into IP addresses.
 For more information about DNS, see the SLES Administration Guide, Services, The Domain Name System.
@@ -826,7 +827,8 @@ For more information about DNS, see the SLES Administration Guide, Services, The
 [[fig-formula-bind-01]]
 image::formula-bind-01.png[]
 
-In the [guimenu]``Config`` group you can set arbitrary options; click btn:[Add Item] to provide more Key/Value fields.
+In the [guimenu]``Config`` group you can set arbitrary options such as ``Forwarders``.
+Click btn:[Add Item] to provide more Key/Value fields for configuration.
 
 Check ``Include Forwarders`` if you want to rely on an external DNS server if your DNS is down (or is otherwise not able to resolve an address).
 
@@ -834,7 +836,7 @@ Check ``Include Forwarders`` if you want to rely on an external DNS server if yo
 
 Zone configuration: 
 
-You will at least configure one zone.
+You will at least configure one zone.  In ``Configured Zones`` define your zone; for example, `example.com`.  Then in ``Available Zones`` configure this zone: as ``Name`` enter your zone (in this case `example.com`) and the ``File`` where this configuration should be written (`example.com.txt`).  Enter the mandatory ``SOA`` record, and the ``Records`` you need. 
 
 .bind-02-zones
 [[fig-formula-bind-02]]
@@ -844,11 +846,22 @@ image::formula-bind-02-zones.png[]
 [[fig-formula-bind-03]]
 image::formula-bind-03-records.png[]
 
+.bind-03-records2
+[[fig-formula-bind-03-2]]
+image::formula-bind-03-records2.png[]
+
+``Generate Reverse`` and for which zones:
+
 .bind-04-reverse
 [[fig-formula-bind-04]]
 image::formula-bind-04-reverse.png[]
 
 When saved, data are written to /srv/susemanager/formula_data/pillar/<salt-minion.example.com>_bind.json
+
+
+If you apply the highstate, it first ensures that bind and all required packages will get installed.
+Then it will start the DNS service.
+
 
 
 
