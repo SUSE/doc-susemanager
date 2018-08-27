@@ -45,16 +45,7 @@ endif::[]
 :sourcedir: .
 :imagesdir: images
 
-// For the github environment we use cross references. These are only used with gh-pages, jekyll and browsing via github.
-// Add a new installation document with methods for each type of installation(jeos, sles extension, ncurses etc.)
-ifdef::env-github[]
-// <<quickstart3_chap_install_overview.adoc#gs-overview, Overview>>
-endif::[]
 
-// For DAPS processing, Includes are not friendly with gh-pages, and jekyll due to default safe methods.
-ifndef::env-github[]
-// include::quickstart3_chap_install_overview.adoc[leveloffset=1]
-endif::[]
 
 
 
@@ -66,18 +57,18 @@ endif::[]
 
 This section assumes:
 
-central SUSE Manager is installed and configured
+central {susemgr} is installed and configured
 
-SUSE Manager for Retail formulas are present on central SUSE Manager
+{smr} formulas are present on central {susemgr}
 
-branch server is installed and registered using salt in central SUSE Manager
+branch server is installed and registered using salt in central {susemgr}
 
 Branch server can be configured in many different ways. In this guide two widely used options are presented.
 
 Branch server with dedicated LAN for terminals
-In this configuration, Branch server has at least two network interfaces. One network interface connected to WAN with the central SUSE Manager server reachable. The other network interface is connected to isolated LAN which terminals are connected to.
+In this configuration, Branch server has at least two network interfaces. One network interface connected to WAN with the central {susemgr} server reachable. The other network interface is connected to isolated LAN which terminals are connected to.
 
-Branch server is the provider of DHCP, DNS, TFTP, PXE and FTP services. These services are configured by respective SUSE Manager for Retail formulas. Enable these formulas for selected Branch server in SUSE Manager web user interface. For information how to do so, refer to bp_chap_getting_started_with_salt_formulas.adoc.
+Branch server is the provider of DHCP, DNS, TFTP, PXE and FTP services. These services are configured by respective {smr} formulas. Enable these formulas for selected Branch server in {susemgr} web user interface. For information how to do so, refer to bp_chap_getting_started_with_salt_formulas.adoc.
 
 Branch Network formula for dedicated LAN
 This formula configures networking of Branch server.
@@ -98,9 +89,9 @@ Select DNS forwarder mode. Select bind to ensure Branch provided DNS can resolve
 
 Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
 
-Server directory specify working directory for SUSE Manager for Retail
+Server directory specify working directory for {smr}
 
-Server directory user and group specify directory owner and group of SUSE Manager for Retail working directory
+Server directory user and group specify directory owner and group of {smr} working directory
 
 DHCPD
 This formula configures DHCP service at Branch server
@@ -126,7 +117,7 @@ If Branch server acts as a router for internal LAN, router option must point to 
 Now continue at Common Branch server configuration
 
 Branch server with shared network for terminals
-In this configuration, Branch server has only one network interface card which is connected to network used to connect to central SUSE Manager as well as to terminals.
+In this configuration, Branch server has only one network interface card which is connected to network used to connect to central {susemgr} as well as to terminals.
 
 Branch server is provider of DNS, TFTP, PXE and FTP services. DHCP may or may not be provided by branch server.
 
@@ -152,9 +143,9 @@ Select DNS forwarder mode. Select bind to ensure Branch provided DNS can resolve
 
 Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
 
-Server directory specify working directory for SUSE Manager for Retail
+Server directory specify working directory for {smr}
 
-Server directory user and group specify directory owner and group of SUSE Manager for Retail working directory
+Server directory user and group specify directory owner and group of {smr} working directory
 
 Now continue at Common Branch server configuration
 
@@ -169,15 +160,15 @@ Synchronization is done by applying salt state 'image-sync'
 Example of image synchronization call:
 salt $branch_server_id state.apply image-sync
 Image deployment configuration and terminal deployment
-This section expects: - configured central SUSE Manager - configured branch server - saltboot PXE image
+This section expects: - configured central {susemgr} - configured branch server - saltboot PXE image
 
 In order to deploy a terminal, several more configuration steps are required:
 
 create a hardware type group for terminal hardware type
 
-assign and configure saltboot formula for given SUSE Manager group
+assign and configure saltboot formula for given {susemgr} group
 
-Before terminal is booted and registered for the first time, there is no system entry in SUSE Manager database. For this reason, hardware type groups are used to determine what image should be deployed on specific terminal.
+Before terminal is booted and registered for the first time, there is no system entry in {susemgr} database. For this reason, hardware type groups are used to determine what image should be deployed on specific terminal.
 
 Each terminal has a specific hardware type. This hardware type is constructed from SMBios information provided by terminal hardware and contain information about the manufacturer and product name.
 
@@ -186,7 +177,7 @@ Hardware type construction
 Hardware type is a concatenation of system manufacturer and system product name using - as a delimiter.
 
 Hardware type groups
-Hardware type groups are regular SUSE Manager system groups with two important details.
+Hardware type groups are regular {susemgr} system groups with two important details.
 
 Hardware type group follows very specific naming
 
@@ -205,15 +196,15 @@ any spaces or non alphanumeric characters are removed (except delimiters _, -)
 Example for system manufacturer 'POS Vendor' and system product name 'Terminal 1'. The resulting hardware type group is HWTYPE:POSVendor-Terminal1.
 
 Saltboot formula
-Once the correct hardware type group is created, saltboot formula must be enabled and configured for this group. Refer to bp_chap_getting_started_with_salt_formulas.adoc how to work with SUSE Manager formulas.
+Once the correct hardware type group is created, saltboot formula must be enabled and configured for this group. Refer to bp_chap_getting_started_with_salt_formulas.adoc how to work with {susemgr} formulas.
 
 This formula specifies partitioning and image to deploy for given terminal hardware type.
 
 Partitioning and Image assignment for specific hardware type
 Partitioning and Image assignment for specific machine
 First terminal boot
-During first terminal boot salt minion id and fingerprint will be presented on the screen. Depending on the configuration, accepting terminal key on SUSE Manager may be required.
+During first terminal boot salt minion id and fingerprint will be presented on the screen. Depending on the configuration, accepting terminal key on {susemgr} may be required.
 
 exclamation
-Accept the terminal key only when information provided on terminal screen match those in SUSE Manager Main Menu › Salt › Keys
+Accept the terminal key only when information provided on terminal screen match those in {susemgr} Main Menu › Salt › Keys
 Terminal will now continue booting, download the image from branch server and deploy it on the machine. Then proceeds to boot deployed image

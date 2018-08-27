@@ -45,72 +45,63 @@ endif::[]
 :sourcedir: .
 :imagesdir: images
 
-// For the github environment we use cross references. These are only used with gh-pages, jekyll and browsing via github.
-// Add a new installation document with methods for each type of installation(jeos, sles extension, ncurses etc.)
-ifdef::env-github[]
-// <<quickstart3_chap_install_overview.adoc#gs-overview, Overview>>
-endif::[]
 
-// For DAPS processing, Includes are not friendly with gh-pages, and jekyll due to default safe methods.
-ifndef::env-github[]
-// include::quickstart3_chap_install_overview.adoc[leveloffset=1]
-endif::[]
 
 
 
 [[retail.sect.running.requirements]]
 == Requirements
 
-This is a checklist of tasks to prepare generic SUSE Manager for Retail stack:
+This is a checklist of tasks to prepare generic {smr} stack:
 
-install and configure central SUSE Manager server
+install and configure central {susemgr} server
 
-install SUSE Manager for Retail pattern on central SUSE Manager server
+install {smr} pattern on central {susemgr} server
 
 install and configure SLES12SP3 to be used as a build host
 
-register build host to SUSE Manager using salt
+register build host to {susemgr} using salt
 
-set build host as an OS Image build host in SUSE Manager web user interface and apply highstate
+set build host as an OS Image build host in {susemgr} web user interface and apply highstate
 
 install and configure branch server
 
-register branch server to SUSE Manager using salt
+register branch server to {susemgr} using salt
 
 assign and configure branch server formulas
 
 
 Hardware requirements
-Central SUSE Manager:
+Central {susemgr}:
 
-check relevant SUSE Manager documentation
+check relevant {susemgr} documentation
 
 Branch servers:
 
-check relevant SUSE Manager Proxy documentation
+check relevant {susemgr} Proxy documentation
 
 Build hosts:
 
-only x86_64 architecture is supported by SUSE Manager for Retail
+only x86_64 architecture is supported by {smr}
 
 Terminals:
 
-only x86_64 architecture is supported by SUSE Manager for Retail
+only x86_64 architecture is supported by {smr}
 
 Images:
 
-only x86_64 architecture is supported by SUSE Manager for Retail
+only x86_64 architecture is supported by {smr}
 
 Network Requirements
-Central SUSE Manager server requires reasonably fast WAN connect
+Central {susemgr} server requires reasonably fast WAN connect
 
 Branch server
 
-Branch server requires a WAN connection where central SUSE Manager server is reachable
+Branch server requires a WAN connection where central {susemgr} server is reachable
 
 In case of shared network, router/firewall filtering DHCP requests from shared network to WAN must be present
 
-In case of dedicated network, branch server requires at least two network interfaces. One connected to WAN with reachable central SUSE Manager and the second connected to internal branch LAN
+In case of dedicated network, branch server requires at least two network interfaces. One connected to WAN with reachable central {susemgr} and the second connected to internal branch LAN
 
 Terminals require LAN connection to branch shared or dedicated network
 
@@ -118,16 +109,16 @@ Terminals require LAN connection to branch shared or dedicated network
 [[retail.sect.running.install]]
 == Installation
 
-Installation of central SUSE Manager server
-Refer to [quickstart3_chap_install_overview.adoc] how to install underlying SUSE Manager.
+Installation of central {susemgr} server
+Refer to [quickstart3_chap_install_overview.adoc] how to install underlying {susemgr}.
 
-Install SUSE Manager for Retail pattern
+Install {smr} pattern
 
-Make sure all SUSE Manager for Retail formulas are installed.
+Make sure all {smr} formulas are installed.
 
-SUSE Manager for Retail formulas consists of several packages that are available from SUSE Manager media
+{smr} formulas consists of several packages that are available from {susemgr} media
 
-SUSE Manager for Retail formula packages
+{smr} formula packages
 bind-formula
 branch-network-formula
 dhcpd-formula
@@ -142,42 +133,42 @@ and synchronize salt filesystem and salt modules
 
 salt-run fileserver.update
 salt '*' saltutil.sync_all
-When all packages are present on central SUSE Manager server saltboot runner needs to be manually configured by providing Salt API access to SUSE Manager system.
+When all packages are present on central {susemgr} server saltboot runner needs to be manually configured by providing Salt API access to {susemgr} system.
 
 /etc/salt/master.d/spacewalk.conf
 spacewalk:
     localhost:
         username: $administration_user
         password: $administration_password
-In order to avoid putting overall SUSE Manager administration credentials to the configuration files, any administration account for given organization is sufficient.
+In order to avoid putting overall {susemgr} administration credentials to the configuration files, any administration account for given organization is sufficient.
 
 exclamation
-To finish configuration of central SUSE Manager server, restart of salt master service is required. Restart salt master service now.
+To finish configuration of central {susemgr} server, restart of salt master service is required. Restart salt master service now.
 
 systemctl restart salt-master
 
 Installation of branch servers
-Branch servers are installed as regular SLES12SP3 system registered to SUSE Manager via salt minion.
+Branch servers are installed as regular SLES12SP3 system registered to {susemgr} via salt minion.
 
 Images
 Preparing customized image
 Building
-Standard OS Image building feature of SUSE Manager is used. Images are built from customized Kiwi templates, as a starting point see SUSE provided OS Image templates.
+Standard OS Image building feature of {susemgr} is used. Images are built from customized Kiwi templates, as a starting point see SUSE provided OS Image templates.
 
 Adapt these templates to contain all required software, branding, configurations. Refer to Kiwi Image System documentation for details how to work with Kiwi templates.
 
 If you are creating Kiwi template from scratch, please make sure image/preferences/type elements attribute boot is set to saltboot/suse-SLES12
 
-Once the image is build, it will be automatically transferred to SUSE Manager server
+Once the image is build, it will be automatically transferred to {susemgr} server
 
 [[retail.sect.running.setup]]
 == Initial setup
 
 
-Having installed and configured SUSE Manager for Retail infrastructure, generic workflow is as follows:
+Having installed and configured {smr} infrastructure, generic workflow is as follows:
 
 build image to be deployed on terminals
 
-synchronize images from SUSE Manager server to branch servers
+synchronize images from {susemgr} server to branch servers
 
 boot terminal

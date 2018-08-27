@@ -1,5 +1,5 @@
-[[retail.chap.introduction]]
-= SUSE Manager Retail Components
+[[retail.chap.components]]
+= Components
 ifdef::env-github,backend-html5,backend-docbook5[]
 //Admonitions
 :tip-caption: :bulb:
@@ -45,51 +45,56 @@ endif::[]
 :sourcedir: .
 :imagesdir: images
 
-// For the github environment we use cross references. These are only used with gh-pages, jekyll and browsing via github.
-// Add a new installation document with methods for each type of installation(jeos, sles extension, ncurses etc.)
-ifdef::env-github[]
-// <<quickstart3_chap_install_overview.adoc#gs-overview, Overview>>
-endif::[]
 
-// For DAPS processing, Includes are not friendly with gh-pages, and jekyll due to default safe methods.
-ifndef::env-github[]
-// include::quickstart3_chap_install_overview.adoc[leveloffset=1]
-endif::[]
 
 
 
 [[retail.sect.components]]
-== SUSE Manager Retail Components
-
-Central SUSE Manager
-Central SUSE Manager server contains the information about infrastructure, network topologies, inventory necessary to automate image deployment and day to day operations of branches and terminals. These data includes, but are not limited to, database entries of registered systems, salt pillar data about build images, image assignments, partitioning, network setup, network services, etc.
-
-Build host
-Build host can be arbitrary SLES12SP3 based server or virtual machine. This server is used to build OS Images in secure manner. See advanced_topics_image_management.adoc
-
-Branch server
-Branch servers are usually located near terminals i.e. in individual stores or branch offices. Provide necessary services for PXE boot and acts as an image cache, salt broker, rpm proxy. Depending on the configuration Branch server can also manage local networking, provide DHCP and DNS service.
-
-[[retail.sect.components.software]]
-=== Software Components
+== Components
 
 
-[[retail.sect.components.software.susemgr]]
-==== {susemgr} Server
+{smr} uses a layered architecture:
+
+* The first layer contains the central server and one or more build hosts.
+* The second layer contains one or more branch servers to provide local network and boot services.
+* The final layer contains any number of deployed point-of-sale terminals.
 
 
-[[retail.sect.omponents.software.image_buildhost]]
-==== Image Build Host
+
+.Central Server
+
+The central server is a {susemgr} server.
+It contains information about infrastructure, network topology, and everything required to automate image deployment and perform day-to-day operations of branches and terminals.
+This can include database entries of registered systems, salt pillar data for build images, image assignments, partitioning, network setup, network services, and more.
+
+.Build Hosts
+
+Build hosts can be arbitrary servers or virtual machines.
+They are used to securely build operating system images.
+Build hosts should be based on {sls}{nbsp}12 SP{nbsp}3.
 
 
-[[retail.sect.components.software.retail_branch_server]]
-==== SUSE Manager for Retail Branch Server
+.Branch Server
 
-General Formulas - these are formulas for setting up DNS, DHCP, etc.
+Branch servers should be physically located close to point-of-sale terminals, such as in an individual store or branch office.
+Branch servers provide services for PXE boot, and act as an image cache, salt broker, and RPM proxy.
+Depending on how you configure your branch server, it can also manage local networking, and provide DHCP and DNS services.
 
-Retail Formulas
+The branch server layer can operate in several different network configurations:
 
+* The branch server has a dedicated network interface card and terminals use an isolated internal branch network.
+* The branch server manages the internal network and provides DHCP, DNS, PXE, FTP, and TFTP services.
+* The branch server shares a network with the terminals, and provides a connection to the central server.
+* The branch server does not manage a network, but acts as a PXE boot server and provides FTP and TFTP services.
+In this configuration, it may or may not provide DHCP and DNS services.
+
+
+.Point-of-Sale Terminals
+
+TODO: Something here.
 
 
 [[retail.sect.components.fitting]]
 === Fitting it all together
+
+TODO: Something here.
