@@ -58,8 +58,126 @@ endif::[]
 
 
 
+[[retail.sect.running.requirements]]
+== Requirements
+
+This is a checklist of tasks to prepare generic SUSE Manager for Retail stack:
+
+install and configure central SUSE Manager server
+
+install SUSE Manager for Retail pattern on central SUSE Manager server
+
+install and configure SLES12SP3 to be used as a build host
+
+register build host to SUSE Manager using salt
+
+set build host as an OS Image build host in SUSE Manager web user interface and apply highstate
+
+install and configure branch server
+
+register branch server to SUSE Manager using salt
+
+assign and configure branch server formulas
+
+
+Hardware requirements
+Central SUSE Manager:
+
+check relevant SUSE Manager documentation
+
+Branch servers:
+
+check relevant SUSE Manager Proxy documentation
+
+Build hosts:
+
+only x86_64 architecture is supported by SUSE Manager for Retail
+
+Terminals:
+
+only x86_64 architecture is supported by SUSE Manager for Retail
+
+Images:
+
+only x86_64 architecture is supported by SUSE Manager for Retail
+
+Network Requirements
+Central SUSE Manager server requires reasonably fast WAN connect
+
+Branch server
+
+Branch server requires a WAN connection where central SUSE Manager server is reachable
+
+In case of shared network, router/firewall filtering DHCP requests from shared network to WAN must be present
+
+In case of dedicated network, branch server requires at least two network interfaces. One connected to WAN with reachable central SUSE Manager and the second connected to internal branch LAN
+
+Terminals require LAN connection to branch shared or dedicated network
+
+
 [[retail.sect.running.install]]
 == Installation
 
+Installation of central SUSE Manager server
+Refer to [quickstart3_chap_install_overview.adoc] how to install underlying SUSE Manager.
+
+Install SUSE Manager for Retail pattern
+
+Make sure all SUSE Manager for Retail formulas are installed.
+
+SUSE Manager for Retail formulas consists of several packages that are available from SUSE Manager media
+
+SUSE Manager for Retail formula packages
+bind-formula
+branch-network-formula
+dhcpd-formula
+image-sync-formula
+pxe-formula
+tftp-formula
+vsftpd-formula
+If any package is missing, install missing package using zypper call
+
+zypper install $package_name
+and synchronize salt filesystem and salt modules
+
+salt-run fileserver.update
+salt '*' saltutil.sync_all
+When all packages are present on central SUSE Manager server saltboot runner needs to be manually configured by providing Salt API access to SUSE Manager system.
+
+/etc/salt/master.d/spacewalk.conf
+spacewalk:
+    localhost:
+        username: $administration_user
+        password: $administration_password
+In order to avoid putting overall SUSE Manager administration credentials to the configuration files, any administration account for given organization is sufficient.
+
+exclamation
+To finish configuration of central SUSE Manager server, restart of salt master service is required. Restart salt master service now.
+
+systemctl restart salt-master
+
+Installation of branch servers
+Branch servers are installed as regular SLES12SP3 system registered to SUSE Manager via salt minion.
+
+Images
+Preparing customized image
+Building
+Standard OS Image building feature of SUSE Manager is used. Images are built from customized Kiwi templates, as a starting point see SUSE provided OS Image templates.
+
+Adapt these templates to contain all required software, branding, configurations. Refer to Kiwi Image System documentation for details how to work with Kiwi templates.
+
+If you are creating Kiwi template from scratch, please make sure image/preferences/type elements attribute boot is set to saltboot/suse-SLES12
+
+Once the image is build, it will be automatically transferred to SUSE Manager server
+
 [[retail.sect.running.setup]]
 == Initial setup
+
+
+Having installed and configured SUSE Manager for Retail infrastructure, generic workflow is as follows:
+
+build image to be deployed on terminals
+
+synchronize images from SUSE Manager server to branch servers
+
+boot terminal
