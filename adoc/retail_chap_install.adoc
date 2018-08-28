@@ -47,128 +47,139 @@ endif::[]
 
 
 
-
-
 [[retail.sect.running.requirements]]
 == Requirements
 
-This is a checklist of tasks to prepare generic {smr} stack:
-
-install and configure central {susemgr} server
-
-install {smr} pattern on central {susemgr} server
-
-install and configure SLES12SP3 to be used as a build host
-
-register build host to {susemgr} using salt
-
-set build host as an OS Image build host in {susemgr} web user interface and apply highstate
-
-install and configure branch server
-
-register branch server to {susemgr} using salt
-
-assign and configure branch server formulas
+Before you install {smr}, ensure your environment meets the minimum requirements:
 
 
-Hardware requirements
-Central {susemgr}:
+[IMPORTANT]
+====
+{smr} is only supported on {x86_64} architecture.
+====
 
-check relevant {susemgr} documentation
 
-Branch servers:
+.Network Requirements
 
-check relevant {susemgr} Proxy documentation
+* The central server requires a reliable and fast WAN connection
+* The Branch server requires a reliable WAN connection in order to reach the central server
+* If you are using a shared network, ensure that your router and firewall can filter DHCP requests between the shared network annd the WAN
+* If you are using a dedicated network, the branch server requires at least two network interfaces: one connected to the WAN with reachable central server, and one connected to the internal branch LAN.
+* Terminals require a LAN connection to the branch server network.
 
-Build hosts:
-
-only x86_64 architecture is supported by {smr}
-
-Terminals:
-
-only x86_64 architecture is supported by {smr}
-
-Images:
-
-only x86_64 architecture is supported by {smr}
-
-Network Requirements
-Central {susemgr} server requires reasonably fast WAN connect
-
-Branch server
-
-Branch server requires a WAN connection where central {susemgr} server is reachable
-
-In case of shared network, router/firewall filtering DHCP requests from shared network to WAN must be present
-
-In case of dedicated network, branch server requires at least two network interfaces. One connected to WAN with reachable central {susemgr} and the second connected to internal branch LAN
-
-Terminals require LAN connection to branch shared or dedicated network
 
 
 [[retail.sect.running.install]]
 == Installation
 
-Installation of central {susemgr} server
-Refer to [quickstart3_chap_install_overview.adoc] how to install underlying {susemgr}.
 
-Install {smr} pattern
+Most {smr} installations require several steps:
 
-Make sure all {smr} formulas are installed.
+. Install and configure the central server
+. Install the {smr} pattern on the central server
+. Install and configure the build host
+. Register the build host to {susemgr}
+. Set the build host as an OS Image build host in the {susemgr} {webui}, and apply highstate
+. Install and configure the branch server
+. Register the branch server to {susemgr}
+. Assign and configure branch server formulas
 
-{smr} formulas consists of several packages that are available from {susemgr} media
+Each procedure is detailed in this section.
 
-{smr} formula packages
-bind-formula
-branch-network-formula
-dhcpd-formula
-image-sync-formula
-pxe-formula
-tftp-formula
-vsftpd-formula
-If any package is missing, install missing package using zypper call
+.Procedure: Install and configure the central server
+. Refer to [quickstart3_chap_install_overview.adoc] how to install underlying {susemgr}.
+. {smr} formulas consists of several packages that are available from {susemgr} media
+. {smr} formula packages:
+* bind-formula
+* branch-network-formula
+* dhcpd-formula
+* image-sync-formula
+* pxe-formula
+* tftp-formula
+* vsftpd-formula
 
+. If any package is missing, install missing package using zypper call
++
+----
 zypper install $package_name
+----
++
 and synchronize salt filesystem and salt modules
-
++
+----
 salt-run fileserver.update
 salt '*' saltutil.sync_all
-When all packages are present on central {susemgr} server saltboot runner needs to be manually configured by providing Salt API access to {susemgr} system.
-
+----
+. When all packages are present on central {susemgr} server saltboot runner needs to be manually configured by providing Salt API access to {susemgr} system.
++
+----
 /etc/salt/master.d/spacewalk.conf
 spacewalk:
     localhost:
         username: $administration_user
         password: $administration_password
-In order to avoid putting overall {susemgr} administration credentials to the configuration files, any administration account for given organization is sufficient.
-
-exclamation
-To finish configuration of central {susemgr} server, restart of salt master service is required. Restart salt master service now.
+----
+. In order to avoid putting overall {susemgr} administration credentials to the configuration files, any administration account for given organization is sufficient.
+. To finish configuration of central {susemgr} server, restart of salt master service is required.
++
+----
+Restart salt master service now.
 
 systemctl restart salt-master
+----
 
-Installation of branch servers
-Branch servers are installed as regular SLES12SP3 system registered to {susemgr} via salt minion.
+.Procedure: Install the {smr} pattern on the central server
+. Step one
+. Another step
 
-Images
-Preparing customized image
-Building
-Standard OS Image building feature of {susemgr} is used. Images are built from customized Kiwi templates, as a starting point see SUSE provided OS Image templates.
+.Procedure: Install and configure the build host
+. Step one
+. Another step
 
-Adapt these templates to contain all required software, branding, configurations. Refer to Kiwi Image System documentation for details how to work with Kiwi templates.
+.Procedure: Register the build host to {susemgr}
+. Step one
+. Another step
 
-If you are creating Kiwi template from scratch, please make sure image/preferences/type elements attribute boot is set to saltboot/suse-SLES12
+.Procedure: Set the build host as an OS Image build host in the {susemgr} {webui}, and apply highstate
+. Standard OS Image building feature of {susemgr} is used. Images are built from customized Kiwi templates, as a starting point see SUSE provided OS Image templates.
+. Adapt these templates to contain all required software, branding, configurations. Refer to Kiwi Image System documentation for details how to work with Kiwi templates.
+. If you are creating Kiwi template from scratch, please make sure image/preferences/type elements attribute boot is set to saltboot/suse-SLES12
+. Once the image is build, it will be automatically transferred to {susemgr} server
 
-Once the image is build, it will be automatically transferred to {susemgr} server
+.Procedure: Install and configure the branch server
+. Step one
+. Another step
+
+.Procedure: Register the branch server to {susemgr}
+. Step one
+. Another step
+
+.Procedure: Assign and configure branch server formulas
+. Step one
+. Another step
+
+
 
 [[retail.sect.running.setup]]
 == Initial setup
 
 
-Having installed and configured {smr} infrastructure, generic workflow is as follows:
+To get started with {smr} after installation, you need to perform these steps:
 
-build image to be deployed on terminals
+. Build the image that will be deployed on terminals
+. Synchronize images from the central server to the branch servers
+. Boot terminals
 
-synchronize images from {susemgr} server to branch servers
+Each procedure is detailed in this section.
 
-boot terminal
+.Procedure: Build the image that will be deployed on terminals
+. Step one
+. Another step
+
+.Procedure: Synchronize images from the central server to the branch servers
+. Step one
+. Another step
+
+.Procedure: Boot terminals
+. Step one
+. Another step
