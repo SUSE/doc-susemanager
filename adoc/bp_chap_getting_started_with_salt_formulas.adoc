@@ -810,11 +810,15 @@ For additional information, see:
 *  https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
 
 
-[[best.practice.salt.formulas.susemgr]]
+
+[[bp.saltforms.susemgr]]
 == Salt Formulas Coming with {susemgr}
 
 For general information, see the `Salt Formulas installation and usage instructions` at https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html.
 
+
+
+[[bp.saltforms.susemgr.dns]]
 === Domain Name System (Bind)
 
 With the bind formula you set up and configure a Domain Name System (DNS) server.
@@ -823,7 +827,7 @@ For technical information about the bind formula and low-level pillar data, see 
 DNS is needed to resolve the domain names and host names into IP addresses.
 For more information about DNS, see the SLES Administration Guide, Services, The Domain Name System.
 
-.bind
+.Bind Formula
 [[fig-formula-bind-01]]
 image::formula-bind-01.png[]
 
@@ -871,7 +875,7 @@ Then it will start the DNS service (``named``).
 
 
 
-
+[[bp.saltforms.susemgr.dhcp]]
 === Dhcpd
 
 With the dhcpd formula you set up and configure a DHCP server (Dynamic Host Configuration Protocol).
@@ -895,7 +899,37 @@ Authoritative:
 Max Lease Time:
 Default Lease Time:
 
-Next is network configuration in the ``Network configuration (subnet)`` group.
+Next is at least one network in the ``Network configuration (subnet)`` group (with IP address, netmask, etc.).  You define every network with ``Dynamic IP range``, ``Routers``, and ``Hosts with static IP addresses (with defaults from subnet)`` (optionally).
+
+And finally ``Hosts with static IP addresses (with global defaults)``.
 
 If you apply the highstate (menu:System Details[States > Highstate]), it first ensures that [package]``dhcp-server`` and all required packages will get installed.
 Then it will start the DHCP service (``dhcpd``).
+
+
+
+[[bp.saltforms.susemgr.tftp]]
+=== Tftpd
+
+With the tftpd formula you set up and configure a TFTP server (Trivial File Transfer Protocol).
+A TFTP server is a component that provides infrastructure for booting with PXE.
+
+////
+For technical information about the dhcpd formula and low-level pillar data, see the Pillar example file 
+[path]``/usr/share/susemanager/formulas/metadata/dhcpd/pillar.example``.
+////
+
+For more information about setting up TFTP, see the SLES Deployment Guide, Preparing Network Boot Environment, Setting Up a TFTP Server.
+// https://www.suse.com/documentation/sles-15/singlehtml/book_sle_deployment/book_sle_deployment.html#sec.deployment.tftp_server
+
+
+.tftpd formula
+[[fig-formula-tftpd-01]]
+image::formula-tftpd-01.png[]
+
+For setting up a TFTP server, specify the ``Internal Network Address``,
+``TFTP base directory`` (default: [path]``/srv/tftpboot``), and ``run
+TFTP under user`` (default: [systemitem]``sftp``).
+
+If you apply the highstate (menu:System Details[States > Highstate]), it first ensures that [package]``atftp`` and all required packages will get installed.
+Then it will start TFTP (``atftpd``).
