@@ -50,48 +50,33 @@ endif::[]
 
 
 [[retail.sect.admin]]
-== Basic Administration
+== Administration
 
+This sections contains notes on administering your {smr} installation.
 
+[[retail.sect.admin.branch_network_config]]
+=== Branch Server Network Configuration
 
+The branch server can be configured to use networking in many different ways.
+The most common ways provide either a dedicated or shared LAN for terminals.
 
-This section assumes:
+.Procedure: Set up a Branch Server with a Dedicated LAN
 
-central {susemgr} is installed and configured
+In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the central server, and the other one acts as an isolated LAN to communicate with terminals.
+This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
 
-{smr} formulas are present on central {susemgr}
-
-branch server is installed and registered using salt in central {susemgr}
-
-Branch server can be configured in many different ways. In this guide two widely used options are presented.
-
-Branch server with dedicated LAN for terminals
-In this configuration, Branch server has at least two network interfaces. One network interface connected to WAN with the central {susemgr} server reachable. The other network interface is connected to isolated LAN which terminals are connected to.
-
-Branch server is the provider of DHCP, DNS, TFTP, PXE and FTP services. These services are configured by respective {smr} formulas. Enable these formulas for selected Branch server in {susemgr} web user interface. For information how to do so, refer to bp_chap_getting_started_with_salt_formulas.adoc.
-
-Branch Network formula for dedicated LAN
-This formula configures networking of Branch server.
-
-Keep Dedicated Nic checked
-
-Enter name of the network device which is connected to the internal LAN
-
-Static IP address to be assigned to Branch server on internal LAN
-
-Network mask of the internal LAN
-
-Check Enable route if you want Branch server to route traffic from internal LAN to WAN
-
-Check Enable NAT if you want Branch server to translate addresses from internal LAN to WAN
-
-Select DNS forwarder mode. Select bind to ensure Branch provided DNS can resolve WAN domain names
-
-Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
-
-Server directory specify working directory for {smr}
-
-Server directory user and group specify directory owner and group of {smr} working directory
+. In the {susemgr} {webui} for the branch server, go to TODO:FIXME
+. Keep [guimenu]``Dedicated NIC`` checked
+. Enter name of the network device which is connected to the internal LAN
+. Static IP address to be assigned to Branch server on internal LAN
+. Network mask of the internal LAN
+. Check [guimenu]``Enable route`` if you want the branch server to route traffic from internal LAN to WAN
+. Check [guimenu]``Enable NAT`` if you want the branch server to convert addresses from internal LAN to WAN
+. Select DNS forwarder mode.
+. Select bind to ensure Branch provided DNS can resolve WAN domain names
+. Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
+. Server directory specify working directory for {smr}
+. Server directory user and group specify directory owner and group of {smr} working directory
 
 DHCPD
 This formula configures DHCP service at Branch server
@@ -159,7 +144,11 @@ Synchronization is done by applying salt state 'image-sync'
 
 Example of image synchronization call:
 salt $branch_server_id state.apply image-sync
-Image deployment configuration and terminal deployment
+
+
+[[retail.sect.admin.deploy_terminals]]
+=== Deploying Terminals
+
 This section expects: - configured central {susemgr} - configured branch server - saltboot PXE image
 
 In order to deploy a terminal, several more configuration steps are required:
