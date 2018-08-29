@@ -78,17 +78,13 @@ This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE 
 . Server directory specify working directory for {smr}
 . Server directory user and group specify directory owner and group of {smr} working directory
 
-DHCPD
+
 This formula configures DHCP service at Branch server
 
-exclamation
-Generic configuration
 Listen interface must be the same entered in Branch Network formula
 
 Domain Name Servers must be configured to point to Branch server
 
-exclamation
-Subnet configuration
 Branch static IP address must be reachable from Network provided by DHCP service
 
 Next server must be configured to point to Branch server
@@ -99,47 +95,31 @@ If terminals MAC addresses are known beforehand, host configuration can be speci
 
 If Branch server acts as a router for internal LAN, router option must point to Branch server.
 
-Now continue at Common Branch server configuration
 
-Branch server with shared network for terminals
-In this configuration, Branch server has only one network interface card which is connected to network used to connect to central {susemgr} as well as to terminals.
 
-Branch server is provider of DNS, TFTP, PXE and FTP services. DHCP may or may not be provided by branch server.
+.Procedure: Set up a Branch Server with a Shared Network
 
-exclamation
-If DHCP service is not provided by Branch server, external DHCP configuration must contain:
+In this configuration, the branch server has only one network interface card which is used to connect to the central server as well as the terminals.
+This configuration allows for the branch server to provide DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
+Optionally, the branch server can also provide DHCP services in this configuration.
 
-next-server option must point to the Branch server for PXE boot to work
+[NOTE]
+====
+If DHCP services are not provided by the branch server, ensure that your external DHCP configuration is set correctly:
+* The [systemitem]``next-server`` option must point to the branch server for PXE boot to work
+* The [systemitem]``filename`` option must correctly identify the network boot program (by default, this is [path]``/boot/pxelinux``)
+* The [systemitem]``domain-name-servers`` option must point to the branch server for correct host name resolution
+====
 
-filename option must correctly identify network boot program (by default /boot/pxelinux)
+. In the {susemgr} {webui} for the branch server, go to TODO:FIXME
+. Keep [guimenu]``Dedicated NIC`` unchecked
+. Select which services should be enabled on Branch server’s firewall. Ensure you include DNS, TFTP and FTP services.
+. Select DNS forwarder mode. Select bind to ensure Branch provided DNS can resolve WAN domain names
+. Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
+. Server directory specify working directory for {smr}
+. Server directory user and group specify directory owner and group of {smr} working directory
 
-domain-name-servers option must point to the Branch server for correct host name resolution
 
-Branch Network formula for shared network
-This formula configures networking of Branch server.
-
-Keep Dedicated Nic unchecked
-
-Select which services should be enabled on Branch server’s firewall.
-
-exclamation
-DNS, TFTP and FTP services should be enabled on Branch server’s firewall.
-Select DNS forwarder mode. Select bind to ensure Branch provided DNS can resolve WAN domain names
-
-Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
-
-Server directory specify working directory for {smr}
-
-Server directory user and group specify directory owner and group of {smr} working directory
-
-Now continue at Common Branch server configuration
-
-Common Branch server configuration
-DNS
-TFTP
-PXE
-VSFTP
-Images synchronization
 Synchronization is done by applying salt state 'image-sync'
 
 Example of image synchronization call:
@@ -161,7 +141,6 @@ Before terminal is booted and registered for the first time, there is no system 
 
 Each terminal has a specific hardware type. This hardware type is constructed from SMBios information provided by terminal hardware and contain information about the manufacturer and product name.
 
-information_source
 Hardware type construction
 Hardware type is a concatenation of system manufacturer and system product name using - as a delimiter.
 
@@ -172,8 +151,6 @@ Hardware type group follows very specific naming
 
 Saltboot formula is assigned and configured
 
-exclamation
-Hardware type group naming
 Hardware type groups follows naming:
 
 prefix "HWTYPE:"
@@ -194,6 +171,6 @@ Partitioning and Image assignment for specific machine
 First terminal boot
 During first terminal boot salt minion id and fingerprint will be presented on the screen. Depending on the configuration, accepting terminal key on {susemgr} may be required.
 
-exclamation
+
 Accept the terminal key only when information provided on terminal screen match those in {susemgr} Main Menu › Salt › Keys
 Terminal will now continue booting, download the image from branch server and deploy it on the machine. Then proceeds to boot deployed image
