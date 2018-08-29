@@ -128,7 +128,7 @@ uyuni-reference-pdf:
 #### Retail
 xml-retail: xml/book_retail_getting_started.xml # retail-images
 
-suma-images: adoc/images/retail/*
+retail-images: adoc/images/retail/*
 	@ccecho result "Linking suma images to DAPS expected image directories..."
 	sleep 1
 	mkdir -p images/src
