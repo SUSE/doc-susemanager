@@ -126,7 +126,14 @@ uyuni-reference-pdf:
 	daps -d DC-uyuni-reference pdf; time
 
 #### Retail
-xml-retail: xml/book_retail_getting_started.xml # uyuni-images
+xml-retail: xml/book_retail_getting_started.xml # retail-images
+
+suma-images: adoc/images/retail/*
+	@ccecho result "Linking suma images to DAPS expected image directories..."
+	sleep 1
+	mkdir -p images/src
+	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/retail/*.png .)
+	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/retail/*.svg .)
 
 xml/book_retail_getting_started.xml: adoc/retail*.adoc
 	@ccecho result "Converting adoc MAIN-manager.xml to Docbook5 xml and adding the {PRODUCTNAME} entities..."
@@ -142,6 +149,9 @@ xml/book_retail_getting_started.xml: adoc/retail*.adoc
 
 retail-getting-started-html: xml-retail
 	daps -d DC-retail-getting-started html; time
+
+retail-getting-started-pdf:
+	daps -d DC-retail-getting-started pdf; time
 
 # Target for www.suse.com/documentation
 suma-online-docs:
