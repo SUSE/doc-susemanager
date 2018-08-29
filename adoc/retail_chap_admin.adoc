@@ -1,0 +1,176 @@
+[[retail.chap.admin]]
+= Administration
+ifdef::env-github,backend-html5,backend-docbook5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Linux Enterprise
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:productname:
+:susemgr: SUSE Manager
+:smr: SUSE Manager for Retail
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:webui: Web UI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+endif::[]
+// Asciidoctor Front Matter
+:doctype: book
+:sectlinks:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:imagesdir: images
+
+
+
+
+
+[[retail.sect.admin]]
+== Administration
+
+This sections contains notes on administering your {smr} installation.
+
+[[retail.sect.admin.branch_network_config]]
+=== Branch Server Network Configuration
+
+The branch server can be configured to use networking in many different ways.
+The most common ways provide either a dedicated or shared LAN for terminals.
+
+.Procedure: Set up a Branch Server with a Dedicated LAN
+
+In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the central server, and the other one acts as an isolated LAN to communicate with terminals.
+This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
+
+. In the {susemgr} {webui} for the branch server, go to TODO:FIXME
+. Keep [guimenu]``Dedicated NIC`` checked
+. Enter name of the network device which is connected to the internal LAN
+. Static IP address to be assigned to Branch server on internal LAN
+. Network mask of the internal LAN
+. Check [guimenu]``Enable route`` if you want the branch server to route traffic from internal LAN to WAN
+. Check [guimenu]``Enable NAT`` if you want the branch server to convert addresses from internal LAN to WAN
+. Select DNS forwarder mode.
+. Select bind to ensure Branch provided DNS can resolve WAN domain names
+. Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
+. Server directory specify working directory for {smr}
+. Server directory user and group specify directory owner and group of {smr} working directory
+
+
+This formula configures DHCP service at Branch server
+
+Listen interface must be the same entered in Branch Network formula
+
+Domain Name Servers must be configured to point to Branch server
+
+Branch static IP address must be reachable from Network provided by DHCP service
+
+Next server must be configured to point to Branch server
+
+Be sure configured ranges match configured network and netmask
+
+If terminals MAC addresses are known beforehand, host configuration can be specified for static IP address assignment.
+
+If Branch server acts as a router for internal LAN, router option must point to Branch server.
+
+
+
+.Procedure: Set up a Branch Server with a Shared Network
+
+In this configuration, the branch server has only one network interface card which is used to connect to the central server as well as the terminals.
+This configuration allows for the branch server to provide DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
+Optionally, the branch server can also provide DHCP services in this configuration.
+
+[NOTE]
+====
+If DHCP services are not provided by the branch server, ensure that your external DHCP configuration is set correctly:
+* The [systemitem]``next-server`` option must point to the branch server for PXE boot to work
+* The [systemitem]``filename`` option must correctly identify the network boot program (by default, this is [path]``/boot/pxelinux``)
+* The [systemitem]``domain-name-servers`` option must point to the branch server for correct host name resolution
+====
+
+. In the {susemgr} {webui} for the branch server, go to TODO:FIXME
+. Keep [guimenu]``Dedicated NIC`` unchecked
+. Select which services should be enabled on Branch server’s firewall. Ensure you include DNS, TFTP and FTP services.
+. Select DNS forwarder mode. Select bind to ensure Branch provided DNS can resolve WAN domain names
+. Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
+. Server directory specify working directory for {smr}
+. Server directory user and group specify directory owner and group of {smr} working directory
+
+
+Synchronization is done by applying salt state 'image-sync'
+
+Example of image synchronization call:
+salt $branch_server_id state.apply image-sync
+
+
+[[retail.sect.admin.deploy_terminals]]
+=== Deploying Terminals
+
+This section expects: - configured central {susemgr} - configured branch server - saltboot PXE image
+
+In order to deploy a terminal, several more configuration steps are required:
+
+create a hardware type group for terminal hardware type
+
+assign and configure saltboot formula for given {susemgr} group
+
+Before terminal is booted and registered for the first time, there is no system entry in {susemgr} database. For this reason, hardware type groups are used to determine what image should be deployed on specific terminal.
+
+Each terminal has a specific hardware type. This hardware type is constructed from SMBios information provided by terminal hardware and contain information about the manufacturer and product name.
+
+Hardware type construction
+Hardware type is a concatenation of system manufacturer and system product name using - as a delimiter.
+
+Hardware type groups
+Hardware type groups are regular {susemgr} system groups with two important details.
+
+Hardware type group follows very specific naming
+
+Saltboot formula is assigned and configured
+
+Hardware type groups follows naming:
+
+prefix "HWTYPE:"
+
+appendix is hardware type of the terminals
+
+any spaces or non alphanumeric characters are removed (except delimiters _, -)
+
+Example for system manufacturer 'POS Vendor' and system product name 'Terminal 1'. The resulting hardware type group is HWTYPE:POSVendor-Terminal1.
+
+Saltboot formula
+Once the correct hardware type group is created, saltboot formula must be enabled and configured for this group. Refer to bp_chap_getting_started_with_salt_formulas.adoc how to work with {susemgr} formulas.
+
+This formula specifies partitioning and image to deploy for given terminal hardware type.
+
+Partitioning and Image assignment for specific hardware type
+Partitioning and Image assignment for specific machine
+First terminal boot
+During first terminal boot salt minion id and fingerprint will be presented on the screen. Depending on the configuration, accepting terminal key on {susemgr} may be required.
+
+
+Accept the terminal key only when information provided on terminal screen match those in {susemgr} Main Menu › Salt › Keys
+Terminal will now continue booting, download the image from branch server and deploy it on the machine. Then proceeds to boot deployed image

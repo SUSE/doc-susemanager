@@ -1,0 +1,185 @@
+[[retail.chap.install]]
+= Installation
+ifdef::env-github,backend-html5,backend-docbook5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Linux Enterprise
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:productname:
+:susemgr: SUSE Manager
+:smr: SUSE Manager for Retail
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:webui: Web UI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+endif::[]
+// Asciidoctor Front Matter
+:doctype: book
+:sectlinks:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:imagesdir: images
+
+
+
+[[retail.sect.running.requirements]]
+== Requirements
+
+Before you install {smr}, ensure your environment meets the minimum requirements:
+
+
+[IMPORTANT]
+====
+{smr} is only supported on {x86_64} architecture.
+====
+
+
+.Network Requirements
+
+* The central server requires a reliable and fast WAN connection
+* The Branch server requires a reliable WAN connection in order to reach the central server
+* If you are using a shared network, ensure that your router and firewall can filter DHCP requests between the shared network annd the WAN
+* If you are using a dedicated network, the branch server requires at least two network interfaces: one connected to the WAN with reachable central server, and one connected to the internal branch LAN.
+* Terminals require a LAN connection to the branch server network.
+
+
+
+[[retail.sect.running.install]]
+== Installation
+
+
+Most {smr} installations require several steps:
+
+. Install and configure the central server
+. Install the {smr} pattern on the central server
+. Install and configure the build host
+. Register the build host to {susemgr}
+. Set the build host as an OS Image build host in the {susemgr} {webui}, and apply highstate
+. Install and configure the branch server
+. Register the branch server to {susemgr}
+. Assign and configure branch server formulas
+
+Each procedure is detailed in this section.
+
+.Procedure: Install and configure the central server
+. Refer to [quickstart3_chap_install_overview.adoc] how to install underlying {susemgr}.
+. {smr} formulas consists of several packages that are available from {susemgr} media
+. {smr} formula packages:
+* bind-formula
+* branch-network-formula
+* dhcpd-formula
+* image-sync-formula
+* pxe-formula
+* tftp-formula
+* vsftpd-formula
+
+. If any package is missing, install missing package using zypper call
++
+----
+zypper install $package_name
+----
++
+and synchronize salt filesystem and salt modules
++
+----
+salt-run fileserver.update
+salt '*' saltutil.sync_all
+----
+. When all packages are present on central {susemgr} server saltboot runner needs to be manually configured by providing Salt API access to {susemgr} system.
++
+----
+/etc/salt/master.d/spacewalk.conf
+spacewalk:
+    localhost:
+        username: $administration_user
+        password: $administration_password
+----
+. In order to avoid putting overall {susemgr} administration credentials to the configuration files, any administration account for given organization is sufficient.
+. To finish configuration of central {susemgr} server, restart of salt master service is required.
++
+----
+Restart salt master service now.
+
+systemctl restart salt-master
+----
+
+.Procedure: Install the {smr} pattern on the central server
+. Step one
+. Another step
+
+.Procedure: Install and configure the build host
+. Step one
+. Another step
+
+.Procedure: Register the build host to {susemgr}
+. Step one
+. Another step
+
+.Procedure: Set the build host as an OS Image build host in the {susemgr} {webui}, and apply highstate
+. Standard OS Image building feature of {susemgr} is used. Images are built from customized Kiwi templates, as a starting point see SUSE provided OS Image templates.
+. Adapt these templates to contain all required software, branding, configurations. Refer to Kiwi Image System documentation for details how to work with Kiwi templates.
+. If you are creating Kiwi template from scratch, please make sure image/preferences/type elements attribute boot is set to saltboot/suse-SLES12
+. Once the image is build, it will be automatically transferred to {susemgr} server
+
+.Procedure: Install and configure the branch server
+. Step one
+. Another step
+
+.Procedure: Register the branch server to {susemgr}
+. Step one
+. Another step
+
+.Procedure: Assign and configure branch server formulas
+. Step one
+. Another step
+
+
+
+[[retail.sect.running.setup]]
+== Initial setup
+
+
+To get started with {smr} after installation, you need to perform these steps:
+
+. Build the image that will be deployed on terminals
+. Synchronize images from the central server to the branch servers
+. Boot terminals
+
+Each procedure is detailed in this section.
+
+.Procedure: Build the image that will be deployed on terminals
+. Step one
+. Another step
+
+.Procedure: Synchronize images from the central server to the branch servers
+. Step one
+. Another step
+
+.Procedure: Boot terminals
+. Step one
+. Another step

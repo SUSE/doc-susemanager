@@ -1,0 +1,98 @@
+[[retail.chap.components]]
+= Components
+ifdef::env-github,backend-html5,backend-docbook5[]
+//Admonitions
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+// SUSE ENTITIES FOR GITHUB
+// System Architecture
+:zseries: z Systems
+:ppc: POWER
+:ppc64le: ppc64le
+:ipf : Itanium
+:x86: x86
+:x86_64: x86_64
+// Rhel Entities
+:rhel: Red Hat Linux Enterprise
+:rhnminrelease6: Red Hat Enterprise Linux Server 6
+:rhnminrelease7: Red Hat Enterprise Linux Server 7
+// SUSE Manager Entities
+:productname:
+:susemgr: SUSE Manager
+:smr: SUSE Manager for Retail
+:susemgrproxy: SUSE Manager Proxy
+:productnumber: 3.2
+:webui: Web UI
+// SUSE Product Entities
+:sles-version: 12
+:sp-version: SP3
+:jeos: JeOS
+:scc: SUSE Customer Center
+:sls: SUSE Linux Enterprise Server
+:sle: SUSE Linux Enterprise
+:slsa: SLES
+:suse: SUSE
+endif::[]
+// Asciidoctor Front Matter
+:doctype: book
+:sectlinks:
+:toc: left
+:icons: font
+:experimental:
+:sourcedir: .
+:imagesdir: images
+
+
+
+[[retail.sect.components]]
+== Components
+
+
+{smr} uses a layered architecture:
+
+* The first layer contains the central server and one or more build hosts.
+* The second layer contains one or more branch servers to provide local network and boot services.
+* The final layer contains any number of deployed point-of-sale terminals.
+
+
+
+.Central Server
+
+The central server is a {susemgr} server.
+It contains information about infrastructure, network topology, and everything required to automate image deployment and perform day-to-day operations of branches and terminals.
+This can include database entries of registered systems, salt pillar data for build images, image assignments, partitioning, network setup, network services, and more.
+
+.Build Hosts
+
+Build hosts can be arbitrary servers or virtual machines.
+They are used to securely build operating system images.
+Build hosts should be based on {sls}{nbsp}12 SP{nbsp}3.
+
+
+.Branch Server
+
+Branch servers should be physically located close to point-of-sale terminals, such as in an individual store or branch office.
+Branch servers provide services for PXE boot, and act as an image cache, salt broker, and RPM proxy.
+Depending on how you configure your branch server, it can also manage local networking, and provide DHCP and DNS services.
+
+The branch server layer can operate in several different network configurations:
+
+* The branch server has a dedicated network interface card and terminals use an isolated internal branch network.
+* The branch server manages the internal network and provides DHCP, DNS, PXE, FTP, and TFTP services.
+* The branch server shares a network with the terminals, and provides a connection to the central server.
+* The branch server does not manage a network, but acts as a PXE boot server and provides FTP and TFTP services.
+In this configuration, it may or may not provide DHCP and DNS services.
+
+
+.Point-of-Sale Terminals
+
+TODO: Something here.
+
+
+[[retail.sect.components.fitting]]
+=== Fitting it all together
+
+TODO: Something here.
