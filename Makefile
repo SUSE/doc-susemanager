@@ -125,6 +125,24 @@ uyuni-getting-started-pdf:
 uyuni-reference-pdf:
 	daps -d DC-uyuni-reference pdf; time
 
+#### Retail
+xml-retail: xml/book_retail_getting_started.xml # uyuni-images
+
+xml/book_retail_getting_started.xml: adoc/retail*.adoc
+	@ccecho result "Converting adoc MAIN-manager.xml to Docbook5 xml and adding the {PRODUCTNAME} entities..."
+	asciidoctor -a productname='$(PRODUCTNAME)' -b docbook5 -d book -D xxml adoc/book_retail_getting_started.adoc
+	#@ccecho result "Inserting entities from doc-susemanager/entities..."
+	#sed -i '2i <!DOCTYPE set [ <!ENTITY % entities SYSTEM "entity-decl.ent"> %entities; ]>' xxml/MAIN-manager.xml
+	#@ccecho result "Replacing {foo} (but not \${foo}) with &foo;..."
+	#perl -p -i -e 's/([^\$$])\{(\w+)\}/\1\&$$2\;/g' xxml/MAIN-manager.xml
+	#@ccecho result "Making .ent files available for validation..."
+	#(cd xxml; ln -sf ../entities/*ent .)
+	rm -rf xml
+	mv xxml xml
+
+retail-getting-started-html: xml-retail
+	daps -d DC-retail-getting-started html; time
+
 # Target for www.suse.com/documentation
 suma-online-docs:
 	daps -d DC-create-all online-docs; time
