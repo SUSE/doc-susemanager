@@ -84,7 +84,8 @@ The primary goal of a {susemgrproxy} is to improve {productname} performance by 
 The following section provides {susemgrproxy} requirements.
 
 .Supported Client Systems
-For supported clients and their requirements, see Supported Client Systems.
+For supported clients and their requirements, see <<quickstart.sect.prereq.clientos>>.
+// Supported Client Systems
 
 .Hardware Requirements
 Hardware requirements highly depend on your usage scenario.
@@ -96,9 +97,9 @@ For specific hardware requirements, see the following table.
 |===
 | Hardware | Required
 | CPU             | Multi-core 64-bit CPU (x86_64).
-| RAM             | Minimum 4{nbsp} GB for a non-production server
-|                 | Minimum 16{nbsp} GB for a production server
-| Free Disk Space | Minimum 100{nbsp} GB for base installation and at least 50 GB for caching per SUSE product and +100 GB per Red Hat product; a resizeable partition strongly recommended.
+| RAM             | Minimum 4{nbsp}GB for a non-production server
+|                 | Minimum 16{nbsp}GB for a production server
+| Free Disk Space | Minimum 100{nbsp}GB for base installation and at least 50 GB for caching per SUSE product and +100 GB per Red Hat product; a resizeable partition strongly recommended.
 |===
 
 [TIP]
@@ -111,14 +112,14 @@ For specific hardware requirements, see the following table.
 For installing the proxy, you need the SSL certificate password entered during the initial installation of {productname}.
 
 .Network Requirements
-For additional network requirements, see Additional Requirements.
+For additional network requirements, see <<quickstart.sect.prereq.network>>.
 
 .{scc}
 For using {susemgrproxy}, you need an account at {scc} (SCC) where your purchased products and product subscriptions are registered.
 Make sure you have the following subscriptions:
 
-* One or more subscriptions for {susemgrproxy} .
-* One or more subscriptions for {productname} .
+* One or more subscriptions for {susemgrproxy}.
+* One or more subscriptions for {productname}.
 * Subscriptions for the products on the client systems you want to register with {productname} via {susemgrproxy} .
 * Subscriptions to client entitlements for the client system you want to register with {productname} via {susemgrproxy} .
 
@@ -186,12 +187,12 @@ image::sles12-proxy-child.png[]
 
 [[at.manager.proxy.install.prep.bss]]
 . Modify a bootstrap script for the proxy.
-Ensure unchecking menu:Bootstrap using Salt[] , because in this case the proxy must be bootstrapped as a so-called traditional client.
+Ensure unchecking menu:Bootstrap using Salt[], because in this case the proxy must be bootstrapped as a so-called traditional client.
 For more information about bootstrap scripts, see <<modify.bootstrap.script>>.
 
 . Bootstrap the client with the bootstrap script.
 . You will see a list of channels to which your client is already subscribed to.
-Select the two unchecked proxy channels which include the [systemitem]``SUSE Manager Proxy-3.2-Pool`` and [systemitem]``SUSE-Manager-Proxy-3.2-Updates`` , then select menu:Change Subscriptions[] to continue.
+Select the two unchecked proxy channels which include the [systemitem]``SUSE Manager Proxy-3.2-Pool`` and [systemitem]``SUSE-Manager-Proxy-3.2-Updates``, then select menu:Change Subscriptions[] to continue.
 This will provide the required repositories for the proxy packages from the {productname} server to the client.
 
 A few more steps are still needed:
@@ -336,13 +337,13 @@ These minions can be registered with a bootstrap script like the traditional cli
 
 Registering Salt clients via {susemgrproxy} from the {webui}
 is done almost the same way as registering clients directly with the {productname} server.
-The difference is that you specify the name of the proxy in the menu:Proxy[] drop-box on menu:Salt[Bootstrapping] page.
+The difference is that you specify the name of the proxy in the [guimenu]``Proxy`` drop-box on the menu:Main Menu[Salt > Bootstrapping] page.
 
 .Bootstrapping a Salt Client With a Proxy
 image::proxy-saltbootstrap.png[scaledwidth=80%]
 
 .Procedure: Register a Salt client through a proxy from command line
-. Instead of the {webui} , you may use the command line to register a minion through a proxy.
+. Instead of the {webui}, you may use the command line to register a minion through a proxy.
 To do so, add the proxy FQDN as the master in the minions configuration file located at:
 +
 
@@ -491,7 +492,7 @@ PXE (tftp) is installed and activated by default.
 To enable systems to find the PXE boot on the {susemgrproxy} server add the following to the DHCP configuration for the zone containing the systems to be provisioned:
 
 ----
-next-server:`IP_Address_of_SUSE_Manager_Proxy_Server`filename: "pxelinux.0"
+next-server:<IP_Address_of_SUSE_Manager_Proxy_Server>filename: "pxelinux.0"
 ----
 
 
@@ -522,7 +523,7 @@ Create a reactivation key for this system and then register the new proxy using 
 If you do not use the reactivation key, you will need to re-registered all the clients against the new proxy.
 
 [[proc.advanced.topics.proxy.migration3.replace]]
-.Procedure: Replacing a {susemgrproxy}and Keeping the ClientsRegistered
+.Procedure: Replacing a {susemgrproxy} and Keeping the Clients Registered
 . Before starting the actual migration procedure, save the data from the old proxy, if needed.
 Consider copying important data to a central place that can also be accessed by the new server:
 ** Copy the scripts that are still needed.
@@ -532,8 +533,8 @@ Of course, it is always better to re-create the keys.
 . Install a new {productname} 3.1 Proxy, see <<at.manager.proxy.inst-and-clients>>.
 . In the SUSE Manager {webui} select the newly installed {susemgrproxy} and delete it from the systems list.
 [[step.at.proxy.migration3.replace.react]]
-. In the {webui} , create a reactivation key for the old proxy system: On the System Details of the old proxy click menu:Reactivation[].
-Then click menu:Generate New Key[] , and remember it (write it on a piece of paper or copy it to the clipboard).
+. In the {webui}, create a reactivation key for the old proxy system: On the System Details of the old proxy click menu:Reactivation[].
+Then click menu:Generate New Key[], and remember it (write it on a piece of paper or copy it to the clipboard).
 For more information about reactivation keys, see <<s5-sm-system-details-react>>.
 . After the installation of the new proxy, perform the following actions (if needed):
 ** Copy the centrally saved data to the new proxy system.
@@ -572,13 +573,13 @@ For the upgrade to {productname} 3.1 Proxy, at least the [systemitem]``SUSE Linu
 
 image::suma_proxy_old_details_page.png[]
 
-. On the system's detail page select the menu:Software[] tab, then the menu:SP Migration[] tab.
+. On the system's detail page select the menu:Software[] tab, then the [guimenu]``SP Migration`` tab.
 +
 
 image::suma_proxy_old_details_spmigration.png[]
 
 . From this page you will see installed products listed on your proxy client, and the available target products.
-Select the wanted menu:Target Products[] , which include [systemitem]``SUSE Linux Enterprise Server 12 SP3`` and [systemitem]``SUSE Manager Proxy 3.1`` .
+Select the wanted menu:Target Products[], which include [systemitem]``SUSE Linux Enterprise Server 12 SP3`` and [systemitem]``SUSE Manager Proxy 3.1``.
 +
 
 image::suma_proxy_migration_target.png[]
@@ -589,7 +590,7 @@ Then confirm with menu:Select Channels[].
 
 image::suma_proxy_migration_channels.png[]
 
-. From the menu:Schedule Migration[] menu, and then btn:[Confirm] .
+. From the menu:Schedule Migration[] menu, and then btn:[Confirm].
 
 Check the menu:System Status[] on the system's details when the migration is done.
 
@@ -612,7 +613,7 @@ Finally consider scheduling a reboot.
 
 
 [[advanced.topics.proxy.migration]]
-== Migrating {productname}  2.1 Proxy to Version 3.1
+== Migrating {productname} 2.1 Proxy to Version 3.1
 
 For the migration of {productname} 2.1 Proxies there are two possible approaches--this section documents both approaches:
 
@@ -640,7 +641,7 @@ In order to replace a {susemgrproxy} and keeping the clients registered to the p
 Create a reactivation key for this system and then register the new proxy using the reactivation key.
 If you do not use the reactivation key, you will need to re-registered all the clients against the new proxy.
 [[proc.advanced.topics.proxy.migration21.replace]]
-.Procedure: Replacing a {susemgrproxy}and Keeping the ClientsRegistered
+.Procedure: Replacing a {susemgrproxy} and Keeping the Clients Registered
 . Before starting the actual migration procedure, save the important data from the old proxy.
 Copy the data to a central place that also the new server can access:
 ** Copy the scripts that are still needed.
@@ -663,8 +664,8 @@ This may take a few hours.
 
 . In the SUSE Manager {webui} select the newly installed {susemgrproxy} and delete it from the systems list.
 [[step.at.proxy.migration.replace.react]]
-. In the {webui} , create a reactivation key for the old proxy system: On the System Details of the old proxy click menu:Reactivation[].
-Then click menu:Generate New Key[] , and remember it (write it on a piece of paper or copy it to the clipboard).
+. In the {webui}, create a reactivation key for the old proxy system: On the System Details of the old proxy click menu:Reactivation[].
+Then click menu:Generate New Key[], and remember it (write it on a piece of paper or copy it to the clipboard).
 For more information about reactivation keys, see <<s5-sm-system-details-react>>.
 . After the installation of the new proxy, perform the following actions (if needed):
 ** Copy the centrally saved data back to the new proxy system.
@@ -680,13 +681,13 @@ In other situations upgrading the proxy will be the preferred solution as it ret
 This route saves time especially regarding proxies connected to a {productname} server via low-bandwith links.
 This upgrade can be automated by using the {yast} auto-installation feature.
 
-.Procedure: Upgrading {susemgrproxy}from 2.1 to 3.1
+.Procedure: Upgrading {susemgrproxy} from 2.1 to 3.1
 . Create an auto-installable distribution based on SLES 12 SP3.
 {productname} 3.1 Proxy is an add-on for SLES 12 SP3.
 Refer to the <<ref.webui.systems.autoinst>> on creating an auto-installable distribution.
 . To start the auto-installation of a proxy, some additional packages must be installed that are only available in the {productname} Tools channel.
 These tools were not available for proxies when in the past the system was shipped as an appliance.
-To gain access to the required packages for use with proxies, the underlying SLES 11 SP3 channel ([systemitem]``SLES11-SP3-SUSE-Manager-Tools`` ) needs to be cloned and assigned to the to-be-upgraded proxies.
+To gain access to the required packages for use with proxies, the underlying SLES 11 SP3 channel ([systemitem]``SLES11-SP3-SUSE-Manager-Tools``) needs to be cloned and assigned to the to-be-upgraded proxies.
 After these steps have been completed, create an auto-installation profile.
 
 In the following example you will see an auto-install profile.
