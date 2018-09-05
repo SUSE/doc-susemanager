@@ -142,10 +142,8 @@ zypper in -t package yast2-storage
 | VirtIO Disk 4        | [path]``swap``           | 4{nbsp}GB    | swap
 |===
 
-. In previous releases, you had to check [path]``/etc/fstab`` for correctness as follows (_updated tools shipped with recent SPs will no longer require human intervention._):
-A mount point was created automatically for [path]``/var/lib/pgsql/`` (even when not installed).
-You had to remove or comment out from the [path]``/etc/fstab`` entries.
-As root, you had to edit [path]``/etc/fstab`` and comment out or remove the line:
+. If you are still using an older version than {susemgr}{nbsp}3.2 check [path]``/etc/fstab`` for correctness as follows (_updated tools shipped with recent SPs will no longer require human intervention._):
+Remove or comment out this mount point entry for [path]``/var/lib/pgsql/`` in the [path]``/etc/fstab`` file:
 +
 
 ----
@@ -154,10 +152,9 @@ As root, you had to edit [path]``/etc/fstab`` and comment out or remove the line
 +
 
 [WARNING]
-.Remove [command]``pgsql`` from the fstab Configuration File
+.Remove [path]``pgsql`` from the fstab Configuration File
 ====
-If you did not remove this line from fstab the first time you shut down the server you would lose your database.
-This occured because of duplicated entries in the fstab file.
+If you do not remove the [path]``/var/lib/pgsql/`` line from fstab the first time you shut down the server you will lose your database because of duplicated entries in the fstab file.
 ====
 +
 
