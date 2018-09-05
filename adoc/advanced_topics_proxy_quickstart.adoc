@@ -26,7 +26,7 @@ ifdef::env-github,backend-html5,backend-docbook5[]
 :susemgrproxy: SUSE Manager Proxy
 :productnumber: 3.2
 :saltversion: 2018.3.0
-:webui: WebUI
+:webui: Web UI
 // SUSE Product Entities
 :sles-version: 12
 :sp-version: SP3
@@ -148,31 +148,25 @@ in virtual environments, use the following settings for the virtual machine (VM)
 
 The following section will guide you through the installation and setup procedure.
 
-[IMPORTANT]
-.Registering Proxies
-====
 {productname} Proxy systems are registered as traditional clients or as Salt clients using a bootstrap script.
 A {susemgrproxy} can serve both Traditional and Salt clients.
-====
-
-
-
-[[at.manager.proxy.install.prep]]
-.Procedure: Registering the Proxy
 
 [IMPORTANT]
 ====
 First completely download the channels ({sle} 12 SP3) and then create the activation key.
 Only then you can select the correct child channels.
 ====
-+
+
+
+[[at.manager.proxy.install.prep]]
+.Procedure: Registering the Proxy
+
 
 . Create an activation key based on the {sle} 12 SP3 base channel.
 For more information about activation keys, see <<create.act.keys>>.
 +
 
 .Proxy Activation Key
-
 image::proxy-key.png[]
 . Click the menu:Child Channels[] subtab and select the {productname} {productnumber} Proxy child channel with the matching update channel ([systemitem]``SUSE Manager Proxy-3.2-Pool`` and [systemitem]``SUSE-Manager-Proxy-3.2-Updates`` ).
 These child channels are required for providing the proxy packages and updates.
@@ -237,7 +231,9 @@ The proxy will share some SSL information with the {productname} server, so the 
 As root, enter the following commands on the proxy using your {productname} server or chained proxy named as [replaceable]``PARENT``:
 
 ----
-cd /root/ssl-build scp root@`PARENT`:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY scp root@`PARENT`:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT scp root@`PARENT`:/root/ssl-build/rhn-ca-openssl.cnf .
+cd /root/ssl-build scp root@`PARENT`:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY
+scp root@PARENT:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT
+scp root@PARENT:/root/ssl-build/rhn-ca-openssl.cnf .
 ----
 
 
@@ -356,7 +352,7 @@ or alternatively:
 +
 
 ----
-/etc/salt/minion.d/`name`.conf
+/etc/salt/minion.d/NAME.conf
 ----
 
 . Add the FQDN to the minion file:
@@ -404,7 +400,7 @@ To view available options type [command]``mgr-bootstrap --help`` from the comman
 +
 
 ----
-# ``mgr-bootstrap --activation-keys=key-string``
+# mgr-bootstrap --activation-keys=key-string
 ----
 
 . Optionally edit the resulting bootstrap script.
@@ -420,8 +416,10 @@ The clients are registered with the {susemgrproxy} specified in the bootstrap sc
 
 Within the {webui}, standard proxy pages will show information about client, no matter whether minions or traditional clients.
 
+// FIXME: adoc refinement needed
 A list of clients connected to a proxy can be located under menu:Systems[] <proxy name> menu:Details[]menu:Proxy[].
 
+// FIXME: adoc refinement needed
 A list of chained proxies for a minion can be located under menu:Systems[] <minion name> menu:Details[]menu:Connection[]
 
 If you decide to move any of your clients between proxies or the server you will need to repeat the registration process from scratch.
@@ -498,7 +496,7 @@ next-server:<IP_Address_of_SUSE_Manager_Proxy_Server>filename: "pxelinux.0"
 
 
 [[advanced.topics.proxy.migration3]]
-== Migrating {productname} 3 Proxy to Version 3.1
+== Migrating {productname} 3 Proxy to Version 3.1
 
 The recommended order for migrations is to first migrate the server and then the proxies.
 Note that a {productname} 3 Proxy works correctly with {productname} 3.1.
