@@ -77,19 +77,20 @@ Most {smr} installations require several steps:
 
 . Install and configure the central server
 . Install the {smr} pattern on the central server
-. Install and configure the build host
-. Register the build host to {susemgr}
-. Set the build host as an OS Image build host in the {susemgr} {webui}, and apply highstate
-. Install and configure the branch server
-. Register the branch server to {susemgr}
+. Install the build host and register it to {susemgr}
+. Configure the build host
+. Install the branch server and register it to {susemgr}
 . Assign and configure branch server formulas
 
 Each procedure is detailed in this section.
 
 .Procedure: Install and configure the central server
-. Refer to [quickstart3_chap_install_overview.adoc] how to install underlying {susemgr}.
-. {smr} formulas consists of several packages that are available from {susemgr} media
-. {smr} formula packages:
+
+Refer to [quickstart3_chap_install_overview.adoc] for instructions to install {susemgr}.
+
+{smr} uses formulas to simplify configuration, which require packages to operate correctly.
+
+. Check that you have these packages installed and available, after installing {susemgr}:
 * bind-formula
 * branch-network-formula
 * dhcpd-formula
@@ -97,30 +98,35 @@ Each procedure is detailed in this section.
 * pxe-formula
 * tftp-formula
 * vsftpd-formula
-
-. If any package is missing, install missing package using zypper call
++
+Install any missing packages with [command]``zypper``:
 +
 ----
-zypper install $package_name
+zypper install package_name
 ----
-+
-and synchronize salt filesystem and salt modules
+. Synchronize the salt filesystem and salt modules:
 +
 ----
 salt-run fileserver.update
 salt '*' saltutil.sync_all
 ----
-. When all packages are present on central {susemgr} server saltboot runner needs to be manually configured by providing Salt API access to {susemgr} system.
+. Grant the Salt API access to the central server, by opening the [filename]``/etc/salt/master.d/spacewalk.conf`` file in your preferred text editor, and adding your administration credentials in the [systemitem]``spacewalk`` section:
 +
 ----
-/etc/salt/master.d/spacewalk.conf
 spacewalk:
     localhost:
         username: $administration_user
         password: $administration_password
 ----
-. In order to avoid putting overall {susemgr} administration credentials to the configuration files, any administration account for given organization is sufficient.
-. To finish configuration of central {susemgr} server, restart of salt master service is required.
++
+[IMPORTANT]
+====
+We recommend that do not put your master {susemgr} administration credentials in plain text in the configuration file.
+Instead, use the credentials for an administration account for any organization.
+This allows you to more easily change the password, should it become compromised.
+====
+
+. Restart the salt master service to pick up the changes:
 +
 ----
 Restart salt master service now.
@@ -132,33 +138,34 @@ systemctl restart salt-master
 . Step one
 . Another step
 
-.Procedure: Install and configure the build host
+.Procedure: Install the build host and register it to {susemgr}
 . Step one
 . Another step
 
-.Procedure: Register the build host to {susemgr}
-. Step one
-. Another step
+.Procedure: Configure the build host
 
-.Procedure: Set the build host as an OS Image build host in the {susemgr} {webui}, and apply highstate
-. Standard OS Image building feature of {susemgr} is used. Images are built from customized Kiwi templates, as a starting point see SUSE provided OS Image templates.
-. Adapt these templates to contain all required software, branding, configurations. Refer to Kiwi Image System documentation for details how to work with Kiwi templates.
-. If you are creating Kiwi template from scratch, please make sure image/preferences/type elements attribute boot is set to saltboot/suse-SLES12
-. Once the image is build, it will be automatically transferred to {susemgr} server
+The build host must be set as an OS Image build host in the {susemgr} {webui}, and highstate applied.
 
-.Procedure: Install and configure the branch server
-TODO: https://github.com/SUSE/spacewalk/issues/5611
-. Step one
-. Another step
+. In the {susemgr} {webui}, navigate to menu:Systems[Overview].
+Locate the system to be made a build host, and click on its name.
+. In the [guimenu]``System Properties`` window, click [btn]``Edit These Properties``.
+. In the [guimenu]``Edit System Details`` window, ensure the [guimenu]``OS Image Build Host`` option is checked, and click [btn]``Update Properties`` to save your changes.
+. Select the [guimenu]``States`` tab, and navigate to the [guimenu]``Highstate`` window.
+. Click the [btn]``Apply Highstate`` button.
 
-.Procedure: Register the branch server to {susemgr}
+
+.Procedure: Install the branch server and register it to {susemgr}
 . Step one
 . Another step
 
 .Procedure: Assign and configure branch server formulas
 TODO: https://github.com/SUSE/spacewalk/issues/5610
-. Step one
-. Another step
+
+. Set the branch server hostname and CNAME aliases, so that services can reach the branch server accurately.
+. Check each formula to ensure the values are appropriate for your environment.
+. Configure the branch server network.
+This will vary depending on your preferred topology.
+See [retail.chap.admin] for more information.
 
 
 
@@ -166,7 +173,7 @@ TODO: https://github.com/SUSE/spacewalk/issues/5610
 == Initial setup
 
 
-To get started with {smr} after installation, you need to perform these steps:
+To get started with {smr} after installation, perform these steps:
 
 . Build the image that will be deployed on terminals
 . Synchronize images from the central server to the branch servers
