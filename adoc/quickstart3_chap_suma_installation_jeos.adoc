@@ -57,7 +57,7 @@ In the following table replace _version_ with the actual product version string.
 2+<| KVM Settings
 | Installation Method | Import Existing Disk Image
 | OS:                 | Linux
-| Version:            | SLES<VERSION>-JeOS-for-kvm-and-xen.x86_64-GM.qcow2
+| Version:            | SLES_version_-JeOS-for-kvm-and-xen.x86_64-GM.qcow2
 | Memory:             | 4096 MB
 | CPU's:              | 2
 | Storage Format:     |_.qcow2_ 24 GB (Default) JeOS Root Partition
@@ -116,13 +116,13 @@ Select a strong password and then in the next message box btn:[Confirm root Pass
 +
 
 ----
-SUSEConnect -e`EMAIL_ADDRESS`-r`SUSE_MANAGER_CODE`
+SUSEConnect -e<EMAIL_ADDRESS> -r<SUSE_MANAGER_CODE>
 ----
 . Add {productname} repositories:
 +
 
 ----
-SUSEConnect -p SUSE-Manager-Server/<productnumber>/x86_64 -r`SUSE_MANAGER_CODE`
+SUSEConnect -p SUSE-Manager-Server/<productnumber>/x86_64 -r<SUSE_MANAGER_CODE>
 ----
 . Install [package]#yast2-storage# with all required dependencies (approx. 40 packages, 30 MB when installed).
 This basic administration package is required for preparing storage partitions:
@@ -142,10 +142,8 @@ zypper in -t package yast2-storage
 | VirtIO Disk 4        | [path]``swap``           | 4{nbsp}GB    | swap
 |===
 
-. {slsa} by default uses the BTRFS file system.
-A mount point is created automatically for [path]``/var/lib/pgsql/`` (even when not installed).
-This must be removed or commented out from the [path]``/etc/fstab`` entries.
-As root, edit [path]``/etc/fstab`` and comment out or remove the line:
+. If you are still using an older version than {susemgr}{nbsp}3.2 check [path]``/etc/fstab`` for correctness as follows (_updated tools shipped with recent SPs will no longer require human intervention._):
+Remove or comment out this mount point entry for [path]``/var/lib/pgsql/`` in the [path]``/etc/fstab`` file:
 +
 
 ----
@@ -154,10 +152,9 @@ As root, edit [path]``/etc/fstab`` and comment out or remove the line:
 +
 
 [WARNING]
-.Remove [command]``pgsql`` from the fstab Configuration File
+.Remove [path]``pgsql`` from the fstab Configuration File
 ====
-If you do not remove this line from fstab the first time you shut down the server you will lose your database.
-This occurs because you will have duplicate entries in the fstab file. _Updated tools shipped with recent SPs will no longer require human intervention._
+If you do not remove the [path]``/var/lib/pgsql/`` line from fstab the first time you shut down the server you will lose your database because of duplicated entries in the fstab file.
 ====
 +
 
