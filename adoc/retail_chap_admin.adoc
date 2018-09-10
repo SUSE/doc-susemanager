@@ -131,37 +131,34 @@ salt $branch_server_id state.apply image-sync
 
 TODO: https://github.com/SUSE/spacewalk/issues/5613
 
-This section expects: - configured central {susemgr} - configured branch server - saltboot PXE image
+Each terminal requires a specific hardware type, which contains information about the product name and terminal manufacturer.
+However, the {susemgr} database does not have this information to begin with.
+In order to tell {susemgr} what image to deploy on each terminal, you can set hardware type groups.
 
-In order to deploy a terminal, several more configuration steps are required:
 
-create a hardware type group for terminal hardware type
+.Procedure: Create a Hardware Type Group
 
-assign and configure saltboot formula for given {susemgr} group
+For this procedure, you will require the system manufacturer name and product name for your terminal.
 
-Before terminal is booted and registered for the first time, there is no system entry in {susemgr} database. For this reason, hardware type groups are used to determine what image should be deployed on specific terminal.
+. Determine the hardware type group name.
+Prefix the name with [systemitem]``HWTYPE:``, followed by the system manufacturer name and product name, separated by a hyphen.
+For example:
++
+----
+HWTYPE:POSVendor-Terminal1
+----
++
+[NOTE]
+====
+Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type group names.
+Spaces and other non-alphanumeric characters will be removed when the name is processed.
+====
++
+. Another step
 
-Each terminal has a specific hardware type. This hardware type is constructed from SMBios information provided by terminal hardware and contain information about the manufacturer and product name.
 
-Hardware type construction
-Hardware type is a concatenation of system manufacturer and system product name using - as a delimiter.
+TODO: Possibly https://gitlab.suse.de/SLEPOS/SLEPOS/blob/master/doc/devel/howto-add_terminal.txt ??
 
-Hardware type groups
-Hardware type groups are regular {susemgr} system groups with two important details.
-
-Hardware type group follows very specific naming
-
-Saltboot formula is assigned and configured
-
-Hardware type groups follows naming:
-
-prefix "HWTYPE:"
-
-appendix is hardware type of the terminals
-
-any spaces or non alphanumeric characters are removed (except delimiters _, -)
-
-Example for system manufacturer 'POS Vendor' and system product name 'Terminal 1'. The resulting hardware type group is HWTYPE:POSVendor-Terminal1.
 
 [[retail.sect.admin.saltboot]]
 == Saltboot
@@ -187,6 +184,10 @@ Terminal will now continue booting, download the image from branch server and de
 == Image Building
 
 TODO: https://github.com/SUSE/spacewalk/issues/5612
+
+￼ setting root user (or other users), see docu of SLEPOS
+￼ note that image needs to stay on the same SUMA instance
+￼ point to the git repository with examples, describe how to use it
 
 
 [[retail.sect.admin.troubleshooting]]
