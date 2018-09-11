@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>SUSE Manager 3.2</title>
-<date>2018-07-24</date>
+<date>2018-09-10</date>
 </info>
 <part xml:id="book.suma.getting-started"><title>Getting Started</title><chapter xml:id="quickstart.chapt.overview.requirements"><title>Introduction</title><simpara>This Getting Started Guide provides guidance on setting up SUSE Manager server with KVM.
 You will learn the fundamentals of managing both traditional and Salt clients.</simpara>
@@ -4260,8 +4260,7 @@ It is recommended to install all updates before proceeding.</para>
 <simpara>After finishing the migration procedure SUSE Manager 3.2 on SLES 12 SP3 is available to be used.</simpara>
 </section>
 </section>
-</chapter>
-<chapter xml:id="bp.chap.mgr.migration"><title>SUSE Manager Migration from Version 2.1 to Version 3</title><simpara>The migration from SUSE Manager 2.1 to SUSE Manager 3 works in the same way as a migration from Red Hat Satellite to SUSE Manager.
+<section xml:id="bp.chap.mgr.migration"><title>SUSE Manager Migration from Version 2.1 to Version 3</title><simpara>The migration from SUSE Manager 2.1 to SUSE Manager 3 works in the same way as a migration from Red Hat Satellite to SUSE Manager.
 The migration happens from the original machine to a new one.
 There is no in-place migration.
 While this has the drawback that you temporarily need two machines, it also has the advantage that the original machine will remain fully functional in case something goes wrong.</simpara>
@@ -4604,6 +4603,7 @@ Password:
   rebooting the new server!
   ============================================================================</screen>
 </section>
+</section>
 </chapter>
 <chapter xml:id="bp.client.migration"><title>Client Migration</title><simpara>Upgrading from SLE&#160;12 with the latest service pack (SP) to SLE&#160;15 can be automated, but requires some preparation steps.</simpara>
 <simpara>To upgrade the SP version on SLE&#160;12 (for example, upgrading from SLE&#160;12, or SLE&#160;12&#160;SP1 or SP2, to SLE&#160;12&#160;SP3 or later) can be fully automated and requires no additional preparation.</simpara>
@@ -4736,10 +4736,9 @@ For upgrade instruction, see <xref linkend="bp.proc.client.migration.sle.upgrade
 <title>Synchronizing Target Channels</title>
 <simpara>Before successfully initializing the product migration, make sure that the migration target channels are completely mirrored.
 For the upgrade to SUSE Linux Enterprise 15, at least the <literal role="systemitem">SLE-Product-SLES15-Pool</literal> base channel with the <literal role="systemitem">SLE-Manager-Tools15-Pool</literal> child channel for your architecture is required.
-The matching update channels such as <literal role="systemitem">SLE-Manager-Tools15-Updates</literal> and <literal role="systemitem">SLE-Product-SLES15-Updates</literal> are recommended.</simpara>
-</warning>
-<simpara>+
+The matching update channels such as <literal role="systemitem">SLE-Manager-Tools15-Updates</literal> and <literal role="systemitem">SLE-Product-SLES15-Updates</literal> are recommended.
 Watch the mirroring progress in <filename>/var/log/rhn/reposync/sles15-pool-x86_64.log</filename>.</simpara>
+</warning>
 <orderedlist numeration="arabic">
 <listitem>
 <para>Go to the system via <menuchoice><guimenu>Main Menu</guimenu> <guimenuitem>Systems</guimenuitem></menuchoice> and click the name of the system. Then click <menuchoice><guimenu>System Details</guimenu> <guisubmenu>Provisioning</guisubmenu> <guisubmenu>Autoinstallation</guisubmenu> <guimenuitem>Schedule</guimenuitem></menuchoice>, and choose the AutoYaST XML profile you have uploaded above.</para>
@@ -4753,9 +4752,7 @@ A shutdown of the machine is initiated as well, effectively 3 minutes after the
 </listitem>
 </orderedlist>
 </section>
-</section>
-</chapter>
-<chapter xml:id="ap-sample-autoinst-system-upgrade"><title>Sample Autoinstallation Script for System Upgrade (SLES 11 SP4 to SLES 12 SP3)</title><screen>&lt;?xml version="1.0"?&gt;
+<section xml:id="ap-sample-autoinst-system-upgrade"><title>Sample Autoinstallation Script for System Upgrade (SLES 12 SP3 to SLES 15)</title><screen>&lt;?xml version="1.0"?&gt;
 &lt;!DOCTYPE profile&gt;
 &lt;profile xmlns="http://www.suse.com/1.0/yast2ns"
          xmlns:config="http://www.suse.com/1.0/configns"&gt;
@@ -4776,14 +4773,14 @@ A shutdown of the machine is initiated as well, effectively 3 minutes after the
       &lt;/listentry&gt;
       &lt;listentry&gt;
         &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
-        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/sle-manager-tools15-pool-x86_64-sp3/summer2017&lt;/media_url&gt;
+        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/sle-manager-tools15-pool-x86_64/summer2017&lt;/media_url&gt;
         &lt;name&gt;SLE15 Manager Tools Pool&lt;/name&gt;
         &lt;product&gt;SLE15&lt;/product&gt;
         &lt;product_dir&gt;/&lt;/product_dir&gt;
       &lt;/listentry&gt;
       &lt;listentry&gt;
         &lt;ask_on_error config:type="boolean"&gt;true&lt;/ask_on_error&gt;
-        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/sle-manager-tools15-updates-x86_64-sp3/summer2017&lt;/media_url&gt;
+        &lt;media_url&gt;http://$redhat_management_server/ks/dist/child/sle-manager-tools15-updates-x86_64/summer2017&lt;/media_url&gt;
         &lt;name&gt;SLE15 Manager Tools Updates&lt;/name&gt;
         &lt;product&gt;SLE15&lt;/product&gt;
         &lt;product_dir&gt;/&lt;/product_dir&gt;
@@ -4809,6 +4806,8 @@ A shutdown of the machine is initiated as well, effectively 3 minutes after the
     &lt;/init-scripts&gt;
   &lt;/scripts&gt;
 &lt;/profile&gt;</screen>
+</section>
+</section>
 <section xml:id="bp.client.migration.sle12"><title>Migrating SLE&#160;12 or later to version 12&#160;SP3</title><simpara>Existing SLE&#160;12 clients (SLE) may be upgraded to SP3 with the <guimenu>SP Migration</guimenu> procedure provided by the Web UI.
 The same applies for other supported products based on SUSE Linux Enterprise 12.</simpara>
 <warning>
@@ -9242,7 +9241,24 @@ Click the <guibutton>Save</guibutton> button to save changes to the database, th
 Click <guibutton>Save</guibutton> to save the change to the database finally select <guibutton>Apply</guibutton> to apply the changes.
 States applied at the system level will only be applied to the selected system.</simpara>
 </section>
-<section xml:id="s5-sm-system-details-states-highstate"><title><menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice></title><simpara>From the <literal role="guimenu">Highstate</literal> page you can view and apply the high state for a selected system.</simpara>
+<section xml:id="s5-sm-system-details-states-highstate"><title><menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice></title><simpara>From the <literal role="guimenu">Highstate</literal> page you can view and apply the highstate for a selected system.</simpara>
+<simpara>Select the <guibutton>Test mode</guibutton> toggle to test the highstate before applying it.</simpara>
+<orderedlist numeration="arabic">
+<title>Using Test mode</title>
+<listitem>
+<para>Select the toggle <guibutton>Test mode</guibutton>.</para>
+</listitem>
+<listitem>
+<para>Select <guibutton>Apply Highstate</guibutton>.</para>
+</listitem>
+<listitem>
+<para>You will see the message:</para>
+<screen>Applying the highstate has been scheduled.</screen>
+</listitem>
+<listitem>
+<para>Select <literal role="guimenu">scheduled</literal> to see the results of the test.</para>
+</listitem>
+</orderedlist>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -9251,7 +9267,7 @@ States applied at the system level will only be applied to the selected system.<
 <textobject><phrase>system details salt states highstate</phrase></textobject>
 </mediaobject>
 </informalfigure>
-<simpara>Select a date and time to apply the high state.
+<simpara>Select a date and time to apply the highstate.
 Then click <guibutton>Apply Highstate</guibutton>.</simpara>
 </section>
 </section>
@@ -9495,55 +9511,68 @@ These two methods have different actions which may be accessed with the System S
 </thead>
 <tbody>
 <row>
-<entry align="left" valign="top"><simpara>Systems:</simpara><simpara>* List Systems</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported</simpara></entry>
+<entry align="left" valign="top"><simpara>Systems:
+* List Systems</simpara></entry>
+<entry align="left" valign="top"><simpara>Supported * Supported</simpara></entry>
+<entry align="left" valign="top"><simpara>Supported * Supported</simpara></entry>
 </row>
 <row>
-<entry align="left" valign="top"><simpara>Install Patches:</simpara><simpara>* Schedule Patch Updates</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported</simpara></entry>
+<entry align="left" valign="top"><simpara>Install Patches:
+* Schedule Patch Updates</simpara></entry>
+<entry align="left" valign="top"><simpara>Supported * Supported</simpara></entry>
+<entry align="left" valign="top"><simpara>Supported * Supported</simpara></entry>
 </row>
 <row>
-<entry align="left" valign="top"><simpara>Install Packages:</simpara><simpara>* Upgrade
+<entry align="left" valign="top"><simpara>Install Packages:
+* Upgrade
 * Install
 * Remove
 * Verify</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported
+<entry align="left" valign="top"><simpara>Supported
+* Supported
 * Supported
 * Supported
 * Supported</simpara></entry>
-<entry align="left" valign="top"><simpara>Limited</simpara><simpara>* Supported
+<entry align="left" valign="top"><simpara>Limited
+* Supported
 * Supported
 * Supported
 * Not Available</simpara></entry>
 </row>
 <row>
-<entry align="left" valign="top"><simpara>Groups:</simpara><simpara>* Create
+<entry align="left" valign="top"><simpara>Groups:
+* Create
 * Manage</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported
+<entry align="left" valign="top"><simpara>Supported
+* Supported
 * Supported</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported
+<entry align="left" valign="top"><simpara>Supported
+* Supported
 * Supported</simpara></entry>
 </row>
 <row>
-<entry align="left" valign="top"><simpara>Channels:</simpara><simpara>* Channel Memberships
+<entry align="left" valign="top"><simpara>Channels:
+* Channel Memberships
 * Channel Subscriptions
 * Deploy / Diff Channels</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported
+<entry align="left" valign="top"><simpara>Supported
+* Supported
 * Supported
 * Supported</simpara></entry>
-<entry align="left" valign="top"><simpara>Limited</simpara><simpara>* Supported
+<entry align="left" valign="top"><simpara>Limited
+* Supported
 * Not Available
 * Not Available</simpara></entry>
 </row>
 <row>
-<entry align="left" valign="top"><simpara>Provisioning:</simpara><simpara>* Autoinstall Systems
+<entry align="left" valign="top"><simpara>Provisioning:
+* Autoinstall Systems
 * Tag for Snapshot
 * Remote Commands
 * Power Management
 * Power Management Operations</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported
+<entry align="left" valign="top"><simpara>Supported
+* Supported
 * Supported
 * Supported
 * Supported
@@ -9551,17 +9580,17 @@ These two methods have different actions which may be accessed with the System S
 <entry align="left" valign="top"><simpara>Not Available</simpara></entry>
 </row>
 <row>
-<entry align="left" valign="top"><simpara>Misc:</simpara><simpara>* Update Hardware Profiles
-* Update Package Profiles
+<entry align="left" valign="top"><simpara>Misc:
 * Update System Preferences
-* Set/Remove Custom Values
-* Add/Remove Add-on Types
-* Delete Systems
+* Update Hardware Profiles
+* Update Package Profiles
+* Run Remote Commands
+* Set and Remove Custom Values for Selected Systems
 * Reboot Systems
 * Migrate Systems to another Organization
-* Lock/Unlock Systems
-* Audit Systems (OpenSCAP)</simpara></entry>
-<entry align="left" valign="top"><simpara>Supported</simpara><simpara>* Supported
+* Delete Systems from SUSE Manager</simpara></entry>
+<entry align="left" valign="top"><simpara>Supported
+* Supported
 * Supported
 * Supported
 * Supported
@@ -9571,16 +9600,17 @@ These two methods have different actions which may be accessed with the System S
 * Supported
 * Supported
 * Supported</simpara></entry>
-<entry align="left" valign="top"><simpara>Limited</simpara><simpara>* Supported
-* Supported
-* Not Available
-* Supported
-* Not Available
+<entry align="left" valign="top"><simpara>Supported
 * Supported
 * Supported
 * Supported
-* Not Available
-* Not Available</simpara></entry>
+* Supported
+* Supported
+* Supported
+* Supported
+* Supported
+* Supported
+* Supported</simpara></entry>
 </row>
 </tbody>
 </tgroup>
@@ -15059,8 +15089,7 @@ in virtual environments, use the following settings for the virtual machine (VM)
 <section xml:id="at.manager.proxy.inst"><title>Installation and Setup</title><simpara>The following section will guide you through the installation and setup procedure.</simpara>
 <important>
 <title>Registering Proxies</title>
-<simpara>SUSE Manager Proxy systems are registered as traditional clients using a bootstrap script.
-Currently there is no method to register proxy systems using Salt.
+<simpara>SUSE Manager Proxy systems are registered as traditional clients or as Salt clients using a bootstrap script.
 A SUSE Manager Proxy can serve both Traditional and Salt clients.</simpara>
 </important>
 <important xml:id="at.manager.proxy.install.prep">
@@ -15936,7 +15965,7 @@ If the directive is missing add it to the file.</simpara>
 </emphasis>* <link xl:href="https://cloud.google.com/compute/docs/networking"> DNS setup on Google Compute Engine</link>
 <emphasis role="strong">*</emphasis> <link xl:href="https://azure.microsoft.com/en-us/documentation/articles/dns-operations-recordsets"> DNS setup on Microsoft Azure</link></simpara>
 <simpara>If you run a SUSE Manager Server instance, you can run YaST after the instance is launched to ensure the external storage is attached and prepared according to <xref linkend="using-separate-storage-volume"/>, and the DNS resolution is set up as described:</simpara>
-<screen>$ /sbin/yast2 susemanagersetup</screen>
+<screen>$ /sbin/yast2 susemanager_setup</screen>
 <simpara>Note that the setup of SUSE Manager from this point forward does not differ from the documentation in the <link xl:href="https://www.suse.com/documentation/suse_manager">SUSE Manager Guide</link>.</simpara>
 <simpara>The SUSE Manager setup procedure in YaST is designed as a one pass process with no rollback or cleanup capability.
 Therefore, if the setup procedure is interrupted or ends with an error, it is not recommended that you repeat the setup process or attempts to manually fix the configuration.
@@ -16053,7 +16082,7 @@ The xfs partition is mounted below the path <filename>/manager_storage</filename
 <simpara>Different cloud frameworks treat the attachment of external storage devices differently at instance boot time.
 Please refer to the cloud environment documentation for guidance about the fstab entry.</simpara>
 <simpara>If your cloud framework recommends to add an fstab entry, add the following line to the <emphasis role="strong">/etc/fstab</emphasis> file.</simpara>
-<screen>/dev/sdb1 /manager_storage xfs defaults 1 1</screen>
+<screen>/dev/sdb1 /manager_storage xfs defaults,nofail 1 1</screen>
 </listitem>
 </orderedlist>
 </section>
