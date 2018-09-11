@@ -147,7 +147,7 @@ xml/book_retail_getting_started.xml: adoc/retail*.adoc
 	rm -rf xml
 	mv xxml xml
 
-retail-getting-started-html: xml-retail
+retail-getting-started-html: xml-suma # xml-retail
 	daps -d DC-retail-getting-started html; time
 
 retail-getting-started-pdf:
