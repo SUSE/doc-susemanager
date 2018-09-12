@@ -176,14 +176,43 @@ Do not enable PXE boot functionality of the {susemgrproxy} during initial setup.
 Use the PXE formula later after the initial setup.
 ====
 
-The installation of such a proxy is outlined in
+Detailed installation instructions of a {susemgrproxy} are outlined in
 // <<advanced.topics.proxy.quickstart>>.
 Keep all the defaults and install it as a Salt-based client ("minion"); do not install it as a traditionally managed client.
 
-. Step one
-. Activation key and bootstrap script with Channel assignment
+[IMPORTANT]
+====
+First completely download the channels and then create the activation key.
+Only then you can select the correct child channels.
+Here is a channel overview:
+----
+- SLES 12 SP3 (SP4 in the future) as a base
+  - SLES Pool
+    - SLES Update
+- SUSE Manager 3.2 Proxy
+  - SUSE Manager 3.2 Proxy Pool
+    - SUSE Manager 3.2 Proxy Update
+- SUSE Manager 3.2 Proxy for Retail
+  - SUSE Manager 3.2 Proxy for Retail Pool
+    - SUSE Manager 3.2 Proxy for Retail Update
+----
+====
 
-After basic proxy installation, use the formulas to deploy the Retail Branch Server functionality on it.
+. Install a basic {sls} 12 SP3 system that you will deploy as a Retail Branch Server with the following steps.  For more information about installing {sls} 12 SP3, see the SLES documentation.
+. Create an activation key based on the {sle} 12 SP3 base channel.  Open menu:Main Menu[Systems > Activation Keys] and click [guimenu]``Create Key``.  In the [guimenu]``Create Activation Key`` dialog enter required fields and select {sle} 12 SP3 as the base channel; confirm with btn:[Create Activation Key].  On the following activation key details page click the [guimenu]``Child Channels`` tab and select the {productname} {productnumber} Proxy child channel with the matching update channel and the Retail channels ([systemitem]``SUSE Manager Proxy-3.2-Pool`` and [systemitem]``SUSE-Manager-Proxy-3.2-Updates`` as well as [systemitem]``SUSE-Manager-Retail-3.2-Pool`` and [systemitem]``SUSE-Manager-Retail-3.-Updates``).  Plus SLES12-SP3-Updates, SLE-Manager-Tools12-Pool, and SLE-Manager-Tools12-Updates.  Confirm with btn:[Update Activation Key].
+. Create a bootstrap script to register the {smr} Proxy system: menu:Main Menu[Admin > Manager Configuration > Bootstrap Script].  Save the bootstrap script as [path]``bootstrap-proxy.sh``.  In the beginning of [path]``bootstrap-proxy.sh``, set ``ACTIVATION_KEY`` to the name of the created activation key.
+. Create the SUSE Manager Tools Repository for bootstrapping, see [create.tools.repository]
+// <<create.tools.repository>>.
+. Bootstrap the proxy system. For more information, see [connect.first.client]
+// <<connect.first.client>>.
+. If not done automatically, accept the Salt key on the menu:Main Menu[Salt > Keys] page by clicking the check mark. The it will appear in the menu:Main Menu[Systems > Overview].
+. Check via menu:System Details[Software > Software Channels] that all the above listed channels are selected.
+. Install the [path]``patterns-suma_proxy`` pattern; Copy the SSL certificate and key from the server; Run [command]``configure-proxy.sh``.
+[TODO: add more info about these 3 actions if wanted; it's in Advanced Topics, Proxy QS.]
+
+[TODO: do we have a suma_retail_proxy pattern?]
+
+After this basic proxy installation, use the formulas to deploy the Retail Branch Server functionality on it.
 
 For mass deployments use the script coming with the [package]``python-susemanager-retail`` package.
 
