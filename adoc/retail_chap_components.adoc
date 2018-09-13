@@ -57,8 +57,6 @@ endif::[]
 * The second layer contains one or more branch servers to provide local network and boot services.
 * The final layer contains any number of deployed point-of-sale terminals.
 
-
-
 .Central Server
 
 The central server is a {susemgr} server.
@@ -89,16 +87,50 @@ In this configuration, it may or may not provide DHCP and DNS services.
 
 .Point-of-Sale Terminals
 
-TODO: Something here.
+Point-of-sale (PoS) terminals can come in many different formats, such as cashier terminals, digital scales, or cash drawers.
+Every terminal, however, is provided by a vendor, who set some basic information about the device in the firmware.
+{smr} accesses this vendor information in order to determine how best to work with the terminal in use.
+In most cases, different terminals will require a different operating system (OS) image to ensure they work correctly.
+For example, a cashier terminal has a full graphical display, where a digital scale might only have a very basic text display.
+While both of these terminals require similar processing and network functionality, they will require different OS images to ensure that the different display mechanisms work correctly.
+
 
 
 [[retail.sect.components.fitting]]
-=== Fitting it all together
+== Fitting it all together
 
 
 {smr} uses the same underlying technology as {susemgr}, but specifically addresses the needs of retail organizations.
-To provide these additional services, and to simplify configuration, {smr} uses formulas.
-Formulas are pre-written scripts, that are used to configure your installation.
-You can use the default formulas, or edit them to make them more specific to your environment.
 
-TODO: System groups https://github.com/SUSE/spacewalk/issues/5609
+
+
+[[retail.sect.components.fitting.hardware-types]]
+=== Hardware Types
+Because every environment is different, and can contain many different configurations of many different terminals, {smr} uses hardware types to simplify device management.
+
+Hardware types allow you to group devices according to manufacturer and device name, so that all devices of a particular type can be managed as one.
+
+
+
+[[retail.sect.components.fitting.formulas]]
+=== Formulas
+
+{smr} uses formulas to help simplify configuration.
+Formulas are pre-written scripts, that are used to configure your installation.
+
+You can use formulas to apply configuration patterns to your hardware groups.
+{smr} uses the Saltboot formula, which defines partitioning and OS images for terminals.
+
+You can use default settings for formulas, or edit them to make them more specific to your environment.
+
+
+
+[[retail.sect.components.fitting.system-groups]]
+=== System Groups
+
+{smr} uses system groups to organize the various devices in your environment.
+
+You can create your own system groups using the {susemgr} {webui}.
+Navigate to menu:Systems[System Groups] and click on [btn]``+ Create System Group``.
+
+We suggest you create a system group for each branch, containing a single branch server, and the PoS terminals associated with that server.
