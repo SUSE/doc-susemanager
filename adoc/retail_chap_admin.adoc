@@ -53,48 +53,32 @@ endif::[]
 == Administration
 
 This sections contains notes on administering your {smr} installation.
+For general administration tasks, see the {susemgr} documentation at https://www.suse.com/documentation/suse-manager-3/
 
 [[retail.sect.admin.branch_network_config]]
-=== Branch Server Network Configuration
+== Branch Server Network Configuration
 
 The branch server can be configured to use networking in many different ways.
 The most common ways provide either a dedicated or shared LAN for terminals.
+
 
 .Procedure: Set up a Branch Server with a Dedicated LAN
 
 In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the central server, and the other one acts as an isolated LAN to communicate with terminals.
 This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
 
-. In the {susemgr} {webui} for the branch server, go to menu:System Details[Formulas > Branch Network]
-. Keep [guimenu]``Dedicated NIC`` checked
-. Enter name of the network device which is connected to the internal LAN ([guimenu]``NIC``)
-. Static IP address to be assigned to Branch server on internal LAN ([guimenu]``IP``)
-. Network mask of the internal LAN ([guimenu]``Netmask``)
-. Check [guimenu]``Enable Route`` if you want the branch server to route traffic from internal LAN to WAN
-. Check [guimenu]``Enable NAT`` if you want the branch server to convert addresses from internal LAN to WAN
-. Select DNS forwarder mode ([guimenu]``Forwarder``): select bind to ensure Branch provided DNS can resolve WAN domain names
-. Check DNS forwarder fallback ([guimenu]``Forwarder Fallback``). Disable if you do not want to rely on external DNS if Branch DNS is down
-. As [guimenu]``server directory`` specify working directory for {smr}
-. As [guimenu]``server directory user`` and [guimenu]``server directory group`` specify directory owner and group of {smr} working directory
-
-
-
-This formula (menu:System Details[Formulas > Dhcpd]) configures DHCP service at Branch server
-
-Listen interface must be the same entered in Branch Network formula
-
-Domain Name Servers must be configured to point to Branch server
-
-Branch static IP address must be reachable from Network provided by DHCP service
-
-Next server must be configured to point to Branch server
-
-Be sure configured ranges match configured network and netmask
-
-If terminals MAC addresses are known beforehand, host configuration can be specified for static IP address assignment.
-
-If Branch server acts as a router for internal LAN, router option must point to Branch server.
-
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
+. In the [guimenu]``Branch Network`` section, set these parameters:
+* Keep [guimenu]``Dedicated NIC`` checked
+* In the [guimenu]``NIC`` field, enter the name of the network device that is connected to the internal LAN.
+* In the [guimenu]``IP`` field, enter the static IP address to be assigned to the branch server on the internal LAN.
+* In the [guimenu]``Netmask`` field, enter the network mask of the internal LAN.
+. Check [guimenu]``Enable Route`` if you want the branch server to route traffic from internal LAN to WAN.
+* Check [guimenu]``Enable NAT`` if you want the branch server to convert addresses from internal LAN to WAN.
+* Select the [guimenu]``bind`` DNS forwarder mode.
+* Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
+* Specify the working directory, and the directory owner and group.
+. Click [btn]``Save`` to save your changes.
 
 
 .Procedure: Set up a Branch Server with a Shared Network
@@ -111,66 +95,162 @@ If DHCP services are not provided by the branch server, ensure that your externa
 * The [systemitem]``domain-name-servers`` option must point to the branch server for correct host name resolution
 ====
 
-. In the {susemgr} {webui} for the branch server, go to menu:System Details[Formulas > Branch Network]
-. Keep [guimenu]``Dedicated NIC`` unchecked
-. Select which services should be enabled on Branch server’s firewall. Ensure you include DNS, TFTP and FTP services.
-. Select DNS forwarder mode. Select bind to ensure Branch provided DNS can resolve WAN domain names
-. Check DNS forwarder fallback. Disable if you do not want to rely on external DNS if Branch DNS is down
-. Server directory specify working directory for {smr}
-. Server directory user and group specify directory owner and group of {smr} working directory
-
-
-Synchronization is done by applying salt state 'image-sync'
-
-Example of image synchronization call:
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
+. In the [guimenu]``Branch Network`` section, set these parameters:
+* Keep [guimenu]``Dedicated NIC`` unchecked
+* Select which services to enable on the branch server’s firewall.
+Ensure you include DNS, TFTP and FTP services.
+* Select the [guimenu]``bind`` DNS forwarder mode.
+* Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
+* Specify the working directory, and the directory owner and group.
+. Click [btn]``Save`` to save your changes.
+. Apply the salt state and synchronize your settings:
++
+----
 salt $branch_server_id state.apply image-sync
+----
+
+
+
+[[retail.sect.admin.branch_mass_config]]
+== Branch Server Mass Configuration
+
+You can either configure branch servers one by one using formulas (*TODO* see xxx) or create system groups of branch servers (*TODO* see yyy) or with a flexible command-line script.
+Such a command-line script is suitable to do a mass configuration of branch servers.
+
+
+
+// https://gitlab.suse.de/SLEPOS/SUMA_Retail/tree/master/python-susemanager-retail
+For mass deployments use the script coming with the [package]``python-susemanager-retail`` package.
+Install it on the central server.
+When installed call it on the command-line with [command]``retail_yaml``.
+This is the [command]``retail_yaml --help`` output:
+
+----
+usage: retail_yaml [-h] [--api-host API_HOST] [--api-user API_USER]
+                   [--api-pass API_PASS] [--from-yaml FROM_YAML]
+                   [--to-yaml TO_YAML]
+
+Initialize Branch Server
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --api-host API_HOST   API host
+  --api-user API_USER   API user
+  --api-pass API_PASS   API password
+  --from-yaml FROM_YAML
+                        initialize retail system from YAML file
+  --to-yaml TO_YAML     save structure of retail system to YAML file
+----
+
+The actual settings are filled in a ``YAML`` file that you will read with the [option]``--from-yaml`` option.
+Here is the documentated [path]``example.yml`` coming with the package:
+
+----
+# /usr/share/doc/packages/python-susemanager-retail/example.yml
+branches:
+# there are 2 possible setups: with / without dedicated NIC
+#
+# with dedicated NIC
+  branchserver1.branch1.cz:     # salt ID of branch server
+    branch_prefix: branch1      # optional, default guessed from salt id
+    server_name: branchserver1  # optional, default guessed from salt id
+    server_domain: branch1.cz   # optional, default guessed from salt id
+    dedicated_nic: eth1         # optional
+    salt_ip: 10.100.24.130      # ip of salt master / broker for terminals, mandatory
+    branch_ip: 192.168.2.1      # default for dedicated NIC: 192.168.1.1
+    netmask: 255.255.255.0      # default for dedicated NIC: 255.255.255.0
+    dyn_range:                  # default for dedicated NIC: 192.168.1.10 - 192.168.1.250
+        - 192.168.2.10
+        - 192.168.2.250
+
+# without dedicated NIC
+# the DHCP formula is not used, DHCP is typically provided by a router
+# the network parameters can be autodetected if the machine is already connected to SUSE Manager
+  branchserver2.branch2.cz:     # salt ID of branch server
+    branch_prefix: branch2      # optional, default guessed from salt id
+    server_name: branchserver2  # optional, default guessed from salt id
+    server_domain: branch2.cz   # optional, default guessed from salt id
+    salt_ip: 10.100.24.130      # ip of salt master / broker for terminals, mandatory
+    branch_ip: 192.168.2.1      # optional, default taken from SUMA data if the machine is registered
+    netmask: 255.255.255.0      # optional, default taken from SUMA data if the machine is registered
+
+
+hwtypes:
+  IBM CORPORATION-4838910:      # HWTYPE string (manufacturer-model) as returned by bios
+    description: 4838-910       # freetext description
+    saltboot:
+      partitioning:             # partitioning pillar as described in saltboot documentation
+        disk1:
+          device: /dev/sda
+          disklabel: msdos
+          partitions:
+            p1:
+              flags: swap
+              format: swap
+              size_MiB: 1000.0
+            p2:
+              image: POS_Image_JeOS6
+              mountpoint: /
+          type: DISK
+  TOSHIBA-6140100:
+    description: HWTYPE:TOSHIBA-6140100
+    saltboot:
+      partitioning:
+        disk1:
+          device: /dev/sda
+          disklabel: msdos
+          partitions:
+            p1:
+              flags: swap
+              format: swap
+              size_MiB: 1000.0
+            p2:
+              image: POS_Image_JeOS6
+              mountpoint: /
+          type: DISK
+----
+
+For details about network settings and ``hwtypes`` related settings, see above.
+
 
 
 [[retail.sect.admin.deploy_terminals]]
-=== Deploying Terminals
+== Deploying Terminals
 
-This section expects: - configured central {susemgr} - configured branch server - saltboot PXE image
+TODO: https://github.com/SUSE/spacewalk/issues/5613
 
-In order to deploy a terminal, several more configuration steps are required:
-
-create a hardware type group for terminal hardware type
-
-assign and configure saltboot formula for given {susemgr} group
-
-Before terminal is booted and registered for the first time, there is no system entry in {susemgr} database. For this reason, hardware type groups are used to determine what image should be deployed on specific terminal.
-
-Each terminal has a specific hardware type. This hardware type is constructed from SMBios information provided by terminal hardware and contain information about the manufacturer and product name.
-
-Hardware type construction
-Hardware type is a concatenation of system manufacturer and system product name using - as a delimiter.
-
-Hardware type groups
-Hardware type groups are regular {susemgr} system groups with two important details.
-
-Hardware type group follows very specific naming
-
-Saltboot formula is assigned and configured
-
-Hardware type groups follows naming:
-
-prefix "HWTYPE:"
-
-appendix is hardware type of the terminals
-
-any spaces or non alphanumeric characters are removed (except delimiters _, -)
-
-Example for system manufacturer 'POS Vendor' and system product name 'Terminal 1'. The resulting hardware type group is HWTYPE:POSVendor-Terminal1.
-
-Saltboot formula
-Once the correct hardware type group is created, saltboot formula must be enabled and configured for this group. Refer to bp_chap_getting_started_with_salt_formulas.adoc how to work with {susemgr} formulas.
-
-This formula specifies partitioning and image to deploy for given terminal hardware type.
-
-Partitioning and Image assignment for specific hardware type
-Partitioning and Image assignment for specific machine
-First terminal boot
-During first terminal boot salt minion id and fingerprint will be presented on the screen. Depending on the configuration, accepting terminal key on {susemgr} may be required.
+Each terminal requires a specific hardware type, which contains information about the product name and terminal manufacturer.
+However, the {susemgr} database does not have this information to begin with.
+In order to tell {susemgr} what image to deploy on each terminal, you can set hardware type groups.
 
 
-Accept the terminal key only when information provided on terminal screen match those in {susemgr} Main Menu › Salt › Keys
-Terminal will now continue booting, download the image from branch server and deploy it on the machine. Then proceeds to boot deployed image
+.Procedure: Create a Hardware Type Group
+
+For this procedure, you will require the system manufacturer name and product name for your terminal.
+
+. Determine the hardware type group name.
+Prefix the name with [systemitem]``HWTYPE:``, followed by the system manufacturer name and product name, separated by a hyphen.
+For example:
++
+----
+HWTYPE:POSVendor-Terminal1
+----
++
+[NOTE]
+====
+Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type group names.
+Spaces and other non-alphanumeric characters will be removed when the name is processed.
+====
++
+. TODO: Apply hardware type
+
+
+
+////
+Commenting this heading out until we have content for it. LKB
+[[retail.sect.admin.troubleshooting]]
+== Troubleshooting
+
+TODO: https://github.com/SUSE/spacewalk/issues/5616
+////
