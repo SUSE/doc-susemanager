@@ -50,7 +50,7 @@ endif::[]
 [abstract]
 --
 This chapter explains how to install and set up {productname} {productnumber} Proxy.
-It also provides notes about migrating a previous proxy such as version 2.1, 3.0, or 3.1 to version 3.2.
+It also provides notes about migrating a previous proxy to version 3.2.
 --
 
 
@@ -506,17 +506,23 @@ filename: "pxelinux.0"
 
 
 [[advanced.topics.proxy.migration3]]
-== Migrating {productname} 3 Proxy to Version 3.1
+== Migrating {productname} 3.1 Proxy to Version {productnumber} [Management]
 
 The recommended order for migrations is to first migrate the server and then the proxies.
-Note that a {productname} 3 Proxy works correctly with {productname} 3.1.
+// Note that a {productname} 3 Proxy works correctly with {productname} 3.1.
 
-For the migration of the proxies there are two possible approaches:
+For the migration of traditionally managed proxies there are two possible approaches:
 
-* Existing {productname} proxies may be upgraded to version 3.1 with {yast} or [command]``zypper`` migration.
+* Existing {productname} proxies may be upgraded to version 3.2 with {yast} or [command]``zypper`` migration.
 * Alternatively, the proxies may be replaced by new ones.
 
 This section documents both approaches.
+
+[NOTE]
+.Migrating {productname} 3 Proxy and Earlier
+====
+For migrating {productname} 3 Proxy and earlier, see https://www.suse.com/documentation/suse-manager-3/book_suma_advanced_topics_31/data/sect1_chapter_book_suma_advanced_topics_31.html, Chapter "SUSE Manager 3.1 Proxy".
+====
 
 
 [[at.replacing.a.susemgrproxy]]
@@ -538,11 +544,11 @@ Consider copying important data to a central place that can also be accessed by 
 ** Copy the activation keys from the previous server.
 Of course, it is always better to re-create the keys.
 . Shutdown the server.
-. Install a new {productname} 3.1 Proxy, see <<at.manager.proxy.inst-and-clients>>.
-. In the SUSE Manager {webui} select the newly installed {susemgrproxy} and delete it from the systems list.
+. Install a new {productname} {productnumber} Proxy, see <<at.manager.proxy.inst-and-clients>>.
+. In the {productname} {webui} select the newly installed {susemgrproxy} and delete it from the systems list.
 [[step.at.proxy.migration3.replace.react]]
-. In the {webui}, create a reactivation key for the old proxy system: On the System Details of the old proxy click menu:Reactivation[].
-Then click menu:Generate New Key[], and remember it (write it on a piece of paper or copy it to the clipboard).
+. In the {webui}, create a reactivation key for the old proxy system: On the System Details tab of the old proxy click [guimenu]``Reactivation``.
+Then click [guimenu]``Generate New Key``, and remember it (write it on a piece of paper or copy it to the clipboard).
 For more information about reactivation keys, see <<s5-sm-system-details-react>>.
 . After the installation of the new proxy, perform the following actions (if needed):
 ** Copy the centrally saved data to the new proxy system.
@@ -561,7 +567,7 @@ This may take a few hours.
 
 
 [[at.upgrade.a.susemgrproxy]]
-=== Upgrading a {susemgrproxy} from 3 to 3.1
+=== Upgrading a {susemgrproxy} from 3.1 to {productnumber}
 
 In most situations upgrading the proxy will be your preferred solution as this retains all cached packages.
 Selecting this route saves time especially regarding proxies connected to {productname} server via low-bandwith links.
@@ -571,55 +577,43 @@ This upgrade is similar to a standard client migration.
 .Synchronizing Target Channels
 ====
 Before successfully initializing the product migration, you first must make sure that the migration target channels are completely mirrored.
-For the upgrade to {productname} 3.1 Proxy, at least the [systemitem]``SUSE Linux Enterprise Server 12 SP3`` base channel with the [systemitem]``SUSE Manager Proxy 3.1`` child channel for your architecture is required.
+For the upgrade to {productname} 3.2 Proxy, at least the [systemitem]``SUSE Linux Enterprise Server 12 SP3`` base channel with the [systemitem]``SUSE Manager Proxy 3.2`` child channel for your architecture is required.
 ====
 
-.Procedure: Migrating Proxy to 3.1
-. Direct your browser to the {productname}{webui} where your proxy is registered, and login.
-. On the menu:Systems[Systems > Proxy] page select your proxy client system from the table.
+.Procedure: Migrating Proxy to {productnumber}
+. Direct your browser to the {productname} {webui} where your proxy is registered, and login.
+. On the menu:Main Menu[Systems > Systems > Proxy] page select your proxy client system from the table.
 +
 
 image::suma_proxy_old_details_page.png[]
 
-. On the system's detail page select the menu:Software[] tab, then the [guimenu]``SP Migration`` tab.
+. On the system's detail page select the menu:Software[SP Migration] tab.
 +
 
 image::suma_proxy_old_details_spmigration.png[]
 
 . From this page you will see installed products listed on your proxy client, and the available target products.
-Select the wanted menu:Target Products[], which include [systemitem]``SUSE Linux Enterprise Server 12 SP3`` and [systemitem]``SUSE Manager Proxy 3.1``.
+Select the wanted [guimenu]``Target Products``, which include [systemitem]``SUSE Linux Enterprise Server 12 SP3`` and [systemitem]``SUSE Manager Proxy 3.2``.
 +
 
 image::suma_proxy_migration_target.png[]
 +
 
-Then confirm with menu:Select Channels[].
+Then confirm with btn:[Select Channels].
 +
 
 image::suma_proxy_migration_channels.png[]
 
-. From the menu:Schedule Migration[] menu, and then btn:[Confirm].
+. From the [guimenu]``Schedule Migration`` menu, select the time and click btn:[Confirm].
 
-Check the menu:System Status[] on the system's details when the migration is done.
+Check the [guimenu]``System Status`` on the menu:System Details[Overview] when the migration is done.
 
 image::suma_proxy_migrated.png[]
-
-
-[NOTE]
-.Checking `refresh_pattern` in [path]``/etc/squid/squid.conf``
-====
-If you migrate from an early {susemgrproxy} 3.0 add the following `refresh_pattern` to [path]``/etc/squid/squid.conf``:
-
-----
-# salt minions get the repodata via a different URL
-refresh_pattern /rhn/manager/download/.*/repodata/.*$ 0 1% 1440 ignore-no-cache reload-into-ims refresh-ims
-----
-====
 
 Finally consider scheduling a reboot.
 
 
-
+////
 [[advanced.topics.proxy.migration]]
 == Migrating {productname} 2.1 Proxy to Version 3.1
 
@@ -865,3 +859,4 @@ rm /mnt/boot/initrd_koan
 When you have completed this step, switch back to the console where {yast} is running (console 7) and click menu:Retry[].
 Installation of the kernel will continue and succeed.
 The system will reboot, a few automated init scripts will run and the proxy will be upgraded to the {productname} 3.1 based on SLES12SP3 and will be fully functional.
+////
