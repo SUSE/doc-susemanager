@@ -6,7 +6,7 @@ include::entities.adoc[]
 [abstract]
 --
 This chapter explains how to install and set up {productname} {productnumber} Proxy.
-It also provides notes about migrating a previous proxy such as version 2.1, 3.0, or 3.1 to version 3.2.
+It also provides notes about migrating a previous proxy to version 3.2.
 --
 
 
@@ -462,17 +462,23 @@ filename: "pxelinux.0"
 
 
 [[advanced.topics.proxy.migration3]]
-== Migrating {productname} 3 Proxy to Version 3.1
+== Migrating {productname} 3.1 Proxy to Version {productnumber} [Management]
 
 The recommended order for migrations is to first migrate the server and then the proxies.
-Note that a {productname} 3 Proxy works correctly with {productname} 3.1.
+// Note that a {productname} 3 Proxy works correctly with {productname} 3.1.
 
-For the migration of the proxies there are two possible approaches:
+For the migration of traditionally managed proxies there are two possible approaches:
 
-* Existing {productname} proxies may be upgraded to version 3.1 with {yast} or [command]``zypper`` migration.
+* Existing {productname} proxies may be upgraded to version 3.2 with {yast} or [command]``zypper`` migration.
 * Alternatively, the proxies may be replaced by new ones.
 
 This section documents both approaches.
+
+[NOTE]
+.Migrating {productname} 3 Proxy and Earlier
+====
+For migrating {productname} 3 Proxy and earlier, see https://www.suse.com/documentation/suse-manager-3/book_suma_advanced_topics_31/data/sect1_chapter_book_suma_advanced_topics_31.html, Chapter "SUSE Manager 3.1 Proxy".
+====
 
 
 [[at.replacing.a.susemgrproxy]]
@@ -494,11 +500,11 @@ Consider copying important data to a central place that can also be accessed by 
 ** Copy the activation keys from the previous server.
 Of course, it is always better to re-create the keys.
 . Shutdown the server.
-. Install a new {productname} 3.1 Proxy, see <<at.manager.proxy.inst-and-clients>>.
-. In the SUSE Manager {webui} select the newly installed {susemgrproxy} and delete it from the systems list.
+. Install a new {productname} {productnumber} Proxy, see <<at.manager.proxy.inst-and-clients>>.
+. In the {productname} {webui} select the newly installed {susemgrproxy} and delete it from the systems list.
 [[step.at.proxy.migration3.replace.react]]
-. In the {webui}, create a reactivation key for the old proxy system: On the System Details of the old proxy click menu:Reactivation[].
-Then click menu:Generate New Key[], and remember it (write it on a piece of paper or copy it to the clipboard).
+. In the {webui}, create a reactivation key for the old proxy system: On the System Details tab of the old proxy click [guimenu]``Reactivation``.
+Then click [guimenu]``Generate New Key``, and remember it (write it on a piece of paper or copy it to the clipboard).
 For more information about reactivation keys, see <<s5-sm-system-details-react>>.
 . After the installation of the new proxy, perform the following actions (if needed):
 ** Copy the centrally saved data to the new proxy system.
@@ -517,7 +523,7 @@ This may take a few hours.
 
 
 [[at.upgrade.a.susemgrproxy]]
-=== Upgrading a {susemgrproxy} from 3 to 3.1
+=== Upgrading a {susemgrproxy} from 3.1 to {productnumber}
 
 In most situations upgrading the proxy will be your preferred solution as this retains all cached packages.
 Selecting this route saves time especially regarding proxies connected to {productname} server via low-bandwith links.
@@ -527,297 +533,38 @@ This upgrade is similar to a standard client migration.
 .Synchronizing Target Channels
 ====
 Before successfully initializing the product migration, you first must make sure that the migration target channels are completely mirrored.
-For the upgrade to {productname} 3.1 Proxy, at least the [systemitem]``SUSE Linux Enterprise Server 12 SP3`` base channel with the [systemitem]``SUSE Manager Proxy 3.1`` child channel for your architecture is required.
+For the upgrade to {productname} 3.2 Proxy, at least the [systemitem]``SUSE Linux Enterprise Server 12 SP3`` base channel with the [systemitem]``SUSE Manager Proxy 3.2`` child channel for your architecture is required.
 ====
 
-.Procedure: Migrating Proxy to 3.1
-. Direct your browser to the {productname}{webui} where your proxy is registered, and login.
-. On the menu:Systems[Systems > Proxy] page select your proxy client system from the table.
+.Procedure: Migrating Proxy to {productnumber}
+. Direct your browser to the {productname} {webui} where your proxy is registered, and login.
+. On the menu:Main Menu[Systems > Systems > Proxy] page select your proxy server from the table.
 +
 
 image::suma_proxy_old_details_page.png[]
 
-. On the system's detail page select the menu:Software[] tab, then the [guimenu]``SP Migration`` tab.
+. On the system's detail page select the menu:Software[SP Migration] tab.
 +
 
 image::suma_proxy_old_details_spmigration.png[]
 
 . From this page you will see installed products listed on your proxy client, and the available target products.
-Select the wanted menu:Target Products[], which include [systemitem]``SUSE Linux Enterprise Server 12 SP3`` and [systemitem]``SUSE Manager Proxy 3.1``.
+Select the wanted [guimenu]``Target Products``, in this case [systemitem]``SUSE Linux Enterprise Server 12 SP3`` with [systemitem]``SUSE Manager Proxy 3.2``.
 +
 
-image::suma_proxy_migration_target.png[]
-+
+// image::suma_proxy_migration_target.png[]
+// +
 
-Then confirm with menu:Select Channels[].
+. Then confirm with btn:[Select Channels].
 +
-
 image::suma_proxy_migration_channels.png[]
 
-. From the menu:Schedule Migration[] menu, and then btn:[Confirm].
+. From the [guimenu]``Schedule Migration`` menu, select the time and click btn:[Confirm].
++
+image::suma_proxy_migration_schedule.png[]
 
-Check the menu:System Status[] on the system's details when the migration is done.
+Check the [guimenu]``System Status`` on the menu:System Details[Overview] when the migration is done.
 
 image::suma_proxy_migrated.png[]
 
-
-[NOTE]
-.Checking `refresh_pattern` in [path]``/etc/squid/squid.conf``
-====
-If you migrate from an early {susemgrproxy} 3.0 add the following `refresh_pattern` to [path]``/etc/squid/squid.conf``:
-
-----
-# salt minions get the repodata via a different URL
-refresh_pattern /rhn/manager/download/.*/repodata/.*$ 0 1% 1440 ignore-no-cache reload-into-ims refresh-ims
-----
-====
-
 Finally consider scheduling a reboot.
-
-
-
-[[advanced.topics.proxy.migration]]
-== Migrating {productname} 2.1 Proxy to Version 3.1
-
-For the migration of {productname} 2.1 Proxies there are two possible approaches--this section documents both approaches:
-
-* Existing {productname} proxies may be replaced by newly installed and reconfigured proxies, see <<advanced.topics.proxy.migration.replace>>.
-This is the recommended method.
-* Proxies may be auto-upgraded to version 3.1 by means of {yast} auto-installation, see <<advanced.topics.proxy.migration.upgrade>>.
-
-[TIP]
-.Order of Server and Proxy Migration
-====
-The recommended order for migrations is to first migrate the server and then the proxies.
-A {productname} 2.1 Proxy works correctly with {productname} 3.1.
-====
-
-
-
-[[advanced.topics.proxy.migration.replace]]
-=== Replacing a {susemgrproxy}
-
-A {susemgrproxy} is `dumb` in the sense that it does not contain any information about the clients which are connected to it.
-A {susemgrproxy} can therefore be replaced by a new one.
-The replacement proxy must have the same name and IP address as its predecessor.
-
-In order to replace a {susemgrproxy} and keeping the clients registered to the proxy leave the old proxy in {productname}.
-Create a reactivation key for this system and then register the new proxy using the reactivation key.
-If you do not use the reactivation key, you will need to re-registered all the clients against the new proxy.
-[[proc.advanced.topics.proxy.migration21.replace]]
-.Procedure: Replacing a {susemgrproxy} and Keeping the Clients Registered
-. Before starting the actual migration procedure, save the important data from the old proxy.
-Copy the data to a central place that also the new server can access:
-** Copy the scripts that are still needed.
-** Copy the activation keys from the existing server.
-Of course, it is always better to re-create the keys.
-. Shutdown the server.
-. Install a new {productname} 3.1 Proxy, see <<at.manager.proxy.inst-and-clients>>.
-+
-
-
-[IMPORTANT]
-.Proxy Installation and Client Connections
-====
-During the installation of the proxy, clients will not be able to reach the {productname} server.
-After a {susemgrproxy} system has been deleted from the systems list, all clients connected to this proxy will be (incorrectly) listed as `directly connected` to the {productname} server.
-After the first successful operation on a client _such as execution of a remote command or installation of a package or patch_ this information will automatically be corrected.
-This may take a few hours.
-====
-+
-
-. In the SUSE Manager {webui} select the newly installed {susemgrproxy} and delete it from the systems list.
-[[step.at.proxy.migration.replace.react]]
-. In the {webui}, create a reactivation key for the old proxy system: On the System Details of the old proxy click menu:Reactivation[].
-Then click menu:Generate New Key[], and remember it (write it on a piece of paper or copy it to the clipboard).
-For more information about reactivation keys, see <<s5-sm-system-details-react>>.
-. After the installation of the new proxy, perform the following actions (if needed):
-** Copy the centrally saved data back to the new proxy system.
-** Install any other needed software.
-** If the proxy is also used for autoinstallation, do not forget to setup TFTP synchronization.
-
-
-
-[[advanced.topics.proxy.migration.upgrade]]
-=== Upgrading a {susemgrproxy} from 2.1 to 3.1
-
-In other situations upgrading the proxy will be the preferred solution as it retains all cached packages.
-This route saves time especially regarding proxies connected to a {productname} server via low-bandwith links.
-This upgrade can be automated by using the {yast} auto-installation feature.
-
-.Procedure: Upgrading {susemgrproxy} from 2.1 to 3.1
-. Create an auto-installable distribution based on SLES 12 SP3.
-{productname} 3.1 Proxy is an add-on for SLES 12 SP3.
-Refer to the <<ref.webui.systems.autoinst>> on creating an auto-installable distribution.
-. To start the auto-installation of a proxy, some additional packages must be installed that are only available in the {productname} Tools channel.
-These tools were not available for proxies when in the past the system was shipped as an appliance.
-To gain access to the required packages for use with proxies, the underlying SLES 11 SP3 channel ([systemitem]``SLES11-SP3-SUSE-Manager-Tools``) needs to be cloned and assigned to the to-be-upgraded proxies.
-After these steps have been completed, create an auto-installation profile.
-
-In the following example you will see an auto-install profile.
-The label `Proxy31` is used both for the auto-installable distribution as well as for the auto-install profile.
-Use the following auto-installation as template and create the auto-installation profile by uploading the edited file:
-
-----
-<?xml version="1.0"?>
-<!DOCTYPE profile>
-<profile xmlns="http://www.suse.com/1.0/yast2ns"
-         xmlns:config="http://www.suse.com/1.0/configns">
-  <general>
-  $SNIPPET('spacewalk/sles_no_signature_checks')
-    <mode>
-      <confirm config:type="boolean">false</confirm>
-    </mode>
-  </general>
-  <add-on>
-    <add_on_products config:type="list">
-      <listentry>
-        <ask_on_error config:type="boolean">true</ask_on_error>
-        <media_url>http://$redhat_management_server/ks/dist/child/sles12-sp3-updates-x86_64/Proxy31</media_url>
-        <name>SLES12 SP3 Updates</name>
-        <product>SLES12-SP3</product>
-        <product_dir>/</product_dir>
-      </listentry>
-      <listentry>
-        <ask_on_error config:type="boolean">true</ask_on_error>
-        <media_url>http://$redhat_management_server/ks/dist/child/sle-manager-tools12-pool-x86_64-sp3/Proxy31</media_url>
-        <name>SLE12 Manager Tools Pool</name>
-        <product>SLES12</product>
-        <product_dir>/</product_dir>
-      </listentry>
-      <listentry>
-        <ask_on_error config:type="boolean">true</ask_on_error>
-        <media_url>http://$redhat_management_server/ks/dist/child/sle-manager-tools12-updates-x86_64-sp3/Proxy31</media_url>
-        <name>SLE12 Manager Tools Updates</name>
-        <product>SLES12</product>
-        <product_dir>/</product_dir>
-      </listentry>
-      <listentry>
-        <ask_on_error config:type="boolean">true</ask_on_error>
-        <media_url>http://$redhat_management_server/ks/dist/child/suse-manager-proxy-3.1-pool-x86_64/Proxy31</media_url>
-        <name>SLE12 Proxy 3.1 Pool</name>
-        <product>SLES12</product>
-        <product_dir>/</product_dir>
-      </listentry>
-      <listentry>
-        <ask_on_error config:type="boolean">true</ask_on_error>
-        <media_url>http://$redhat_management_server/ks/dist/child/suse-manager-proxy-3.1-updates-x86_64/Proxy31</media_url>
-        <name>SLE12 Proxy 3.1 Update</name>
-        <product>SLES12</product>
-        <product_dir>/</product_dir>
-      </listentry>
-    </add_on_products>
-  </add-on>
-  <upgrade>
-    <only_installed_packages config:type="boolean">false</only_installed_packages>
-    <stop_on_solver_conflict config:type="boolean">true</stop_on_solver_conflict>
-  </upgrade>
-  <backup>
-    <sysconfig config:type="boolean">true</sysconfig>
-    <modified config:type="boolean">true</modified>
-    <remove_old config:type="boolean">false</remove_old>
-  </backup>
-  <networking>
-    <keep_install_network config:type="boolean">true</keep_install_network>
-    <start_immediately config:type="boolean">true</start_immediately>
-  </networking>
-  <scripts>
-    <pre-scripts config:type="list">
-      <script>
-        <filename>remove_initrd_koan.sh</filename>
-        <source>
-
-        mount /dev/sda1 /mnt
-        rm -f /mnt/initrd_koan
-        umount /mnt
-
-        </source>
-      </script>
-    </pre-scripts>
-    <chroot-scripts config:type="list">
-      <script>
-        <filename>migration_fix_script.sh</filename>
-        <chrooted config:type="boolean">true</chrooted>
-        <source><![CDATA[ ln -sf /usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT /etc/pki/trust/anchors/
-/usr/sbin/update-ca-certificates ]]>
-</source>
-      </script>
-    </chroot-scripts>
-    <init-scripts config:type="list">
-      <script>
-        <filename>sles_register.sh</filename>
-        <source>
-
-         $SNIPPET('spacewalk/sles_register')
-         chmod 640 /etc/sysconfig/rhn/systemid
-         chown root:www /etc/sysconfig/rhn/systemid
-         systemctl enable squid
-         systemctl start squid
-
-        </source>
-      </script>
-    </init-scripts>
-  </scripts>
-</profile>
-----
-
-Ensure all channels referenced in this file are available and fully synced.
-Replace the label `Proxy31` with the correct reference chosen for your auto-installation profile.
-It is recommended to create a new activation key, for example: `1-sles12sp3` which has the relevant channels assigned; later this key will be used to subscribe the upgraded proxy with the correct channels.
-The following base channel should be assigned:
-
-----
-SLES12-SP3-Pool
-----
-
-Also include the following child channels:
-
-----
-SLE-Manager-Tools12-Pool
-SLE-Manager-Tools12-Updates
-SLES12-SP3-Updates
-SUSE-Manager-Proxy-3.1-Pool
-SUSE-Manager-Proxy-3.1-Updates
-----
-
-In `Kernel Options` enter the following value:
-
-----
-autoupgrade=1 Y2DEBUG=1
-----
-
-The debug setting is not required but can help investigate problems in case something goes wrong; the [parameter]``autoupgrade`` parameter is vital! Do not remove it.
-
-Save your changes then click on "Variables" and enter the following value:
-
-----
-registration_key=1-sles12sp3
-----
-
-Specify the name of the key which has all respective channels assigned to it.
-The auto-install file contains a script named [command]``remove_initrd_koan.sh``.
-In this script you should specify the device name of your [path]``/boot`` partition.
-
-[NOTE]
-.remove_initrd_koan.sh
-====
-The purpose of this script is to act as a workaround for the following problem: During installation the initrd of the installation media (SLES12SP3) is in use.
-This initrd is rather large (around 50 MB), so there is not enough space left when the new kernel is being installed.
-Therefore this script deletes the initial ramdisk file once it has been booted.
-The partition of your boot partition might differ, so it should be explicitly specified in the autoinstall file.
-====
-
-During auto-installation this script attempts to delete the initial ramdisk file once it has booted.
-Your boot partition may differ, so ensure it is explicitly specified within the auto-install file.
-
-If this step is bypassed or mixed up (for example: specifying a wrong value) it's fine.
-During installation of the new kernel, {yast} will detect that there is not enough space available and will stop.
-You may switch to another console (there is a shell running on virtual console 2) and reclaim some disk space by issuing the command:
-
-----
-rm /mnt/boot/initrd_koan
-----
-
-When you have completed this step, switch back to the console where {yast} is running (console 7) and click menu:Retry[].
-Installation of the kernel will continue and succeed.
-The system will reboot, a few automated init scripts will run and the proxy will be upgraded to the {productname} 3.1 based on SLES12SP3 and will be fully functional.
