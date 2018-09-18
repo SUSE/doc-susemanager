@@ -3,18 +3,8 @@
 <?asciidoc-numbered?>
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<title>SUSE Manager 3.2</title>
-<date>2018-09-10</date>
-=======
 <title>SUSE Manager Documentation</title>
 <date>2018-09-18</date>
->>>>>>> eadc4168... Removed entities from top of files, added a single include, added missing entities for retail
-=======
-<title>SUSE Manager Documentation</title>
-<date>2018-09-18</date>
->>>>>>> eadc4168... Removed entities from top of files, added a single include, added missing entities for retail
 </info>
 <part xml:id="book.suma.getting-started"><title>Getting Started</title><chapter xml:id="quickstart.chapt.overview.requirements"><title>Introduction</title><simpara>This Getting Started Guide provides guidance on setting up SUSE Manager server with KVM.
 You will learn the fundamentals of managing both traditional and Salt clients.</simpara>
@@ -407,7 +397,7 @@ In the following table replace <emphasis>version</emphasis> with the actual prod
 </row>
 <row>
 <entry align="left" valign="top"><simpara>Version:</simpara></entry>
-<entry align="left" valign="top"><simpara>SLES_version_-JeOS-for-kvm-and-xen.x86_64-GM.qcow2</simpara></entry>
+<entry align="left" valign="top"><simpara>SLES&lt;VERSION&gt;-JeOS-for-kvm-and-xen.x86_64-GM.qcow2</simpara></entry>
 </row>
 <row>
 <entry align="left" valign="top"><simpara>Memory:</simpara></entry>
@@ -515,11 +505,11 @@ Select a strong password and then in the next message box <guibutton>Confirm roo
 <title>Procedure: Preparing JeOS for SUSE Manager Installation</title>
 <listitem>
 <para>Register with SCC:</para>
-<screen>SUSEConnect -e&lt;EMAIL_ADDRESS&gt; -r&lt;SUSE_MANAGER_CODE&gt;</screen>
+<screen>SUSEConnect -e`EMAIL_ADDRESS`-r`SUSE_MANAGER_CODE`</screen>
 </listitem>
 <listitem>
 <para>Add SUSE Manager repositories:</para>
-<screen>SUSEConnect -p SUSE-Manager-Server/&lt;productnumber&gt;/x86_64 -r&lt;SUSE_MANAGER_CODE&gt;</screen>
+<screen>SUSEConnect -p SUSE-Manager-Server/&lt;productnumber&gt;/x86_64 -r`SUSE_MANAGER_CODE`</screen>
 </listitem>
 <listitem>
 <para>Install <package>yast2-storage</package> with all required dependencies (approx. 40 packages, 30 MB when installed).
@@ -566,12 +556,15 @@ This basic administration package is required for preparing storage partitions:<
 </informaltable>
 </listitem>
 <listitem>
-<para>If you are still using an older version than SUSE Manager&#160;3.2 check <filename>/etc/fstab</filename> for correctness as follows (<emphasis>updated tools shipped with recent SPs will no longer require human intervention.</emphasis>):
-Remove or comment out this mount point entry for <filename>/var/lib/pgsql/</filename> in the <filename>/etc/fstab</filename> file:</para>
+<para>SLES by default uses the BTRFS file system.
+A mount point is created automatically for <filename>/var/lib/pgsql/</filename> (even when not installed).
+This must be removed or commented out from the <filename>/etc/fstab</filename> entries.
+As root, edit <filename>/etc/fstab</filename> and comment out or remove the line:</para>
 <screen>/var/lib/pgsql btrfs subvol=@/var/lib/pgsql 0 0</screen>
 <warning>
-<title>Remove <filename>pgsql</filename> from the fstab Configuration File</title>
-<simpara>If you do not remove the <filename>/var/lib/pgsql/</filename> line from fstab the first time you shut down the server you will lose your database because of duplicated entries in the fstab file.</simpara>
+<title>Remove <command>pgsql</command> from the fstab Configuration File</title>
+<simpara>If you do not remove this line from fstab the first time you shut down the server you will lose your database.
+This occurs because you will have duplicate entries in the fstab file. <emphasis>Updated tools shipped with recent SPs will no longer require human intervention.</emphasis></simpara>
 </warning>
 </listitem>
 <listitem>
@@ -905,21 +898,34 @@ To update the grub2 during boot run <command>grub2-install /dev/sda</command>.</
 </section>
 </section>
 </chapter>
-<chapter xml:id="preparing.and.registering.clients"><title>Registering Clients</title><section xml:id="_introduction"><title>Introduction</title><simpara>For SUSE Manager&#160;3 and later, you can choose to use either traditional or Salt clients, or a mixture of both, depending on your environment and requirements.</simpara>
+<chapter xml:id="preparing.and.registering.clients"><title>Registering Clients</title><section xml:id="_introduction"><title>Introduction</title><simpara>Releases prior to SUSE Manager 2.1 were shipped with a <emphasis role="strong">traditional</emphasis> client management framework (which is still fully supported today).
+SUSE Manager 3 and later include the Salt framework in addition to the <emphasis role="strong">traditional</emphasis> framework.</simpara>
+<variablelist>
+<varlistentry>
+<term>Salt</term>
+<listitem>
+<simpara>Is an end-to-end data-center automation tool which may also be used outside the scope of SUSE Manager to introduce reactive, real-time orchestration, and configuration management.
+Managed systems can coexist using both <emphasis role="strong">traditional</emphasis> and <emphasis role="strong">Salt</emphasis> frameworks.
+This functionality provides a safe learning environment when switching to <emphasis role="strong">Salt</emphasis> while you continue to maintain existing deployments.</simpara>
+</listitem>
+</varlistentry>
+</variablelist>
 </section>
-<section xml:id="create.act.keys"><title>Creating Activation Keys</title><simpara>Activation keys are used with both traditional and Salt clients to ensure that your clients have the correct software entitlements, are connecting to the appropriate channels, and are subscribed to the relevant groups.
-Each activation key is bound to an orgnization, which you can set when you create the key.</simpara>
-<simpara>This section contains information on how to create activation keys for both traditional and Salt clients, and provides some best practices for working with activation keys.</simpara>
+<section xml:id="create.act.keys"><title>Creating Activation Keys</title><simpara>The following procedure will guide you through creating the activation keys for your test channels.
+Activation keys can be used with both Salt and traditional clients.</simpara>
+<simpara>Activation keys define the number of software entitlements, channels, and groups a client system is allowed to subscribe to.
+This information is passed on to all systems registered with said key.
+Each activation key is bound to the organization for which it has been created.</simpara>
 <orderedlist xml:id="create.activation.keys" numeration="arabic">
 <title>Procedure: Creating Activation Keys</title>
 <listitem>
 <para>As the administrator login to the SUSE Manager Web UI.</para>
 </listitem>
 <listitem>
-<para>Navigate to <menuchoice><guimenu>Systems</guimenu> <guimenuitem>Activation Keys</guimenuitem></menuchoice>.</para>
+<para>Switch to <menuchoice><guimenu>Systems</guimenu> <guimenuitem>Activation Keys</guimenuitem></menuchoice>.</para>
 </listitem>
 <listitem>
-<para>Click the <guibutton>Create Key</guibutton> button in the upper right corner.</para>
+<para>Click the <guibutton>Create Key</guibutton> link at the upper right corner.</para>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -930,45 +936,30 @@ Each activation key is bound to an orgnization, which you can set when you creat
 </informalfigure>
 </listitem>
 <listitem>
-<para>In the <literal role="guimenu">Description</literal> field, enter a name for the activation key.</para>
+<para>Enter an <menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Description</guimenuitem></menuchoice> to identify the generated activation key.</para>
 </listitem>
 <listitem>
-<para>In the <literal role="guimenu">Key</literal> field, enter the distribution and service pack associated with the key. For example, <literal>SLES12-SP3</literal> for SUSE Linux Enterprise Server&#160;12&#160;SP3.</para>
+<para>Enter a human readable <menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Key</guimenuitem></menuchoice> string value such as <emphasis role="strong">SLES12-SP3</emphasis> to represent the distribution and service pack associated with the key.</para>
 <warning>
 <title>Allowed Characters</title>
-<simpara>Do not use commas in the <literal role="guimenu">Key</literal> field for any SUSE products.
-However, you <emphasis role="strong">must</emphasis> use commas for Red Hat Products.
+<simpara>For all SUSE
+Products do not use commas within the key string.
+Red Hat Products require commas.
 For more information, see <xref linkend="ref.webui.systems.activ-keys"/>.</simpara>
 </warning>
 </listitem>
 <listitem>
-<para>In the <literal role="guimenu">Base Channels</literal> drop-down box, select the SUSE Linux Enterprise channel that you added during
-<link xl:href="proc-quickstart-first-channel-sync.xml#proc-quickstart-first-channel-sync">First Channel Sync</link></para>
+<para>Select the SUSE Linux Enterprise channel that was added during
+<link xl:href="proc-quickstart-first-channel-sync.xml#proc-quickstart-first-channel-sync">First Channel Sync</link>
+from the <menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Base Channels</guimenuitem></menuchoice> drop down.</para>
 </listitem>
 <listitem>
-<para>We recommend you leave the <literal role="guimenu">Contact Method</literal> set to <literal role="guimenu">Default</literal>.</para>
+<para>For this guide leave <menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Contact Method</guimenuitem></menuchoice> set to default.</para>
 </listitem>
 <listitem>
-<para>We recommend you leave the <literal role="guimenu">Universal Default</literal> setting unchecked.</para>
-</listitem>
-<listitem>
-<para>Click <guibutton>Update Activation Key</guibutton> to create the activation key.</para>
-</listitem>
-<listitem>
-<para>Check the <literal role="guimenu">Configuration File Deployment</literal> check box to enable configuration management for this key, and click <guibutton>Update Activation Key</guibutton> to save this change.</para>
+<para><menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Universal Default</guimenuitem></menuchoice> should remain unchecked. Click <guibutton>Update Activation Key</guibutton> to complete creation of the activation key.</para>
 </listitem>
 </orderedlist>
-<simpara>When you create activation keys, keep these best practices in mind:
-* Avoid using the <literal role="systemitem">SUSE Manager Default</literal> parent channel.
-This setting forces SUSE Manager to choose a parent channel that best corresponds to the installed operating system, which can sometimes lead to unexpected behavior.
-Instead, we recommend you create activation keys specific to each distribution and architecture.
-* If you are using bootstrap scripts, consider creating an activation key for each script.
-This will help you align channel assignments, package installation, system group memberships, and configuration channel assignments.
-You will also need less manual interaction with your system after registration.
-* If you do not enter a human-readable name for your activation keys, the system will automatically generate a number string, which can make it difficult to manage your keys.
-Consider a naming scheme for your activation keys to help you keep track of them.
-* Note that the <literal role="guimenu">Configuration File Deployment</literal> check box does not appear until after you have created the activation key.
-Ensure you go back and check the box if you need to enable configuration management.</simpara>
 </section>
 <section xml:id="create.tools.repository"><title>Creating the SUSE Manager Tools Repository</title><simpara>In this section you will create a tools repository on the SUSE Manager Server for providing client tools.
 The client tools repository contains packages for installing Salt on minions as well as required packages for registering traditional clients during the bootstrapping procedure.
@@ -1079,7 +1070,7 @@ cp bootstrap.sh bootstrap-sles12.sh</screen>
 <listitem>
 <para>Open <filename>sles12.sh</filename> for modification.
 Scroll down and modify both lines marked in green.
-You must comment out <literal>exit 1</literal> with a hash mark (<literal>#</literal>) to activate the script and then enter the name of the key for this script in the <literal>ACTIVATION_KEYS=</literal> field as follows:</para>
+You must comment out <literal>exit 1</literal> with a hash mark (<literal>\#</literal>) to activate the script and then enter the name of the key for this script in the <literal>ACTIVATION_KEYS=</literal> field as follows:</para>
 <screen>echo "Enable this script: comment (with #'s) this block (or, at least just"
 echo "the exit below)"
 echo
@@ -2638,7 +2629,7 @@ metadata directory is located in:</simpara>
 </variablelist>
 <simpara>All custom folders located in the following directories needs to contain a <filename>form.yml</filename> file.
 These files are detected as form recipes and may be applied to groups and systems from the Web UI:</simpara>
-<screen>/srv/formula_metadata/`custom-formula-name`/form.yml</screen>
+<screen>/srv/salt/formula_metadata/`custom-formula-name`/form.yml</screen>
 </section>
 <section xml:id="best.practice.salt.formulas.pillar"><title>Editing Pillar Data in SUSE Manager</title><simpara>SUSE Manager requires a file called <filename>form.yml</filename>, to describe how formula data should look within the Web UI.
 <filename>form.yml</filename> is used by SUSE Manager to generate the desired form, with values editable by a user.</simpara>
@@ -3153,13 +3144,16 @@ Salt will ensure that only modified values are adjusted and restart or reinstall
 For additional information, see:</simpara>
 <itemizedlist>
 <listitem>
-<para><link xl:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html">https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html</link></para>
+<para><link xl:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html">https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html</link>
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</para>
 </listitem>
 </itemizedlist>
-</section>
-<section xml:id="retail.formulas"><title>SUSE Manager for Retail Salt Formulas</title><simpara>This section provides an introduction to Salt Formulas shipped with SUSE Manager for Retail.
+<informalexample>
+<simpara xml:id="retail.formulas">= SUSE Manager for Retail Salt Formulas</simpara>
+<simpara>This section provides an introduction to Salt Formulas shipped with SUSE Manager for Retail.
 These formulas such as the PXE boot, branch server network, or saltboot formulas are used to fine-tune the SUSE Manager for Retail infrastructure.</simpara>
-<section xml:id="retail.formulas.pxe"><title>Pxe Formula</title><simpara>The Pxe formula (<literal role="package">pxe-formula</literal>) for installing, setting up, and uninstalling syslinux PXE boot on the POS branchserver.</simpara>
+<simpara xml:id="retail.formulas.pxe">== Pxe Formula
+The Pxe formula (<literal role="package">pxe-formula</literal>) for installing, setting up, and uninstalling syslinux PXE boot on the POS branchserver.</simpara>
 <figure xml:id="fig-formula-pxe">
 <title>pxe formula</title>
 <mediaobject>
@@ -3169,8 +3163,8 @@ These formulas such as the PXE boot, branch server network, or saltboot formulas
 <textobject><phrase>formula pxe</phrase></textobject>
 </mediaobject>
 </figure>
-</section>
-<section xml:id="retail.formulas.branch-network"><title>Branch Network Formula</title><simpara>The Branch Network formula (<literal role="package">branch-network-formula</literal>) for configuring the branch server network.</simpara>
+<simpara xml:id="retail.formulas.branch-network">== Branch Network Formula</simpara>
+<simpara>The Branch Network formula (<literal role="package">branch-network-formula</literal>) for configuring the branch server network.</simpara>
 <figure xml:id="fig-formula-branch-network">
 <title>branch network formula</title>
 <mediaobject>
@@ -3180,8 +3174,8 @@ These formulas such as the PXE boot, branch server network, or saltboot formulas
 <textobject><phrase>formula branch network</phrase></textobject>
 </mediaobject>
 </figure>
-</section>
-<section xml:id="retail.formulas.saltboot"><title>Saltboot Formula</title><simpara>The Saltboot formula (<literal role="package">saltboot-formula</literal>) is a formula for configuring a boot image of a POS terminal.</simpara>
+<simpara xml:id="retail.formulas.saltboot">== Saltboot Formula</simpara>
+<simpara>The Saltboot formula (<literal role="package">saltboot-formula</literal>) is a formula for configuring a boot image of a POS terminal.</simpara>
 <figure xml:id="fig-formula-saltboot-01">
 <title>saltboot formula</title>
 <mediaobject>
@@ -3201,15 +3195,15 @@ These formulas such as the PXE boot, branch server network, or saltboot formulas
 <textobject><phrase>formula saltboot 02</phrase></textobject>
 </mediaobject>
 </figure>
-</section>
-<section xml:id="retail.formulas.image-sync"><title>Image Sync Formula</title><simpara>The Image Sync formula (<literal role="package">image-sync-formula</literal>) is a formula for syncing images to a Branch Server.</simpara>
+<simpara xml:id="retail.formulas.image-sync">== Image Sync Formula</simpara>
+<simpara>The Image Sync formula (<literal role="package">image-sync-formula</literal>) is a formula for syncing images to a Branch Server.</simpara>
 <simpara>For now, there is nothing configurable and it is not part of the highstate.
 This means it is not visible in the Web UI.  Apply it from the command-line or via cron as follows (replace <emphasis>&lt;branchserver&gt;</emphasis> with the name of your branch server):</simpara>
 <screen>salt &lt;branchserver&gt; state.apply image-sync</screen>
-</section>
-</section>
-<section xml:id="bp.saltforms.susemgr"><title>Salt Formulas Coming with SUSE Manager</title><simpara>For general information, see the <literal>Salt Formulas installation and usage instructions</literal> at <link xl:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html">https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html</link>.</simpara>
-<section xml:id="bp.saltforms.susemgr.dns"><title>Domain Name System (Bind)</title><simpara>With the bind formula you set up and configure a Domain Name System (DNS) server.
+<simpara xml:id="bp.saltforms.susemgr">== Salt Formulas Coming with SUSE Manager</simpara>
+<simpara>For general information, see the <literal>Salt Formulas installation and usage instructions</literal> at <link xl:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html">https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html</link>.</simpara>
+<simpara xml:id="bp.saltforms.susemgr.dns">=== Domain Name System (Bind)</simpara>
+<simpara>With the bind formula you set up and configure a Domain Name System (DNS) server.
 For technical information about the bind formula and low-level pillar data, see the <filename>README.rst</filename> file on the SUSE Manager server: <filename>/usr/share/susemanager/formulas/metadata/bind/README.rst</filename>.</simpara>
 <simpara>DNS is needed to resolve the domain names and host names into IP addresses.
 For more information about DNS, see the SLES Administration Guide, Services, The Domain Name System.</simpara>
@@ -3273,8 +3267,8 @@ this URL, see <filename>pillar.example</filename>.</simpara>
 <simpara>When saved, data is written to /srv/susemanager/formula_data/pillar/&lt;salt-minion.example.com&gt;_bind.json</simpara>
 <simpara>If you apply the highstate (<menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice>), it first ensures that <literal role="package">bind</literal> and all required packages will get installed.
 Then it will start the DNS service (<literal>named</literal>).</simpara>
-</section>
-<section xml:id="bp.saltforms.susemgr.dhcp"><title>Dhcpd</title><simpara>With the dhcpd formula you set up and configure a DHCP server (Dynamic Host Configuration Protocol).
+<simpara xml:id="bp.saltforms.susemgr.dhcp">=== Dhcpd</simpara>
+<simpara>With the dhcpd formula you set up and configure a DHCP server (Dynamic Host Configuration Protocol).
 For technical information about the dhcpd formula and low-level pillar data, see the Pillar example file
 <filename>/usr/share/susemanager/formulas/metadata/dhcpd/pillar.example</filename>.</simpara>
 <simpara>DHCP is needed to define network settings centrally (on a server) and let clients retrieve and use this information for local host configuration.
@@ -3299,8 +3293,8 @@ Default Lease Time:</simpara>
 <simpara>And finally <literal>Hosts with static IP addresses (with global defaults)</literal>.</simpara>
 <simpara>If you apply the highstate (<menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice>), it first ensures that <literal role="package">dhcp-server</literal> and all required packages will get installed.
 Then it will start the DHCP service (<literal>dhcpd</literal>).</simpara>
-</section>
-<section xml:id="bp.saltforms.susemgr.tftp"><title>Tftpd</title><simpara>With the tftpd formula you set up and configure a TFTP server (Trivial File Transfer Protocol).
+<simpara xml:id="bp.saltforms.susemgr.tftp">=== Tftpd</simpara>
+<simpara>With the tftpd formula you set up and configure a TFTP server (Trivial File Transfer Protocol).
 A TFTP server is a component that provides infrastructure for booting with PXE.</simpara>
 <simpara>For more information about setting up TFTP, see the SLES Deployment Guide, Preparing Network Boot Environment, Setting Up a TFTP Server.</simpara>
 <figure xml:id="fig-formula-tftpd-01">
@@ -3317,8 +3311,8 @@ A TFTP server is a component that provides infrastructure for booting with PXE.<
 TFTP under user</literal> (default: <literal role="systemitem">sftp</literal>).</simpara>
 <simpara>If you apply the highstate (<menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice>), it first ensures that <literal role="package">atftp</literal> and all required packages will get installed.
 Then it will start TFTP (<literal>atftpd</literal>).</simpara>
-</section>
-<section xml:id="bp.saltforms.susemgr.vsftp"><title>Vsftpd</title><simpara>With the vsftpd formula you set up and configure Vsftpd.  Vsftpd is an
+<simpara xml:id="bp.saltforms.susemgr.vsftp">=== Vsftpd</simpara>
+<simpara>With the vsftpd formula you set up and configure Vsftpd.  Vsftpd is an
 FTP server or daemon, written with security in mind.  "vs" in its name
 stands for "Very Secure".</simpara>
 <figure xml:id="fig-formula-vsftpd-01">
@@ -3336,8 +3330,11 @@ stands for "Very Secure".</simpara>
 <literal>Enable ssl</literal>, etc.</simpara>
 <simpara>If you apply the highstate (<menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice>), it first ensures that <literal role="package">vsftpd</literal> and all required packages will get installed.
 Then it will start the VSFTP service (<literal>vsftpd</literal>).</simpara>
-<simpara>For more information about setting up and tuning Vsftpd, see the documentation coming with the <literal role="package">vsftpd</literal> package (<filename>/usr/share/doc/packages/vsftpd/</filename> when the package is installed).</simpara>
-</section>
+<simpara>For more information about setting up and tuning Vsftpd, see the documentation coming with the <literal role="package">vsftpd</literal> package (<filename>/usr/share/doc/packages/vsftpd/</filename> when the package is installed).
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; eadc4168&#8230;&#8203; Removed entities from top of files, added a single include, added missing entities for retail</simpara>
+</informalexample>
+<simpara>&gt;&gt;&gt;&gt;&gt;&gt;&gt; eadc4168&#8230;&#8203; Removed entities from top of files, added a single include, added missing entities for retail</simpara>
 </section>
 </chapter>
 <chapter xml:id="bp.chapt.config.management.with.salt"><title>Configuration Management with Salt</title><section xml:id="bp.chapt.config.mgr.overview"><title>Configuration Management Overview</title><simpara>Salt is capable of applying states by matching minions with relevant state data.
@@ -4311,10 +4308,28 @@ Therefore Service Pack migration (for example, from version 12 SP1 to 12 SP3) 
 <title>Upgrading PostgreSQL to Version 9.6 Before Migrating to SLES12 SP3</title>
 <simpara>Before migrating the underlying system to SUSE Linux Enterprise 12 SP3 you must upgrade PostgreSQL to version 9.6.</simpara>
 <simpara>The migration needs PostgreSQL 9.4 and 9.6 installed in parallel and PostgreSQL 9.4 is only available in SUSE Linux Enterprise 12 SP2.
-For more information, see <xref linkend="bp.sect.postgresql.prepare.upgrade"/>.</simpara>
+For more information, see <xref linkend="sp.migration.postgresql"/>.</simpara>
 </warning>
 <simpara>SUSE offers a graphical and command line tool for upgrading to a new service pack.
 Comprehensive documentation for executing service pack migration scenarios is located in the SUSE Linux Enterprise Server documentation chapter <link xl:href="https://www.suse.com/documentation/sles-12/book_sle_deployment/data/cha_update_sle.html">https://www.suse.com/documentation/sles-12/book_sle_deployment/data/cha_update_sle.html</link>.</simpara>
+</section>
+<section xml:id="sp.migration.postgresql"><title>Upgrading PostgreSQL to Version 9.6</title><warning>
+<title>Migrating to SLES 12 SP3</title>
+<simpara>SUSE Manager Server 3.1 must <emphasis>not</emphasis> be migrated to SLES 12 SP3 before upgrading PostgreSQL to version 9.6.</simpara>
+</warning>
+<simpara>The upgrade needs PostgreSQL 9.4 and 9.6 installed in parallel.
+PostgreSQL 9.4 is only available in SLES 12 SP2.</simpara>
+<simpara>Before starting the update, prepare an up-to-date backup of your database.</simpara>
+<simpara>On existing installations of SUSE Manager Server 3.1 you must migrate from PostgreSQL 9.4 to version 9.6.</simpara>
+<screen>/usr/lib/susemanager/bin/pg-migrate.sh</screen>
+<simpara>During the upgrade your SUSE Manager Server will not be accessible.</simpara>
+<simpara>The upgrade will create a copy of the database under <filename>/var/lib/pgsql</filename> and thus needs sufficient disk space to hold two copies (versions 9.4 and 9.6) of the database.
+Because it does a full copy of the database, it also needs considerable time depending on the size of the database and the I/O speed of the storage system.</simpara>
+<simpara>If your system is short on disk space you can do a fast, in-place upgrade by running</simpara>
+<screen>/usr/lib/susemanager/bin/pg-migrate.sh fast</screen>
+<simpara>The fast upgrade usually only takes a few minutes and uses no additional disk space.
+However, if the upgrade fails, you will need to restore the database from a backup.</simpara>
+<simpara>For more information, see <link xl:href="https://wiki.microfocus.com/index.php?title=SUSE_Manager/postgresql96">https://wiki.microfocus.com/index.php?title=SUSE_Manager/postgresql96</link>.</simpara>
 </section>
 <section xml:id="update.suse.manager"><title>Updating SUSE Manager</title><simpara>This section provides information on performing regular updates and running a <command>spacewalk-schema-upgrade</command> on your PostgreSQL database.</simpara>
 <orderedlist numeration="arabic">
@@ -4367,7 +4382,7 @@ installRecommends=false # or commented</screen>
 <section xml:id="bp.sp.migration.version.yast"><title>Using YaST</title><warning>
 <title>Checking PostgreSQL Version</title>
 <simpara>Before migrating to SLES 12 SP3, check whether PostgreSQL is already updated to version 9.6.
-For more information, see <xref linkend="bp.sect.postgresql.prepare.upgrade"/>.</simpara>
+For more information, see <xref linkend="sp.migration.postgresql"/>.</simpara>
 </warning>
 <simpara>To perform the migration with YaST, use the <guimenu>Online Migration</guimenu> tool:</simpara>
 <orderedlist numeration="arabic">
@@ -4397,7 +4412,7 @@ It is recommended to install all updates before proceeding.</para>
 <section xml:id="bp.sp.migration.version.zypper"><title>Using zypper</title><warning>
 <title>Checking PostgreSQL Version</title>
 <simpara>Before migrating to SLES 12 SP3, check whether PostgreSQL is already updated to version 9.6.
-For more information, see <xref linkend="bp.sect.postgresql.prepare.upgrade"/>.</simpara>
+For more information, see <xref linkend="sp.migration.postgresql"/>.</simpara>
 </warning>
 <simpara>To perform the migration with Zypper on the command-line, use the <command>zypper migration</command> subcommand tool:</simpara>
 <orderedlist numeration="arabic">
@@ -4486,7 +4501,7 @@ If you want the dump to be stored somewhere else, change the definition of the v
 <title>Background Information on Required Target Machine</title>
 <simpara>It is actually required to install version 12 SP2 on the target machine.
 On that version you will upgrade the PostgreSQL database from version_9.4 to 9.6.
-For more information about the PostgreSQL upgrade, see <xref linkend="bp.sect.postgresql.prepare.upgrade"/>.</simpara>
+For more information about the PostgreSQL upgrade, see <xref linkend="sp.migration.postgresql"/>.</simpara>
 </important>
 </listitem>
 <listitem>
@@ -5069,54 +5084,34 @@ The matching update channels such as <literal role="systemitem">SLE-Manager-Tool
 <simpara>Finally, consider to schedule a reboot.</simpara>
 </section>
 </chapter>
-<chapter xml:id="bp.postgresql.database.migration"><title>PostgreSQL Database Migration</title><section xml:id="bp.chap.postgres.intro"><title>Introduction to PostgreSQL Databases</title><simpara>SUSE Manager&#160;3 uses PostgreSQL&#160;9.4 by default.
-SUSE Linux Enterprise Server&#160;12&#160;SP3 uses PostgreSQL&#160;9.6 by default.</simpara>
-<simpara>When you installed SUSE Manager Server 3.1 or earlier on SUSE Linux Enterprise Server&#160;12&#160;SP2 or earlier, it was based on a PostgreSQL&#160;9.4 database, which you can upgrade to PostgreSQL&#160;9.6.
-This chapter provides information on managing your PostgreSQL database, and provides instructions for upgrading your database to PostgreSQL&#160;9.6.
-SUSE Manager 3.1 on SUSE Linux Enterprise Server&#160;12&#160;SP3 and SUSE Manager 3.2 use PostgreSQL&#160;9.6 by default.  If you use one of those you can skip the following sections.</simpara>
-<simpara>PostgreSQL stores data at <filename>/var/lib/pgsql/data/</filename>, and logs to <filename>/var/lib/pgsql/data/pg_xlog/</filename>.</simpara>
-</section>
-<section xml:id="bp.sect.postgresql.prepare.upgrade"><title>Prepare to Upgrade PostgreSQL</title><simpara>Before you begin upgrading you will need to check your existing system is ready for the upgrade, and prepare a database backup.</simpara>
-<orderedlist numeration="arabic">
-<title>Procedure: Preparing to Upgrade PostgreSQL</title>
-<listitem>
-<para>Check the active PostgreSQL version:</para>
+<chapter xml:id="bp.postgresql.database.migration"><title>PostgreSQL Database Migration</title><simpara>SUSE Manager 3 uses postgresql database version 9.4.
+Postgresql version 9.6 has been officially released for SUSE Linux Enterprise Server 12 SP3.
+In the near future postgresql 9.6 will become the base version provided by SUSE Manager.
+Currently version 9.4 is hardcoded into SUSE Manager, therefore when installing SUSE Manager it will explicitly use this version.
+This chapter provides guidance on migrating an existing 9.4 database to 9.6 on your SUSE Manager Server.</simpara>
+<section xml:id="bp.postgresql.database.migration.new.installations"><title>New SUSE Manager Installations</title><simpara>Once support for postgresql version 9.6 has been officially released for SUSE Manager, no action will be required for new installations.
+The SUSE Manager extension will pick up the latest version during installation on SLES 12 SP3.
+This will be fully transparent to the user.
+Check the active postgresql version with the following command:</simpara>
 <screen>suse-manager-example-srv:~ # psql --version
-psql (PostgreSQL) 9.x.y</screen>
-<simpara>If you are using PostgreSQL&#160;9.4, you can update to PostgreSQL&#160;9.6.</simpara>
-</listitem>
-<listitem>
-<para>Check your system is fully updated:</para>
+psql (PostgreSQL) 9.6.3</screen>
+</section>
+<section xml:id="bp.postgresql.database.migrating.existing.installations"><title>Migrating an Existing Installation</title><simpara>Before migrating to the new database version, ensure SUSE Manager is fully patched to the latest version.
+You can check if the system is ready to use postgresql 9.6 by issuing the following command:</simpara>
 <screen>suma-test-srv:~ # rpm -q smdba
 smdba-1.5.8-0.2.3.1.x86_64</screen>
-<simpara>PostgreSQL&#160;9.6 requires smdba version 1.5.8 or higher.</simpara>
-</listitem>
-<listitem>
-<para>Perform a database backup before you begin.
-For more information on backing up, see <xref linkend="bp.sect.backup.smdba.performbackup"/>.</para>
-</listitem>
-</orderedlist>
+<important>
+<simpara>Postgresql 9.6 requires smdba version 1.5.8 or higher</simpara>
+</important>
 <warning>
 <simpara>Always create a database backup before performing a migration</simpara>
 </warning>
-</section>
-<section xml:id="bp.sect.postgresql.regular.upgrade"><title>Upgrade PostgreSQL</title><simpara>PostgreSQL upgrades can be performed in two ways: a regular upgrade, or a fast upgrade.
-A regular upgrade will create a complete copy of the database, so you will need double the existing database size of space available.
-Regular upgrades can take a considerable amount of time, depending on the size of the database and the speed of the storage system.
-Regular upgrades also require database downtime, your database will not be accessible while the upgrade is running.</simpara>
-<simpara>A fast upgrade only takes a few minutes, and uses no additional disk space.
-However, fast upgrades are more likely to fail, and if this occurs you will need to restore the database from backup.</simpara>
-<orderedlist numeration="arabic">
-<title>Procedure: Performing a Regular PostgreSQL Upgrade</title>
-<listitem>
-<para>Perform a database backup before you begin.
-For more information on backing up, see <xref linkend="bp.sect.backup.smdba.performbackup"/>.</para>
-</listitem>
-<listitem>
-<para>Begin the upgrade:</para>
-<screen>/usr/lib/susemanager/bin/pg-migrate.sh</screen>
-<simpara>The <filename>pg-migrate.sh</filename> script performs these operations:</simpara>
-<itemizedlist mark="listing">
+<simpara>.
+The database migration begins by executing the following command:</simpara>
+<screen>$&gt; /usr/lib/susemanager/bin/pg-migrate.sh</screen>
+<simpara>The <filename>pg-migrate.sh</filename>
+ script will automatically perform the following operations:</simpara>
+<itemizedlist>
 <listitem>
 <para>Stop spacewalk services</para>
 </listitem>
@@ -5124,40 +5119,183 @@ For more information on backing up, see <xref linkend="bp.sect.backup.smdba.perf
 <para>Shut down the running database</para>
 </listitem>
 <listitem>
-<para>Check if PostgreSQL&#160;9.6 is installed and install it if not already present</para>
+<para>Check if postgresql 9.6 is installed and install it if not already present</para>
 </listitem>
 <listitem>
-<para>Switch from PostgreSQL&#160;9.4 to PostgreSQL&#160;9.6 as the new default</para>
+<para>Switch from postgresql 9.4 to postgresql 9.6 as the new default</para>
 </listitem>
 <listitem>
-<para>Initiate the database migration</para>
+<para>Initiates the database migration</para>
 </listitem>
 <listitem>
-<para>Create a PostgreSQL configuration file tuned for use by SUSE Manager</para>
+<para>Creates a postgresql configuration file tuned for use by SUSE Manager (The reason for the latest version of smdba)</para>
 </listitem>
 <listitem>
-<para>Start the database and spacewalk services</para>
-<note>
-<simpara>If the upgrade fails, the migration script will attempt to restore the database to its original state.</simpara>
-</note>
+<para>Start both the database and spacewalk services</para>
 </listitem>
 </itemizedlist>
+<note>
+<simpara>Please note that during the migration the data directory of the database is copied for use by the postgresql 9.6.
+This results in temporarily doubling the amount of required disk space.
+In case of a failure, the migration script will attempt a restore to the original state.
+After a successful migration, you may safely delete the old database directory (renamed to /var/lib/pgsql/data-pg94) to reclaim lost disk space.</simpara>
+</note>
+</section>
+<section xml:id="_performing_a_fast_migration"><title>Performing a Fast Migration</title><simpara>There are two negative aspects to performing a regular migration:</simpara>
+<itemizedlist>
+<listitem>
+<para>You temporarily need double the disk space under <filename>/var/lib/pgsql</filename></para>
 </listitem>
 <listitem>
-<para>After the upgrade has successfully completed, you can safely delete the old database directory which will have been renamed to <filename>/var/lib/pgsql/data-pg94</filename> to reclaim lost disk space.</para>
+<para>Depending on the size of the database the migration can take up some time because the whole data directory needs to be copied.</para>
 </listitem>
-</orderedlist>
-<orderedlist numeration="arabic">
-<title>Procedure: Performing a Fast PostgreSQL Upgrade</title>
-<listitem>
-<para>Perform a database backup before you begin.
-For more information on backing up, see <xref linkend="bp.sect.backup.smdba.performbackup"/>.</para>
-</listitem>
-<listitem>
-<para>Begin the upgrade:</para>
-<screen>/usr/lib/susemanager/bin/pg-migrate.sh fast</screen>
-</listitem>
-</orderedlist>
+</itemizedlist>
+<simpara>It is possible however to perform a <literal>fast migration</literal>.
+In this case you do not need the additional disk space as the database files will not be copied but hard linked.
+This also has the natural effect of greatly increasing the speed of the migration process The entire migration could be completed in less than one minute.</simpara>
+<warning>
+<simpara>Keep in mind if a fast migration fails, database restoration will only be possible with a database backup.
+Only perform a fast migration if you have an availabel database backup.</simpara>
+</warning>
+<simpara>Perform a fast migration with the following command (Ensure you have a database backup):</simpara>
+<screen>$&gt; /usr/lib/susemanager/bin/pg-migrate.sh fast</screen>
+</section>
+<section xml:id="_typical_migration_sample_session"><title>Typical Migration Sample Session</title><simpara>A slow migration should provide you with the following output:</simpara>
+<screen>d235:~ # /usr/lib/susemanager/bin/pg-migrate.sh
+15:58:00   Shut down spacewalk services...
+Shutting down spacewalk services...
+Done.
+15:58:03   Checking postgresql version...
+15:58:03   Installing postgresql 9.6...
+Dienst 'SUSE_Linux_Enterprise_Server_12_SP2_x86_64' wird aktualisiert.
+Dienst 'SUSE_Manager_Server_3.1_x86_64' wird aktualisiert.
+Repository-Daten werden geladen...
+Installierte Pakete werden gelesen...
+Paketabhängigkeiten werden aufgelöst...
+
+Die folgenden 3 NEUEN Pakete werden installiert:
+  postgresql96 postgresql96-contrib postgresql96-server
+
+3 neue Pakete zu installieren.
+Gesamtgröße des Downloads: 5,7 MiB. Bereits im Cache gespeichert: 0 B. Nach der Operation werden zusätzlich 25,3 MiB belegt.
+Fortfahren? [j/n/...? zeigt alle Optionen] (j): j
+Paket postgresql96-9.6.3-2.4.x86_64 abrufen (1/3),   1,3 MiB (  5,1 MiB entpackt)
+Abrufen: postgresql96-9.6.3-2.4.x86_64.rpm [fertig]
+Paket postgresql96-server-9.6.3-2.4.x86_64 abrufen (2/3),   3,7 MiB ( 17,9 MiB entpackt)
+Abrufen: postgresql96-server-9.6.3-2.4.x86_64.rpm [.fertig]
+Paket postgresql96-contrib-9.6.3-2.4.x86_64 abrufen (3/3), 648,9 KiB (  2,2 MiB entpackt)
+Abrufen: postgresql96-contrib-9.6.3-2.4.x86_64.rpm [fertig]
+Überprüfung auf Dateikonflikte läuft: [......fertig]
+(1/3) Installieren: postgresql96-9.6.3-2.4.x86_64 [............fertig]
+(2/3) Installieren: postgresql96-server-9.6.3-2.4.x86_64 [............fertig]
+(3/3) Installieren: postgresql96-contrib-9.6.3-2.4.x86_64 [............fertig]
+15:58:08   Ensure postgresql 9.6 is being used as default...
+15:58:09   Successfully switched to new postgresql version 9.6.
+15:58:09   Create new database directory...
+15:58:09   Initialize new postgresql 9.6 database...
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.UTF-8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+fixing permissions on existing directory /var/lib/pgsql/data ... ok
+creating subdirectories ... ok
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting dynamic shared memory implementation ... posix
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+WARNING: enabling "trust" authentication for local connections
+You can change this by editing pg_hba.conf or using the option -A, or
+--auth-local and --auth-host, the next time you run initdb.
+
+Success. You can now start the database server using:
+
+    pg_ctl -D /var/lib/pgsql/data -l logfile start
+
+15:58:12   Successfully initialized new postgresql 9.6 database.
+15:58:12   Upgrade database to new version postgresql 9.6...
+Performing Consistency Checks
+-----------------------------
+Checking cluster versions                                   ok
+Checking database user is the install user                  ok
+Checking database connection settings                       ok
+Checking for prepared transactions                          ok
+Checking for reg* system OID user data types                ok
+Checking for contrib/isn with bigint-passing mismatch       ok
+Checking for roles starting with 'pg_'                      ok
+Creating dump of global objects                             ok
+Creating dump of database schemas
+  postgres
+  susemanager
+  template1
+                                                            ok
+Checking for presence of required libraries                 ok
+Checking database user is the install user                  ok
+Checking for prepared transactions                          ok
+
+If pg_upgrade fails after this point, you must re-initdb the
+new cluster before continuing.
+
+Performing Upgrade
+------------------
+Analyzing all rows in the new cluster                       ok
+Freezing all rows on the new cluster                        ok
+Deleting files from new pg_clog                             ok
+Copying old pg_clog to new server                           ok
+Setting next transaction ID and epoch for new cluster       ok
+Deleting files from new pg_multixact/offsets                ok
+Copying old pg_multixact/offsets to new server              ok
+Deleting files from new pg_multixact/members                ok
+Copying old pg_multixact/members to new server              ok
+Setting next multixact ID and offset for new cluster        ok
+Resetting WAL archives                                      ok
+Setting frozenxid and minmxid counters in new cluster       ok
+Restoring global objects in the new cluster                 ok
+Restoring database schemas in the new cluster
+  postgres
+  susemanager
+  template1
+                                                            ok
+Copying user relation files
+  /var/lib/pgsql/data-pg94/base/12753/12710
+
+[...]
+
+  /var/lib/pgsql/data-pg94/base/1/12574
+                                                            ok
+Setting next OID for new cluster                            ok
+Sync data directory to disk                                 ok
+Creating script to analyze new cluster                      ok
+Creating script to delete old cluster                       ok
+
+Upgrade Complete
+----------------
+Optimizer statistics are not transferred by pg_upgrade so,
+once you start the new server, consider running:
+    ./analyze_new_cluster.sh
+
+Running this script will delete the old cluster's data files:
+    ./delete_old_cluster.sh
+15:58:51   Successfully upgraded database to postgresql 9.6.
+15:58:51   Tune new postgresql configuration...
+INFO: Database configuration has been changed.
+INFO: Wrote new general configuration. Backup as /var/lib/pgsql/data/postgresql.2017-07-26-15-58-51.conf
+INFO: Wrote new client auth configuration. Backup as /var/lib/pgsql/data/pg_hba.2017-07-26-15-58-51.conf
+INFO: Configuration has been changed, but your database is right now offline.
+Database is offline
+System check finished
+15:58:51   Successfully tuned new postgresql configuration.
+15:58:51   Starting spacewalk services...
+Starting spacewalk services...
+Done.</screen>
 </section>
 </chapter>
 <chapter xml:id="bp.chap.suma.backup"><title>Backup and Restore</title><simpara>Back up your SUSE Manager installation regularly, in order to prevent data loss.
@@ -9180,7 +9318,7 @@ Non-admins see a <literal role="guimenu">Review this system&#8217;s group member
 To add the system to groups, select the groups' check boxes and click the <guibutton>Join Selected Groups</guibutton> button.</simpara>
 </section>
 </section>
-<section xml:id="s4-sm-system-details-virtualization"><title><menuchoice><guimenu>System Details</guimenu> <guimenuitem>Virtualization</guimenuitem></menuchoice></title><simpara>This tab allows you to create new virtual guests, apply images on a
+<section xml:id="s4-sm-system-details-virtualization"><title><menuchoice><guimenu>System Details</guimenu> <guimenuitem>Virtualization</guimenuitem></menuchoice> [Management]</title><simpara>This tab allows you to create new virtual guests, apply images on a
 traditionally managed host system, or change the status of virtual guests.</simpara>
 <informalfigure>
 <mediaobject>
@@ -9190,12 +9328,12 @@ traditionally managed host system, or change the status of virtual guests.</simp
 <textobject><phrase>system details traditional virtualization details</phrase></textobject>
 </mediaobject>
 </informalfigure>
-<simpara>The <literal role="guimenu">Virtualization</literal> tab has one subtab, <literal role="guimenu">Guests</literal>.
-Traditional systems have two additional subtabs, <literal role="guimenu">Provisioning</literal>, and <literal role="guimenu">Deployment</literal>.
+<simpara>The <literal role="guimenu">Virtualization</literal> tab has three subtabs, <literal role="guimenu">Details</literal>,
+ <literal role="guimenu">Provisioning</literal>, and <literal role="guimenu">Deployment</literal>.
 These tabs appear the same for both virtual hosts and guests, but the functionality only makes sense for virtual hosts.
 It is not possible to create a guest system that runs on another guest system.</simpara>
-<bridgehead xml:id="sdc-virt-host-place" renderas="sect4">System Details &gt; Virtualization&gt; Guests</bridgehead>
-<simpara><literal role="guimenu">Guests</literal> is the default tab.
+<bridgehead xml:id="sdc-virt-host-place" renderas="sect4">System Details &gt; Virtualization&gt; Details</bridgehead>
+<simpara><literal role="guimenu">Details</literal> is the default tab.
 For host systems, it presents a table of the host system&#8217;s virtual guests.
 For each guest system, the following information is provided:</simpara>
 <variablelist>
@@ -9221,20 +9359,10 @@ For each guest system, the following information is provided:</simpara>
 <note>
 <simpara>If a guest system has not registered with SUSE Manager, this information appears as plain text in the table.</simpara>
 </note>
-<variablelist>
-<varlistentry>
-<term><literal role="guimenu">Actions</literal></term>
-<listitem>
-<simpara>This field contains the possible actions for the guest.
-These are depending on the virtual guest status, they may not refresh instantaneously when running a Start, Stop, Suspend, Resume action.
-The <guibutton>Edit</guibutton> button allows changing virtual guest properties, including the amount of allocated memory and virtual CPUs.</simpara>
-</listitem>
-</varlistentry>
-</variablelist>
 <simpara>If you have System Group Administrator responsibilities assigned for your guest systems, a user might see the message <literal role="guimenu">You do not have permission to access this system</literal> in the table.
 This is because it is possible to assign virtual guests on a single host to multiple System Group Administrators.
 Only users that have System Group Administrator privileges on the host system may create new virtual guests.</simpara>
-<section xml:id="s5-sm-system-details-virtualization-deployment"><title>System Details &gt; Virtualization &gt; Deployment [Management]</title><simpara>In the <menuchoice><guimenu>System Details</guimenu> <guimenuitem>Virtualization</guimenuitem></menuchoice> tab of a traditionally registered bare-metal machine, there is a  <menuchoice><guimenu>System Details</guimenu> <guisubmenu>Virtualization</guisubmenu> <guimenuitem>Deployment</guimenuitem></menuchoice> subtab. This form expects a URL to a <literal>qcow2</literal> type of image and some other parameters allowing the user to schedule the deployment of that image.</simpara>
+<section xml:id="s5-sm-system-details-virtualization-deployment"><title>System Details &gt; Virtualization &gt; Deployment</title><simpara>In the <menuchoice><guimenu>System Details</guimenu> <guimenuitem>Virtualization</guimenuitem></menuchoice> tab of a traditionally registered bare-metal machine, there is a  <menuchoice><guimenu>System Details</guimenu> <guisubmenu>Virtualization</guisubmenu> <guimenuitem>Deployment</guimenuitem></menuchoice> subtab. This form expects a URL to a <literal>qcow2</literal> type of image and some other parameters allowing the user to schedule the deployment of that image.</simpara>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -15015,10 +15143,8 @@ For more information on beginning management with SUSE Manager
 , see <link xl:href="suma-setup-with-yast-sumasetup.xml#suma-setup-with-yast-sumasetup">Setup SUSE Manager with YaST</link>.</simpara>
 </section>
 </chapter>
-<chapter xml:id="advanced.topics.proxy.quickstart"><title>SUSE Manager 3.2 Proxy</title><info><abstract>
-<simpara>This chapter explains how to install and set up SUSE Manager 3.2 Proxy.
+<chapter xml:id="advanced.topics.proxy.quickstart"><title>SUSE Manager 3.2 Proxy</title><simpara>This chapter explains how to install and set up SUSE Manager 3.2 Proxy.
 It also provides notes about migrating a previous proxy such as version 2.1, 3.0, or 3.1 to version 3.2.</simpara>
-</abstract></info>
 <section xml:id="at.manager.proxy.concepts"><title>Overview</title><simpara>SUSE Manager 3.2 Proxy is a SUSE Manager add-on that caches software packages on an internal, central server.
 The proxy caches patch updates from SUSE or custom RPMs generated by third-party organizations.
 A proxy allows you to use bandwidth more effectively because client systems connect to the proxy for updates, and the SUSE Manager server is no longer required to handle all client requests.
@@ -15040,7 +15166,7 @@ The proxy also supports transparent custom package deployment.</simpara>
 <section xml:id="at.manager.proxy.inst-and-clients"><title>Proxy Installation and Connecting Clients</title><section xml:id="at.manager.proxy.requirements"><title>Requirements</title><simpara>The following section provides SUSE Manager Proxy requirements.</simpara>
 <formalpara>
 <title>Supported Client Systems</title>
-<para>For supported clients and their requirements, see <xref linkend="quickstart.sect.prereq.clientos"/>.</para>
+<para>For supported clients and their requirements, see Supported Client Systems.</para>
 </formalpara>
 <formalpara>
 <title>Hardware Requirements</title>
@@ -15066,15 +15192,15 @@ For specific hardware requirements, see the following table.</para>
 </row>
 <row>
 <entry align="left" valign="top"><simpara>RAM</simpara></entry>
-<entry align="left" valign="top"><simpara>Minimum 4&#160;GB for a non-production server</simpara></entry>
+<entry align="left" valign="top"><simpara>Minimum 4&#160; GB for a non-production server</simpara></entry>
 </row>
 <row>
 <entry align="left" valign="top"></entry>
-<entry align="left" valign="top"><simpara>Minimum 16&#160;GB for a production server</simpara></entry>
+<entry align="left" valign="top"><simpara>Minimum 16&#160; GB for a production server</simpara></entry>
 </row>
 <row>
 <entry align="left" valign="top"><simpara>Free Disk Space</simpara></entry>
-<entry align="left" valign="top"><simpara>Minimum 100&#160;GB for base installation and at least 50 GB for caching per SUSE product and +100 GB per Red Hat product; a resizeable partition strongly recommended.</simpara></entry>
+<entry align="left" valign="top"><simpara>Minimum 100&#160; GB for base installation and at least 50 GB for caching per SUSE product and +100 GB per Red Hat product; a resizeable partition strongly recommended.</simpara></entry>
 </row>
 </tbody>
 </tgroup>
@@ -15089,7 +15215,7 @@ For specific hardware requirements, see the following table.</para>
 </formalpara>
 <formalpara>
 <title>Network Requirements</title>
-<para>For additional network requirements, see <xref linkend="quickstart.sect.prereq.network"/>.</para>
+<para>For additional network requirements, see Additional Requirements.</para>
 </formalpara>
 <formalpara>
 <title>SUSE Customer Center</title>
@@ -15098,10 +15224,10 @@ Make sure you have the following subscriptions:</para>
 </formalpara>
 <itemizedlist>
 <listitem>
-<para>One or more subscriptions for SUSE Manager Proxy.</para>
+<para>One or more subscriptions for SUSE Manager Proxy .</para>
 </listitem>
 <listitem>
-<para>One or more subscriptions for SUSE Manager.</para>
+<para>One or more subscriptions for SUSE Manager .</para>
 </listitem>
 <listitem>
 <para>Subscriptions for the products on the client systems you want to register with SUSE Manager via SUSE Manager Proxy .</para>
@@ -15143,22 +15269,18 @@ in virtual environments, use the following settings for the virtual machine (VM)
 </itemizedlist>
 </section>
 <section xml:id="at.manager.proxy.inst"><title>Installation and Setup</title><simpara>The following section will guide you through the installation and setup procedure.</simpara>
-<<<<<<< HEAD
-<<<<<<< HEAD
 <important>
 <title>Registering Proxies</title>
-=======
->>>>>>> eadc4168... Removed entities from top of files, added a single include, added missing entities for retail
-=======
->>>>>>> eadc4168... Removed entities from top of files, added a single include, added missing entities for retail
 <simpara>SUSE Manager Proxy systems are registered as traditional clients or as Salt clients using a bootstrap script.
 A SUSE Manager Proxy can serve both Traditional and Salt clients.</simpara>
-<important>
+</important>
+<important xml:id="at.manager.proxy.install.prep">
+<title>Procedure: Registering the Proxy</title>
 <simpara>First completely download the channels (SUSE Linux Enterprise 12 SP3) and then create the activation key.
 Only then you can select the correct child channels.</simpara>
 </important>
-<orderedlist xml:id="at.manager.proxy.install.prep" numeration="arabic">
-<title>Procedure: Registering the Proxy</title>
+<simpara>+</simpara>
+<orderedlist numeration="arabic">
 <listitem>
 <para>Create an activation key based on the SUSE Linux Enterprise 12 SP3 base channel.
 For more information about activation keys, see <xref linkend="create.act.keys"/>.</para>
@@ -15173,7 +15295,7 @@ For more information about activation keys, see <xref linkend="create.act.keys"/
 </figure>
 </listitem>
 <listitem>
-<para>Click the <literal role="guimenu">Child Channels</literal> tab and select the SUSE Manager 3.2 Proxy child channel with the matching update channel (<literal role="systemitem">SUSE Manager Proxy-3.2-Pool</literal> and <literal role="systemitem">SUSE-Manager-Proxy-3.2-Updates</literal> ).
+<para>Click the <guimenu>Child Channels</guimenu> subtab and select the SUSE Manager 3.2 Proxy child channel with the matching update channel (<literal role="systemitem">SUSE Manager Proxy-3.2-Pool</literal> and <literal role="systemitem">SUSE-Manager-Proxy-3.2-Updates</literal> ).
 These child channels are required for providing the proxy packages and updates.
 As for normal SLES clients, <literal role="systemitem">SLES12-SP3-Updates</literal> plus <literal role="systemitem">SLE-Manager-Tools12-Pool</literal> and <literal role="systemitem">SLE-Manager-Tools12-Updates</literal> are required.</para>
 <figure>
@@ -15189,60 +15311,35 @@ As for normal SLES clients, <literal role="systemitem">SLES12-SP3-Updates</liter
 </orderedlist>
 <orderedlist xml:id="at.manager.proxy.install.prep.bss" numeration="arabic">
 <listitem>
-<para>Modify a bootstrap script for the proxy if needed.
-If you want to run the proxy on a traditional client (system type <literal>Management</literal>) uncheck <literal role="guimenu">Bootstrap using Salt</literal>.
-Using Salt is supported since version 3.2.
+<para>Modify a bootstrap script for the proxy.
+Ensure unchecking <guimenu>Bootstrap using Salt</guimenu> , because in this case the proxy must be bootstrapped as a so-called traditional client.
 For more information about bootstrap scripts, see <xref linkend="modify.bootstrap.script"/>.</para>
 </listitem>
-</orderedlist>
-<figure>
-<title>Modifying Bootstrap Script</title>
-<mediaobject>
-<imageobject>
-<imagedata fileref="sles12-proxy-bootstrap.png"/>
-</imageobject>
-<textobject><phrase>sles12 proxy bootstrap</phrase></textobject>
-</mediaobject>
-</figure>
-<orderedlist numeration="arabic">
 <listitem>
-<para>Create the SUSE Manager Tools Repository for bootstrapping, see <xref linkend="create.tools.repository"/>.</para>
+<para>Bootstrap the client with the bootstrap script.</para>
 </listitem>
 <listitem>
-<para>Bootstrap the client with the bootstrap script.  For more information, see <xref linkend="connect.first.client"/>.</para>
-</listitem>
-<listitem>
-<para>In case of a Salt client, accept the key on the <menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Salt</guisubmenu> <guimenuitem>Keys</guimenuitem></menuchoice> page by clicking the check mark and it will appear in the <menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Systems</guisubmenu> <guimenuitem>Overview</guimenuitem></menuchoice>.</para>
-</listitem>
-<listitem>
-<para>Check via <menuchoice><guimenu>System Details</guimenu> <guisubmenu>Software</guisubmenu> <guimenuitem>Software Channels</guimenuitem></menuchoice> that the two proxy channels <literal role="systemitem">SUSE Manager Proxy-3.2-Pool</literal> and <literal role="systemitem">SUSE-Manager-Proxy-3.2-Updates</literal> are selected.</para>
+<para>You will see a list of channels to which your client is already subscribed to.
+Select the two unchecked proxy channels which include the <literal role="systemitem">SUSE Manager Proxy-3.2-Pool</literal> and <literal role="systemitem">SUSE-Manager-Proxy-3.2-Updates</literal> , then select <guimenu>Change Subscriptions</guimenu> to continue.
+This will provide the required repositories for the proxy packages from the SUSE Manager server to the client.</para>
 </listitem>
 </orderedlist>
-<figure>
-<title>Proxy Channels</title>
-<mediaobject>
-<imageobject>
-<imagedata fileref="sles12-proxy-channels.png"/>
-</imageobject>
-<textobject><phrase>sles12 proxy channels</phrase></textobject>
-</mediaobject>
-</figure>
 <simpara>A few more steps are still needed:</simpara>
 <itemizedlist>
 <listitem>
-<para>Install the <filename>patterns-suma_proxy</filename> pattern (see <xref linkend="at.manager.proxy.run.pattern"/>)</para>
+<para>install the <filename>suma_proxy</filename> pattern (see <xref linkend="at.manager.proxy.run.pattern"/>);</para>
 </listitem>
 <listitem>
-<para>Copy the SSL certificate and key from the server (see <xref linkend="at.manager.proxy.run.copycert"/>)</para>
+<para>copy the SSL certificate and key from the server (see <xref linkend="at.manager.proxy.run.copycert"/>);</para>
 </listitem>
 <listitem>
-<para>Run <command>configure-proxy.sh</command> (see <xref linkend="at.manager.proxy.run.confproxy"/>)</para>
+<para>run <command>configure-proxy.sh</command> (see <xref linkend="at.manager.proxy.run.confproxy"/>);</para>
 </listitem>
 </itemizedlist>
 <simpara>You will then be able to register your clients against the proxy using the Web UI or a bootstrap script as if it were a SUSE Manager server.
 For more information, see <xref linkend="at.manager.proxy.register.saltclients"/>.</simpara>
 </section>
-<section xml:id="at.manager.proxy.run.pattern"><title>Install the <filename>suma_proxy</filename> pattern</title><simpara>Either on the sever select the <literal role="package">pattern_suma_proxy</literal> package for installation, or make sure the <filename>suma_proxy</filename> pattern is installed using the following command on the proxy as root:</simpara>
+<section xml:id="at.manager.proxy.run.pattern"><title>Install the <filename>suma_proxy</filename> pattern</title><simpara>Make sure the <filename>suma_proxy</filename> pattern version 2.5.1.3 or later is installed using the following command on the proxy as root:</simpara>
 <screen>zypper in -t pattern suma_proxy</screen>
 <simpara>The new salt-broker service will be automatically started at the end of the package installation.
 This service forwards the Salt interactions to the SUSE Manager server.</simpara>
@@ -15255,10 +15352,7 @@ In such a case, the upstream proxy is named <quote>parent</quote>.</simpara>
 </section>
 <section xml:id="at.manager.proxy.run.copycert"><title>Copy Server Certificate and Key</title><simpara>The proxy will share some SSL information with the SUSE Manager server, so the next step is to copy the certificate and its key from the SUSE Manager server or the upstream proxy.</simpara>
 <simpara>As root, enter the following commands on the proxy using your SUSE Manager server or chained proxy named as <replaceable>PARENT</replaceable>:</simpara>
-<screen>cd /root/ssl-build
-scp root@PARENT:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .
-scp root@PARENT:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .
-scp root@PARENT:/root/ssl-build/rhn-ca-openssl.cnf .</screen>
+<screen>cd /root/ssl-build scp root@`PARENT`:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY scp root@`PARENT`:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT scp root@`PARENT`:/root/ssl-build/rhn-ca-openssl.cnf .</screen>
 <note>
 <title>Known Limitation</title>
 <simpara>The SUSE Manager Proxy functionality is only supported if the SSL certificate was signed by the same CA as the SUSE Manager Server certificate.
@@ -15280,7 +15374,7 @@ Here is some information about the requested settings:</simpara>
 <term>HTTP Proxy</term>
 <listitem>
 <simpara>A HTTP proxy enables your SUSE Manager proxy to access the Web.
-This is needed if direct access to the Web is prohibited by a firewall.</simpara>
+This is needed if where direct access to the Web is prohibited by a firewall.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -15376,13 +15470,13 @@ Otherwise it can be left empty.</simpara>
 When the mandatory files are copied, re-run <command>configure-proxy.sh</command>.
 Also restart the script if a HTTP error was met during script execution.</simpara>
 <simpara><command>configure-proxy.sh</command> activates services required by SUSE Manager Proxy, such as <literal role="systemitem">squid</literal>, <literal role="systemitem">apache2</literal>, <literal role="systemitem">salt-broker</literal>, and <literal role="systemitem">jabberd</literal>.</simpara>
-<simpara>To check the status of the proxy system and its clients, click the proxy system&#8217;s details page on the Web UI (<menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Systems</guisubmenu> <guimenuitem>Proxy</guimenuitem></menuchoice>, then the system name). <literal role="guimenu">Connection</literal> and <literal role="guimenu">Proxy</literal> subtabs display the respective status information.</simpara>
+<simpara>To check the status of the proxy system and its clients, click the proxy system&#8217;s details page on the Web UI (<menuchoice><guimenu>Systems</guimenu> <guimenuitem>Proxy</guimenuitem></menuchoice>, then the system name). <guimenu>Connection</guimenu> and <guimenu>Proxy</guimenu> subtabs display the respective status information.</simpara>
 </section>
 <section xml:id="at.manager.proxy.register.saltclients"><title>Registering Salt Clients via SUSE Manager Proxy</title><simpara>Proxy servers may now act as a broker and package cache for Salt minions.
-These minions can be registered with a bootstrap script like the traditional clients, or from the Web UI, or the command line.</simpara>
+These minions can be registered with a bootstrap script like the traditional clients, or directly from the Web UI or the command line.</simpara>
 <simpara>Registering Salt clients via SUSE Manager Proxy from the Web UI
 is done almost the same way as registering clients directly with the SUSE Manager server.
-The difference is that you specify the name of the proxy in the <literal role="guimenu">Proxy</literal> drop-box on the <menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Systems</guisubmenu> <guimenuitem>Bootstrapping</guimenuitem></menuchoice> page.</simpara>
+The difference is that you specify the name of the proxy in the <guimenu>Proxy</guimenu> drop-box on <menuchoice><guimenu>Salt</guimenu> <guimenuitem>Bootstrapping</guimenuitem></menuchoice> page.</simpara>
 <figure>
 <title>Bootstrapping a Salt Client With a Proxy</title>
 <mediaobject>
@@ -15395,11 +15489,11 @@ The difference is that you specify the name of the proxy in the <literal role="g
 <orderedlist numeration="arabic">
 <title>Procedure: Register a Salt client through a proxy from command line</title>
 <listitem>
-<para>Instead of the Web UI, you may use the command line to register a minion through a proxy.
+<para>Instead of the Web UI , you may use the command line to register a minion through a proxy.
 To do so, add the proxy FQDN as the master in the minions configuration file located at:</para>
 <screen>/etc/salt/minion</screen>
 <simpara>or alternatively:</simpara>
-<screen>/etc/salt/minion.d/NAME.conf</screen>
+<screen>/etc/salt/minion.d/`name`.conf</screen>
 </listitem>
 <listitem>
 <para>Add the FQDN to the minion file:</para>
@@ -15427,7 +15521,7 @@ See <xref linkend="create.act.keys"/>.</para>
 <para>On the proxy, execute the <command>mgr-bootstrap</command> command-line tool as root.
 If needed, use the additional command-line switches to tune your bootstrap script. An important option is <command>--traditional</command> that enables to opt for a traditional client instead of a salt minion.</para>
 <simpara>To view available options type <command>mgr-bootstrap --help</command> from the command line:</simpara>
-<screen># mgr-bootstrap --activation-keys=key-string</screen>
+<screen># ``mgr-bootstrap --activation-keys=key-string``</screen>
 </listitem>
 <listitem>
 <para>Optionally edit the resulting bootstrap script.
@@ -15474,11 +15568,10 @@ For more information about Cobbler, see <xref linkend="advanced.topics.cobbler"/
 <section xml:id="advanced.topics.proxy.pxe.dhcp"><title>Configuring DHCP for PXE via SUSE Manager Proxy</title><simpara>SUSE Manager is using Cobbler to provide provisioning.
 PXE (tftp) is installed and activated by default.
 To enable systems to find the PXE boot on the SUSE Manager Proxy server add the following to the DHCP configuration for the zone containing the systems to be provisioned:</simpara>
-<screen>next-server: &lt;IP_Address_of_SUSE_Manager_Proxy_Server&gt;
-filename: "pxelinux.0"</screen>
+<screen>next-server:`IP_Address_of_SUSE_Manager_Proxy_Server`filename: "pxelinux.0"</screen>
 </section>
 </section>
-<section xml:id="advanced.topics.proxy.migration3"><title>Migrating SUSE Manager 3 Proxy to Version 3.1</title><simpara>The recommended order for migrations is to first migrate the server and then the proxies.
+<section xml:id="advanced.topics.proxy.migration3"><title>Migrating SUSE Manager 3 Proxy to Version 3.1</title><simpara>The recommended order for migrations is to first migrate the server and then the proxies.
 Note that a SUSE Manager 3 Proxy works correctly with SUSE Manager 3.1.</simpara>
 <simpara>For the migration of the proxies there are two possible approaches:</simpara>
 <itemizedlist>
@@ -15497,7 +15590,7 @@ Naturally, the replacement proxy must have the same name and IP address as its p
 Create a reactivation key for this system and then register the new proxy using the reactivation key.
 If you do not use the reactivation key, you will need to re-registered all the clients against the new proxy.</simpara>
 <orderedlist xml:id="proc.advanced.topics.proxy.migration3.replace" numeration="arabic">
-<title>Procedure: Replacing a SUSE Manager Proxy and Keeping the Clients Registered</title>
+<title>Procedure: Replacing a SUSE Manager Proxyand Keeping the ClientsRegistered</title>
 <listitem>
 <para>Before starting the actual migration procedure, save the data from the old proxy, if needed.
 Consider copying important data to a central place that can also be accessed by the new server:</para>
@@ -15521,8 +15614,8 @@ Of course, it is always better to re-create the keys.</para>
 <para>In the SUSE Manager Web UI select the newly installed SUSE Manager Proxy and delete it from the systems list.</para>
 </listitem>
 <listitem xml:id="step.at.proxy.migration3.replace.react">
-<para>In the Web UI, create a reactivation key for the old proxy system: On the System Details of the old proxy click <guimenu>Reactivation</guimenu>.
-Then click <guimenu>Generate New Key</guimenu>, and remember it (write it on a piece of paper or copy it to the clipboard).
+<para>In the Web UI , create a reactivation key for the old proxy system: On the System Details of the old proxy click <guimenu>Reactivation</guimenu>.
+Then click <guimenu>Generate New Key</guimenu> , and remember it (write it on a piece of paper or copy it to the clipboard).
 For more information about reactivation keys, see <xref linkend="s5-sm-system-details-react"/>.</para>
 </listitem>
 <listitem>
@@ -15573,7 +15666,7 @@ For the upgrade to SUSE Manager 3.1 Proxy, at least the <literal role="systemite
 </informalfigure>
 </listitem>
 <listitem>
-<para>On the system&#8217;s detail page select the <guimenu>Software</guimenu> tab, then the <literal role="guimenu">SP Migration</literal> tab.</para>
+<para>On the system&#8217;s detail page select the <guimenu>Software</guimenu> tab, then the <guimenu>SP Migration</guimenu> tab.</para>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -15585,7 +15678,7 @@ For the upgrade to SUSE Manager 3.1 Proxy, at least the <literal role="systemite
 </listitem>
 <listitem>
 <para>From this page you will see installed products listed on your proxy client, and the available target products.
-Select the wanted <guimenu>Target Products</guimenu>, which include <literal role="systemitem">SUSE Linux Enterprise Server 12 SP3</literal> and <literal role="systemitem">SUSE Manager Proxy 3.1</literal>.</para>
+Select the wanted <guimenu>Target Products</guimenu> , which include <literal role="systemitem">SUSE Linux Enterprise Server 12 SP3</literal> and <literal role="systemitem">SUSE Manager Proxy 3.1</literal> .</para>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -15605,7 +15698,7 @@ Select the wanted <guimenu>Target Products</guimenu>, which include <literal rol
 </informalfigure>
 </listitem>
 <listitem>
-<para>From the <guimenu>Schedule Migration</guimenu> menu, and then <guibutton>Confirm</guibutton>.</para>
+<para>From the <guimenu>Schedule Migration</guimenu> menu, and then <guibutton>Confirm</guibutton> .</para>
 </listitem>
 </orderedlist>
 <simpara>Check the <guimenu>System Status</guimenu> on the system&#8217;s details when the migration is done.</simpara>
@@ -15626,7 +15719,7 @@ refresh_pattern /rhn/manager/download/.*/repodata/.*$ 0 1% 1440 ignore-no-cache 
 <simpara>Finally consider scheduling a reboot.</simpara>
 </section>
 </section>
-<section xml:id="advanced.topics.proxy.migration"><title>Migrating SUSE Manager 2.1 Proxy to Version 3.1</title><simpara>For the migration of SUSE Manager 2.1 Proxies there are two possible approaches&#8212;&#8203;this section documents both approaches:</simpara>
+<section xml:id="advanced.topics.proxy.migration"><title>Migrating SUSE Manager  2.1 Proxy to Version 3.1</title><simpara>For the migration of SUSE Manager 2.1 Proxies there are two possible approaches&#8212;&#8203;this section documents both approaches:</simpara>
 <itemizedlist>
 <listitem>
 <para>Existing SUSE Manager proxies may be replaced by newly installed and reconfigured proxies, see <xref linkend="advanced.topics.proxy.migration.replace"/>.
@@ -15648,7 +15741,7 @@ The replacement proxy must have the same name and IP address as its predecessor.
 Create a reactivation key for this system and then register the new proxy using the reactivation key.
 If you do not use the reactivation key, you will need to re-registered all the clients against the new proxy.</simpara>
 <orderedlist xml:id="proc.advanced.topics.proxy.migration21.replace" numeration="arabic">
-<title>Procedure: Replacing a SUSE Manager Proxy and Keeping the Clients Registered</title>
+<title>Procedure: Replacing a SUSE Manager Proxyand Keeping the ClientsRegistered</title>
 <listitem>
 <para>Before starting the actual migration procedure, save the important data from the old proxy.
 Copy the data to a central place that also the new server can access:</para>
@@ -15682,8 +15775,8 @@ This may take a few hours.</simpara>
 <para>In the SUSE Manager Web UI select the newly installed SUSE Manager Proxy and delete it from the systems list.</para>
 </listitem>
 <listitem xml:id="step.at.proxy.migration.replace.react">
-<para>In the Web UI, create a reactivation key for the old proxy system: On the System Details of the old proxy click <guimenu>Reactivation</guimenu>.
-Then click <guimenu>Generate New Key</guimenu>, and remember it (write it on a piece of paper or copy it to the clipboard).
+<para>In the Web UI , create a reactivation key for the old proxy system: On the System Details of the old proxy click <guimenu>Reactivation</guimenu>.
+Then click <guimenu>Generate New Key</guimenu> , and remember it (write it on a piece of paper or copy it to the clipboard).
 For more information about reactivation keys, see <xref linkend="s5-sm-system-details-react"/>.</para>
 </listitem>
 <listitem>
@@ -15706,7 +15799,7 @@ For more information about reactivation keys, see <xref linkend="s5-sm-system-de
 This route saves time especially regarding proxies connected to a SUSE Manager server via low-bandwith links.
 This upgrade can be automated by using the YaST auto-installation feature.</simpara>
 <orderedlist numeration="arabic">
-<title>Procedure: Upgrading SUSE Manager Proxy from 2.1 to 3.1</title>
+<title>Procedure: Upgrading SUSE Manager Proxyfrom 2.1 to 3.1</title>
 <listitem>
 <para>Create an auto-installable distribution based on SLES 12 SP3.
 SUSE Manager 3.1 Proxy is an add-on for SLES 12 SP3.
@@ -15715,7 +15808,7 @@ Refer to the <xref linkend="ref.webui.systems.autoinst"/> on creating an auto-in
 <listitem>
 <para>To start the auto-installation of a proxy, some additional packages must be installed that are only available in the SUSE Manager Tools channel.
 These tools were not available for proxies when in the past the system was shipped as an appliance.
-To gain access to the required packages for use with proxies, the underlying SLES 11 SP3 channel (<literal role="systemitem">SLES11-SP3-SUSE-Manager-Tools</literal>) needs to be cloned and assigned to the to-be-upgraded proxies.
+To gain access to the required packages for use with proxies, the underlying SLES 11 SP3 channel (<literal role="systemitem">SLES11-SP3-SUSE-Manager-Tools</literal> ) needs to be cloned and assigned to the to-be-upgraded proxies.
 After these steps have been completed, create an auto-installation profile.</para>
 </listitem>
 </orderedlist>
@@ -18946,7 +19039,7 @@ In addition, basic VM Guestmanagement tasks such as (re)starting and stopping or
 Salt minions must be treated differently:</simpara>
 <itemizedlist>
 <listitem>
-<para>Autoinstallation is still not supported.</para>
+<para>Autoinstallation is still not supported and libvirt hosts are supported as read-only.</para>
 </listitem>
 </itemizedlist>
 <warning>
@@ -18955,28 +19048,47 @@ Salt minions must be treated differently:</simpara>
 SUSE Manager uses <literal role="library">libvirt</literal> for virtual machine management.
 Currently, virtual machines from other virtualization solutions such as VMware* or VirtualBox*, are recognized as VM Guests, but cannot be managed from within SUSE Manager.</simpara>
 </warning>
-<section xml:id="sec.virtualization.autoinstall"><title>Autoinstalling VM Guests</title><simpara>With SUSE Manager you can automatically deploy Xen and KVM VM Guests using AutoYaST or {kickstart} profiles.
+<section xml:id="sec.virtualization.autoinstall"><title>Autoinstalling VM Guest s</title><simpara>With SUSE Manager you can automatically deploy Xen and KVM VM Guests using AutoYaST or {kickstart} profiles.
 It is also possible to automatically register the VM Guests, so they can immediately be managed by SUSE Manager.</simpara>
-<section xml:id="sec.virtualization.autoinstall.req_mgr"><title>Requirements on SUSE Manager</title><simpara>Setting up and managing VM Guests with SUSE Manager does not require special configuration options.
-However, you need to provide activation keys for the VM Host Server and the VM Guests, an autoinstallable distribution and an autoinstallation profile.
-To automatically register VM Guests with SUSE Manager, a bootstrap script is needed.</simpara>
-<section xml:id="sec.virtualzation.autoinstall.req-mgr.keys"><title>Activation Keys</title><simpara>Just like any other client, VM Host Server and VM Guests need to be registered with SUSE Manager using activation keys.
+<section xml:id="sec.virtualization.autoinstall.req_mgr"><title>Requirements on SUSE Manager</title><simpara>Setting up and managing VM Guest
+s with SUSE Manager
+does not require special configuration options.
+However, you need to provide activation keys for the VM Host Server
+and the VM Guest
+s, an autoinstallable distribution and an autoinstallation profile.
+To automatically register VM Guest
+s with SUSE Manager
+, a bootstrap script is needed.</simpara>
+<section xml:id="sec.virtualzation.autoinstall.req-mgr.keys"><title>Activation Keys</title><simpara>Just like any other client, VM Host Server
+and VM Guest
+s need to be registered with SUSE Manager
+using activation keys.
 Find details on how to set up activation keys at <xref linkend="create.act.keys"/>.
-While there are no special requirements for a VM Guest key, at least the following requirements must be met for the VM Host Server activation key.</simpara>
+While there are no special requirements for a VM Guest
+ key, at least the following requirements must be met for the VM Host Server
+ activation key.</simpara>
 <itemizedlist>
-<title>VM Host Server Activation Key: Minimum Requirements</title>
+<title>VM Host ServerActivation Key: Minimum Requirements</title>
 <listitem>
 <para>Entitlements: Provisioning, Virtualization Platform.</para>
 </listitem>
 <listitem>
-<para>Packages: <literal role="package">rhn-virtualization-host</literal>, <literal role="package">osad</literal>.</para>
-<simpara>If you want to manage the VM Host Server system from SUSE Manager (for example, by executing remote scripts), the package <literal role="package">rhncfg-actions</literal> needs to be installed as well.</simpara>
+<para>Packages: <literal role="resource">rhn-virtualization-host</literal> , <literal role="resource">osad</literal> .</para>
+<simpara>If you want to manage the VM Host Server
+system from SUSE Manager
+(e.g.
+by executing remote scripts), the package <literal role="resource">rhncfg-actions</literal>
+needs to be installed as well.</simpara>
 </listitem>
 </itemizedlist>
 </section>
-<section xml:id="sec.virtualzation.autoinstall.req-mgr.inst-source"><title>Setting up an Autoinstallable Distribution</title><simpara>To autoinstall clients from SUSE Manager, you need to provide an <quote>autoinstallable distribution</quote>, also referred to as autoinstallable tree or installation source.
-This installation source needs to be made available through the file system of the SUSE Manager host.
-It can for example be a mounted local or remote directory or a <quote>loop-mounted</quote> ISO image.
+<section xml:id="sec.virtualzation.autoinstall.req-mgr.inst-source"><title>Setting up an Autoinstallable Distribution</title><simpara>To autoinstall clients from SUSE Manager
+, you need to provide an <quote>autoinstallable distribution</quote>
+, also referred to as autoinstallable tree or installation source.
+This installation source needs to be made available through the file system of the SUSE Manager
+ host.
+It can for example be a mounted local or remote directory or a <quote>loop-mounted</quote>
+ ISO image.
 It must match the following requirements:</simpara>
 <itemizedlist>
 <listitem>
@@ -19008,56 +19120,59 @@ It must match the following requirements:</simpara>
 </itemizedlist>
 <important>
 <title>Autoinstallation package sources</title>
-<simpara>There is a fundamental difference between RedHat and SUSE systems regarding the package sources for autoinstallation.
-The packages for a RedHat installation are being fetched from the <guimenu>Base Channel</guimenu>.
-Packages for installing SUSE systems are being fetched from the autoinstallable distribution.</simpara>
-<simpara>As a consequence, the autoinstallable distribution for a SUSE system has to be a complete installation source (same as for a regular installation).</simpara>
+<simpara>There is a fundamental difference between RedHat and SUSE
+systems regarding the package sources for autoinstallation.
+The packages for a RedHat installation are being fetched from the <guimenu>Base Channel</guimenu>
+.
+Packages for installing SUSE
+ systems are being fetched from the autoinstallable distribution.</simpara>
+<simpara>As a consequence, the autoinstallable distribution for a SUSE
+system has to be a complete installation source (same as for a regular installation).</simpara>
 </important>
 <orderedlist numeration="arabic">
 <title>Procedure: Creating Autoinstallable Distribution</title>
 <listitem>
-<para>Make sure an installation source is available from a local directory.
-The data source can be any kind of network resource, a local directory or an ISO image (which has to be <quote>loop-mounted</quote> ).
-Files and directories must be world readable.</para>
+<para>Make sure an installation source is available from a local directory. The data source can be any kind of network resource, a local directory or an ISO image (which has to be <quote>loop-mounted</quote> ). Files and directories must be world readable.</para>
 </listitem>
 <listitem>
-<para>Log in to the SUSE Manager Web UI and navigate to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guisubmenu>Distributions</guisubmenu> <guimenuitem>Create Distribution</guimenuitem></menuchoice>.</para>
+<para>Log in to the SUSE Manager Web UI} and navigate to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guisubmenu>Distributions</guisubmenu> <guimenuitem>Create Distribution</guimenuitem></menuchoice> .</para>
 </listitem>
 <listitem>
-<para>Fill out the form <literal role="guimenu">Create Autoinstallable Distribution</literal> as follows:</para>
+<para>Fill out the form <guimenu>Create Autoinstallable Distribution</guimenu> as follows:</para>
 <variablelist>
 <varlistentry>
-<term><literal role="guimenu">Distribution Label</literal></term>
+<term><guimenu>Distribution Label</guimenu></term>
 <listitem>
 <simpara>Choose a unique name for the distribution.
-Only letters, numbers, hyphens, periods, and underscores are allowed; the minimum length is 4 characters.
+Only letters, numbers, hyphens, periods, and underscores are allowed; the minimum length is 4 characters.
 This field is mandatory.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term><literal role="guimenu">Tree Path</literal></term>
+<term><guimenu>Tree Path</guimenu></term>
 <listitem>
 <simpara>Absolute local disk path to installation source.
 This field is mandatory.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term><literal role="guimenu">Base Channel</literal></term>
+<term><guimenu>Base Channel</guimenu></term>
 <listitem>
 <simpara>Channel matching the installation source.
-This channel is the package source for non-SUSE installations.
+This channel is the package source for non-SUSE
+installations.
 This field is mandatory.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term><literal role="guimenu">Installer Generation</literal></term>
+<term><guimenu>Installer Generation</guimenu></term>
 <listitem>
 <simpara>Operating system version matching the installation source.
 This field is mandatory.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term><literal role="guimenu">Kernel Options</literal></term>
+<term><guimenu>Kernel Options</guimenu></term>
 <listitem>
 <simpara>Options passed to the kernel when booting for the installation.
 There is no need to specify the <option>install=</option> parameter since it will automatically be added.
@@ -19066,7 +19181,7 @@ This field is optional.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term><literal role="guimenu">Post Kernel Options</literal></term>
+<term><guimenu>Post Kernel Options</guimenu></term>
 <listitem>
 <simpara>Options passed to the kernel when booting the installed system for the first time.
 This field is optional.</simpara>
@@ -19075,31 +19190,41 @@ This field is optional.</simpara>
 </variablelist>
 </listitem>
 <listitem>
-<para>Save your settings by clicking <guibutton>Create Autoinstallable Distribution</guibutton>.</para>
+<para>Save your settings by clicking <guimenu>Create Autoinstallable Distribution</guimenu> .</para>
 </listitem>
 </orderedlist>
-<simpara>To edit an existing <literal role="guimenu">Autoinstallable Distribution</literal>, go to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guimenuitem>Distributions</guimenuitem></menuchoice> and click on a <literal role="guimenu">Label</literal>.
-Save your settings by clicking <guibutton>Update Autoinstallable Distribution</guibutton>.</simpara>
+<simpara>To edit an existing <guimenu>Autoinstallable Distribution</guimenu>
+, go to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guimenuitem>Distributions</guimenuitem></menuchoice>
+ and click on a <guimenu>Label</guimenu>
+.
+Make the desired changes and save your settings by clicking <guimenu>Update Autoinstallable Distribution</guimenu>
+.</simpara>
 </section>
-<section xml:id="sec.virtualzation.autoinstall.req-mgr.profile"><title>Providing an Autoinstallation Profile</title><simpara>Autoinstallation profiles (AutoYaST or {kickstart} files) contain all the installation and configuration data needed to install a system without user intervention.
+<section xml:id="sec.virtualzation.autoinstall.req-mgr.profile"><title>Providing an Autoinstallation Profile</title><simpara>Autoinstallation profiles (AutoYaST
+or {kickstart}
+files) contain all the installation and configuration data needed to install a system without user intervention.
 They may also contain scripts that will be executed after the installation has completed.</simpara>
-<simpara>All profiles can be uploaded to SUSE Manager and be edited afterwards.
-Kickstart profiles can also be created from scratch with SUSE Manager.</simpara>
-<simpara>A minimalist AutoYaST profile including a script for registering the client with SUSE Manager is listed in
+<simpara>All profiles can be uploaded to SUSE Manager
+and be edited afterwards.
+Kickstart profiles can also be created from scratch with SUSE Manager
+.</simpara>
+<simpara>A minimalist AutoYaST
+profile including a script for registering the client with SUSE Manager
+is listed in
 <xref linkend="advanced.topics.app.ay.example-simple"/>.
-For more information, examples and HOWTOs on AutoYaST profiles, refer to <emphasis><phrase role="ref">SUSE Linux Enterprise AutoYaST</phrase></emphasis> (<link xl:href="https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html">https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html</link>).
-For more information on {kickstart} profiles, refer to your RedHat documentation.</simpara>
+For more information, examples and HOWTOs on AutoYaST
+ profiles, refer to <emphasis><phrase role="ref">SUSE Linux Enterprise AutoYaST</phrase></emphasis>
+ (<link xl:href="https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html">https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html</link>). For more information on {kickstart}
+ profiles, refer to your RedHat documentation.</simpara>
 </section>
-<section xml:id="_suse_linux_enterprise_15_systems"><title>SUSE Linux Enterprise 15 Systems</title><simpara>You need the installation media to setup the distribution.
-Starting with version 15, there is only one installation media.
-You will use the same one for SLES, SLED, and all the other SUSE Linux Enterprise 15 based products.</simpara>
+<section xml:id="_suse_linux_enterprise_15_systems"><title>SUSE Linux Enterprise 15 Systems</title><simpara>You need the installation media to setup the distribution.  Starting with version 15, there is only one installation media.  You will use the same one for SLES, SLED, and all the other SUSE Linux Enterprise 15 based products.</simpara>
 <simpara>In the AutoYaST profile specify which product is to be installed.
 For installing SUSE Linux Enterprise Server use the following snippet in <filename>autoyast.xml</filename>:</simpara>
 <screen>&lt;products config:type="list"&gt;
   &lt;listentry&gt;SLES&lt;/listentry&gt;
 &lt;/products&gt;</screen>
-<simpara>Then then specify all the required modules as <literal>add-on</literal> in <filename>autoyast.xml</filename>.
-This is a minimal <literal>SLE-Product-SLES15-Pool</literal> selection that will result in a working installation and can be managed by SUSE Manager:</simpara>
+<simpara>Then then specify all the required modules as <literal>add-on</literal> in <filename>autoyast.xml</filename>. This is a minimal <literal>SLE-Product-SLES15-Pool</literal> selection that will result in a working
+installation and can be managed by SUSE Manager:</simpara>
 <itemizedlist>
 <listitem>
 <para>SLE-Manager-Tools15-Pool</para>
@@ -19128,110 +19253,107 @@ This is a minimal <literal>SLE-Product-SLES15-Pool</literal> selection that will
 </itemizedlist>
 <section xml:id="sec.virtualzation.autoinstall.req-mgr.profile.upload"><title>Uploading an Autoinstallation Profile</title><orderedlist numeration="arabic">
 <listitem>
-<para>Log in to the SUSE Manager Web interface and open <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guisubmenu>Profiles</guisubmenu> <guimenuitem>Upload New Kickstart/AutoYaST File</guimenuitem></menuchoice>.</para>
+<para>Log in to the SUSE Manager Web interface and open <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guisubmenu>Profiles</guisubmenu> <guimenuitem>Upload New Kickstart/AutoYaST File</guimenuitem></menuchoice> .</para>
 </listitem>
 <listitem>
-<para>Choose a unique name for the profile.
-Only letters, numbers, hyphens, periods, and underscores are allowed; the minimum length is 6 characters.
-This field is mandatory.</para>
+<para>Choose a unique name for the profile. Only letters, numbers, hyphens, periods, and underscores are allowed; the minimum length is 6 characters. This field is mandatory.</para>
 </listitem>
 <listitem>
-<para>Choose an <literal role="guimenu">Autoinstallable Tree</literal> from the drop-down menu.
-If no <literal role="guimenu">Autoinstallable Tree</literal> is available, you need to add an Autoinstallable Distribution.
-Refer to <xref linkend="sec.virtualzation.autoinstall.req-mgr.inst-source"/> for instructions.</para>
+<para>Choose an <guimenu>Autoinstallable Tree</guimenu> from the drop-down menu. If no <guimenu>Autoinstallable Tree</guimenu> is available, you need to add an Autoinstallable Distribution. Refer to <xref linkend="sec.virtualzation.autoinstall.req-mgr.inst-source"/> for instructions.</para>
 </listitem>
 <listitem>
-<para>Choose a <literal role="guimenu">Virtualization Type</literal> from the drop-down menu. KVM and Xen (para-virtualized and fully-virtualized) are available. Do not choose <literal role="guimenu">Xen Virtualized Host</literal> here.</para>
+<para>Choose a <guimenu>Virtualization Type</guimenu> from the drop-down menu. KVM and Xen (para-virtualized and fully-virtualized) are available. Do not choose <guimenu>Xen Virtualized Host</guimenu> here.</para>
 </listitem>
 <listitem>
-<para>Scroll down to the <literal role="guimenu">File to Upload</literal> dialog, click <guibutton>Browse</guibutton> to select it, then click <guibutton>Upload File</guibutton>.</para>
+<para>Scroll down to the <guimenu>File to Upload</guimenu> dialog, click <guimenu>Browse</guimenu> to select it, then click <guimenu>Upload File</guimenu> .</para>
 </listitem>
 <listitem>
-<para>The uploaded file will be displayed in the [guimenu]``File Contents] section, where you can edit it.</para>
+<para>The uploaded file will be displayed in the <guimenu>File Contents</guimenu> section, where you can edit it.</para>
 </listitem>
 <listitem>
-<para>Click <guibutton>Create</guibutton> to store the profile.</para>
+<para>Click <guimenu>Create</guimenu> to store the profile.</para>
 </listitem>
 </orderedlist>
-<simpara>To edit an existing profile, go to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guimenuitem>Profiles</guimenuitem></menuchoice> and click on a <literal role="guimenu">Label</literal>.
-Make the desired changes and save your settings by clicking <guibutton>Create</guibutton>.</simpara>
+<simpara>To edit an existing profile, go to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guimenuitem>Profiles</guimenuitem></menuchoice>
+ and click on a <guimenu>Label</guimenu>
+.
+Make the desired changes and save your settings by clicking <guimenu>Create</guimenu>
+.</simpara>
 <note>
-<title>Editing existing {kickstart} profiles</title>
-<simpara>If you are changing the <literal role="guimenu">Virtualization Type</literal> of an existing {kickstart} profile, it may also modify the bootloader and partition options, potentially overwriting any user customizations.
-Be sure to review the <literal role="guimenu">Partitioning</literal> tab to verify these settings when changing the <literal role="guimenu">Virtualization Type</literal>.</simpara>
+<title>Editing existing {kickstart}profiles</title>
+<simpara>If you are changing the <guimenu>Virtualization Type</guimenu>
+ of an existing {kickstart}
+ profile, it may also modify the bootloader and partition options, potentially overwriting any user customizations.
+Be sure to review the <guimenu>Partitioning</guimenu>
+ tab to verify these settings when changing the <guimenu>Virtualization Type</guimenu>
+.</simpara>
 </note>
 </section>
 <section xml:id="sec.virtualzation.autoinstall.req-mgr.profile.generate"><title>Creating a Kickstart Profile</title><note>
 <simpara>Currently it is only possible to create autoinstallation profiles for RHEL systems.
-If installing a SUSE Linux Enterprise Server system, you need to upload an existing AutoYaST profile as described in <xref linkend="sec.virtualzation.autoinstall.req-mgr.profile.upload"/>.</simpara>
+If installing a SUSE Linux Enterprise Server
+system, you need to upload an existing AutoYaST
+profile as described in <xref linkend="sec.virtualzation.autoinstall.req-mgr.profile.upload"/>.</simpara>
 </note>
 <orderedlist xml:id="pro.at.virtualzation.autoinstall.ks.profile.generate" numeration="arabic">
 <listitem>
-<para>Log in to the SUSE Manager Web interface and go to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guisubmenu>Profiles</guisubmenu> <guimenuitem>Create New Kickstart File</guimenuitem></menuchoice>.</para>
+<para>Log in to the SUSE Manager Web interface and go to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guisubmenu>Profiles</guisubmenu> <guimenuitem>Create New Kickstart File</guimenuitem></menuchoice> .</para>
 </listitem>
 <listitem>
-<para>Choose a unique name for the profile.
-The minimum length is 6 characters. This field is mandatory.</para>
+<para>Choose a unique name for the profile. The minimum length is 6 characters. This field is mandatory.</para>
 </listitem>
 <listitem>
-<para>Choose a <literal role="guimenu">Base Channel</literal>.
-This channel is the package source for non-SUSE installations and must match the <literal role="guimenu">Autoinstallable Tree</literal>.
-This field is mandatory.</para>
+<para>Choose a <guimenu>Base Channel</guimenu> . This channel is the package source for non-SUSE installations and must match the <guimenu>Autoinstallable Tree</guimenu> . This field is mandatory.</para>
 </listitem>
 <listitem>
-<para>Choose an <literal role="guimenu">Autoinstallable Tree</literal> from the drop-down menu.
-If no <literal role="guimenu">Autoinstallable Tree</literal> is available, you need to add an Autoinstallable Distribution.
-Refer to <xref linkend="sec.virtualzation.autoinstall.req-mgr.inst-source"/> for instructions.</para>
+<para>Choose an <guimenu>Autoinstallable Tree</guimenu> from the drop-down menu. If no <guimenu>Autoinstallable Tree</guimenu> is available, you need to add an Autoinstallable Distribution. Refer to <xref linkend="sec.virtualzation.autoinstall.req-mgr.inst-source"/> for instructions.</para>
 </listitem>
 <listitem>
-<para>Choose a <literal role="guimenu">Virtualization Type</literal> from the drop-down menu.
-KVM and Xen (para-virtualized and fully-virtualized) are available.
-Do not choose <literal role="guimenu">Xen Virtualized Host</literal> here.</para>
+<para>Choose a <guimenu>Virtualization Type</guimenu> from the drop-down menu. KVM and Xen (para-virtualized and fully-virtualized) are available. Do not choose <guimenu>Xen Virtualized Host</guimenu> here.</para>
 </listitem>
 <listitem>
-<para>Click the <guibutton>Next</guibutton> button.</para>
+<para>Click the <guimenu>Next</guimenu> button.</para>
 </listitem>
 <listitem>
-<para>Select the location of the distribution files for the installation of your VM Guests.
-There should already be a <literal role="guimenu">Default Download Location</literal> filled out and selected for you on this screen.
-Click the <guibutton>Next</guibutton> button.</para>
+<para>Select the location of the distribution files for the installation of your VM Guest s. There should already be a <guimenu>Default Download Location</guimenu> filled out and selected for you on this screen. Click the <guimenu>Next</guimenu> button.</para>
 </listitem>
 <listitem>
-<para>Choose a root password for the VM Guests.
-Click the <guibutton>Finish</guibutton> button to generate the profile.</para>
+<para>Choose a root password for the VM Guest s. Click the <guimenu>Finish</guimenu> button to generate the profile.</para>
 <simpara>This completes {kickstart} profile creation.
 After generating a profile, you are taken to the newly-created {kickstart} profile.
 You may browse through the various tabs of the profile and modify the settings as you see fit, but this is not necessary as the default settings should work well for the majority of cases.</simpara>
 </listitem>
 </orderedlist>
 </section>
-<section xml:id="sec.virtualzation.autoinstall.req-mgr.profile.scripts"><title>Adding a Registration Script to the Autoinstallation Profile</title><simpara>A VM Guest that is autoinstalled does not get automatically registered.
+<section xml:id="sec.virtualzation.autoinstall.req-mgr.profile.scripts"><title>Adding a Registration Script to the Autoinstallation Profile</title><simpara>A VM Guest
+that is autoinstalled does not get automatically registered.
 Adding a section to the autoinstallation profile that invokes a bootstrap script for registration will fix this.
-The following procedure describes adding a corresponding section to an AutoYaST profile.
-Refer to your RedHat Enterprise Linux documentation for instructions on adding scripts to a {kickstart} file.</simpara>
+The following procedure describes adding a corresponding section to an AutoYaST
+profile.
+Refer to your RedHat Enterprise Linux documentation for instructions on adding scripts to a {kickstart}
+file.</simpara>
 <orderedlist numeration="arabic">
 <listitem>
-<para>First, provide a bootstrap script on the SUSE Manager:</para>
+<para>First, provide a bootstrap script on the SUSE Manager :</para>
 <itemizedlist>
 <listitem>
-<para>Create a bootstrap script for VM Guests on the SUSE Manager as described in <xref linkend="generate.bootstrap.script"/>.</para>
+<para>Create a bootstrap script for VM Guest s on the SUSE Manager as described in <xref linkend="generate.bootstrap.script"/>.</para>
 </listitem>
 <listitem>
-<para>Log in as root to the konsole of SUSE Manager and go to <filename>/srv/www/htdocs/pub/bootstrap</filename>.
-Copy <filename>bootstrap.sh</filename> (the bootstrap script created in the previous step) to for example, <filename>bootstrap_vm_guests.sh</filename> in the same directory.</para>
+<para>Log in as root to the konsole of SUSE Manager and go to <filename>/srv/www/htdocs/pub/bootstrap</filename> . Copy <filename>bootstrap.sh</filename> (the bootstrap script created in the previous step) to e.g. <filename>bootstrap_vm_guests.sh</filename> in the same directory.</para>
 </listitem>
 <listitem>
-<para>Edit the newly created file according to your needs.
-The minimal requirement is to include the activation key for the VM Guests (see <xref linkend="sec.virtualzation.autoinstall.req-mgr.keys"/> for details).
-We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).</para>
+<para>Edit the newly created file according to your needs. The minimal requirement is to include the activation key for the VM Guest s (see <xref linkend="sec.virtualzation.autoinstall.req-mgr.keys"/> for details). We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).</para>
 </listitem>
 </itemizedlist>
 </listitem>
 <listitem>
-<para>Log in to the SUSE Manager Web interface and go to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guimenuitem>Profiles</guimenuitem></menuchoice>.
-Click on the profile that is to be used for autoinstalling the VM Guests to open it for editing.</para>
-<simpara>Scroll down to the <guimenu>File Contents</guimenu> section where you can edit the AutoYaST XML file.
-Add the following snippet at the end of the XML file right before the closing <literal>&lt;/profile&gt;</literal> tag and replace the given IP address with the address of the SUSE Manager server.
+<para>Log in to the SUSE Manager Web interface and go to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guimenuitem>Profiles</guimenuitem></menuchoice> . Click on the profile that is to be used for autoinstalling the VM Guest s to open it for editing.</para>
+<simpara>Scroll down to the <guimenu>File Contents</guimenu>
+section where you can edit the AutoYaST
+XML file.
+Add the following snippet at the end of the XML file right before the closing <literal>&lt;/profile&gt;</literal> tag and replace the given IP address with the address of the SUSE Manager
+server.
 See <xref linkend="advanced.topics.app.ay.example-simple"/>for an example script.</simpara>
 <screen>&lt;scripts&gt;
   &lt;init-scripts config:type="list"&gt;
@@ -19256,16 +19378,45 @@ profile already contains a <literal>&lt;scripts&gt;</literal> section, do not ad
 </section>
 </section>
 </section>
-<section xml:id="sec.virtualization.autoinstall.req_vmhost"><title>VM Host Server Setup</title><simpara>A VM Host Server system serving as a target for autoinstalling VM Guests from SUSE Manager must be capable of running guest operating systems.
-This requires either KVM or Xen being properly set up.
-For installation instructions for SUSE Linux Enterprise Server systems refer to the <emphasis><phrase role="ref">SLES Virtualization Guide</phrase></emphasis> available from <link xl:href="https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html">https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html</link>.
-For instructions on setting up a RedHat VM Host Server refer to your RedHat Enterprise Linux documentation.</simpara>
-<simpara>Since SUSE Manager uses <literal role="library">libvirt</literal> for VM Guest installation and management, the <literal role="daemon">libvirtd</literal> needs to run on the VM Host Server.
-The default <literal role="library">libvirt</literal> configuration is sufficient to install and manage VM Guests from SUSE Manager.
-However, in case you want to access the VNC console of a VM Guest as a non-root user, you need to configure <literal role="library">libvirt</literal> appropriately.
-Configuration instructions for <literal role="library">libvirt</literal> on SUSE Linux Enterprise Server are available in the <emphasis><phrase role="ref">SLES Virtualization Guide</phrase></emphasis> available from <link xl:href="https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html">https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html</link> available from <link xl:href="http://www.suse.com/documentation/sles11/">http://www.suse.com/documentation/sles11/</link>.
-For instructions for a RedHat VM Host Server refer to your RedHat Enterprise Linux documentation.</simpara>
-<simpara>Apart from being able to serve as a host for KVM or Xen guests, which are managed by <literal role="library">libvirt</literal>, a VM Host Server must be registered with SUSE Manager.</simpara>
+<section xml:id="sec.virtualization.autoinstall.req_vmhost"><title>VM Host Server Setup</title><simpara>A VM Host Server
+system serving as a target for autoinstalling VM Guest
+s from SUSE Manager
+must be capable of running guest operating systems.
+This requires either KVM
+or Xen
+being properly set up.
+For installation instructions for SUSE Linux Enterprise Server
+systems refer to the <emphasis><phrase role="ref">SLES Virtualization Guide</phrase></emphasis>
+ available from <link xl:href="https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html">https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html</link>.
+For instructions on setting up a RedHat VM Host Server
+ refer to your RedHat Enterprise Linux documentation.</simpara>
+<simpara>Since SUSE Manager
+uses <literal role="library">libvirt</literal>
+ for VM Guest
+ installation and management, the <literal role="daemon">libvirtd</literal>
+ needs to run on the VM Host Server
+.
+The default <literal role="library">libvirt</literal>
+ configuration is sufficient to install and manage VM Guest
+s from SUSE Manager
+.
+However, in case you want to access the VNC console of a VM Guest
+ as a non-root
+ user, you need to configure <literal role="library">libvirt</literal>
+ appropriately.
+Configuration instructions for <literal role="library">libvirt</literal>
+ on SUSE Linux Enterprise Server
+ are available in the <emphasis><phrase role="ref">SLES Virtualization
+    Guide</phrase></emphasis>
+ available from <link xl:href="https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html">https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html</link> available from <link xl:href="http://www.suse.com/documentation/sles11/">http://www.suse.com/documentation/sles11/</link>.
+For instructions for a RedHat VM Host Server
+ refer to your RedHat Enterprise Linux documentation.</simpara>
+<simpara>Apart from being able to serve as a host for KVM
+or Xen
+guests, which are managed by <literal role="library">libvirt</literal>
+, a VM Host Server
+ must be registered with SUSE Manager
+.</simpara>
 <orderedlist numeration="arabic">
 <listitem>
 <para>Make sure either KVM or Xen is properly set up.</para>
@@ -19274,7 +19425,7 @@ For instructions for a RedHat VM Host Server refer to your RedHat Enterprise Lin
 <para>Make sure the <literal role="daemon">libvirtd</literal> is running.</para>
 </listitem>
 <listitem>
-<para>Register the VM Host Server with SUSE Manager:</para>
+<para>Register the VM Host Server with SUSE Manager :</para>
 <itemizedlist>
 <listitem>
 <para>Create a bootstrap script on the SUSE Manager as described in <xref linkend="generate.bootstrap.script"/>.</para>
@@ -19283,12 +19434,10 @@ For instructions for a RedHat VM Host Server refer to your RedHat Enterprise Lin
 <para>Download the bootstrap script from <literal>susemanager.example.com/pub/bootstrap/bootstrap.sh</literal> to the VM Host Server .</para>
 </listitem>
 <listitem>
-<para>Edit the bootstrap script according to your needs.
-The minimal requirement is to include the activation key for the VM Host Server (see <xref linkend="sec.virtualzation.autoinstall.req-mgr.keys"/> for details).
-We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).</para>
+<para>Edit the bootstrap script according to your needs. The minimal requirement is to include the activation key for the VM Host Server (see <xref linkend="sec.virtualzation.autoinstall.req-mgr.keys"/> for details). We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).</para>
 </listitem>
 <listitem>
-<para>Execute the bootstrap script to register the VM Host Server.</para>
+<para>Execute the bootstrap script to register the VM Host Server .</para>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -19303,8 +19452,10 @@ We strongly recommend to also include one or more GPG keys (for example, your or
 </listitem>
 </orderedlist>
 </section>
-<section xml:id="sec.virtualization.autoinstall.req_vmhost.traditional"><title>VM Host Server setup on Traditional clients</title><simpara>Once the registration process is finished and all packages have been installed, enable the <literal role="daemon">osad</literal> (Open Source Architecture Daemon).
-On a SUSE Linux Enterprise Server system this can be achieved by running the following commands as user root:</simpara>
+<section xml:id="sec.virtualization.autoinstall.req_vmhost.traditional"><title>VM Host Server setup on Traditional clients</title><simpara>Once the registration process is finished and all packages have been installed, enable the <literal role="daemon">osad</literal>
+(Open Source Architecture Daemon). On a SUSE Linux Enterprise Server
+system this can be achieved by running the following commands as user root
+:</simpara>
 <screen>systemctl stop rhnsd
 systemctl disable rhnsd</screen>
 <screen>systemctl enable osad
@@ -19313,101 +19464,155 @@ systemctl start osad</screen>
 <title><literal role="daemon">osad</literal>Together with <literal role="daemon">rhnsd</literal></title>
 <simpara>The <literal role="daemon">rhnsd</literal>
  daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
-If many clients are registered with SUSE Manager, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.</simpara>
+If many clients are registered with SUSE Manager
+, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.</simpara>
 </important>
-<simpara>However, when managing VM Guests, you usually want actions like rebooting a VM Guest to be carried out immediately.
-Adding <literal role="daemon">osad</literal> ensures that.
-The <literal role="daemon">osad</literal> daemon receives commands over the jabber protocol from SUSE Manager and commands are instantly executed.
-Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with <literal role="daemon">rhnsd</literal> you can only schedule for a time in the future plus up to four hours).</simpara>
+<simpara>However, when managing VM Guest
+s, you usually want actions like rebooting a VM Guest
+to be carried out immediately. Adding <literal role="daemon">osad</literal>
+ ensures that.
+The <literal role="daemon">osad</literal>
+ daemon receives commands over the jabber protocol from SUSE Manager
+ and commands are instantly executed.
+Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with <literal role="daemon">rhnsd</literal>
+ you can only schedule for a time in the future plus up to four hours).</simpara>
 </section>
 </section>
-<section xml:id="sec.virtualization.autoinstall.installation"><title>Autoinstalling VM Guests</title><simpara>Once all requirements on the SUSE Manager and the VM Host Server are met, you can start to autoinstall VM Guests on the host.
-Note that VM Guests will not be automatically registered with SUSE Manager, therefore we strongly recommend to modify the autoinstallation profile as described in <xref linkend="sec.virtualzation.autoinstall.req-mgr.profile.scripts"/>.
-VM Guests need to be registered to manage them with SUSE Manager.
-Proceed as follows to autoinstall a VM Guest.</simpara>
+<section xml:id="sec.virtualization.autoinstall.installation"><title>Autoinstalling VM Guest s</title><simpara>Once all requirements on the SUSE Manager
+and the VM Host Server
+are met, you can start to autoinstall VM Guest
+s on the host.
+Note that VM Guest
+s will not be automatically registered with SUSE Manager
+, therefore we strongly recommend to modify the autoinstallation profile as described in <xref linkend="sec.virtualzation.autoinstall.req-mgr.profile.scripts"/>. VM Guest
+s need to be registered to manage them with SUSE Manager
+.
+Proceed as follows to autoinstall a VM Guest
+;.</simpara>
 <important>
 <title>No parallel Autoinstallations on VM Host Server</title>
-<simpara>It is not possible to install more than one VM Guest at a time on a single VM Host Server.
-When scheduling more than one autoinstallation with SUSE Manager make sure to choose a timing, that starts the next installation after the previous one has finished.
+<simpara>It is not possible to install more than one VM Guest
+at a time on a single VM Host Server
+.
+When scheduling more than one autoinstallation with SUSE Manager
+make sure to choose a timing, that starts the next installation after the previous one has finished.
 If a guest installation starts while another one is still running, the running installation will be cancelled.</simpara>
 </important>
 <orderedlist numeration="arabic">
 <listitem>
-<para>In the Web UI click the <menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Systems</guisubmenu> <guimenuitem>Systems</guimenuitem></menuchoice> tab.</para>
+<para>Log in to the SUSE Manager Web interface and click the <guimenu>Systems</guimenu> tab.</para>
 </listitem>
 <listitem>
-<para>Click the VM Host Server&#8217;s name to open its <literal role="guimenu">System Status</literal> page.</para>
+<para>Click the VM Host Server 's name to open its <guimenu>System Status</guimenu> page.</para>
 </listitem>
 <listitem>
-<para>Open the form for creating a new VM Guest by clicking <menuchoice><guimenu>Virtualization</guimenu> <guimenuitem>Provisioning</guimenuitem></menuchoice>.
-Fill out the form by choosing an autoinstallation profile and by specifying a name for the VM Guest (must not already exist on VM Host Server).
-Choose a proxy if applicable and enter a schedule.
-To change the VM Guest&#8217;s hardware profile and configuration options, click <guibutton>Advanced Options</guibutton>.</para>
+<para>Open the form for creating a new VM Guest by clicking <menuchoice><guimenu>Virtualization</guimenu> <guimenuitem>Provisioning</guimenuitem></menuchoice> . Fill out the form by choosing an autoinstallation profile and by specifying a name for the VM Guest (must not already exist on VM Host Server ). Choose a proxy if applicable and enter a schedule. To change the VM Guest 's hardware profile and configuration options, click <guimenu>Advanced Options</guimenu> .</para>
 </listitem>
 <listitem>
-<para>Finish the configuration by clicking <guibutton>Schedule Autoinstallation and Finish</guibutton>.
-The <literal role="guimenu">Session Status</literal> page opens for you to monitor the autoinstallation process.</para>
+<para>Finish the configuration by clicking <guimenu>Schedule Autoinstallation and Finish</guimenu> . The <guimenu>Session Status</guimenu> page opens for you to monitor the autoinstallation process.</para>
 </listitem>
 </orderedlist>
 <note>
 <title>Checking the Installation Log</title>
-<simpara>To view the installation log, click <menuchoice><guimenu>Events</guimenu> <guimenuitem>History</guimenuitem></menuchoice> on the <literal role="guimenu">Session Status</literal> page.
-On the <literal role="guimenu">System History Event</literal> page you can click a <literal role="guimenu">Summary</literal> entry to view a detailed log.</simpara>
-<simpara>In case an installation has failed, you can <guibutton>Reschedule</guibutton> it from this page once you have corrected the problem.
+<simpara>To view the installation log, click <menuchoice><guimenu>Events</guimenu> <guimenuitem>History</guimenuitem></menuchoice>
+ on the <guimenu>Session Status</guimenu>
+ page.
+On the <guimenu>System History Event</guimenu>
+ page you can click a <guimenu>Summary</guimenu>
+ entry to view a detailed log.</simpara>
+<simpara>In case an installation has failed, you can <guimenu>Reschedule</guimenu>
+ it from this page once you have corrected the problem.
 You do not have to configure the installation again.</simpara>
-<simpara>If the event log does not contain enough information to locate a problem, log in to the VM Host Server console and read the log file <filename>/var/log/up2date</filename>.
-If you are using the <literal role="daemon">rhnsd</literal>, you may alternatively immediately trigger any scheduled actions by calling <command>rhn_ckeck</command> on the VM Host Server.
+<simpara>If the event log does not contain enough information to locate a problem, log in to the VM Host Server
+console and read the log file <filename>/var/log/up2date</filename>
+.
+If you are using the <literal role="daemon">rhnsd</literal>
+, you may alternatively immediately trigger any scheduled actions by calling <command>rhn_ckeck</command> on the VM Host Server
+.
 Increase the command&#8217;s verbosity by using the options <option>-v</option>, <option>-vv</option>, or <option>-vvv</option>, respectively.</simpara>
 </note>
 </section>
 </section>
-<section xml:id="sec.virtualization.vmguest-manage"><title>Managing VM Guests</title><simpara>Basic VM Guest management actions such as restarting or shutting down a virtual machine as well as changing the CPU and memory allocation can be carried out in the SUSE Manager Web interface if the following requirements are met:</simpara>
+<section xml:id="sec.virtualization.vmguest-manage"><title>Managing VM Guest s</title><simpara>Basic VM Guest
+management actions such as restarting or shutting down a virtual machine as well as changing the CPU and memory allocation can be carried out in the SUSE Manager
+Web interface if the following requirements are met:</simpara>
 <itemizedlist>
 <listitem>
 <para>VM Host Server must be a KVM or Xen host.</para>
 </listitem>
 <listitem>
-<para><literal role="daemon">libvirtd</literal> must be running on VM Host Server.</para>
+<para><literal role="daemon">libvirtd</literal> must be running on VM Host Server .</para>
 </listitem>
 <listitem>
 <para>VM Host Server must be registered with SUSE Manager.</para>
 </listitem>
 </itemizedlist>
 <simpara>In addition, if you want to see the profile of the VM Guest, install packages, etc., you must also register it with SUSE Manager.</simpara>
-<simpara>All actions can be triggered in the SUSE Manager Web UI from the <literal role="guimenu">Virtualization</literal> page of the VM Host Server.
-Navigate to this page by clicking the <menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Systems</guisubmenu> <guimenuitem>Systems</guimenuitem></menuchoice>.
-On the resulting page, click the VM Host Server&#8217;s name and then on <literal role="guimenu">Virtualization</literal>.
-This page lists all VM Guests for this host, known to SUSE Manager.</simpara>
-<section xml:id="sec.virtualization.vmguest-manage.details"><title>Displaying a VM Guest 's Profile</title><simpara>Click the name of a VM Guest on the VM Host Server&#8217;s <literal role="guimenu">Virtualization</literal> page to open its profile page with detailed information about this guest.
+<simpara>All actions can be triggered in the SUSE Manager Web UI from the <guimenu>Virtualization</guimenu>
+ page of the VM Host Server
+.
+Navigate to this page by clicking the <guimenu>Systems</guimenu>
+ tab.
+On the resulting page, click the VM Host Server
+'s name and then on <guimenu>Virtualization</guimenu>
+.
+This page lists all VM Guest
+s for this host, known to SUSE Manager
+.</simpara>
+<section xml:id="sec.virtualization.vmguest-manage.details"><title>Displaying a VM Guest 's Profile</title><simpara>Click the name of a VM Guest
+on the VM Host Server
+'s <guimenu>Virtualization</guimenu>
+ page to open its profile page with detailed information about this guest.
 For details, refer to <xref linkend="ref.webui.systems.systems"/>.</simpara>
 <simpara>A profile page for a virtual system does not differ from a regular system&#8217;s profile page.
-You can perform the same actions (for example, installing software or changing its configuration).</simpara>
+You can perform the same actions (e.g.
+installing software or changing its configuration).</simpara>
 </section>
-<section xml:id="sec.virtualization.vmguest-manage.status"><title>Starting, Stopping, Suspending and Resuming a VM Guest</title><simpara>To start, stop, restart, suspend, or resume a VM Guest, navigate to the VM Host Server&#8217;s <literal role="guimenu">Virtualization</literal> page.
-Click the corresponding action button in the row of the VM Guest.
-Alternatively, check one or more <literal role="guimenu">Guests</literal> listed in the table and click the corresponding button above the table.
-<guibutton>Confirm</guibutton> the action on the displayed popup dialog.</simpara>
+<section xml:id="sec.virtualization.vmguest-manage.status"><title>Starting, Stopping, Suspending and Resuming a VM Guest</title><simpara>To start, stop, restart, suspend, or resume a VM Guest
+, navigate to the VM Host Server
+'s <guimenu>Virtualization</guimenu>
+ page.
+Check one or more <guimenu>Guests</guimenu>
+ listed in the table and scroll down to the bottom of the page.
+Choose an action from the drop-down list and click <guimenu>Apply Action</guimenu>
+. <guimenu>Confirm</guimenu>
+ the action on the next page.</simpara>
 <note>
 <title>Automatically restarting a VM Guest</title>
-<simpara>Automatically restarting a VM Guest when the VM Host Server reboots is not enabled by default on VM Guests and cannot be configured from SUSE Manager.
-Refer to your KVM or Xen documentation.
-Alternatively, you may use <literal role="library">libvirt</literal> to enable automatic reboots.</simpara>
+<simpara>Automatically restarting a VM Guest
+when the VM Host Server
+reboots is not enabled by default on VM Guest
+s and cannot be configured from SUSE Manager
+.
+Refer to your KVM
+or Xen
+documentation.
+Alternatively, you may use <literal role="library">libvirt</literal>
+ to enable automatic reboots.</simpara>
 </note>
 </section>
-<section xml:id="_changing_the_cpu_or_ram_allocation_of_a_vm_guest"><title>Changing the CPU or RAM allocation of a VM Guest</title><simpara>To change the CPU or RAM allocation of a VM Guest navigate to the VM Host Server&#8217;s <literal role="guimenu">Virtualization</literal> page.
-Click the <guibutton>Edit</guibutton> button on the VM Guest row.
-Change the values to the desired ones in the next page and click the <guibutton>Update</guibutton> button to apply.</simpara>
-<simpara>The memory allocation can be changed on the fly, provided the memory ballooning driver is installed on the VM Guest.
+<section xml:id="_changing_the_cpu_or_ram_allocation_of_a_vm_guest"><title>Changing the CPU or RAM allocation of a VM Guest</title><simpara>To change the CPU or RAM allocation of a VM Guest
+navigate to the VM Host Server
+'s <guimenu>Virtualization</guimenu>
+ page.
+Check one or more <guimenu>Guests</guimenu>
+ from the table and scroll down to the bottom of the page.
+Choose an action from the <guimenu>Set</guimenu>
+ drop-down list and provide a new value.
+Confirm with <guimenu>Apply Changes</guimenu>
+ followed by <guimenu>Confirm</guimenu>
+.</simpara>
+<simpara>The memory allocation can be changed on the fly, provided the memory ballooning driver is installed on the VM Guest
+.
 If this is not the case, or if you want to change the CPU allocation, you need to shutdown the guest first.
 Refer to <xref linkend="sec.virtualization.vmguest-manage.status"/> for details.</simpara>
 </section>
-<section xml:id="sec.virtualization.vmguest-manage.delete"><title>Deleting a VM Guest</title><important>
-<simpara>Deleting a VM Guest is only possible on Salt minions, not on traditional clients.</simpara>
-</important>
-<simpara>To delete a VM Guest, navigate to the VM Host Server&#8217;s <literal role="guimenu">Virtualization</literal> page.
-Click the <guibutton>Delete</guibutton> button on the VM Guest row.
-Alternatively, check one or more <literal role="guimenu">Guests</literal> listed in the table and click the <guibutton>Delete</guibutton> button above the table.
-<guibutton>Confirm</guibutton> the action on the displayed popup dialog.</simpara>
+<section xml:id="sec.virtualization.vmguest-manage.delete"><title>Deleting a VM Guest</title><simpara>To delete a VM Guest
+you must first shut it down as described in <xref linkend="sec.virtualization.vmguest-manage.status"/>.
+Wait at least two minutes to allow the shutdown to finish and then choose <guimenu>Delete Systems</guimenu>
+ followed by <guimenu>Apply Action</guimenu>
+ and <guimenu>Confirm</guimenu>
+.</simpara>
 </section>
 </section>
 </chapter>
