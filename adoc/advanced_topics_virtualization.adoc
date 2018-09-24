@@ -4,10 +4,10 @@
 include::entities.adoc[]
 
 
-{productname} allows you to autoinstall and manage {xen} and {kvm}{vmguest}s on a registered {vmhost}.
+{productname} allows you to autoinstall and manage {xen} and {kvm} {vmguest}s on a registered {vmhost}.
 To autoinstall a {vmguest}, an autoinstallable distribution and an autoinstallation profile ({ay} or {kickstart}) need to exist on {productname}.
 {vmguest}s registered with {productname} can be managed like "`regular`" machines.
-In addition, basic {vmguest}management tasks such as (re)starting and stopping or changing processor and memory allocation can be carried out using {productname}.
+In addition, basic {vmguest} management tasks such as (re)starting and stopping or changing processor and memory allocation can be carried out using {productname}.
 
 The following documentation is valid in the context of traditional clients.
 Salt minions must be treated differently:
@@ -64,7 +64,7 @@ It must match the following requirements:
 
 * Kernel and initrd location:
 
-.RedHat / Generic RPM
+.{rhel} / Generic RPM
 ** images/pxeboot/vmlinuz
 ** images/pxeboot/initrd.img
 
@@ -78,8 +78,8 @@ It must match the following requirements:
 .Autoinstallation package sources
 [IMPORTANT]
 ====
-There is a fundamental difference between RedHat and {suse} systems regarding the package sources for autoinstallation.
-The packages for a RedHat installation are being fetched from the menu:Base Channel[].
+There is a fundamental difference between {rhel} and {suse} systems regarding the package sources for autoinstallation.
+The packages for a {rhel} installation are being fetched from the menu:Base Channel[].
 Packages for installing {suse} systems are being fetched from the autoinstallable distribution.
 
 As a consequence, the autoinstallable distribution for a {suse} system has to be a complete installation source (same as for a regular installation).
@@ -145,7 +145,7 @@ ifndef::env-github,backend-html5[]
 <<advanced.topics.app.ay.example-simple>>.
 endif::[]
 For more information, examples and HOWTOs on {ay} profiles, refer to [ref]_SUSE Linux Enterprise AutoYaST_ (https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html).
-For more information on {kickstart} profiles, refer to your RedHat documentation.
+For more information on {kickstart} profiles, refer to your {rhel} documentation.
 
 
 ==== {sle} 15 Systems
@@ -192,7 +192,7 @@ It is also recommended to add the following modules:
   Refer to <<sec.virtualzation.autoinstall.req-mgr.inst-source>> for instructions.
 . Choose a [guimenu]``Virtualization Type`` from the drop-down menu. {kvm} and {xen} (para-virtualized and fully-virtualized) are available. Do not choose [guimenu]``Xen Virtualized Host`` here.
 . Scroll down to the [guimenu]``File to Upload`` dialog, click btn:[Browse] to select it, then click btn:[Upload File].
-. The uploaded file will be displayed in the [guimenu]``File Contents] section, where you can edit it.
+. The uploaded file will be displayed in the [guimenu]``File Contents`` section, where you can edit it.
 . Click btn:[Create] to store the profile.
 
 
@@ -213,7 +213,7 @@ Be sure to review the [guimenu]``Partitioning`` tab to verify these settings whe
 
 [NOTE]
 ====
-Currently it is only possible to create autoinstallation profiles for RHEL systems.
+Currently it is only possible to create autoinstallation profiles for {rhel} systems.
 If installing a {sls} system, you need to upload an existing {ay} profile as described in <<sec.virtualzation.autoinstall.req-mgr.profile.upload>>.
 ====
 
@@ -249,7 +249,7 @@ You may browse through the various tabs of the profile and modify the settings a
 A {vmguest} that is autoinstalled does not get automatically registered.
 Adding a section to the autoinstallation profile that invokes a bootstrap script for registration will fix this.
 The following procedure describes adding a corresponding section to an {ay} profile.
-Refer to your RedHat Enterprise Linux documentation for instructions on adding scripts to a {kickstart} file.
+Refer to your {rhel} documentation for instructions on adding scripts to a {kickstart} file.
 
 
 . First, provide a bootstrap script on the {productname}:
@@ -296,13 +296,13 @@ profile already contains a `<scripts>` section, do not add a second one, but rat
 A {vmhost} system serving as a target for autoinstalling {vmguest}s from {productname} must be capable of running guest operating systems.
 This requires either {kvm} or {xen} being properly set up.
 For installation instructions for {sls} systems refer to the [ref]_SLES Virtualization Guide_ available from https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html.
-For instructions on setting up a RedHat {vmhost} refer to your RedHat Enterprise Linux documentation.
+For instructions on setting up a {rhel} {vmhost} refer to your {rhel} documentation.
 
 Since {productname} uses [library]``libvirt`` for {vmguest} installation and management, the [daemon]``libvirtd`` needs to run on the {vmhost}.
 The default [library]``libvirt`` configuration is sufficient to install and manage {vmguest}s from {productname}.
 However, in case you want to access the VNC console of a {vmguest} as a non-{rootuser} user, you need to configure [library]``libvirt`` appropriately.
 Configuration instructions for [library]``libvirt`` on {sls} are available in the [ref]_SLES Virtualization Guide_ available from https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html available from http://www.suse.com/documentation/sles11/.
-For instructions for a RedHat {vmhost} refer to your RedHat Enterprise Linux documentation.
+For instructions for a {rhel} {vmhost} refer to your {rhel} documentation.
 
 Apart from being able to serve as a host for {kvm} or {xen} guests, which are managed by [library]``libvirt``, a {vmhost} must be registered with {productname}.
 
@@ -312,7 +312,7 @@ Apart from being able to serve as a host for {kvm} or {xen} guests, which are ma
 . Register the {vmhost} with {productname}:
 +
 ** Create a bootstrap script on the {productname} as described in <<generate.bootstrap.script>>.
-** Download the bootstrap script from `susemanager.example.com/pub/bootstrap/bootstrap.sh` to the {vmhost} .
+** Download the bootstrap script from `susemanager.example.com/pub/bootstrap/bootstrap.sh` to the {vmhost}.
 ** Edit the bootstrap script according to your needs.
    The minimal requirement is to include the activation key for the {vmhost} (see <<sec.virtualzation.autoinstall.req-mgr.keys>> for details).
    We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).
@@ -351,8 +351,7 @@ systemctl start osad
 ----
 
 .[daemon]``osad``Together with [daemon]``rhnsd``
-IMPORTANT: The [daemon]``rhnsd``
- daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
+IMPORTANT: The [daemon]``rhnsd`` daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
 If many clients are registered with {productname}, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.
 
 However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately.
