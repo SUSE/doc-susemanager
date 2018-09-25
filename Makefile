@@ -63,7 +63,7 @@ uyuni-html: uyuni xml-uyuni
 # Build SUMA docs and link images to the suma folder
 suma-html: suma xml-suma
 	daps -d DC-create-all html
-	(cd build/create-all/html/create-all; ln -sf ../../../../../adoc/images/suma .)
+	(cd build/create-all/html/create-all; ln -sf ../../../../adoc/images/suma .)
 
 # Make SUMA Packages for OBS
 suma-dist: suma xml-suma
