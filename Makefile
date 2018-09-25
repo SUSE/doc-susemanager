@@ -139,3 +139,5 @@ clean:
 	rm -rf xml
 	rm -rf xxml
 	rm -rf build
+	rm -rf book-to-set/build/
+	rm -rf book-to-set/xml/*
