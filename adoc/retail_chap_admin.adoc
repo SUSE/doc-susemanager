@@ -174,11 +174,10 @@ For details about network settings and ``hwtypes`` related settings, see above.
 [[retail.sect.admin.deploy_terminals]]
 == Deploying Terminals
 
-TODO: https://github.com/SUSE/spacewalk/issues/5613
-
 Each terminal requires a specific hardware type, which contains information about the product name and terminal manufacturer.
 However, the {susemgr} database does not have this information to begin with.
 In order to tell {susemgr} what image to deploy on each terminal, you can set hardware type groups.
+After you have created your new hardware type group, you can apply the [systemitem]``saltboot-formula`` to the group and configure it for your environment.
 
 
 .Procedure: Create a Hardware Type Group
@@ -199,7 +198,60 @@ Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type
 Spaces and other non-alphanumeric characters will be removed when the name is processed.
 ====
 +
-. TODO: Apply hardware type
+. In the {susemgr} {webui}, navigate to menu:Systems[Overview], and click on the [guimenu]``Groups`` tab.
+. Click the [btn]``Create new`` button.
+. In the [guimenu]``Create System Group`` dialog, create a new system group, using the hardware type group name you created earlier.
+
+
+.Procedure: Apply and configure the Saltboot Formula
+
+. Open the details page for your new hardware group, and navigate to the [guimenu]``Formulas`` tab.
+. Select the [systemitem]``saltboot-formula`` and click [btn]``Save`` to save your changes.
+. An additional [guimenu]``saltboot`` tab will become available from the top menu, click on it to configure the new formula.
++
+[NOTE]
+====
+There are many different configurations possible.
+This procedure outlines a simple, single-disk, three-partition configuration.
+Adjust it to suit your own environment.
+====
+. In the [guimenu]``Disk 1`` section, set these parameters:
+* In the [guimenu]``Disk symbolic ID`` field, enter a custom name for the disk (for example, [systemitem]``disk1``).
+* In the [guimenu]``Device type`` field, select [systemitem]``DISK``.
+* In the [guimenu]``Disk device`` field, select the device that corresponds to the device name on the target machine (for example, [path]``/dev/sda``).
+* In the [guimenu]``RAID level`` field, leave it empty.
+* In the [guimenu]``Disk Label`` field, select [systemitem]``gpt``.
+. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 1``:
+* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p1``).
+* In the [guimenu]``Partition size`` field, specify a size for the partition in Mebibytes (MiB).
+* In the [guimenu]``Device mount point`` field, select a location to mount the partition (for example, [path]``/data``).
+* In the [guimenu]``Filesystem format`` field, select your preferred format (for example, [systemitem]``xfs``).
+* In the [guimenu]``OS Image to deploy`` field, leave it empty.
+* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
+* In the [guimenu]``Partition flags`` field, leave it empty.
+. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 2``:
+* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p2``).
+* In the [guimenu]``Partition size`` field, specify a size for the partition in Mebibytes (MiB).
+* In the [guimenu]``Device mount point`` field, leave it empty.
+* In the [guimenu]``Filesystem format`` field, select [systemitem]``swap``.
+* In the [guimenu]``OS Image to deploy`` field, leave it empty.
+* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
+* In the [guimenu]``Partition flags`` field, select [systemitem]``swap``.
+. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 3``:
+* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p3``).
+* In the [guimenu]``Partition size`` field, leave it empty.
+This will ensure the partition uses up all remaining space.
+* In the [guimenu]``Device mount point`` field, select [systemitem]``/``.
+* In the [guimenu]``Filesystem format`` field, leave it empty.
+* In the [guimenu]``OS Image to deploy`` field, enter the name of the image to deploy.
+* In the [guimenu]``Image version`` field, leave it empty.
+This will ensure you use the latest available version.
+* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
+* In the [guimenu]``Partition flags`` field, leave it empty.
+. Click [btn]``Save Formula`` to save your formula.
+. Apply highstate to apply your configuration changes.
+Click [btn]``Apply Highstate``.
+Applying highstate will execute the state associated with the formula and configure the affected systems.
 
 
 [[retail.sect.admin.terminal_mass_config]]
