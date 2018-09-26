@@ -1,54 +1,7 @@
 [[advanced.topics.optimizing.scalability]]
 = Optimization and Scalability
-ifdef::env-github,backend-html5,backend-docbook5[]
-//Admonitions
-:tip-caption: :bulb:
-:note-caption: :information_source:
-:important-caption: :heavy_exclamation_mark:
-:caution-caption: :fire:
-:warning-caption: :warning:
-:linkattrs:
-// SUSE ENTITIES FOR GITHUB
-// System Architecture
-:zseries: z Systems
-:ppc: POWER
-:ppc64le: ppc64le
-:ipf : Itanium
-:x86: x86
-:x86_64: x86_64
-// Rhel Entities
-:rhel: Red Hat Enterprise Linux
-:rhnminrelease6: Red Hat Enterprise Linux Server 6
-:rhnminrelease7: Red Hat Enterprise Linux Server 7
-// SUSE Manager Entities
-:productname:
-:susemgr: SUSE Manager
-:susemgrproxy: SUSE Manager Proxy
-:productnumber: 3.2
-:saltversion: 2018.3.0
-:webui: WebUI
-// SUSE Product Entities
-:sles-version: 12
-:sp-version: SP3
-:jeos: JeOS
-:scc: SUSE Customer Center
-:sls: SUSE Linux Enterprise Server
-:sle: SUSE Linux Enterprise
-:slsa: SLES
-:suse: SUSE
-:ay: AutoYaST
-endif::[]
-// Asciidoctor Front Matter
-:doctype: book
-:sectlinks:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
-:imagesdir: images
 
-
-
+include::entities.adoc[]
 
 [[optimizing.apache-tomcat]]
 == Optimizing Apache and Tomcat
@@ -228,7 +181,7 @@ Keep the server monitored in order to identify possible issues early.
 * Increase Tomcat's Salt return result workers to allow parallelizing work on a high number of Salt return results. Set parameter [parameter]``java.message_queue_thread_pool_size = 100`` in [path]``/etc/rhn/rhn.conf`` (affects patching).
 * Increase the number of PostgreSQL connections available to Java applications (Tomcat, Taskomatic) according to the previous parameters, otherwise extra workers will starve waiting for a connection. Set parameter [parameter]``hibernate.c3p0.max_size = 150`` in [path]``/etc/rhn/rhn.conf`` (affects all minion operations). Make sure enough PostgreSQL connections are configured before changing this parameter {mdash} refer to ``smdba system-check autotuning --help`` to get automatic tuning of the PostgreSQL configuration file while changing the number of available connections. Additional manual tuning is usually not necessary but might be required depending on scale and exact use cases.
 * Increase the number of Taskomatic's ``minion-action-executor`` worker threads allowing to parallelize the scheduling of Actions to minions. Set parameter [parameter]``taskomatic.com.redhat.rhn.taskomatic.task.MinionActionExecutor.parallel_threads = 8`` in [path]``/etc/rhn/rhn.conf`` (affects all minion operations, especially staging).
-* Increase Salt's presence ping timeouts if responses might come back later than the defaults. Set parameters [parameter]``salt_presence_ping_timeout = 20`` and [parameter]``salt_presence_ping_timeout = 20`` in [path]``/etc/rhn/rhn.conf`` (affects all minion operations).
+* Increase Salt's presence ping timeouts if responses might come back later than the defaults. Set parameters [parameter]``java.salt_presence_ping_timeout = 20`` and [parameter]``java.salt_presence_ping_gather_job_timeout = 20`` in [path]``/etc/rhn/rhn.conf`` (affects all minion operations).
 * Increase the Salt master worker threads allowing to parallelize more requests (otherwise Tomcat and Taskomatic workers will starve waiting for the Salt API). Set parameter [parameter]``worker_threads: 100`` in [path]``/etc/salt/master.d/susemanager.conf`` (affects onboarding and patching).
 * Disable daily comparison of configuration files. Click on menu:Admin[Task Schedules], then on the btn:[compare-configs-default] link, then on the btn:[Disable Schedule] button and finally on btn:[Delete Schedule].
 

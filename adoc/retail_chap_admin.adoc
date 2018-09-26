@@ -1,51 +1,7 @@
 [[retail.chap.admin]]
 = Administration
-ifdef::env-github,backend-html5,backend-docbook5[]
-//Admonitions
-:tip-caption: :bulb:
-:note-caption: :information_source:
-:important-caption: :heavy_exclamation_mark:
-:caution-caption: :fire:
-:warning-caption: :warning:
-// SUSE ENTITIES FOR GITHUB
-// System Architecture
-:zseries: z Systems
-:ppc: POWER
-:ppc64le: ppc64le
-:ipf : Itanium
-:x86: x86
-:x86_64: x86_64
-// Rhel Entities
-:rhel: Red Hat Linux Enterprise
-:rhnminrelease6: Red Hat Enterprise Linux Server 6
-:rhnminrelease7: Red Hat Enterprise Linux Server 7
-// SUSE Manager Entities
-:productname:
-:susemgr: SUSE Manager
-:smr: SUSE Manager for Retail
-:susemgrproxy: SUSE Manager Proxy
-:productnumber: 3.2
-:webui: Web UI
-// SUSE Product Entities
-:sles-version: 12
-:sp-version: SP3
-:jeos: JeOS
-:scc: SUSE Customer Center
-:sls: SUSE Linux Enterprise Server
-:sle: SUSE Linux Enterprise
-:slsa: SLES
-:suse: SUSE
-endif::[]
-// Asciidoctor Front Matter
-:doctype: book
-:sectlinks:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
-:imagesdir: images
 
-
+include::entities.adoc[]
 
 
 
@@ -218,11 +174,10 @@ For details about network settings and ``hwtypes`` related settings, see above.
 [[retail.sect.admin.deploy_terminals]]
 == Deploying Terminals
 
-TODO: https://github.com/SUSE/spacewalk/issues/5613
-
 Each terminal requires a specific hardware type, which contains information about the product name and terminal manufacturer.
 However, the {susemgr} database does not have this information to begin with.
 In order to tell {susemgr} what image to deploy on each terminal, you can set hardware type groups.
+After you have created your new hardware type group, you can apply the [systemitem]``saltboot-formula`` to the group and configure it for your environment.
 
 
 .Procedure: Create a Hardware Type Group
@@ -243,7 +198,85 @@ Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type
 Spaces and other non-alphanumeric characters will be removed when the name is processed.
 ====
 +
-. TODO: Apply hardware type
+. In the {susemgr} {webui}, navigate to menu:Systems[Overview], and click on the [guimenu]``Groups`` tab.
+. Click the [btn]``Create new`` button.
+. In the [guimenu]``Create System Group`` dialog, create a new system group, using the hardware type group name you created earlier.
+
+
+.Procedure: Apply and configure the Saltboot Formula
+
+. Open the details page for your new hardware group, and navigate to the [guimenu]``Formulas`` tab.
+. Select the [systemitem]``saltboot-formula`` and click [btn]``Save`` to save your changes.
+. An additional [guimenu]``saltboot`` tab will become available from the top menu, click on it to configure the new formula.
++
+[NOTE]
+====
+There are many different configurations possible.
+This procedure outlines a simple, single-disk, three-partition configuration.
+Adjust it to suit your own environment.
+====
+. In the [guimenu]``Disk 1`` section, set these parameters:
+* In the [guimenu]``Disk symbolic ID`` field, enter a custom name for the disk (for example, [systemitem]``disk1``).
+* In the [guimenu]``Device type`` field, select [systemitem]``DISK``.
+* In the [guimenu]``Disk device`` field, select the device that corresponds to the device name on the target machine (for example, [path]``/dev/sda``).
+* In the [guimenu]``RAID level`` field, leave it empty.
+* In the [guimenu]``Disk Label`` field, select [systemitem]``gpt``.
+. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 1``:
+* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p1``).
+* In the [guimenu]``Partition size`` field, specify a size for the partition in Mebibytes (MiB).
+* In the [guimenu]``Device mount point`` field, select a location to mount the partition (for example, [path]``/data``).
+* In the [guimenu]``Filesystem format`` field, select your preferred format (for example, [systemitem]``xfs``).
+* In the [guimenu]``OS Image to deploy`` field, leave it empty.
+* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
+* In the [guimenu]``Partition flags`` field, leave it empty.
+. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 2``:
+* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p2``).
+* In the [guimenu]``Partition size`` field, specify a size for the partition in Mebibytes (MiB).
+* In the [guimenu]``Device mount point`` field, leave it empty.
+* In the [guimenu]``Filesystem format`` field, select [systemitem]``swap``.
+* In the [guimenu]``OS Image to deploy`` field, leave it empty.
+* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
+* In the [guimenu]``Partition flags`` field, select [systemitem]``swap``.
+. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 3``:
+* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p3``).
+* In the [guimenu]``Partition size`` field, leave it empty.
+This will ensure the partition uses up all remaining space.
+* In the [guimenu]``Device mount point`` field, select [systemitem]``/``.
+* In the [guimenu]``Filesystem format`` field, leave it empty.
+* In the [guimenu]``OS Image to deploy`` field, enter the name of the image to deploy.
+* In the [guimenu]``Image version`` field, leave it empty.
+This will ensure you use the latest available version.
+* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
+* In the [guimenu]``Partition flags`` field, leave it empty.
+. Click [btn]``Save Formula`` to save your formula.
+. Apply highstate to apply your configuration changes.
+Click [btn]``Apply Highstate``.
+Applying highstate will execute the state associated with the formula and configure the affected systems.
+
+
+[[retail.sect.admin.terminal_mass_config]]
+== Terminal Mass Configuration
+
+System profiles can be used to configure terminals before they are deployed.
+This is particularly useful when you a large number of terminals that need to be configured in the same way.
+In this procedure, you create an empty system profile with a network interface and a given hardware address using XMLRPC.
+When a new machine connects using the specified hardware address, it is paired to the system profile and configured accordingly.
+
+.Procedure: Configuring Multiple Terminals
+. In the {susemgr} {webui}, navigate to menu:Systems[Overview].
+. Locate the build host system, and click on the corresponding number in the [guimenu]``Packages`` column.
+. Click on the [guimenu]``Profiles`` tab.
+. Click on the [btn]``Create System Profile`` button.
+. Give the system profile using the hardware address for your terminals, in the format:
++
+----
+hwaddress:01-23-45-67-89-AB
+----
+. Add a description and click [btn]``Save`` to save your profile.
+By default, the new profile will have the [systemitem]``BOOTSTRAP`` entitlement, and a single network interface with the specified hardware address.
+All other values are created as default values, and will be updated when the terminal connects.
+. Boot the terminal with the matching hardware address.
+The terminal pairs to the profile you have created, and configuration values are loaded.
 
 
 

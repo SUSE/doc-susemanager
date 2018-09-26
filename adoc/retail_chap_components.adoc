@@ -1,49 +1,7 @@
 [[retail.chap.components]]
 = Components
-ifdef::env-github,backend-html5,backend-docbook5[]
-//Admonitions
-:tip-caption: :bulb:
-:note-caption: :information_source:
-:important-caption: :heavy_exclamation_mark:
-:caution-caption: :fire:
-:warning-caption: :warning:
-// SUSE ENTITIES FOR GITHUB
-// System Architecture
-:zseries: z Systems
-:ppc: POWER
-:ppc64le: ppc64le
-:ipf : Itanium
-:x86: x86
-:x86_64: x86_64
-// Rhel Entities
-:rhel: Red Hat Linux Enterprise
-:rhnminrelease6: Red Hat Enterprise Linux Server 6
-:rhnminrelease7: Red Hat Enterprise Linux Server 7
-// SUSE Manager Entities
-:productname:
-:susemgr: SUSE Manager
-:smr: SUSE Manager for Retail
-:susemgrproxy: SUSE Manager Proxy
-:productnumber: 3.2
-:webui: Web UI
-// SUSE Product Entities
-:sles-version: 12
-:sp-version: SP3
-:jeos: JeOS
-:scc: SUSE Customer Center
-:sls: SUSE Linux Enterprise Server
-:sle: SUSE Linux Enterprise
-:slsa: SLES
-:suse: SUSE
-endif::[]
-// Asciidoctor Front Matter
-:doctype: book
-:sectlinks:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
-:imagesdir: images
+
+include::entities.adoc[]
 
 
 
@@ -55,13 +13,15 @@ endif::[]
 
 * The first layer contains the central server and one or more build hosts.
 * The second layer contains one or more branch servers to provide local network and boot services.
-* The final layer contains any number of deployed point-of-sale terminals.
+* The final layer contains any number of deployed point-of-service terminals.
+
+image::retail_ref_arch.png[Reference Architecture diagram]
 
 [[retail.sect.components.central-server]]
 === Central Server
 
 The central server is a {susemgr} server.
-It contains information about infrastructure, network topology, and everything required to automate image deployment and perform day-to-day operations of branches and terminals.
+It contains information about infrastructure, network topology, and everything required to automate image deployment and perform day-to-day operations on branches and terminals.
 This can include database entries of registered systems, salt pillar data for build images, image assignments, partitioning, network setup, network services, and more.
 
 [[retail.sect.components.build-hosts]]
@@ -69,12 +29,12 @@ This can include database entries of registered systems, salt pillar data for bu
 
 Build hosts can be arbitrary servers or virtual machines.
 They are used to securely build operating system images.
-Build hosts should be based on {sls}{nbsp}12 SP{nbsp}3.
+Build hosts should be based on {sls}{nbsp}12 SP3.
 
 [[retail.sect.components.branch-server]]
 === Branch Server
 
-Branch servers should be physically located close to point-of-sale terminals, such as in an individual store or branch office.
+Branch servers should be physically located close to point-of-service terminals, such as in an individual store or branch office.
 Branch servers provide services for PXE boot, and act as an image cache, salt broker, and RPM proxy.
 Depending on how you configure your branch server, it can also manage local networking, and provide DHCP and DNS services.
 
@@ -87,14 +47,18 @@ The branch server layer can operate in several different network configurations:
 In this configuration, it may or may not provide DHCP and DNS services.
 
 [[retail.sect.components.pos-terminals]]
-=== Point-of-Sale Terminals
+=== Point-of-Service Terminals
 
-Point-of-sale (PoS) terminals can come in many different formats, such as cashier terminals, digital scales, or cash drawers.
-Every terminal, however, is provided by a vendor, who set some basic information about the device in the firmware.
-{smr} accesses this vendor information in order to determine how best to work with the terminal in use.
+Point-of-Service (PoS) terminals can come in many different formats, such as point-of-sale terminals, kiosks, digital scales, self-service systems, and reverse-vending systems.
+Every terminal, however, is provided by a vendor, who set basic information about the device in the firmware.
+{smr} accesses this vendor information to determine how best to work with the terminal in use.
+
 In most cases, different terminals will require a different operating system (OS) image to ensure they work correctly.
-For example, a cashier terminal has a full graphical display, where a digital scale might only have a very basic text display.
+For example, an information kiosk has a high-resolution touchscreen, where a cashier terminal might only have a very basic display.
 While both of these terminals require similar processing and network functionality, they will require different OS images to ensure that the different display mechanisms work correctly.
+
+Note that {smr} works well for deployments containing up to around 5000 terminals.
+It is possible to increase the size of your {smr} deployment past that number by duplicating the set up, and installing additional central servers.
 
 
 
@@ -102,7 +66,7 @@ While both of these terminals require similar processing and network functionali
 == Fitting it all together
 
 
-{smr} uses the same underlying technology as {susemgr}, but specifically addresses the needs of retail organizations.
+{smr} uses the same technology as {susemgr}, but is customized to address the needs of retail organizations.
 
 
 
@@ -115,9 +79,9 @@ Hardware types allow you to group devices according to manufacturer and device n
 
 
 [[retail.sect.components.fitting.formulas]]
-=== Formulas
+=== Salt Formulas
 
-{smr} uses formulas to help simplify configuration.
+{smr} uses Salt formulas to help simplify configuration.
 Formulas are pre-written scripts, that are used to configure your installation.
 
 You can use formulas to apply configuration patterns to your hardware groups.

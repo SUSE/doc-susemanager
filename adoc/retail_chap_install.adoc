@@ -1,56 +1,16 @@
 [[retail.chap.install]]
 = Installation
 ifdef::env-github,backend-html5,backend-docbook5[]
-//Admonitions
-:tip-caption: :bulb:
-:note-caption: :information_source:
-:important-caption: :heavy_exclamation_mark:
-:caution-caption: :fire:
-:warning-caption: :warning:
-// SUSE ENTITIES FOR GITHUB
-// System Architecture
-:zseries: z Systems
-:ppc: POWER
-:ppc64le: ppc64le
-:ipf : Itanium
-:x86: x86
-:x86_64: x86_64
-// Rhel Entities
-:rhel: Red Hat Linux Enterprise
-:rhnminrelease6: Red Hat Enterprise Linux Server 6
-:rhnminrelease7: Red Hat Enterprise Linux Server 7
-// SUSE Manager Entities
-:productname:
-:susemgr: SUSE Manager
-:smr: SUSE Manager for Retail
-:susemgrproxy: SUSE Manager Proxy
-:productnumber: 3.2
-:webui: Web UI
-// SUSE Product Entities
-:sles-version: 12
-:sp-version: SP3
-:jeos: JeOS
-:scc: SUSE Customer Center
-:sls: SUSE Linux Enterprise Server
-:sle: SUSE Linux Enterprise
-:slsa: SLES
-:suse: SUSE
-endif::[]
-// Asciidoctor Front Matter
-:doctype: book
-:sectlinks:
-:toc: left
-:icons: font
-:experimental:
-:sourcedir: .
-:imagesdir: images
+
+include::entities.adoc[]
 
 
 
 [[retail.sect.running.requirements]]
 == Requirements
 
-Before you install {smr}, ensure your environment meets the minimum requirements:
+Before you install {smr}, ensure your environment meets the minimum requirements.
+In addition to the {susemgr} requirements listed at https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-getting-started/single-html/book.suma.getting-started/book.suma.getting-started.html#quickstart.sect.prereq.hardware and https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_proxyquick/book_susemanager_proxyquick.html your {smr} installation will require:
 
 
 [IMPORTANT]
@@ -61,7 +21,7 @@ Before you install {smr}, ensure your environment meets the minimum requirements
 
 .Central Server Requirements
 
-* {x86-64} processor
+* {x86_64} processor
 * A minimum of 4{nbsp}GB hard disk space (recommended 15{nbsp}GB)
 * A minimum of 1{nbsp}GB RAM per CPU
 * Networking capability
@@ -69,7 +29,7 @@ Before you install {smr}, ensure your environment meets the minimum requirements
 
 .Build Host Requirements
 
-* {x86-64} processor
+* {x86_64} processor
 * A minimum of 8{nbsp}GB hard disk space (recommended 25{nbsp}GB)
  terminals.
 * A minimum of 1{nbsp}GB RAM per CPU
@@ -78,7 +38,7 @@ Before you install {smr}, ensure your environment meets the minimum requirements
 
 .Branch Server Requirements
 
-* {x86-64} processor
+* {x86_64} processor
 * A minimum of 4{nbsp}GB hard disk space (recommended 10{nbsp}GB)
  terminals.
 * A minimum of 1{nbsp}GB RAM per CPU
@@ -89,7 +49,7 @@ Before you install {smr}, ensure your environment meets the minimum requirements
 
 * The central server requires a reliable and fast WAN connection
 * The Branch server requires a reliable WAN connection in order to reach the central server
-* If you are using a shared network, ensure that your router and firewall can filter DHCP requests between the shared network annd the WAN
+* If you are using a shared network, ensure that DHCP requests are filtered before reaching the rest of your shared network
 * If you are using a dedicated network, the branch server requires at least two network interfaces: one connected to the WAN with reachable central server, and one connected to the internal branch LAN.
 * Terminals require a LAN connection to the branch server network.
 
@@ -125,6 +85,7 @@ See [quickstart3_chap_install_overview.adoc] for instructions to install {susemg
 * dhcpd-formula
 * image-sync-formula
 * pxe-formula
+* susemanager-retail-tools
 * tftp-formula
 * vsftpd-formula
 +
@@ -262,15 +223,15 @@ Here is a channel overview:
 // <<connect.first.client>>.
 . If not done automatically, accept the Salt key on the menu:Main Menu[Salt > Keys] page by clicking the check mark. The it will appear in the menu:Main Menu[Systems > Overview].
 . Check via menu:System Details[Software > Software Channels] that all the above listed channels are selected.
-. Install the [path]``patterns-suma_proxy`` pattern; Copy the SSL certificate and key from the server; Run [command]``configure-proxy.sh``.
+. Install the [path]``patterns-suma_retail_proxy`` pattern.
+. Copy the SSL certificate and key from the server
+. Run [command]``configure-proxy.sh``.
 +
-*TODO*: add more info about these 3 actions if wanted; it's in Advanced Topics, Proxy QS.
-+
-*TODO*: do we have a suma_retail_proxy pattern?
+*TODO*: add more info about the last 3 actions if wanted; it's in Advanced Topics, Proxy QS.
 
 After this basic proxy installation, use the formulas to deploy the Retail Branch Server functionality on it.
 
-For mass deployments use the script coming with the [package]``python-susemanager-retail`` package.
+For mass deployments, use the script included with the [package]``susemanager-retail-tools`` package.
 
 
 .Procedure: Assign and configure branch server formulas
