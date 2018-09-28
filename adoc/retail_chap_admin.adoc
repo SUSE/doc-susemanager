@@ -11,6 +11,8 @@ include::entities.adoc[]
 This sections contains notes on administering your {smr} installation.
 For general administration tasks, see the {susemgr} documentation at https://www.suse.com/documentation/suse-manager-3/
 
+
+
 [[retail.sect.admin.branch_network_config]]
 == Branch Server Network Configuration
 
@@ -18,9 +20,11 @@ The branch server can be configured to use networking in many different ways.
 The most common ways provide either a dedicated or shared LAN for terminals.
 
 
-.Procedure: Set up a Branch Server with a Dedicated LAN
+
+=== Procedure: Set up a Branch Server with a Dedicated LAN
 
 In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the central server, and the other one acts as an isolated LAN to communicate with terminals.
+
 This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
 
 . In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
@@ -34,12 +38,14 @@ This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE 
 * Select the [guimenu]``bind`` DNS forwarder mode.
 * Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
 * Specify the working directory, and the directory owner and group.
-. Click [btn]``Save`` to save your changes.
+. Click btn:[Save] to save your changes.
 
 
-.Procedure: Set up a Branch Server with a Shared Network
+
+=== Procedure: Set up a Branch Server with a Shared Network
 
 In this configuration, the branch server has only one network interface card which is used to connect to the central server as well as the terminals.
+
 This configuration allows for the branch server to provide DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
 Optionally, the branch server can also provide DHCP services in this configuration.
 
@@ -59,7 +65,7 @@ Ensure you include DNS, TFTP and FTP services.
 * Select the [guimenu]``bind`` DNS forwarder mode.
 * Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
 * Specify the working directory, and the directory owner and group.
-. Click [btn]``Save`` to save your changes.
+. Click btn:[Save] to save your changes.
 . Apply the salt state and synchronize your settings:
 +
 ----
@@ -71,37 +77,31 @@ salt $branch_server_id state.apply image-sync
 [[retail.sect.admin.branch_mass_config]]
 == Branch Server Mass Configuration
 
-You can either configure branch servers one by one using formulas (*TODO* see xxx) or create system groups of branch servers (*TODO* see yyy) or with a flexible command-line script.
-Such a command-line script is suitable to do a mass configuration of branch servers.
-
-
+Branch servers are configured individually using formulas.
+If you are working in an environment with many branch servers, you might find it easier to configure the terminals automatically with a pre-defined configuration file, rather than configuring each branch server individually.
 
 // https://gitlab.suse.de/SLEPOS/SUMA_Retail/tree/master/python-susemanager-retail
-For mass deployments use the script coming with the [package]``python-susemanager-retail`` package.
-Install it on the central server.
-When installed call it on the command-line with [command]``retail_yaml``.
-This is the [command]``retail_yaml --help`` output:
 
+
+
+=== Procedure: Configuring Multiple Branch Servers
+
+This procedure requires the [package]``python-susemanager-retail`` package, which is provided with {smr}.
+Install the [package]``python-susemanager-retail`` package on the central server.
+
+. Create a YAML file describing the infrastructure you intend to install.
+An example YAML file is at the end of this section, for you to reference.
+. On a clean {susemgr} installation, import the YAML file you have created:
++
 ----
-usage: retail_yaml [-h] [--api-host API_HOST] [--api-user API_USER]
-                   [--api-pass API_PASS] [--from-yaml FROM_YAML]
-                   [--to-yaml TO_YAML]
-
-Initialize Branch Server
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --api-host API_HOST   API host
-  --api-user API_USER   API user
-  --api-pass API_PASS   API password
-  --from-yaml FROM_YAML
-                        initialize retail system from YAML file
-  --to-yaml TO_YAML     save structure of retail system to YAML file
+retail_yaml --from-yaml filename.yaml
 ----
+You can use the [command]``retail_yaml --help`` command for additional options.
 
-The actual settings are filled in a ``YAML`` file that you will read with the [option]``--from-yaml`` option.
-Here is the documentated [path]``example.yml`` coming with the package:
+If you need to change your configuration, you can edit the YAML file at any time, and use the retail_yaml --from-yaml command to upload the new configuration.
 
+.Example: YAML Mass Branch Server Configuration file
+[source,yaml]
 ----
 # /usr/share/doc/packages/python-susemanager-retail/example.yml
 branches:
@@ -167,8 +167,6 @@ hwtypes:
           type: DISK
 ----
 
-For details about network settings and ``hwtypes`` related settings, see above.
-
 
 
 [[retail.sect.admin.deploy_terminals]]
@@ -180,7 +178,8 @@ In order to tell {susemgr} what image to deploy on each terminal, you can set ha
 After you have created your new hardware type group, you can apply the [systemitem]``saltboot-formula`` to the group and configure it for your environment.
 
 
-.Procedure: Create a Hardware Type Group
+
+=== Procedure: Create a Hardware Type Group
 
 For this procedure, you will require the system manufacturer name and product name for your terminal.
 
@@ -199,14 +198,15 @@ Spaces and other non-alphanumeric characters will be removed when the name is pr
 ====
 +
 . In the {susemgr} {webui}, navigate to menu:Systems[Overview], and click on the [guimenu]``Groups`` tab.
-. Click the [btn]``Create new`` button.
+. Click the btn:[Create new] button.
 . In the [guimenu]``Create System Group`` dialog, create a new system group, using the hardware type group name you created earlier.
 
 
-.Procedure: Apply and configure the Saltboot Formula
+
+=== Procedure: Apply and configure the Saltboot Formula
 
 . Open the details page for your new hardware group, and navigate to the [guimenu]``Formulas`` tab.
-. Select the [systemitem]``saltboot-formula`` and click [btn]``Save`` to save your changes.
+. Select the [systemitem]``saltboot-formula`` and click btn:[Save] to save your changes.
 . An additional [guimenu]``saltboot`` tab will become available from the top menu, click on it to configure the new formula.
 +
 [NOTE]
@@ -248,10 +248,11 @@ This will ensure the partition uses up all remaining space.
 This will ensure you use the latest available version.
 * In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
 * In the [guimenu]``Partition flags`` field, leave it empty.
-. Click [btn]``Save Formula`` to save your formula.
+. Click btn:[Save Formula] to save your formula.
 . Apply highstate to apply your configuration changes.
-Click [btn]``Apply Highstate``.
+Click btn:[Apply Highstate].
 Applying highstate will execute the state associated with the formula and configure the affected systems.
+
 
 
 [[retail.sect.admin.terminal_mass_config]]
@@ -386,6 +387,12 @@ hwtypes:
               mountpoint: /
           type: DISK
 ----
+
+. Add a description and click btn:[Save] to save your profile.
+By default, the new profile will have the [systemitem]``BOOTSTRAP`` entitlement, and a single network interface with the specified hardware address.
+All other values are created as default values, and will be updated when the terminal connects.
+. Boot the terminal with the matching hardware address.
+The terminal pairs to the profile you have created, and configuration values are loaded.
 
 
 
