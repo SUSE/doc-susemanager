@@ -39,7 +39,7 @@ xml/MAIN-manager.xml: adoc/*.adoc
 	mv xxml xml
 
 # run book-to-set stylesheet first on xml/MAIN-manager.xml this allows creation of single books, next run make suma-getting-started-html to created both the single and chunked version of a book
-book-to-set-suma: clean suma xml-suma 
+book-to-set: clean suma xml-suma
 	@ccecho result "Copying Main file into book-to-set/ ..."
 	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
 	@ccecho result "Making entities available ..."
@@ -56,9 +56,40 @@ book-to-set-suma: clean suma xml-suma
 
 # TODO: Add additional DC files for uyuni so we can setup a make all scenario for building both SUMA/Uyuni docs and pdf files.
 # Build Uyuni docs and link images to the uyuni folder
+
+#############################
+# Uyuni Documentation Outputs
+#############################
+
+# Create all Uyuni docs (HTML)
 uyuni-html: uyuni xml-uyuni
 	daps -d DC-create-all-uyuni html
 	(cd build/create-all/html/create-all; rm -rf images; ln -sf ../../../../adoc/images/uyuni .)
+
+# Make Uyuni Packages for OBS
+uyuni-dist: xml-uyuni
+	daps -vvv -d DC-create-all-uyuni package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc; time
+
+# Build Uyuni .pdf files
+uyuni-pdf: xml
+	daps -d DC-create-all-uyuni pdf; time
+
+uyuni-advanced-pdf:
+	daps -d DC-uyuni-advanced-topics- pdf; time
+
+uyuni-best-practices-pdf:
+	daps -d DC-uyuni-best-practices pdf; time
+
+uyuni-getting-started-pdf:
+	daps -d DC-uyuni-getting-started pdf; time
+
+uyuni-reference-pdf:
+	daps -d DC-uyuni-reference pdf; time
+
+
+############################
+# SUMA Documentation Outputs
+############################
 
 # Build SUMA docs and link images to the suma folder
 suma-html: suma xml-suma
@@ -69,11 +100,7 @@ suma-html: suma xml-suma
 suma-dist: suma xml-suma
 	daps -vvv -d DC-create-all package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc; time
 
-# Make Uyuni Packages for OBS
-uyuni-dist: xml-uyuni
-	daps -vvv -d DC-create-all-uyuni package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc; time
-
-#### Build SUMA PDF ####
+# Build SUMA PDF
 suma-pdf: xml-suma
 	daps -d DC-create-all pdf; time
 
@@ -108,22 +135,6 @@ suma-getting-started-html:
 suma-reference-html:
 	daps -d DC-susemanager-reference html; time
 	daps -d DC-susemanager-reference html --single; time
-
-#### Build Uyuni PDF ####
-uyuni-pdf: xml
-	daps -d DC-create-all-uyuni pdf; time
-
-uyuni-advanced-pdf:
-	daps -d DC-uyuni-advanced-topics- pdf; time
-
-uyuni-best-practices-pdf:
-	daps -d DC-uyuni-best-practices pdf; time
-
-uyuni-getting-started-pdf:
-	daps -d DC-uyuni-getting-started pdf; time
-
-uyuni-reference-pdf:
-	daps -d DC-uyuni-reference pdf; time
 
 # Target for www.suse.com/documentation
 suma-online-docs:
