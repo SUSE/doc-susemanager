@@ -116,9 +116,7 @@ suma-getting-started-pdf:
 suma-reference-pdf:
 	daps -d DC-susemanager-reference pdf; time
 
-#### Build SUMA HTML ####
-#suma-html: xml-suma
-#	daps -d DC-create-all html; time
+# Build SUMA HTML Chunked/single
 
 suma-advanced-html: xml-suma
 	daps -d DC-susemanager-advanced-topics html; time
@@ -136,12 +134,11 @@ suma-reference-html:
 	daps -d DC-susemanager-reference html; time
 	daps -d DC-susemanager-reference html --single; time
 
-# Target for www.suse.com/documentation
-suma-online-docs:
-	daps -d DC-create-all online-docs; time
-
-uyuni-online-docs:
-	daps -d DC-create-all-uyuni --force online-docs; time
+# Target for www.suse.com/documentation (BROKEN, USE ANTORA SITE GENERATOR)
+#suma-online-docs:
+#	daps -d DC-create-all online-docs; time
+#uyuni-online-docs:
+#	daps -d DC-create-all-uyuni --force online-docs; time
 
 clean:
 	rm -rf package/doc-susemanager-develop.tar.bz2
