@@ -26,6 +26,3 @@ WORKDIR /workspace
 # Add the build script
 ADD run.sh /root/run.sh
 CMD /root/run.sh
-
-#RUN useradd -ms /bin/bash daps
-#USER daps
