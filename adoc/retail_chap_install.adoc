@@ -74,14 +74,19 @@ xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.requirements[Proxy R
 [[retail.sect.running.install]]
 == Installation
 
-{smr} can be installed in various ways, recommended installations require following steps:
+{smr} can be installed in various ways depending on individual needs.
+We recommend these steps:
 
-. Install the central server
-. Configure the central server
-. Install the {smr} pattern on the central server
-. Install the build host and register it to {susemgr}
-. Configure the build host
-. Install the branch server and register it to {susemgr}
+. Install the Central Server
+. Configure the Central Server
+. Install the {smr} pattern on the Central Server
+. Install the Build Host and register it to {susemgr}
+. Configure the Build Host
+. Create mandatory system group _TERMINALS_
+
+Branch server installation steps:
+
+. Install a branch server and register it to {susemgr}
 . Assign and configure branch server formulas
 
 Each procedure is detailed in this section.
@@ -191,14 +196,32 @@ Locate the system to be made a build host, and click on its name.
 . Select the [guimenu]``States`` tab, and navigate to the [guimenu]``Highstate`` window.
 . In the [guimenu]``States`` tab, click btn:[Apply Highstate].
 
+[IMPORTANT]
+====
+Check that the Build Host has following packages installed after Highstate run:
+
+- kiwi
+- kiwi-desc-saltboot
+
+If any package is missing, make sure ``SUSE Manager 3.2 Tools`` repository is available on the Build Host and install packages manually using ``zypper install`` command.
+====
 
 
-=== Procedure Install the Branch Server and register it to {susemgr}
+=== Procedure Create mandatory system group _TERMINALS_
+
+Registration routine expects mandatory system group to exists. This system group has a name
+
+``TERMINALS``
+
+and needs to be manually created during {smr} installation. For instructions to create system group see xref:reference-webui-systems.adoc#ref.webui.systems.systemgroups[System groups reference]
+
+
+
+=== Procedure Install the branch server and register it to {susemgr}
 
 Your branch server should be installed as a default Salt-based client ("minion"), running {susemgrproxy} 3.2.
 
-For instructions to install Salt-based proxy minions and register them to {susemgr}, see xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.inst[{susemgr} Advanced
-Topics].
+For instructions to install Salt-based proxy minions and register them to {susemgr}, see xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.inst[{susemgr} Advanced Topics].
 
 
 For mass deployments, see xref:#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration].
