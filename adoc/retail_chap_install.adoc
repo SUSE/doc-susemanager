@@ -189,7 +189,6 @@ Locate the system to be made a build host, and click on its name.
 
 Your branch server should be installed as a default Salt-based client ("minion"), running {susemgrproxy} 3.2.
 Do not install it as a traditionally managed client.
-For instructions to install Salt-based proxy minions and register them to {susemgr}, see xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.inst[{susemgr} Advanced Topics].
 
 [WARNING]
 .Do Not Enable PXE Boot
@@ -198,14 +197,12 @@ Do not enable PXE boot functionality on the {susemgrproxy} during initial setup.
 This functionality will be installed later, after the initial setup.
 ====
 
-////
-Karl: Isn't this all documented in the SUMA docs? We only want the additional content here, I think. -LKB
 
 [IMPORTANT]
 ====
 First completely download the channels and then create the activation key.
 Only then you can select the correct child channels.
-Here is a channel overview:
+Here is a channel overview for {susemgrproxy}:
 ----
 - SLES 12 SP3 (SP4 in the future) as a base
   - SLES Pool
@@ -219,22 +216,7 @@ Here is a channel overview:
 ----
 ====
 
-. Install a basic {sls} 12 SP3 system that you will deploy as a Retail Branch Server with the following steps.  For more information about installing {sls} 12 SP3, see the SLES documentation.
-. Create an activation key based on the {sle} 12 SP3 base channel.  Open menu:Main Menu[Systems > Activation Keys] and click [guimenu]``Create Key``.  In the [guimenu]``Create Activation Key`` dialog enter required fields and select {sle} 12 SP3 as the base channel; confirm with btn:[Create Activation Key].  On the following activation key details page click the [guimenu]``Child Channels`` tab and select the {productname} {productnumber} Proxy child channel with the matching update channel and the Retail channels ([systemitem]``SUSE Manager Proxy-3.2-Pool`` and [systemitem]``SUSE-Manager-Proxy-3.2-Updates`` as well as [systemitem]``SUSE-Manager-Retail-3.2-Pool`` and [systemitem]``SUSE-Manager-Retail-3.2-Updates``).  Plus SLES12-SP3-Updates, SLE-Manager-Tools12-Pool, and SLE-Manager-Tools12-Updates.  Confirm with btn:[Update Activation Key].
-+
-. Create a bootstrap script to register the {smr} Proxy system: menu:Main Menu[Admin > Manager Configuration > Bootstrap Script].  Save the bootstrap script as [path]``bootstrap-proxy.sh``.  In the beginning of [path]``bootstrap-proxy.sh``, set ``ACTIVATION_KEY`` to the name of the created activation key.
-. Create the SUSE Manager Tools Repository for bootstrapping, see [create.tools.repository]
-// <<create.tools.repository>>.
-. Bootstrap the proxy system. For more information, see [connect.first.client]
-// <<connect.first.client>>.
-. If not done automatically, accept the Salt key on the menu:Main Menu[Salt > Keys] page by clicking the check mark. The it will appear in the menu:Main Menu[Systems > Overview].
-. Check via menu:System Details[Software > Software Channels] that all the above listed channels are selected.
-. Install the [path]``patterns-suma_retail_proxy`` pattern.
-. Copy the SSL certificate and key from the server
-. Run [command]``configure-proxy.sh``.
-+
-*TODO*: add more info about the last 3 actions if wanted; it's in Advanced Topics, Proxy QS.
-////
+For instructions to install Salt-based proxy minions and register them to {susemgr}, see xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.inst[{susemgr} Advanced Topics].
 
 
 For mass deployments, see xref:#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration].
@@ -243,39 +225,19 @@ For mass deployments, see xref:#retail.sect.admin.branch_mass_config[Branch Serv
 
 === Procedure Assign and configure branch server formulas
 
-Before you configure the branch server formulas, ensure you have configured networking, and know the subdomain name and IP address of the branch server.
+Before you configure the branch server formulas, ensure you have configured networking, and know the Salt ID of the branch server.
 
-[IMPORTANT]
-====
-Check each formula to ensure the values are appropriate for your environment.
-Note that these instructions will vary depending on your network architecture.
-====
-
-. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. Check the [systemitem]``bind`` formula, and click btn:[Save].
-. Navigate to the menu:Formulas[Bind] tab, and set these parameters for Zone1:
-* In the [guimenu]``Name`` field, use the fully qualified domain name (FQDN) of the  branch server (for example: [systemitem]``branch1.example.com``).
-* In the [guimenu]``Type`` field, select [systemitem]``master``.
-. Click btn:[Add item], and set these parameters for Zone2:
-* In the [guimenu]``Name`` field, use the reverse zone for the configured IP range (for example: [systemitem]``1.168.192.in-addr.arpa``).
-* In the [guimenu]``Type`` field, select [systemitem]``master``.
-. In the [guimenu]``Available Zones`` section, use these parameters for Zone1:
-* In the [guimenu]``Name`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.example.com``).
-* In the [guimenu]``File`` field, type the name of your configuration file *TODO: Check this* (for example: [systemitem]``branch1.txt``).
-. In the [guimenu]``Start of Authority (SOA)`` section, use these parameters for Zone1:
-* In the [guimenu]``Nameserver (Ns)`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.example.com``).
-* In the [guimenu]``Contact`` field, use the email address for the domain administrator.
-* Leave all other fields as their default values.
-. In the [guimenu]``Records`` section, click on btn:[Add Item] and use these parameters to set up an A record for Zone1:
-* In the [guimenu]``Hostname`` field, use the hostname of the branch server (for example: [systemitem]``branchserver``).
-* In the [guimenu]``IP`` field, use the IP address of the branch server (for example, [systemitem]``192.168.1.1``).
-. In the [guimenu]``Records`` section, click on btn:[Add Item] and use these parameters to set up an NS record for Zone1:
-* In the [guimenu]``Hostname`` field, use the hostname of the branch server (for example: [systemitem]``branchserver``).
-. In the [guimenu]``Common Name (CNAME) Records`` section, use these parameters:
-* In the [systemitem]``tftp`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-* In the [systemitem]``ftp`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-* In the [systemitem]``dns`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-* In the [systemitem]``dhcp`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-* In the [systemitem]``salt`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-. Set up Zone2 using the same parameters as for Zone1, but ensure you use the reverse  details.
-. Click btn:[Save Formula] to save your configuration.
+. Branch server configuration is performed using the [command]``retail_branch_init`` command:
++
+----
+retail_branch_init <branch_server_salt_id>
+----
++
+If you need to specify values for your architecture, use:
++
+----
+retail_branch_init <branch_server_salt_id> --dedicated-nic eth1 --branch-ip 192.168.10.1 --netmask 255.255.255.0 --dyn-range 192.168.10.50 192.168.10.100
+----
++
+You can use the [command]``retail_branch_init --help`` command for additional options.
+. Verify that your changes have been configured correctly by checking the {susemgr} {webui}.
