@@ -1,0 +1,163 @@
+= High Availability and {productname}
+include::entities.adoc[]
+
+== Overview
+
+In this guide you will use a KVM environment to setup {productname} on {sleha} using two nodes.
+You will also setup a third server to provide shared storage.
+
+This guide assumes basic {sleha} knowledge.
+For an overview and more information on {sleha} see: 
+
+https://www.suse.com/documentation/sle-ha-12/[{sleha} {sles-version} {sp-version} Documentation]
+
+.Storage-based Fencing
+NOTE: The STONITH(Shoot the other node in the head) Block Devices(SBD) will be set up on a shared storage server based on {sle}{nbsp}{sp-version} running an iSCSI target. The following sections will guide you through the setup of this device.
+
+[#iscsi-hardware-requirements]
+== Hardware Requirements
+
+The following section will cover setup of the iSCSI storage devices.
+
+[#storage-server-requirements]
+.Storage Server Disk Requirements
+|===
+| Location | Size
+
+| SBD device     | 100{nbsp}MB
+| /var/cache     | 25{nbsp}GB 
+| /var/lib/pgsql | 50{nbsp}GB
+| /var/spacewalk | 100{nbsp}GB (100{nbsp}GB for a test setup, a production setup will be greater than 500{nbsp}GB+)
+| /srv           | 10{nbsp}GB
+| other          | 100{nbsp}GB for all other required filesystems
+|===
+
+
+[#setup-the-iscsi-storage-server]
+== Setup the iSCSI Storage Server
+
+In this procedure you will setup the iSCSI Storage Server.
+From this point on we will call this server the **storage-commander**
+
+[#procedure-setup-the-storage-server]
+.Procedure: Setup the iSCSI Storage Server
+. Use KVM to setup a basic {sle}{nbsp}{sles-version}{nbsp}{sp-version} server.
+. Once the installation has completed, open a terminal as {ruser} and install the following iscsi server package:
++
+----
+zypper -n in yast2-iscsi-lio-server-3.2.1-1.23.noarch
+----
+
+. Prepare the image files:
++
+----
+dd if=/dev/zero of=c01-sbd.img bs=1M seek=100 count=0
+dd if=/dev/zero of=c01-spacewalk.img bs=1M seek=102400 count=0
+dd if=/dev/zero of=c01-srv.img bs=1M seek=10240 count=0
+dd if=/dev/zero of=c01-pgsql.img bs=1M seek=51200 count=0
+dd if=/dev/zero of=c01-cacherhn.img bs=1M seek=26200 count=0
+dd if=/dev/zero of=c01-others.img bs=1M seek=52200 count=0
+---- 
+
+. Run {yast} to setup the images:
++
+----
+yast iscsi-lio-server
+----
+
+
+== Setup Your Nodes
+
+In this procedure you will setup two {sleha} nodes.
+From this point on we will call these two servers  **node1** and **node2**.
+
+.Procedure: Prepare node1 and node2
+. Use {kvm} to install two {sle}{nbsp}{sles-version}{nbsp}{sp-version} systems with the following specs:
++
+[#node-server-requirements]
+.Node Server Requirements
+|===
+| Server | Disk Space
+
+| node1  | Minimum of 16 - 30{nbsp}GB (100{nbsp}GB if you are using btrfs)
+| node2  | Minimum of 16 - 30{nbsp}GB (100{nbsp}GB if you are using btrfs)
+|===
+
+. Install the SLE-HA pattern on both nodes:
++
+----
+zypper -n in -t ha-sles
+----
+
+. Configure watchdog:
+.. Create the file [filename]``/etc/modules-load.d/watchdog.conf``.
+.. Add the following snippet to the file:
++
+----
+softdog
+----
+
+.. Restart the service:
++
+----
+systemctl restart systemd-modules-load
+----
+
+.. Create the file [filename]``/etc/corosync/corosync.conf`` and add the following content:
++
+----
+totem {
+     crypto_hash:    none
+     rrp_mode:       none
+     join:   60
+     max_messages:   20
+     cluster_name:   c01 
+     vsftype:        none
+     secauth:        on
+     crypto_cipher:  none
+     consensus:      6000
+     interface {
+           bindnetaddr:    192.168.150.0 <1>
+           mcastaddr:      239.255.1.1
+           ringnumber:     0
+           mcastport:      5405
+           ttl:    1
+           }
+     token:  5000
+     version:        2
+     transport:      udp
+     token_retransmits_before_loss_const:    10
+     ip_version:     ipv4
+     clear_node_high_bit:    yes
+}
+logging {
+      to_logfile:     no
+      logger_subsys {
+           debug:  off
+           subsys: QUORUM
+      }
+      to_syslog:      yes
+      debug:  off
+      timestamp:      on
+      to_stderr:      no
+      fileline:       off
+      syslog_facility:        daemon
+}
+quorum {
+      expected_votes: 2
+      two_node:       1
+      provider:       corosync_votequorum
+}
+----
++
+<1> The **bindnetaddr** should be set to the correct network.
+
+. On **node1** generate a **corosync key**. To generate the key enter:
++
+----
+corosync-keygen
+---- 
++
+The file is generated and is placed in: [filename]``/etc/corosync/authkey``.
+
+. Now copy the key generated on **node1** over to **node2** and place it in: [filename]``/etc/corosync/authkey``.
