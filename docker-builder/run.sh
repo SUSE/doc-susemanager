@@ -17,10 +17,10 @@ make book-to-set
 ###################################
 
 # Create all Uyuni (Single HTML)
-make uyuni-html
+#make uyuni-html
 
 # Uyuni OBS Packages
-make uyuni-dist
+#make uyuni-dist
 
 
 
