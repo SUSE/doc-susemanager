@@ -25,28 +25,40 @@ xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.requirements[Proxy R
 
 .Central Server Requirements
 
-* {x86_64} processor
-* A minimum of 4{nbsp}GB hard disk space (recommended 15{nbsp}GB)
-* A minimum of 1{nbsp}GB RAM per CPU
-* Networking capability
-
+[cols="1,1", options="header"]
+.Hardware Requirements for Central Server
+|===
+| Hardware                 | Recommended
+| CPU                      | Multi-core 64-bit CPU
+| RAM:                     | _Test Server_ Minimum 8{nbsp}GB
+|                          | _Base Installation_ Minimum 16{nbsp}GB
+|                          | _Production Server_ Minimum 32{nbsp}GB
+| Disk Space:              | [path]``/`` _(root)_ 100{nbsp}GB
+|                          | [path]``/var/lib/pgsql`` Minimum 50{nbsp}GB
+|                          | [path]``/srv/`` 50{nbsp}GB (Minimum 2{nbsp}GB per OS image)
+|                          | [path]``/var/spacewalk`` Minimum 50{nbsp}GB per SUSE product and 250{nbsp}GB per Red Hat product
+|===
 
 .Build Host Requirements
 
-* {x86_64} processor
-* A minimum of 8{nbsp}GB hard disk space (recommended 25{nbsp}GB)
- terminals.
-* A minimum of 1{nbsp}GB RAM per CPU
-* Networking capability
+.Hardware Requirements for Build Host
+|===
+| Hardware                 | Recommended
+| CPU                      | Multi-core 64-bit CPU
+| RAM:                     | 4{nbsp}GB
+| Disk Space:              | [path]``/`` _(root)_ 50{nbsp}GB
+|===
 
 
 .Branch Server Requirements
 
-* {x86_64} processor
-* A minimum of 4{nbsp}GB hard disk space (recommended 10{nbsp}GB)
- terminals.
-* A minimum of 1{nbsp}GB RAM per CPU
-* Networking capability
+.Hardware Requirements for Branch Server
+|===
+| Hardware                 | Recommended
+| CPU                      | Multi-core 64-bit CPU
+| RAM:                     | 8{nbsp}GB
+| Disk Space:              | [path]``/`` _(root)_ 100{nbsp}GB (Minimum 50{nbsp}GB per SUSE product and 2{nbsp}GB per OS image)
+|===
 
 
 .Network Requirements
@@ -62,13 +74,18 @@ xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.requirements[Proxy R
 [[retail.sect.running.install]]
 == Installation
 
-Most {smr} installations require several steps:
+{smr} can be installed in various ways depending on individual needs.
+We recommend these steps:
 
-. Install the central server
-. Configure the central server
-. Install the {smr} pattern on the central server
-. Install the build host and register it to {susemgr}
-. Configure the build host
+. Install the Central Server
+. Configure the Central Server
+. Install the {smr} pattern on the Central Server
+. Install the Build Host and register it to {susemgr}
+. Configure the Build Host
+. Create required system group
+
+Branch server installation steps:
+
 . Install the branch server and register it to {susemgr}
 . Assign and configure branch server formulas
 
@@ -79,10 +96,52 @@ Each procedure is detailed in this section.
 === Procedure Install the Central Server
 
 For instructions to install {susemgr}, see the xref:quickstart3_chap_install_overview.adoc[{susemgr} Getting Started Guide].
+[WARNING]
+.Do Not Enable PXE Boot
+====
+Do not enable PXE boot functionality on the {susemgrproxy} during initial setup.
+This functionality will be installed later, after the initial setup.
+====
 
-{smr} uses formulas to simplify configuration, which are installed as RPM packages.
 
-. Check that you have these packages installed and available, after installing {susemgr}:
+
+=== Procedure Configure the Central Server
+
+Available SUSE channels are essential for functional image building as well as day-to-day operations.
+Make sure all the required channels are synchronized.
+For instructions see the xref:command-line-tools.adoc[Syncing {susemgr} Repositories from SCC (mgr-sync)].
+
+Channel overview required for {smr} functionality:
+----
+- SLES 12 SP3 (SP4 in the future) as a base
+  - SLES Pool
+    - SLES Update
+- SUSE Manager 3.2 Tools
+  - SUSE Manager 3.2 Tools Pool
+    - SUSE Manager 3.2 Tools Update
+- SUSE Manager 3.2 Proxy
+  - SUSE Manager 3.2 Proxy Pool
+    - SUSE Manager 3.2 Proxy Update
+- SUSE Manager 3.2 Proxy for Retail
+  - SUSE Manager 3.2 Proxy for Retail Pool
+    - SUSE Manager 3.2 Proxy for Retail Update
+----
+
+After you have synchronized the required SUSE channels, create channels for custom software.
+Channels are used to provide custom software for OS image building.
+For instructions see the xref:reference-webui-channels.adoc[Software Channels Reference]
+
+
+
+=== Procedure Install the {smr} pattern on the Central Server
+
+. Install the [package]``SUSE Manager for Retail`` pattern on the Central Server:
++
+----
+zypper in -t pattern suma_retail
+----
+
+. Check that you have these packages installed and available, after installing {susemgr} and {smr} pattern:
 
 * bind-formula
 * branch-network-formula
@@ -104,22 +163,6 @@ zypper install package_name
 salt-run fileserver.update
 salt '*' saltutil.sync_all
 ----
-. Grant the Salt API access to the central server, by opening the [filename]``/etc/salt/master.d/spacewalk.conf`` file in your preferred text editor, and adding your administration credentials in the [systemitem]``spacewalk`` section:
-+
-----
-spacewalk:
-    localhost:
-        username: $administration_user
-        password: $administration_password
-----
-+
-[IMPORTANT]
-====
-We recommend that do not put your master {susemgr} administration credentials in plain text in the configuration file.
-Instead, use the credentials for an administration account for any organization.
-This allows you to more easily change the password, should it become compromised.
-====
-
 . Restart the salt master service to pick up the changes:
 +
 ----
@@ -130,49 +173,19 @@ systemctl restart salt-master
 
 
 
-=== Procedure Configure the central server
-
-Default formulas are supplied with {smr} and can be installed as RPM packages.
-
-. Formula RPMs are provided as part of the {susemgr} installation process.
-Save the formula custom states to [path]``/srv/salt/formula-name/``.
-Save the metadata files ([path]``form.yaml`` and [path]``metadata.yml``) to [path]``/srv/formula_metadata/formula-name/``.
-. Check that your formula has been installed correctly.
-In the {susemgr} {webui}, navigate to menu:Salt[Formula Catalog] and check that the required formula appears in the list.
-. Open the details page for the group or system you want to apply the formula to, and navigate to the [guimenu]``Formulas`` tab.
-. Select the formulas you want to apply to the group or system and click btn:[Save] to save your changes.
-
-After applying one or more formulas to a group or system, additional tabs will become available from the top menu, one for each formula selected.
-These tabs give you specific configuration options for each formula.
-
-When you have finished customizing your formula values you will need to apply highstate for them to take effect.
-Do this by clicking btn:[Apply Highstate] from any formulas page.
-Applying highstate will execute the state associated with the formula and configure the affected systems.
-
-If you need to change any values, or re-apply formulas because of a failure, make the changes in the [guimenu]``Formulas`` tab, save your changes, and re-apply the highstate.
-Salt will ensure that only modified values are adjusted and restart or reinstall services only when necessary.
-
-For additional information about Salt formulas, see: https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
-
-
-
-=== Procedure Install the {smr} pattern on the central server
-
-. Install the [package]``SUSE Manager for Retail`` pattern on the central server:
-+
-----
-zypper in -t pattern suma_retail
-----
-
-
-
-=== Procedure Install the build host and register it to {susemgr}
+=== Procedure Install the Build Host and register it to {susemgr}
 
 Your build host should be a Salt minion, running {sls}{nbsp}12 SP3.
-See [quickstart3_chap_suma_keys_and_first_clients.adoc] for instructions to install Salt minions and register them to {susemgr}.
+For instructions to install Salt minion see xref:quickstart3_chap_suma_keys_and_first_client.adoc[Registering Clients].
+
+[WARNING]
+====
+Do not install the Build Host as a traditionally managed client.
+====
 
 
-=== Procedure Configure the build host
+
+=== Procedure Configure the Build Host
 
 The build host must be set as an OS Image build host in the {susemgr} {webui}, and highstate applied.
 
@@ -181,83 +194,59 @@ Locate the system to be made a build host, and click on its name.
 . In the [guimenu]``System Properties`` window, click btn:[Edit These Properties].
 . In the [guimenu]``Edit System Details`` window, ensure the [guimenu]``OS Image Build Host`` option is checked, and click btn:[Update Properties] to save your changes.
 . Select the [guimenu]``States`` tab, and navigate to the [guimenu]``Highstate`` window.
-. Click btn:[Apply Highstate] to save your changes.
+. In the [guimenu]``States`` tab, click btn:[Apply Highstate].
+
+[IMPORTANT]
+====
+Check that the Build Host has following packages installed after Highstate run:
+
+- kiwi
+- kiwi-desc-saltboot
+
+If any package is missing, make sure ``SUSE Manager 3.2 Tools`` repository is available on the Build Host and install packages manually using ``zypper install`` command.
+====
+
+
+
+=== Procedure Create required system group
+
+When you register terminals, {smr} requires a system group called [systemitem]``Terminals``.
+The [systemitem]``Terminals`` system group needs to be manually created during installation.
+For instructions on how to create system groups, see xref:reference-webui-systems.adoc#ref.webui.systems.systemgroups[System groups reference]
 
 
 
 === Procedure Install the branch server and register it to {susemgr}
 
 Your branch server should be installed as a default Salt-based client ("minion"), running {susemgrproxy} 3.2.
-Do not install it as a traditionally managed client.
-
-[WARNING]
-.Do Not Enable PXE Boot
-====
-Do not enable PXE boot functionality on the {susemgrproxy} during initial setup.
-This functionality will be installed later, after the initial setup.
-====
-
-
-[IMPORTANT]
-====
-First completely download the channels and then create the activation key.
-Only then you can select the correct child channels.
-Here is a channel overview for {susemgrproxy}:
-----
-- SLES 12 SP3 (SP4 in the future) as a base
-  - SLES Pool
-    - SLES Update
-- SUSE Manager 3.2 Proxy
-  - SUSE Manager 3.2 Proxy Pool
-    - SUSE Manager 3.2 Proxy Update
-- SUSE Manager 3.2 Proxy for Retail
-  - SUSE Manager 3.2 Proxy for Retail Pool
-    - SUSE Manager 3.2 Proxy for Retail Update
-----
-====
 
 For instructions to install Salt-based proxy minions and register them to {susemgr}, see xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.inst[{susemgr} Advanced Topics].
 
 
 For mass deployments, see xref:#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration].
 
+[WARNING]
+====
+Do not install the branch server as a traditionally managed client.
+====
+
 
 
 === Procedure Assign and configure branch server formulas
 
-Before you configure the branch server formulas, ensure you have configured networking, and know the subdomain name and IP address of the branch server.
+Before you configure the branch server formulas, ensure you have configured networking, and know the Salt ID of the branch server.
 
-[IMPORTANT]
-====
-Check each formula to ensure the values are appropriate for your environment.
-Note that these instructions will vary depending on your network architecture.
-====
-
-. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. Check the [systemitem]``bind`` formula, and click btn:[Save].
-. Navigate to the menu:Formulas[Bind] tab, and set these parameters for Zone1:
-* In the [guimenu]``Name`` field, use the fully qualified domain name (FQDN) of the  branch server (for example: [systemitem]``branch1.example.com``).
-* In the [guimenu]``Type`` field, select [systemitem]``master``.
-. Click btn:[Add item], and set these parameters for Zone2:
-* In the [guimenu]``Name`` field, use the reverse zone for the configured IP range (for example: [systemitem]``1.168.192.in-addr.arpa``).
-* In the [guimenu]``Type`` field, select [systemitem]``master``.
-. In the [guimenu]``Available Zones`` section, use these parameters for Zone1:
-* In the [guimenu]``Name`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.example.com``).
-* In the [guimenu]``File`` field, type the name of your configuration file *TODO: Check this* (for example: [systemitem]``branch1.txt``).
-. In the [guimenu]``Start of Authority (SOA)`` section, use these parameters for Zone1:
-* In the [guimenu]``Nameserver (Ns)`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.example.com``).
-* In the [guimenu]``Contact`` field, use the email address for the domain administrator.
-* Leave all other fields as their default values.
-. In the [guimenu]``Records`` section, click on btn:[Add Item] and use these parameters to set up an A record for Zone1:
-* In the [guimenu]``Hostname`` field, use the hostname of the branch server (for example: [systemitem]``branchserver``).
-* In the [guimenu]``IP`` field, use the IP address of the branch server (for example, [systemitem]``192.168.1.1``).
-. In the [guimenu]``Records`` section, click on btn:[Add Item] and use these parameters to set up an NS record for Zone1:
-* In the [guimenu]``Hostname`` field, use the hostname of the branch server (for example: [systemitem]``branchserver``).
-. In the [guimenu]``Common Name (CNAME) Records`` section, use these parameters:
-* In the [systemitem]``tftp`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-* In the [systemitem]``ftp`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-* In the [systemitem]``dns`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-* In the [systemitem]``dhcp`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-* In the [systemitem]``salt`` section, use the use the FQDN of the  branch server, ending with a period (for example: [systemitem]``branchserver.branch1.example.com.``).
-. Set up Zone2 using the same parameters as for Zone1, but ensure you use the reverse  details.
-. Click btn:[Save Formula] to save your configuration.
+. Branch server configuration is performed using the [command]``retail_branch_init`` command:
++
+----
+retail_branch_init <branch_server_salt_id>
+----
++
+If you need to specify values for your architecture, use:
++
+----
+retail_branch_init <branch_server_salt_id> --dedicated-nic eth1 --branch-ip 192.168.10.1 --netmask 255.255.255.0 --dyn-range 192.168.10.50 192.168.10.100
+----
++
+You can use the [command]``retail_branch_init --help`` command for additional options.
+. Verify that your changes have been configured correctly by checking the {susemgr} {webui}.
