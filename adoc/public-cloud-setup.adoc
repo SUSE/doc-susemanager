@@ -23,11 +23,15 @@ Select an instance size that meets the system requirements as documented in the 
 * {productname} Server and {productname} Proxy instances are expected to run in a network configuration that provides you control over DNS entries and that is shielded from the Internet at large. Within this network configuration DNS (Domain Name Service) resolution must be provided, such that `hostname -f` returns the FQDN (Full Qualified Domain Name). The DNS resolution is not only important for the {productname} Server procedure but is also important when clients are configured to be managed via {productname}. Configuring DNS is Cloud Framework dependent, please refer to the cloud service provider documentation for detailed instructions.
 * Minimal free disk space for {productname} 15G.
 +
-For Public Cloud instances we recommend that the repositories and the {productname} Server database, and respectively the {productname} Proxy squid cache, be located on an external virtual disk.
+For Public Cloud instances we recommend that the repositories and the {productname} Server database, be located on an external virtual disk.
 The details for this setup are provided in <<using-separate-storage-volume>>.
 +
 Storing the database and the repositories on an external virtual disk ensures that the data is not lost should the instance need to be terminated for some reason.
-
+[TIP]
+.Storage for Proxy Data
+====
+{suse} recommends storing the squid proxy caching data on a separate disk formatted with the XFS file system.
+====
 
 Please ensure that the selected instance type matches the requirements listed above.
 Although we recommend that the database and the repositories are stored on a separate device it is still recommended to set the root volume size of the instance to 20G.
@@ -169,7 +173,6 @@ file that contains the *susecloud.net* reference.
 +
 Launch the instance, optionally with external storage configured.
 If you use external storage (recommended), prepare it according to <<using-separate-storage-volume>>.
-It is recommended but not required to prepare the storage before configuring {productname} proxy, as the suma-storage script will migrate any existing cached data to the external storage.
 After preparing the instance, register the system with the parent SUSE Manager, which could be a {productname} Server or another {productname} Proxy.
 See the https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_proxyquick/book_susemanager_proxyquick.html[ SUSE Manager Proxy Setup guide] for details.
 Once registered, run
@@ -261,7 +264,6 @@ $ /usr/bin/suma-storage /dev/sdb
 ----
 +
 After the call all database and repository files used by SUSE Manager Server are moved to the newly created xfs based storage.
-In case your instance is a {productname} Proxy, the script will move the Squid cache, which caches the software packages, to the newly created storage.
 The xfs partition is mounted below the path [path]``/manager_storage``.
 .
 . Create an entry in /etc/fstab (optional)
