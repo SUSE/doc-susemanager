@@ -19,15 +19,17 @@
    keeping existing deployments intact. </para>
  </sect1>
  <sect1 xml:id="create.act.keys">
-  <title>Creating Your Keys</title>
+  <title>Creating Activation Keys</title>
 
-  <para> The following procedure will guide you through creating the activation keys for your test
-   channels. Activation keys can be used for both Salt and traditional clients. </para>
-
-  <para> Activation keys define the number of software entitlements, channels, and groups a client
-   system is allowed to subscribe to. This information is passed on to all systems registered with a
-   key. Each activation key is bound to the organization for which it has been created. Activation
-   keys may be used with traditional clients or with Salt clients. </para>
+  <para>Activation keys are used with both traditional and Salt clients
+  to ensure that your clients have the correct software entitlements,
+  are connecting to the appropriate channels, and are subscribed to the
+  relevant groups.  Each activation key is bound to an orgnization,
+  which you can set when you create the key.</para>
+  
+  <para>This section contains information on how to create activation
+  keys for both traditional and Salt clients, and provides some best
+  practices for working with activation keys.</para>
 
   <procedure xml:id="create.activation.keys">
    <title>Creating Activation Keys</title>
@@ -62,8 +64,10 @@
      the key. </para>
     <warning>
      <title>Allowed Characters</title>
-     <para> For all &suse; Products do not use commas within the key string. Red Hat Products
-      require commas. For more information, see <xref linkend="ref.webui.systems.activ-keys"/>.
+     <para>Do not use commas in the <guimenu>Key</guimenu> field for any
+     &suse; products.  However, you <emphasis>must</emphasis> use commas
+     for Red Hat Products. For more information, see <xref
+     linkend="ref.webui.systems.activ-keys"/>.
       <!-- was: Activation
                     Keys and rhnreg_ks: Reference Guide -->
      </para>
@@ -85,7 +89,46 @@
       Key</guimenu> to finish creating the key for the first channel. </para>
    </step>
   </procedure>
- </sect1>
+  <para>When you create activation keys, keep these best practices in mind:</para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     Avoid using the <systemitem>SUSE Manager Default</systemitem>
+     parent channel.  This setting forces {productname} to choose a
+     parent channel that best corresponds to the installed operating
+     system, which can sometimes lead to unexpected behavior.  Instead,
+     &suse; recommends you create activation keys specific to each
+     distribution and architecture.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     If you are using bootstrap scripts, consider creating an activation
+     key for each script.  This will help you align channel assignments,
+     package installation, system group memberships, and configuration
+     channel assignments.  You will also need less manual interaction
+     with your system after registration.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     If you do not enter a human-readable name for your activation keys,
+     the system will automatically generate a number string, which can
+     make it difficult to manage your keys.  Consider a naming scheme
+     for your activation keys to help you keep track of them.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     Note that the <guimenu>Configuration File Deployment</guimenu>
+     check box does not appear until after you have created the
+     activation key.  Ensure you go back and check the box if you need
+     to enable configuration management.
+    </para>
+   </listitem>
+  </itemizedlist>
+  
+</sect1>
  <sect1 xml:id="create.tools.repository">
   <title>Creating the &susemgr; Tools Repository</title>
 
@@ -314,14 +357,34 @@ ORG_GPG_KEY=</screen>
  <sect1 xml:id="preparing.and.registering.clients.salt">
   <title>Registering Salt Clients</title>
 
-  <para> There are currently three methods for registering Salt minions. The following section
-   describes the first method and uses a bootstrap repository. The second method is to create a
-   bootstrap script using <command>mgr-bootstrap</command>. Bootstrapping Salt minions with
-    <command>mgr-bootstrap</command> is performed in the same manner as bootstrapping traditional
-   clients; for more information, see <xref linkend="registering.clients.traditional"/>. The third
-   method is performed from the &susemgr; &webui;; find this method located in <xref
-    linkend="ref.webui.systems.bootstrapping"/>. </para>
-
+  <para> There are currently three methods for registering Salt
+  minions:</para>
+  <itemizedlist>
+   <listitem>
+    <para>
+     The following section describes the first method and uses a
+     bootstrap repository.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The second method is to create a bootstrap script with the
+     <command>mgr-bootstrap</command> commandline tool or using the
+     &webui;.  Make sure that the <guimenu>Bootstrap using
+     Salt</guimenu> option is properly checked.  Then bootstrapping Salt
+     minions with a bootstrap script is performed in the same manner as
+     bootstrapping traditional clients&mdash;for more information, see
+     <xref linkend="registering.clients.traditional"/>.
+    </para>
+   </listitem>
+   <listitem>
+    <para>
+     The third method is performed from the &susemgr; &webui;; find this
+     method located in <xref
+     linkend="ref.webui.systems.bootstrapping"/>. </para>
+   </listitem>
+  </itemizedlist>
+  
   <important>
    <title>Deprecation Warning</title>
    <para> The <command>mgr-bootstrap --salt</command> option will be deprecated as of SUSE Manager
@@ -338,7 +401,7 @@ ORG_GPG_KEY=</screen>
     In the following rare scenario: </para>
    <itemizedlist>
     <listitem>
-     <para> The Salt master(SUSE Manager) is in some DNS. </para>
+     <para> The Salt master (SUSE Manager) is in some DNS. </para>
     </listitem>
     <listitem>
      <para> Your Minions are in a different subnet bound to an alternate DNS and the Salt master
