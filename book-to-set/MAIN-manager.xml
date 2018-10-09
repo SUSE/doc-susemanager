@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>SUSE Manager Documentation</title>
-<date>2018-09-25</date>
+<date>2018-10-04</date>
 </info>
 <part xml:id="book.suma.getting-started">
 <title>Getting Started</title>
@@ -47,56 +47,6 @@ This book will guide you through an initial proof-of-concept setup, using these 
 </listitem>
 <listitem>
 <simpara>Register a Salt minion</simpara>
-</listitem>
-</orderedlist>
-<formalpara role="tour">
-<title>Procedure: Tour Guide</title>
-<para>Make an introduction paragraph first</para>
-</formalpara>
-<orderedlist numeration="arabic">
-<listitem>
-<simpara>First Task</simpara>
-<informalexample>
-<simpara>This is all the text which will be highlighted in step 1 with a popup with text Tjos is only a tooltip!</simpara>
-</informalexample>
-</listitem>
-<listitem>
-<simpara>Second task</simpara>
-<informalexample>
-<simpara>You may use complex content:</simpara>
-<itemizedlist>
-<listitem>
-<simpara>yes</simpara>
-</listitem>
-<listitem>
-<simpara>no</simpara>
-</listitem>
-</itemizedlist>
-</informalexample>
-</listitem>
-</orderedlist>
-<simpara>Intro paragraph here.</simpara>
-<orderedlist numeration="arabic">
-<listitem>
-<simpara>Step 1</simpara>
-</listitem>
-<listitem>
-<simpara>Step 2</simpara>
-</listitem>
-<listitem>
-<simpara>Step 3</simpara>
-</listitem>
-</orderedlist>
-<simpara>Intro paragraph</simpara>
-<orderedlist numeration="arabic">
-<listitem>
-<simpara>Step 1</simpara>
-</listitem>
-<listitem>
-<simpara>Step 2</simpara>
-</listitem>
-<listitem>
-<simpara>Step 3</simpara>
 </listitem>
 </orderedlist>
 </section>
@@ -811,6 +761,12 @@ You will perform the following procedures:</simpara>
 </section>
 <section xml:id="suma-setup-with-yast-sumasetup">
 <title>SUSE Manager Setup</title>
+<warning>
+<title>Third Party Software</title>
+<simpara>SUSE Manager is an extension of SUSE Linux Enterprise Server and compatible with the software shipped with SUSE Linux Enterprise Server.</simpara>
+<simpara>SUSE Manager is a complex system, and therefore installing third party is not allowed. Installing monitoring software provided by a third party vendor is allowed only if you do not exchange basic libraries such as SSL, cryptographic software, and similar tools.
+In case of emergency, SUSE reserves the right to ask to remove any third party software (and associated configuration changes) and then to reproduce the problem on a clean system.</simpara>
+</warning>
 <simpara>This section will guide you through SUSE Manager setup procedures.</simpara>
 <orderedlist numeration="arabic">
 <title>Procedure: SUSE Manager Setup</title>
@@ -995,36 +951,31 @@ To update the grub2 during boot run <literal role="command">grub2-install /dev/s
 <title>Registering Clients</title>
 <section xml:id="_introduction">
 <title>Introduction</title>
-<simpara>Releases prior to SUSE Manager 2.1 were shipped with a <emphasis role="strong">traditional</emphasis> client management framework (which is still fully supported today).
-SUSE Manager 3 and later include the Salt framework in addition to the <emphasis role="strong">traditional</emphasis> framework.</simpara>
+<simpara>For SUSE Manager&#160;3 and later, you can choose to use either traditional or Salt client management framework, or a mixture of both, depending on your environment and requirements.</simpara>
 <variablelist>
 <varlistentry>
 <term>Salt</term>
 <listitem>
-<simpara>Is an end-to-end data-center automation tool which may also be used outside the scope of SUSE Manager to introduce reactive, real-time orchestration, and configuration management.
-Managed systems can coexist using both <emphasis role="strong">traditional</emphasis> and <emphasis role="strong">Salt</emphasis> frameworks.
-This functionality provides a safe learning environment when switching to <emphasis role="strong">Salt</emphasis> while you continue to maintain existing deployments.</simpara>
+<simpara>Is an end-to-end data-center automation tool which may also be used outside the scope of SUSE Manager to introduce reactive, real-time orchestration, and configuration management.</simpara>
 </listitem>
 </varlistentry>
 </variablelist>
 </section>
 <section xml:id="create.act.keys">
 <title>Creating Activation Keys</title>
-<simpara>The following procedure will guide you through creating the activation keys for your test channels.
-Activation keys can be used with both Salt and traditional clients.</simpara>
-<simpara>Activation keys define the number of software entitlements, channels, and groups a client system is allowed to subscribe to.
-This information is passed on to all systems registered with said key.
-Each activation key is bound to the organization for which it has been created.</simpara>
+<simpara>Activation keys are used with both traditional and Salt clients to ensure that your clients have the correct software entitlements, are connecting to the appropriate channels, and are subscribed to the relevant groups.
+Each activation key is bound to an orgnization, which you can set when you create the key.</simpara>
+<simpara>This section contains information on how to create activation keys for both traditional and Salt clients, and provides some best practices for working with activation keys.</simpara>
 <orderedlist xml:id="create.activation.keys" numeration="arabic">
 <title>Procedure: Creating Activation Keys</title>
 <listitem>
 <simpara>As the administrator login to the SUSE Manager Web UI.</simpara>
 </listitem>
 <listitem>
-<simpara>Switch to <menuchoice><guimenu>Systems</guimenu> <guimenuitem>Activation Keys</guimenuitem></menuchoice>.</simpara>
+<simpara>Navigate to <menuchoice><guimenu>Systems</guimenu> <guimenuitem>Activation Keys</guimenuitem></menuchoice>.</simpara>
 </listitem>
 <listitem>
-<simpara>Click the <guibutton>Create Key</guibutton> link at the upper right corner.</simpara>
+<simpara>Click the <guibutton>Create Key</guibutton> button in the upper right corner.</simpara>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -1035,30 +986,55 @@ Each activation key is bound to the organization for which it has been created.<
 </informalfigure>
 </listitem>
 <listitem>
-<simpara>Enter an <menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Description</guimenuitem></menuchoice> to identify the generated activation key.</simpara>
+<simpara>In the <literal role="guimenu">Description</literal> field, enter a name for the activation key.</simpara>
 </listitem>
 <listitem>
-<simpara>Enter a human readable <menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Key</guimenuitem></menuchoice> string value such as <emphasis role="strong">SLES12-SP3</emphasis> to represent the distribution and service pack associated with the key.</simpara>
+<simpara>In the <literal role="guimenu">Key</literal> field, enter the distribution and service pack associated with the key. For example, <literal>SLES12-SP3</literal> for SUSE Linux Enterprise Server&#160;12&#160;SP3.</simpara>
 <warning>
 <title>Allowed Characters</title>
-<simpara>For all SUSE
-Products do not use commas within the key string.
-Red Hat Products require commas.
+<simpara>Do not use commas in the <literal role="guimenu">Key</literal> field for any SUSE products.
+However, you <emphasis role="strong">must</emphasis> use commas for Red Hat Products.
 For more information, see <xref linkend="ref.webui.systems.activ-keys"/>.</simpara>
 </warning>
 </listitem>
 <listitem>
-<simpara>Select the SUSE Linux Enterprise channel that was added during
-<link xl:href="proc-quickstart-first-channel-sync.xml#proc-quickstart-first-channel-sync">First Channel Sync</link>
-from the <menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Base Channels</guimenuitem></menuchoice> drop down.</simpara>
+<simpara>In the <literal role="guimenu">Base Channels</literal> drop-down box, select the SUSE Linux Enterprise channel that you added during
+<link xl:href="proc-quickstart-first-channel-sync.xml#proc-quickstart-first-channel-sync">First Channel Sync</link></simpara>
 </listitem>
 <listitem>
-<simpara>For this guide leave <menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Contact Method</guimenuitem></menuchoice> set to default.</simpara>
+<simpara>We recommend you leave the <literal role="guimenu">Contact Method</literal> set to <literal role="guimenu">Default</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara><menuchoice><guimenu>Activation Key Details</guimenu> <guimenuitem>Universal Default</guimenuitem></menuchoice> should remain unchecked. Click <guibutton>Update Activation Key</guibutton> to complete creation of the activation key.</simpara>
+<simpara>We recommend you leave the <literal role="guimenu">Universal Default</literal> setting unchecked.</simpara>
+</listitem>
+<listitem>
+<simpara>Click <guibutton>Update Activation Key</guibutton> to create the activation key.</simpara>
+</listitem>
+<listitem>
+<simpara>Check the <literal role="guimenu">Configuration File Deployment</literal> check box to enable configuration management for this key, and click <guibutton>Update Activation Key</guibutton> to save this change.</simpara>
 </listitem>
 </orderedlist>
+<simpara>When you create activation keys, keep these best practices in mind:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Avoid using the <literal role="systemitem">SUSE Manager Default</literal> parent channel.
+This setting forces SUSE Manager to choose a parent channel that best corresponds to the installed operating system, which can sometimes lead to unexpected behavior.
+Instead, we recommend you create activation keys specific to each distribution and architecture.</simpara>
+</listitem>
+<listitem>
+<simpara>If you are using bootstrap scripts, consider creating an activation key for each script.
+This will help you align channel assignments, package installation, system group memberships, and configuration channel assignments.
+You will also need less manual interaction with your system after registration.</simpara>
+</listitem>
+<listitem>
+<simpara>If you do not enter a human-readable name for your activation keys, the system will automatically generate a number string, which can make it difficult to manage your keys.
+Consider a naming scheme for your activation keys to help you keep track of them.</simpara>
+</listitem>
+<listitem>
+<simpara>Note that the <literal role="guimenu">Configuration File Deployment</literal> check box does not appear until after you have created the activation key.
+Ensure you go back and check the box if you need to enable configuration management.</simpara>
+</listitem>
+</itemizedlist>
 </section>
 <section xml:id="create.tools.repository">
 <title>Creating the SUSE Manager Tools Repository</title>
@@ -1096,8 +1072,7 @@ In the following example replace <literal role="replaceable">version</literal> w
 <simpara>SUSE Manager will create and add the client tools to the newly created <literal role="path">repositories</literal> directory located at <literal role="path">/srv/www/htdocs/pub/repositories/</literal> .</simpara>
 </listitem>
 </orderedlist>
-<simpara>This repository is suitable for both Server and Desktop of SUSE Linux Enterprise
-.</simpara>
+<simpara>This repository is suitable for both Server and Desktop of SUSE Linux Enterprise.</simpara>
 </section>
 <section xml:id="registering.clients.traditional">
 <title>Registering Traditional Clients</title>
@@ -1177,7 +1152,7 @@ cp bootstrap.sh bootstrap-sles12.sh</screen>
 <listitem>
 <simpara>Open <literal role="path">sles12.sh</literal> for modification.
 Scroll down and modify both lines marked in green.
-You must comment out <literal>exit 1</literal> with a hash mark (<literal>\#</literal>) to activate the script and then enter the name of the key for this script in the <literal>ACTIVATION_KEYS=</literal> field as follows:</simpara>
+You must comment out <literal>exit 1</literal> with a hash mark (<literal>#</literal>) to activate the script and then enter the name of the key for this script in the <literal>ACTIVATION_KEYS=</literal> field as follows:</simpara>
 <screen>echo "Enable this script: comment (with #'s) this block (or, at least just"
 echo "the exit below)"
 echo
