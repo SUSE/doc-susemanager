@@ -5,109 +5,219 @@ include::entities.adoc[]
 
 
 This section provides an introduction to Salt Formulas shipped with {smr}.
-These formulas such as the PXE boot, branch server network, or saltboot formulas are used to fine-tune the {smr} infrastructure.
+These formulas such as the PXE boot, branch server network, or bind formulas are used to fine-tune the {smr} infrastructure.
 
 .Salt State Name Clashes
-[IMPORTANT]
+[WARNING]
 ====
 If a Salt Formula uses the same name as an existing Salt State, the two names will collide, and could result in the formula being used instead of the state.
 Always check states and formulas to avoid name clashes.
 ====
 
-
-
-[[retail.formulas.pxe]]
-== Pxe Formula
-The Pxe formula ([package]``pxe-formula``) for installing, setting up, and uninstalling syslinux PXE boot on the POS branchserver.
-
-.pxe formula
-[[fig-formula-pxe]]
-image::formula-pxe.png[]
-
-////
-Kernel filename:
-Initrd filename:
-Kernel commandline parameters:
-PXE root directory:
-Branch id:
-////
-
-
-
 [[retail.formulas.branch-network]]
-== Branch Network Formula
+== Branch Server network configuration using Branch Network Formula
 
 The Branch Network formula ([package]``branch-network-formula``) for configuring the branch server network.
 
-
-.branch network formula
-[[fig-formula-branch-network]]
-image::formula-branch-network.png[]
-
-
-////
-Dedicated Nic:
-Nic:
-Ip:
-Netmask:
-Enable Route:
-Enable Nat:
-Forwarder:
-Forwarder Fallback:
-server directory:
-server directory user:
-server directory group:
-////
-
-
-[[retail.formulas.saltboot]]
-== Saltboot Formula
-
-The Saltboot formula ([package]``saltboot-formula``) is a formula for configuring a boot image of a POS terminal.
-
-
-.saltboot formula
-[[fig-formula-saltboot-01]]
-image::formula-saltboot-01.png[]
-
-Then you configure one or more partitions:
-
-.saltboot formula partitions
-[[fig-formula-saltboot-02]]
-image::formula-saltboot-02.png[]
-
-
-////
-////
-
-
-[[retail.formulas.image-sync]]
-== Image Sync Formula
-
-The Image Sync formula ([package]``image-sync-formula``) is a formula for syncing images to a Branch Server.
-
-For now, there is nothing configurable and it is not part of the highstate.
-This means it is not visible in the {webui}.  Apply it from the command-line or via cron as follows (replace _<branchserver>_ with the name of your branch server):
-
-----
-salt <branchserver> state.apply image-sync
-----
-
-// Related issue: https://github.com/SUSE/spacewalk/issues/2714
+The branch server can be configured to use networking in many different ways.
+The most common ways provide either a dedicated or shared LAN for terminals.
 
 
 
-////
-.saltboot formula
-[[fig-formula-saltboot-01]]
-image::formula-saltboot-01.png[]
+=== Procedure Set up a Branch Server with a dedicated LAN
 
-Then you configure one or more partitions:
+In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the central server, and the other one acts as an isolated LAN to communicate with terminals.
 
-.saltboot formula partitions
-[[fig-formula-saltboot-02]]
-image::formula-saltboot-02.png[]
-////
+This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
 
-////
-////
+.Configuration of Branch Network formula to use dedicated network interface card
+====
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
+. In the [guimenu]``Branch Network`` section, set these parameters:
+* Keep [guimenu]``Dedicated NIC`` checked
+* In the [guimenu]``NIC`` field, enter the name of the network device that is connected to the internal LAN (for example: [systemitem]``eth1``)
+* In the [guimenu]``IP`` field, enter the static IP address to be assigned to the branch server on the internal LAN (for example: [systemitem]``192.168.1.1``)
+* In the [guimenu]``Netmask`` field, enter the network mask of the internal LAN (for example: [systemitem]``255.255.255.0``)
+* Check [guimenu]``Configure Firewall`` checkbox to configure firewall, network address translation and routing
+. In the [guimenu]``Firewall`` section, set these parameters:
+* Check [guimenu]``Enable Route`` if you want the branch server to route traffic from internal LAN to WAN.
+* Check [guimenu]``Enable NAT`` if you want the branch server to convert addresses from internal LAN to WAN.
+* Keep rest of the checkboxes checked to allow branch server act as a {susemgr} Proxy
+. Select the [guimenu]``Forwarder`` to be [systemitem]``bind``.
+. Check [guimenu]``Forwarder Fallback`` if you want to rely on an external DNS if the branch DNS fails.
+. In the [guimenu]``Server Directory`` field, keep default value [systemitem]``/srv/saltboot``
+. In the [guimenu]``Server Directory User`` field, keep default value [systemitem]``saltboot``
+. In the [guimenu]``Server Directory Group`` field, keep default value [systemitem]``saltboot``
+. Click [btn]``Save Formula`` to save your configuration
+. Apply the hightstate.
+====
+
+
+
+=== Procedure Set up a Branch Server with a shared network
+
+In this configuration, the branch server has only one network interface card which is used to connect to the central server as well as the terminals.
+
+This configuration allows for the branch server to provide DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
+Optionally, the branch server can also provide DHCP services in this configuration.
+
+[NOTE]
+====
+If DHCP services are not provided by the branch server, ensure that your external DHCP configuration is set correctly:
+
+* The [systemitem]``next-server`` option must point to the branch server for PXE boot to work
+* The [systemitem]``filename`` option must correctly identify the network boot program (by default, this is [path]``/boot/pxelinux``)
+* The [systemitem]``domain-name-servers`` option must point to the branch server for correct host name resolution
+====
+
+.Configuration of Branch Network formula to use one network interface card and shared network
+====
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
+. In the [guimenu]``Branch Network`` section, set these parameters:
+* Keep [guimenu]``Dedicated NIC`` unchecked
+* Check [guimenu]``Configure Firewall`` checkbox to configure firewall, network address translation and routing
+. In the [guimenu]``Firewall`` section, set these parameters:
+* Enable checkboxes of the services available on branch server
+. Select the [guimenu]``Forwarder`` to be [systemitem]``bind``.
+. Check [guimenu]``Forwarder Fallback`` if you want to rely on an external DNS if the branch DNS fails.
+. In the [guimenu]``Server Directory`` field, keep default value [systemitem]``/srv/saltboot``
+. In the [guimenu]``Server Directory User`` field, keep default value [systemitem]``saltboot``
+. In the [guimenu]``Server Directory Group`` field, keep default value [systemitem]``saltboot``
+. Click [btn]``Save Formula`` to save your configuration
+. Apply the hightstate.
+====
+
+
+
+[[retail.formulas.dhcpd]]
+== DHCPd formula
+
+The DHCPd formula ([package]``dhcpd-formula``) manages DHCP service on the branch server
+
+
+.Steps to configure typical retail branch server with dedicated network card
+====
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
+. Check the [systemitem]``Dhcpd`` formula, and click [btn]``Save``.
+. Navigate to the menu:Formulas[Dhcpd] tab, and set these parameters:
+. Set the [guimenu]``Domain Name`` (for example: [systemitem]``branch1.mycompany.org``)
+. In the [guimenu]``Domain Name Server`` enter IP address or resolvable FQDN of branch server DNS server (for example: [systemitem]``192.168.1.1``)
+. In the [guimenu]``Listen Interfaces`` enter network interface name connected to local branch network (for example: [systemitem]``eth1``)
+. In the [guimenu]``Network Configuration (subnet)`` section configure [systemitem]``Network 1``:
+* In the [guimenu]``Network IP`` field enter IP address of branch server network (for example: [systemitem]``192.168.1.0``)
+* In the [guimenu]``Netmask`` field enter network mask of branch server network (for example: [systemitem]``255.255.255.0``)
+* In the [guimenu]``Domain Name`` field enter domain name for branch server network (for example: [systemitem]``branch1.mycompany.org``)
+. In the [guimenu]``Dynamic IP Range`` section, configure IP range to be served by DHCP service:
+* In the first input box set the lower bound of IP range (for example: [systemitem]``192.168.1.51``)
+* In the second input box set the upper bound of IP range (for example: [systemitem]``192.168.1.151``)
+. In the [guimenu]``Broadcast Address`` field, enter broadcast IP address for branch network (for example: [systemitem]``192.168.1.255)
+. In the [guimenu]``Routers`` section enter IP address of routers in branch server network (for example: [systemitem]``192.168.1.1``)
+. In the [guimenu]``Next Server`` field, use the hostname  or IP address of the branch server (for example: [systemitem]``192.168.1.1``)
+. In the [guimenu]``Filename`` field, keep default value ([systemitem]``/boot/pxelinux.0``)
+. Click [btn]``Save Formula`` to save your configuration
+. Apply highstate on branch server
+====
+
+
+
+[[retail.formulas.bind]]
+== BIND Formula
+The BIND formula ([package]``bind-formula``) manages DNS settings and service on the branch server.
+
+.Steps to configure typical retail branch server
+====
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
+. Check the [systemitem]``Bind`` formula, and click [btn]``Save``.
+. Navigate to the menu:Formulas[Bind] tab, and set these parameters for Zone1:
+. In the [guimenu]``Config`` section, select [systemitem]``Include Forwarders`` check box
+. In the [guimenu]``Configured Zones`` section:
+* In the [guimenu]``Name`` field, use the fully qualified domain name (FQDN) of the  branch server (for example: [systemitem]``branch1.mycompany.org``)
+* In the [guimenu]``Type`` field, select [systemitem]``master``
+. Click [btn]``Add item``, and set these parameters for Zone2:
+* In the [guimenu]``Name`` field, use the reverse zone for the configured IP range (for example: [systemitem]``1.168.192.in-addr.arpa``)
+* In the [guimenu]``Type`` field, select [systemitem]``master``
+. In the [guimenu]``Available Zones`` section, use these parameters for Zone1:
+* In the [guimenu]``Name`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.mycompany.org``)
+* In the [guimenu]``File`` field, type the name of your configuration file *TODO: Check this* (for example: [systemitem]``branch1.txt``)
+. In the [guimenu]``Start of Authority (SOA)`` section, use these parameters for Zone1:
+* In the [guimenu]``Nameserver (Ns)`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.mycompany.org``)
+* In the [guimenu]``Contact`` field, use the email address for the domain administrator
+* Leave all other fields as their default values.
+. In the [guimenu]``Records`` section, subsection [guimenu]``A``, click on [btn]``Add Item`` and use these parameters to set up an A record for Zone1:
+* In the [guimenu]``Hostname`` field, use the hostname of the branch server (for example: [systemitem]``branchserver``)
+* In the [guimenu]``IP`` field, use the IP address of the branch server (for example, [systemitem]``192.168.1.1``)
+. In the [guimenu]``Records`` section, subsection [guimenu]``NS``, click on [btn]``Add Item`` and use these parameters to set up an NS record for Zone1:
+* In the input box, use the hostname of the branch server (for example: [systemitem]``branchserver``)
+. In the [guimenu]``Records`` section, subsection [guimenu]``CNAME``, click on [btn]``Add Item`` to add these entries:
+* In the [systemitem]``tftp``, use the hostname of the  branch server: [systemitem]``branchserver``)
+* In the [systemitem]``ftp``, use the hostname of the  branch server: [systemitem]``branchserver``)
+* In the [systemitem]``dns``, use the hostname of the  branch server: [systemitem]``branchserver``)
+* In the [systemitem]``dhcp``, use the hostname of the  branch server: [systemitem]``branchserver``)
+* In the [systemitem]``salt``, use the hostname of the  branch server: [systemitem]``branchserver``)
+. Set up Zone2 using the same parameters as for Zone1, but ensure you use the reverse  details.
+. Click [btn]``Save Formula`` to save your configuration
+. Apply highstate on branch server
+====
+
+
+[[retail.formulas.pxe]]
+== PXE Formula
+The PXE formula ([package]``pxe-formula``) manages syslinux PXE boot on the branch server.
+
+[IMPORTANT]
+====
+Branch server ID specified in this formula is mandatory information and prefixes terminal IDs deployed in branch server network.
+====
+
+.Steps to configure typical retail branch server
+====
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab
+. Check the [systemitem]``Pxe`` formula, and click [btn]``Save``
+. Navigate to the menu:Formulas[Pxe] tab, and set these parameters:
+. In the [guimenu]``Kernel filename``, keep default value
+. In the [guimenu]``Initrd filename``, keep default value
+. In the [guimenu]``Kernel commandline parameters``, keep default value
+. In the [guimenu]``PXE root directory``, use saltboot directory [systemitem]``/srv/saltboot``
+. In the [guimenu]``Branch id``, choose any alphanumeric string as a branch identifier
+. Click [btn]``Save Formula`` to save your configuration
+. Apply highstate on branch server
+====
+
+[[retail.formulas.tftpd]]
+== TFTPd Formula
+The TFTPd formula ([package]``tftpd-formula``) manages TFTP service on the branch server.
+TFTP service is used to provide network boot program (PXE) to the terminals.
+
+
+.Steps to configure typical retail branch server
+====
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab
+. Check the [systemitem]``Tftpd`` formula, and click [btn]``Save``
+. Navigate to the menu:Formulas[Tftpd] tab, and set these parameters:
+. In the [guimenu]``Internal Network Address``, enter IP address of branch server (for example: [systemitem]``192.168.1.1``)
+. In the [guimenu]``TFTP Base Directory``, enter [systemitem]``/srv/saltboot``
+. In the [guimenu]``Run TFTP Under User``, enter [systemitem]``saltboot``
+. Click [btn]``Save Formula`` to save your configuration
+. Apply highstate on branch server
+====
+
+
+
+[[retail.formulas.vsftpd]]
+== VsFTPd Formula
+The VsFTPd formula ([package]``vsftpd-formula``) manages FTP service on the branch server.
+Configuration of this formula and service is optional and by default not required.
+
+
+.Steps to configure typical retail branch server
+====
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab
+. Check the [systemitem]``Vsftpd`` formula, and click [btn]``Save``
+. Navigate to the menu:Formulas[Vsftpd] tab, and set these parameters:
+. In the [guimenu]``Internal Network Address``, enter IP address of branch server (for example: [systemitem]``192.168.1.1``)
+. Keep the rest of the items in their default values
+. Click [btn]``Save Formula`` to save your configuration
+. Apply highstate on branch server
+====
+
+
