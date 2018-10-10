@@ -234,19 +234,31 @@ Do not install the branch server as a traditionally managed client.
 
 === Procedure Assign and configure branch server formulas
 
-Before you configure the branch server formulas, ensure you have configured networking, and know the Salt ID of the branch server.
+Before you configure the branch server, ensure you have decided on networking topology, and know the Salt ID of the branch server.
 
 . Branch server configuration is performed using the [command]``retail_branch_init`` command:
 +
+.Configure branch server using default values and single shared network interface
 ----
 retail_branch_init <branch_server_salt_id>
 ----
 +
 If you need to specify values for your architecture, use:
 +
+.Configure branch server using specified values and dedicated network interface for branch network
 ----
 retail_branch_init <branch_server_salt_id> --dedicated-nic eth1 --branch-ip 192.168.10.1 --netmask 255.255.255.0 --dyn-range 192.168.10.50 192.168.10.100
 ----
 +
 You can use the [command]``retail_branch_init --help`` command for additional options.
-. Verify that your changes have been configured correctly by checking the {susemgr} {webui}.
+. Verify that your changes have been configured correctly by checking the {susemgr} {webui} branch server system formulas.
+. Apply highstate on branch server.
++
+----
+salt <branch_server_salt_id> state.apply
+----
+. Synchronize OS images from Central Server to branch server.
++
+----
+salt <branch_server_salt_id> state.apply image-sync
+----
