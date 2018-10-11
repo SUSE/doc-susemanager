@@ -13,67 +13,6 @@ For general administration tasks, see the {susemgr} documentation at https://www
 
 
 
-[[retail.sect.admin.branch_network_config]]
-== Branch Server network configuration
-
-The branch server can be configured to use networking in many different ways.
-The most common ways provide either a dedicated or shared LAN for terminals.
-
-
-
-=== Procedure Set up a Branch Server with a dedicated LAN
-
-In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the central server, and the other one acts as an isolated LAN to communicate with terminals.
-
-This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
-
-. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. In the [guimenu]``Branch Network`` section, set these parameters:
-* Keep [guimenu]``Dedicated NIC`` checked
-* In the [guimenu]``NIC`` field, enter the name of the network device that is connected to the internal LAN.
-* In the [guimenu]``IP`` field, enter the static IP address to be assigned to the branch server on the internal LAN.
-* In the [guimenu]``Netmask`` field, enter the network mask of the internal LAN.
-. Check [guimenu]``Enable Route`` if you want the branch server to route traffic from internal LAN to WAN.
-* Check [guimenu]``Enable NAT`` if you want the branch server to convert addresses from internal LAN to WAN.
-* Select the [guimenu]``bind`` DNS forwarder mode.
-* Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
-* Specify the working directory, and the directory owner and group.
-. Click btn:[Save] to save your changes.
-
-
-
-=== Procedure Set up a Branch Server with a shared network
-
-In this configuration, the branch server has only one network interface card which is used to connect to the central server as well as the terminals.
-
-This configuration allows for the branch server to provide DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
-Optionally, the branch server can also provide DHCP services in this configuration.
-
-[NOTE]
-====
-If DHCP services are not provided by the branch server, ensure that your external DHCP configuration is set correctly:
-* The [systemitem]``next-server`` option must point to the branch server for PXE boot to work
-* The [systemitem]``filename`` option must correctly identify the network boot program (by default, this is [path]``/boot/pxelinux``)
-* The [systemitem]``domain-name-servers`` option must point to the branch server for correct host name resolution
-====
-
-. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. In the [guimenu]``Branch Network`` section, set these parameters:
-* Keep [guimenu]``Dedicated NIC`` unchecked
-* Select which services to enable on the branch server’s firewall.
-Ensure you include DNS, TFTP and FTP services.
-* Select the [guimenu]``bind`` DNS forwarder mode.
-* Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
-* Specify the working directory, and the directory owner and group.
-. Click btn:[Save] to save your changes.
-. Apply the salt state and synchronize your settings:
-+
-----
-salt $branch_server_id state.apply image-sync
-----
-
-
-
 [[retail.sect.admin.branch_mass_config]]
 == Branch Server mass configuration
 
@@ -171,6 +110,10 @@ hwtypes:
 [[retail.sect.admin.deploy_terminals]]
 == Deploying terminals
 
+Before terminals can be deployed, ensure you have prepared a saltboot based OS image.
+For how to build OS images see xref:advanced_topics_image_management.adoc#at.images.kiwi[OS image building]
+
+
 Each terminal requires a specific hardware type, which contains information about the product name and terminal manufacturer.
 However, the {susemgr} database does not have this information to begin with.
 In order to tell {susemgr} what image to deploy on each terminal, you can set hardware type groups.
@@ -190,7 +133,7 @@ For example:
 HWTYPE:POSVendor-Terminal1
 ----
 +
-[NOTE]
+[IMPORTANT]
 ====
 Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type group names.
 Spaces and other non-alphanumeric characters will be removed when the name is processed.
@@ -248,9 +191,14 @@ This will ensure you use the latest available version.
 * In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
 * In the [guimenu]``Partition flags`` field, leave it empty.
 . Click btn:[Save Formula] to save your formula.
-. Apply highstate to apply your configuration changes.
-In the [guimenu]``States`` tab, click btn:[Apply Highstate].
-Applying highstate will execute the state associated with the formula and configure the affected systems.
+
+=== Procedure Synchronize OS images to the branch servers
+
+Synchronization of images is managed by salt state [systemitem]``image-sync``.
+
+----
+salt <branch_server_salt_id> state.apply image-sync
+----
 
 
 

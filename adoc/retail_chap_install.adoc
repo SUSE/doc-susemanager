@@ -210,10 +210,16 @@ If any package is missing, make sure ``SUSE Manager 3.2 Tools`` repository is av
 
 
 
-=== Procedure Create required system group
+=== Procedure Create required system groups
 
-When you register terminals, {smr} requires a system group called [systemitem]``Terminals``.
-The [systemitem]``Terminals`` system group needs to be manually created during installation.
+{smr} uses two generic system groups for administration purposes.
+Theses system groups needs to be manually created before configuration of Retail system.
+
+Check and create mandatory system groups:
+
+- TERMINALS
+- SERVERS
+
 For instructions on how to create system groups, see xref:reference-webui-systems.adoc#ref.webui.systems.systemgroups[System groups reference]
 
 
@@ -236,19 +242,40 @@ Do not install the branch server as a traditionally managed client.
 
 === Procedure Assign and configure branch server formulas
 
-Before you configure the branch server formulas, ensure you have configured networking, and know the Salt ID of the branch server.
+Before you configure the branch server, ensure you have decided on networking topology, and know the Salt ID of the branch server.
+Branch server can be configured manually using Formulas or automatically using [command]``retail_branch_init`` command on {susemgr} server.
 
-. Branch server configuration is performed using the [command]``retail_branch_init`` command:
+. Branch server configuration performed using the [command]``retail_branch_init`` command:
 +
+.Configure branch server using default values and single shared network interface
 ----
 retail_branch_init <branch_server_salt_id>
 ----
 +
 If you need to specify values for your architecture, use:
 +
+.Configure branch server using specified values and dedicated network interface for branch network
 ----
 retail_branch_init <branch_server_salt_id> --dedicated-nic eth1 --branch-ip 192.168.10.1 --netmask 255.255.255.0 --dyn-range 192.168.10.50 192.168.10.100
 ----
 +
 You can use the [command]``retail_branch_init --help`` command for additional options.
-. Verify that your changes have been configured correctly by checking the {susemgr} {webui}.
+. Verify that your changes have been configured correctly by checking the {susemgr} {webui} branch server system formulas.
+. Apply highstate on branch server.
++
+----
+salt <branch_server_salt_id> state.apply
+----
+. Synchronize OS images from Central Server to branch server.
++
+----
+salt <branch_server_salt_id> state.apply image-sync
+----
+
+For manual configuration or fine-tuning using Formulas see xref:retail_salt_formulas.adoc[Retail Formulas documentation]
+
+[IMPORTANT]
+====
+In case of manual configuration of the branch server using formulas, mandatory branch group must be manually created.
+This branch group has a name of the Branch Server ID used in configuration of PXE formula.
+====
