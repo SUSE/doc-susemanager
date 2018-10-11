@@ -13,13 +13,9 @@ RUN /root/add_repositories.sh
 ADD add_packages.sh /root/add_packages.sh
 RUN /root/add_packages.sh
 
-# Add the dapsrc
-#ADD dapsrc /root/.config/daps/dapsrc
-
 # Add Ruby and asciidoctor
 ADD add_ruby.sh /root/add_ruby.sh
 RUN /root/add_ruby.sh
-
 
 WORKDIR /workspace
 
