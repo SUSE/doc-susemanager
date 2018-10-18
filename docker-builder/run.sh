@@ -2,12 +2,14 @@
 # docker build . -t daps-builder -f Dockerfile
 # docker run --rm -v /home/coyote/workspace/doc-susemanager:/workspace daps-builder
 
+
 # Cleanup
 
 make clean
 
 # Create the correct links and apply DB5 geekodoc stylesheet (Required for publishing and packaging) 
 # Create Uyuni opensource outputs
+
 make book-to-set-uyuni
 
 # Create all Uyuni (Single HTML)
@@ -27,6 +29,7 @@ make uyuni-getting-started-pdf
 make uyuni-reference-pdf
 make uyuni-advanced-pdf
 make uyuni-best-practices-pdf
+
 
 # Create SUMA product outputs
 
@@ -49,4 +52,5 @@ make suma-getting-started-pdf
 make suma-reference-pdf
 make suma-advanced-pdf
 make suma-best-practices-pdf
+
 
