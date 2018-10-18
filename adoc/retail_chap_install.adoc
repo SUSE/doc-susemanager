@@ -23,10 +23,10 @@ xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.requirements[Proxy R
 ====
 
 
-.Central Server Requirements
+.{susemgr} server requirements
 
 [cols="1,1", options="header"]
-.Hardware Requirements for Central Server
+.Hardware Requirements for {susemgr} server
 |===
 | Hardware                 | Recommended
 | CPU                      | Multi-core 64-bit CPU
@@ -39,9 +39,9 @@ xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.requirements[Proxy R
 |                          | [path]``/var/spacewalk`` Minimum 50{nbsp}GB per SUSE product and 250{nbsp}GB per Red Hat product
 |===
 
-.Build Host Requirements
+.Build host requirements
 
-.Hardware Requirements for Build Host
+.Hardware requirements for build host
 |===
 | Hardware                 | Recommended
 | CPU                      | Multi-core 64-bit CPU
@@ -50,9 +50,9 @@ xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.requirements[Proxy R
 |===
 
 
-.Branch Server Requirements
+.Branch server requirements
 
-.Hardware Requirements for Branch Server
+.Hardware requirements for branch server
 |===
 | Hardware                 | Recommended
 | CPU                      | Multi-core 64-bit CPU
@@ -63,10 +63,10 @@ xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.requirements[Proxy R
 
 .Network Requirements
 
-* The central server requires a reliable and fast WAN connection
-* The branch server requires a reliable WAN connection, to reach the central server
+* The {susemgr} server requires a reliable and fast WAN connection
+* The branch server requires a reliable WAN connection, to reach the {susemgr} server
 * If you are using a shared network, ensure that DHCP requests are filtered before reaching the rest of your shared network
-* If you are using a dedicated network, the branch server requires at least two network interfaces: one connected to the WAN with reachable central server, and one connected to the internal branch LAN.
+* If you are using a dedicated network, the branch server requires at least two network interfaces: one connected to the WAN with reachable {susemgr} server, and one connected to the internal branch LAN.
 * Terminals require a LAN connection to the branch server network.
 
 
@@ -77,23 +77,24 @@ xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.requirements[Proxy R
 {smr} can be installed in various ways depending on individual needs.
 We recommend these steps:
 
-. Install the Central Server
-. Configure the Central Server
-. Install the {smr} pattern on the Central Server
-. Install the Build Host and register it to {susemgr}
-. Configure the Build Host
+. Install the {susemgr} server
+. Configure the {susemgr} server
+. Install the {smr} pattern on the {susemgr} server
+. Install the build host and register it to {susemgr}
+. Configure the build host
 . Create required system group
 
 Branch server installation steps:
 
 . Install the branch server and register it to {susemgr}
 . Assign and configure branch server formulas
+. Synchronize images to the servers
 
 Each procedure is detailed in this section.
 
 
 
-=== Install the Central Server
+=== Install the {susemgr} server
 
 For instructions to install {susemgr}, see the xref:quickstart3_chap_install_overview.adoc[{susemgr} Getting Started Guide].
 
@@ -106,13 +107,12 @@ This functionality will be installed later, after the initial setup.
 
 
 
-=== Configure the Central Server
+=== Configure the {susemgr} server
 
-Available SUSE channels are essential for functional image building as well as day-to-day operations.
-Make sure all the required channels are synchronized.
-For instructions see the xref:command-line-tools.adoc[Syncing {susemgr} Repositories from SCC (mgr-sync)].
+It is important that all required SUSE channels are available on your system and synchronized in order for {smr} to operate correctly.
+For more information on channel management, see xref:command-line-tools.adoc[Syncing {susemgr} Repositories from SCC (mgr-sync)].
 
-Channel overview required for {smr} functionality:
+Channels required for {smr} functionality:
 ----
 - SLES 12 SP3 (SP4 in the future) as a base
   - SLES Pool
@@ -128,16 +128,16 @@ Channel overview required for {smr} functionality:
     - SUSE Manager 3.2 Proxy for Retail Update
 ----
 
-After you have synchronized the required SUSE channels, create channels for custom software.
+After you have synchronized the required SUSE channels, create channels for any custom software.
 Channels are used to provide custom software for OS image building.
-For instructions see the xref:reference-webui-channels.adoc[Software Channels Reference]
+For more information on software channels, see xref:reference-webui-channels.adoc[Software Channels Reference]
 
 
 
-=== Install the {smr} pattern on the Central Server
+=== Install the {smr} pattern on the {susemgr} server
 
-.Procedure: Installing the {smr} pattern on the Central Server
-. Install the [package]``SUSE Manager for Retail`` pattern on the Central Server:
+.Procedure: Installing the {smr} pattern on the {susemgr} server
+. Install the [package]``SUSE Manager for Retail`` pattern on the {susemgr} server:
 +
 ----
 zypper in -t pattern suma_retail
@@ -176,23 +176,23 @@ systemctl restart salt-master
 
 
 
-=== Install the Build Host and register it to {susemgr}
+=== Install the build host and register it to {susemgr}
 
 Your build host should be a Salt minion, running {sls}{nbsp}12 SP3.
 For instructions to install Salt minion see xref:quickstart3_chap_suma_keys_and_first_client.adoc[Registering Clients].
 
 [WARNING]
 ====
-Do not install the Build Host as a traditionally managed client.
+Do not install the build host as a traditionally managed client.
 ====
 
 
 
-=== Configure the Build Host
+=== Configure the build host
 
 The build host must be set as an OS Image build host in the {susemgr} {webui}, and highstate applied.
 
-.Procedure: Configuring the Build Host
+.Procedure: Configuring the build host
 
 . In the {susemgr} {webui}, navigate to menu:Systems[Overview].
 Locate the system to be made a build host, and click on its name.
@@ -203,12 +203,12 @@ Locate the system to be made a build host, and click on its name.
 
 [IMPORTANT]
 ====
-Check that the Build Host has following packages installed after Highstate run:
+Check that the build host has following packages installed after Highstate run:
 
 - kiwi
 - kiwi-desc-saltboot
 
-If any package is missing, make sure ``SUSE Manager 3.2 Tools`` repository is available on the Build Host and install packages manually using ``zypper install`` command.
+If any package is missing, make sure ``SUSE Manager 3.2 Tools`` repository is available on the build host and install packages manually using ``zypper install`` command.
 ====
 
 
@@ -259,13 +259,25 @@ retail_branch_init <branch_server_salt_id>
 +
 You can use the [command]``retail_branch_init --help`` command for additional options.
 . Verify that your changes have been configured correctly by checking the {susemgr} {webui} branch server system formulas.
-. Apply highstate on branch server.
+. Apply highstate on the branch server.
+You can do this through the {webui}, or by running this command:
 +
 ----
 salt <branch_server_salt_id> state.apply
 ----
-. Synchronize OS images from Central Server to branch server.
+
+
+
+=== Synchronize images to the servers
+
+The OS image you use on the {susemgr} server must be synchronized for use on the branch server.
+You can do this with the Salt [command]``image-sync`` tool.
+
+.Procedure: Synchronize images with branch server
+
+. On the branch server, run this command:
 +
 ----
 salt <branch_server_salt_id> state.apply image-sync
 ----
+. The image details will be transferred to [path]``/srv/saltboot`` on the branch server.
