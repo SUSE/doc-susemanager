@@ -2,9 +2,6 @@
 # docker build . -t daps-builder -f Dockerfile
 # docker run --rm -v /home/coyote/workspace/doc-susemanager:/workspace daps-builder
 
-
-# Cleanup
-
 make clean
 
 # Create the correct links and apply DB5 geekodoc stylesheet (Required for publishing and packaging) 
