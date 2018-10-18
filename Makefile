@@ -54,6 +54,21 @@ book-to-set: clean suma xml-suma
 	@ccecho result "Copying processed Main file to primary build path ..."
 	cp book-to-set/xml/MAIN-manager.xml xml/MAIN-manager.xml
 
+book-to-set-uyuni: clean uyuni xml-suma
+	@ccecho result "Copying Main file into book-to-set/ ..."
+	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
+	@ccecho result "Making entities available ..."
+	(cd book-to-set; ln -sf ../entities/*ent .)
+	@ccecho result "Converting unsupported db5 tags to supported geekodoc subset tags..."
+	(cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml)
+	@ccecho result "Renaming and moving test.xml to xml/MAIN-manager.xml ..."
+	mkdir -p book-to-set/xml
+	mv book-to-set/test.xml book-to-set/xml/MAIN-manager.xml
+	@ccecho result "Validating resulting Main file ..."
+	cd book-to-set/; daps -m xml/MAIN-manager.xml validate
+	@ccecho result "Copying processed Main file to primary build path ..."
+	cp book-to-set/xml/MAIN-manager.xml xml/MAIN-manager.xml
+
 # TODO: Add additional DC files for uyuni so we can setup a make all scenario for building both SUMA/Uyuni docs and pdf files.
 # Build Uyuni docs and link images to the uyuni folder
 
