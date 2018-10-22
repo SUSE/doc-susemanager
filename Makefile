@@ -31,7 +31,7 @@ xml/MAIN-manager.xml: adoc/*.adoc
 
 #### run book-to-set stylesheet first on xml/MAIN-manager.xml this allows creation of single books, next run make suma-getting-started-html to created both the single and chunked version of a book
 book-to-set: suma xml-suma
-	rm -rf xml/MAIN-manager.xml
+	#rm -rf xml/MAIN-manager.xml
 	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
 	(cd book-to-set; ln -sf ../entities/*ent .)
 	(cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml)

@@ -7,19 +7,19 @@ make clean
 # Create the correct links and apply DB5 geekodoc stylesheet (Required for publishing and packaging) 
 # Create Uyuni opensource outputs
 
-#make book-to-set-uyuni
+make book-to-set-uyuni
 
 # Create all Uyuni (Single HTML)
-#make uyuni-html
+make uyuni-html
 
 # Uyuni OBS Packages
-#make uyuni-dist
+make uyuni-dist
 
 # Uyuni HTML Single/Chunked books
-#make uyuni-advanced-html
-#make uyuni-best-practices-html
-#make uyuni-getting-started-html
-#make uyuni-reference-html
+make uyuni-advanced-html
+make uyuni-best-practices-html
+make uyuni-getting-started-html
+make uyuni-reference-html
 
 # Uyuni PDF
 #make uyuni-getting-started-pdf
@@ -30,10 +30,10 @@ make clean
 
 # Create SUMA product outputs
 
-make book-to-set
+#make book-to-set
 
 # Create all SUMA (Single HTML)
-make suma-html
+#make suma-html
 
 # SUMA OBS Packages
 #make suma-dist
@@ -52,6 +52,6 @@ make suma-html
 
 # SUMA for Retail
 
-make retail-getting-started-html
+#make retail-getting-started-html
 
 
