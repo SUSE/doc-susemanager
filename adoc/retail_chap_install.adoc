@@ -93,9 +93,10 @@ Each procedure is detailed in this section.
 
 
 
-=== Procedure Install the Central Server
+=== Install the Central Server
 
-For instructions to install {susemgr}, see the xref:quickstart3_chap_install_overview.adoc[{susemgr} Getting Started Guide].
+For instructions to install {susemgr}, see the xref:quickstart3_chap_install_overview.adoc#quickstart.chapt.overview.requirements[{susemgr} Getting Started Guide].
+
 [WARNING]
 .Do Not Enable PXE Boot
 ====
@@ -105,11 +106,11 @@ This functionality will be installed later, after the initial setup.
 
 
 
-=== Procedure Configure the Central Server
+=== Configure the Central Server
 
 Available SUSE channels are essential for functional image building as well as day-to-day operations.
 Make sure all the required channels are synchronized.
-For instructions see the xref:command-line-tools.adoc[Syncing {susemgr} Repositories from SCC (mgr-sync)].
+For instructions see the xref:command-line-tools.adoc#syncing.suse.mgr.repositories.scc[Syncing {susemgr} Repositories from SCC (mgr-sync)].
 
 Channel overview required for {smr} functionality:
 ----
@@ -129,12 +130,13 @@ Channel overview required for {smr} functionality:
 
 After you have synchronized the required SUSE channels, create channels for custom software.
 Channels are used to provide custom software for OS image building.
-For instructions see the xref:reference-webui-channels.adoc[Software Channels Reference]
+For instructions see the xref:reference-webui-channels.adoc#ref.webui.channels[Software Channels Reference]
 
 
 
-=== Procedure Install the {smr} pattern on the Central Server
+=== Install the {smr} pattern on the Central Server
 
+.Procedure: Installing the {smr} pattern on the Central Server
 . Install the [package]``SUSE Manager for Retail`` pattern on the Central Server:
 +
 ----
@@ -148,6 +150,7 @@ zypper in -t pattern suma_retail
 * dhcpd-formula
 * image-sync-formula
 * pxe-formula
+* saltboot-formula
 * susemanager-retail-tools
 * tftp-formula
 * vsftpd-formula
@@ -173,10 +176,10 @@ systemctl restart salt-master
 
 
 
-=== Procedure Install the Build Host and register it to {susemgr}
+=== Install the Build Host and register it to {susemgr}
 
 Your build host should be a Salt minion, running {sls}{nbsp}12 SP3.
-For instructions to install Salt minion see xref:quickstart3_chap_suma_keys_and_first_client.adoc[Registering Clients].
+For instructions to install Salt minion see xref:quickstart3_chap_suma_keys_and_first_client.adoc#preparing.and.registering.clients[Registering Clients].
 
 [WARNING]
 ====
@@ -185,9 +188,11 @@ Do not install the Build Host as a traditionally managed client.
 
 
 
-=== Procedure Configure the Build Host
+=== Configure the Build Host
 
 The build host must be set as an OS Image build host in the {susemgr} {webui}, and highstate applied.
+
+.Procedure: Configuring the Build Host
 
 . In the {susemgr} {webui}, navigate to menu:Systems[Overview].
 Locate the system to be made a build host, and click on its name.
@@ -208,22 +213,30 @@ If any package is missing, make sure ``SUSE Manager 3.2 Tools`` repository is av
 
 
 
-=== Procedure Create required system group
+=== Create required system groups
 
-When you register terminals, {smr} requires a system group called [systemitem]``Terminals``.
-The [systemitem]``Terminals`` system group needs to be manually created during installation.
-For instructions on how to create system groups, see xref:reference-webui-systems.adoc#ref.webui.systems.systemgroups[System groups reference]
+{smr} requires system groups for terminals and servers.
+Manually create these system groups during installation:
+
+* [systemitem]``TERMINALS``
+* [systemitem]``SERVERS``
+
+Additionally, you will need to create a system group for each branch server, and each terminal hardware type in your environment.
+
+You can create system groups using the {susemgr} {webui}.
+Navigate to menu:Systems[System Groups] and click on btn:[Create System Group].
+
+For more information about system groups, see xref:reference-webui-systems.adoc#ref.webui.systems.systemgroups[System groups reference]
 
 
 
-=== Procedure Install the branch server and register it to {susemgr}
+=== Install the branch server and register it to {susemgr}
 
 Your branch server should be installed as a default Salt-based client ("minion"), running {susemgrproxy} 3.2.
 
 For instructions to install Salt-based proxy minions and register them to {susemgr}, see xref:advanced_topics_proxy_quickstart.adoc#at.manager.proxy.inst[{susemgr} Advanced Topics].
 
-
-For mass deployments, see xref:#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration].
+For mass deployments, see xref:retail_chap_admin.adoc#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration].
 
 [WARNING]
 ====
@@ -232,9 +245,11 @@ Do not install the branch server as a traditionally managed client.
 
 
 
-=== Procedure Assign and configure branch server formulas
+=== Assign and configure branch server formulas
 
-Before you configure the branch server formulas, ensure you have configured networking, and know the Salt ID of the branch server.
+Before you configure the branch server, ensure you have decided on networking topology, and know the Salt ID of the branch server.
+
+.Procedure: Configuring branch server formulas
 
 . Branch server configuration is performed using the [command]``retail_branch_init`` command:
 +
@@ -242,11 +257,15 @@ Before you configure the branch server formulas, ensure you have configured netw
 retail_branch_init <branch_server_salt_id>
 ----
 +
-If you need to specify values for your architecture, use:
-+
-----
-retail_branch_init <branch_server_salt_id> --dedicated-nic eth1 --branch-ip 192.168.10.1 --netmask 255.255.255.0 --dyn-range 192.168.10.50 192.168.10.100
-----
-+
 You can use the [command]``retail_branch_init --help`` command for additional options.
-. Verify that your changes have been configured correctly by checking the {susemgr} {webui}.
+. Verify that your changes have been configured correctly by checking the {susemgr} {webui} branch server system formulas.
+. Apply highstate on branch server.
++
+----
+salt <branch_server_salt_id> state.apply
+----
+. Synchronize OS images from Central Server to branch server.
++
+----
+salt <branch_server_salt_id> state.apply image-sync
+----

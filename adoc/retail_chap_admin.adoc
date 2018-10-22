@@ -21,11 +21,13 @@ The most common ways provide either a dedicated or shared LAN for terminals.
 
 
 
-=== Procedure Set up a Branch Server with a dedicated LAN
+=== Set up a Branch Server with a dedicated LAN
 
 In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the central server, and the other one acts as an isolated LAN to communicate with terminals.
 
 This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
+
+.Procedure: Setting up a branch server with a dedicated LAN
 
 . In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
 . In the [guimenu]``Branch Network`` section, set these parameters:
@@ -39,10 +41,11 @@ This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE 
 * Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
 * Specify the working directory, and the directory owner and group.
 . Click btn:[Save] to save your changes.
+. Apply the highstate.
 
 
 
-=== Procedure Set up a Branch Server with a shared network
+=== Set up a Branch Server with a shared network
 
 In this configuration, the branch server has only one network interface card which is used to connect to the central server as well as the terminals.
 
@@ -57,6 +60,8 @@ If DHCP services are not provided by the branch server, ensure that your externa
 * The [systemitem]``domain-name-servers`` option must point to the branch server for correct host name resolution
 ====
 
+.Procedure: Setting up a Branch Server with a shared network
+
 . In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
 . In the [guimenu]``Branch Network`` section, set these parameters:
 * Keep [guimenu]``Dedicated NIC`` unchecked
@@ -66,11 +71,7 @@ Ensure you include DNS, TFTP and FTP services.
 * Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
 * Specify the working directory, and the directory owner and group.
 . Click btn:[Save] to save your changes.
-. Apply the salt state and synchronize your settings:
-+
-----
-salt $branch_server_id state.apply image-sync
-----
+. Apply the highstate.
 
 
 
@@ -84,10 +85,12 @@ If you are working in an environment with many branch servers, you might find it
 
 
 
-=== Procedure Configuring multiple Branch Servers
+=== Configure multiple Branch Servers
 
 This procedure requires the [package]``python-susemanager-retail`` package, which is provided with {smr}.
 Install the [package]``python-susemanager-retail`` package on the central server.
+
+.Procedure: Configuring multiple Branch Servers
 
 . Create a YAML file describing the infrastructure you intend to install.
 An example YAML file is at the end of this section, for you to reference.
@@ -171,6 +174,10 @@ hwtypes:
 [[retail.sect.admin.deploy_terminals]]
 == Deploying terminals
 
+Before terminals can be deployed, ensure you have prepared a saltboot based OS image.
+For how to build OS images see xref:advanced_topics_image_management.adoc#at.images.kiwi[OS image building]
+
+
 Each terminal requires a specific hardware type, which contains information about the product name and terminal manufacturer.
 However, the {susemgr} database does not have this information to begin with.
 In order to tell {susemgr} what image to deploy on each terminal, you can set hardware type groups.
@@ -178,9 +185,11 @@ After you have created your new hardware type group, you can apply the [systemit
 
 
 
-=== Procedure Create a Hardware Type group
+=== Create a Hardware Type group
 
 For this procedure, you will require the system manufacturer name and product name for your terminal.
+
+.Procedure: Creating a Hardware Type group
 
 . Determine the hardware type group name.
 Prefix the name with [systemitem]``HWTYPE:``, followed by the system manufacturer name and product name, separated by a hyphen.
@@ -190,7 +199,7 @@ For example:
 HWTYPE:POSVendor-Terminal1
 ----
 +
-[NOTE]
+[IMPORTANT]
 ====
 Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type group names.
 Spaces and other non-alphanumeric characters will be removed when the name is processed.
@@ -202,7 +211,9 @@ Spaces and other non-alphanumeric characters will be removed when the name is pr
 
 
 
-=== Procedure Apply and configure the Saltboot formula
+=== Configure the Saltboot formula
+
+.Procedure: Configuring the Saltboot formula
 
 . Open the details page for your new hardware group, and navigate to the [guimenu]``Formulas`` tab.
 . Select the [systemitem]``saltboot-formula`` and click btn:[Save] to save your changes.
@@ -248,9 +259,16 @@ This will ensure you use the latest available version.
 * In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
 * In the [guimenu]``Partition flags`` field, leave it empty.
 . Click btn:[Save Formula] to save your formula.
-. Apply highstate to apply your configuration changes.
-In the [guimenu]``States`` tab, click btn:[Apply Highstate].
-Applying highstate will execute the state associated with the formula and configure the affected systems.
+
+=== Synchronize OS images to the branch servers
+
+Synchronization of images is managed by salt state [systemitem]``image-sync``.
+
+.Procedure: Synchronize OS images to branch server
+
+----
+salt <branch_server_salt_id> state.apply image-sync
+----
 
 
 
@@ -262,7 +280,9 @@ If you are working in an environment with many terminals, you might find it easi
 In order to do this, you will need to have your infrastructure planned out ahead of time, including the IP addresses, hostnames, and domain names of branch servers and terminals.
 You will also require the hardware (MAC) addresses of each terminal.
 
-=== Procedure Configuring multiple terminals
+=== Configure multiple terminals
+
+.Procedure: Configuring multiple terminals
 
 . Create a YAML file describing the infrastructure you intend to install, specifying the hardware address for each terminal.
 An example YAML file is at the end of this section, for you to reference.
@@ -279,6 +299,7 @@ For further information on these steps, see the {susemgr} documentation.
 . Apply highstate to apply your configuration changes.
 In the [guimenu]``States`` tab, click btn:[Apply Highstate].
 . Connect your terminals according to your infrastructure plan.
+
 
 If you need to change your configuration, you can edit the YAML file at any time, and use the [command]``retail_yaml --from-yaml`` command to upload the new configuration.
 
@@ -386,13 +407,15 @@ hwtypes:
           type: DISK
 ----
 
+
+////
+I'm not sure why this is here, or what it attaches to. -LKB
 . Add a description and click btn:[Save] to save your profile.
 By default, the new profile will have the [systemitem]``BOOTSTRAP`` entitlement, and a single network interface with the specified hardware address.
 All other values are created as default values, and will be updated when the terminal connects.
 . Boot the terminal with the matching hardware address.
 The terminal pairs to the profile you have created, and configuration values are loaded.
-
-
+////
 
 ////
 Commenting this heading out until we have content for it. LKB
