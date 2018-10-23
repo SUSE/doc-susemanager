@@ -1,165 +1,163 @@
 
 PRODUCTNAME=
 
-suma:
-	$(eval PRODUCTNAME = SUSE Manager)
-
 uyuni:
 	$(eval PRODUCTNAME = Uyuni)
 
-xml-suma: suma xml/MAIN-manager.xml suma-images
+suma:
+	$(eval PRODUCTNAME = SUSE Manager)
 
-xml-uyuni: uyuni xml/MAIN-manager.xml uyuni-images
+xml-suma: xml/MAIN-manager.xml suma-images
+
+xml-uyuni: xml/MAIN-manager.xml uyuni-images
 
 suma-images: adoc/images/suma/*
-	@ccecho result "Linking suma images to DAPS expected image directories..."
-	sleep 1
 	mkdir -p images/src
 	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/suma/*.png .)
 	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/suma/*.svg .)
 
 uyuni-images: adoc/images/uyuni/*
-	@ccecho result "Linking Uyuni images to DAPS expected image directories..."
-	sleep 1
 	mkdir -p images/src
 	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/uyuni/*.png .)
 	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/uyuni/*.svg .)
 
-# SUSE Manager asciidoctor processing instructions and entity linking
+#### Uyuni asciidoctor processing instructions and entity linking
 xml/MAIN-manager.xml: adoc/*.adoc
-	@ccecho result "Converting adoc MAIN-manager.xml to Docbook5 xml and adding the {PRODUCTNAME} entities..."
+	rm -rf xml/MAIN-manager.xml 
 	asciidoctor -a productname='$(PRODUCTNAME)' -b docbook5 -d book -D xxml adoc/MAIN-manager.adoc
-	#@ccecho result "Inserting entities from doc-susemanager/entities..."
-	#sed -i '2i <!DOCTYPE set [ <!ENTITY % entities SYSTEM "entity-decl.ent"> %entities; ]>' xxml/MAIN-manager.xml
-	#@ccecho result "Replacing {foo} (but not \${foo}) with &foo;..."
-	#perl -p -i -e 's/([^\$$])\{(\w+)\}/\1\&$$2\;/g' xxml/MAIN-manager.xml
-	#@ccecho result "Making .ent files available for validation..."
-	#(cd xxml; ln -sf ../entities/*ent .)
 	rm -rf xml
 	mv xxml xml
 
-# run book-to-set stylesheet first on xml/MAIN-manager.xml this allows creation of single books, next run make suma-getting-started-html to created both the single and chunked version of a book
-book-to-set-suma: clean suma xml-suma 
-	@ccecho result "Copying Main file into book-to-set/ ..."
+
+#### run book-to-set stylesheet first on xml/MAIN-manager.xml this allows creation of single books, next run make suma-getting-started-html to created both the single and chunked version of a book
+book-to-set: suma xml-suma
+	#rm -rf xml/MAIN-manager.xml
 	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
-	@ccecho result "Making entities available ..."
 	(cd book-to-set; ln -sf ../entities/*ent .)
-	@ccecho result "Converting unsupported db5 tags to supported geekodoc subset tags..."
 	(cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml)
-	@ccecho result "Renaming and moving test.xml to xml/MAIN-manager.xml ..."
 	mkdir -p book-to-set/xml
 	mv book-to-set/test.xml book-to-set/xml/MAIN-manager.xml
-	@ccecho result "Validating resulting Main file ..."
 	cd book-to-set/; daps -m xml/MAIN-manager.xml validate
-	@ccecho result "Copying processed Main file to primary build path ..."
 	cp book-to-set/xml/MAIN-manager.xml xml/MAIN-manager.xml
 
-# TODO: Add additional DC files for uyuni so we can setup a make all scenario for building both SUMA/Uyuni docs and pdf files.
-# Build Uyuni docs and link images to the uyuni folder
+#### Build Uyuni docs and link images to the uyuni folder
+book-to-set-uyuni: uyuni xml-uyuni
+	rm -rf xml/MAIN-manager.xml
+	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
+	(cd book-to-set; ln -sf ../entities/*ent .)
+	(cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml)
+	mkdir -p book-to-set/xml
+	mv book-to-set/test.xml book-to-set/xml/MAIN-manager.xml
+	cd book-to-set/; daps -m xml/MAIN-manager.xml validate
+	cp book-to-set/xml/MAIN-manager.xml xml/MAIN-manager.xml
+
+#### Uyuni Documentation Outputs
+#### Create all Uyuni docs (HTML)
 uyuni-html: uyuni xml-uyuni
 	daps -d DC-create-all-uyuni html
 	(cd build/create-all/html/create-all; rm -rf images; ln -sf ../../../../adoc/images/uyuni .)
 
-# Build SUMA docs and link images to the suma folder
+#### Make Uyuni Packages for OBS
+uyuni-dist: uyuni xml-uyuni
+	daps -vvv -d DC-create-all-uyuni package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc
+
+#### Build Uyuni .pdf files
+uyuni-pdf: uyuni xml-uyuni 
+	daps -d DC-create-all-uyuni pdf
+
+uyuni-advanced-pdf: uyuni xml-uyuni
+	daps -d DC-uyuni-advanced-topics pdf
+
+uyuni-best-practices-pdf: uyuni xml-uyuni
+	daps -d DC-uyuni-best-practices pdf
+
+uyuni-getting-started-pdf: uyuni xml-uyuni
+	daps -d DC-uyuni-getting-started pdf
+
+uyuni-reference-pdf: uyuni xml-uyuni
+	daps -d DC-uyuni-reference pdf
+
+#### Build UYUNI HTML Chunked/single
+uyuni-advanced-html: uyuni xml-uyuni
+	daps -d DC-uyuni-advanced-topics html
+	daps -d DC-uyuni-advanced-topics html --single
+
+uyuni-best-practices-html: uyuni xml-uyuni
+	daps -d DC-uyuni-best-practices html
+	daps -d DC-uyuni-best-practices html --single
+
+uyuni-getting-started-html: uyuni xml-uyuni
+	daps -d DC-uyuni-getting-started html
+	daps -d DC-uyuni-getting-started html --single
+
+uyuni-reference-html: uyuni xml-uyuni
+	daps -d DC-uyuni-reference html
+	daps -d DC-uyuni-reference html --single
+
+#### Build SUMA docs and link images to the suma folder
 suma-html: suma xml-suma
 	daps -d DC-create-all html
 	(cd build/create-all/html/create-all; ln -sf ../../../../../adoc/images/suma .)
 
-# Make SUMA Packages for OBS
+#### Make SUMA Packages for OBS
 suma-dist: suma xml-suma
-	daps -vvv -d DC-create-all package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc; time
+	daps -vvv -d DC-create-all package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc
 
-# Make Uyuni Packages for OBS
-uyuni-dist: xml-uyuni
-	daps -vvv -d DC-create-all-uyuni package-src --set-date=$(date --iso) --def-file DEF-susemanager-docs-adoc; time
+#### Build SUMA PDF
+suma-pdf: suma xml-suma
+	daps -d DC-create-all pdf
 
-#### Build SUMA PDF ####
-suma-pdf: xml-suma
-	daps -d DC-create-all pdf; time
+suma-advanced-pdf: suma xml-suma
+	daps -d DC-susemanager-advanced-topics pdf
 
-suma-advanced-pdf: xml-suma
-	daps -d DC-susemanager-advanced-topics pdf; time
+suma-best-practices-pdf: suma xml-suma
+	daps -d DC-susemanager-best-practices pdf
 
-suma-best-practices-pdf: xml-suma
-	daps -d DC-susemanager-best-practices pdf; time
+suma-getting-started-pdf: suma xml-suma
+	daps -d DC-susemanager-getting-started pdf
 
-suma-getting-started-pdf:
-	daps -d DC-susemanager-getting-started pdf; time
+suma-reference-pdf: suma xml-suma
+	daps -d DC-susemanager-reference pdf
 
-suma-reference-pdf:
-	daps -d DC-susemanager-reference pdf; time
+#### Build SUMA HTML Chunked/single
 
-#### Build SUMA HTML ####
-#suma-html: xml-suma
-#	daps -d DC-create-all html; time
+suma-advanced-html: suma xml-suma
+	daps -d DC-susemanager-advanced-topics html
+	daps -d DC-susemanager-advanced-topics html --single
 
-suma-advanced-html: xml-suma
-	daps -d DC-susemanager-advanced-topics html; time
-	daps -d DC-susemanager-advanced-topics html --single; time
+suma-best-practices-html: suma xml-suma
+	daps -d DC-susemanager-best-practices html
+	daps -d DC-susemanager-best-practices html --single
 
-suma-best-practices-html: xml-suma
-	daps -d DC-susemanager-best-practices html; time
-	daps -d DC-susemanager-best-practices html --single; time
+suma-getting-started-html: suma xml-suma
+	daps -d DC-susemanager-getting-started html
+	daps -d DC-susemanager-getting-started html --single
 
-suma-getting-started-html:
-	daps -d DC-susemanager-getting-started html; time
-	daps -d DC-susemanager-getting-started html --single; time
-
-suma-reference-html:
-	daps -d DC-susemanager-reference html; time
-	daps -d DC-susemanager-reference html --single; time
-
-#### Build Uyuni PDF ####
-uyuni-pdf: xml
-	daps -d DC-create-all-uyuni pdf; time
-
-uyuni-advanced-pdf:
-	daps -d DC-uyuni-advanced-topics- pdf; time
-
-uyuni-best-practices-pdf:
-	daps -d DC-uyuni-best-practices pdf; time
-
-uyuni-getting-started-pdf:
-	daps -d DC-uyuni-getting-started pdf; time
-
-uyuni-reference-pdf:
-	daps -d DC-uyuni-reference pdf; time
+suma-reference-html: suma xml-suma
+	daps -d DC-susemanager-reference html
+	daps -d DC-susemanager-reference html --single
 
 #### Retail
-xml-retail: xml/book_retail_getting_started.xml # retail-images
+xml-retail: xml/book_retail_getting_started.xml retail-images
 
 retail-images: adoc/images/retail/*
-	@ccecho result "Linking suma images to DAPS expected image directories..."
-	sleep 1
 	mkdir -p images/src
 	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/retail/*.png .)
 	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/retail/*.svg .)
 
 xml/book_retail_getting_started.xml: adoc/retail*.adoc
-	@ccecho result "Converting adoc MAIN-manager.xml to Docbook5 xml and adding the {PRODUCTNAME} entities..."
 	asciidoctor -a productname='$(PRODUCTNAME)' -b docbook5 -d book -D xxml adoc/book_retail_getting_started.adoc
-	#@ccecho result "Inserting entities from doc-susemanager/entities..."
-	#sed -i '2i <!DOCTYPE set [ <!ENTITY % entities SYSTEM "entity-decl.ent"> %entities; ]>' xxml/MAIN-manager.xml
-	#@ccecho result "Replacing {foo} (but not \${foo}) with &foo;..."
-	#perl -p -i -e 's/([^\$$])\{(\w+)\}/\1\&$$2\;/g' xxml/MAIN-manager.xml
-	#@ccecho result "Making .ent files available for validation..."
-	#(cd xxml; ln -sf ../entities/*ent .)
 	rm -rf xml
 	mv xxml xml
 
-retail-getting-started-html: xml-retail
-	daps -d DC-retail-getting-started html; time
+retail-getting-started-html: suma xml-retail
+	daps -d DC-retail-getting-started html
 
-retail-getting-started-pdf:
-	daps -d DC-retail-getting-started pdf; time
+retail-getting-started-pdf: suma xml-retail
+	daps -d DC-retail-getting-started pdf
 
-# Target for www.suse.com/documentation
-suma-online-docs:
-	daps -d DC-create-all online-docs; time
 
-uyuni-online-docs:
-	daps -d DC-create-all-uyuni --force online-docs; time
-
+#### Cleanup
 clean:
 	rm -rf package/doc-susemanager-develop.tar.bz2
 	rm -rf package/*~
@@ -167,3 +165,14 @@ clean:
 	rm -rf xml
 	rm -rf xxml
 	rm -rf build
+	rm -rf book-to-set/build/
+	rm -rf book-to-set/xml/*
+
+
+# Keep for reference
+	#@ccecho result "Inserting entities from doc-susemanager/entities..."
+	#sed -i '2i <!DOCTYPE set [ <!ENTITY % entities SYSTEM "entity-decl.ent"> %entities; ]>' xxml/MAIN-manager.xml
+	#@ccecho result "Replacing {foo} (but not \${foo}) with &foo;..."
+	#perl -p -i -e 's/([^\$$])\{(\w+)\}/\1\&$$2\;/g' xxml/MAIN-manager.xml
+	#@ccecho result "Making .ent files available for validation..."
+	#(cd xxml; ln -sf ../entities/*ent .)
