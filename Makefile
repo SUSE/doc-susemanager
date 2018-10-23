@@ -31,7 +31,6 @@ xml/MAIN-manager.xml: adoc/*.adoc
 
 # run book-to-set stylesheet first on xml/MAIN-manager.xml this allows creation of single books, next run make suma-getting-started-html to created both the single and chunked version of a book
 book-to-set: suma xml-suma
-	rm -rf xml/MAIN-manager.xml
 	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
 	(cd book-to-set; ln -sf ../entities/*ent .)
 	(cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml)
@@ -40,29 +39,8 @@ book-to-set: suma xml-suma
 	cd book-to-set/; daps -m xml/MAIN-manager.xml validate
 	cp book-to-set/xml/MAIN-manager.xml xml/MAIN-manager.xml
 
-<<<<<<< HEAD
-book-to-set-uyuni: clean uyuni xml-suma
-	@ccecho result "Copying Main file into book-to-set/ ..."
-	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
-	@ccecho result "Making entities available ..."
-	(cd book-to-set; ln -sf ../entities/*ent .)
-	@ccecho result "Converting unsupported db5 tags to supported geekodoc subset tags..."
-	(cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml)
-	@ccecho result "Renaming and moving test.xml to xml/MAIN-manager.xml ..."
-	mkdir -p book-to-set/xml
-	mv book-to-set/test.xml book-to-set/xml/MAIN-manager.xml
-	@ccecho result "Validating resulting Main file ..."
-	cd book-to-set/; daps -m xml/MAIN-manager.xml validate
-	@ccecho result "Copying processed Main file to primary build path ..."
-	cp book-to-set/xml/MAIN-manager.xml xml/MAIN-manager.xml
-
-# TODO: Add additional DC files for uyuni so we can setup a make all scenario for building both SUMA/Uyuni docs and pdf files.
-=======
-
->>>>>>> 561ba71129b4e87bb5c372a4f7b2e12caff13912
 # Build Uyuni docs and link images to the uyuni folder
 book-to-set-uyuni: uyuni xml-uyuni
-	rm -rf xml/MAIN-manager.xml
 	cp xml/MAIN-manager.xml book-to-set/MAIN-manager.xml
 	(cd book-to-set; ln -sf ../entities/*ent .)
 	(cd book-to-set/; xsltproc book2set.xsl MAIN-manager.xml > test.xml)
@@ -164,16 +142,36 @@ suma-reference-html: suma xml-suma
 #uyuni-online-docs:
 #	daps -d DC-create-all-uyuni --force online-docs
 
-clean:
+start-clean:
 	rm -rf package/doc-susemanager-develop.tar.bz2
 	rm -rf package/*~
 	rm -rf images
 	rm -rf xml
 	rm -rf xxml
 	rm -rf build
-	rm -rf book-to-set/build/
-	rm -rf book-to-set/xml/*
+	rm -rf book-to-set/build
+	rm -rf book-to-set/xml
+	rm book-to-set/MAIN-manager.xml
 
+uyuni-clean:
+	rm -rf xml
+	rm -rf xxml
+	rm -rf book-to-set/build
+	rm -rf book-to-set/xml/*
+	rm book-to-set/MAIN-manager.xml
+	rm -rf images
+	rm -rf build/.profiled
+	rm -rf build/.images
+
+suma-clean:
+	rm -rf xml
+	rm -rf xxml
+	rm -rf book-to-set/build/
+	rm -rf book-to-set/xml
+	rm book-to-set/MAIN-manager.xml
+	rm -rf images
+	rm -rf build/.profiled
+	rm -rf build/.images
 
 # Keep for reference
 	#@ccecho result "Inserting entities from doc-susemanager/entities..."
