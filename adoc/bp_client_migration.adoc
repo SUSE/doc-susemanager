@@ -6,7 +6,7 @@ include::entities.adoc[]
 
 Upgrading from SLE{nbsp}12 with the latest service pack (SP) to SLE{nbsp}15 can be automated, but requires some preparation steps.
 
-To upgrade the SP version on SLE{nbsp}12 (for example, upgrading from SLE{nbsp}12, or SLE{nbsp}12{nbsp}SP1 or SP2, to SLE{nbsp}12{nbsp}SP3 or later) can be fully automated and requires no additional preparation.
+To upgrade the SP version on SLE{nbsp}12 (for example, upgrading from SLE{nbsp}12 or any SLE{nbsp}12{nbsp}SPx to SLE{nbsp}12{nbsp}SP4) can be fully automated and requires no additional preparation.
 
 
 
@@ -21,12 +21,15 @@ This also applies for other supported products based on SLE{nbsp}12.
 ====
 For generally supported {sle} upgrade paths, see  https://www.suse.com/documentation/sles-15/book_sle_upgrade/data/sec_upgrade-paths_supported.html ({slea} {upgrade}, Chapter "`Supported Upgrade Paths to SLE 15`").
 It is important that you migrate the client to the latest available SP first.
-In the case of SLE{nbsp}12, this is currently SP3 (August 2018).
+In the case of SLE{nbsp}12, this is currently SP4 (December 2018).
 ====
 
-
+.Auto-Upgrading Salt Minions Currently Not Supported
+[IMPORTANT]
+====
 This procedure will work for traditionally  managed systems (system type [systemitem]``management``).
 It is not currently available for systems using Salt (system type [systemitem]``salt``).
+====
 
 During the procedure, the machine reboots and performs the system upgrade.
 The process is controlled by {yast} and {ay}, not by [command]``zypper`` commands.
@@ -78,7 +81,7 @@ For more information about Autoinstallation, see <<ref.webui.systems.autoinst>>.
 
 .Procedure: Create an Activation Key
 
-In order to switch from the old SLE{nbsp}12{nbsp}SP3 base channel to the new SLE{nbsp}15 channel, you need an activation key.
+In order to switch from the old SLE{nbsp}12{nbsp}SP4 base channel to the new SLE{nbsp}15 channel, you need an activation key.
 
 . Go to menu:Main Menu[Systems > Activation Keys] and click [guimenu]``Create Key``.
 . Enter a description for your key.
@@ -132,25 +135,21 @@ include::bp_ex_autoinst_system-upgrade.adoc[leveloffset=3]
 
 
 [[bp.client.migration.sle12]]
-== Migrating SLE{nbsp}12 or later to version 12{nbsp}SP3
+== Migrating SLE{nbsp}12 or later to version 12{nbsp}SP4
 
 
-Existing SLE{nbsp}12 clients (SLE) may be upgraded to SP3 with the menu:SP Migration[] procedure provided by the {webui}.
-The same applies for other supported products based on {sle} 12.
+Existing SLE{nbsp}12 clients (SLE) may be upgraded to SP4 with the menu:SP Migration[] procedure provided by the {webui}.
+The same applies for other supported products based on {sle} 12.
 
 .Synchronizing Target Channels
 [WARNING]
 ====
 Before successfully initializing the product migration, you first must make sure that the migration target channels are completely mirrored.
-For the upgrade to SLE{nbsp}12{nbsp}SP3, at least the [systemitem]``SLES12-SP3-Pool``
- base channel with the [systemitem]``SLE-Manager-Tools12-Pool``
- child channel for your architecture is required.
-The matching update channels such as [systemitem]``SLE-Manager-Tools12-Updates``
- and [systemitem]``SLES12-SP3-Updates``
- are recommended.
+For the upgrade to SLE{nbsp}12{nbsp}SP4, at least the [systemitem]``SLES12-SP4-Pool`` base channel with the [systemitem]``SLE-Manager-Tools12-Pool`` child channel for your architecture is required.
+The matching update channels such as [systemitem]``SLE-Manager-Tools12-Updates`` and [systemitem]``SLES12-SP4-Updates`` are recommended.
 ====
 
-.Procedure: Migrating SLE{nbsp}12 Client to SP3
+.Procedure: Migrating SLE{nbsp}12 Client to SP4
 . Direct your browser to the {productname} {webui} where your client is registered, and login.
 . On the menu:Systems[All] page select your client system from the table.
 +
@@ -165,18 +164,17 @@ If there are menu:Software Updates Available[] in the menu:System Status[] notif
 
 image::sles_old_details_spmigration.png[scaledwidth=80%]
 
-. From this tab you will see the installed products listed on your client. Select the wanted menu:Target Products[] (if there is more than one), which is [systemitem]``SUSE Linux Enterprise Server 12{nbsp}SP3`` .
+. From this tab you will see the installed products listed on your client. Select the wanted menu:Target Products[] (if there is more than one), which is [systemitem]``SUSE Linux Enterprise Server 12{nbsp}SP4``.
 +
 
 image::sles_migration_target.png[scaledwidth=80%]
 
 +
-Then confirm with menu:Select Channels[]
-.
+Then confirm with menu:Select Channels[].
 +
 
 image::sles_migration_channels.png[scaledwidth=80%]
-. Select menu:Schedule Migration[] , and then menu:Confirm[] .
+. Select menu:Schedule Migration[], and then menu:Confirm[].
 +
 
 image::sles_migration_schedule.png[scaledwidth=80%]
@@ -185,8 +183,6 @@ Check the menu:System Status[] on the system's details when the migration is don
 
 image::sles_migrated.png[scaledwidth=80%]
 
-If the menu:System Status[]
- notification does not report a successful migration but lists menu:Software Updates Available[]
-, install the update now and then check again.
+If the menu:System Status[] notification does not report a successful migration but lists menu:Software Updates Available[], install the update now and then check again.
 
 Finally, consider to schedule a reboot.
