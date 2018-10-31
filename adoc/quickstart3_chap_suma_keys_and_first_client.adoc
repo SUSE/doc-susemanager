@@ -118,11 +118,32 @@ mgr-create-bootstrap-repo -l SLE-`version`-x86_64
 +
 
 ----
-mgr-create-bootstrap-repo -c SLE-version-x86_64
+mgr-create-bootstrap-repo -c SLE-`version`-x86_64
 ----
-. {productname} will create and add the client tools to the newly created [path]``repositories`` directory located at [path]``/srv/www/htdocs/pub/repositories/``. 
+. {productname} will create and add the client tools to the newly created [path]``repositories`` directory located at [path]``/srv/www/htdocs/pub/repositories/``.
 
 This repository is suitable for both Server and Desktop of {sle}.
+
+[NOTE]
+.Support for {sle} 15 Products
+====
+If you have mirrored more than one {sle} 15 Product (for example, {slsa}, {slda}, and {slsa} for SAP Application), you can specify the one you are actually interested in. First check what is avaiable:
+
+----
+mgr-create-bootstrap-repo -c SLE-15-x86_64 --with-custom-channel
+Multiple options for parent channel found. Please use option
+--with-parent-channel <label> and choose one of:
+- sle-product-sles15-pool-x86_64
+- sle-product-sles_sap15-pool-x86_64
+- sle-product-sled15-pool-x86_64
+----
+
+Then specify it with [literal]``--with-parent-channel``:
+
+----
+mgr-create-bootstrap-repo -c SLE-15-x86_64 --with-parent-channel sle-product-sled15-pool-x86_64
+----
+====
 
 
 
