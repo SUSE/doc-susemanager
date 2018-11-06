@@ -1,0 +1,56 @@
+[[retail_migr.chap.scenarios]]
+= Scenarios
+
+
+include::entities.adoc[]
+
+
+
+[[retail_migr.chap.scenarios.s1]]
+== Scenario 1—Migrate SLEPOS (No {susemgr} Installed)
+
+Proceed as follows if you want to migrate an existing SLEPOS installation to {susemgr} that is not installed thus far.
+
+. Install a {susemgr} server {productnumber} (with the Retail extension).  For more information, see xref:retail_chap_install.adoc#retail.chap.install[{smr} Installation].
+
+. On the SLEPOS Admin server export your LDAP data to an XML file with the following command:
++
+----
+posAdmin --export --type xml --file dumpfile.xml
+----
++
+Alternatively, this data can be exported branch by branch with:
++
+----
+posAdmin --export --type xml --file dumpfile.xml --user 
+----
+
+. Move the XML file to the {susemgr} server and convert it to YAML:
++
+----
+retail_migration dumpfile.xml retail.yml
+----
+
+. For each SLEPOS image build a replacement image in {susemgr}, edit the [path]``retail.yml`` file, and adjust the image names and other settings if needed.
+For more information about building images, see xref:advanced_topics_image_management.adoc#at.images.kiwi[OS image building].
+
+    import complete yaml with retail_yaml --from-yaml retail.yml. Alternatively, it can be imported branch by branch later
+
+    for each branch
+
+    reinstall SLEPOS Branch Server with SUMA Proxy, connect it to SUMA Server (the same procedure as "mass deployment")
+
+    optionally import selected branch from yaml retail_yaml --from-yaml retail.yml --branch <branch_name>  if it was not done in step 5 (steps 2 - 4 can be optionally repeated too)
+
+    apply highstate on Branch Server
+
+    boot rerminals
+
+    remove SLEPOS Admin Server
+
+
+== Scenario 2a: existing SUMA, not connected to SLEPOS
+
+    migrate SUMA to 3.2
+
+    continue as in Scenario 1 step 2
