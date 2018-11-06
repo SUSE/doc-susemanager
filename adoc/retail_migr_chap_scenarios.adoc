@@ -34,23 +34,42 @@ retail_migration dumpfile.xml retail.yml
 . For each SLEPOS image build a replacement image in {susemgr}, edit the [path]``retail.yml`` file, and adjust the image names and other settings if needed.
 For more information about building images, see xref:advanced_topics_image_management.adoc#at.images.kiwi[OS image building].
 
-    import complete yaml with retail_yaml --from-yaml retail.yml. Alternatively, it can be imported branch by branch later
-
-    for each branch
-
-    reinstall SLEPOS Branch Server with SUMA Proxy, connect it to SUMA Server (the same procedure as "mass deployment")
-
-    optionally import selected branch from yaml retail_yaml --from-yaml retail.yml --branch <branch_name>  if it was not done in step 5 (steps 2 - 4 can be optionally repeated too)
-
-    apply highstate on Branch Server
-
-    boot rerminals
-
-    remove SLEPOS Admin Server
+. Import the complete data (YAML) with:
++
+----
+retail_yaml --from-yaml retail.yml
+----
++
+Alternatively, it can be imported branch by branch.
 
 
-== Scenario 2a: existing SUMA, not connected to SLEPOS
+For each branch perform the following steps:
 
-    migrate SUMA to 3.2
+. Replace each old SLEPOS branch server with a {smr} branch server (see xref:retail_chap_install.adoc#retail.sect.install.branch[Install Branch Server]) and connect it to the {smr} server (the same procedure as for xref:retail_chap_admin.adoc#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration]).
 
-    continue as in Scenario 1 step 2
+. Optionally, import a selected branch from the YAML data with:
++
+----
+retail_yaml --from-yaml retail.yml --branch <branch_name>
+----
++
+If it was not done in the previous step with the complete import. (The other steps before can also be repeated optionally).
+
+. Apply highstate on the branch server.
+
+. Boot the terminals of the banch.
+
+Finally, shutdown and remove the old SLEPOS Admin Server.
+
+
+
+[[retail_migr.chap.scenarios.s2a]]
+== Scenario 2a—Migrate SLEPOS ({susemgr} Installed Independantly)
+
+
+Proceed as follows if you want to migrate an existing SLEPOS installation to {susemgr} that was already installed independantly.
+
+. Check the version number of the installed {susemgr}. If needed migrate {susemgr} to version 3.2.
+. Check whether is the Retail extension is already installed. If not, see xref:retail_chap_install.adoc#retail.chap.install[{smr} Installation] and enhance your server accordingly.
+. Continue as in xref:retail_migr_chap_scenarios.adoc#retail_migr.chap.scenarios.s1[Scenario 1, Step 2].
+
