@@ -3,7 +3,7 @@ include::entities.adoc[]
 
 == Overview
 
-In this guide you will use a KVM environment to setup {productname} on {sleha} using two nodes.
+In this guide you will use a KVM environment to setup {productname} on {sleha} using three nodes.
 You will also setup a third server to provide shared storage.
 
 This guide assumes basic {sleha} knowledge.
@@ -15,7 +15,32 @@ https://www.suse.com/documentation/sle-ha-12/[{sleha} {sles-version} {sp-version
 NOTE: The STONITH(Shoot the other node in the head) Block Devices(SBD) will be set up on a shared storage server based on {sle}{nbsp}{sp-version} running an iSCSI target. The following sections will guide you through the setup of this device.
 
 [#iscsi-hardware-requirements]
-== Hardware Requirements
+
+== System Requirements
+
+=== Hardware Requirements
+
+Servers::
+For true HA you need at least three servers with the following software installed:
++
+* SUSE® Linux Enterprise Server 12 SP3 (with all available online updates)
++
+* SUSE Linux Enterprise High Availability Extension 12 SP3 (with all available online updates)
+
+Time Synchronization::
+Cluster nodes must synchronize to an NTP server outside the cluster. For more information, see the Administration Guide for SUSE Linux Enterprise Server 12 SP3:
+* http://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_netz_xntp.html
+
+Host Name and IP Address::
+* Use static IP addresses.
+* List all cluster nodes in the /etc/hosts file with their fully qualified host name and short host name. It is essential that members of the cluster can find each other by name. If the names are not available, internal cluster communication will fail.
+
+SSH::
+All cluster nodes must be able to access each other via SSH. Tools like crm report (for troubleshooting) and Hawk2's History Explorer require passwordless SSH access between the nodes, otherwise they can only collect data from the current node.
++
+If you use the bootstrap scripts for setting up the cluster, the SSH keys will automatically be created and copied.
+
+
 
 The following section will cover setup of the iSCSI storage devices.
 
@@ -45,7 +70,7 @@ From this point on we will call this server the **storage-commander**
 . Once the installation has completed, open a terminal as {ruser} and install the following iscsi server package:
 +
 ----
-zypper -n in yast2-iscsi-lio-server-3.2.1-1.23.noarch
+zypper -n in yast2-iscsi-lio-server
 ----
 
 . Prepare the image files:
