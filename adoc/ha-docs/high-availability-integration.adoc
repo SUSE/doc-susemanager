@@ -1,134 +1,152 @@
 = High Availability and {productname}
 include::entities.adoc[]
 
+
+
 == Overview
 
-In this guide you will use a KVM environment to setup {productname} on {sleha} using three nodes.
+In this guide you will use KVM to setup {productname} on two nodes with {sleha}.
 You will also setup a third server to provide shared storage.
 
-This guide assumes basic {sleha} knowledge.
+[NOTE]
+.What you Should Already Know
+====
+This guide assumes basic {sleha} and {sle} installation knowledge.
 For an overview and more information on {sleha} see: 
 
 https://www.suse.com/documentation/sle-ha-12/[{sleha} {sles-version} {sp-version} Documentation]
+====
 
 .Storage-based Fencing
-NOTE: The STONITH(Shoot the other node in the head) Block Devices(SBD) will be set up on a shared storage server based on {sle}{nbsp}{sp-version} running an iSCSI target. The following sections will guide you through the setup of this device.
+NOTE: The STONITH(Shoot the other node in the head) Block Devices(SBD) will be set up on the shared storage server based on {sle}{nbsp}{sp-version} running an iSCSI target. The following sections will guide you through the setup of this device.
 
 [#iscsi-hardware-requirements]
 
-== System Requirements
 
-=== Hardware Requirements
 
-Servers::
-For true HA you need at least three servers with the following software installed:
-+
+== Preparation and Requirements
+
+
+[#prepare-two-nodes]
+=== Prepare two Nodes
+
+Begin by setting up two servers on KVM with the following software installed:
+
 * SUSE® Linux Enterprise Server 12 SP3 (with all available online updates)
-+
+
 * SUSE Linux Enterprise High Availability Extension 12 SP3 (with all available online updates)
 
+During the {sle} {sp-version} installation select {sleha} to be installed. 
+
+[#node-server-requirements]
+.KVM Node Server Disk and RAM Requirements
+
+* 100{nbsp}GB (Btrfs - filesystem)
+
+* For this guide each node requires at least 4096{nbsp}GB of RAM.
+
+[IMPORTANT]
+.Calculating RAM and Storage Requirements
+====
+In a production setting your storage needs and memory requirements will be much higher. These numbers depend entirely on your environment. See the <PRODUCTNAME> documentation for recommendations on storage, memory and number of CPUs.
+====
+
+
+
+
+[#prepare-the-shared-storage-node]
+=== Prepare the Shared iSCSI Storage Node
+
+Continue by setting up a storage server on KVM with the following software installed:
+
+* SUSE® Linux Enterprise Server 12 SP3 (with all available online updates)
+
+* SUSE Linux Enterprise High Availability Extension 12 SP3 (with all available online updates)
+
+During the {sle} {sp-version} installation select {sleha} to be installed. 
+
+[#node-server-requirements]
+.KVM Storage Server Disk Requirements
+
+* 500{nbsp}GB (Btrfs - filesystem)
+
+* For this guide the storage server requires at least 4096{nbsp}GB of RAM.
+
 Time Synchronization::
-Cluster nodes must synchronize to an NTP server outside the cluster. For more information, see the Administration Guide for SUSE Linux Enterprise Server 12 SP3:
+During the {sle} installation setup NTP. Cluster nodes must synchronize to an NTP server outside the cluster. For more information, see the Administration Guide for SUSE Linux Enterprise Server 12 SP3:
 * http://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_netz_xntp.html
 
-Host Name and IP Address::
-* Use static IP addresses.
-* List all cluster nodes in the /etc/hosts file with their fully qualified host name and short host name. It is essential that members of the cluster can find each other by name. If the names are not available, internal cluster communication will fail.
-
-SSH::
-All cluster nodes must be able to access each other via SSH. Tools like crm report (for troubleshooting) and Hawk2's History Explorer require passwordless SSH access between the nodes, otherwise they can only collect data from the current node.
-+
-If you use the bootstrap scripts for setting up the cluster, the SSH keys will automatically be created and copied.
-
-
-
-The following section will cover setup of the iSCSI storage devices.
-
-[#storage-server-requirements]
-.Storage Server Disk Requirements
-|===
-| Location | Size
-
-| SBD device     | 100{nbsp}MB
-| /var/cache     | 25{nbsp}GB 
-| /var/lib/pgsql | 50{nbsp}GB
-| /var/spacewalk | 100{nbsp}GB (100{nbsp}GB for a test setup, a production setup will be greater than 500{nbsp}GB+)
-| /srv           | 10{nbsp}GB
-| other          | 100{nbsp}GB for all other required filesystems
-|===
 
 
 [#setup-the-iscsi-storage-server]
 == Setup the iSCSI Storage Server
 
 In this procedure you will setup the iSCSI Storage Server.
-From this point on we will call this server the **storage-commander**
+From this point on we will call this server the *storage node*
 
 [#procedure-setup-the-storage-server]
-.Procedure: Setup the iSCSI Storage Server
-. Use KVM to setup a basic {sle}{nbsp}{sles-version}{nbsp}{sp-version} server.
-. Once the installation has completed, open a terminal as {ruser} and install the following iscsi server package:
+.Procedure: Post Installation Setup of the iSCSI Storage Server
+. Once the storage server has been prepared as explained in: <<#prepare-the-shared-storage-node>>, open a terminal as *{ruser}* and prepare the following image files for use as the block device files:
 +
-----
-zypper -n in yast2-iscsi-lio-server
-----
 
-. Prepare the image files:
+. Prepare the following block device files:
 +
+
 ----
-dd if=/dev/zero of=c01-sbd.img bs=1M seek=100 count=0
-dd if=/dev/zero of=c01-spacewalk.img bs=1M seek=102400 count=0
-dd if=/dev/zero of=c01-srv.img bs=1M seek=10240 count=0
-dd if=/dev/zero of=c01-pgsql.img bs=1M seek=51200 count=0
-dd if=/dev/zero of=c01-cacherhn.img bs=1M seek=26200 count=0
-dd if=/dev/zero of=c01-others.img bs=1M seek=52200 count=0
+dd if=/dev/zero of=c01-sbd.img bs=1M seek=100 count=0 <1>
+dd if=/dev/zero of=c01-spacewalk.img bs=1M seek=102400 count=0 <2>
+dd if=/dev/zero of=c01-srv.img bs=1M seek=10240 count=0 <3>
+dd if=/dev/zero of=c01-pgsql.img bs=1M seek=51200 count=0 <4>
+dd if=/dev/zero of=c01-cacherhn.img bs=1M seek=26200 count=0 <5>
+dd if=/dev/zero of=c01-others.img bs=1M seek=52200 count=0 <6>
 ---- 
++
+
+[#storage-server-requirements]
+.Storage Server Block Devices:
+
+<1> *c01-sbd.img* SBD storage device 100{nbsp}MB 
+<2> *c01-spacewalk.img* /var/spacewalk 100{nbsp}GB (A production setup will be greater than 500{nbsp}GB+)
+<3> *c01-srv.img* /srv 10{nbsp}GB
+<4> *c01-pgsql.img* /var/lib/pgsql 50{nbsp}GB
+<5> *c01-cacherhn.img* /var/cache 25{nbsp}GB
+<6> *c01-others.img* other 100{nbsp}GB for all other required file systems
 
 . Run {yast} to setup the images:
 +
 ----
-yast iscsi-lio-server
+yast2 iscsi-lio-server
 ----
 
 
-== Setup Your Nodes
 
-In this procedure you will setup two {sleha} nodes.
-From this point on we will call these two servers  **node1** and **node2**.
+== Configure the Two Nodes
 
-.Procedure: Prepare node1 and node2
-. Use {kvm} to install two {sle}{nbsp}{sles-version}{nbsp}{sp-version} systems with the following specs:
+In this procedure you will finalize setup of the two {sle} nodes.
+From this point on we will call these two servers  *node1* and *node2*.
+
+
+[#procedure-setup-the-two-nodes]
+.Procedure: Post Installation Setup of the Two Nodes
+
+. Once the two nodes have been prepared as explained in: <<#prepare-two-nodes>>, open a terminal as *{ruser}* and configure watchdog.
+
+. Create the file [filename]``/etc/modules-load.d/watchdog.conf``.
+
+. Add the following snippet to the file:
 +
-[#node-server-requirements]
-.Node Server Requirements
-|===
-| Server | Disk Space
 
-| node1  | Minimum of 16 - 30{nbsp}GB (100{nbsp}GB if you are using btrfs)
-| node2  | Minimum of 16 - 30{nbsp}GB (100{nbsp}GB if you are using btrfs)
-|===
-
-. Install the SLE-HA pattern on both nodes:
-+
-----
-zypper -n in -t ha-sles
-----
-
-. Configure watchdog:
-.. Create the file [filename]``/etc/modules-load.d/watchdog.conf``.
-.. Add the following snippet to the file:
-+
 ----
 softdog
 ----
 
-.. Restart the service:
+. Restart the service:
 +
 ----
 systemctl restart systemd-modules-load
 ----
 
-.. Create the file [filename]``/etc/corosync/corosync.conf`` and add the following content:
+. Create the file [filename]``/etc/corosync/corosync.conf`` and add the following content:
 +
 ----
 totem {
@@ -175,14 +193,29 @@ quorum {
 }
 ----
 +
-<1> The **bindnetaddr** should be set to the correct network.
 
-. On **node1** generate a **corosync key**. To generate the key enter:
+<1> The *bindnetaddr* should be set to your network.
+
+. On *node1* generate a *corosync key*. 
+To generate a key enter:
 +
+
 ----
 corosync-keygen
 ---- 
 +
+
 The file is generated and is placed in: [filename]``/etc/corosync/authkey``.
 
-. Now copy the key generated on **node1** over to **node2** and place it in: [filename]``/etc/corosync/authkey``.
+. Now as *root* copy the key using *scp* from *node1* to *node2* and place it in: [filename]``/etc/corosync/authkey``.
++
+----
+scp /etc/corosync/authkey node2@node2:/etc/corosync/authkey <1>
+----
+
+<1> In the *scp* snippet *node2* is the user, and we added the servers short host name to the `/etc/hosts` file on node1 with its IP address:
++
+./etc/hosts on node1
+----
+192.168.188.2 node2
+----
