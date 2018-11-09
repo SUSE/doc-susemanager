@@ -22,6 +22,68 @@ Once you have made changes to your formula, ensure you apply the highstate to pr
 
 // We should ensure these are in alphabetical order. LKB
 
+[[retail.sect.formulas.bind]]
+== Bind Formula
+
+The Bind formula is used to configure the boot image on a terminal.
+
+
+[NOTE]
+====
+There are many different configurations possible.
+This procedure outlines a simple, single-disk, three-partition configuration.
+Adjust it to suit your own environment.
+====
+
+
+.Procedure: Configuring bind
+
+. Check the [systemitem]``Bind`` formula, and click [btn]``Save``.
+. Navigate to the menu:Formulas[Bind] tab, and set these parameters for Zone1:
+* In the [guimenu]``Config`` section, select [systemitem]``Include Forwarders``.
+* In the [guimenu]``Name`` field, use the fully qualified domain name (FQDN) of the  branch server (for example: [systemitem]``branch1.mycompany.org``).
+* In the [guimenu]``Type`` field, select [systemitem]``master``.
+. Click [btn]``Add item`` to save your changes.
+. Set these parameters for Zone2:
+* In the [guimenu]``Name`` field, use the reverse zone for the configured IP range (for example: [systemitem]``1.168.192.in-addr.arpa``).
+* In the [guimenu]``Type`` field, select [systemitem]``master``
+. In the [guimenu]``Available Zones`` section, use these parameters for Zone1:
+* In the [guimenu]``Name`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.mycompany.org``).
+* In the [guimenu]``File`` field, type the name of your configuration file *TODO: Check this* (for example: [systemitem]``branch1.txt``).
+. In the [guimenu]``Start of Authority (SOA)`` section, use these parameters for Zone1:
+* In the [guimenu]``Nameserver (Ns)`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.mycompany.org``).
+* In the [guimenu]``Contact`` field, use the email address for the domain administrator.
+* Keep all other fields as their default values.
+. In the [guimenu]``Records`` section, in subsection [guimenu]``A``, click on btn:[Add Item] and use these parameters to set up an A record for Zone1:
+* In the [guimenu]``Hostname`` field, use the hostname of the branch server (for example: [systemitem]``branchserver``).
+* In the [guimenu]``IP`` field, use the IP address of the branch server (for example, [systemitem]``192.168.1.1``).
+. In the [guimenu]``Records`` section, subsection [guimenu]``NS``, click on btn:[Add Item] and use these parameters to set up an NS record for Zone1:
+* In the input box, use the hostname of the branch server (for example: [systemitem]``branchserver``).
+. In the [guimenu]``Records`` section, subsection [guimenu]``CNAME``, click on btn:[Add Item] and add the hostname of the branch server in each of these fields:
+* [systemitem]``tftp``
+* [systemitem]``ftp``
+* [systemitem]``dns``
+* [systemitem]``dhcp``
+* [systemitem]``salt``
+. Set up Zone2 using the same parameters as for Zone1, but ensure you use the reverse  details.
+. Click btn:[Save Formula] to save your configuration
+. Apply the highstate.
+
+
+[IMPORTANT]
+====
+Reverse name resolution on terminals might not work for networks that are inside one of these IPv4 private address ranges:
+* 10.0.0.0/8
+* 172.16.0.0/12
+* 192.168.0.0/16
+
+If you encounter this problem, go to the [guimenu]``Options`` section of the bind formula, and click btn:[Add item].
+In the [guimenu]``Options`` field, enter [systemitem]``empty-zones-enable``.
+In the [guimenu]``Value`` field, select [systemitem]``No``.
+====
+
+
+
 [[retail.sect.formulas.branch-network]]
 == Branch Network Formula
 
@@ -88,6 +150,36 @@ Ensure you include DNS, TFTP and FTP services.
 
 
 
+[[retail.sect.formulas.dhcpd]]
+== DHCPd Formula
+
+The DHCPd formula is used to configure the DHCP service on the branch server.
+
+
+.Procedure: Configuring DHCP
+
+. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the Formulas tab.
+. Select the [guimenu]``Dhcpd`` formula, and click btn:[Save].
+. Navigate to the menu:Formulas[Dhcpd] tab, and set these parameters:
+* In the [guimenu]``Domain Name`` field, enter the domain name for the branch server (for example: [systemitem]``branch1.example.com``).
+* In the [guimenu]``Domain Name Server`` field, enter either the IP address or resolvable FQDN of the branch DNS server (for example: [systemitem]``192.168.1.1``).
+* In the [guimenu]``Listen Interfaces`` field, enter the name of the network interface used to connect to the local branch network (for example: [systemitem]``eth1``).
+. Navigate to the [guimenu]``Network Configuration (subnet)`` section, and use these parameters for Network1:
+* In the [guimenu]``Network IP`` field, enter the IP address of the branch server network (for example: [systemitem]``192.168.1.0``).
+* In the [guimenu]``Netmask`` field, enter the network mask of the branch server network (for example: [systemitem]``255.255.255.0``).
+* In the [guimenu]``Domain Name`` field, enter the domain name for the branch server network (for example: [guimenu]``branch1.example.com``).
+. In the [guimenu]``Dynamic IP Range`` section, use these parameters to configure the IP range to be served by the DHCP service:
+* In the first input box, set the lower bound of the IP range (for example: [systemitem]``192.168.1.51``).
+* In the second input box, set the upper bound of the IP range (for example: [systemitem]``192.168.1.151``).
+. In the [guimenu]``Broadcast Address`` field, enter the broadcast IP address for the branch network (for example: [systemitem]``192.168.1.255``).
+. In the [guimenu]``Routers`` field, enter the IP address to be used by routers in the branch server network (for example: [systemitem]``192.168.1.1``).
+. In the [guimenu]``Next Server`` field, enter the hostname or IP address of the branch server (for example: [systemitem]``192.168.1.1``).
+. In the [guimenu]``Filename`` field, keep the default value of [systemitem]``/boot/pxelinux.0``.
+. Click btn:[Save Formula] to save your configuration
+. Apply the highstate.
+
+
+
 [[retail.sect.formulas.pxe]]
 == PXE Formula
 
@@ -117,29 +209,9 @@ The Saltboot formula is used to configure disk images and partitioning.
 
 .Procedure: Configuring the branch server with saltboot
 
-// TBD
-
-
-
-[[retail.sect.formulas.bind]]
-== Bind Formula
-
-The Bind formula is used to configure the boot image on a terminal.
-
-
-[NOTE]
-====
-There are many different configurations possible.
-This procedure outlines a simple, single-disk, three-partition configuration.
-Adjust it to suit your own environment.
-====
-
-
-.Procedure: Configuring bind
-
 . Open the details page for your new hardware group, and navigate to the [guimenu]``Formulas`` tab.
-. Select the [systemitem]``saltboot-formula`` and click btn:[Save] to save your changes.
-. An additional [guimenu]``saltboot`` tab will become available from the top menu, click on it to configure the new formula.
+. Select the [systemitem]``saltboot-formula`` and click btn:[Save].
+. Navigate to the new menu:Formulas[Saltboot] tab.
 . In the [guimenu]``Disk 1`` section, set these parameters:
 * In the [guimenu]``Disk symbolic ID`` field, enter a custom name for the disk (for example, [systemitem]``disk1``).
 * In the [guimenu]``Device type`` field, select [systemitem]``DISK``.
@@ -175,17 +247,9 @@ This will ensure you use the latest available version.
 * In the [guimenu]``Partition flags`` field, leave it empty.
 . Click btn:[Save Formula] to save your formula.
 
-[IMPORTANT]
-====
-Reverse name resolution on terminals might not work for networks that are inside one of these IPv4 private address ranges:
-* 10.0.0.0/8
-* 172.16.0.0/12
-* 192.168.0.0/16
 
-If you encounter this problem, go to the [guimenu]``Options`` section of the bind formula, and click btn:[Add item].
-In the [guimenu]``Options`` field, enter [systemitem]``empty-zones-enable``.
-In the [guimenu]``Value`` field, select [systemitem]``No``.
-====
+
+
 
 [[retail.sect.formulas.tftpd]]
 == TFTPd Formula
@@ -196,12 +260,12 @@ The TFTPd formula is used to configure the TFTP service on the branch server.
 .Procedure: Configuring TFTP
 
 . In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. Select the [systemitem]``Tftpd`` formula, and click [btn]``Save``.
+. Select the [systemitem]``Tftpd`` formula, and click btn:[Save].
 . Navigate to the menu:Formulas[Tftpd] tab, and set these parameters:
 * In the [guimenu]``Internal Network Address`` field, enter the IP address of the branch server (for example: [systemitem]``192.168.1.1``).
 * In the [guimenu]``TFTP Base Directory`` field, enter the path to the saltboot directory (for example, [systemitem]``/srv/saltboot``).
 * In the [guimenu]``Run TFTP Under User`` field, enter [systemitem]``saltboot``.
-. Click [btn]``Save Formula`` to save your configuration.
+. Click btn:[Save Formula] to save your configuration.
 . Apply the highstate.
 
 
@@ -216,9 +280,9 @@ Use of this formula is optional.
 .Procedure: Configuring VsFTPd
 
 . In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. Select the [systemitem]``Vsftpd`` formula, and click [btn]``Save``.
+. Select the [systemitem]``Vsftpd`` formula, and click btn:[Save].
 . Navigate to the menu:Formulas[Vsftpd] tab, and set these parameters:
 * In the [guimenu]``Internal Network Address``, enter IP address of branch server (for example: [systemitem]``192.168.1.1``).
 * All other fields can retain their default values.
-. Click [btn]``Save Formula`` to save your configuration
+. Click btn:[Save Formula] to save your configuration
 . Apply the highstate.
