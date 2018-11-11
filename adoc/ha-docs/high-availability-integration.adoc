@@ -2,11 +2,10 @@
 include::entities.adoc[]
 
 
-
 == Overview
 
 In this guide you will use KVM to setup {productname} on two nodes with {sleha}.
-You will also setup a third server to provide shared storage.
+You will also add a third server to provide iSCSI shared storage for the nodes.
 
 [NOTE]
 .What you Should Already Know
@@ -45,6 +44,10 @@ During the {sle} {sp-version} installation select {sleha} to be installed.
 
 * For this guide each node requires at least 4096{nbsp}GB of RAM.
 
+Time Synchronization::
+During the {sle} installation setup NTP. Cluster nodes must synchronize to an NTP server outside the cluster. For more information, see the Administration Guide for SUSE Linux Enterprise Server 12 SP3:
+* http://www.suse.com/documentation/sles-12/book_sle_admin/data/cha_netz_xntp.html
+
 [IMPORTANT]
 .Calculating RAM and Storage Requirements
 ====
@@ -55,7 +58,7 @@ In a production setting your storage needs and memory requirements will be much 
 
 
 [#prepare-the-shared-storage-node]
-=== Prepare the Shared iSCSI Storage Node
+=== Prepare the iSCSI Shared Storage Node
 
 Continue by setting up a storage server on KVM with the following software installed:
 
@@ -79,27 +82,36 @@ During the {sle} installation setup NTP. Cluster nodes must synchronize to an NT
 
 
 [#setup-the-iscsi-storage-server]
-== Setup the iSCSI Storage Server
+== Create the iSCSI Block Devices on the Storage Server
 
-In this procedure you will setup the iSCSI Storage Server.
+In this procedure you will setup the iSCSI block devices on the storage server.
 From this point on we will call this server the *storage node*
 
+
 [#procedure-setup-the-storage-server]
-.Procedure: Post Installation Setup of the iSCSI Storage Server
+.Procedure: Configure the iSCSI Block Devices on the Storage Server
+****
+
 . Once the storage server has been prepared as explained in: <<#prepare-the-shared-storage-node>>, open a terminal as *{ruser}* and prepare the following image files for use as the block device files:
 +
 
 . Prepare the following block device files:
 +
 
-----
+[.small]
+....
 dd if=/dev/zero of=c01-sbd.img bs=1M seek=100 count=0 <1>
+
 dd if=/dev/zero of=c01-spacewalk.img bs=1M seek=102400 count=0 <2>
+
 dd if=/dev/zero of=c01-srv.img bs=1M seek=10240 count=0 <3>
+
 dd if=/dev/zero of=c01-pgsql.img bs=1M seek=51200 count=0 <4>
+
 dd if=/dev/zero of=c01-cacherhn.img bs=1M seek=26200 count=0 <5>
+
 dd if=/dev/zero of=c01-others.img bs=1M seek=52200 count=0 <6>
----- 
+....
 +
 
 [#storage-server-requirements]
@@ -111,20 +123,45 @@ dd if=/dev/zero of=c01-others.img bs=1M seek=52200 count=0 <6>
 <4> *c01-pgsql.img* /var/lib/pgsql 50{nbsp}GB
 <5> *c01-cacherhn.img* /var/cache 25{nbsp}GB
 <6> *c01-others.img* other 100{nbsp}GB for all other required file systems
+****
 
-. Run {yast} to setup the images:
+[#setup-the-block-device-images-using-yast]
+=== Setup the Block Device Files with {yast}
+
+
+.Procedure: Setup the Block Devices
+****
+. Run {yast} to setup the new block device images on the storage server:
 +
-----
-yast2 iscsi-lio-server
-----
 
+....
+yast2 iscsi-lio-server
+....
++
+
+image:lio-server-service.png[]
+
+. From the *Service* screen select the service to start kbd:[(x) When Booting].
++
+
+image:lio-server-global.png[]
+
+. On the *Global* screen select kbd:[(x) No Discovery Authentication]
++
+
+. On the *Target* screen select kbd:[Add] to add a new iSCSI Target.
++
+
+image:lio-server-target.png[]
+
+. On the *Add iSCSI Target* screen uncheck kbd:[x Use Login Authentication]
+****
 
 
 == Configure the Two Nodes
 
 In this procedure you will finalize setup of the two {sle} nodes.
 From this point on we will call these two servers  *node1* and *node2*.
-
 
 [#procedure-setup-the-two-nodes]
 .Procedure: Post Installation Setup of the Two Nodes
@@ -139,7 +176,7 @@ From this point on we will call these two servers  *node1* and *node2*.
 ----
 softdog
 ----
-
++
 . Restart the service:
 +
 ----
@@ -213,9 +250,10 @@ The file is generated and is placed in: [filename]``/etc/corosync/authkey``.
 scp /etc/corosync/authkey node2@node2:/etc/corosync/authkey <1>
 ----
 
-<1> In the *scp* snippet *node2* is the user, and we added the servers short host name to the `/etc/hosts` file on node1 with its IP address:
+<1> In the *scp* snippet *node2* is the user, and the servers short host name was added to the `/etc/hosts` file on node1 with its IP address:
 +
 ./etc/hosts on node1
 ----
 192.168.188.2 node2
 ----
+
