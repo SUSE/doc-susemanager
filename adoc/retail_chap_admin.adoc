@@ -13,68 +13,6 @@ For general administration tasks, see the {susemgr} documentation at https://www
 
 
 
-[[retail.sect.admin.branch_network_config]]
-== Branch server network configuration
-
-The branch server can be configured to use networking in many different ways.
-The most common ways provide either a dedicated or shared LAN for terminals.
-
-
-
-=== Set up a branch server with a dedicated LAN
-
-In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the {susemgr} server, and the other one acts as an isolated LAN to communicate with terminals.
-
-This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
-
-.Procedure: Setting up a branch server with a dedicated LAN
-
-. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. In the [guimenu]``Branch Network`` section, set these parameters:
-* Keep [guimenu]``Dedicated NIC`` checked
-* In the [guimenu]``NIC`` field, enter the name of the network device that is connected to the internal LAN.
-* In the [guimenu]``IP`` field, enter the static IP address to be assigned to the branch server on the internal LAN.
-* In the [guimenu]``Netmask`` field, enter the network mask of the internal LAN.
-. Check [guimenu]``Enable Route`` if you want the branch server to route traffic from internal LAN to WAN.
-* Check [guimenu]``Enable NAT`` if you want the branch server to convert addresses from internal LAN to WAN.
-* Select the [guimenu]``bind`` DNS forwarder mode.
-* Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
-* Specify the working directory, and the directory owner and group.
-. Click btn:[Save] to save your changes.
-. Apply the highstate.
-
-
-
-=== Set up a branch server with a shared network
-
-In this configuration, the branch server has only one network interface card which is used to connect to the {susemgr} server as well as the terminals.
-
-This configuration allows for the branch server to provide DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
-Optionally, the branch server can also provide DHCP services in this configuration.
-
-[NOTE]
-====
-If DHCP services are not provided by the branch server, ensure that your external DHCP configuration is set correctly:
-* The [systemitem]``next-server`` option must point to the branch server for PXE boot to work
-* The [systemitem]``filename`` option must correctly identify the network boot program (by default, this is [path]``/boot/pxelinux``)
-* The [systemitem]``domain-name-servers`` option must point to the branch server for correct host name resolution
-====
-
-.Procedure: Setting up a branch server with a shared network
-
-. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. In the [guimenu]``Branch Network`` section, set these parameters:
-* Keep [guimenu]``Dedicated NIC`` unchecked
-* Select which services to enable on the branch server’s firewall.
-Ensure you include DNS, TFTP and FTP services.
-* Select the [guimenu]``bind`` DNS forwarder mode.
-* Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
-* Specify the working directory, and the directory owner and group.
-. Click btn:[Save] to save your changes.
-. Apply the highstate.
-
-
-
 [[retail.sect.admin.branch_mass_config]]
 == Branch server mass configuration
 
@@ -145,57 +83,6 @@ Spaces and other non-alphanumeric characters will be removed when the name is pr
 
 
 
-=== Configure the Saltboot formula
-
-.Procedure: Configuring the Saltboot formula
-
-. Open the details page for your new hardware group, and navigate to the [guimenu]``Formulas`` tab.
-. Select the [systemitem]``saltboot-formula`` and click btn:[Save] to save your changes.
-. An additional [guimenu]``saltboot`` tab will become available from the top menu, click on it to configure the new formula.
-+
-[NOTE]
-====
-There are many different configurations possible.
-This procedure outlines a simple, single-disk, three-partition configuration.
-Adjust it to suit your own environment.
-====
-. In the [guimenu]``Disk 1`` section, set these parameters:
-* In the [guimenu]``Disk symbolic ID`` field, enter a custom name for the disk (for example, [systemitem]``disk1``).
-* In the [guimenu]``Device type`` field, select [systemitem]``DISK``.
-* In the [guimenu]``Disk device`` field, select the device that corresponds to the device name on the target machine (for example, [path]``/dev/sda``).
-* In the [guimenu]``RAID level`` field, leave it empty.
-* In the [guimenu]``Disk Label`` field, select [systemitem]``gpt``.
-. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 1``:
-* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p1``).
-* In the [guimenu]``Partition size`` field, specify a size for the partition in Mebibytes (MiB).
-* In the [guimenu]``Device mount point`` field, select a location to mount the partition (for example, [path]``/data``).
-* In the [guimenu]``Filesystem format`` field, select your preferred format (for example, [systemitem]``xfs``).
-* In the [guimenu]``OS Image to deploy`` field, leave it empty.
-* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
-* In the [guimenu]``Partition flags`` field, leave it empty.
-. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 2``:
-* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p2``).
-* In the [guimenu]``Partition size`` field, specify a size for the partition in Mebibytes (MiB).
-* In the [guimenu]``Device mount point`` field, leave it empty.
-* In the [guimenu]``Filesystem format`` field, select [systemitem]``swap``.
-* In the [guimenu]``OS Image to deploy`` field, leave it empty.
-* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
-* In the [guimenu]``Partition flags`` field, select [systemitem]``swap``.
-. In the [guimenu]``Partition`` section, set these parameters for [guimenu]``Partition 3``:
-* In the [guimenu]``Partition symbolic ID`` field, enter a custom name for the partition (for example, [systemitem]``p3``).
-* In the [guimenu]``Partition size`` field, leave it empty.
-This will ensure the partition uses up all remaining space.
-* In the [guimenu]``Device mount point`` field, select [systemitem]``/``.
-* In the [guimenu]``Filesystem format`` field, leave it empty.
-* In the [guimenu]``OS Image to deploy`` field, enter the name of the image to deploy.
-* In the [guimenu]``Image version`` field, leave it empty.
-This will ensure you use the latest available version.
-* In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
-* In the [guimenu]``Partition flags`` field, leave it empty.
-. Click btn:[Save Formula] to save your formula.
-
-
-
 [[retail.sect.admin.terminal_naming]]
 == Terminal Names
 
@@ -214,7 +101,6 @@ B002.TOSHIBA-6140100-41BA03X-c643
 
 You can adjust this behaviour by toggling the [systemitem]``DISABLE_HOSTNAME_ID`` and [systemitem]``DISABLE_UNIQUE_SUFFIX`` parameters in the PXE formula settings.
 For more information about the PXE formula, see xref:retail.chap.formulas.adoc#retail.sect.formulas.pxe[PXE Formula].
-
 
 
 
