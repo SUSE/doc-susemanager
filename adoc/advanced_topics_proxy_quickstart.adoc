@@ -1,13 +1,10 @@
 [[advanced.topics.proxy.quickstart]]
 = {productname} {productnumber} Proxy
-
 include::entities.adoc[]
 
 
 This chapter explains how to install and set up {productname} {productnumber} Proxy.
 It also provides notes about migrating a previous proxy to version 3.2.
-
-
 
 [[at.manager.proxy.concepts]]
 == Overview
@@ -38,7 +35,8 @@ The primary goal of a {susemgrproxy} is to improve {productname} performance by 
 The following section provides {susemgrproxy} requirements.
 
 .Supported Client Systems
-For supported clients and their requirements, see Supported Client Systems.
+For supported clients and their requirements, see <<quickstart.sect.prereq.clientos>>.
+// Supported Client Systems
 
 .Hardware Requirements
 Hardware requirements highly depend on your usage scenario.
@@ -65,7 +63,7 @@ For specific hardware requirements, see the following table.
 For installing the proxy, you need the SSL certificate password entered during the initial installation of {productname}.
 
 .Network Requirements
-For additional network requirements, see Additional Requirements.
+For additional network requirements, see <<quickstart.sect.prereq.network>>.
 
 .{scc}
 For using {susemgrproxy}, you need an account at {scc} (SCC) where your purchased products and product subscriptions are registered.
@@ -101,58 +99,61 @@ in virtual environments, use the following settings for the virtual machine (VM)
 
 The following section will guide you through the installation and setup procedure.
 
-[IMPORTANT]
-.Registering Proxies
-====
 {productname} Proxy systems are registered as traditional clients or as Salt clients using a bootstrap script.
 A {susemgrproxy} can serve both Traditional and Salt clients.
-====
 
+[IMPORTANT]
+.Downloading Channels
+====
+Before you can select the correct child channels while creating the activation key, ensure you have completely downloaded the channels for {sle} 12 SP4.
+====
 
 
 [[at.manager.proxy.install.prep]]
 .Procedure: Registering the Proxy
 
-[IMPORTANT]
-====
-First completely download the channels ({sle} 12 SP3) and then create the activation key.
-Only then you can select the correct child channels.
-====
-+
 
-. Create an activation key based on the {sle} 12 SP3 base channel.
+. Create an activation key based on the {sle} 12 SP4 base channel.
 For more information about activation keys, see <<create.act.keys>>.
 +
 
 .Proxy Activation Key
-
 image::proxy-key.png[]
+
 . From the [guimenu]``Child Channels`` listing select the {productname} {productnumber} Proxy child channel with the matching update channel ([systemitem]``SUSE Manager Proxy-3.2-Pool`` and [systemitem]``SUSE-Manager-Proxy-3.2-Updates``).
 These child channels are required for providing the proxy packages and updates.
-As for normal SLES clients, [systemitem]``SLES12-SP3-Updates`` plus [systemitem]``SLE-Manager-Tools12-Pool`` and [systemitem]``SLE-Manager-Tools12-Updates`` are required.
+For normal SLES clients, [systemitem]``SLES12-SP4-Updates`` plus [systemitem]``SLE-Manager-Tools12-Pool`` and [systemitem]``SLE-Manager-Tools12-Updates`` are mandatory.
 +
 
 .Base and Child Proxy Channel
-
 image::sles12-proxy-child.png[]
 
 
-
-[[at.manager.proxy.install.prep.bss]]
-. Modify a bootstrap script for the proxy.
-Ensure unchecking menu:Bootstrap using Salt[] , because in this case the proxy must be bootstrapped as a so-called traditional client.
+. Modify a bootstrap script for the proxy if needed.
+If you want to run the proxy on a traditional client (system type ``Management``) uncheck [guimenu]``Bootstrap using Salt``.
+Using Salt is supported since version 3.2.
+// What's up with:
+// Enable Remote Configuration
+// Enable Remote Commands
 For more information about bootstrap scripts, see <<modify.bootstrap.script>>.
++
 
-. Bootstrap the client with the bootstrap script.
-. You will see a list of channels to which your client is already subscribed to.
-Select the two unchecked proxy channels which include the [systemitem]``SUSE Manager Proxy-3.2-Pool`` and [systemitem]``SUSE-Manager-Proxy-3.2-Updates`` , then select menu:Change Subscriptions[] to continue.
-This will provide the required repositories for the proxy packages from the {productname} server to the client.
+.Modifying Bootstrap Script
+image::sles12-proxy-bootstrap.png[]
+
+. Create the SUSE Manager Tools Repository for bootstrapping, see <<create.tools.repository>>.
+. Bootstrap the client with the bootstrap script.  For more information, see <<connect.first.client>>.
+. In case of a Salt client, accept the key on the menu:Main Menu[Salt > Keys] page by clicking the check mark and it will appear in the menu:Main Menu[Systems > Overview].
+. Check via menu:System Details[Software > Software Channels] that the two proxy channels [systemitem]``SUSE Manager Proxy-3.2-Pool`` and [systemitem]``SUSE-Manager-Proxy-3.2-Updates`` are selected.
+
+.Proxy Channels
+image::sles12-proxy-channels.png[]
 
 A few more steps are still needed:
 
-* install the [path]``suma_proxy`` pattern (see <<at.manager.proxy.run.pattern>>);
-* copy the SSL certificate and key from the server (see <<at.manager.proxy.run.copycert>>);
-* run [command]``configure-proxy.sh`` (see <<at.manager.proxy.run.confproxy>>);
+* Install the [path]``patterns-suma_proxy`` pattern (see <<at.manager.proxy.run.pattern>>)
+* Copy the SSL certificate and key from the server (see <<at.manager.proxy.run.copycert>>)
+* Run [command]``configure-proxy.sh`` (see <<at.manager.proxy.run.confproxy>>)
 
 You will then be able to register your clients against the proxy using the {webui} or a bootstrap script as if it were a {productname} server.
 For more information, see <<at.manager.proxy.register.saltclients>>.
@@ -162,7 +163,7 @@ For more information, see <<at.manager.proxy.register.saltclients>>.
 [[at.manager.proxy.run.pattern]]
 === Install the [path]``suma_proxy`` pattern
 
-Make sure the [path]``suma_proxy`` pattern version 2.5.1.3 or later is installed using the following command on the proxy as root:
+On the server select the [package]``pattern_suma_proxy`` package for installation, or make sure the [path]``suma_proxy`` pattern is installed using the following command on the proxy as root:
 
 ----
 zypper in -t pattern suma_proxy
@@ -190,7 +191,10 @@ The proxy will share some SSL information with the {productname} server, so the 
 As root, enter the following commands on the proxy using your {productname} server or chained proxy named as [replaceable]``PARENT``:
 
 ----
-cd /root/ssl-build scp root@`PARENT`:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY scp root@`PARENT`:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT scp root@`PARENT`:/root/ssl-build/rhn-ca-openssl.cnf .
+cd /root/ssl-build
+scp root@PARENT:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .
+scp root@PARENT:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .
+scp root@PARENT:/root/ssl-build/rhn-ca-openssl.cnf .
 ----
 
 
@@ -217,7 +221,7 @@ A {productname} parent can be either another proxy server or a {productname} ser
 
 HTTP Proxy::
 A HTTP proxy enables your {productname} proxy to access the Web.
-This is needed if where direct access to the Web is prohibited by a firewall.
+This is needed if direct access to the Web is prohibited by a firewall.
 
 Proxy Version to Activate::
 Normally, the correct value (3.0, 3.1, or 3.2) should be offered as a default.
@@ -278,7 +282,7 @@ Also restart the script if a HTTP error was met during script execution.
 
 [command]``configure-proxy.sh`` activates services required by {productname} Proxy, such as [systemitem]``squid``, [systemitem]``apache2``, [systemitem]``salt-broker``, and [systemitem]``jabberd``.
 
-To check the status of the proxy system and its clients, click the proxy system's details page on the {webui} (menu:Systems[Proxy], then the system name). menu:Connection[] and menu:Proxy[] subtabs display the respective status information.
+To check the status of the proxy system and its clients, click the proxy system's details page on the {webui} (menu:Main Menu[Systems > Proxy], then the system name). [guimenu]``Connection`` and [guimenu]``Proxy`` subtabs display the respective status information.
 
 
 
@@ -286,11 +290,11 @@ To check the status of the proxy system and its clients, click the proxy system'
 === Registering Salt Clients via {susemgrproxy}
 
 Proxy servers may now act as a broker and package cache for Salt minions.
-These minions can be registered with a bootstrap script like the traditional clients, or directly from the {webui} or the command line.
+These minions can be registered with a bootstrap script like the traditional clients, or from the {webui}, or the command line.
 
 Registering Salt clients via {susemgrproxy} from the {webui}
 is done almost the same way as registering clients directly with the {productname} server.
-The difference is that you specify the name of the proxy in the menu:Proxy[] drop-box on menu:Salt[Bootstrapping] page.
+The difference is that you specify the name of the proxy in the [guimenu]``Proxy`` drop-box on the menu:Main Menu[Systems > Bootstrapping] page.
 
 .Bootstrapping a Salt Client With a Proxy
 image::proxy-saltbootstrap.png[scaledwidth=80%]
@@ -309,7 +313,7 @@ or alternatively:
 +
 
 ----
-/etc/salt/minion.d/`name`.conf
+/etc/salt/minion.d/NAME.conf
 ----
 
 . Add the FQDN to the minion file:
@@ -357,7 +361,7 @@ To view available options type [command]``mgr-bootstrap --help`` from the comman
 +
 
 ----
-# ``mgr-bootstrap --activation-keys=key-string``
+# mgr-bootstrap --activation-keys=key-string
 ----
 
 . Optionally edit the resulting bootstrap script.
@@ -373,8 +377,10 @@ The clients are registered with the {susemgrproxy} specified in the bootstrap sc
 
 Within the {webui}, standard proxy pages will show information about client, no matter whether minions or traditional clients.
 
+// FIXME: adoc refinement needed
 A list of clients connected to a proxy can be located under menu:Systems[] <proxy name> menu:Details[]menu:Proxy[].
 
+// FIXME: adoc refinement needed
 A list of chained proxies for a minion can be located under menu:Systems[] <minion name> menu:Details[]menu:Connection[]
 
 If you decide to move any of your clients between proxies or the server you will need to repeat the registration process from scratch.
@@ -445,7 +451,8 @@ PXE (tftp) is installed and activated by default.
 To enable systems to find the PXE boot on the {susemgrproxy} server add the following to the DHCP configuration for the zone containing the systems to be provisioned:
 
 ----
-next-server:`IP_Address_of_SUSE_Manager_Proxy_Server`filename: "pxelinux.0"
+next-server: <IP_Address_of_SUSE_Manager_Proxy_Server>
+filename: "pxelinux.0"
 ----
 
 
@@ -522,7 +529,7 @@ This upgrade is similar to a standard client migration.
 .Synchronizing Target Channels
 ====
 Before successfully initializing the product migration, you first must make sure that the migration target channels are completely mirrored.
-For the upgrade to {productname} 3.2 Proxy, at least the [systemitem]``SUSE Linux Enterprise Server 12 SP3`` base channel with the [systemitem]``SUSE Manager Proxy 3.2`` child channel for your architecture is required.
+To upgrade to {productname} 3.2 Proxy, you will require at least the [systemitem]``SUSE Linux Enterprise Server 12 SP4`` base channel with the [systemitem]``SUSE Manager Proxy 3.2`` child channel for your architecture.
 ====
 
 .Procedure: Migrating Proxy to {productnumber}
@@ -538,11 +545,11 @@ image::suma_proxy_old_details_page.png[]
 image::suma_proxy_old_details_spmigration.png[]
 
 . From this page you will see installed products listed on your proxy client, and the available target products.
-Select the wanted [guimenu]``Target Products``, in this case [systemitem]``SUSE Linux Enterprise Server 12 SP3`` with [systemitem]``SUSE Manager Proxy 3.2``.
+Select the required [guimenu]``Target Products``.  In this case, you will require [systemitem]``SUSE Linux Enterprise Server 12 SP4`` with [systemitem]``SUSE Manager Proxy 3.2``.
 +
 
-// image::suma_proxy_migration_target.png[]
-// +
+image::suma_proxy_migration_target.png[]
++
 
 . Then confirm with btn:[Select Channels].
 +
