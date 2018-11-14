@@ -1,0 +1,188 @@
+= Create the cLVM Volume
+
+To create cLVM volume there are several services needed within the cluster.
+
+
+
+== Setup the Required Services
+
+
+. on *node1* run the command:
++
+----
+crm configure edit
+----
+
+. Add the following (replacing the correct IP address):
++
+----
+primitive admin-ip IPaddr2 \
+        params ip=192.168.188.105 \
+        op monitor interval=10 timeout=20
+primitive pri_clvmd ocf:lvm2:clvmd \
+        op stop interval=0 timeout=100 \
+        op start interval=0 timeout=90 \
+        op monitor interval=20 timeout=60
+primitive pri_dlm ocf:pacemaker:controld \
+        op start interval=0 timeout=90 \
+        op stop interval=0 timeout=100 \
+        op monitor interval=60 timeout=60
+primitive res_sbd-fencing stonith:external/sbd \
+        params pcmk_delay_max=30s
+group grp_base_clvm pri_dlm pri_clvmd
+clone cln_clvm grp_base_clvm \
+        meta interleave=true
+rsc_defaults rsc-options: \
+        resource-stickiness=1 \
+        migration-threshold=3
+----
+
+
+
+== Check the Device Names
+
+On *node1* check the file systems to see the correct lun device names:
+
+[.small]
+....
+lsscsi -sku
+
+[1:0:1:0]    cd/dvd  ATA     QEMU DVD-ROM            _ /dev/sr0        -
+[2:0:0:0]    disk    6001405d5543b23418c4956b44e30f80  /dev/sda    104MB <1>
+[2:0:0:1]    disk    6001405d95a9d1d21444099bbd2b563b  /dev/sdb    107GB <2>
+[2:0:0:2]    disk    600140500d9ddf1d8244b51b73733d1e  /dev/sdc   53.6GB <3>
+[2:0:0:3]    disk    60014057835fe8b95b64afb88b5d21be  /dev/sdd   27.4GB <4>
+[2:0:0:4]    disk    60014054774ef2d9ddf4e76b30c29b82  /dev/sde   10.7GB <5>
+[2:0:0:5]    disk    60014054d1141cd69fc444a8f92b53ed  /dev/sdf   54.7GB <6>
+....
+
+<1> /dev/sda (sdb device)
+<2> /dev/sdb (spacewalk storage)
+<3> /dev/sdc (pgsql storage)
+<4> /dev/sdd (cacherhn storage)
+<5> /dev/sde (srv storage)
+<6> /dev/sdf (other storage)
+
+
+
+
+== Create the Volumes
+Run the following commands in order to create the volumes based on the device names from above:
+
+. Create the /dev/sdf volume:
+.. `pvcreate /dev/sdf`
+
+.. `vgcreate vg_c01_spacewalk /dev/sdf`
+
+.. `lvcreate -n lv_c01_spacewalk -l 100%FREE vg_c01_spacewalk`
+
+.. `mkfs -t xfs /dev/vg_c01_spacewalk/lv_c01_spacewalk`
+
+. Create the _/dev/sde_ *pgsql* volume:
+
+.. `pvcreate /dev/sde`
+
+.. `vgcreate vg_c01_pgsql /dev/sde`
+
+.. `lvcreate -n lv_c01_pgsql -l 100%FREE vg_c01_pgsql`
+ 
+.. `mkfs -t xfs /dev/vg_c01_pgsql/lv_c01_pgsql`
+
+. Create the _/dev/sdd_ *cacherhn* volume:
+
+.. `pvcreate /dev/sdd`
+
+.. `vgcreate vg_c01_spacewalk /dev/sdd`
+
+.. `lvcreate -n lv_c01_cacherhn -l 100%FREE vg_c01_cacherhn`
+
+.. `mkfs -t xfs /dev/vg_c01_cacherhn/lv_c01_cacherhn`
+
+. Create the _/dev/sdc_ *srv* volume:
+
+.. pvcreate /dev/sdc
+
+.. vgcreate vg_c01_srv /dev/sdc
+
+.. lvcreate -n lv_c01_srv -l 100%FREE vg_c01_srv
+
+.. mkfs -t xfs /dev/vg_c01_srv/lv_c01_srv
+
+. Create the _/dev/sdb_ *other* volume (This volume includes: __varcachesalt, varlibspacewalk, varlibrhn, varlibjabberd, varlibsalt, varliblibvirtimages, sysconfigrhn, etcrhn, etcsalt, and etctomcat__):
+
+.. `pvcreate /dev/sdb`
+
+.. `vgcreate vg_c01_other /dev/sdb`
+
+.. `lvcreate -n lv_c01_othervarcachesalt -L 250M vg_c01_other`
+
+.. `mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarcachesalt`
+
+.. `lvcreate -n lv_c01_othervarlibspacewalk -L 50M vg_c01_other`
+
+.. `mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibspacewalk`
+
+.. `lvcreate -n lv_c01_othervarlibrhn -L 500M vg_c01_other`
+
+.. `mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibrhn`
+
+.. `lvcreate -n lv_c01_othervarlibjabberd -L 50M vg_c01_other`
+
+.. `mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibjabberd`
+
+.. `lvcreate -n lv_c01_othervarlibsalt -L 50M vg_c01_other`
+
+.. `mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibsalt`
+
+.. `lvcreate -n lv_c01_othervarliblibvirtimages -L 100M vg_c01_other`
+
+.. `mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarliblibvirtimages`
+
+.. `lvcreate -n lv_c01_othersyssysconfigrhn -L 10M vg_c01_other`
+
+.. `mkfs -t ext3 /dev/vg_c01_other/lv_c01_othersyssysconfigrhn`
+
+.. `lvcreate -n lv_c01_otheretcrhn -L 10M vg_c01_other`
+
+.. `mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretcrhn`
+
+.. `lvcreate -n lv_c01_otheretcsalt -L 10M vg_c01_other`
+
+.. `mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretcsalt`
+
+.. `lvcreate -n lv_c01_otheretctomcat -L 10M vg_c01_other`
+
+.. `mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretctomcat`
+
+== Check the File Systems
+
+After completing the above steps the filesystems should look like the following:
+
+----
+lvs
+  LV                              VG               Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  lv_c01_cacherhn                 vg_c01_cacherhn  -wi-a-----  25.58g                                                    
+  lv_c01_otheretcrhn              vg_c01_other     -wi-a-----  12.00m                                                    
+  lv_c01_otheretcsalt             vg_c01_other     -wi-a-----  12.00m                                                    
+  lv_c01_otheretctomcat           vg_c01_other     -wi-a-----  12.00m                                                    
+  lv_c01_othersyssysconfigrhn     vg_c01_other     -wi-a-----  12.00m                                                    
+  lv_c01_othervarcachesalt        vg_c01_other     -wi-a----- 252.00m                                                    
+  lv_c01_othervarlibjabberd       vg_c01_other     -wi-a-----  52.00m                                                    
+  lv_c01_othervarliblibvirtimages vg_c01_other     -wi-a----- 100.00m                                                    
+  lv_c01_othervarlibrhn           vg_c01_other     -wi-a----- 500.00m                                                    
+  lv_c01_othervarlibsalt          vg_c01_other     -wi-a-----  52.00m                                                    
+  lv_c01_othervarlibspacewalk     vg_c01_other     -wi-a-----  52.00m                                                    
+  lv_c01_pgsql                    vg_c01_pgsql     -wi-a-----  49.99g                                                    
+  lv_c01_spacewalk                vg_c01_spacewalk -wi-a-----  99.99g                                                    
+  lv_c01_srv                      vg_c01_srv       -wi-a-----   9.99g                
+----
+
+----
+pvs
+  PV         VG               Fmt  Attr PSize  PFree 
+  /dev/sdb   vg_c01_other     lvm2 a--  50.97g 49.94g
+  /dev/sdc   vg_c01_srv       lvm2 a--   9.99g     0 
+  /dev/sdd   vg_c01_cacherhn  lvm2 a--  25.58g     0 
+  /dev/sde   vg_c01_pgsql     lvm2 a--  49.99g     0 
+  /dev/sdf   vg_c01_spacewalk lvm2 a--  99.99g     0 
+----

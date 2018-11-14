@@ -1,0 +1,77 @@
+= Configure the Storage Server
+include::_partials/entities.adoc[]
+
+[#setup-the-iscsi-storage-server]
+== Create the iSCSI Block Devices on the Storage Server
+
+In this procedure you will setup the iSCSI block devices on the storage server.
+From this point on we will call this server the *storage node*
+
+
+[#procedure-setup-the-storage-server]
+.Procedure: Configure the iSCSI Block Devices on the Storage Server
+
+
+. Once the storage server has been prepared as explained in: xref:ha-requirements.adoc#prepare-the-shared-storage-node[Prepare the iSCSI Storage Node], open a terminal as *{ruser}* and prepare the following image files for use as the block device files:
++
+
+. Prepare the following block device files:
++
+
+[.small]
+....
+dd if=/dev/zero of=c01-sbd.img bs=1M seek=100 count=0 <1>
+
+dd if=/dev/zero of=c01-spacewalk.img bs=1M seek=102400 count=0 <2>
+
+dd if=/dev/zero of=c01-srv.img bs=1M seek=10240 count=0 <3>
+
+dd if=/dev/zero of=c01-pgsql.img bs=1M seek=51200 count=0 <4>
+
+dd if=/dev/zero of=c01-cacherhn.img bs=1M seek=26200 count=0 <5>
+
+dd if=/dev/zero of=c01-others.img bs=1M seek=52200 count=0 <6>
+....
++
+
+[#storage-server-requirements]
+.Storage Server Block Devices:
+
+<1> *c01-sbd.img* SBD storage device 100{nbsp}MB 
+<2> *c01-spacewalk.img* /var/spacewalk 100{nbsp}GB (A production setup will be greater than 500{nbsp}GB+)
+<3> *c01-srv.img* /srv 10{nbsp}GB
+<4> *c01-pgsql.img* /var/lib/pgsql 50{nbsp}GB
+<5> *c01-cacherhn.img* /var/cache 25{nbsp}GB
+<6> *c01-others.img* other 100{nbsp}GB for all other required file systems
+
+
+[#setup-the-block-device-images-using-yast]
+=== Setup the Block Device Files with {yast}
+
+
+.Procedure: Setup the Block Devices
+
+. Run {yast} to setup the new block device images on the storage server:
++
+
+....
+yast2 iscsi-lio-server
+....
++
+
+image:lio-server-service.png[]
+
+. From the *Service* screen select the service to start kbd:[(x) When Booting].
++
+
+image:lio-server-global.png[]
+
+. On the *Global* screen select kbd:[(x) No Discovery Authentication]
++
+
+. On the *Target* screen select kbd:[Add] to add a new iSCSI Target.
++
+
+image:lio-server-target.png[]
+
+. On the *Add iSCSI Target* screen uncheck kbd:[x Use Login Authentication]

@@ -1,0 +1,137 @@
+= Configure the Cluster Information Base(CIB)
+
+. Add the following to the CIB on *node1*:
++
+
+----
+crm configure edit
+----
+
+. Add the following primitives:
++
+
+----
+primitive pri_fs_c01_cacherhn Filesystem \
+        params device="/dev/vg_c01_cacherhn/lv_c01_cacherhn" directory="/var/cache/rhn" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othercarlibsalt Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibsalt" directory="/var/lib/salt" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretcrhn Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretcrhn" directory="/etc/rhn" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretcsalt Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretcsalt" directory="/etc/salt" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretctomcat Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretctomcat" directory="/etc/tomcat" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othersyssysconfigrhn Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othersyssysconfigrhn" directory="/etc/sysconfig/rhn" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarcachesalt Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarcachesalt" directory="/var/cache/salt" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarlibjabberd Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibjabberd" directory="/var/lib/jabberd" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarliblibvirtimages Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarliblibvirtimages" directory="/var/lib/libvirt/images" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarlibrhn Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibrhn" directory="/var/lib/rhn" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarlibspacewalk Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibspacewalk" directory="/var/lib/spacewalk" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_pgsql Filesystem \
+        params device="/dev/vg_c01_pgsql/lv_c01_pgsql" directory="/var/lib/pgsql" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_spacewalk Filesystem \
+        params device="/dev/vg_c01_spacewalk/lv_c01_spacewalk" directory="/var/lib/spacewalk" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_srv Filesystem \
+        params device="/dev/vg_c01_srv/lv_c01_srv" directory="/srv_1" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_lvm_vg_c01_cacherhn LVM \
+        params volgrpname=vg_c01_cacherhn \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+primitive pri_lvm_vg_c01_other LVM \
+        params volgrpname=vg_c01_other \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+primitive pri_lvm_vg_c01_pgsql LVM \
+        params volgrpname=vg_c01_pgsql \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+primitive pri_lvm_vg_c01_spacewalk LVM \
+        params volgrpname=vg_c01_spacewalk \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+primitive pri_lvm_vg_c01_srv LVM \
+        params volgrpname=vg_c01_srv \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+group grp_susemanager admin-ip pri_lvm_vg_c01_cacherhn pri_lvm_vg_c01_other pri_lvm_vg_c01_pgsql pri_lvm_vg_c01_spacewalk pri_lvm_vg_c01_srv pri_fs_c01_srv pri_fs_c01_pgsql pri_fs_c01_cacherhn pri_fs_c01_spacewalk pri_fs_c01_othervarlibspacewalk pri_fs_c01_othervarlibrhn pri_fs_c01_othervarlibjabberd pri_fs_c01_othercarlibsalt pri_fs_c01_othervarliblibvirtimages pri_fs_c01_othersyssysconfigrhn pri_fs_c01_otheretcrhn pri_fs_c01_otheretcsalt pri_fs_c01_otheretctomcat pri_fs_c01_othervarcachesalt
+----
+
+. There is a mount to */srv_1*.
+
+.. Check on which the */srv_1* is mounted.
+
+.. Run the following: `cp -ar /srv/* /srv_1/`
+
+. change the resource that mounts */srv_1*: 
++
+
+----
+`crm configure edit`
+----
++
+
+Listed under the *primitive pri_fs_c01_srv*, change */srv_1 to /srv*.
++
+
+----
+primitive pri_fs_c01_srv Filesystem \
+        params device="/dev/vg_c01_srv/lv_c01_srv" directory="/srv" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+----
+
+.  All file systems should now be mounted on *node1*.

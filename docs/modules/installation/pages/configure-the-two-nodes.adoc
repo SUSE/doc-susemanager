@@ -1,0 +1,99 @@
+= Configure the Two Nodes
+include::_partials/entities.adoc[]
+
+In this procedure you will finalize setup of the two {sle} nodes.
+From this point on we will call these two servers  *node1* and *node2*.
+
+[#procedure-setup-the-two-nodes]
+.Procedure: Post Installation Setup of the Two Nodes
+
+. Once the two nodes have been prepared as explained in: xref:ha-requirements.adoc#prepare-two-nodes[Prepare the Two Nodes], open a terminal as *{ruser}* and configure watchdog.
+
+. Create the file [filename]``/etc/modules-load.d/watchdog.conf``.
+
+. Add the following snippet to the file:
++
+
+----
+softdog
+----
++
+. Restart the service:
++
+----
+systemctl restart systemd-modules-load
+----
+
+. Create the file [filename]``/etc/corosync/corosync.conf`` and add the following content:
++
+----
+totem {
+     crypto_hash:    none
+     rrp_mode:       none
+     join:   60
+     max_messages:   20
+     cluster_name:   c01 
+     vsftype:        none
+     secauth:        on
+     crypto_cipher:  none
+     consensus:      6000
+     interface {
+           bindnetaddr:    192.168.150.0 <1>
+           mcastaddr:      239.255.1.1
+           ringnumber:     0
+           mcastport:      5405
+           ttl:    1
+           }
+     token:  5000
+     version:        2
+     transport:      udp
+     token_retransmits_before_loss_const:    10
+     ip_version:     ipv4
+     clear_node_high_bit:    yes
+}
+logging {
+      to_logfile:     no
+      logger_subsys {
+           debug:  off
+           subsys: QUORUM
+      }
+      to_syslog:      yes
+      debug:  off
+      timestamp:      on
+      to_stderr:      no
+      fileline:       off
+      syslog_facility:        daemon
+}
+quorum {
+      expected_votes: 2
+      two_node:       1
+      provider:       corosync_votequorum
+}
+----
++
+
+<1> The *bindnetaddr* should be set to your network.
+
+. On *node1* generate a *corosync key*. 
+To generate a key enter:
++
+
+----
+corosync-keygen
+---- 
++
+
+The file is generated and is placed in: [filename]``/etc/corosync/authkey``.
+
+. Now as *root* copy the key using *scp* from *node1* to *node2* and place it in: [filename]``/etc/corosync/authkey``.
++
+----
+scp /etc/corosync/authkey node2@node2:/etc/corosync/authkey <1>
+----
+
+<1> In the *scp* snippet *node2* is the user, and the servers short host name was added to the `/etc/hosts` file on node1 with its IP address:
++
+./etc/hosts on node1
+----
+192.168.188.2 node2
+----
