@@ -1,0 +1,332 @@
+#Running SUSE Manager on HAE
+
+#Preparing cluster file system. 
+
+#This needs to be done before installation of SUSE Manager Server
+
+#Shared storage needed:
+- sbd 100Mb
+- 25Gb for /var/cache
+- 50Gb for /var/lib/pgsql
+- 100Gb-500Gb for /var/spacewalk (started with 100Gb)
+- 10Gb for /srv
+- 100Gb for all other file systems needed. Currently 50Gb in use.
+
+1.) Shared storage is on a separate server (SLES12 SP3) running iSCSI target
+
+Prepare systems for cluster:
+1.) Install 2 SLES12 SPx  systems. hard disk requirements minimal 16Gb, / 30Gb when not using btrfs, if using btrfs 100Gb.
+
+2.) Assign the SLE-HA pattern to the systems:
+   `zypper -n in -t ha-sles`
+
+3.) For cluster service softdog is needed:
+   → create file: /etc/modules-load.d/watchdog.conf
+   → add the following to the file: softdog
+   → restart the service: systemctl restart systemd-modules-load
+   → create the file /etc/corosync/corosync.conf with the following content (bindnetaddr should be the correct network:
+
+totem {
+     crypto_hash:    none
+     rrp_mode:       none
+     join:   60
+     max_messages:   20
+     cluster_name:   c01 
+     vsftype:        none
+     secauth:        on
+     crypto_cipher:  none
+     consensus:      6000
+     interface {
+           bindnetaddr:    192.168.150.0
+           mcastaddr:      239.255.1.1
+           ringnumber:     0
+           mcastport:      5405
+           ttl:    1
+           }
+     token:  5000
+     version:        2
+     transport:      udp
+     token_retransmits_before_loss_const:    10
+     ip_version:     ipv4
+     clear_node_high_bit:    yes
+}
+logging {
+      to_logfile:     no
+      logger_subsys {
+           debug:  off
+           subsys: QUORUM
+      }
+      to_syslog:      yes
+      debug:  off
+      timestamp:      on
+      to_stderr:      no
+      fileline:       off
+      syslog_facility:        daemon
+}
+quorum {
+      expected_votes: 2
+      two_node:       1
+      provider:       corosync_votequorum
+}
+
+1.) on 1 system generate the corosync key and copy to the other system. 
+      → The file is named: /etc/corosync/authkey
+      → generate with: corosync-keygen
+
+2.) attach the sbd device to the servers
+      → to check if the device is present:
+      ⇒ rescan-scsi-bus.sh
+      ⇒ lsscsi -vv
+      → you should see the small disk
+
+3.) create the file /etc/sysconfig/sbd with the following content (the SBD_DEVICE should point to correct device):
+SBD_DEVICE="/dev/disk/by-id/scsi-36001405c95c6cad8edb491fb1d5cb7cc"
+SBD_PACEMAKER=
+SBD_STARTMODE="clean"
+SBD_DELAY_START=
+SBD_WATCHDOG=
+SBD_OPTS="-W -P -5 6"
+
+4.) create the sbd partition. Run on 1 system the following command:
+      → sbd -d <sbd device as in /etc/sysconfig/sbd> create
+
+5.) enable the sbd and pacemaker service:
+      → systemctl enable sbd
+      → systemctl enable pacemaker
+      → systemctl enable hawk
+
+6.) set password for user hacluster
+
+7.) on both nodes run: # lvmconf --enable-cluster
+
+8.) Reboot servers. Before the servers start be sure that all shared storage has been added.
+
+9.) After reboot the cluster service should run. With the following command check if both nodes are present:
+    → crm_mon
+
+10.) To create cLVM volume there are several services needed within the cluster. 
+     → one 1 node run the command:
+       ⇒ crm configure edit
+       ⇒ add the following (enter the correct IP address):
+primitive admin-ip IPaddr2 \
+        params ip=192.168.150.195 \
+        op monitor interval=10 timeout=20
+primitive pri_clvmd ocf:lvm2:clvmd \
+        op stop interval=0 timeout=100 \
+        op start interval=0 timeout=90 \
+        op monitor interval=20 timeout=60
+primitive pri_dlm ocf:pacemaker:controld \
+        op start interval=0 timeout=90 \
+        op stop interval=0 timeout=100 \
+        op monitor interval=60 timeout=60
+primitive res_sbd-fencing stonith:external/sbd \
+        params pcmk_delay_max=30s
+group grp_base_clvm pri_dlm pri_clvmd
+clone cln_clvm grp_base_clvm \
+        meta interleave=true
+rsc_defaults rsc-options: \
+        resource-stickiness=1 \
+        migration-threshold=3
+
+11.) On node1 create the file systems to see the correct luns run: # lsscsi -vv
+
+[3:0:0:0]    disk    LIO-ORG  FILEIO           4.0   /dev/sda 
+  dir: /sys/bus/scsi/devices/3:0:0:0  [/sys/devices/platform/host3/session1/target3:0:0/3:0:0:0]
+[3:0:0:1]    disk    LIO-ORG  FILEIO           4.0   /dev/sdf 
+  dir: /sys/bus/scsi/devices/3:0:0:1  [/sys/devices/platform/host3/session1/target3:0:0/3:0:0:1]
+[3:0:0:2]    disk    LIO-ORG  FILEIO           4.0   /dev/sde 
+  dir: /sys/bus/scsi/devices/3:0:0:2  [/sys/devices/platform/host3/session1/target3:0:0/3:0:0:2]
+[3:0:0:3]    disk    LIO-ORG  FILEIO           4.0   /dev/sdd 
+  dir: /sys/bus/scsi/devices/3:0:0:3  [/sys/devices/platform/host3/session1/target3:0:0/3:0:0:3]
+[3:0:0:4]    disk    LIO-ORG  FILEIO           4.0   /dev/sdc 
+  dir: /sys/bus/scsi/devices/3:0:0:4  [/sys/devices/platform/host3/session1/target3:0:0/3:0:0:4]
+[3:0:0:6]    disk    LIO-ORG  FILEIO           4.0   /dev/sdb 
+  dir: /sys/bus/scsi/devices/3:0:0:6  [/sys/devices/platform/host3/session1/target3:0:0/3:0:0:5]
+
+12.) Create the volumes.
+ 
+# pvcreate /dev/sdf
+# vgcreate vg_c01_spacewalk /dev/sdf
+# lvcreate -n lv_c01_spacewalk -l 100%FREE vg_c01_spacewalk
+# mkfs -t xfs /dev/vg_c01_spacewalk/lv_c01_spacewalk
+
+# pvcreate /dev/sde
+# vgcreate vg_c01_pgsql /dev/sde
+# lvcreate -n lv_c01_pgsql -l 100%FREE vg_c01_pgsql
+# mkfs -t xfs /dev/vg_c01_pgsql/lv_c01_pgsql
+
+# pvcreate /dev/sdd
+# vgcreate vg_c01_spacewalk /dev/sdd
+# lvcreate -n lv_c01_cacherhn -l 100%FREE vg_c01_cacherhn
+# mkfs -t xfs /dev/vg_c01_cacherhn/lv_c01_cacherhn
+
+# pvcreate /dev/sdc
+# vgcreate vg_c01_srv /dev/sdc
+# lvcreate -n lv_c01_srv -l 100%FREE vg_c01_srv
+# mkfs -t xfs /dev/vg_c01_srv/lv_c01_srv
+
+# pvcreate /dev/sdb
+# vgcreate vg_c01_other /dev/sdb
+# lvcreate -n lv_c01_othervarcachesalt -L 250M vg_c01_other
+# mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarcachesalt
+# lvcreate -n lv_c01_othervarlibspacewalk -L 50M vg_c01_other
+# mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibspacewalk
+# lvcreate -n lv_c01_othervarlibrhn -L 500M vg_c01_other
+# mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibrhn
+# lvcreate -n lv_c01_othervarlibjabberd -L 50M vg_c01_other
+# mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibjabberd
+# lvcreate -n lv_c01_othervarlibsalt -L 50M vg_c01_other
+# mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibsalt
+# lvcreate -n lv_c01_othervarliblibvirtimages -L 100M vg_c01_other
+# mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarliblibvirtimages
+# lvcreate -n lv_c01_othersyssysconfigrhn -L 10M vg_c01_other
+# mkfs -t ext3 /dev/vg_c01_other/lv_c01_othersyssysconfigrhn
+# lvcreate -n lv_c01_otheretcrhn -L 10M vg_c01_other
+# mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretcrhn
+# lvcreate -n lv_c01_otheretcsalt -L 10M vg_c01_other
+# mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretcsalt
+# lvcreate -n lv_c01_otheretctomcat -L 10M vg_c01_other
+# mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretctomcat
+
+13.) The filesystems should look like:
+# lvs
+  LV                              VG               Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  lv_c01_cacherhn                 vg_c01_cacherhn  -wi-a-----  25.58g                                                    
+  lv_c01_otheretcrhn              vg_c01_other     -wi-a-----  12.00m                                                    
+  lv_c01_otheretcsalt             vg_c01_other     -wi-a-----  12.00m                                                    
+  lv_c01_otheretctomcat           vg_c01_other     -wi-a-----  12.00m                                                    
+  lv_c01_othersyssysconfigrhn     vg_c01_other     -wi-a-----  12.00m                                                    
+  lv_c01_othervarcachesalt        vg_c01_other     -wi-a----- 252.00m                                                    
+  lv_c01_othervarlibjabberd       vg_c01_other     -wi-a-----  52.00m                                                    
+  lv_c01_othervarliblibvirtimages vg_c01_other     -wi-a----- 100.00m                                                    
+  lv_c01_othervarlibrhn           vg_c01_other     -wi-a----- 500.00m                                                    
+  lv_c01_othervarlibsalt          vg_c01_other     -wi-a-----  52.00m                                                    
+  lv_c01_othervarlibspacewalk     vg_c01_other     -wi-a-----  52.00m                                                    
+  lv_c01_pgsql                    vg_c01_pgsql     -wi-a-----  49.99g                                                    
+  lv_c01_spacewalk                vg_c01_spacewalk -wi-a-----  99.99g                                                    
+  lv_c01_srv                      vg_c01_srv       -wi-a-----   9.99g                                                    
+                                                   
+# pvs
+  PV         VG               Fmt  Attr PSize  PFree 
+  /dev/sdb   vg_c01_other     lvm2 a--  50.97g 49.94g
+  /dev/sdc   vg_c01_srv       lvm2 a--   9.99g     0 
+  /dev/sdd   vg_c01_cacherhn  lvm2 a--  25.58g     0 
+  /dev/sde   vg_c01_pgsql     lvm2 a--  49.99g     0 
+  /dev/sdf   vg_c01_spacewalk lvm2 a--  99.99g     0 
+
+14.) Add the following to the CIB:
+   → on 1 node: crm configure edit
+   → add the following:
+
+primitive pri_fs_c01_cacherhn Filesystem \
+        params device="/dev/vg_c01_cacherhn/lv_c01_cacherhn" directory="/var/cache/rhn" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othercarlibsalt Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibsalt" directory="/var/lib/salt" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretcrhn Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretcrhn" directory="/etc/rhn" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretcsalt Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretcsalt" directory="/etc/salt" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretctomcat Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretctomcat" directory="/etc/tomcat" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othersyssysconfigrhn Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othersyssysconfigrhn" directory="/etc/sysconfig/rhn" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarcachesalt Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarcachesalt" directory="/var/cache/salt" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarlibjabberd Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibjabberd" directory="/var/lib/jabberd" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarliblibvirtimages Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarliblibvirtimages" directory="/var/lib/libvirt/images" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarlibrhn Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibrhn" directory="/var/lib/rhn" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarlibspacewalk Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibspacewalk" directory="/var/lib/spacewalk" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_pgsql Filesystem \
+        params device="/dev/vg_c01_pgsql/lv_c01_pgsql" directory="/var/lib/pgsql" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_spacewalk Filesystem \
+        params device="/dev/vg_c01_spacewalk/lv_c01_spacewalk" directory="/var/lib/spacewalk" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_srv Filesystem \
+        params device="/dev/vg_c01_srv/lv_c01_srv" directory="/srv_1" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_lvm_vg_c01_cacherhn LVM \
+        params volgrpname=vg_c01_cacherhn \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+primitive pri_lvm_vg_c01_other LVM \
+        params volgrpname=vg_c01_other \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+primitive pri_lvm_vg_c01_pgsql LVM \
+        params volgrpname=vg_c01_pgsql \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+primitive pri_lvm_vg_c01_spacewalk LVM \
+        params volgrpname=vg_c01_spacewalk \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+primitive pri_lvm_vg_c01_srv LVM \
+        params volgrpname=vg_c01_srv \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
+group grp_susemanager admin-ip pri_lvm_vg_c01_cacherhn pri_lvm_vg_c01_other pri_lvm_vg_c01_pgsql pri_lvm_vg_c01_spacewalk pri_lvm_vg_c01_srv pri_fs_c01_srv pri_fs_c01_pgsql pri_fs_c01_cacherhn pri_fs_c01_spacewalk pri_fs_c01_othervarlibspacewalk pri_fs_c01_othervarlibrhn pri_fs_c01_othervarlibjabberd pri_fs_c01_othercarlibsalt pri_fs_c01_othervarliblibvirtimages pri_fs_c01_othersyssysconfigrhn pri_fs_c01_otheretcrhn pri_fs_c01_otheretcsalt pri_fs_c01_otheretctomcat pri_fs_c01_othervarcachesalt
+
+15.) There is a mount to /srv_1.
+   → check on which the /srv_1 is mounted.
+   → run the following: cp -ar /srv/* /srv_1/
+   → change the resource that mounts /srv_1:
+      ⇒ crm configure edit
+      ⇒ in the primitive pri_fs_c01_srv, change /srv_1 to /srv 
+
+primitive pri_fs_c01_srv Filesystem \
+        params device="/dev/vg_c01_srv/lv_c01_srv" directory="/srv" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+16.) All file systems should now be mounted on 1 node.
+
+
