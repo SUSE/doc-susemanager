@@ -78,4 +78,24 @@ If it was not done in the previous step with the complete import. (The other ste
 
 Finally, shutdown and remove the old SLEPOS Admin Server.
 
+
+[[retail_migr.sect.slepostosuma.s1.x2y]]
+=== Converting XML to YAML (draft!)
+
+----
+retail_migration dumpfile.xml  
+      - validates the file, prints eventual problems
+    
+    retail_migration dumpfile.xml  --save-mapping map.yml
+      write mapping yaml file, the file contains 2 dictionaries: 
+          images - map old SLEPOS images to new built in SUMA
+          groups - map of slepos scCashRegister objects to SUMA HWTYPE groups
+       this file should be edited as needed
+       
+   retail_migration dumpfile.xml  retail.yml --mapping map.yml
+      convert dumpfile.xml to retail.yml, use the mapping map.yml
+    
+    In branch-by-branch scenario the retail.yml will contain new version of SLEPOS LDAP. To preserve the changes done in global  SUMA Retail setting meanwhile, the global part (hwtypes) can be deleted from yaml or the yaml can be imported with retail_yaml --only-new option.
+----
+
 include::retail_migr_chap_slepostosumaind.adoc[leveloffset=1]
