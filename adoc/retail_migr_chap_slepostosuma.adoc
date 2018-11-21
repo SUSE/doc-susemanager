@@ -70,12 +70,13 @@ This procedure explains how you can migrate the SLEPOS infrastructure and the br
 . Install a {susemgr} server {productnumber} (with the Retail pattern).  For more information, see https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html.
 
 . On every branch server:
++
 ----
 posAdmin --export --type xml --file dumpfile.xml
 ----
 +
-These dumps will contain only the LDAP data of the branch plus the global data.
-+
+These dumps will only contain the LDAP data of the branch and the global data.
+
 . Similarily, you can export the LDAP data of every branch if you run the command on the Admin server with the branch credentials explicitly specified:
 +
 ----
@@ -85,12 +86,27 @@ posAdmin --export --type xml --file dumpfile.xml --user $branch_dn \
 +
 For background information about SLEPOS branch server configuration, see https://www.suse.com/documentation/slepos11/book_slepos/data/cha_slepos_branchserv.html.
 
+. Review the generated YAML file ([literal]``retail.yml``) and adjust it as necessary.
+Consider ``HWTYPE`` group naming and image name and version changes in the partitioning data.
+You can shorten the names as needed, and the image names must match the images in {susemgr}.
+The [option]``--save-mapping`` option can help you with this task.
++
+Also check whether there are duplicate MAC addresses of the terminals in the generated YAML file.
+Choose which entry you want to keep.
+As long as there are duplicate MAC addresses, {susemgr} will refuse importing the YAML file.
++
+[NOTE]
+====
+{slepos} images will not be migrated. You must rebuild the images using the OS image building functionality.
+For more information about building images, see https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-advanced-topics/html/book.suma.advanced.topics/at.images.html#at.images.kiwi.
+====
+
 The data can be imported branch by branch.
 For each branch perform the following steps:
 
 . Replace each old SLEPOS branch server with a {smr} branch server (see https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html[Install Branch Server]) and connect it to the {smr} server (the same procedure as for https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.admin.html#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration]).
 
-. If you want to import one branch after the other from the YAML data instead of a complete import in one go, specify the wanted branch with:
+. Run the import command for one branch after the other:
 +
 ----
 retail_yaml --from-yaml retail.yml --branch <branch_name>
