@@ -9,26 +9,27 @@ include::entities.adoc[]
 [[retail_migr.sect.slepostosuma.s1]]
 == Migration from {slepos} 11 to {smr}
 
-This section describes migrating from an existing {slepos} 11 installation, to a new {susemgr} installation.
+This section describes migrating from an existing {slepos} 11 installation, to a new {susemgr} installation.  During this procedure, you will either dump the complete on the admin server in one session (see <<retail_migr.sect.slepostosuma.s1.complete>>) or dump the data branch by branch separately (see <<retail_migr.sect.slepostosuma.s1.bbb>>); similar approaches are available for importing and deploying the converted data.
+
+
+
+[[retail_migr.sect.slepostosuma.s1.complete]]
+=== Migration with Complete Data Dump
+
+This procedure explains how you can migrate the SLEPOS infrastructure all at once.
 
 . Install a {susemgr} server {productnumber} (with the Retail pattern).  For more information, see https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html.
 
-. On the SLEPOS Admin server export your LDAP data to an XML file with the following command:
+. On the SLEPOS Admin server export all your data stored in LDAP to an XML file.
+Use the following command that relies on the admin credentials:
 +
 ----
 posAdmin --export --type xml --file dumpfile.xml
 ----
 +
 The resulting [literal]``dumpfile.xml`` file will contain global information, with parts about images, hardware and its partitioning, and the description of the branch servers with networking data, services, and attached terminals.
-+
-Alternatively, this data can be exported branch by branch with:
-+
-----
-posAdmin --export --type xml --file dumpfile.xml --user $branch_dn \
-    --password $password
-----
 
-. Move the XML file to the {susemgr} server and convert it to YAML:
+. Move the XML file to the {susemgr} server (see Step 1) and convert it to YAML:
 +
 ----
 retail_migration dumpfile.xml retail.yml
@@ -55,11 +56,36 @@ For more information about building images, see https://www.suse.com/documentati
 retail_yaml --from-yaml retail.yml
 ----
 +
-You can statistical data while importing and check the results in the {webui}. In menu:Main Menu[Systems > Systems > All], you will see empty profiles, and in menu:Main Menu[Systems > Groups], you will see the groups for the hardware configurations, branches, servers, and terminals.
+You can see statistical data while importing.  Then check the results in the {webui}. In menu:Main Menu[Systems > Systems > All], find empty profiles, and in menu:Main Menu[Systems > Groups], the groups for the hardware configuration, the branches, servers, and terminals.
+
+After all the branches are migrated, shutdown and remove the old SLEPOS Admin Server.
+
+
+
+[[retail_migr.sect.slepostosuma.s1.bbb]]
+=== Migration with Branch by Branch Data Dump
+
+This procedure explains how you can migrate the SLEPOS infrastructure and the branches one by one, exporting and then importing.
+
+. Install a {susemgr} server {productnumber} (with the Retail pattern).  For more information, see https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html.
+
+. On every branch server:
+----
+posAdmin --export --type xml --file dumpfile.xml
+----
 +
-Alternatively, it can be imported branch by branch.
+These dumps will contain only the LDAP data of the branch plus the global data.
++
+. Similarily, you can export the LDAP data of every branch if you run the command on the Admin server with the branch credentials explicitly specified:
++
+----
+posAdmin --export --type xml --file dumpfile.xml --user $branch_dn \
+    --password $password
+----
++
+For background information about SLEPOS branch server configuration, see https://www.suse.com/documentation/slepos11/book_slepos/data/cha_slepos_branchserv.html.
 
-
+The data can be imported branch by branch.
 For each branch perform the following steps:
 
 . Replace each old SLEPOS branch server with a {smr} branch server (see https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html[Install Branch Server]) and connect it to the {smr} server (the same procedure as for https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.admin.html#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration]).
@@ -76,6 +102,8 @@ Repeat the command for every branch.
 
 . Boot the terminals of the branch.
 
-After migrating all branches, shutdown and remove the old SLEPOS Admin Server.
+After all the branches are migrated, shutdown and remove the old SLEPOS Admin Server.
+
+
 
 include::retail_migr_chap_slepostosumaind.adoc[leveloffset=1]
