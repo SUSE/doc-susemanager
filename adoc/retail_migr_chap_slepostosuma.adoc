@@ -82,25 +82,43 @@ Finally, shutdown and remove the old SLEPOS Admin Server.
 [[retail_migr.sect.slepostosuma.s1.x2y]]
 === Converting XML to YAML (draft!)
 
+When you perform a migration using one of the methods in this chapter, one of the steps takes the XML data dump file from {slepos}, and converts it to a YAML file for {smr}.
+The tool that performs this conversion has additional features, which are outlined in this section.
+
+To validate the XML file before conversion, and print any errors:
+
 ----
-retail_migration dumpfile.xml  
+retail_migration dumpfile.xml
 ----
-validates the file, prints eventual problems
+
+
+To write a mapping file called [path]``map.yml``:
 
 ----
 retail_migration dumpfile.xml  --save-mapping map.yml
 ----
-write mapping yaml file, the file contains 2 dictionaries: 
 
-. images - map old SLEPOS images to new built in SUMA
-. groups - map of slepos scCashRegister objects to SUMA HWTYPE groups this file should be edited as needed
+The mapping file contains two dictionaries:
+. [systemitem]``images``, which maps old {slepos} images to new images built in {susemgr}.
+. [systemitem]``groups``, which maps legacy {slepos}[systemitem]``scCashRegister`` objects to {susemgr} [systemitem]``HWTYPE`` groups.
+
+The mapping file should be edited as required for your environment.
+
+
+To perform a conversion using a mapping file:
 
 ----
 retail_migration dumpfile.xml  retail.yml --mapping map.yml
 ----
-convert dumpfile.xml to retail.yml, use the mapping map.yml
-    
-In branch-by-branch scenario the retail.yml will contain new version of SLEPOS LDAP. To preserve the changes done in global  SUMA Retail setting meanwhile, the global part (hwtypes) can be deleted from yaml or the yaml can be imported with retail_yaml --only-new option.
+
+If you are performing a branch-by-branch migration, the resulting [path]``retail.yml`` file will contain a new version of {slepos} LDAP data.
+If you want to preserve any global changes in your {sme} settings, remove the [systemitem]``global`` hardware types from the resulting [path]``retail.yml`` file before importing it.
+Alternatively, you can import [path]``retail.yml`` using this command to only import the new information contained in the file:
+**TODO**: What does 'new' mean here?
+
+----
+retail_yaml --only-new option.
+----
 
 
 include::retail_migr_chap_slepostosumaind.adoc[leveloffset=1]
