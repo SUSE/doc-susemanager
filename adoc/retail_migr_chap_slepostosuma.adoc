@@ -62,13 +62,11 @@ retail_yaml --from-yaml retail.yml
 +
 You can see statistical data while importing.  Then check the results in the {webui}. In menu:Main Menu[Systems > Systems > All], find empty profiles, and in menu:Main Menu[Systems > Groups], the groups for the hardware configuration, the branches, servers, and terminals.
 
-Use the empty profiles together with activation keys to onboard all the systems of your infrastructure.
 
-Branch servers must be based on SUSE Manager Proxy systems; for more information, see xref:retail_chap_install.adoc#retail.sect.install.branch[Installing and Registrering].
-Use an activation key to assign the channels listed in xref:retail_chap_install.adoc#retail.sect.install.install.config[Configuring Server].
-
-For instructions to install Salt-based proxy minions and register them to SUSE Manager, see SUSE Manager Advanced Topics.
-
+To finalize the branch server migration, you must install the branch server machines as Salt-based minions and bootstrap them as proxies.
+For more information about proxy installation, see xref:retail_chap_install.adoc#retail.sect.install.branch[Installing and Registrering].
+For more information about using an activation key to assign the required channels, see xref:retail_chap_install.adoc#retail.sect.install.install.config[Configuring Server].
+After onboarded to {susemgr}, the branch servers machines are connected with the empty profiles (by FQDN), and so they will get the Retail configuration.
 
 After all the branches are migrated, shutdown and remove the old SLEPOS Admin Server.
 
@@ -117,10 +115,15 @@ For more information about building images, see https://www.suse.com/documentati
 The data can be imported branch by branch.
 For each branch perform the following steps:
 
-. Replace each old SLEPOS branch server with a {smr} branch server (see https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html[Install Branch Server]) and connect it to the {smr} server (the same procedure as for https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.admin.html#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration]).
-+
-Use the empty profiles together with activation keys to onboard all the systems of your infrastructure.
-Use an activation key to assign the channels listed in https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html[Configuring Server].
+// . Replace each old SLEPOS branch server with a {smr} branch server (see https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html[Install Branch Server]) and connect it to the {smr} server (the same procedure as for https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.admin.html#retail.sect.admin.branch_mass_config[Branch Server Mass Configuration]).
+// +
+// Use the empty profiles together with activation keys to onboard all the systems of your infrastructure.
+// Use an activation key to assign the channels listed in https://www.suse.com/documentation/suse-manager-for-retail-3-2/retail-getting-started/retail.chap.install.html[Configuring Server].
+
+. To finalize each branch server migration, you must install the branch server machine as a Salt-based minion and bootstrap it as a proxy.
+For more information about proxy installation, see xref:retail_chap_install.adoc#retail.sect.install.branch[Installing and Registering].
+For more information about using an activation key to assign the required channels, see xref:retail_chap_install.adoc#retail.sect.install.install.config[Configuring Server].
+After onboarded to {smr}, the branch server machine is connected with the empty profile (by FQDN), and so it will get the Retail configuration.
 
 . Run the import command for one branch after the other:
 +
@@ -130,12 +133,12 @@ retail_yaml --from-yaml retail.yml --branch <branch_name>
 +
 Repeat the command for every branch.
 
-. Apply highstate on the branch server.
+. Apply highstate on the branch server; this will happen automatically if [guimenu]``Configuration
+File Deployment`` is enabled.
 
 . Boot the terminals of the branch.
 
 After all the branches are migrated, shut down and remove the old SLEPOS Admin Server.
-
 
 
 
