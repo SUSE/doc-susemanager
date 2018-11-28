@@ -2836,13 +2836,14 @@ endif::[]
 == Systems > Virtual Host Managers
 
 
-Third party hypervisors and hypervisor managers such as VMWare vCenter are called "`Virtual Host Managers`" (VHM) within {productname}.
-These managers can manage one or multiple virtual hosts, which in turn may contain virtual guests. {productname} ships with a tool called [command]``virtual-host-gatherer`` that can connect to VHMs using their API, and request information about virtual hosts.
-This tool is automatically invoked via Taskomatic nightly, therefore you need to configure your VHMs via XMLRPC APIs. [command]``virtual-host-gatherer`` maintains the concept of optional modules, where each module enables a specific Virtual Host Manager.
+Third party hypervisors and hypervisor managers such as VMWare vCenter are called "`Virtual Host Managers`" (VHM).
+VHMs can manage one or more virtual hosts, and each virtual host can can contain one or more virtual guests.
 
-Proceed to menu:Systems[Virtual Host Managers] page in the {webui} to begin working with a Virtual Host Manager.
-In the upper right click btn:[Create] and select either [guimenu]``VMware-based`` or [guimenu]``File-based``.
+To create a VHM, navigate to menu:Systems[Virtual Host Managers] in the {webui}.
+In the upper right of the page, click btn:[Create] and select either [guimenu]``VMware-based`` or [guimenu]``File-based``.
+Continue according to one of the following procedures.
 
+After it has been created and configured, VHMs can be started or refreshed manually through the {webui}, by navigating to menu:Systems[Virtual Host Managers], selecting the VHM you wish to start, and clicking btn:[Refresh Data]
 
 [[ref.webui.systems.virt-host-managers.vmware]]
 === VMware-Based
@@ -2939,7 +2940,7 @@ The following JSON data is an example of the exported information in the file:
 For more information, see the man page on your {productname} server for [command]``virtual-host-gatherer``:
 
 ----
-{prompt.user}man virtual-host-gatherer
+man virtual-host-gatherer
 ----
 
 
@@ -2951,6 +2952,12 @@ The `README` file coming with the package provides background information about 
 
 === Configuring Virtual Host Managers via XMLRPC API
 
+{productname} ships with a tool called [command]``virtual-host-gatherer`` that can connect to VHMs using their API, and request information about virtual hosts.
+[command]``virtual-host-gatherer`` maintains the concept of optional modules, where each module enables a specific Virtual Host Manager.
+This tool is automatically invoked nightly by Taskomatic.
+In order to use the [command]``virtual-host-gatherer`` tool, you will need configure your VHMs using XMLRPC APIs, after creating them in the {webui}.
+
+Log files for the [command]``virtual-host-gatherer`` tool are located at [path]``/avr/log/rhn/gather.log``.
 
 The following APIs allow you to get a list of available [command]``virtual-host-manager`` modules and the parameters they require:
 
