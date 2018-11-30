@@ -159,11 +159,6 @@ retail-getting-started-pdf: suma xml-retail
 #### Retail Migration
 xml-retail-migration: xml/book_retail-migration.xml retail-images
 
-retail-images: adoc/images/retail/*
-	mkdir -p images/src
-	(mkdir -p images/src/png; cd images/src/png; ln -sf ../../../adoc/images/retail/*.png .)
-	(mkdir -p images/src/svg; cd images/src/svg; ln -sf ../../../adoc/images/retail/*.svg .)
-
 xml/book_retail-migration.xml: adoc/retail_migr*.adoc
 	asciidoctor -a productname='$(PRODUCTNAME)' -b docbook5 -d book -D xxml adoc/book_retail_migration.adoc
 	rm -rf xml
