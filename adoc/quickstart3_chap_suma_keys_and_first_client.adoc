@@ -282,8 +282,7 @@ cd /srv/www/htdocs/pub/bootstrap/
 +
 
 ----
-cat MODIFIED-SCRIPT.SH \
-| ssh root@example.com /bin/bash
+cat MODIFIED-SCRIPT.SH | ssh root@example.com /bin/bash
 ----
 
 . The script will execute and proceed to download the required dependencies located in the repositories directory you created earlier.
@@ -333,13 +332,13 @@ Note that even if you do not select a date and time, the lock might not deactiva
 
 There are currently three methods for registering Salt minions.
 This section describes the first method and uses a bootstrap repository.
-The second method uses the bootstrap script, and is mostly similar to the procedure described in <<registering.clients.traditional>>{mdash}the difference is enabling [guimenu]``Bootstrap using Salt`` and [guimenu]``Enable Remote Commands`` ([literal]``ALLOW_REMOTE_COMMANDS=1``).
+The second method uses the bootstrap script, and is mostly similar to the procedure described in <<registering.clients.traditional>>{mdash}the difference is enabling [guimenu]``Bootstrap using Salt`` and the activation key option [guimenu]``Configuration File Deployment`` that applies highstate automatically.
 The third method uses the {webui}, and is described in <<ref.webui.systems.bootstrapping>>.
 
 You can also use these methods to change existing traditional clients into Salt minions.
 
 
-The following section assumes you have created a SUSE Manager tools repository.
+The rest of this section assumes you have created a SUSE Manager tools repository.
 You can review creating a tools repository in <<create.tools.repository>>.
 
 
@@ -357,15 +356,14 @@ In the following rare scenario:
 ====
 
 
-Once you have fully synced a base channel from the {webui}
-for clients to obtain software sources from, for example: `SLES12-SP4-Pool_for_x86_64` perform the following procedure to register a Salt minion.
+When you have fully synchronized a base channel from the {webui} for clients to obtain software packages from (for example: `SLES12-SP4-Pool_for_x86_64`) perform the following procedure to register a Salt minion.
 
 .Procedure: Registering Salt Minions
 . On your minion as {rootuser} enter the following command:
 +
 
 ----
-zypper ar http://`FQDN.SUSE.Manager.com`/pub/repositories/sle/12/3/bootstrap/ \
+zypper ar http://FQDN.server.example.com/pub/repositories/sle/12/4/bootstrap/ \
    sles12-sp4
 ----
 +
@@ -401,7 +399,7 @@ to:
 +
 
 ----
-master:`FQDN.SUSE.Manager.com`
+master: FQDN.server.example.com
 ----
 . Restart the Salt minion with:
 +
