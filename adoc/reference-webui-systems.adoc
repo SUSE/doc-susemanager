@@ -1419,11 +1419,12 @@ This tab allows you to create new virtual guests, apply images on a
 traditionally managed host system, or change the status of virtual guests.
 
 
+// TODO Update the screenshot for a salt minion
 image::system_details_traditional_virtualization_details.png[scaledwidth=80%]
 
 The [guimenu]``Virtualization`` tab has one subtab, [guimenu]``Guests``.
-Traditional systems have two additional subtabs, [guimenu]``Provisioning``, and [guimenu]``Deployment``.
-These tabs appear the same for both virtual hosts and guests, but the functionality only makes sense for virtual hosts.
+For traditional systems that have Virtualization entitlements, you will also see two additional subtabs for [guimenu]``Provisioning``, and [guimenu]``Deployment``.
+These tabs appear only for systems having the Virtualization entitlement.
 It is not possible to create a guest system that runs on another guest system.
 
 [float]
@@ -1431,7 +1432,7 @@ It is not possible to create a guest system that runs on another guest system.
 ==== System Details > Virtualization> Guests
 
 [guimenu]``Guests`` is the default tab.
-For host systems, it presents a table of the host system's virtual guests.
+It presents a table of the host system's virtual guests.
 For each guest system, the following information is provided:
 
 [guimenu]``Status``::
@@ -1458,7 +1459,56 @@ If you have System Group Administrator responsibilities assigned for your guest 
 This is because it is possible to assign virtual guests on a single host to multiple System Group Administrators.
 Only users that have System Group Administrator privileges on the host system may create new virtual guests.
 
+For Salt systems, the btn:[Create Guest] button shows a dialog to configure and create a new virtual machine.
 
+[float]
+[[sdc-virt-host-guest-edit]]
+===== Editing a virtual machine
+
+[NOTE]
+====
+Traditional systems can only edit CPU and memory allocation.
+====
+
+The fields in this dialog are grouped into several panels.
+The [guimenu]``General`` panel contains the [guimenu]``CPU`` and [guimenu]``memory`` fields.
+The [guimenu]``Disks`` and [guimenu]``Network Interfaces`` panels list the fields corresponding to the matching devices of the virtal machine.
+The [guimenu]``Graphics`` panel allows configuring the display of the virtual machine.
+The [guimenu]``Schedule`` panel helps configuring when the edit should take place by choosing either an earliest time or an action chain to append to.
+
+[NOTE]
+====
+If a guest contains one or more disks or network interfaces not recognized by {susemgr}, you will not be able to edit the configuration.
+This prevents any possibility of {susemgr} destroying the setup because of an unhandled type.
+====
+
+The order of the disks is important: the disk naming will be computed from it. This means that the first virtio disk will be named 'vda', the second will be named 'vdb' and so on.
+
+When clicking the btn:[+] in the [guimenu]``Disks`` (or [guimenu]``Network Interfaces``) panel header, a new disk (or network interface) will be appended to the list.
+Likewise, clicking the btn:[-] button next to a disk or interface will remove it.
+The default size for a new disk is 8[nbsp]GB.
+The [guimenu]``Source image template URL`` field contains the URL to a disk image to be copied and used for the virtual machine.
+
+Click the btn:[Update] button to apply the changes.
+
+// TODO Add a screenshot of the edit page, maybe more
+
+[float]
+[[sdc-virt-host-guest-create]]
+===== Creating a virtual machine [Salt]
+
+To create a new virtual machine, the process is similar to editing, but there are some additional fields:
+
+The [guimenu]``Name`` field defining the name of the virtual machine to create.
+The [guimenu]``Hypervisor`` field to allow choosing among the available hypervisors of the host.
+The [guimenu]``Virtual Machine Type`` to choose between fully virtualized and para-virtualized virtual machines if applicable.
+The [guimenu]``Architecture`` to select the emulated CPU architecture, the default being the virtual host one.
+
+By default a disk and a network interfaces are added. The only required value to set is the disk [guimenu]``Source template image URL`` or the virtual machine will only have an empty disk.
+
+The new virtual machine will start immediately after it has been defined.
+
+// TODO Add a screenshot of the create page showing the additional fields
 
 [[s5-sm-system-details-virtualization-deployment]]
 ==== System Details > Virtualization > Deployment [Management]
