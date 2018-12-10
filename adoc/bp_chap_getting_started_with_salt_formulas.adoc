@@ -24,13 +24,13 @@ The following list will help you in making the decision to use a state or a form
 * Formulas and States both act as a kind of configuration documentation.
 Once written and stored you will have a snapshot of what your infrastructure should look like.
 * You can greatly decrease the amount of time required for writing a formula by grabbing one of the many pre-written formulas on github.
-There are pre-written formulas for hundreds of configurations.
 You can find these located at https://github.com/saltstack-formulas.
 
 [NOTE]
 .Formula with Forms Improvements
 ====
-* Formula data can now be managed via the XMLRPC API
+// We need a intro sentence about Forms in general
+* Formula data can be managed via the XMLRPC API
 * New types were added to help SUSE Manager handle almost any kind of upstream formula.
 ====
 
@@ -108,7 +108,8 @@ Installed Size: 47.9 KiB
 Installed: No
 Source package : locale-formula-0.2-1.1.src
 Summary        : Locale Salt Formula for SUSE Manager
-Description    : Salt Formula for SUSE Manager. Sets up the locale.
+Description    :
+    Salt Formula for SUSE Manager. Sets up the locale.
 ----
 . To install a formula run as root:
 +
@@ -137,12 +138,8 @@ For example, the [package]#locale-formula# states directory is located in:
 /usr/share/susemanager/formulas/states/locale/
 ----
 The Formula Metadata Directory::
-The metadata directory contains a [path]``form.yml``
-file which defines the forms for {productname}
-and an optional [path]``metadata.yml``
-file that can contain additional information about a formula.
-For example, the [package]#locale-formula#
-metadata directory is located in:
+The metadata directory contains a [path]``form.yml`` file which defines the forms for {productname} and an optional [path]``metadata.yml`` file that can contain additional information about a formula.
+For example, the [package]#locale-formula# metadata directory is located in:
 +
 
 ----
@@ -168,11 +165,11 @@ Custom metadata (information) need to be placed in:
 /srv/formula_metadata/custom/
 ----
 
-All custom folders located in the following directories needs to contain a [path]``form.yml`` file.
+All custom folders located in the following directories need to contain a [path]``form.yml`` file.
 These files are detected as form recipes and may be applied to groups and systems from the {webui}:
 
 ----
-/srv/formula_metadata/`custom-formula-name`/form.yml
+/srv/formula_metadata/<custom-formula-name>/form.yml
 ----
 
 
@@ -325,12 +322,12 @@ Many of these values are self-explanatory:
 
 ** The `text` type generates a simple text field
 ** The `password` type generates a password field
-** The `color` type generates a color picker.
+** The `color` type generates a color picker
 
 
 The ``group``, ``edit-group``, and `namespace` (formerly ``hidden-group``) types do not generate an editable field and are used to structure form and pillar data.
 The difference between `group` and `namespace` is `group` generates a visible border with a heading, and `namespace` shows nothing visually (and is only used to structure pillar data).
-The difference between `group` and `edit-group` is `edit-group` allows to structure and restrict editable fields in a more flexible way.
+The difference between `group` and `edit-group` is: `edit-group` allows to structure and restrict editable fields in a more flexible way.
 For example, `edit-group` supports the `$minItems` and `$maxItems` attributes, and thus it simplifies complex and repeatable input structures.
 For an `edit-group` example, see <<salt.formulas.ex.edit-group>>.
 
@@ -346,7 +343,7 @@ You reference it in the same section with ``${name}``.
 $help and $placeholder::
 The `$help` and `$placeholder` attributes are used to give a user a better understanding of what the value should be.
 ** `$help` defines the message a user sees when hovering over a field
-** `$placeholder` displays a gray placeholder text in the field.
+** `$placeholder` displays a gray placeholder text in the field
 
 `$placeholder` may only be used with text fields like text, password, email or date.
 It does not make sense to add a placeholder if you also use `$default` as this will hide the placeholder.
@@ -362,7 +359,7 @@ In an ``edit-group``, `$prototype` allows to define default (or pre-filled) valu
 
 $scope::
 `$scope` allows you to specify a hierarchy level at which a value may be edited.
-Possible values are ``system``, `group` and ``readonly``.
+Possible values are ``system``, `group`, and ``readonly``.
 +
 
 The default `$scope: system` allows values to be edited at group and system levels.
@@ -375,7 +372,7 @@ On the system level you will be able to see the value, but not edit it.
 
 The `$scope: readonly` option makes a field read-only.
 It can be used to show a user data which should be known, but should not be editable.
-This option only makes sense in combination with the $default attribute.
+This option only makes sense in combination with the ``$default`` attribute.
 
 $visibleIf::
 `$visibleIf` allows you to show a field or group if a simple condition is met.
@@ -524,7 +521,7 @@ The formula itself is called [path]``hd-partitions`` and will appear as [guimenu
 [[fig-formula-custom-harddisk-partitions]]
 image::formula-custom-harddisk-partitions.png[]
 
-To remove definition of a partition click the minus symbol in the title line of an inner group.
+To remove the definition of a partition click the minus symbol in the title line of an inner group.
 When form fields are properly filled confirm with clicking btn:[Save Formula] in the upper right corner of the formula.
 
 
@@ -535,13 +532,13 @@ When form fields are properly filled confirm with clicking btn:[Save Formula] in
 Salt formulas are pre-written Salt states, which may be configured with pillar data.
 You can parametrize state files using Jinja.
 Jinja allows you to access pillar data by using the following syntax.
-(This syntax works best when your uncertain a pillar value exists as it will throw an error):
+This syntax works best when you are uncertain whether a pillar value exists as it will throw an error:
 
 ----
 pillar.some.value
 ----
 
-When you are sure a pillar exists may also use the following syntax:
+When you are sure a pillar exists you may also use the following syntax:
 
 ----
 salt['pillar.get']('some:value', 'default value')
@@ -550,8 +547,7 @@ salt['pillar.get']('some:value', 'default value')
 You may also replace the `pillar` value with `grains` (for example, ``grains.some.value``) allowing access to grains.
 
 Using data this way allows you to make a formula configurable.
-The following code snippet will install a package specified in the pillar ``package_name``.
-For example:
+The following code snippet will install a package specified in the pillar ``package_name``:
 
 ----
 install_a_package:
@@ -559,8 +555,7 @@ install_a_package:
     - name: {{ pillar.package_name }}
 ----
 
-You may also use more complex constructs such as `if/else` and `for-loops` to provide greater functionality.
-For Example:
+You may also use more complex constructs such as `if/else` and `for-loops` to provide greater functionality:
 
 ----
 {% if pillar.installSomething %}
@@ -636,7 +631,7 @@ You can also choose to override defined values from pillars (for example, by ove
 }, merge=salt['pillar.get']('some:pillar:data')) %}
 ----
 
-After creating a map file like the above example, you can easily maintain compatibility with multiple system types while accessing "deep" pillar data in a simpler way.
+After creating a map file like the above example, you can maintain compatibility with multiple system types while accessing "deep" pillar data in a simpler way.
 Now you can import and use `data` in any file.
 For example:
 
@@ -680,8 +675,7 @@ Formulas utilized with {productname} should follow formula conventions listed in
 [[best.practice.salt.formulas.pillardata]]
 == {productname} Generated Pillar Data
 
-When pillar data is generated (for example, after applying the highstate) the following external pillar script generates pillar data for packages, group ids, etc.
-and includes all pillar data for a system:
+When pillar data is generated (for example, after applying the highstate) the following external pillar script generates pillar data for packages, group ids, etc. and includes all pillar data for a system:
 
 ----
 /usr/share/susemanager/modules/pillar/suma_minion.py
@@ -723,7 +717,7 @@ Formulas should be designed/created directly after a {productname} installation,
 * Data is saved to [path]``/srv/susemanager/formula_data`` and the [path]``pillar`` and [path]``group_pillar`` sub-directories.
 These should be automatically generated by the server.
 * Formulas must be included for every minion listed in the top file.
-Currently this process is initiated by the [path]``mgr_master_tops.py`` script which includes the formulas.sls file located in:
+Currently this process is initiated by the [path]``mgr_master_tops.py`` script which includes the `formulas.sls` file located in:
 +
 
 ----
@@ -778,7 +772,10 @@ For general information, see the `Salt Formulas installation and usage instructi
 
 
 
-// Locale formula
+[[bp.saltforms.susemgr.locale]]
+=== Locale
+
+The locale formula allows setting [guimenu]``Timezone` and [guimenu]``Keyboard and Language`.
 
 
 
@@ -831,7 +828,7 @@ In ``Generate Reverse``, and define reverse mapping and for which zones:
 [[fig-formula-bind-04]]
 image::formula-bind-04-reverse.png[]
 
-When saved, data is written to /srv/susemanager/formula_data/pillar/<salt-minion.example.com>_bind.json
+When saved, data is written to [path]``/srv/susemanager/formula_data/pillar/<salt-minion.example.com>_bind.json``.
 
 
 If you apply the highstate (menu:System Details[States > Highstate]), it first ensures that [package]``bind`` and all required packages will get installed.
@@ -891,9 +888,7 @@ For more information about setting up TFTP, see the SLES Deployment Guide, Prepa
 [[fig-formula-tftpd-01]]
 image::formula-tftpd-01.png[]
 
-For setting up a TFTP server, specify the ``Internal Network Address``,
-``TFTP base directory`` (default: [path]``/srv/tftpboot``), and ``run
-TFTP under user`` (default: [systemitem]``sftp``).
+For setting up a TFTP server, specify the ``Internal Network Address``, ``TFTP base directory`` (default: [path]``/srv/tftpboot``), and ``run TFTP under user`` (default: [systemitem]``sftp``).
 
 If you apply the highstate (menu:System Details[States > Highstate]), it first ensures that [package]``atftp`` and all required packages will get installed.
 Then it will start TFTP (``atftpd``).
@@ -903,9 +898,7 @@ Then it will start TFTP (``atftpd``).
 [[bp.saltforms.susemgr.vsftp]]
 === Vsftpd
 
-With the vsftpd formula you set up and configure Vsftpd.  Vsftpd is an
-FTP server or daemon, written with security in mind.  "vs" in its name
-stands for "Very Secure".
+With the vsftpd formula you set up and configure Vsftpd.  Vsftpd is an FTP server or daemon, written with security in mind.  "vs" in its name stands for "Very Secure".
 
 
 
@@ -913,7 +906,8 @@ stands for "Very Secure".
 [[fig-formula-vsftpd-01]]
 image::formula-vsftpd-01.png[]
 
-For configuring a VSFTP server, specify the settings and options in the Vsftpd formula.  There are settings such as
+For configuring a VSFTP server, specify the settings and options in the Vsftpd formula.
+There are settings such as
 ``FTP server directory``,
 ``Internal Network Address``
 ``Enable ssl``, etc.
