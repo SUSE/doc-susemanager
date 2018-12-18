@@ -2842,12 +2842,21 @@ endif::[]
 == Systems > Virtual Host Managers
 
 
-Third party hypervisors and hypervisor managers such as VMWare vCenter are called "`Virtual Host Managers`" (VHM) within {productname}.
-These managers can manage one or multiple virtual hosts, which in turn may contain virtual guests. {productname} ships with a tool called [command]``virtual-host-gatherer`` that can connect to VHMs using their API, and request information about virtual hosts.
-This tool is automatically invoked via Taskomatic nightly, therefore you need to configure your VHMs via XMLRPC APIs. [command]``virtual-host-gatherer`` maintains the concept of optional modules, where each module enables a specific Virtual Host Manager.
+Third party hypervisors and hypervisor managers such as VMWare vCenter are called "`Virtual Host Managers`" (VHM).
+VHMs can manage one or more virtual hosts, and each virtual host can contain one or more virtual guests.
 
-Proceed to menu:Systems[Virtual Host Managers] page in the {webui} to begin working with a Virtual Host Manager.
-In the upper right click btn:[Create] and select either [guimenu]``VMware-based`` or [guimenu]``File-based``.
+To create a VHM, navigate to menu:Systems[Virtual Host Managers] in the {webui}.
+In the upper right of the page, click btn:[Create] and select either [guimenu]``VMware-based`` or [guimenu]``File-based``.
+Continue according to one of the following procedures.
+
+After it has been created and configured, data collection will be run automatically using Taskomatic.
+You can also begin data collection from your VHMs manually through the {webui}, by navigating to menu:Systems[Virtual Host Managers], selecting the appropriate VHM, and clicking btn:[Refresh Data].
+
+{productname} ships with a tool called [command]``virtual-host-gatherer`` that can connect to VHMs using their API, and request information about virtual hosts.
+[command]``virtual-host-gatherer`` maintains the concept of optional modules, where each module enables a specific Virtual Host Manager.
+This tool is automatically invoked nightly by Taskomatic.
+Log files for the [command]``virtual-host-gatherer`` tool are located at [path]``/avr/log/rhn/gather.log``.
+
 
 
 [[ref.webui.systems.virt-host-managers.vmware]]
@@ -2873,7 +2882,7 @@ image::systems_virtual_host_managers_vmware.png[scaledwidth=80%]
 [[ref.webui.systems.virt-host-managers.file]]
 === File-Based
 
-In a VMWare environment where direct connection to the SUSE Manager Server is not possible, a JSON file can be exported from the ESXi or vSphere host and later imported into {productname} via this option.
+In a VMWare environment where direct connection to the {susemgr} is not possible, a JSON file can be exported from the ESXi or vSphere host and later imported into {productname}.
 
 After selecting menu:Create[File-Based] enter a label and URL leading to the location of this file.
 
@@ -2886,7 +2895,7 @@ image::systems_virtual_host_managers_file.png[scaledwidth=80%]
 ====
 The file-based is not meant to be used with manually crafted files.
 It only meant to be used with the output of [command]``virtual-host-gatherer`` against some other module.
-File-based is suitable for VMWare vCenter installations for which no direct API access is possible from the SUSE Manager Server.
+File-based is suitable for VMWare vCenter installations for which no direct API access is possible from the {susemgr}.
 
 The solution is to run [command]``virtual-host-gatherer`` from somewhere else in the network and save the produced JSON data for further processing.
 ====
@@ -2941,22 +2950,27 @@ The following JSON data is an example of the exported information in the file:
 }
 ----
 
-
 For more information, see the man page on your {productname} server for [command]``virtual-host-gatherer``:
 
 ----
-{prompt.user}man virtual-host-gatherer
+man virtual-host-gatherer
 ----
 
 
-The `README` file coming with the package provides background information about the `type` of a hypervisor, etc.:
+The `README` file provided with the package provides background information about the `type` of a hypervisor, etc.:
 
 ----
 /usr/share/doc/packages/virtual-host-gatherer/README.md
 ----
 
-=== Configuring Virtual Host Managers via XMLRPC API
+The man page and the `README` file also contain example configuration files for your reference.
 
+
+
+=== Configuring Virtual Host Managers using the XMLRPC API
+
+VHMs can be managed manually using the {webui}, or programtically using XMLRPC.
+If you want to to manage your VHMs with XMLRPC, you will need to configure them to use the XMLRPC APIs.
 
 The following APIs allow you to get a list of available [command]``virtual-host-manager`` modules and the parameters they require:
 
