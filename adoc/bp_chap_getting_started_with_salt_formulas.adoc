@@ -331,12 +331,41 @@ Many of these values are self-explanatory:
 The ``group``, ``edit-group``, and `namespace` (formerly ``hidden-group``) types do not generate an editable field and are used to structure form and pillar data.
 The difference between `group` and `namespace` is `group` generates a visible border with a heading, and `namespace` shows nothing visually (and is only used to structure pillar data).
 The difference between `group` and `edit-group` is: `edit-group` allows to structure and restrict editable fields in a more flexible way.
+`edit-group` is a collection of items of the same kind; collections can have the following four "shapes":
+
+** A list of primitive items
+** A list of dictionaries
+** A dictionary of primitive items
+** A dictionary of dictionaries
+
+The size of each collection is variable; users can add or remove elements.
+
 For example, `edit-group` supports the `$minItems` and `$maxItems` attributes, and thus it simplifies complex and repeatable input structures.
+These, and also `itemName`, are optional.
 For an `edit-group` example, see <<salt.formulas.ex.edit-group>>.
 
 $default::
 `$default` allows you to specify a default value that is displayed and used, if no other value is entered.
 In an `edit-group` it allows to create initial members of the group and populate them with specified data.
+
+$optional::
+`$optional` is a boolean attribute.
+If it is `true` and the field is empty in the form, then this field will not be generated in the formula data and the generated dictionary will not contain the field name key.
+If `$optional` is `false` and the field is empty, the formula data will contain a `<field name>: null` entry.
+
+$ifEmpty::
+The value to be used if the field is empty (because the user did not input
+any value).
+`ifEmpty` can only be used when `$optional` is `false` or not defined at all!
+If `$optional` is `true`, then `$ifEmpty` is ignored.
+In the following example, the `DP2` string would be used if user leaves the field empty:
++
+
+----
+displayName:
+  $type: string
+  $ifEmpty: DP2
+----
 
 $name::
 `$name` allows you to specify the name of a value that is shown in the form.
@@ -351,14 +380,45 @@ The `$help` and `$placeholder` attributes are used to give a user a better under
 `$placeholder` may only be used with text fields like text, password, email or date.
 It does not make sense to add a placeholder if you also use `$default` as this will hide the placeholder.
 
+$key::
+`$key` is applicable if the `edit-group` has the "shape" of a dictionary; you use it when the pillar data is supposed to be a dictionary.
+The `$key` attribute then determines the key of an entry in the dictionary.
+Example:
++
+
+----
+user_passwords:
+  $type: edit-group
+  $minItems: 1
+  $prototype:
+    $key:
+        $type: text
+    $type: text
+  $default:
+    alice: secret-password
+    bob: you-shall-not-pass
+----
++
+
+Pillar:
++
+
+----
+user_passwords:
+  alice:
+    secret-password
+  bob:
+    you-shall-not-pass
+----
+
 $minItems and $maxItems::
 In an ``edit-group``, `$minItems` and `$maxItems` allow you to specify the lowest and highest number the group can occur.
 
 $itemName::
-In an ``edit-group``, `$itemName` allows to define a template for the name to be used for the members of the group.
+In an ``edit-group``, `$itemName` allows you to define a template for the name to be used for the members of the group.
 
 $prototype::
-In an ``edit-group``, `$prototype` allows to define default (or pre-filled) values for newly added members in the group.
+In an ``edit-group``, `$prototype` is mandatory and allows to define default (or pre-filled) values for newly added members in the group.
 
 $scope::
 `$scope` allows you to specify a hierarchy level at which a value may be edited.
