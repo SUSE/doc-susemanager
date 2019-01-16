@@ -33,42 +33,53 @@ If the FQDN does not match on both networks, the branch server will not be recog
 
 [NOTE]
 ====
-This procedure outlines a standard configuration.
+The following procedure outlines a standard configuration with two zones.
 Adjust it to suit your own environment.
 ====
 
+Zone 1 is a regular domain zone.
+Its main purpose is to resolve saltboot hostnames such as TFTP, FTP, or Salt and the terminal names if configured.
+Zone 2 is the reverse zone of Zone 1.
+It is reponsible for resolving IP addresses back to hostnames.
+Zone 2 is primarily needed for the correct determination of the FQDNs of the branch.
 
-.Procedure: Configuring bind
+
+.Procedure: Configuring Bind with Two Zones
 
 . Check the [systemitem]``Bind`` formula, and click [btn]``Save``.
-. Navigate to the menu:Formulas[Bind] tab, and set these parameters for Zone1:
+. Navigate to the menu:Formulas[Bind] tab, and set these parameters for Zone 1:
 * In the [guimenu]``Config`` section, select [systemitem]``Include Forwarders``.
-* In the [guimenu]``Name`` field, use the fully qualified domain name (FQDN) of the  branch server (for example: [systemitem]``branch1.mycompany.org``).
+* In the [guimenu]``Name`` field, enter the domain name of your branch network (for example: [systemitem]``branch1.example.org``).
 * In the [guimenu]``Type`` field, select [systemitem]``master``.
 . Click [btn]``Add item`` to save your changes.
-. Set these parameters for Zone2:
+. Set these parameters for Zone 2:
 * In the [guimenu]``Name`` field, use the reverse zone for the configured IP range (for example: [systemitem]``1.168.192.in-addr.arpa``).
 * In the [guimenu]``Type`` field, select [systemitem]``master``
-. In the [guimenu]``Available Zones`` section, use these parameters for Zone1:
-* In the [guimenu]``Name`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.mycompany.org``).
+. In the [guimenu]``Available Zones`` section, use these parameters for Zone 1:
+* In the [guimenu]``Name`` field, enter the domain name of your branch network (for example: [systemitem]``branch1.example.org``).
 * In the [guimenu]``File`` field, type the name of your configuration file.
-. In the [guimenu]``Start of Authority (SOA)`` section, use these parameters for Zone1:
-* In the [guimenu]``Nameserver (Ns)`` field, use the FQDN of the  branch server (for example: [systemitem]``branch1.mycompany.org``).
+. In the [guimenu]``Start of Authority (SOA)`` section, use these parameters for Zone 1:
+* In the [guimenu]``Nameserver (Ns)`` field, use the FQDN of the  branch server (for example: [systemitem]``branchserver.branch1.example.org``).
 * In the [guimenu]``Contact`` field, use the email address for the domain administrator.
 * Keep all other fields as their default values.
-. In the [guimenu]``Records`` section, in subsection [guimenu]``A``, click on btn:[Add Item] and use these parameters to set up an A record for Zone1:
+. In the [guimenu]``Records`` section, in subsection [guimenu]``A``, click btn:[Add Item] and use these parameters to set up an A record for Zone 1:
 * In the [guimenu]``Hostname`` field, use the hostname of the branch server (for example: [systemitem]``branchserver``).
 * In the [guimenu]``IP`` field, use the IP address of the branch server (for example, [systemitem]``192.168.1.1``).
-. In the [guimenu]``Records`` section, subsection [guimenu]``NS``, click on btn:[Add Item] and use these parameters to set up an NS record for Zone1:
+. In the [guimenu]``Records`` section, subsection [guimenu]``NS``, click btn:[Add Item] and use these parameters to set up an NS record for Zone 1:
 * In the input box, use the hostname of the branch server (for example: [systemitem]``branchserver``).
 . In the [guimenu]``Records`` section, subsection [guimenu]``CNAME``, click on btn:[Add Item] and add the hostname of the branch server in each of these fields:
 * [systemitem]``tftp``
 * [systemitem]``ftp``
 * [systemitem]``dns``
 * [systemitem]``dhcp``
-* [systemitem]``salt``
-. Set up Zone2 using the same parameters as for Zone1, but ensure you use the reverse details.
-. Click btn:[Save Formula] to save your configuration
+* [systemitem]``salt``.  The [systemitem]`salt` CNAME should be the FQDN of the branch server's external interface for proxy functionality to work correctly.
+. Set up Zone 2 using the same parameters as for Zone 1, but ensure you use the reverse details:
+* The same SOA section as Zone 1.
+* Empty A and CNAME records.
+*  On top of that, Zone 2 should have configured:
+** `Generate Reverse` field by the network IP address set in branch server network formula (for example, [systemitem]``192.168.1.1/24``).
+** `For Zones` should specify the domain name of your branch network (for example, [systemitem]``branch1.example.org``).
+. Click btn:[Save Formula] to save your configuration.
 . Apply the highstate.
 
 
@@ -76,13 +87,13 @@ Adjust it to suit your own environment.
 ====
 Reverse name resolution on terminals might not work for networks that are inside one of these IPv4 private address ranges:
 
-* 10.0.0.0/8
-* 172.16.0.0/12
-* 192.168.0.0/16
+* [systemitem]``10.0.0.0/8``
+* [systemitem]``172.16.0.0/12``
+* [systemitem]``192.168.0.0/16``
 
-If you encounter this problem, go to the [guimenu]``Options`` section of the bind formula, and click btn:[Add item].
-In the [guimenu]``Options`` field, enter [systemitem]``empty-zones-enable``.
-In the [guimenu]``Value`` field, select [systemitem]``No``.
+If you encounter this problem, go to the [guimenu]``Options`` section of the Bind formula, and click btn:[Add item]:
+* In the [guimenu]``Options`` field, enter [systemitem]``empty-zones-enable``.
+* In the [guimenu]``Value`` field, select [systemitem]``No``.
 ====
 
 
