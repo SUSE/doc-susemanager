@@ -38,15 +38,15 @@ make suma-html
 make suma-dist
 
 # SUMA HTML Single/Chunked books
-#make suma-advanced-html
-#make suma-best-practices-html
-#make suma-getting-started-html
-#make suma-reference-html
+make suma-advanced-html
+make suma-best-practices-html
+make suma-getting-started-html
+make suma-reference-html
 
 # SUMA PDF
-#make suma-getting-started-pdf
-#make suma-reference-pdf
-#make suma-advanced-pdf
-#make suma-best-practices-pdf
+make suma-getting-started-pdf
+make suma-reference-pdf
+make suma-advanced-pdf
+make suma-best-practices-pdf
 
 

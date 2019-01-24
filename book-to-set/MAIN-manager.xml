@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>SUSE Manager Documentation</title>
-<date>2018-11-20</date>
+<date>2019-01-22</date>
 </info>
 <part xml:id="book.suma.getting-started">
 <title>Getting Started</title>
@@ -52,6 +52,7 @@ This book will guide you through an initial proof-of-concept setup, using these 
 <simpara>Register a Salt minion</simpara>
 </listitem>
 </orderedlist>
+<simpara>The book also contains a section about getting started with Salt.</simpara>
 </section>
 <section xml:id="quickstart.sect.prereq">
 <title>Prerequisites for Installation</title>
@@ -1213,8 +1214,7 @@ You must enter the full name of the key you wish to use in the bootstrap script 
 </listitem>
 <listitem>
 <simpara>Run the following command to execute the bootstrap script on the client:</simpara>
-<screen>cat MODIFIED-SCRIPT.SH \
-| ssh root@example.com /bin/bash</screen>
+<screen>cat MODIFIED-SCRIPT.SH | ssh root@example.com /bin/bash</screen>
 </listitem>
 <listitem>
 <simpara>The script will execute and proceed to download the required dependencies located in the repositories directory you created earlier.
@@ -1260,37 +1260,17 @@ Note that even if you do not select a date and time, the lock might not deactiva
 <title>Registering Salt Clients</title>
 <simpara>There are currently three methods for registering Salt minions.
 This section describes the first method and uses a bootstrap repository.
-The second method uses the bootstrap script, and is mostly similar to the procedure described in <xref linkend="registering.clients.traditional"/>-the difference is enabling <literal role="guimenu">Bootstrap using Salt</literal> and <literal role="guimenu">Enable Remote Commands</literal> (<literal role="literal">ALLOW_REMOTE_COMMANDS=1</literal>).
+The second method uses the bootstrap script, and is mostly similar to the procedure described in <xref linkend="registering.clients.traditional"/>-the difference is enabling <literal role="guimenu">Bootstrap using Salt</literal> and the activation key option <literal role="guimenu">Configuration File Deployment</literal> that applies highstate automatically.
 The third method uses the Web UI, and is described in <xref linkend="ref.webui.systems.bootstrapping"/>.</simpara>
 <simpara>You can also use these methods to change existing traditional clients into Salt minions.</simpara>
-<simpara>The following section assumes you have created a SUSE Manager tools repository.
+<simpara>The rest of this section assumes you have created a SUSE Manager tools repository.
 You can review creating a tools repository in <xref linkend="create.tools.repository"/>.</simpara>
-<warning>
-<title>Ensure the Salt Master is Reachable During Bootstrap</title>
-<simpara>The Salt master and its proxy should always be reachable via both IP address and the FQDN.
-In the following rare scenario:</simpara>
-<itemizedlist>
-<listitem>
-<simpara>The Salt master (SUSE Manager) is in some DNS.</simpara>
-</listitem>
-<listitem>
-<simpara>Your Minions are in a different subnet bound to an alternate DNS and the Salt master record is absent.</simpara>
-</listitem>
-<listitem>
-<simpara>The Salt master cannot know that the minion is not utilizing the same DNS record. The the Salt master nevertheless sends the FQDN of itself to the minion expecting it to join.</simpara>
-</listitem>
-<listitem>
-<simpara>The minion looks for a different DNS, one where the master record does not exist therefore bootstrap fails.</simpara>
-</listitem>
-</itemizedlist>
-</warning>
-<simpara>Once you have fully synced a base channel from the Web UI
-for clients to obtain software sources from, for example: <literal>SLES12-SP4-Pool_for_x86_64</literal> perform the following procedure to register a Salt minion.</simpara>
+<simpara>When you have fully synchronized a base channel from the Web UI for clients to obtain software packages from (for example: <literal>SLES12-SP4-Pool_for_x86_64</literal>) perform the following procedure to register a Salt minion.</simpara>
 <orderedlist numeration="arabic">
 <title>Procedure: Registering Salt Minions</title>
 <listitem>
 <simpara>On your minion as root enter the following command:</simpara>
-<screen>zypper ar http://`FQDN.SUSE.Manager.com`/pub/repositories/sle/12/3/bootstrap/ \
+<screen>zypper ar http://FQDN.server.example.com/pub/repositories/sle/12/4/bootstrap/ \
    sles12-sp4</screen>
 <note>
 <simpara>Do not use <literal>HTTPS</literal>.
@@ -1307,7 +1287,7 @@ Use <literal>HTTP</literal> instead to avoid errors.</simpara>
 <simpara>Find and change the line:</simpara>
 <screen>master: salt</screen>
 <simpara>to:</simpara>
-<screen>master:`FQDN.SUSE.Manager.com`</screen>
+<screen>master: FQDN.server.example.com</screen>
 </listitem>
 <listitem>
 <simpara>Restart the Salt minion with:</simpara>
@@ -2699,7 +2679,7 @@ Creation of custom formulas will also be introduced.</simpara>
 <simpara>Formulas are collections of Salt States that have been pre-written by other Salt users and contain generic parameter fields.
 Formulas allow for reliable reproduction of a specific configuration again and again.
 Formulas can be installed from RPM packages or an external git repository.</simpara>
-<simpara>The following list will help you in making the decision to use a state or a formula.</simpara>
+<simpara>This list will help you decide whether to use a state or a formula:</simpara>
 <itemizedlist>
 <title>Formula Tips</title>
 <listitem>
@@ -2713,21 +2693,18 @@ Formulas can be installed from RPM packages or an external git repository.</simp
 Once written and stored you will have a snapshot of what your infrastructure should look like.</simpara>
 </listitem>
 <listitem>
-<simpara>You can greatly decrease the amount of time required for writing a formula by grabbing one of the many pre-written formulas on github.
-There are pre-written formulas for hundreds of configurations.
-You can find these located at <link xl:href="https://github.com/saltstack-formulas">https://github.com/saltstack-formulas</link>.</simpara>
+<simpara>Pre-written formulas are available from the <link xl:href="https://github.com/saltstack-formulas">Saltstack formula repository on Github</link>.
+Use these as a starting point for your own custom formulas.</simpara>
+</listitem>
+<listitem>
+<simpara>Formula data can be managed via the XMLRPC API.</simpara>
 </listitem>
 </itemizedlist>
 <note>
 <title>Formula with Forms Improvements</title>
-<itemizedlist>
-<listitem>
-<simpara>Formula data can now be managed via the XMLRPC API</simpara>
-</listitem>
-<listitem>
-<simpara>New types were added to help SUSE Manager handle almost any kind of upstream formula.</simpara>
-</listitem>
-</itemizedlist>
+<simpara>Forms are a graphical representation of the formulas parameter data.
+You can customize these configuration data in the SUSE Manager Web UI, with entry fields, drop-down, check boxes, etc.</simpara>
+<simpara>For more information, see <link xl:href="https://www.suse.com/c/forms-formula-success/">https://www.suse.com/c/forms-formula-success/</link>.</simpara>
 </note>
 </section>
 <section xml:id="best.practice.salt.formulas.install">
@@ -2763,7 +2740,8 @@ Installed Size: 47.9 KiB
 Installed: No
 Source package : locale-formula-0.2-1.1.src
 Summary        : Locale Salt Formula for SUSE Manager
-Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
+Description    :
+    Salt Formula for SUSE Manager. Sets up the locale.</screen>
 </listitem>
 <listitem>
 <simpara>To install a formula run as root:</simpara>
@@ -2790,12 +2768,8 @@ For example, the <phrase role="package">locale-formula</phrase> states directory
 <varlistentry>
 <term>The Formula Metadata Directory</term>
 <listitem>
-<simpara>The metadata directory contains a <literal role="path">form.yml</literal>
-file which defines the forms for SUSE Manager
-and an optional <literal role="path">metadata.yml</literal>
-file that can contain additional information about a formula.
-For example, the <phrase role="package">locale-formula</phrase>
-metadata directory is located in:</simpara>
+<simpara>The metadata directory contains a <literal role="path">form.yml</literal> file which defines the forms for SUSE Manager and an optional <literal role="path">metadata.yml</literal> file that can contain additional information about a formula.
+For example, the <phrase role="package">locale-formula</phrase> metadata directory is located in:</simpara>
 <screen>/usr/share/susemanager/formulas/metadata/locale/</screen>
 </listitem>
 </varlistentry>
@@ -2822,9 +2796,9 @@ metadata directory is located in:</simpara>
 </listitem>
 </varlistentry>
 </variablelist>
-<simpara>All custom folders located in the following directories needs to contain a <literal role="path">form.yml</literal> file.
+<simpara>All custom folders located in the following directories need to contain a <literal role="path">form.yml</literal> file.
 These files are detected as form recipes and may be applied to groups and systems from the Web UI:</simpara>
-<screen>/srv/salt/formula_metadata/`custom-formula-name`/form.yml</screen>
+<screen>/srv/formula_metadata/&lt;custom-formula-name&gt;/form.yml</screen>
 </section>
 <section xml:id="best.practice.salt.formulas.pillar">
 <title>Editing Pillar Data in SUSE Manager</title>
@@ -2997,13 +2971,30 @@ The following represent the supported types:</simpara>
 <simpara>The <literal>password</literal> type generates a password field</simpara>
 </listitem>
 <listitem>
-<simpara>The <literal>color</literal> type generates a color picker.</simpara>
+<simpara>The <literal>color</literal> type generates a color picker</simpara>
 </listitem>
 </itemizedlist>
 <simpara>The <literal>group</literal>, <literal>edit-group</literal>, and <literal>namespace</literal> (formerly <literal>hidden-group</literal>) types do not generate an editable field and are used to structure form and pillar data.
 The difference between <literal>group</literal> and <literal>namespace</literal> is <literal>group</literal> generates a visible border with a heading, and <literal>namespace</literal> shows nothing visually (and is only used to structure pillar data).
-The difference between <literal>group</literal> and <literal>edit-group</literal> is <literal>edit-group</literal> allows to structure and restrict editable fields in a more flexible way.
-For example, <literal>edit-group</literal> supports the <literal>$minItems</literal> and <literal>$maxItems</literal> attributes, and thus it simplifies complex and repeatable input structures.
+The difference between <literal>group</literal> and <literal>edit-group</literal> is: <literal>edit-group</literal> allows to structure and restrict editable fields in a more flexible way.
+<literal>edit-group</literal> is a collection of items of the same kind; collections can have the following four "shapes":</simpara>
+<itemizedlist>
+<listitem>
+<simpara>A list of primitive items</simpara>
+</listitem>
+<listitem>
+<simpara>A list of dictionaries</simpara>
+</listitem>
+<listitem>
+<simpara>A dictionary of primitive items</simpara>
+</listitem>
+<listitem>
+<simpara>A dictionary of dictionaries</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The size of each collection is variable; users can add or remove elements.</simpara>
+<simpara>For example, <literal>edit-group</literal> supports the <literal>$minItems</literal> and <literal>$maxItems</literal> attributes, and thus it simplifies complex and repeatable input structures.
+These, and also <literal>itemName</literal>, are optional.
 For an <literal>edit-group</literal> example, see <xref linkend="salt.formulas.ex.edit-group"/>.</simpara>
 <variablelist>
 <varlistentry>
@@ -3011,6 +3002,27 @@ For an <literal>edit-group</literal> example, see <xref linkend="salt.formulas.e
 <listitem>
 <simpara><literal>$default</literal> allows you to specify a default value that is displayed and used, if no other value is entered.
 In an <literal>edit-group</literal> it allows to create initial members of the group and populate them with specified data.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>$optional</term>
+<listitem>
+<simpara><literal>$optional</literal> is a boolean attribute.
+If it is <literal>true</literal> and the field is empty in the form, then this field will not be generated in the formula data and the generated dictionary will not contain the field name key.
+If <literal>$optional</literal> is <literal>false</literal> and the field is empty, the formula data will contain a <literal>&lt;field name&gt;: null</literal> entry.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>$ifEmpty</term>
+<listitem>
+<simpara>The value to be used if the field is empty (because the user did not input
+any value).
+<literal>ifEmpty</literal> can only be used when <literal>$optional</literal> is <literal>false</literal> or not defined at all!
+If <literal>$optional</literal> is <literal>true</literal>, then <literal>$ifEmpty</literal> is ignored.
+In the following example, the <literal>DP2</literal> string would be used if user leaves the field empty:</simpara>
+<screen>displayName:
+  $type: string
+  $ifEmpty: DP2</screen>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -3030,7 +3042,7 @@ You reference it in the same section with <literal>${name}</literal>.</simpara>
 <simpara><literal>$help</literal> defines the message a user sees when hovering over a field</simpara>
 </listitem>
 <listitem>
-<simpara><literal>$placeholder</literal> displays a gray placeholder text in the field.</simpara>
+<simpara><literal>$placeholder</literal> displays a gray placeholder text in the field</simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -3040,6 +3052,30 @@ You reference it in the same section with <literal>${name}</literal>.</simpara>
 It does not make sense to add a placeholder if you also use <literal>$default</literal> as this will hide the placeholder.</simpara>
 <variablelist>
 <varlistentry>
+<term>$key</term>
+<listitem>
+<simpara><literal>$key</literal> is applicable if the <literal>edit-group</literal> has the "shape" of a dictionary; you use it when the pillar data is supposed to be a dictionary.
+The <literal>$key</literal> attribute then determines the key of an entry in the dictionary.
+Example:</simpara>
+<screen>user_passwords:
+  $type: edit-group
+  $minItems: 1
+  $prototype:
+    $key:
+        $type: text
+    $type: text
+  $default:
+    alice: secret-password
+    bob: you-shall-not-pass</screen>
+<simpara>Pillar:</simpara>
+<screen>user_passwords:
+  alice:
+    secret-password
+  bob:
+    you-shall-not-pass</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
 <term>$minItems and $maxItems</term>
 <listitem>
 <simpara>In an <literal>edit-group</literal>, <literal>$minItems</literal> and <literal>$maxItems</literal> allow you to specify the lowest and highest number the group can occur.</simpara>
@@ -3048,27 +3084,27 @@ It does not make sense to add a placeholder if you also use <literal>$default</l
 <varlistentry>
 <term>$itemName</term>
 <listitem>
-<simpara>In an <literal>edit-group</literal>, <literal>$itemName</literal> allows to define a template for the name to be used for the members of the group.</simpara>
+<simpara>In an <literal>edit-group</literal>, <literal>$itemName</literal> allows you to define a template for the name to be used for the members of the group.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
 <term>$prototype</term>
 <listitem>
-<simpara>In an <literal>edit-group</literal>, <literal>$prototype</literal> allows to define default (or pre-filled) values for newly added members in the group.</simpara>
+<simpara>In an <literal>edit-group</literal>, <literal>$prototype</literal> is mandatory and allows to define default (or pre-filled) values for newly added members in the group.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
 <term>$scope</term>
 <listitem>
 <simpara><literal>$scope</literal> allows you to specify a hierarchy level at which a value may be edited.
-Possible values are <literal>system</literal>, <literal>group</literal> and <literal>readonly</literal>.</simpara>
+Possible values are <literal>system</literal>, <literal>group</literal>, and <literal>readonly</literal>.</simpara>
 <simpara>The default <literal>$scope: system</literal> allows values to be edited at group and system levels.
 A value can be entered for each system but if no value is entered the system will fall back to the group default.</simpara>
 <simpara>If using <literal>$scope: group</literal>, a value may only be edited for a group.
 On the system level you will be able to see the value, but not edit it.</simpara>
 <simpara>The <literal>$scope: readonly</literal> option makes a field read-only.
 It can be used to show a user data which should be known, but should not be editable.
-This option only makes sense in combination with the $default attribute.</simpara>
+This option only makes sense in combination with the <literal>$default</literal> attribute.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -3177,7 +3213,7 @@ The formula itself is called <literal role="path">hd-partitions</literal> and wi
 <textobject><phrase>formula custom harddisk partitions</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>To remove definition of a partition click the minus symbol in the title line of an inner group.
+<simpara>To remove the definition of a partition click the minus symbol in the title line of an inner group.
 When form fields are properly filled confirm with clicking <guibutton>Save Formula</guibutton> in the upper right corner of the formula.</simpara>
 </section>
 </section>
@@ -3186,19 +3222,17 @@ When form fields are properly filled confirm with clicking <guibutton>Save Formu
 <simpara>Salt formulas are pre-written Salt states, which may be configured with pillar data.
 You can parametrize state files using Jinja.
 Jinja allows you to access pillar data by using the following syntax.
-(This syntax works best when your uncertain a pillar value exists as it will throw an error):</simpara>
+This syntax works best when you are uncertain whether a pillar value exists as it will throw an error:</simpara>
 <screen>pillar.some.value</screen>
-<simpara>When you are sure a pillar exists may also use the following syntax:</simpara>
+<simpara>When you are sure a pillar exists you may also use the following syntax:</simpara>
 <screen>salt['pillar.get']('some:value', 'default value')</screen>
 <simpara>You may also replace the <literal>pillar</literal> value with <literal>grains</literal> (for example, <literal>grains.some.value</literal>) allowing access to grains.</simpara>
 <simpara>Using data this way allows you to make a formula configurable.
-The following code snippet will install a package specified in the pillar <literal>package_name</literal>.
-For example:</simpara>
+The following code snippet will install a package specified in the pillar <literal>package_name</literal>:</simpara>
 <screen>install_a_package:
   pkg.installed:
     - name: {{ pillar.package_name }}</screen>
-<simpara>You may also use more complex constructs such as <literal>if/else</literal> and <literal>for-loops</literal> to provide greater functionality.
-For Example:</simpara>
+<simpara>You may also use more complex constructs such as <literal>if/else</literal> and <literal>for-loops</literal> to provide greater functionality:</simpara>
 <screen>{% if pillar.installSomething %}
 something:
   pkg.installed
@@ -3245,7 +3279,7 @@ It will also merge data with the pillar using the <literal>some.pillar.data</lit
         'service': 'service_a'
     }
 }, merge=salt['pillar.get']('some:pillar:data')) %}</screen>
-<simpara>After creating a map file like the above example, you can easily maintain compatibility with multiple system types while accessing "deep" pillar data in a simpler way.
+<simpara>After creating a map file like the above example, you can maintain compatibility with multiple system types while accessing "deep" pillar data in a simpler way.
 Now you can import and use <literal>data</literal> in any file.
 For example:</simpara>
 <screen>{% from "some_folder/map.jinja" import data with context %}
@@ -3277,8 +3311,7 @@ For Example:</simpara>
 </section>
 <section xml:id="best.practice.salt.formulas.pillardata">
 <title>SUSE Manager Generated Pillar Data</title>
-<simpara>When pillar data is generated (for example, after applying the highstate) the following external pillar script generates pillar data for packages, group ids, etc.
-and includes all pillar data for a system:</simpara>
+<simpara>When pillar data is generated (for example, after applying the highstate) the following external pillar script generates pillar data for packages, group ids, etc. and includes all pillar data for a system:</simpara>
 <screen>/usr/share/susemanager/modules/pillar/suma_minion.py</screen>
 <simpara>The process is executed as follows:</simpara>
 <orderedlist numeration="arabic">
@@ -3313,7 +3346,7 @@ These should be automatically generated by the server.</simpara>
 </listitem>
 <listitem>
 <simpara>Formulas must be included for every minion listed in the top file.
-Currently this process is initiated by the <literal role="path">mgr_master_tops.py</literal> script which includes the formulas.sls file located in:</simpara>
+Currently this process is initiated by the <literal role="path">mgr_master_tops.py</literal> script which includes the <literal>formulas.sls</literal> file located in:</simpara>
 <screen>/usr/share/susemanager/formulas/states/</screen>
 <simpara>This directory must be a salt file root.
 File roots are configured on the salt-master (SUSE Manager) located in:</simpara>
@@ -3421,6 +3454,10 @@ This means it is not visible in the Web UI.  Apply it from the command-line or 
 <section xml:id="bp.saltforms.susemgr">
 <title>Salt Formulas Coming with SUSE Manager</title>
 <simpara>For general information, see the <literal>Salt Formulas installation and usage instructions</literal> at <link xl:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html">https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html</link>.</simpara>
+<section xml:id="bp.saltforms.susemgr.locale">
+<title>Locale</title>
+<simpara>The locale formula allows setting <literal role="guimenu">Timezone` and [guimenu]</literal>Keyboard and Language`.</simpara>
+</section>
 <section xml:id="bp.saltforms.susemgr.dns">
 <title>Domain Name System (Bind)</title>
 <simpara>With the bind formula you set up and configure a Domain Name System (DNS) server.
@@ -3484,7 +3521,7 @@ this URL, see <literal role="path">pillar.example</literal>.</simpara>
 <textobject><phrase>formula bind 04 reverse</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>When saved, data is written to /srv/susemanager/formula_data/pillar/&lt;salt-minion.example.com&gt;_bind.json</simpara>
+<simpara>When saved, data is written to <literal role="path">/srv/susemanager/formula_data/pillar/&lt;salt-minion.example.com&gt;_bind.json</literal>.</simpara>
 <simpara>If you apply the highstate (<menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice>), it first ensures that <literal role="package">bind</literal> and all required packages will get installed.
 Then it will start the DNS service (<literal>named</literal>).</simpara>
 </section>
@@ -3530,17 +3567,13 @@ A TFTP server is a component that provides infrastructure for booting with PXE.<
 <textobject><phrase>formula tftpd 01</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>For setting up a TFTP server, specify the <literal>Internal Network Address</literal>,
-<literal>TFTP base directory</literal> (default: <literal role="path">/srv/tftpboot</literal>), and <literal>run
-TFTP under user</literal> (default: <literal role="systemitem">sftp</literal>).</simpara>
+<simpara>For setting up a TFTP server, specify the <literal>Internal Network Address</literal>, <literal>TFTP base directory</literal> (default: <literal role="path">/srv/tftpboot</literal>), and <literal>run TFTP under user</literal> (default: <literal role="systemitem">sftp</literal>).</simpara>
 <simpara>If you apply the highstate (<menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice>), it first ensures that <literal role="package">atftp</literal> and all required packages will get installed.
 Then it will start TFTP (<literal>atftpd</literal>).</simpara>
 </section>
 <section xml:id="bp.saltforms.susemgr.vsftp">
 <title>Vsftpd</title>
-<simpara>With the vsftpd formula you set up and configure Vsftpd.  Vsftpd is an
-FTP server or daemon, written with security in mind.  "vs" in its name
-stands for "Very Secure".</simpara>
+<simpara>With the vsftpd formula you set up and configure Vsftpd.  Vsftpd is an FTP server or daemon, written with security in mind.  "vs" in its name stands for "Very Secure".</simpara>
 <figure xml:id="fig-formula-vsftpd-01">
 <title>vsftpd formula</title>
 <mediaobject>
@@ -3550,7 +3583,8 @@ stands for "Very Secure".</simpara>
 <textobject><phrase>formula vsftpd 01</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>For configuring a VSFTP server, specify the settings and options in the Vsftpd formula.  There are settings such as
+<simpara>For configuring a VSFTP server, specify the settings and options in the Vsftpd formula.
+There are settings such as
 <literal>FTP server directory</literal>,
 <literal>Internal Network Address</literal>
 <literal>Enable ssl</literal>, etc.</simpara>
@@ -7793,10 +7827,11 @@ Your results appear at the bottom of the page.</simpara>
 <textobject><phrase>top search</phrase></textobject>
 </mediaobject>
 </informalfigure>
-<simpara>If you misspell a word during your search query, the SUSE Manager search engine performs approximate string (or fuzzy string) matching, returning results that may be similar in spelling to your misspelled queries.</simpara>
-<simpara>For example, if you want to search for a certain development system called <literal>test-1.example.com</literal> that is registered with SUSE Manager, but you misspell your query <literal>tset</literal>, the <literal>test-1.example.com</literal> system still appears in the search results.</simpara>
+<simpara>If you misspell a word during your search query, the SUSE Manager search engine performs approximate string (or fuzzy string) matching, returning results that may be similar in spelling to your misspelled queries.
+For example, if you want to search for a certain development system called <literal>test-1.example.com</literal> that is registered with SUSE Manager, but you misspell your query <literal>tset</literal>, the <literal>test-1.example.com</literal> system still appears in the search results.</simpara>
 <note>
-<simpara>If you add a distribution or register a system with a SUSE Manager server, it may take several minutes for it to be indexed and appear in search results.</simpara>
+<simpara>If you add a distribution, newly synchronize channels, or register a system with a SUSE Manager server, it may take several minutes for it to be indexed and appear in search results.
+To force the rebuild of the search index, enter <literal role="command">rhn-search cleanindex</literal> on the command line and wait until the rebuild is finished.</simpara>
 </note>
 <itemizedlist>
 <listitem>
@@ -7957,6 +7992,14 @@ At the bottom of the <literal role="guimenu">Recently Registered Systems</litera
 <textobject><phrase>home notification messages</phrase></textobject>
 </mediaobject>
 </informalfigure>
+<simpara>The default lifetime of notification messages is 30 days, after which messages are deleted from the database, regardless of read status.
+You can configure the amount of time in <literal role="path">/etc/rhn/rhn.conf</literal>:</simpara>
+<screen># Configure the lifetime of notification messages in days
+java.notifications_lifetime = 30</screen>
+<simpara>All notification types are enabled by default.
+To disable a notification type, open the <literal role="path">/etc/rhn/rhn.conf</literal> configuration file and edit the <literal role="systemitem">java.notifications_type_disabled</literal> parameter:</simpara>
+<screen># Configure the disablement of notification messages by type - example disabling all notification types
+java.notifications_type_disabled = OnboardingFailed,ChannelSyncFailed,ChannelSyncFinished</screen>
 <section xml:id="_notification_messages_tabs">
 <title>Notification Messages Tabs</title>
 <simpara>The <literal role="guimenu">Notification Messages</literal> page displays two tabs:</simpara>
@@ -11167,6 +11210,10 @@ This can be performed in two ways:</simpara>
 To list all systems that do <emphasis>not</emphasis> match the criteria, select the <literal role="guimenu">Invert Result</literal> check box.</simpara>
 <simpara>The results appear at the bottom of the page.
 For details on how to use the resulting system list, refer to <xref linkend="ref.webui.systems.systems"/>.</simpara>
+<note>
+<simpara>If you add a distribution, newly synchronize channels, or register a system with a SUSE Manager server, it may take several minutes for it to be indexed and appear in search results.
+To force the rebuild of the search index, enter <literal role="command">rhn-search cleanindex</literal> on the command line and wait until the rebuild is finished.</simpara>
+</note>
 </section>
 <section xml:id="ref.webui.systems.activ-keys">
 <title>Systems &gt; Activation Keys</title>
@@ -11266,6 +11313,7 @@ In the upper right corner find also the <literal role="guimenu">Clone Key</liter
 The Client Tools channel should be selected in the <literal role="guimenu">Child Channels</literal> listing below the selected base channel.</simpara>
 <simpara>After creating the activation key, you can see in the <literal role="guimenu">Details</literal> tab a check box named <literal role="guimenu">Configuration File Deployment</literal>.
 If you select it, all needed packages are automatically added to the <literal role="guimenu">Packages</literal> list.
+In case of Salt clients the <literal role="guimenu">Configuration File Deployment</literal> option also ensures that highstate will get applied automatically.
 By default, the following packages are added: <phrase role="package">rhncfg</phrase>, <phrase role="package">rhncfg-client</phrase>, and <phrase role="package">rhncfg-actions</phrase>.</simpara>
 <simpara>If you select <literal role="guimenu">Virtualization Host</literal> you automatically get the following package: <phrase role="package">rhn-virtualization-host</phrase>.</simpara>
 <simpara>Adding the <phrase role="package">osad</phrase> package makes sense to execute scheduled actions immediately after the schedule time.
@@ -16310,6 +16358,7 @@ It also provides notes about migrating a previous proxy to version 3.2.</simpar
 <simpara>SUSE Manager 3.2 Proxy is a SUSE Manager add-on that caches software packages on an internal, central server.
 The proxy caches patch updates from SUSE or custom RPMs generated by third-party organizations.
 A proxy allows you to use bandwidth more effectively because client systems connect to the proxy for updates, and the SUSE Manager server is no longer required to handle all client requests.
+A SUSE Manager Proxy can serve both Traditional and Salt clients.
 The proxy also supports transparent custom package deployment.</simpara>
 <simpara>SUSE Manager Proxy is an open source (GPLv2) solution that provides the following features:</simpara>
 <itemizedlist>
@@ -16423,8 +16472,7 @@ For more information, see <link xl:href="https://www.suse.com/documentation/sles
 <simpara><link xl:href="http://www.microsoft.com/en-us/server-cloud/solutions/virtualization.aspx">http://www.microsoft.com/en-us/server-cloud/solutions/virtualization.aspx</link></simpara>
 </listitem>
 </itemizedlist>
-<simpara>For running SUSE Manager Proxy
-in virtual environments, use the following settings for the virtual machine (VM):</simpara>
+<simpara>For running SUSE Manager Proxy in virtual environments, use the following settings for the virtual machine (VM):</simpara>
 <itemizedlist>
 <listitem>
 <simpara>At least 1 GB of RAM</simpara>
@@ -16438,7 +16486,8 @@ in virtual environments, use the following settings for the virtual machine (VM)
 <title>Installation and Setup</title>
 <simpara>The following section will guide you through the installation and setup procedure.</simpara>
 <simpara>SUSE Manager Proxy systems are registered as traditional clients or as Salt clients using a bootstrap script.
-A SUSE Manager Proxy can serve both Traditional and Salt clients.</simpara>
+Migrating a traditionally registered Proxy system to a Salt Proxy system is not possible.
+Re-install the Proxy if you want to switch to Salt.</simpara>
 <important>
 <title>Downloading Channels</title>
 <simpara>Before you can select the correct child channels while creating the activation key, ensure you have completely downloaded the channels for SUSE Linux Enterprise 12 SP4.</simpara>
@@ -16540,8 +16589,9 @@ In such a case, the upstream proxy is named &#8220;parent&#8221;.</simpara>
 <section xml:id="at.manager.proxy.run.copycert">
 <title>Copy Server Certificate and Key</title>
 <simpara>The proxy will share some SSL information with the SUSE Manager server, so the next step is to copy the certificate and its key from the SUSE Manager server or the upstream proxy.</simpara>
-<simpara>As root, enter the following commands on the proxy using your SUSE Manager server or chained proxy named as <literal role="replaceable">PARENT</literal>:</simpara>
-<screen>cd /root/ssl-build
+<simpara>As root, enter the following commands on the proxy using your SUSE Manager server or chained proxy named <literal role="replaceable">PARENT</literal>:</simpara>
+<screen>mkdir /root/ssl-build
+cd /root/ssl-build
 scp root@PARENT:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .
 scp root@PARENT:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .
 scp root@PARENT:/root/ssl-build/rhn-ca-openssl.cnf .</screen>
@@ -17509,16 +17559,27 @@ Keep the server monitored in order to identify possible issues early.</simpara>
 <simpara>Increase the number of PostgreSQL connections available to Java applications (Tomcat, Taskomatic) according to the previous parameters, otherwise extra workers will starve waiting for a connection. Set parameter <literal role="parameter">hibernate.c3p0.max_size = 150</literal> in <literal role="path">/etc/rhn/rhn.conf</literal> (affects all minion operations). Make sure enough PostgreSQL connections are configured before changing this parameter - refer to <literal>smdba system-check autotuning --help</literal> to get automatic tuning of the PostgreSQL configuration file while changing the number of available connections. Additional manual tuning is usually not necessary but might be required depending on scale and exact use cases.</simpara>
 </listitem>
 <listitem>
-<simpara>Increase Salt&#8217;s presence ping timeouts if responses might come back later than the defaults. Set parameters <literal role="parameter">salt_presence_ping_timeout = 20</literal> and <literal role="parameter">salt_presence_ping_timeout = 20</literal> in <literal role="path">/etc/rhn/rhn.conf</literal> (affects all minion operations).</simpara>
+<simpara>Increase Salt&#8217;s presence ping timeouts if responses might come back later than the defaults. Set parameters <literal role="parameter">java.salt_presence_ping_timeout = 20</literal> and <literal role="parameter">java.salt_presence_ping_gather_job_timeout = 20</literal> in <literal role="path">/etc/rhn/rhn.conf</literal> (affects all minion operations).</simpara>
 </listitem>
 <listitem>
-<simpara>Increase the Salt master worker threads allowing to parallelize more requests (otherwise Tomcat and Taskomatic workers will starve waiting for the Salt API). Set parameter <literal role="parameter">worker_threads: 100</literal> in <literal role="path">/etc/salt/master.d/susemanager.conf</literal> (affects onboarding and patching).</simpara>
+<simpara>Increase the number of Salt master workers so that more requests can run in parallel (otherwise Tomcat and Taskomatic workers will starve waiting for the Salt API, and Salt will not be able to serve files timely). Set parameter <literal role="parameter">worker_threads: 100</literal> in <literal role="path">/etc/salt/master.d/susemanager.conf</literal> (affects onboarding and patching).</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Increase this parameter further if file management states fail with the error "Unable to manage file: Message timed out"</simpara>
+</listitem>
+<listitem>
+<simpara>Note that Salt master workers can consume significant amounts of RAM (typically about 70&#160;MB per worker). It is recommended to keep usage monitored when increasing this value and to do so in relatively small increments (eg. 20) until failures are no longer produced.</simpara>
+</listitem>
+</itemizedlist>
 </listitem>
 <listitem>
 <simpara>Disable daily comparison of configuration files. Click on <menuchoice><guimenu>Admin</guimenu> <guimenuitem>Task Schedules</guimenuitem></menuchoice>, then on the <guibutton>compare-configs-default</guibutton> link, then on the <guibutton>Disable Schedule</guibutton> button and finally on <guibutton>Delete Schedule</guibutton>.</simpara>
 </listitem>
+<listitem>
+<simpara>Increase the maximum heap memory for the search daemon to be able to index many minions. Set 4 GiB instead of the current default 512 MB: add <literal role="parameter">rhn-search.java.maxmemory=4096</literal> in <literal role="path">/etc/rhn/rhn.conf</literal> (affects background indexing only).</simpara>
+</listitem>
 </itemizedlist>
-<simpara>Note that increasing the number of Postgres connections and Salt workers will require more RAM, make sure the SUSE Manager server is monitored and swap is never used.</simpara>
+<simpara>Note that increasing the number of Postgres connections will require more RAM, make sure the SUSE Manager server is monitored and swap is never used.</simpara>
 <simpara>Also note the above settings should be regarded as guidelines-they have been tested to be safe but care should be exercised when changing them, and consulting support is highly recommended.</simpara>
 </section>
 </section>
@@ -19128,6 +19189,12 @@ They can be of various types: PXE, QCOW2, LiveCD images, and others.</simpara>
 </listitem>
 </itemizedlist>
 <simpara>Example scripts are provided in the following sections.</simpara>
+<note>
+<title>Hardware Requirements for Hosts Running OS Images</title>
+<simpara>Hosts running OS images built with Kiwi need at least 1 GB of RAM.
+Disk space depends on the actual size of the image.
+For more information, see the documentation of the underlying system.</simpara>
+</note>
 </section>
 <section xml:id="at.images.kiwi.buildhost">
 <title>Creating a Build Host</title>
@@ -21706,7 +21773,6 @@ Uploading /tmp/ola_world.txt from blah4/tmp/ola_world.txt</screen>
 <simpara><literal role="command">mgr-sync</literal> should be used if SUSE Manager is connected to SUSE Customer Center (SCC).
 With <literal role="command">mgr-sync</literal> you may add or synchronize products and channels.
 The <literal role="command">mgr-sync</literal> command also enables and refreshes SCC data.</simpara>
-<simpara>This tool requires that SCC is enabled by running <literal role="command">mgr-sync enable-scc</literal> first (Enabled by default in SUSE Manager 2.1 and greater).</simpara>
 <simpara>By default, log rotation of <literal role="path">spacewalk-repo-sync</literal> is disabled.
 This logfile is run by a cron job, and managed by a configuration file.
 You can enable log rotation by editing the configuration file at <literal role="path">etc/sysconfig/rhn/reposync</literal> and setting the <literal role="command">MAX_DAYS</literal> parameter.
@@ -21719,9 +21785,7 @@ Most functions are available as part of the public API.</simpara>
 <simpara>mgr-sync provides a command structure with sub-commands similar to git or osc.
 For a complete list of command line option, see the mgr-sync manpage (man mgr-sync).
 Basic actions are:</simpara>
-<screen>mgr-sync enable-scc
-
-mgr-sync list channel(s)|product(s)|credentials
+<screen>mgr-sync list channel(s)|product(s)|credentials
 mgr-sync add  channel(s)|product(s)|credentials
 mgr-sync delete  credentials
 
@@ -22018,6 +22082,13 @@ Always put <literal>--</literal> before arguments, to avoid them being treated a
 Additionally, make sure you escape any quotes that you pass to the functions so that they are not interpreted.
 An example of a well-formed <literal role="command">spacecmd</literal> command:</simpara>
 <screen>spacecmd -s server1 -- softwarechannel_create -n \'My Channel\' -l channel1 -a x86_64</screen>
+</section>
+<section xml:id="_spacecmd_caching_problems">
+<title>Spacecmd caching problems</title>
+<simpara>The <literal role="command">spacecmd</literal> command keeps a cache of the various systems and packages that you have installed.
+Sometimes, this can result in a mismatch between the system name and the system ID.
+To clear the <literal role="command">spacecmd</literal> cache, use this command:</simpara>
+<screen>spacecmd clear_caches</screen>
 </section>
 </section>
 <section xml:id="at.spacecmd.command.reference">
