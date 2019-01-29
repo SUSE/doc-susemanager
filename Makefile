@@ -118,6 +118,9 @@ suma-getting-started-pdf: suma xml-suma
 suma-reference-pdf: suma xml-suma
 	daps -d DC-susemanager-reference pdf
 
+suma-ha-guide-pdf: suma xml-suma
+	daps -d DC-susemanager-ha-guide pdf
+
 # Build SUMA HTML Chunked/single
 
 suma-advanced-html: suma xml-suma
@@ -135,6 +138,10 @@ suma-getting-started-html: suma xml-suma
 suma-reference-html: suma xml-suma
 	daps -d DC-susemanager-reference html
 	daps -d DC-susemanager-reference html --single
+
+suma-ha-guide-html: suma xml-suma
+	daps -d DC-susemanager-ha-guide html
+	daps -d DC-susemanager-ha-guide html --single
 
 # Target for www.suse.com/documentation (BROKEN, USE ANTORA SITE GENERATOR)
 #suma-online-docs:

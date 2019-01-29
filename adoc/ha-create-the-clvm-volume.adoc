@@ -1,0 +1,226 @@
+= Create the cLVM Volume
+include::entities.adoc[]
+
+To create cLVM volume there are several services needed within the cluster.
+
+== Setup the Required Services
+
+. on *node1* run the command:
++
+----
+crm configure edit
+----
+
+. Add the following __(replacing the correct IP address)__:
++
+----
+primitive admin-ip IPaddr2 \
+        params ip=192.168.188.174 \
+        op monitor interval=10 timeout=20
+primitive pri_clvmd ocf:lvm2:clvmd \
+        op stop interval=0 timeout=100 \
+        op start interval=0 timeout=90 \
+        op monitor interval=20 timeout=60
+primitive pri_dlm ocf:pacemaker:controld \
+        op start interval=0 timeout=90 \
+        op stop interval=0 timeout=100 \
+        op monitor interval=60 timeout=60
+primitive res_sbd-fencing stonith:external/sbd \
+        params pcmk_delay_max=30s
+group grp_base_clvm pri_dlm pri_clvmd
+clone cln_clvm grp_base_clvm \
+        meta interleave=true
+rsc_defaults rsc-options: \
+        resource-stickiness=1 \
+        migration-threshold=3
+----
+
+== Check the Device Names
+
+On *node1* check the file systems to view the correct lun device names:
+
+[.small]
+....
+lsscsi -sku
+
+[1:0:1:0]    cd/dvd  ATA     QEMU DVD-ROM            _ /dev/sr0        -
+[2:0:0:0]    disk    6001405d5543b23418c4956b44e30f80  /dev/sda    104MB <1>
+[2:0:0:1]    disk    6001405d95a9d1d21444099bbd2b563b  /dev/sdb    107GB <2>
+[2:0:0:2]    disk    600140500d9ddf1d8244b51b73733d1e  /dev/sdc   53.6GB <3>
+[2:0:0:3]    disk    60014057835fe8b95b64afb88b5d21be  /dev/sdd   27.4GB <4>
+[2:0:0:4]    disk    60014054774ef2d9ddf4e76b30c29b82  /dev/sde   10.7GB <5>
+[2:0:0:5]    disk    60014054d1141cd69fc444a8f92b53ed  /dev/sdf   54.7GB <6>
+....
+<1> /dev/sda (sdb storage device)
+<2> /dev/sdb (spacewalk storage)
+<3> /dev/sdc (pgsql storage)
+<4> /dev/sdd (cacherhn storage)
+<5> /dev/sde (srv storage)
+<6> /dev/sdf (other storage)
+
+== Create the Volumes
+
+Run the following commands in order to create the required volumes based on the device names listed on your system.
+
+=== Create the Spacewalk Volume
+
+----
+pvcreate /dev/sdb
+vgcreate vg_c01_spacewalk /dev/sdb
+
+lvcreate -n lv_c01_spacewalk -l 100%FREE vg_c01_spacewalk
+mkfs -t xfs /dev/vg_c01_spacewalk/lv_c01_spacewalk
+----
+
+=== Create the pgsql Volume
+
+----
+pvcreate /dev/sdc
+vgcreate vg_c01_pgsql /dev/sdc
+
+lvcreate -n lv_c01_pgsql -l 100%FREE vg_c01_pgsql
+mkfs -t xfs /dev/vg_c01_pgsql/lv_c01_pgsql
+----
+
+=== Create the cacherhn Volume
+
+----
+pvcreate /dev/sdd
+vgcreate vg_c01_cache /dev/sdd
+
+lvcreate -n lv_c01_cachesalt -L 1G vg_c01_cache
+mkfs -t xfs /dev/vg_c01_cache/lv_c01_cachesalt
+
+lvcreate -n lv_c01_cacherhn -L 20G vg_c01_cache
+mkfs -t xfs /dev/vg_c01_cache/lv_c01_cacherhn
+
+lvcreate -n lv_c01_cacheapache2 -L 1G vg_c01_cache
+mkfs -t xfs /dev/vg_c01_cache/lv_c01_cacheapach2
+
+lvcreate -n lv_c01_cachecobbler -L 1G vg_c01_cache
+mkfs -t xfs /dev/vg_c01_cache/lv_c01_cachecobbler
+----
+
+=== Create the srv volume
+
+----
+pvcreate /dev/sde
+vgcreate vg_c01_srv /dev/sde
+
+lvcreate -n lv_c01_srv -l 100%FREE vg_c01_srv
+mkfs -t xfs /dev/vg_c01_srv/lv_c01_srv
+----
+
+=== Create the varlog Volume
+
+----
+pvcreate /dev/sdf
+vgcreate vg_c01_varlog /dev/sdf
+
+lvcreate -n lv_c01_varlogapache2 -L 1G vg_c01_varlog
+mkfs -t xfs /dev/vg_c01_varlog/lv_c01_varlogapache2
+
+lvcreate -n lv_c01_varlogtomcat -L 1G vg_c01_varlog
+mkfs -t xfs /dev/vg_c01_varlog/lv_c01_varlogtomcat
+
+lvcreate -n lv_c01_varlogcobbler -L 1G vg_c01_varlog
+mkfs -t xfs /dev/vg_c01_varlog/lv_c01_varlogcobbler
+
+lvcreate -n lv_c01_varlogatftpd -L 500M vg_c01_varlog
+mkfs -t xfs /dev/vg_c01_varlog/lv_c01_varlogatftpd
+
+lvcreate -n lv_c01_varlogspacewalk -L 500M vg_c01_varlog
+mkfs -t xfs /dev/vg_c01_varlog/lv_c01_varlogspacewalk
+
+lvcreate -n lv_c01_varlogsalt -L 500M vg_c01_varlog
+mkfs -t xfs /dev/vg_c01_varlog/lv_c01_varlogsalt
+
+lvcreate -n lv_c01_varlogrhn -L 500M vg_c01_varlog
+mkfs -t xfs /dev/vg_c01_varlog/lv_c01_varlogrhn
+----
+
+=== Create the Other volume
+
+----
+pvcreate /dev/sdg
+vgcreate vg_c01_other /dev/sdg
+lvcreate -n lv_c01_othervarlibspacewalk -L 50M vg_c01_other
+
+mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibspacewalk
+lvcreate -n lv_c01_othervarlibrhn -L 500M vg_c01_other
+
+mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibrhn
+lvcreate -n lv_c01_othervarlibjabberd -L 50M vg_c01_other
+
+mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibjabberd
+lvcreate -n lv_c01_othervarlibsalt -L 50M vg_c01_other
+
+mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarlibsalt
+lvcreate -n lv_c01_othervarliblibvirtimages -L 100M vg_c01_other
+
+mkfs -t xfs /dev/vg_c01_other/lv_c01_othervarliblibvirtimages
+lvcreate -n lv_c01_otheretcsysconfigrhn -L 50M vg_c01_other
+
+mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretcsysconfigrhn
+lvcreate -n lv_c01_otheretccobbler -L 10M vg_c01_other
+
+mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretccobbler
+lvcreate -n lv_c01_otheretcrhn -L 10M vg_c01_other
+
+mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretcrhn
+lvcreate -n lv_c01_otheretcsalt -L 10M vg_c01_other
+
+mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretcsalt
+lvcreate -n lv_c01_otheretctomcat -L 10M vg_c01_other
+
+mkfs -t ext3 /dev/vg_c01_other/lv_c01_otheretctomcat
+lvcreate -n lv_c01_otheretcapache2 -L 10M vg_c01_other
+----
+
+== Check the File Systems
+
+After completing the above steps the filesystems should look like the following:
+
+----
+# pvs
+  PV         VG               Fmt  Attr PSize  PFree
+  /dev/sdb   vg_c01_spacewalk lvm2 a--  99.99g     0
+  /dev/sdc   vg_c01_pgsql     lvm2 a--  49.99g     0
+  /dev/sdd   vg_c01_cache     lvm2 a--  25.58g  2.58g
+  /dev/sde   vg_c01_srv       lvm2 a--   9.99g     0
+  /dev/sdf   vg_c01_varlog    lvm2 a--  25.58g 20.62g
+  /dev/sdg   vg_c01_other     lvm2 a--  50.97g 50.12g
+  /dev/vda1  system           lvm2 a--  39.99g  4.00m
+----
+
+----
+# lvs
+  LV                              VG               Attr       LSize
+  root                            system           -wi-ao----  38.57g
+  swap                            system           -wi-ao----   1.42g
+  lv_c01_cacheapache2             vg_c01_cache     -wi-ao----   1.00g
+  lv_c01_cachecobbler             vg_c01_cache     -wi-ao----   1.00g
+  lv_c01_cacherhn                 vg_c01_cache     -wi-ao----  20.00g
+  lv_c01_cachesalt                vg_c01_cache     -wi-ao----   1.00g
+  lv_c01_otheretcapache2          vg_c01_other     -wi-ao----  12.00m
+  lv_c01_otheretccobbler          vg_c01_other     -wi-ao----  12.00m
+  lv_c01_otheretcrhn              vg_c01_other     -wi-ao----  12.00m
+  lv_c01_otheretcsalt             vg_c01_other     -wi-ao----  12.00m
+  lv_c01_otheretcsysconfigrhn     vg_c01_other     -wi-ao----  52.00m
+  lv_c01_otheretctomcat           vg_c01_other     -wi-ao----  12.00m
+  lv_c01_othervarlibjabberd       vg_c01_other     -wi-ao----  52.00m
+  lv_c01_othervarliblibvirtimages vg_c01_other     -wi-ao---- 100.00m
+  lv_c01_othervarlibrhn           vg_c01_other     -wi-ao---- 500.00m
+  lv_c01_othervarlibsalt          vg_c01_other     -wi-ao----  52.00m
+  lv_c01_othervarlibspacewalk     vg_c01_other     -wi-ao----  52.00m
+  lv_c01_pgsql                    vg_c01_pgsql     -wi-ao----  49.99g
+  lv_c01_spacewalk                vg_c01_spacewalk -wi-ao----  99.99g
+  lv_c01_srv                      vg_c01_srv       -wi-ao----   9.99g
+  lv_c01_varlogapache2            vg_c01_varlog    -wi-ao----   1.00g
+  lv_c01_varlogatftpd             vg_c01_varlog    -wi-ao---- 500.00m
+  lv_c01_varlogcobbler            vg_c01_varlog    -wi-ao----   1.00g
+  lv_c01_varlogrhn                vg_c01_varlog    -wi-ao---- 500.00m
+  lv_c01_varlogsalt               vg_c01_varlog    -wi-ao---- 500.00m
+  lv_c01_varlogspacewalk          vg_c01_varlog    -wi-ao---- 500.00m
+  lv_c01_varlogtomcat             vg_c01_varlog    -wi-ao----   1.00g
+----
