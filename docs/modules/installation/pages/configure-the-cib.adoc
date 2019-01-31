@@ -12,13 +12,33 @@ crm configure edit
 
 [.small]
 ----
-primitive pri_fs_c01_cacherhn Filesystem \
-        params device="/dev/vg_c01_cacherhn/lv_c01_cacherhn" directory="/var/cache/rhn" fstype=xfs options="noatime,defaults" \
+primitive pri_fs_c01_cacheapache2 Filesystem \
+        params device="/dev/vg_c01_cache/lv_c01_cacheapache2" directory="/var/cache/apache2" fstype=xfs options="noatime,defaults" \
         op start timeout=60 interval=0 \
         op stop timeout=60 interval=0 \
         op monitor timeout=40 interval=20
-primitive pri_fs_c01_othercarlibsalt Filesystem \
-        params device="/dev/vg_c01_other/lv_c01_othervarlibsalt" directory="/var/lib/salt" fstype=xfs options="noatime,defaults" \
+primitive pri_fs_c01_cachecobbler Filesystem \
+        params device="/dev/vg_c01_cache/lv_c01_cachecobbler" directory="/var/cache/cobbler" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_cacherhn Filesystem \
+        params device="/dev/vg_c01_cache/lv_c01_cacherhn" directory="/var/cache/rhn" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_cachesalt Filesystem \
+        params device="/dev/vg_c01_cache/lv_c01_cachesalt" directory="/var/cache/salt" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretcapache2 Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretcapache2" directory="/etc/apache2_1" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretccobbler Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretccobbler" directory="/etc/cobbler" fstype=ext3 options="noatime,defaults" \
         op start timeout=60 interval=0 \
         op stop timeout=60 interval=0 \
         op monitor timeout=40 interval=20
@@ -32,18 +52,13 @@ primitive pri_fs_c01_otheretcsalt Filesystem \
         op start timeout=60 interval=0 \
         op stop timeout=60 interval=0 \
         op monitor timeout=40 interval=20
+primitive pri_fs_c01_otheretcsysconfigrhn Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_otheretcsysconfigrhn" directory="/etc/sysconfig/rhn" fstype=ext3 options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
 primitive pri_fs_c01_otheretctomcat Filesystem \
         params device="/dev/vg_c01_other/lv_c01_otheretctomcat" directory="/etc/tomcat" fstype=ext3 options="noatime,defaults" \
-        op start timeout=60 interval=0 \
-        op stop timeout=60 interval=0 \
-        op monitor timeout=40 interval=20
-primitive pri_fs_c01_othersyssysconfigrhn Filesystem \
-        params device="/dev/vg_c01_other/lv_c01_othersyssysconfigrhn" directory="/etc/sysconfig/rhn" fstype=ext3 options="noatime,defaults" \
-        op start timeout=60 interval=0 \
-        op stop timeout=60 interval=0 \
-        op monitor timeout=40 interval=20
-primitive pri_fs_c01_othervarcachesalt Filesystem \
-        params device="/dev/vg_c01_other/lv_c01_othervarcachesalt" directory="/var/cache/salt" fstype=xfs options="noatime,defaults" \
         op start timeout=60 interval=0 \
         op stop timeout=60 interval=0 \
         op monitor timeout=40 interval=20
@@ -62,6 +77,11 @@ primitive pri_fs_c01_othervarlibrhn Filesystem \
         op start timeout=60 interval=0 \
         op stop timeout=60 interval=0 \
         op monitor timeout=40 interval=20
+primitive pri_fs_c01_othervarlibsalt Filesystem \
+        params device="/dev/vg_c01_other/lv_c01_othervarlibsalt" directory="/var/lib/salt" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
 primitive pri_fs_c01_othervarlibspacewalk Filesystem \
         params device="/dev/vg_c01_other/lv_c01_othervarlibspacewalk" directory="/var/lib/spacewalk" fstype=xfs options="noatime,defaults" \
         op start timeout=60 interval=0 \
@@ -73,7 +93,7 @@ primitive pri_fs_c01_pgsql Filesystem \
         op stop timeout=60 interval=0 \
         op monitor timeout=40 interval=20
 primitive pri_fs_c01_spacewalk Filesystem \
-        params device="/dev/vg_c01_spacewalk/lv_c01_spacewalk" directory="/var/lib/spacewalk" fstype=xfs options="noatime,defaults" \
+        params device="/dev/vg_c01_spacewalk/lv_c01_spacewalk" directory="/var/spacewalk" fstype=xfs options="noatime,defaults" \
         op start timeout=60 interval=0 \
         op stop timeout=60 interval=0 \
         op monitor timeout=40 interval=20
@@ -82,8 +102,43 @@ primitive pri_fs_c01_srv Filesystem \
         op start timeout=60 interval=0 \
         op stop timeout=60 interval=0 \
         op monitor timeout=40 interval=20
-primitive pri_lvm_vg_c01_cacherhn LVM \
-        params volgrpname=vg_c01_cacherhn \
+primitive pri_fs_c01_varlogapache2 Filesystem \
+        params device="/dev/vg_c01_varlog/lv_c01_varlogapache2" directory="/var/log/apache2" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_varlogatftpd Filesystem \
+        params device="/dev/vg_c01_varlog/lv_c01_varlogatftpd" directory="/var/log/atftpd" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_varlogcobbler Filesystem \
+        params device="/dev/vg_c01_varlog/lv_c01_varlogcobbler" directory="/var/log/cobbler" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_varlogrhn Filesystem \
+        params device="/dev/vg_c01_varlog/lv_c01_varlogrhn" directory="/var/log/rhn" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_varlogsalt Filesystem \
+        params device="/dev/vg_c01_varlog/lv_c01_varlogsalt" directory="/var/log/salt" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_varlogspacewalk Filesystem \
+        params device="/dev/vg_c01_varlog/lv_c01_varlogspacewalk" directory="/var/log/spacewalk" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_fs_c01_varlogtomcat Filesystem \
+        params device="/dev/vg_c01_varlog/lv_c01_varlogtomcat" directory="/var/log/tomcat" fstype=xfs options="noatime,defaults" \
+        op start timeout=60 interval=0 \
+        op stop timeout=60 interval=0 \
+        op monitor timeout=40 interval=20
+primitive pri_lvm_vg_c01_cache LVM \
+        params volgrpname=vg_c01_cache \
         op start timeout=30 interval=0 \
         op stop timeout=10 interval=0 \
         op monitor timeout=130 interval=130 on-fail=fence
@@ -107,7 +162,11 @@ primitive pri_lvm_vg_c01_srv LVM \
         op start timeout=30 interval=0 \
         op stop timeout=10 interval=0 \
         op monitor timeout=130 interval=130 on-fail=fence
-group grp_susemanager admin-ip pri_lvm_vg_c01_cacherhn pri_lvm_vg_c01_other pri_lvm_vg_c01_pgsql pri_lvm_vg_c01_spacewalk pri_lvm_vg_c01_srv pri_fs_c01_srv pri_fs_c01_pgsql pri_fs_c01_cacherhn pri_fs_c01_spacewalk pri_fs_c01_othervarlibspacewalk pri_fs_c01_othervarlibrhn pri_fs_c01_othervarlibjabberd pri_fs_c01_othercarlibsalt pri_fs_c01_othervarliblibvirtimages pri_fs_c01_othersyssysconfigrhn pri_fs_c01_otheretcrhn pri_fs_c01_otheretcsalt pri_fs_c01_otheretctomcat pri_fs_c01_othervarcachesalt
+primitive pri_lvm_vg_c01_varlog LVM \
+        params volgrpname=vg_c01_varlog \
+        op start timeout=30 interval=0 \
+        op stop timeout=10 interval=0 \
+        op monitor timeout=130 interval=130 on-fail=fence
 ----
 
 . There is a mount to */srv_1*.

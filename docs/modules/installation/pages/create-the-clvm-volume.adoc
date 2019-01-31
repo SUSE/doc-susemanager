@@ -13,11 +13,11 @@ To create cLVM volume there are several services needed within the cluster.
 crm configure edit
 ----
 
-. Add the following (replacing the correct IP address):
+. Add the following __(replacing the correct IP address)__:
 +
 ----
 primitive admin-ip IPaddr2 \
-        params ip=192.168.188.105 \
+        params ip=192.168.150.195 \
         op monitor interval=10 timeout=20
 primitive pri_clvmd ocf:lvm2:clvmd \
         op stop interval=0 timeout=100 \
@@ -67,7 +67,10 @@ lsscsi -sku
 
 
 == Create the Volumes
+
 Run the following commands in order to create the volumes based on the device names from above:
+
+=== Create the Spacewalk Volume
 
 . Create the /dev/sdf volume:
 .. `pvcreate /dev/sdf`
@@ -77,6 +80,25 @@ Run the following commands in order to create the volumes based on the device na
 .. `lvcreate -n lv_c01_spacewalk -l 100%FREE vg_c01_spacewalk`
 
 .. `mkfs -t xfs /dev/vg_c01_spacewalk/lv_c01_spacewalk`
+
+=== Create the sdg Volume
+
+This volume adds additional directories required for {productname} to function with HA. (This volumes include: __varlibspacewalk, varlibjabberd, varlibsalt, varlibvirtimages, etcsysconfigrhn, etccobbler, etcrhn, etcsalt, etctomcat, and etcapache2__):
+
+. Create the dev/sdg volume:
+
+.. `pvcreate /dev/sdg`
+
+.. `vgcreate vg_c01_other /dev/sdg`
+
+.. `lvcreate -n lv_c01_othervarlibspacewalk -L 50M vg_c01_other`
+
+.. `vlvcreate -n lv_c01_othervarlibrhn -L 500M vg_c01_other`
+
+
+
+
+=== Create the pgsql Volume
 
 . Create the _/dev/sde_ *pgsql* volume:
 
@@ -88,6 +110,8 @@ Run the following commands in order to create the volumes based on the device na
  
 .. `mkfs -t xfs /dev/vg_c01_pgsql/lv_c01_pgsql`
 
+=== Create the RHN Cache Volume
+
 . Create the _/dev/sdd_ *cacherhn* volume:
 
 .. `pvcreate /dev/sdd`
@@ -98,6 +122,8 @@ Run the following commands in order to create the volumes based on the device na
 
 .. `mkfs -t xfs /dev/vg_c01_cacherhn/lv_c01_cacherhn`
 
+=== Create the srv volume
+
 . Create the _/dev/sdc_ *srv* volume:
 
 .. pvcreate /dev/sdc
@@ -107,6 +133,8 @@ Run the following commands in order to create the volumes based on the device na
 .. lvcreate -n lv_c01_srv -l 100%FREE vg_c01_srv
 
 .. mkfs -t xfs /dev/vg_c01_srv/lv_c01_srv
+
+=== Create the Other volume
 
 . Create the _/dev/sdb_ *other* volume (This volume includes: __varcachesalt, varlibspacewalk, varlibrhn, varlibjabberd, varlibsalt, varliblibvirtimages, sysconfigrhn, etcrhn, etcsalt, and etctomcat__):
 
