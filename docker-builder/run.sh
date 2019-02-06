@@ -4,16 +4,16 @@
 
 make start-clean
 
-# Create the correct links and apply DB5 geekodoc stylesheet (Required for publishing and packaging) 
-# Create Uyuni opensource outputs
-make uyuni-clean
-make book-to-set-uyuni
-
-# Create all Uyuni (Single HTML)
-make uyuni-html
-
-# Uyuni OBS Packages
-make uyuni-dist
+# # Create the correct links and apply DB5 geekodoc stylesheet (Required for publishing and packaging) 
+# # Create Uyuni opensource outputs
+# make uyuni-clean
+# make book-to-set-uyuni
+# 
+# # Create all Uyuni (Single HTML)
+# make uyuni-html
+# 
+# # Uyuni OBS Packages
+# make uyuni-dist
 
 # Uyuni HTML Single/Chunked books
 #make uyuni-advanced-html
