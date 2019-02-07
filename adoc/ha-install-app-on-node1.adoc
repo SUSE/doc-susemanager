@@ -1,3 +1,394 @@
-= Install Uyuni on Node1
+= Install {susemgr} on Node1 and Node2
+include::entities.adoc[]
 
-Coming Soon!
+In this section you will install {susemgr} on node1 and node2.
+
+== Installing {susemgr} on node1
+
+You need to install {susemgr} on one node at a time following these steps. This section will guide you through installing {susemgr} on node1.
+
+.Procedure: Installing {susemgr} on node1
+
+. On node1 run the following commands as {rootuser}:
++
+
+.. Install the {susemgr} pattern:
++
+
+----
+zypper in -t pattern suma_server
+----
+.. Stop the spacewalk service
++
+
+----
+spacewalk-service stop
+----
++
+
+.. Disable spacewalk services
++
+
+----
+spacewalk-service disable
+----
+
+.. Stop the database:
++
+
+----
+systemctl stop postgresql
+----
++
+
+.. Disable database:
++
+
+----
+systemctl disable postgresql
+----
++
+
+.. Disable atftpd:
++
+
+----
+systemctl disable atftpd
+----
++
+
+.. Stop pacemaker:
++
+
+----
+systemctl stop pacemaker
+----
++
+
+.. Adjust the hostname for node1 to your preferred hostname. For example
++
+
+----
+sumahae.testing.local
+----
++
+
+[IMPORTANT]
+====
+Restart your SSH session otherwise you will be unable to use the new hostname.
+====
++
+
+.. Set the certificates variables:
++
+
+----
+export SERVER_KEY=/root/certs/server_key.pem
+export SERVER_CERT=/root/certs/server_cert.pem
+export CA_CERT=/root/certs/cacert.pem
+----
++
+
+.. Start the database:
++
+
+----
+systemctl start postgresql
+----
++
+
+.. Start {susemgr} setup:
++
+
+----
+yast susemanager_setup
+----
++
+
+.. Stop space walk services after setup is complete.
++
+
+----
+spacewalk-service stop
+----
++
+
+.. Stop the database:
++
+
+----
+systemctl stop postgresql
+----
++
+
+.. Rename hostname to its original name and reboot server.
+
+== Install {susemgr} on node2
+
+This section will guide you through installing {susemgr} on node2.
+
+[IMPORTANT]
+====
+Wait until all resources are loaded before executing these steps.
+====
+
+.Procedure: Installing {susemgr} on node2
+
+. On node1 run the following commands as {rootuser}:
++
+
+.. Install the {susemgr} pattern:
++
+
+----
+zypper in -t pattern suma_server
+----
+.. Stop the spacewalk service
++
+
+----
+spacewalk-service stop
+----
++
+
+.. Disable spacewalk services
++
+
+----
+spacewalk-service disable
+----
+
+.. Stop the database:
++
+
+----
+systemctl stop postgresql
+----
++
+
+.. Disable database:
++
+
+----
+systemctl disable postgresql
+----
++
+
+.. Disable atftpd:
++
+
+----
+systemctl disable atftpd
+----
++
+
+.. Stop pacemaker:
++
+
+----
+systemctl stop pacemaker
+----
++
+
+.. Adjust the hostname for node1 to your preferred hostname. For example
++
+
+----
+sumahae.testing.local
+----
++
+
+[IMPORTANT]
+====
+Restart your SSH session otherwise you will be unable to use the new hostname.
+====
++
+
+.. Set the certificates variables:
++
+
+----
+export SERVER_KEY=/root/certs/server_key.pem
+export SERVER_CERT=/root/certs/server_cert.pem
+export CA_CERT=/root/certs/cacert.pem
+----
++
+
+.. Start the database:
++
+
+----
+systemctl start postgresql
+----
++
+
+.. Start {susemgr} setup:
++
+
+----
+yast susemanager_setup
+----
++
+
+.. Stop space walk services after setup is complete.
++
+
+----
+spacewalk-service stop
+----
++
+
+.. Stop the database:
++
+
+----
+systemctl stop postgresql
+----
++
+
+.. Rename hostname to its original name and reboot server.
+
+== Cleaning up SBD
+
+You need to clean up SBD before continuing.
+
+.Procedure: Clean up SBD
+
+. on both nodes stop pacemaker (wait until the first is up before starting the other):
++
+----
+systemctl stop pacemaker
+----
++
+
+. Re-create the SBD:
++
+
+----
+sbd -d <sbd device as in /etc/sysconfig/sbd> create
+----
++
+
+. Start pacemaker again (wait until node1 is up before starting node2):
++
+----
+systemctl start pacemaker
+----
++
+
+. Wait until the servers are up and everything is *green* again. SUSE Manager
+and the database should not be running.
+
+== Final changes to the CIB
+
+In the following procedure you will make the final changes to the CIB.
+
+.Procedure: Final Changes to the CIB
+
+. Add the following lines to the cib:
++
+----
+crm configure edit
+----
++
+
+----
+primitive pri_systemd_apache systemd:apache \
+op start timeout=100 interval=0 \
+20/23op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_atftpd service:atftpd \
+op start interval=0 timeout=15 \
+op stop interval=0 timeout=15 \
+op monitor interval=15 timeout=15
+primitive pri_systemd_cobblerd systemd:cobblerd \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_jabberd systemd:jabberd \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_osa-dispatcher systemd:osa-dispatcher \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_postgresql systemd:postgresql \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_rhn-search systemd:rhn-search \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_salt-api systemd:salt-api \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_salt-master systemd:salt-master \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_spacewalk-wait-for-jabberd systemd:spacewalk-wait-for-
+jabberd \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_spacewalk-wait-for-salt systemd:spacewalk-wait-for-salt \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_spacewalk-wait-for-taskomatic systemd:spacewalk-wait-for-
+21/23taskomatic \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_spacewalk-wait-for-tomcat systemd:spacewalk-wait-for-tomcat \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_taskomatic systemd:taskomatic \
+op start timeout=200 interval=0 \
+op stop timeout=1000 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_spacewalk-wait-for-tomcat systemd:spacewalk-wait-for-tomcat \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_taskomatic systemd:taskomatic \
+op start timeout=200 interval=0 \
+op stop timeout=1000 interval=0 \
+op monitor timeout=100 interval=60
+primitive pri_systemd_tomcat systemd:tomcat \
+op start timeout=100 interval=0 \
+op stop timeout=100 interval=0 \
+op monitor timeout=100 interval=60
+----
++
+
+. Replace the “group grp_susemanager” with the following (It is better to delete the
+current line and add the following):
++
+
+----
+group grp_susemanager admin-ip pri_lvm_vg_c01_cache pri_lvm_vg_c01_other
+pri_lvm_vg_c01_pgsql pri_lvm_vg_c01_spacewalk pri_lvm_vg_c01_srv
+pri_lvm_vg_c01_varlog pri_fs_c01_srv pri_fs_c01_pgsql pri_fs_c01_cacherhn
+pri_fs_c01_cacheapache2 pri_fs_c01_cachesalt pri_fs_c01_cachecobbler
+pri_fs_c01_spacewalk pri_fs_c01_varlogapache2 pri_fs_c01_varlogtomcat
+pri_fs_c01_varlogcobbler pri_fs_c01_varlogatftpd pri_fs_c01_varlogspacewalk
+pri_fs_c01_varlogsalt pri_fs_c01_varlogrhn pri_fs_c01_othervarlibspacewalk
+pri_fs_c01_othervarlibrhn pri_fs_c01_othervarlibjabberd pri_fs_c01_othervarlibsalt
+pri_fs_c01_othervarliblibvirtimages pri_fs_c01_otheretcsysconfigrhn
+pri_fs_c01_otheretcrhn pri_fs_c01_otheretccobbler pri_fs_c01_otheretcsalt
+pri_fs_c01_otheretctomcat pri_fs_c01_otheretcapache2 pri_systemd_postgresql
+pri_systemd_atftpd pri_systemd_jabberd pri_systemd_tomcat
+pri_systemd_spacewalk-wait-for-tomcat pri_systemd_salt-master pri_systemd_salt-
+api pri_systemd_spacewalk-wait-for-salt pri_systemd_apache
+pri_systemd_spacewalk-wait-for-jabberd pri_systemd_osa-dispatcher
+pri_systemd_rhn-search pri_systemd_cobblerd pri_systemd_taskomatic
+pri_systemd_spacewalk-wait-for-taskomatic
+----
+
+All services should now be running. You should be able to access the SUSE Manager
+server via its FQDN. This concludes this guide.
