@@ -419,58 +419,94 @@ Traditional clients running {ubuntu} are not supported.
 This section describes how to manually prepare {ubuntu} clients for registration to your {susemgr} Server and synchronize the repositories.
 
 
-[[bp.ubuntu.register]]
-== Registering {ubuntu} Clients
+.Procedure: Preparing an {Ubuntu} 16.04 Client for Registration
 
-
-sudo vi /etc/apt/sources.list.d/suma_client_tools.list
-
-# add next line for Ubuntu 16.04
+. On the client, open the [filename]``/etc/apt/sources.list.d/suma_client_tools.list`` file in your preferred text editor, and add this line to the bottom of the file:
++
+----
 deb http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu16.04-SUSE-Manager-Tools/xUbuntu_16.04/ /
-
-# add next line for Ubuntu 18.04
-deb http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu18.04-SUSE-Manager-Tools/xUbuntu_18.04/ /
-
-# Ubuntu 16.04: import key
-curl http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu16.04-SUSE-Manager-Tools/xUbuntu_16.04/Release.key | sudo apt-key add -
-
-# Ubuntu 18.04: import key
-curl http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu18.04-SUSE-Manager-Tools/xUbuntu_18.04/Release.key | sudo apt-key add -
-
+----
++
+. From the command line, import the appropriate release key and add it to the keyring:
++
+----
+curl http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu16.04-SUSE-Manager-Tools/xUbuntu_16.04/Release.key
+sudo apt-key add -
+----
++
+. Update the repository list in the package manager:
++
+----
 sudo apt update
-
+----
++
+. Edit the [filename]``sudoers`` file:
++
+----
 sudo visudo
-# add next line, where <user> will be used to bootstrap the minion from the UI
+----
++
+Grant [command]``sudo`` access to the user by adding this line to the [filename]``sudoers`` file. Replace [systemitem]``<user>`` with the name of the user that will be used to bootsrap the client in the {webui}:
++
+----
 <user>   ALL=NOPASSWD: /usr/bin/python, /usr/bin/python2, /usr/bin/python3
+----
+
+.Procedure: Preparing an {Ubuntu} 18.04 Client for Registration
+
+. On the client, open the [filename]``/etc/apt/sources.list.d/suma_client_tools.list`` file in your preferred text editor, and add this line to the bottom of the file:
++
+----
+deb http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu18.04-SUSE-Manager-Tools/xUbuntu_18.04/ /
+----
++
+. From the command line, import the appropriate release key and add it to the keyring:
++
+----
+curl http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu18.04-SUSE-Manager-Tools/xUbuntu_18.04/Release.key
+sudo apt-key add -
+----
++
+. Update the repository list in the package manager:
++
+----
+sudo apt update
+----
++
+. Edit the [filename]``sudoers`` file:
++
+----
+sudo visudo
+----
++
+Grant [command]``sudo`` access to the user by adding this line to the [filename]``sudoers`` file. Replace [systemitem]``<user>`` with the name of the user that will be used to bootsrap the client in the {webui}:
++
+----
+<user>   ALL=NOPASSWD: /usr/bin/python, /usr/bin/python2, /usr/bin/python3
+----
 
 
 
-[[bp.ubuntu.synchrepo]]
-== Synchronizing {ubuntu} Repositories
+.Procedure: Synchronizing {ubuntu} Repositories
 
 
-Software -> Manage Software Channels -> Manage Repositories -> Create Repository
-Repository Type: deb
-Repository URL: url to directory containing binarires, e.g for source
-   http://archive.ubuntu.com/ubuntu bionic restricted main => http://archive.ubuntu.com/ubuntu/dists/bionic/main/binary-amd64/
-   http://archive.ubuntu.com/ubuntu bionic-updates restricted main =>  http://us.archive.ubuntu.com/ubuntu/dists/bionic-updates/main/binary-amd64
+. In the {susemgr} {webui}, navigate to menu:Software[Manage > Repositories] and click btn:[Create Repository].
+. In the [guimenu]``Create Repository`` window, use these values to create a new repository:
++
+* In the [guimenu]``Repository URL`` field, type the URL that contains the appropriate binary files, for example [path]``http://ubuntumirror.example.com/ubuntu/dists/bionic/main/binary-amd64/``.
+* In the [guimenu]``Repository Type`` field, select [systemitem]``deb``.
++
+. Click btn:[Create Repository] to create the repository.
+. Navigate to menu:Software[Manage > Channels] and click btn:[Create Channel].
+. In the [guimenu]``Create Software Channel`` window, create the channel as required for your environment.
+Ensure that in the [guimenu]``Architecture`` field, you select [systemitem]``AMD64 Debian``.
+. Click btn:[Create Channel] to create the software channel.
+. Navigate to menu:Software[Manage > Channels] and select your new channel from the channel list.
+. In the [guimenu]``Repositories`` tab, click the [guimenu]``Add/Remove`` tab, and select your new repository from the repository list.
+. Click the btn:[Update Repositories] button to synchronize the repository.
 
-Software -> Manage Software Channels -> Create Channel
-Architecture: AMD64 Debian 
-... 
-Click "Create"
 
-Software -> Manage Software Channels -> click new channel -> Repositories tab -> Add/Remove tab
-Select repo
-Click "Update Repositories"
-Select Sync tab
-Click "Sync Now"
-
-Check sync progess: tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
-
-Unsupported Helper script
-
-This sets up main, updates and client tools channel on the server. 
-Warning: This is just a helper script so it's unsupported. Ubuntu urls are hard coded
-https://gist.github.com/cbbayburt/22a680582feb9e058dc34949e8e829bd
-https://gitlab.suse.de/mateialbu/uyuni-deb-channel-setup-tool
+You can check the progress of your synchronization from the command line using this command:
+----
+tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
+----
