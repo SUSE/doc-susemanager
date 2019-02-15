@@ -1,0 +1,148 @@
+= Building Documentation with Containers
+
+== Overview
+
+This guide will cover our process of building documentation using containers.
+You will perform the following tasks to get started building docs 
+
+* Install Docker, enable the docker daemon, start the docker daemon and add your user to the docker group.
+* Create Uyuni documentation via the docker container
+*generating our Uyuni web presence with the Antora. 
+
+== Installing Docker on OpenSUSE
+
+. Install docker on your OpenSUSE Leap 42.3/15 system:
++
+----
+sudo zypper in docker
+----
+
+. Start and enable the docker daemon:
++
+----
+sudo systemctl enable docker 
+sudo systemctl start docker
+----
+
+. Add your user to the docker group (you will not need to use sudo):
++
+----
+ sudo usermod -aG docker $USER
+----
+
+. To activate docker with your user, log out of your user session and log back in.
+
+.  Test that docker works without `sudo` with:
++
+----
+docker images
+----
++
+The following should be displayed:
++
+----
+~> docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+----
+
+. Docker is now setup on your system. 
+In the next section you will learn how to build documentation using our custom container.
+
+== Building the Documentation Container
+
+. If you do not have one already, create a new directory called workspace located in your $HOME_DIR:
++
+----
+mdkir /home/<USERNAME>/workspace
+----
+
+. Clone our documentation develop repository located at https://www.github.com/SUSE/doc-susemanager[]:
++
+----
+cd workspace/ && git clone git@github.com:SUSE/doc-susemanager.git && cd doc-susemanager/
+----
+
+.Fork to Contribute
+[NOTE]
+====
+If You are part of the Uyuni team you can use https or ssh, but be aware when using an ssh key you will first require an ssh key to be associated with the doc repository and permissions from an experienced contributor. 
+
+Unless you are part of the Uyuni team we recommend that new contributors fork the repository and submit a pull request. A technical writer will review your PR and accept it, or reject it with a friendly comment containing suggestions for you to fix.
+====
+
+. The current active branches are **develop**, **maintenance/3.1**, and **maintenance/3.2**. These branches contain a folder named __docker-builder__. 
+:
++
+----
+cd docker-builder
+----
+
+. Execute the following command to build the container locally on your system.
++
+----
+docker build -t doc-builder .
+----
+
+
+
+
+
+== Building Documentation
+Now that you have docker installed, and the doc-builder container setup you can proceed with building docs!
+
+. Use the following command to build all documentation sources, replacing <USERNAME> with your user:
++
+----
+docker run --rm -v /home/<USERNAME>/workspace/doc-susemanager:/workspace doc-builder
+----
+
+. The docker container runs and builds all files specified in the `run.sh` file stored in the docker-builder directory. To speed up the build time during development you may optionally comment out any publishing sources you do not need to build. 
++
+IMPORTANT: You always need to leave the `make book-to-set` command un-commented.
++
+.run.sh
+[source, bash]
+----
+#!/bin/bash
+
+# Cleanup
+make clean
+
+# Create the correct links and apply DB5 geekodoc stylesheet (Required for publishing and packaging)
+make book-to-set
+ 
+# CREATE ALL UYUNI PRODUCT OUTPUTS
+# Create Uyuni (Single HTML)
+# make uyuni-html
+
+# Uyuni OBS Packages
+# make uyuni-dist
+
+
+# CREATE ALL SUMA PRODUCT OUTPUTS
+
+# Create SUMA (Single HTML)
+make suma-html
+
+# SUMA OBS Packages
+make suma-dist
+
+# SUMA HTML Single/Chunked books
+make suma-advanced-html
+make suma-best-practices-html
+make suma-getting-started-html
+make suma-reference-html
+
+# SUMA PDF
+make suma-getting-started-pdf
+make suma-reference-pdf
+make suma-advanced-pdf
+make suma-best-practices-pdf
+
+----
+
+. The completed build results will be located in the `doc-susemanager/build` directory.
+
+== Using Antora to Build the Uyuni Online Documentation
+
+Coming soon...

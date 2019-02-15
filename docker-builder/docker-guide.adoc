@@ -1,0 +1,279 @@
+= Galaxy: Docker Quickstart Guide
+
+This short guide covers basic docker usage in preparation for setting up Uyuni documentation CI, building, publishing and indexing.
+
+
+
+== Manage Multiple Containers
+
+[NOTE]
+.Getting Help
+====
+`docs.docker.com` and `--help` are your best friends.
+====
+
+.Quickstart to Multiple Containers
+. Setup and run an **nginx**, **mysql**, and **httpd** (apache) server
+. Run all of them in `--detach` (or `-d`), name them with `--name`
+. **nginx** should listen on `80:80`, **httpd** on `8080:80`, **mysql** on `3306:3306`
+. When running **mysql**, use the `--env` option (or `-e`) to pass in `MYSQL_RANDOM_ROOT_PASSWORD=yes`.
+. Use `docker container logs` on **mysql** to find the random password it created on startup.
+. Clean it all up with `docker container stop` and `docker container rm` (both can accept multiple names or ID's).
+. Use `docker container ls` command to ensure everything is correct before and after cleanup.
+
+
+
+=== Setup the Mysql Container
+
+. Enter the following command to setup the container, providing a port, name and environment variable.
++
+----
+docker container run -d -p 3306:3306 --name db -e MYSQL_RANDOM_ROOT_PASSWORD=yes mysql
+----
+. __Check__ logs for password:
++
+----
+docker container logs db
+
+...
+GENERATED ROOT PASSWORD: aeRee8zaeweeviePhaget6uophi8Diek
+...
+----
+
+
+
+=== Setup the httpd (Apache) Server
+
+. Enter the following command to setup the apache webserver
++
+----
+docker container run -d --name webserver -p 8080:80 httpd
+----
+
+. Show **webserver** logs:
++
+----
+docker container logs webserver
+----
+
+. List __running__ containers:
++
+----
+docker ps
+----
+
+
+
+=== Setup the nginx Proxy
+
+. Enter in the following command to setup the nginx proxy server:
++
+----
+docker container run -d --name proxy -p 80:80 nginx
+----
+
+. Show the **proxy** logs:
++
+----
+docker container logs proxy
+----
+
+
+
+== Test the Containers
+
+Run the curl command on both localhost ports to see the outputs:
+
+.Nginx output
+----
+curl localhost:80
+----
+
+.Apache output
+----
+curl localhost:8080
+----
+
+
+
+
+== Cleanup the Mess
+
+. Stop all running named container processes:
++
+----
+docker container stop db webserver proxy
+----
+
+
+
+== Remove Old Containers
+
+. List all exited containers:
++
+----
+docker ps -a
+docker container ls -a
+----
+
+. Remove all old containers:
++
+----
+docker container rm db proxy webserver
+----
+
+
+
+== List Processes Running In Containers
+
+Setup two new containers, so you can have a look at the processes running in them.
+
+
+
+=== Setup Two Containers
+
+. Setup an **nginx** container:
++
+----
+docker container run -d --name nginx nginx
+----
+
+. Setup a **mysql** container:
++
+----
+docker container run -d --name mysql -e MYSQL_RANDOM_ROOT_PASSWORD=true mysql
+----
+
+. Run one of the following commands to list all running processes in the new containers:
++
+----
+docker container top mysql
+docker container top nginx
+----
+
+
+
+== Inspect Containers
+
+To inspect a container and see a json output of how the docker container was configured at runtime use:
+
+----
+docker container inspect mysql
+----
+
+
+
+
+== Look at Container Stats
+
+To have a look at container stats(display a live stream of container(s) resource usage stats):
+
+----
+docker container stats
+----
+
+By default the stats command does not show the container name, only its ID. To check stats by id add the following format string:
+
+----
+docker container stats $(docker ps --format={{.Names}})
+----
+
+==  Getting a Shell Inside Containers
+
+=== Start an Interactive Container Shell
+
+Start a new container interactively:
+----
+docker container run -it
+----
+
+==== Run an Additional Command in an Existing Container
+
+Using exec to modify a running container does not stop the container on exit.
+
+----
+docker container exec -it
+----
+
+==== Run a docker Container
+
+Exiting a normal container will stop the container process.
+
+----
+docker container run -it --name proxy nginx bash
+----
+
+==== How to use a Container without Bash
+
+In some cases you may end up with a linux distribution without bash. Use ssh to get into the box, then use that distributions package manager to install bash, or whatever shell or software you like:
+
+----
+docker container run -it alpine bash
+----
+
+The above command will error as bash is not installed by default, instead try the following:
+
+----
+docker container run -it alpine sh
+----
+
+==== Start Up a Previously Exited Container
+
+After you exit a container you may wish to reuse it, generally if you expect you will reuse a container use exec. Call docker container start and then the ID or container name followed by the command, in this case __bash__:
+
+----
+docker start  `docker ps -q -l` # restart it in the background
+docker attach `docker ps -q -l` # reattach the terminal & stdin
+----
+
+
+
+== Docker Network Defaults
+
+* Each container is connected to a private virtual network "bridge"
+
+* Each virtual network routes through NAT firewall on host IP
+
+* All containers on a virtual network can talk to each other without `-p`
+
+* Best practice is to create a new virtual network for each app:
+
+** network "web_app" for mysql and php/apache containers
+
+** network "web_api" for mongo and nodejs containers
+
+=== Docker Networks Continued
+
+* "Batteries included, but you can remove them as you wish"
+** Defaults work well in many cases, but it is easy to swap out parts and customize it
+* Make new virtual networks
+* Attach containers to more than one virtual network (or none)
+* Skip virtual networks and use host IP (--net=host)
+
+[TIP]
+.`-p` (--publish)
+====
+Remember publishing ports are always specified in `HOST:CONTAINER` format.
+
+----
+docker container run -p 80:80 --name webhost -d nginx
+docker container port webhost
+80/tcp -> 0.0.0.0:80
+----
+====
+
+[TIP]
+.--format
+====
+You can use the `--format` command with docker inspect to find out the actual docker containers **IP**. The `--format` command can be used for __any__ docker config setting.
+
+----
+docker container inspect --format '{{ .NetworkSettings.IPAddress }}' webhost
+
+172.17.0.5
+----
+====
+
+
+
+
