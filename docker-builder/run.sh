@@ -42,7 +42,7 @@ make book-to-set
 make mgr-html
 
 # MANAGER OBS Packages
-make mgr-dist
+#make mgr-dist
 
 # MANAGER HTML Single/Chunked books
 #make mgr-architecture-html
