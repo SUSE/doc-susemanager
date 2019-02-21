@@ -164,16 +164,16 @@ mgr-salt-guide-pdf: mgr xml-mgr
 
 # HTML (MANAGER) Chunked & single
 mgr-architecture-html: xml-mgr
-	daps -d DC-architecture html
-	daps -d DC-architecture html --single
+	daps -d DC-mgr-architecture html
+	daps -d DC-mgr-architecture html --single
 
 mgr-install-guide-html: xml-mgr
 	daps -d DC-mgr-install-guide html
 	daps -d DC-mgr-install-guide html --single
 
 mgr-client-config-guide-html: xml-mgr
-	daps -d DC-client-config-guide html
-	daps -d DC-client-config-guide html --single
+	daps -d DC-mgr-client-config-guide html
+	daps -d DC-mgr-client-config-guide html --single
 
 mgr-upgrade-guide-html: xml-mgr
 	daps -d DC-mgr-upgrade-guide html

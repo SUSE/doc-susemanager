@@ -6,14 +6,14 @@ make start-clean
 
 # Create the correct links and apply DB5 geekodoc stylesheet (Required for publishing and packaging) 
 # Create Uyuni opensource outputs
-make uyuni-clean
-make book-to-set-uyuni
+#make uyuni-clean
+#make book-to-set-uyuni
 
 # Create all Uyuni (Single HTML)
-make uyuni-html
+#make uyuni-html
 
 # Uyuni OBS Packages
-make uyuni-dist
+#make uyuni-dist
 
 #TODO make ONE command that builds each book/output.. this is method=stupid
 # UYUNI HTML Single/Chunked books
@@ -42,7 +42,7 @@ make book-to-set
 make mgr-html
 
 # MANAGER OBS Packages
-#make mgr-dist
+make mgr-dist
 
 # MANAGER HTML Single/Chunked books
 #make mgr-architecture-html
