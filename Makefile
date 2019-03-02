@@ -1,14 +1,14 @@
 # Makefile for SUSE Manager/Uyuni Documentation
-# Author: Joseph Cayouette - Inspired/modified from Owncloud's documentation Makefile written by Matthew Setter
-# Thanks for the tips Matthew! https://github.com/owncloud/docs
+# Author: Joseph Cayouette
+# Inspired/modified from Owncloud's documentation Makefile written by Matthew Setter
 
 SHELL = bash
 FONTS_DIR ?= pdf-constructor/fonts
 STYLES_DIR ?= pdf-constructor/resources/themes
 
-# Todo allow setting the style, productname, and output filename prefix from the CLI
-#STYLE ?= draft
-STYLE ?= suse
+#TODO allow setting the style, productname, and output filename prefix from the CLI
+STYLE ?= draft
+#STYLE ?= suse
 PRODUCTNAME ?= SUSE Manager
 FILENAME ?= suse_manager
 #PRODUCTNAME ?= Uyuni
@@ -16,11 +16,20 @@ FILENAME ?= suse_manager
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
+VERSION ?= beta1
+OUTPUT_INSTALL ?= build/$(VERSION)/installation_guide
+OUTPUT_CLIENT_CONFIG ?= build/$(VERSION)/client_config_guide
+OUTPUT_UPGRADE ?= build/$(VERSION)/upgrade_guide
+OUTPUT_REFERENCE ?= build/$(VERSION)/reference_manual
+OUTPUT_ADMIN ?= build/$(VERSION)/administration_guide
+OUTPUT_SALT ?= build/$(VERSION)/salt_guide
+OUTPUT_RETAIL ?= build/$(VERSION)/retail_guide
+OUTPUT_ARCHITECTURE ?= build/$(VERSION)/architecture_guide
 
 
 
 PHONY: help
-help: ## Print a basic help about the targets
+help: ## Prints a basic help menu about available targets
 	@IFS=$$'\n' ; \
 	help_lines=(`fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##/:/'`); \
 	printf "%-30s %s\n" "target" "help" ; \
@@ -56,7 +65,7 @@ pdf-install: ## Generate PDF version of the Installation Guide
 		-a imagesdir=modules/installation/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(FILENAME)_installation_guide.pdf \
+		--out-file $(OUTPUT_INSTALL)/$(FILENAME)_installation_guide.pdf \
 		pdf-constructor/product_installation_guide.adoc
 
 
@@ -70,7 +79,7 @@ pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 		-a imagesdir=modules/client-configuration/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(FILENAME)_client_configuration_guide.pdf \
+		--out-file $(OUTPUT_CLIENT_CONFIG)/$(FILENAME)_client_configuration_guide.pdf \
 		pdf-constructor/product_client_configuration_guide.adoc
 
 
@@ -84,7 +93,7 @@ pdf-upgrade: ## Generate PDF version of the Upgrade Guide
 		-a imagesdir=modules/upgrade/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(FILENAME)_upgrade_guide.pdf \
+		--out-file $(OUTPUT_UPGRADE)/$(FILENAME)_upgrade_guide.pdf \
 		pdf-constructor/product_upgrade_guide.adoc
 
 
@@ -98,7 +107,7 @@ pdf-reference: ## Generate PDF version of the Reference Manual
 		-a imagesdir=modules/reference/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(FILENAME)_reference_manual.pdf \
+		--out-file $(OUTPUT_REFERENCE)/$(FILENAME)_reference_manual.pdf \
 		pdf-constructor/product_reference_manual.adoc
 
 
@@ -112,7 +121,7 @@ pdf-administration: ## Generate PDF version of the Administration Guide
 		-a imagesdir=modules/administration/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(FILENAME)_administration_guide.pdf \
+		--out-file $(OUTPUT_ADMIN)/$(FILENAME)_administration_guide.pdf \
 		pdf-constructor/product_administration_guide.adoc
 
 
@@ -126,7 +135,7 @@ pdf-salt: ## Generate PDF version of the Salt Guide
 		-a imagesdir=modules/salt/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(FILENAME)_salt_guide.pdf \
+		--out-file $(OUTPUT_SALT)/$(FILENAME)_salt_guide.pdf \
 		pdf-constructor/product_salt_guide.adoc
 
 
@@ -141,7 +150,7 @@ pdf-retail: ## Generate PDF version of the Retail Guide
 		-a imagesdir=modules/retail/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(FILENAME)_retail_guide.pdf \
+		--out-file $(OUTPUT_RETAIL)/$(FILENAME)_retail_guide.pdf \
 		pdf-constructor/product_retail_guide.adoc
 
 
@@ -156,7 +165,7 @@ pdf-architecture: ## Generate PDF version of the Architecture Guide
 		-a imagesdir=modules/architecture/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir $(CURDIR) \
-	 	--out-file $(FILENAME)_architecture.pdf \
+	 	--out-file $(OUTPUT_ARCHITECTURE)/$(FILENAME)_architecture.pdf \
 		pdf-constructor/product_architecture.adoc
 
 
