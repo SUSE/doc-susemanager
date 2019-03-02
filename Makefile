@@ -1,16 +1,22 @@
-# Makefile for the Documentation
+# Makefile for SUSE Manager/Uyuni Documentation
+# Author: Joseph Cayouette - Inspired/modified from Owncloud's documentation Makefile written by Matthew Setter
+# Thanks for the tips Matthew! https://github.com/owncloud/docs
 
 SHELL = bash
 FONTS_DIR ?= pdf-constructor/fonts
 STYLES_DIR ?= pdf-constructor/resources/themes
+
+# Todo allow setting the style, productname, and output filename prefix from the CLI
 #STYLE ?= draft
 STYLE ?= suse
+PRODUCTNAME ?= SUSE Manager
+FILENAME ?= suse_manager
+#PRODUCTNAME ?= Uyuni
+#FILENAME ?= uyuni
+
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
-PRODUCTNAME ?= Uyuni
-FILENAME ?= uyuni
-#PRODUCTNAME ?= SUSE Manager
-#FILENAME ?= suse_manager
+
 
 
 PHONY: help
