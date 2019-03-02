@@ -1,8 +1,9 @@
 # Makefile for the Documentation
 
 SHELL = bash
-FONTS_DIR ?= fonts
-STYLES_DIR ?= resources/themes
+FONTS_DIR ?= pdf-constructor/fonts
+STYLES_DIR ?= pdf-constructor/resources/themes
+#STYLE ?= draft
 STYLE ?= suse
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
@@ -36,7 +37,7 @@ clean: ## Remove build artifacts from output dir
 
 
 .PHONY: pdf-all
-pdf-all: pdf-install pdf-client-config pdf-upgrade pdf-reference pdf-administration pdf-salt pdf-retail pdf-architecture ## Generate PDF versions of the books
+pdf-all: pdf-install pdf-client-config pdf-upgrade pdf-reference pdf-administration pdf-salt pdf-retail pdf-architecture ## Generate PDF versions of all books
 
 
 .PHONY: pdf-install
