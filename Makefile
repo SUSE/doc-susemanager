@@ -6,6 +6,10 @@ STYLES_DIR ?= resources/themes
 STYLE ?= suse
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
+PRODUCTNAME ?= Uyuni
+FILENAME ?= uyuni
+#PRODUCTNAME ?= SUSE Manager
+#FILENAME ?= suse_manager
 
 
 PHONY: help
@@ -26,6 +30,10 @@ help: ## Print a basic help about the targets
 	done
 
 
+.PHONY: clean
+clean: ## Remove build artifacts from output dir
+	-rm -rf build/
+
 
 .PHONY: pdf-all
 pdf-all: pdf-install pdf-client-config pdf-upgrade pdf-reference pdf-administration pdf-salt pdf-retail pdf-architecture ## Generate PDF versions of the books
@@ -41,7 +49,7 @@ pdf-install: ## Generate PDF version of the Installation Guide
 		-a imagesdir=modules/installation/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file suse_manager_installation_guide.pdf \
+		--out-file $(FILENAME)_installation_guide.pdf \
 		pdf-constructor/product_installation_guide.adoc
 
 
@@ -55,7 +63,7 @@ pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 		-a imagesdir=modules/client-configuration/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file suse_manager_client_configuration_guide.pdf \
+		--out-file $(FILENAME)_client_configuration_guide.pdf \
 		pdf-constructor/product_client_configuration_guide.adoc
 
 
@@ -69,7 +77,7 @@ pdf-upgrade: ## Generate PDF version of the Upgrade Guide
 		-a imagesdir=modules/upgrade/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file suse_manager_upgrade_guide.pdf \
+		--out-file $(FILENAME)_upgrade_guide.pdf \
 		pdf-constructor/product_upgrade_guide.adoc
 
 
@@ -83,7 +91,7 @@ pdf-reference: ## Generate PDF version of the Reference Manual
 		-a imagesdir=modules/reference/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file suse_manager_reference_manual.pdf \
+		--out-file $(FILENAME)_reference_manual.pdf \
 		pdf-constructor/product_reference_manual.adoc
 
 
@@ -97,7 +105,7 @@ pdf-administration: ## Generate PDF version of the Administration Guide
 		-a imagesdir=modules/administration/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file suse_manager_administration_guide.pdf \
+		--out-file $(FILENAME)_administration_guide.pdf \
 		pdf-constructor/product_administration_guide.adoc
 
 
@@ -111,7 +119,7 @@ pdf-salt: ## Generate PDF version of the Salt Guide
 		-a imagesdir=modules/salt/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file suse_manager_salt_guide.pdf \
+		--out-file $(FILENAME)_salt_guide.pdf \
 		pdf-constructor/product_salt_guide.adoc
 
 
@@ -126,13 +134,14 @@ pdf-retail: ## Generate PDF version of the Retail Guide
 		-a imagesdir=modules/retail/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file suse_manager_retail_guide.pdf \
+		--out-file $(FILENAME)_retail_guide.pdf \
 		pdf-constructor/product_retail_guide.adoc
 
 
 .PHONY: pdf-architecture
 pdf-architecture: ## Generate PDF version of the Architecture Guide
 	asciidoctor-pdf \
+		-a productname='$(PRODUCTNAME)' \
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
@@ -140,7 +149,7 @@ pdf-architecture: ## Generate PDF version of the Architecture Guide
 		-a imagesdir=modules/architecture/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir $(CURDIR) \
-		--out-file suse_manager_architecture.pdf \
+	 	--out-file $(FILENAME)_architecture.pdf \
 		pdf-constructor/product_architecture.adoc
 
 
