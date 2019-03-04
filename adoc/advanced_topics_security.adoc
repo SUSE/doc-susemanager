@@ -97,45 +97,75 @@ sub   2048R/A812FA62 2018-07-09
 // ianew: installation/security.adoc
 // iawho: lana 2019-02-28
 
-There are two configuration files which needs to be changed to enable signing of metadata.
+To enable or disble metadata signing use the `mgr-sign-metadata-ctl` tool:
 
-. [filename]``/etc/rhn/signing.conf`` to specify KEYID and PASSPHRASE
-. [filename]``/etc/rhn/rhn.conf`` to enable signing metadata
+Usage: mgr-sign-metadata-ctl [enable <keyid> | disable | check-config |
+check-channels]
+  enable KEYID     Enable GPG signing of repository metadata using the
+provided KEYID.
+                   Requires a valid key with the given KEYID to exist in
+the default keyring.
+  disable          Disable GPG signing of repository metadata.
+  check-channels   Check if the cached channels repodata is signed.
+  check-config     Check configuration and report any problems. This is
+the default option.
+  regen-metadata   Restart services and schedule metadata regeneration.
 
-Example for [filename]``/etc/rhn/signing.conf``:
+In order to enable the GPG signing of the SUSE Manager repository
+metadata the user must have a GPG key and the keyring must have a password set.
 
-----
-KEYID="607FABDB"
-
-GPGPASS="MySecretPassword"
-----
-
-To enable signing of metadata please add the following in [filename]``/etc/rhn/rhn.conf``:
-
-----
-sign_metadata = 1
-----
-
-All spacewalk services must be restarted after modifying 'rhn.conf'.
-
-=== Regenerate all metadata
-// ianew: installation/security.adoc
-// iawho: lana 2019-02-28
-
-After enabling signing metadata, all metadata needs to be re-generated.
-This can be done with a small SQL script:
+After the key is generated the password of the keyring must be set in
+`/etc/rhn/signing.conf`:
 
 ----
-$> spacewalk-sql -i
-psql (9.6.9)
-Type "help" for help.
-
-susemanager=# insert into rhnRepoRegenQueue (id, CHANNEL_LABEL, REASON, FORCE)
-susemanager-# (select sequence_nextval('rhn_repo_regen_queue_id_seq'), C.label, 'changed signing of metadata', 'Y' from rhnChannel C);
-INSERT 0 40
-susemanager=# \q
-$>
+GPGPASS="<my sercret pass>"
 ----
+
+Then list the key ids in short format:
+
+----
+gpg --keyid-format short --list-keys
+----
+
+This will produce an output similar to this:
+
+----
+pub   rsa2048/4E2C3DD8 2019-02-26 [SC] [expires: 2021-02-25]
+      6213EBE2292F878CC15DE308F88942134E2C3DD8
+uid         [ultimate] SUMA Server <root@localhost>
+sub   rsa2048/5B46F2C5 2019-02-26 [E] [expires: 2021-02-25
+----
+
+Finaly enable the GPG signing with:
+
+----
+mgr-sign-metadata-ctl enable 4E2C3DD8
+----
+
+The output should be similar to:
+
+----
+OK. Found key 4E2C3DD8 in keyring.
+DONE. Set key 4E2C3DD8 in /etc/rhn/signing.conf.
+DONE. Enabled metadata signing in /etc/rhn/rhn.conf.
+DONE. Exported key 4E2C3DD8 to /srv/susemanager/salt/gpg/mgr-keyring.gpg.
+DONE. Exported key 4E2C3DD8 to /srv/www/htdocs/pub/mgr-gpg-pub.key.
+----
+
+NOTE. For the changes to become effective run:
+
+----
+   mgr-sign-metadata-ctl regen-metadata
+----
+
+To regenerate the channel metadata with signing enabled:
+
+----
+   mgr-sign-metadata-ctl regen-metadata
+----
+
+Note that repo metadata signing is a global option. It affects all
+software channels present on the server.
 
 === Trust the GPG key on all clients
 // ianew: installation/security.adoc
@@ -144,18 +174,10 @@ $>
 When this feature is enabled, all clients have to trust the new GPG key.
 If the new GPG key is not imported on the client, installation or updating of packages is not possible.
 
-. Export the GPG key and make it availabel in the 'pub/' directory.
-+
-
-----
-# gpg --batch --export -a -o <output filename> <KEYID>
-$> gpg --batch --export -a -o /srv/www/htdocs/pub/company.key 607FABDB
-----
-
 . Import the GPG key on all clients
 +
 
-This can be done using a remote command on all clients
+On RPM based systems this can be done using a remote command on all clients
 +
 
 ----
@@ -163,6 +185,9 @@ This can be done using a remote command on all clients
 $> rpm --import http://suma-refhead-srv.mgr.suse.de/pub/company.key
 ----
 +
+For Ubuntu minions reassign the channels. This will take care of adding
+
+the GPG key to the minion.
 
 [TIP]
 .Tip
