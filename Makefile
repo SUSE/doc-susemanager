@@ -96,7 +96,7 @@ pdf-upgrade: ## Generate PDF version of the Upgrade Guide
 		-a revdate=$(REVDATE) \
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_upgrade_guide.pdf \
-		pdf-constructor/product_upgrade_guide.adoc
+		modules/upgrade/nav-upgrade-guide.adoc
 
 
 .PHONY: pdf-reference
