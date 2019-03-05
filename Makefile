@@ -16,15 +16,12 @@ FILENAME ?= suse_manager
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
-VERSION ?= beta1
-OUTPUT_INSTALL ?= build/$(VERSION)/installation_guide
-OUTPUT_CLIENT_CONFIG ?= build/$(VERSION)/client_config_guide
-OUTPUT_UPGRADE ?= build/$(VERSION)/upgrade_guide
-OUTPUT_REFERENCE ?= build/$(VERSION)/reference_manual
-OUTPUT_ADMIN ?= build/$(VERSION)/administration_guide
-OUTPUT_SALT ?= build/$(VERSION)/salt_guide
-OUTPUT_RETAIL ?= build/$(VERSION)/retail_guide
-OUTPUT_ARCHITECTURE ?= build/$(VERSION)/architecture_guide
+# Build directories for TAR
+HTML_BUILD_DIR ?= build
+PDF_BUILD_DIR ?= build/pdf
+# OBS Filenames
+HTML_OUTPUT ?= susemanager-docs_en
+PDF_OUTPUT ?= susemanager-docs_en-pdf
 
 
 
@@ -47,8 +44,13 @@ help: ## Prints a basic help menu about available targets
 
 
 .PHONY: clean
-clean: ## Remove build artifacts from output dir
-	-rm -rf build/
+clean: ## Remove build artifacts from output directory (Antora and PDF)
+	-rm -rf build/ .cache/ public/
+
+
+.PHONY: antora
+antora: ## Build the Antora static site (Requires Docker)
+	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 site.yml
 
 
 .PHONY: pdf-all
@@ -65,7 +67,7 @@ pdf-install: ## Generate PDF version of the Installation Guide
 		-a imagesdir=modules/installation/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(OUTPUT_INSTALL)/$(FILENAME)_installation_guide.pdf \
+		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_installation_guide.pdf \
 		pdf-constructor/product_installation_guide.adoc
 
 
@@ -79,7 +81,7 @@ pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 		-a imagesdir=modules/client-configuration/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(OUTPUT_CLIENT_CONFIG)/$(FILENAME)_client_configuration_guide.pdf \
+		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_client_configuration_guide.pdf \
 		pdf-constructor/product_client_configuration_guide.adoc
 
 
@@ -93,7 +95,7 @@ pdf-upgrade: ## Generate PDF version of the Upgrade Guide
 		-a imagesdir=modules/upgrade/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(OUTPUT_UPGRADE)/$(FILENAME)_upgrade_guide.pdf \
+		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_upgrade_guide.pdf \
 		pdf-constructor/product_upgrade_guide.adoc
 
 
@@ -107,7 +109,7 @@ pdf-reference: ## Generate PDF version of the Reference Manual
 		-a imagesdir=modules/reference/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(OUTPUT_REFERENCE)/$(FILENAME)_reference_manual.pdf \
+		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_reference_manual.pdf \
 		pdf-constructor/product_reference_manual.adoc
 
 
@@ -121,7 +123,7 @@ pdf-administration: ## Generate PDF version of the Administration Guide
 		-a imagesdir=modules/administration/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(OUTPUT_ADMIN)/$(FILENAME)_administration_guide.pdf \
+		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_administration_guide.pdf \
 		pdf-constructor/product_administration_guide.adoc
 
 
@@ -135,7 +137,7 @@ pdf-salt: ## Generate PDF version of the Salt Guide
 		-a imagesdir=modules/salt/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(OUTPUT_SALT)/$(FILENAME)_salt_guide.pdf \
+		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_salt_guide.pdf \
 		pdf-constructor/product_salt_guide.adoc
 
 
@@ -150,7 +152,7 @@ pdf-retail: ## Generate PDF version of the Retail Guide
 		-a imagesdir=modules/retail/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir . \
-		--out-file $(OUTPUT_RETAIL)/$(FILENAME)_retail_guide.pdf \
+		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_retail_guide.pdf \
 		pdf-constructor/product_retail_guide.adoc
 
 
@@ -165,7 +167,13 @@ pdf-architecture: ## Generate PDF version of the Architecture Guide
 		-a imagesdir=modules/architecture/assets/images \
 		-a revdate=$(REVDATE) \
 		--base-dir $(CURDIR) \
-	 	--out-file $(OUTPUT_ARCHITECTURE)/$(FILENAME)_architecture.pdf \
+	 	--out-file $(PDF_BUILD_DIR)/$(FILENAME)_architecture.pdf \
 		pdf-constructor/product_architecture.adoc
 
+.PHONY: obs-packages
+obs-packages: pdf-all antora ## Generate tar files for the SUSE/OpenSUSE build service
+	tar --exclude='$(PDF_BUILD_DIR)' -czvf $(HTML_OUTPUT).tar.gz $(HTML_BUILD_DIR)
+	tar -czvf $(PDF_OUTPUT).tar.gz $(PDF_BUILD_DIR)
+	mkdir build/packages
+	mv $(HTML_OUTPUT).tar.gz $(PDF_OUTPUT).tar.gz build/packages
 
