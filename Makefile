@@ -5,7 +5,7 @@
 SHELL = bash
 FONTS_DIR ?= pdf-constructor/fonts
 STYLES_DIR ?= pdf-constructor/resources/themes
-
+#TODO speak with java dev about creating a wildcard for the WebUI. For specific branches antora should only have 1 branch see: site.yml
 #TODO allow setting the style, productname, and output filename prefix from the CLI
 STYLE ?= draft
 #STYLE ?= suse
