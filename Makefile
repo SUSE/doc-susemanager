@@ -82,7 +82,7 @@ pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 		-a revdate=$(REVDATE) \
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_client_configuration_guide.pdf \
-		pdf-constructor/product_client_configuration_guide.adoc
+		modules/client-configuration/nav-client-config-guide.adoc
 
 
 .PHONY: pdf-upgrade
