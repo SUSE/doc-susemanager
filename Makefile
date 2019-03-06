@@ -68,7 +68,7 @@ pdf-install: ## Generate PDF version of the Installation Guide
 		-a revdate=$(REVDATE) \
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_installation_guide.pdf \
-		pdf-constructor/product_installation_guide.adoc
+		modules/installation/nav-installation-guide.adoc
 
 
 .PHONY: pdf-client-config
