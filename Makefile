@@ -168,7 +168,7 @@ pdf-architecture: ## Generate PDF version of the Architecture Guide
 		-a revdate=$(REVDATE) \
 		--base-dir $(CURDIR) \
 	 	--out-file $(PDF_BUILD_DIR)/$(FILENAME)_architecture.pdf \
-		pdf-constructor/product_architecture.adoc
+		modules/architecture/nav-architecture-components-guide.adoc
 
 .PHONY: obs-packages
 obs-packages: pdf-all antora ## Generate tar files for the SUSE/OpenSUSE build service
