@@ -329,6 +329,8 @@ Many of these values are self-explanatory:
 
 
 The ``group``, ``edit-group``, and `namespace` (formerly ``hidden-group``) types do not generate an editable field and are used to structure form and pillar data.
+All these types support nesting.
+For providing default values with nesting, see <<salt.formulas.ex.edit-group-nesting>>.
 The difference between `group` and `namespace` is `group` generates a visible border with a heading, and `namespace` shows nothing visually (and is only used to structure pillar data).
 The difference between `group` and `edit-group` is: `edit-group` allows to structure and restrict editable fields in a more flexible way.
 `edit-group` is a collection of items of the same kind; collections can have the following four "shapes":
@@ -586,6 +588,39 @@ image::formula-custom-harddisk-partitions.png[]
 
 To remove the definition of a partition click the minus symbol in the title line of an inner group.
 When form fields are properly filled confirm with clicking btn:[Save Formula] in the upper right corner of the formula.
+
+
+[[salt.formulas.ex.edit-group-nesting]]
+=== edit-group Example with Nesting
+
+See the following *edit-group* example:
+
+----
+users:
+  $name: "Users"
+  $type: edit-group
+  $minItems: 2
+  $maxItems: 5
+  $prototype:
+    name:
+      $default: "username"
+    password:
+      $type: password
+    groups:
+      $type: edit-group
+      $minItems: 1
+      $prototype:
+        group_name:
+          $type: text
+  $default:
+    - name: "root"
+      groups:
+        - group_name: "users"
+        - group_name: "admins"
+    - name: "admin"
+      groups:
+        - group_name: "users"
+----
 
 
 
