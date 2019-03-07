@@ -124,7 +124,7 @@ pdf-administration: ## Generate PDF version of the Administration Guide
 		-a revdate=$(REVDATE) \
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_administration_guide.pdf \
-		pdf-constructor/product_administration_guide.adoc
+		modules/administration/nav-administration-guide.adoc
 
 
 .PHONY: pdf-salt
