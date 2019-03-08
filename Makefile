@@ -50,7 +50,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 .PHONY: antora
 antora: ## Build the Antora static site (Requires Docker)
-	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 site.yml
+	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 site.yml --stacktrace
 
 
 .PHONY: pdf-all
