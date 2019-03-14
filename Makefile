@@ -148,7 +148,7 @@ pdf-salt: ## Generate PDF version of the Salt Guide
 		-a revdate=$(REVDATE) \
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_salt_guide.pdf \
-		pdf-constructor/product_salt_guide.adoc
+		modules/salt/nav-salt-guide.adoc
 
 
 
@@ -164,7 +164,7 @@ pdf-retail: ## Generate PDF version of the Retail Guide
 		-a revdate=$(REVDATE) \
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_retail_guide.pdf \
-		pdf-constructor/product_retail_guide.adoc
+		modules/retail/nav-retail.adoc
 
 
 .PHONY: pdf-architecture
