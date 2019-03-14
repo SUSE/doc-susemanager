@@ -5,14 +5,14 @@
 SHELL = bash
 FONTS_DIR ?= pdf-constructor/fonts
 STYLES_DIR ?= pdf-constructor/resources/themes
-#TODO speak with java dev about creating a wildcard for the WebUI. For specific branches antora should only have 1 branch see: site.yml
+#TODO speak with java dev about creating a wildcard for the WebUI. For specific branches antora should only have 1 branch see: suma-site.yml
 #TODO allow setting the style, productname, and output filename prefix from the CLI
 STYLE ?= draft
 #STYLE ?= suse
-PRODUCTNAME ?= SUSE Manager
-FILENAME ?= suse_manager
-#PRODUCTNAME ?= Uyuni
-#FILENAME ?= uyuni
+#PRODUCTNAME ?= SUSE Manager
+#FILENAME ?= suse_manager
+PRODUCTNAME ?= Uyuni
+FILENAME ?= uyuni
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
@@ -47,10 +47,14 @@ help: ## Prints a basic help menu about available targets
 clean: ## Remove build artifacts from output directory (Antora and PDF)
 	-rm -rf build/ .cache/ public/
 
+# To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
+.PHONY: antora-suma
+antora-suma: ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
+	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 suma-site.yml --stacktrace
 
-.PHONY: antora
-antora: ## Build the Antora static site (Requires Docker)
-	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 site.yml --stacktrace
+.PHONY: antora-uyuni
+antora-uyuni: ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
+	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml --stacktrace
 
 
 .PHONY: pdf-all
@@ -63,6 +67,7 @@ pdf-install: ## Generate PDF version of the Installation Guide
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/installation/examples \
 		-a imagesdir=modules/installation/assets/images \
 		-a revdate=$(REVDATE) \
@@ -77,6 +82,7 @@ pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/client-configuration/examples \
 		-a imagesdir=modules/client-configuration/assets/images \
 		-a revdate=$(REVDATE) \
@@ -91,6 +97,7 @@ pdf-upgrade: ## Generate PDF version of the Upgrade Guide
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/upgrade/examples \
 		-a imagesdir=modules/upgrade/assets/images \
 		-a revdate=$(REVDATE) \
@@ -105,6 +112,7 @@ pdf-reference: ## Generate PDF version of the Reference Manual
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/reference/examples \
 		-a imagesdir=modules/reference/assets/images \
 		-a revdate=$(REVDATE) \
@@ -119,6 +127,7 @@ pdf-administration: ## Generate PDF version of the Administration Guide
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/administration/examples \
 		-a imagesdir=modules/administration/assets/images \
 		-a revdate=$(REVDATE) \
@@ -133,6 +142,7 @@ pdf-salt: ## Generate PDF version of the Salt Guide
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/salt/examples \
 		-a imagesdir=modules/salt/assets/images \
 		-a revdate=$(REVDATE) \
@@ -148,6 +158,7 @@ pdf-retail: ## Generate PDF version of the Retail Guide
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/retail/examples \
 		-a imagesdir=modules/retail/assets/images \
 		-a revdate=$(REVDATE) \
@@ -163,6 +174,7 @@ pdf-architecture: ## Generate PDF version of the Architecture Guide
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/architecture/examples \
 		-a imagesdir=modules/architecture/assets/images \
 		-a revdate=$(REVDATE) \
@@ -170,8 +182,17 @@ pdf-architecture: ## Generate PDF version of the Architecture Guide
 	 	--out-file $(PDF_BUILD_DIR)/$(FILENAME)_architecture.pdf \
 		modules/architecture/nav-architecture-components-guide.adoc
 
-.PHONY: obs-packages
-obs-packages: pdf-all antora ## Generate tar files for the SUSE/OpenSUSE build service
+# UYUNI
+.PHONY: obs-packages-uyuni
+obs-packages-uyuni: pdf-all antora-uyuni ## Generate tar files for the SUSE/OpenSUSE build service
+	tar --exclude='$(PDF_BUILD_DIR)' -czvf $(HTML_OUTPUT).tar.gz $(HTML_BUILD_DIR)
+	tar -czvf $(PDF_OUTPUT).tar.gz $(PDF_BUILD_DIR)
+	mkdir build/packages
+	mv $(HTML_OUTPUT).tar.gz $(PDF_OUTPUT).tar.gz build/packages
+
+# SUMA
+.PHONY: obs-packages-suma
+obs-packages-suma: pdf-all antora-suma ## Generate tar files for the SUSE/OpenSUSE build service
 	tar --exclude='$(PDF_BUILD_DIR)' -czvf $(HTML_OUTPUT).tar.gz $(HTML_BUILD_DIR)
 	tar -czvf $(PDF_OUTPUT).tar.gz $(PDF_BUILD_DIR)
 	mkdir build/packages
