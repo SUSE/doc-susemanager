@@ -9,10 +9,10 @@ STYLES_DIR ?= pdf-constructor/resources/themes
 #TODO allow setting the style, productname, and output filename prefix from the CLI
 STYLE ?= draft
 #STYLE ?= suse
-#PRODUCTNAME ?= SUSE Manager
-#FILENAME ?= suse_manager
-PRODUCTNAME ?= Uyuni
-FILENAME ?= uyuni
+PRODUCTNAME ?= 'SUSE Manager'
+FILENAME ?= suse_manager
+#PRODUCTNAME ?= Uyuni
+#FILENAME ?= uyuni
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
@@ -170,7 +170,7 @@ pdf-retail: ## Generate PDF version of the Retail Guide
 .PHONY: pdf-architecture
 pdf-architecture: ## Generate PDF version of the Architecture Guide
 	asciidoctor-pdf \
-		-a productname='$(PRODUCTNAME)' \
+		-a productname=$(PRODUCTNAME) \
 		-a pdf-stylesdir=$(STYLES_DIR)/ \
 		-a pdf-style=$(STYLE) \
 		-a pdf-fontsdir=$(FONTS_DIR) \
