@@ -164,3 +164,58 @@ Apply the highstate to all minions in the group:
 ----
 salt -I 'group_ids:GID' state.apply
 ----
+
+
+
+[[salt.pillars.setrpmendpoint]]
+== Use pillars to set the RPM endpoint
+
+By default, {productname} assumes that the {productname} server is the Salt master, and uses its single FQDN as the download endpoint for RPMs and repository metadata.
+However, there are some cases where you might like to use a different FQDN as the download endpoint.
+The most common example is if you need to use a proxy, or in environments with complicated networking requirements.
+
+To change the RPM endpoint, you can manually adjust three salt pillars:
+* [systemitem]``pkg_download_point_protocol``, defaults to [systemitem]``https``.
+* [systemitem]``pkg_download_point_host``, defaults to [systemitem]``fqdn``.
+* [systemitem]``pkg_download_point_port``, defaults to [systemitem]``443``.
+
+If you do not adjust these pillars directly, {productname} will fall back to the default values.
+
+.Procedure: Changing the RPM endpoint pillar
+
+. Navigate to [path]``/srv/pillar/`` and create a file called [filename]``top.sls``  with these contents:
++
+----
+base:
+  '*':
+    - rpm_download_points
+----
++
+This example directs Salt to look at the [filename]``rpm_download_points`` file to determine the base URL to use.
+You can adjust this file to target different minions or groups, depending on your environment.
++
+. Remain in [path]``/srv/pillar/`` and create a file called [filename]``rpm_download_points`` with a script that provides the base URLs you want to use.
+For example:
++
+----
+{% if grains['fqdn'] == 'minion1.tf.local' %}
+    rpm_download_point: example1.com
+{% elif grains['fqdn'] == 'minion2.tf.local'' %}
+    rpm_download_point: example2.com
+{%else%}
+    rpm_download_point: example.com
+{% endif %}
+----
+. OPTIONAL: If you want to use group IDs to set the pillar values, open the master configuration file and set the [systemitem]``ext_pillar_first`` parameter to [systemitem]``true``, and use a script like this:
++
+----
+{% if pillar['group_ids'] is defined and 8 in pillar['group_ids'] %}
+  rpm_download_point_protocol: http
+  rpm_download_point_host: example.com
+  rpm_download_point_port: 444
+{%else%}
+  rpm_download_point_protocol: ftp
+  rpm_download_point_host: example.com
+  rpm_download_point_port: 445
+{%- endif %}
+----
