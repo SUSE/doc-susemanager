@@ -1,0 +1,29 @@
+[[troubleshooting-packages]]
+= Troubleshooting Package Inconsistencies
+// Antora entities
+ifndef::backend-pdf[]
+include::ROOT:partial$entities.adoc[]
+endif::[]
+
+// PDF entities
+ifdef::backend-pdf[]
+include::_partials/entities.adoc[]
+endif::[]
+
+
+
+In some cases, updates are available in the web interface, but not appearing on the client.
+If you schedule an update on the client, it will fail with an error stating that no updates are available.
+This can be caused by a metadata regeneration problem, or because update packages have been locked.
+
+The notice that updates are available will appear immediately, but new metadata is only generated on the server after synchronizing.
+In this case, an inconsistency can occur if taskomatic crashes, or because taskomatic is still running and creating new metadata.
+
+To address this issue, check the [path]``/var/log/rhn/rhn_taskomatic_daemon.log`` file to determine if any processess are still running, or an exception which could indicate a crash.
+In the case of a crash, restart taskomatic.
+
+Check package locks and exclude lists to determine if packages are locked or excluded on the client:
+
+On Expanded Support Platform, check [path]``/etc/yum.conf`` and search for ``exclude=``.
+
+On SUSE Linux Enterprise Server, use the [command]``zypper locks`` command.
