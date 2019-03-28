@@ -118,7 +118,7 @@ pdf-reference: ## Generate PDF version of the Reference Manual
 		-a revdate=$(REVDATE) \
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_reference_manual.pdf \
-		pdf-constructor/product_reference_manual.adoc
+		modules/reference/nav-reference-manual.adoc
 
 
 .PHONY: pdf-administration
