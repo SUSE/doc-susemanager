@@ -95,10 +95,9 @@ E.g.:
             ... other sls files ...
 ----
 
-
-
 [[bp.chapt.config.mgr.pillar.data]]
 == Pillar Data
+
 
 SUSE Manager exposes a small amount of internal data as Pillars which can be used with custom {sls} states.
 Data that is exposed includes group membership, organization membership, and file roots.
@@ -123,7 +122,7 @@ file.managed:
     - mode: 644
 ----
 
-For more information on Salt pillars, see https://docs.saltstack.com/en/latest/topics/pillar/.
+
 
 [[bp.sect.groupstates]]
 == Group States
@@ -164,66 +163,4 @@ Apply the highstate to all minions in the group:
 
 ----
 salt -I 'group_ids:GID' state.apply
-----
-
-
-
-[[salt.pillars.setpackageendpoint]]
-== Use Pillars to Set the Package Download Endpoint
-
-By default, {productname} assumes that the download endpoint to use is the FQDN of the {productname} server, or the {productname} Proxy.
-However, there are some cases where you might like to use a different FQDN as the download endpoint.
-The most common example is if you need to use load balancing, caching proxies, or in environments with complicated networking requirements.
-
-To change the package download endpoint, you can manually adjust three salt pillars:
-* [systemitem]``pkg_download_point_protocol``, defaults to [systemitem]``https``.
-* [systemitem]``pkg_download_point_host``, defaults to the FQDN of the {productname} Server (or Proxy, if in use).
-* [systemitem]``pkg_download_point_port``, defaults to [systemitem]``443``.
-
-If you do not adjust these pillars directly, {productname} will fall back to the default values.
-
-.Procedure: Changing the package download endpoint pillar
-
-. Navigate to [path]``/srv/pillar/`` and create a file called [filename]``top.sls``  with these contents:
-+
-----
-base:
-  '*':
-    - pkg_download_endpoints
-----
-+
-This example directs Salt to look at the [filename]``pkg_download_endpoints.sls`` file to determine the base URL to use.
-You can adjust this file to target different minions or groups, depending on your environment.
-+
-. Remain in [path]``/srv/pillar/`` and create a file called [filename]``pkg_download_endpoints.sls`` with the base URLs you want to use.
-For example:
-+
-----
-pkg_download_point_protocol: http
-pkg_download_point_host: example.com
-pkg_download_point_port: 444
-----
-. OPTIONAL: You can use grains to set conditional values, for example:
-----
-{% if grains['fqdn'] == 'minion1.example.com' %}
-    pkg_download_point: example1.com
-{% elif grains['fqdn'] == 'minion2.example.com' %}
-    pkg_download_point: example2.com
-{% else %}
-    pkg_download_point: example.com
-{% endif %}
-----
-. OPTIONAL: If you want to use external pillars, for example Group IDs, open the master configuration file and set the [systemitem]``ext_pillar_first`` parameter to [systemitem]``true``.
-You can then use Group IDs to set conditional values, for example:
-+
-----
-{% if pillar['group_ids'] is defined and Group_ID in pillar['group_ids'] %}
-  pkg_download_point_protocol: http
-  pkg_download_point_host: example.com
-  pkg_download_point_port: 444
-{% else %}
-  pkg_download_point_protocol: ftp
-  pkg_download_point_host: example.com
-  pkg_download_point_port: 445
-{% endif %}
 ----
