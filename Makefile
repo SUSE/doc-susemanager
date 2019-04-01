@@ -3,16 +3,18 @@
 # Inspired/modified from Owncloud's documentation Makefile written by Matthew Setter
 
 SHELL = bash
-FONTS_DIR ?= pdf-constructor/fonts
-STYLES_DIR ?= pdf-constructor/resources/themes
+FONTS_DIR ?= resources/fonts
+STYLES_DIR ?= resources/themes
 #TODO speak with java dev about creating a wildcard for the WebUI. For specific branches antora should only have 1 branch see: suma-site.yml
 #TODO allow setting the style, productname, and output filename prefix from the CLI
-STYLE ?= draft
+#STYLE ?= suse-draft
+STYLE ?= uyuni-draft
 #STYLE ?= suse
-PRODUCTNAME ?= 'SUSE Manager'
-FILENAME ?= suse_manager
-#PRODUCTNAME ?= Uyuni
-#FILENAME ?= uyuni
+#STYLE ?= uyuni
+#PRODUCTNAME ?= 'SUSE Manager'
+#FILENAME ?= suse_manager
+PRODUCTNAME ?= Uyuni
+FILENAME ?= uyuni
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
