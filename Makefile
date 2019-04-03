@@ -3,16 +3,20 @@
 # Inspired/modified from Owncloud's documentation Makefile written by Matthew Setter
 
 SHELL = bash
-FONTS_DIR ?= pdf-constructor/fonts
-STYLES_DIR ?= pdf-constructor/resources/themes
+FONTS_DIR ?= resources/fonts
+STYLES_DIR ?= resources/themes
 #TODO speak with java dev about creating a wildcard for the WebUI. For specific branches antora should only have 1 branch see: suma-site.yml
 #TODO allow setting the style, productname, and output filename prefix from the CLI
-STYLE ?= draft
+#STYLE ?= suse-draft
+STYLE ?= uyuni-draft
 #STYLE ?= suse
-PRODUCTNAME ?= 'SUSE Manager'
-FILENAME ?= suse_manager
-#PRODUCTNAME ?= Uyuni
-#FILENAME ?= uyuni
+#STYLE ?= uyuni
+#PRODUCTNAME ?= 'SUSE Manager'
+#FILENAME ?= suse_manager
+PRODUCTNAME ?= Uyuni
+FILENAME ?= uyuni
+
+
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
@@ -43,22 +47,30 @@ help: ## Prints a basic help menu about available targets
 	done
 
 
+
+
 .PHONY: clean
 clean: ## Remove build artifacts from output directory (Antora and PDF)
 	-rm -rf build/ .cache/ public/
+
+
 
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
 	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 suma-site.yml --stacktrace
 
+
+
 .PHONY: antora-uyuni
 antora-uyuni: ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
 	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml --stacktrace
 
 
+
 .PHONY: pdf-all
 pdf-all: pdf-install pdf-client-config pdf-upgrade pdf-reference pdf-administration pdf-salt pdf-retail pdf-architecture ## Generate PDF versions of all books
+
 
 
 .PHONY: pdf-install
@@ -76,6 +88,7 @@ pdf-install: ## Generate PDF version of the Installation Guide
 		modules/installation/nav-installation-guide.adoc
 
 
+
 .PHONY: pdf-client-config
 pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 	asciidoctor-pdf \
@@ -89,6 +102,7 @@ pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_client_configuration_guide.pdf \
 		modules/client-configuration/nav-client-config-guide.adoc
+
 
 
 .PHONY: pdf-upgrade
@@ -106,6 +120,7 @@ pdf-upgrade: ## Generate PDF version of the Upgrade Guide
 		modules/upgrade/nav-upgrade-guide.adoc
 
 
+
 .PHONY: pdf-reference
 pdf-reference: ## Generate PDF version of the Reference Manual
 	asciidoctor-pdf \
@@ -118,7 +133,8 @@ pdf-reference: ## Generate PDF version of the Reference Manual
 		-a revdate=$(REVDATE) \
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_reference_manual.pdf \
-		pdf-constructor/product_reference_manual.adoc
+		modules/reference/nav-reference-manual.adoc
+
 
 
 .PHONY: pdf-administration
@@ -134,6 +150,7 @@ pdf-administration: ## Generate PDF version of the Administration Guide
 		--base-dir . \
 		--out-file $(PDF_BUILD_DIR)/$(FILENAME)_administration_guide.pdf \
 		modules/administration/nav-administration-guide.adoc
+
 
 
 .PHONY: pdf-salt
@@ -167,6 +184,7 @@ pdf-retail: ## Generate PDF version of the Retail Guide
 		modules/retail/nav-retail.adoc
 
 
+
 .PHONY: pdf-architecture
 pdf-architecture: ## Generate PDF version of the Architecture Guide
 	asciidoctor-pdf \
@@ -182,6 +200,8 @@ pdf-architecture: ## Generate PDF version of the Architecture Guide
 	 	--out-file $(PDF_BUILD_DIR)/$(FILENAME)_architecture.pdf \
 		modules/architecture/nav-architecture-components-guide.adoc
 
+
+
 # UYUNI
 .PHONY: obs-packages-uyuni
 obs-packages-uyuni: pdf-all antora-uyuni ## Generate tar files for the SUSE/OpenSUSE build service
@@ -189,6 +209,8 @@ obs-packages-uyuni: pdf-all antora-uyuni ## Generate tar files for the SUSE/Open
 	tar -czvf $(PDF_OUTPUT).tar.gz $(PDF_BUILD_DIR)
 	mkdir build/packages
 	mv $(HTML_OUTPUT).tar.gz $(PDF_OUTPUT).tar.gz build/packages
+
+
 
 # SUMA
 .PHONY: obs-packages-suma
