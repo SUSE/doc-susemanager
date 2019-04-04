@@ -46,6 +46,66 @@ Some actions are not yet supported:
 
 This section describes how to manually prepare {ubuntu} clients for registration to your {susemgr} Server and synchronize the repositories.
 
+
+.Procedure: Preparing an {Ubuntu} Client for Registration
+
+Ensure you have the corresponding {ubuntu} product enabled and required channels have been fully synchronized:
+
+.Ubuntu 18.04
+* Product: {ubuntu} Client 18.04
+* Mandatory channels: [systemitem]``ubuntu-18.04-pool-amd64``
+
+.Ubuntu 16.04
+* Product: {ubuntu} Client 16.04
+* Mandatory channels: [systemitem]``ubuntu-16.04-pool-amd64``
+
+After synchronization the follwing vendor channels will be created:
+
+----
+ ubuntu-18.04-pool for amd64 
+ |
+ +- Ubuntu-18.04-SUSE-Manager-Tools for amd64 
+----
+
+Next create custom repositories to mirror the {ubuntu} packages (see <<manage-repositories.adoc>>):
++
+For e.g. create repositories for the `main` and `main-updates` components:
+
+
+* Repository Label: ubuntu-bionic-main
+* Repository URL: http://example.com/ubuntu/dists/bionic/main/binary-amd64/
+* Repository Type: deb
+
+* Repository Label: ubuntu-bionic-main-updates
+* Repository URL: http://example.com/ubuntu/dists/bionic-updates/main/binary-amd64/
+* Repository Type: deb
+
+Create custom channels under the `pool` channel and associate them with the repositories created in the previous step.
++
+Suggested channels structure:
+
+----
+ ubuntu-18.04-pool for amd64 (vendor chanel)
+ |
+ +- Ubuntu-18.04-SUSE-Manager-Tools for amd64 (vendor channel)
+ |
+ +- ubuntu-18.04-amd64-main (custom)
+ |
+ +- ubuntu-18.04-amd64-main-updates (custom)
+----
+
+Synchronize the custom channels (see <<s4-chnlmgmt-cdetails-repos>>).
+
+.Procedure: Generate a bootstrap repository
+
+To genererate a bootstrap repo for {ubuntu}:
+
+----
+mgr-create-bootstrap-repo --with-custom-channels
+----
+
+
+
 ////
 .Procedure: Preparing an {Ubuntu} 16.04 Client for Registration
 
