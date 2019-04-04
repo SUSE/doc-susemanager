@@ -25,9 +25,26 @@ A kernel virtual machine (KVM) combined with Virtual Machine Manager (_virt-mana
 For more information on virtualization, see: https://www.suse.com/documentation/sles-12/singlehtml/book_virt/book_virt.html[SUSE Linux Enterprise Virtualization Guide]
 ====
 
-You will require a new virtual machine, which you can create using [systemitem]``virt-manager``.
-When you create your new virtual machine, ensure it meets the hardware requirements at xref:hardware-requirements.adoc[].
+//This section needs revision its ugly and outdated.
+Enter the following settings when creating a new virtual machine using *virt-manager*.
+In the following table replace _version_ with the actual product version string.
 
+[cols="1,1", options="header"]
+|===
+2+<| KVM Settings
+| Installation Method | Import Existing Disk Image
+| OS:                 | Linux
+| Version:            | SLES_version_-JeOS-for-kvm-and-xen.x86_64-GM.qcow2
+| Memory:             | 4096 MB
+| CPU's:              | 2
+| Storage Format:     |_.qcow2_ 24 GB (Default) JeOS Root Partition
+| Virtual Disks:      |
+| VirtIO Disk 2       | 101 GB for [path]``/var/spacewalk``
+| VirtIO Disk 3       | 50 GB for [path]``/var/lib/pgsql``
+| VirtIO Disk 4       | 4 GB for swap
+| Name:               | test-setup
+| Network             |Bridge _br0_
+|===
 
 .{suse} Virtualization Guide
 [TIP]
@@ -42,7 +59,7 @@ Create three additional virtual disks required for the {productname} storage par
 
 .Procedure: Creating the Required Partitions with KVM
 . Create a new virtual machine using the downloaded JeOS KVM image and select menu:Import existing disk image[] .
-. Configure RAM and number of CPUs, according to xref:hardware-requirements.adoc[].
+. Configure RAM and number of CPUs (At least 4 GB RAM and 2 CPUs).
 . Name your KVM machine and select the menu:Customize configuration before install[] check box.
 . Select the btn:[Add Hardware] button and create three new virtual disks with the following specifications.
 These disks will be partitioned and mounted in <<proc.jeos.susemgr.prep>>.
@@ -50,10 +67,10 @@ These disks will be partitioned and mounted in <<proc.jeos.susemgr.prep>>.
 
 [cols="1,1,1", options="header"]
 |===
-| VirtIO Storage Disks | Name
-| VirtIO Disk 2        | spacewalk
-| VirtIO Disk 3        | pgsql
-| VirtIO Disk 4        | swap
+| VirtIO Storage Disks | Name      | Sizing
+| VirtIO Disk 2        | spacewalk | 101{nbsp}GB
+| VirtIO Disk 3        | pgsql     | 50{nbsp}GB
+| VirtIO Disk 4        | swap      | 4{nbsp}GB
 |===
 
 . Click menu:Begin Installation[] and your new VM will boot from the JeOS image.
@@ -96,13 +113,13 @@ zypper in -t package yast2-storage
 
 [cols="1,1,1,1", options="header"]
 |===
-| VirtIO Storage Disks | Name                     | File System Type
-| VirtIO Disk 2        | [path]``/var/spacewalk`` | XFS
-| VirtIO Disk 3        | [path]``/var/lib/pgsql`` | XFS
-| VirtIO Disk 4        | [path]``swap``           | swap
+| VirtIO Storage Disks | Name                     | Storage Size | File System Type
+| VirtIO Disk 2        | [path]``/var/spacewalk`` | 101{nbsp}GB  | XFS
+| VirtIO Disk 3        | [path]``/var/lib/pgsql`` | 50{nbsp}GB   | XFS
+| VirtIO Disk 4        | [path]``swap``           | 4{nbsp}GB    | swap
 |===
 
-. If you are using a version older than {susemgr}{nbsp}3.2 check [path]``/etc/fstab`` for correctness as follows:
+. If you are still using an older version than {susemgr}{nbsp}3.2 check [path]``/etc/fstab`` for correctness as follows (_updated tools shipped with recent SPs will no longer require human intervention._):
 Remove or comment out this mount point entry for [path]``/var/lib/pgsql/`` in the [path]``/etc/fstab`` file:
 +
 
