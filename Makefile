@@ -1,20 +1,23 @@
 # Makefile for SUSE Manager/Uyuni Documentation
 # Author: Joseph Cayouette
 # Inspired/modified from Owncloud's documentation Makefile written by Matthew Setter
-
 SHELL = bash
-FONTS_DIR ?= resources/fonts
-STYLES_DIR ?= resources/themes
-#TODO speak with java dev about creating a wildcard for the WebUI. For specific branches antora should only have 1 branch see: suma-site.yml
-#TODO allow setting the style, productname, and output filename prefix from the CLI
-STYLE ?= suse-draft
-#STYLE ?= uyuni-draft
-#STYLE ?= suse
-#STYLE ?= uyuni
+
+# Productname to replace
 PRODUCTNAME ?= 'SUSE Manager'
 FILENAME ?= suse_manager
 #PRODUCTNAME ?= Uyuni
 #FILENAME ?= uyuni
+
+# PDF Themes
+PDF_THEME ?= suse-draft
+#PDF_THEME ?= uyuni-draft
+#PDF_THEME ?= suse
+#PDF_THEME ?= uyuni
+
+# PDF Resource Locations
+PDF_FONTS_DIR ?= branding/pdf-resources/fonts
+PDF_THEME_DIR ?= branding/pdf-resources/themes
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
@@ -25,7 +28,7 @@ PDF_BUILD_DIR ?= build/pdf
 HTML_OUTPUT ?= susemanager-docs_en
 PDF_OUTPUT ?= susemanager-docs_en-pdf
 
-
+#TODO allow setting the style, productname, and output filename prefix from the CLI
 
 PHONY: help
 help: ## Prints a basic help menu about available targets
@@ -74,9 +77,9 @@ pdf-all: pdf-install pdf-client-config pdf-upgrade pdf-reference pdf-administrat
 .PHONY: pdf-install
 pdf-install: ## Generate PDF version of the Installation Guide
 	asciidoctor-pdf \
-		-a pdf-stylesdir=$(STYLES_DIR)/ \
-		-a pdf-style=$(STYLE) \
-		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/installation/examples \
 		-a imagesdir=modules/installation/assets/images \
@@ -90,9 +93,9 @@ pdf-install: ## Generate PDF version of the Installation Guide
 .PHONY: pdf-client-config
 pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 	asciidoctor-pdf \
-		-a pdf-stylesdir=$(STYLES_DIR)/ \
-		-a pdf-style=$(STYLE) \
-		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/client-configuration/examples \
 		-a imagesdir=modules/client-configuration/assets/images \
@@ -106,9 +109,9 @@ pdf-client-config: ## Generate PDF version of the Client Configuraiton Guide
 .PHONY: pdf-upgrade
 pdf-upgrade: ## Generate PDF version of the Upgrade Guide
 	asciidoctor-pdf \
-		-a pdf-stylesdir=$(STYLES_DIR)/ \
-		-a pdf-style=$(STYLE) \
-		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/upgrade/examples \
 		-a imagesdir=modules/upgrade/assets/images \
@@ -122,9 +125,9 @@ pdf-upgrade: ## Generate PDF version of the Upgrade Guide
 .PHONY: pdf-reference
 pdf-reference: ## Generate PDF version of the Reference Manual
 	asciidoctor-pdf \
-		-a pdf-stylesdir=$(STYLES_DIR)/ \
-		-a pdf-style=$(STYLE) \
-		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/reference/examples \
 		-a imagesdir=modules/reference/assets/images \
@@ -138,9 +141,9 @@ pdf-reference: ## Generate PDF version of the Reference Manual
 .PHONY: pdf-administration
 pdf-administration: ## Generate PDF version of the Administration Guide
 	asciidoctor-pdf \
-		-a pdf-stylesdir=$(STYLES_DIR)/ \
-		-a pdf-style=$(STYLE) \
-		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/administration/examples \
 		-a imagesdir=modules/administration/assets/images \
@@ -154,9 +157,9 @@ pdf-administration: ## Generate PDF version of the Administration Guide
 .PHONY: pdf-salt
 pdf-salt: ## Generate PDF version of the Salt Guide
 	asciidoctor-pdf \
-		-a pdf-stylesdir=$(STYLES_DIR)/ \
-		-a pdf-style=$(STYLE) \
-		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/salt/examples \
 		-a imagesdir=modules/salt/assets/images \
@@ -170,9 +173,9 @@ pdf-salt: ## Generate PDF version of the Salt Guide
 .PHONY: pdf-retail
 pdf-retail: ## Generate PDF version of the Retail Guide
 	asciidoctor-pdf \
-		-a pdf-stylesdir=$(STYLES_DIR)/ \
-		-a pdf-style=$(STYLE) \
-		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/retail/examples \
 		-a imagesdir=modules/retail/assets/images \
@@ -187,9 +190,9 @@ pdf-retail: ## Generate PDF version of the Retail Guide
 pdf-architecture: ## Generate PDF version of the Architecture Guide
 	asciidoctor-pdf \
 		-a productname=$(PRODUCTNAME) \
-		-a pdf-stylesdir=$(STYLES_DIR)/ \
-		-a pdf-style=$(STYLE) \
-		-a pdf-fontsdir=$(FONTS_DIR) \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
 		-a examplesdir=modules/architecture/examples \
 		-a imagesdir=modules/architecture/assets/images \
