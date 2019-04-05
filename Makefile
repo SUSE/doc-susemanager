@@ -7,16 +7,14 @@ FONTS_DIR ?= resources/fonts
 STYLES_DIR ?= resources/themes
 #TODO speak with java dev about creating a wildcard for the WebUI. For specific branches antora should only have 1 branch see: suma-site.yml
 #TODO allow setting the style, productname, and output filename prefix from the CLI
-#STYLE ?= suse-draft
-STYLE ?= uyuni-draft
+STYLE ?= suse-draft
+#STYLE ?= uyuni-draft
 #STYLE ?= suse
 #STYLE ?= uyuni
-#PRODUCTNAME ?= 'SUSE Manager'
-#FILENAME ?= suse_manager
-PRODUCTNAME ?= Uyuni
-FILENAME ?= uyuni
-
-
+PRODUCTNAME ?= 'SUSE Manager'
+FILENAME ?= suse_manager
+#PRODUCTNAME ?= Uyuni
+#FILENAME ?= uyuni
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
@@ -58,13 +56,13 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
-	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 suma-site.yml --stacktrace
+	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 suma-site.yml
 
 
 
 .PHONY: antora-uyuni
 antora-uyuni: ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
-	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml --stacktrace
+	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml
 
 
 
