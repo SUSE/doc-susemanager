@@ -1,134 +1,100 @@
 [[security-repo-metadata]]
 = Signing Repository Metadata
-// Antora entities
-ifndef::backend-pdf[]
-include::ROOT:partial$entities.adoc[]
-endif::[]
-
-// PDF entities
-ifdef::backend-pdf[]
-include::_partials/entities.adoc[]
-endif::[]
 
 
-== Signing Repository Metadata
 
-=== Generate a Custom GPG key
 
-To sign repository metadata a custom GPG key is required. Create a new GPG key as *root* via the following steps.
 
-----
-$> gpg --gen-key
+TODO:: Explain why repository metadata should/would be signed.
 
-Please select what kind of key you want:
-   (1) RSA and RSA (default)
-   (2) DSA and Elgamal
-   (3) DSA (sign only)
-   (4) RSA (sign only)
-Your selection? 1
-RSA keys may be between 1024 and 4096 bits long.
-What keysize do you want? (2048)
-Requested keysize is 2048 bits
-Please specify how long the key should be valid.
-         0 = key does not expire
-      <n>  = key expires in n days
-      <n>w = key expires in n weeks
-      <n>m = key expires in n months
-      <n>y = key expires in n years
-Key is valid for? (0)
-Key does not expire at all
-Is this correct? (y/N) y
+You will require a custom GPG key to be able to sign repository metadata.
 
-GnuPG needs to construct a user ID to identify your key.
+.Procedure: Generating a custom GPG Key
 
-Real name: company sign key
-Email address: company@example.com
-Comment:
-You selected this USER-ID:
-    "company sign key <company@example.com>"
-
-Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
-You need a Passphrase to protect your secret key.
-
-gpg: key 607FABDB marked as ultimately trusted
-public and secret key created and signed.
-
-gpg: checking the trustdb
-gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
-gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
-pub   2048R/607FABDB 2018-07-09
-      Key fingerprint = ACF5 4698 EC70 FD6A F8C9  942B A7A1 9301 607F ABDB
-uid       [ultimate] company sign key <company@example.com>
-sub   2048R/A812FA62 2018-07-09
-----
-
-=== Configure signing metadata
-
-There are two configuration files which needs to be changed to enable signing of metadata.
-
-. [filename]``/etc/rhn/signing.conf`` to specify KEYID and PASSPHRASE
-. [filename]``/etc/rhn/rhn.conf`` to enable signing metadata
-
-Example for [filename]``/etc/rhn/signing.conf``:
-
-----
-KEYID="607FABDB"
-
-GPGPASS="MySecretPassword"
-----
-
-To enable signing of metadata please add the following in [filename]``/etc/rhn/rhn.conf``:
-
-----
-sign_metadata = 1
-----
-
-All spacewalk services must be restarted after modifying 'rhn.conf'.
-
-=== Regenerate all metadata
-
-After enabling signing metadata, all metadata needs to be re-generated.
-This can be done with a small SQL script:
-
-----
-$> spacewalk-sql -i
-psql (9.6.9)
-Type "help" for help.
-
-susemanager=# insert into rhnRepoRegenQueue (id, CHANNEL_LABEL, REASON, FORCE)
-susemanager-# (select sequence_nextval('rhn_repo_regen_queue_id_seq'), C.label, 'changed signing of metadata', 'Y' from rhnChannel C);
-INSERT 0 40
-susemanager=# \q
-$>
-----
-
-=== Trust the GPG key on all clients
-
-When this feature is enabled, all clients have to trust the new GPG key.
-If the new GPG key is not imported on the client, installation or updating of packages is not possible.
-
-. Export the GPG key and make it availabel in the 'pub/' directory.
+. As the root user, use the [command]``gpg`` command to generate a new key:
 +
-
 ----
-# gpg --batch --export -a -o <output filename> <KEYID>
-$> gpg --batch --export -a -o /srv/www/htdocs/pub/company.key 607FABDB
-----
-
-. Import the GPG key on all clients
-+
-
-This can be done using a remote command on all clients
-+
-
-----
-# rpm --import http://<server.domain.top/pub/keyname.key
-$> rpm --import http://suma-refhead-srv.mgr.suse.de/pub/company.key
+gpg --gen-key
 ----
 +
+. At the prompts, select [systemitem]``RSA`` as the key type, with a size of 2048 bits, and select an appropriate expiry date for your key.
+Check the details for your new key, and type [systemitem]``y`` to confirm.
+. At the prompts, enter a name and email address to be associated with your key.
+You can also add a comment to help you identify the key, if desired.
+When you are happy with the user identity, type [systemitem]``O`` to confirm.
+. At the prompt, enter a passphrase to protect your key.
+. The key should be automatically added to your keyring.
+You can check by listing the keys in your keyring:
++
+----
+gpg --list-keys
+----
++
+. Add the password for your keyring to the [filename]``/etc/rhn/signing.conf`` configuration file, by opening the file in your text editor and adding this line:
++
+----
+GPGPASS="password"
+----
 
-[TIP]
-.Tip
-====
-For salt managed systems it might make sense to use a state to trust GPG keys.
-====
+
+You can manage metadata signing on the command line using the [command]``mgr-sign-metadata-ctl`` command.
+
+
+.Procedure: Enabling Metadata Signing
+. You will need to know the short identifier for the key to use.
+You can list your available public keys in short format:
++
+----
+gpg --keyid-format short --list-keys
+...
+pub   rsa2048/3E7BFE0A 2019-04-02 [SC] [expires: 2021-04-01]
+      A43F9EC645ED838ED3014B035CFA51BF3E7BFE0A
+uid         [ultimate] SUSE Manager
+sub   rsa2048/118DE7FF 2019-04-02 [E] [expires: 2021-04-01]
+----
++
+. Enable metadata signing with the [command]``mgr-sign-metadata-ctl`` command:
++
+----
+mgr-sign-metadata-ctl enable 3E7BFE0A
+OK. Found key 3E7BFE0A in keyring.
+DONE. Set key 3E7BFE0A in /etc/rhn/signing.conf.
+DONE. Enabled metadata signing in /etc/rhn/rhn.conf.
+DONE. Exported key 4E2C3DD8 to /srv/susemanager/salt/gpg/mgr-keyring.gpg.
+DONE. Exported key 4E2C3DD8 to /srv/www/htdocs/pub/mgr-gpg-pub.key.
+NOTE. For the changes to become effective run:
+   mgr-sign-metadata-ctl regen-metadata
+----
+. You can check that your configuration is correct with this command:
++
+----
+mgr-sign-metadata-ctl check-config
+----
+. Restart the services and schedule metadata regeneration to pick up the changes:
++
+----
+mgr-sign-metadata-ctl regen-metadata
+----
+
+You can also use the [command]``mgr-sign-metadata-ctl`` command to perform other tasks.
+Use [command]``mgr-sign-metadata-ctl --help`` to see the complete list.
+
+Repository metadata signing is a global option.
+When it is enabled, it is enabled on all software channels on the server.
+This means that all clients connected to the server will need to trust the new  GPG key to be able to install or update packages.
+
+.Procedure: Importing GPG keys on Clients
+
+. For RPM-based client systems, use these remote commands:
++
+----
+rpm --import http://server.example.com/pub/keyname.key
+rpm --import http://server.example.com/pub/company.key
+----
+. For Ubuntu clients, you will need to reassign the channels, which will automatically pick up the new GPG key.
+You can do this through the {productname} {webui}, or from the command line on the server with this command:
++
+----
+salt <ubuntu-minion> state.apply channels
+----
+. OPTIONAL: For salt minions, you might prefer to use  a state to manage your GPG keys.
