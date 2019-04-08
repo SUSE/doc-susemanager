@@ -58,13 +58,13 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
+antora-suma: pdf-all ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
 	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 suma-site.yml
 
 
 
 .PHONY: antora-uyuni
-antora-uyuni: ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
+antora-uyuni: pdf-all ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
 	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml
 
 
