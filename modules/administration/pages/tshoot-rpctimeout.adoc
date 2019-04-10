@@ -1,0 +1,51 @@
+[[troubleshooting-rpc-timeout]]
+= Troubleshooting RPC Connection Timeouts
+
+
+
+
+
+
+[[bp.troubleshooting.timeouts]]
+== RPC Connection Timeout Settings
+
+(((connection timeout)))
+
+(((timeout settings,RPC connection)))
+
+
+RPC connection timeouts are configurable on the {productname} server, {susemgrproxy} server, and the clients.
+For example, if package downloads take longer then expected, you can increase timeout values. [command]``spacewalk-proxy restart`` should be run after the setting is added or modified.
+
+Set the following variables to a value in seconds specifying how long an RPC connection may take at maximum:
+
+Server {mdash}[path]``/etc/rhn/rhn.conf`` :::
++
+
+----
+server.timeout =`number`
+----
+Proxy Server {mdash}[path]``/etc/rhn/rhn.conf`` :::
++
+
+----
+proxy.timeout =`number`
+----
+{sls} Clients (using [package]#zypp-plugin-spacewalk# ) {mdash}[path]``/etc/zypp/zypp.conf`` :::
++
+
+----
+## Valid values:  [0,3600]
+## Default value: 180
+download.transfer_timeout = 180
+----
+This is the maximum time in seconds that a transfer operation is allowed to take.
+This is useful for preventing batch jobs from hanging for hours due to slow networks or links going down.
+If limiting operations to less than a few minutes, you risk aborting perfectly normal operations.
+
+{rhel} Clients (using [package]#yum-rhn-plugin# ) {mdash}[path]``/etc/yum.conf`` :::
++
+
+----
+timeout =`number`
+----

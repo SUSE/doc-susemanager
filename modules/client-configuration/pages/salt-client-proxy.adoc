@@ -1,0 +1,60 @@
+[[salt-client-proxy]]
+= Registering Salt Clients on a Proxy
+
+
+
+
+
+
+Proxy servers may now act as a broker and package cache for Salt minions.
+These minions can be registered with a bootstrap script like the traditional clients, or from the {webui}, or the command line.
+
+Registering Salt clients via {susemgrproxy} from the {webui}
+is done almost the same way as registering clients directly with the {productname} server.
+The difference is that you specify the name of the proxy in the [guimenu]``Proxy`` drop-box on the menu:Main Menu[Systems > Bootstrapping] page.
+
+.Bootstrapping a Salt Client With a Proxy
+image::proxy-saltbootstrap.png[scaledwidth=80%]
+
+.Procedure: Register a Salt client through a proxy from the command line
+. Instead of the {webui}, you may use the command line to register a minion through a proxy.
+Note that this procedure requires that you have installed the salt package on the minion before registration, and have the Advanced systems module activated.
+Add the proxy FQDN as the master in the minions configuration file located at:
++
+
+----
+/etc/salt/minion
+----
++
+
+or alternatively:
++
+
+----
+/etc/salt/minion.d/NAME.conf
+----
+
+. Add the FQDN to the minion file:
++
+
+----
+master: proxy123.example.com
+----
++
+
+Save and restart the salt-minion service with:
++
+
+----
+systemctl restart salt-minion
+----
+
+. On the Server, accept the new minion key with:
++
+
+----
+salt-key -a 'minion'
+----
++
+
+The minion will now connect to the proxy exclusively for Salt operations and normal HTTP package downloads.
