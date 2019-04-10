@@ -394,8 +394,7 @@ See the matrix of {productname} clients on the main page of the {productname} wi
 
 [[bp.expanded-support.ubuntu]]
 == Managing {ubuntu} Clients
-// ianew: clientconfig/ubuntu-clients.adoc
-// iawho: lana 2019-03-01
+
 
 Support for {ubuntu} Clients was added in {susemgr} 3.2.
 Currently, Salt minions running {ubuntu} 16.04 LTS and 18.04 LTS are supported.
@@ -414,7 +413,6 @@ Other supported features:
 * Synchronizing [systemitem]``.deb`` channels
 * Assigning [systemitem]``.deb`` channels to minions
 * GPG signing [systemitem]``.deb`` repositories
-* Minion cleanup on delete
 * Information displayed in System details pages
 * Package install, update, and remove
 * Package install using [systemitem]``Package States``
@@ -430,38 +428,89 @@ Some actions are not yet supported:
 // Reason: RMT and SMT cannot mirror Debian repositories (yet) and so cannot create it in that directory the correct files.
 // We are waiting for SMT to release the feature/fix to mirror Debian repositories. When this has been done, this comment and the limitation above can be removed.
 
+== Prepare {ubuntu} Clients for Registration
 
-This section describes how to manually prepare {ubuntu} clients for registration to your {susemgr} Server and synchronize the repositories.
+Some preparation is required before you can register {ubuntu} clients to {productname} Server.
+
+Before you begin, ensure you have the {ubuntu} product enabled, and have synchronized the {ubuntu} channels:
+
+For {ubuntu} 18.04:
+
+* Product: {ubuntu} Client 18.04
+* Mandatory channels: [systemitem]``ubuntu-18.04-pool-amd64``
+
+For {ubuntu} 16.04:
+
+* Product: {ubuntu} Client 16.04
+* Mandatory channels: [systemitem]``ubuntu-16.04-pool-amd64``
+
+[NOTE]
+====
+The mandatory channels do not contain {ubuntu} upstream packages.
+The repositories and channels for synchronizing upstream content must be configured manually.
+====
 
 
-.Procedure: Preparing an {Ubuntu} 16.04 Client for Registration
 
-. On the client, open the [filename]``/etc/apt/sources.list.d/suma_client_tools.list`` file, and add this line:
+.Procedure: Preparing an {ubuntu} Client for Registration
+
+. Ensure that you have the appropriate software channels available on your system.
+In the {productname} {webui}, navigate to menu:Software[Channel List  > All].
+You should see a base channel and a child channel for your architecture, for example:
 +
 ----
-deb http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu16.04-SUSE-Manager-Tools/xUbuntu_16.04/ /
+ ubuntu-18.04-pool for amd64
+ |
+ +- Ubuntu-18.04-SUSE-Manager-Tools for amd64
 ----
+. Create custom repositories to mirror the {ubuntu} packages.
+For more information on creating custom repositories, see xref:modules/administration/pages/channel-management.adoc[].
+For example:
 +
-. Edit the [filename]``sudoers`` file:
+For `main`:
+
+* Repository Label: ubuntu-bionic-main
+* Repository URL: http://ubuntumirror.example.com/ubuntu/dists/bionic/main/binary-amd64/
+* Repository Type: deb
++
+For `main-updates`:
+
+* Repository Label: ubuntu-bionic-main-updates
+* Repository URL: http://ubuntumirror.example.com/ubuntu/dists/bionic-updates/main/binary-amd64/
+* Repository Type: deb
+
+. Create custom channels under the `pool` channel, mirroring the vendor channels.
+For more information on creating custom channels, see xref:modules/administration/pages/channel-management.adoc[].
+Ensure the custom channels you create have `AMD64 Debian` architecture.
++
+For example:
 +
 ----
-sudo visudo
+ ubuntu-18.04-pool for amd64 (vendor channel)
+ |
+ +- Ubuntu-18.04-SUSE-Manager-Tools for amd64 (vendor channel)
+ |
+ +- ubuntu-18.04-amd64-main (custom channel)
+ |
+ +- ubuntu-18.04-amd64-main-updates (custom channel)
 ----
-+
-Grant [command]``sudo`` access to the user by adding this line to the [filename]``sudoers`` file. Replace [systemitem]``<user>`` with the name of the user that will bootstrap the client in the {webui}:
+. Associate the custom channels with the appropriate custom repositories.
+. Synchronize the new custom channels.
+You can check the progress of your synchronization from the command line with this command:
+----
+tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
+----
+. To use bootstrap with {ubuntu}, you will need to create a bootstrap repository.
+You can  do this from the command line with [command]``mgr-create``:
 +
 ----
-<user>   ALL=NOPASSWD: /usr/bin/python, /usr/bin/python2, /usr/bin/python3
+mgr-create-bootstrap-repo --with-custom-channels
 ----
 
-.Procedure: Preparing an {Ubuntu} 18.04 Client for Registration
 
-. On the client, open the [filename]``/etc/apt/sources.list.d/suma_client_tools.list`` file, and add this line:
-+
-----
-deb http://download.suse.de/ibs/Devel:/Galaxy:/Manager:/3.2:/Ubuntu18.04-SUSE-Manager-Tools/xUbuntu_18.04/ /
-----
-+
+
+.Procedure: Granting Root User Access
+
 . Edit the [filename]``sudoers`` file:
 +
 ----
@@ -472,30 +521,4 @@ Grant [command]``sudo`` access to the user by adding this line to the [filename]
 +
 ----
 <user>   ALL=NOPASSWD: /usr/bin/python, /usr/bin/python2, /usr/bin/python3
-----
-
-
-
-.Procedure: Synchronizing {ubuntu} Repositories
-
-
-. In the {susemgr} {webui}, navigate to menu:Software[Manage > Repositories] and click btn:[Create Repository].
-. In the [guimenu]``Create Repository`` dialog, use these values to create a new repository:
-+
-* In the [guimenu]``Repository URL`` field, type the URL that contains the appropriate binary files, for example [path]``http://ubuntumirror.example.com/ubuntu/dists/bionic/main/binary-amd64/``.
-* In the [guimenu]``Repository Type`` field, select [systemitem]``deb``.
-+
-. Click btn:[Create Repository] to create the repository.
-. Navigate to menu:Software[Manage > Channels] and click btn:[Create Channel].
-. In the [guimenu]``Create Software Channel`` dialog, create the channel as required for your environment.
-Ensure that in the [guimenu]``Architecture`` field, you select [systemitem]``AMD64 Debian``.
-. Click btn:[Create Channel] to create the software channel.
-. Navigate to menu:Software[Manage > Channels] and select your new channel from the channel list.
-. In the [guimenu]``Repositories`` tab, click the [guimenu]``Add/Remove`` tab, and select your new repository from the repository list.
-. Click the btn:[Update Repositories] button to synchronize the repository.
-
-
-You can check the progress of your synchronization from the command line using this command:
-----
-tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
 ----
