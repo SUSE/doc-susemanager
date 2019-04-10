@@ -2,14 +2,6 @@
 = Ubuntu Clients
 
 
-
-
-[[bp.expanded-support.ubuntu]]
-== Managing {ubuntu} Clients
-// ianew: clientconfig/ubuntu-clients.adoc
-// iawho: lana 2019-03-01
-
-
 Support for {ubuntu} Clients was added in {susemgr} 3.2.
 Currently, Salt minions running {ubuntu} 16.04 LTS and 18.04 LTS are supported.
 
@@ -42,66 +34,66 @@ Some actions are not yet supported:
 // Reason: RMT and SMT cannot mirror Debian repositories (yet) and so cannot create it in that directory the correct files.
 // We are waiting for SMT to release the feature/fix to mirror Debian repositories. When this has been done, this comment and the limitation above can be removed.
 
+== Prepare to Register {ubuntu} Clients
 
-This section describes how to prepare {ubuntu} clients for registration to your {susemgr} Server.
+Some preparation is required on before you can register {ubuntu} clients to {productname} Server.
 
-// SUSE Manager specific instructions
-//ifeval::[{suma-content} == true]
+Before you begin, ensure you have the {ubuntu} product enabled, and have synchronized the {ubuntu} channels:
 
-.Procedure: Setting up the software channels for {ubuntu} Client registration
+For {ubuntu} 18.04:
 
-Ensure you have the corresponding {ubuntu} product enabled and required channels have been fully synchronized:
-
-.Ubuntu 18.04
 * Product: {ubuntu} Client 18.04
 * Mandatory channels: [systemitem]``ubuntu-18.04-pool-amd64``
 
-.Ubuntu 16.04
+For {ubuntu} 16.04:
+
 * Product: {ubuntu} Client 16.04
 * Mandatory channels: [systemitem]``ubuntu-16.04-pool-amd64``
 
+[NOTE]
+====
+The mandatory channels do not contain {ubuntu} upstream packages.
+The repositories and channels for synchronizing upstream content must be configured manually.
+====
 
-After synchronization the following vendor channels will be created:
 
+
+// SUSE Manager specific instructions
+// Commented out for reviewing purposes ifeval::[{suma-content} == true]
+
+.Procedure: Preparing to Register {ubuntu} Clients
+
+. Ensure that you have the appropriate software channels available on your system.
+In the {productname} {webui}, navigate to menu:Software[Channel List  > All].
+You should see a base channel and a child channel for your architecture, for example:
++
 ----
  ubuntu-18.04-pool for amd64
  |
  +- Ubuntu-18.04-SUSE-Manager-Tools for amd64
 ----
-
-Similar channels exist for Ubuntu 16.04.
-
-[NOTE]
-====
-The {ubuntu} vendor channels don't contain {ubuntu} upstream packages.
-The repositories and channels for syncing upstream content must be configured manually.
-====
-
-Next create custom repositories to mirror the {ubuntu} packages (see <<manage-repositories.adoc>>):
-
-For e.g. create repositories for the `main` and `main-updates` components.
-
+. Create custom repositories to mirror the {ubuntu} packages.
+For more information on creating custom repositories, see xref:modules/administration/pages/channel-management.adoc[].
+For example:
++
 For `main`:
 
 * Repository Label: ubuntu-bionic-main
 * Repository URL: http://ubuntumirror.example.com/ubuntu/dists/bionic/main/binary-amd64/
 * Repository Type: deb
-
++
 For `main-updates`:
 
 * Repository Label: ubuntu-bionic-main-updates
 * Repository URL: http://ubuntumirror.example.com/ubuntu/dists/bionic-updates/main/binary-amd64/
 * Repository Type: deb
 
-Create custom channels under the `pool` channel and associate them with the repositories created in the previous step (see <<ref.webui.channels.mgmnt.overview>>).
-
-[NOTE]
-====
-Make sure the {ubuntu} custom channels have architecture set to `AMD64 Debian`.
-====
-
-Suggested channels structure:
-
+. Create custom channels under the `pool` channel, mirroring the vendor channels.
+For more information on creating custom channels, see xref:modules/administration/pages/channel-management.adoc[].
+Ensure the custom channels you create have `AMD64 Debian` architecture.
++
+For example:
++
 ----
  ubuntu-18.04-pool for amd64 (vendor channel)
  |
@@ -111,27 +103,27 @@ Suggested channels structure:
  |
  +- ubuntu-18.04-amd64-main-updates (custom channel)
 ----
-
-Synchronize the custom channels (see <<s4-chnlmgmt-cdetails-repos>>).
-
-You can check the progress of your synchronization from the command line using this command:
+. Associate the custom channels with the appropriate custom repositories.
+. Synchronize the new custom channels.
+You can check the progress of your synchronization from the command line with this command:
 ----
 tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
 ----
-
-.Procedure: Generate a bootstrap repository
-
-To generate a bootstrap repository for {ubuntu}:
-
+. To use bootstrap with {ubuntu}, you will need to create a bootstrap repository.
+You can  do this from the command line with [command]``mgr-create-bootstrap-repo``:
++
 ----
 mgr-create-bootstrap-repo --with-custom-channels
 ----
 //endif::[]
 
-.Procedure: Preparing an {Ubuntu} Client for Registration
+
 
 // Uyuni specific instructions
 ifeval::[{suma-content} == false]
+
+.Procedure: Preparing to Register {ubuntu} Clients
+
 . On the client, open the [filename]``/etc/apt/sources.list.d/suma_client_tools.list`` file, and add this line:
 +
 ----
@@ -145,10 +137,17 @@ deb https://download.opensuse.org/repositories/systemsmanagement:/saltstack:/pro
 for Ubuntu 18.04.
 +
 Make sure the `main` and `universe` upstream repositories are enabled.
-+
+
 endif::[]
 
-. Edit the [filename]``sudoers`` file:
+
+
+The root user on {ubuntu} is disabled by default.
+You can enable it by editing the [filename]``sudoers`` file.
+
+.Procedure: Granting Root User Access
+
+. On the client, edit the [filename]``sudoers`` file:
 +
 ----
 sudo visudo
