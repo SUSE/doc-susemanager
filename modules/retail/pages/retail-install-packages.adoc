@@ -1,0 +1,99 @@
+[[retail-install-packages]]
+= Installing from Packages
+// Antora entities
+ifndef::backend-pdf[]
+include::ROOT:partial$entities.adoc[]
+endif::[]
+
+// PDF entities
+ifdef::backend-pdf[]
+include::_partials/entities.adoc[]
+endif::[]
+
+
+
+
+If you have chosen not to use the Unified Installer, you can install {smr} manually instead.
+
+
+== Install the {susemgr} server
+
+For instructions to install {susemgr}, see the https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-getting-started/html/book.suma.getting-started/quickstart.chapt.overview.requirements.html#quickstart.sect.introduction
+
+[WARNING]
+.Do Not Enable PXE Boot
+====
+Do not enable PXE boot functionality on the {susemgrproxy} during initial setup.
+This functionality will be installed later, after the initial setup.
+====
+
+
+
+[[retail.sect.install.install.config]]
+== Configure the {susemgr} server
+
+It is important that all required SUSE channels are available on your system and synchronized in order for {smr} to operate correctly.
+For more information on channel management, see https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-advanced-topics/html/book.suma.advanced.topics/suse.mgr.command.line.tools.html#syncing.suse.mgr.repositories.scc
+
+Channels required for {smr} functionality:
+----
+- SLES 12 SP3 (SP4 in the future) as a base
+  - SLES Pool
+    - SLES Update
+- SUSE Manager 3.2 Tools
+  - SUSE Manager 3.2 Tools Pool
+    - SUSE Manager 3.2 Tools Update
+- SUSE Manager 3.2 Proxy
+  - SUSE Manager 3.2 Proxy Pool
+    - SUSE Manager 3.2 Proxy Update
+- SUSE Manager 3.2 Proxy for Retail
+  - SUSE Manager 3.2 Proxy for Retail Pool
+    - SUSE Manager 3.2 Proxy for Retail Update
+----
+
+After you have synchronized the required SUSE channels, create channels for any custom software.
+Channels are used to provide custom software for OS image building.
+For more information on software channels, see https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-reference/html/book.suma.reference.manual/ref.webui.channels.html
+
+
+
+
+== Install the {smr} pattern on the {susemgr} server
+
+.Procedure: Installing the {smr} pattern on the {susemgr} server
+. Install the [package]``SUSE Manager for Retail`` pattern on the {susemgr} server:
++
+----
+zypper in -t pattern suma_retail
+----
+
+. Check that you have these packages installed and available, after installing {susemgr} and {smr} pattern:
+
+* bind-formula
+* branch-network-formula
+* dhcpd-formula
+* image-sync-formula
+* pxe-formula
+* saltboot-formula
+* susemanager-retail-tools
+* tftpd-formula
+* vsftpd-formula
++
+Install any missing packages with [command]``zypper``:
++
+----
+zypper install package_name
+----
+. Synchronize the salt filesystem and salt modules:
++
+----
+salt-run fileserver.update
+salt '*' saltutil.sync_all
+----
+. Restart the salt master service to pick up the changes:
++
+----
+systemctl restart salt-master
+----
+
+For more information about formulas, see xref:retail_chap_formulas.adoc#retail.chap.formulas[Formulas].
