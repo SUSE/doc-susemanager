@@ -28,6 +28,7 @@ PDF_BUILD_DIR ?= build/pdf
 HTML_OUTPUT ?= susemanager-docs_en
 PDF_OUTPUT ?= susemanager-docs_en-pdf
 
+
 #TODO allow setting the style, productname, and output filename prefix from the CLI
 
 PHONY: help
@@ -59,12 +60,24 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: pdf-all ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
+	sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
+s/^ # *\(title: *SUSE Manager\)/\1/;\
+s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
+s/^ *\(title: *Uyuni\)/#\1/;\
+s/^ *\(name: *uyuni\)/#\1/;\
+s/^ *\(start_page: *ROOT:index-uyuni\)/#\1/;" antora.yml
 	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 suma-site.yml
 
 
 
 .PHONY: antora-uyuni
 antora-uyuni: pdf-all ## Build the Antora static site (Requires Docker, you must modify the antora.yml file see comments for uyuni/suma)
+	sed -i "s/^ *\(name: *suse-manager\)/#\1/;\
+s/^ *\(title: *SUSE Manager\)/#\1/;\
+s/^ *\(start_page: *ROOT:index-suma\)/#\1/;\
+s/^ *# *\(title: *Uyuni\)/\1/;\
+s/^ *# *\(name: *uyuni\)/\1/;\
+s/^ *# *\(start_page: *ROOT:index-uyuni\)/\1/;" antora.yml
 	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml
 
 
