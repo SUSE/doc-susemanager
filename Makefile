@@ -77,7 +77,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
+antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
 	s/^ # *\(title: *SUSE Manager\)/\1/;\
 	s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
@@ -90,7 +90,7 @@ antora-suma: pdf-all-suma ## Build the SUMA Antora static site (See README for m
 
 # SUMA
 .PHONY: obs-packages-suma
-obs-packages-suma: pdf-all-suma antora-suma ## Generate SUMA OBS tar files
+obs-packages-suma: clean pdf-all-suma antora-suma ## Generate SUMA OBS tar files
 	tar --exclude='$(PDF_BUILD_DIR)' -czvf $(HTML_OUTPUT_SUMA).tar.gz $(HTML_BUILD_DIR)
 	tar -czvf $(PDF_OUTPUT_SUMA).tar.gz $(PDF_BUILD_DIR)
 	mkdir build/packages
@@ -235,7 +235,7 @@ pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 # UYUNI DOCUMENTATION BUILD COMMANDS
 
 .PHONY: antora-uyuni
-antora-uyuni: pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
+antora-uyuni: clean pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
 		sed -i "s/^ *\(name: *suse-manager\)/#\1/;\
 s/^ *\(title: *SUSE Manager\)/#\1/;\
 s/^ *\(start_page: *ROOT:index-suma\)/#\1/;\
@@ -248,7 +248,7 @@ s/^ *# *\(start_page: *ROOT:index-uyuni\)/\1/;" antora.yml
 
 # UYUNI
 .PHONY: obs-packages-uyuni
-obs-packages-uyuni: pdf-all-uyuni antora-uyuni ## Generate UYUNI OBS tar files
+obs-packages-uyuni: clean pdf-all-uyuni antora-uyuni ## Generate UYUNI OBS tar files
 	tar --exclude='$(PDF_BUILD_DIR)' -czvf $(HTML_OUTPUT_UYUNI).tar.gz $(HTML_BUILD_DIR)
 	tar -czvf $(PDF_OUTPUT_UYUNI).tar.gz $(PDF_BUILD_DIR)
 	mkdir build/packages
