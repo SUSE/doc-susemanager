@@ -387,12 +387,3 @@ pdf-architecture-uyuni: ## Generate PDF version of the UYUNI Architecture Guide
 		--base-dir $(CURDIR) \
 	 	--out-file $(PDF_BUILD_DIR)/$(FILENAME_UYUNI)_architecture.pdf \
 		modules/architecture/nav-architecture-components-guide.adoc
-
-
-
-
-
-
-
-
-
