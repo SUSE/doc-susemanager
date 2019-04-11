@@ -83,7 +83,7 @@ s/^ *# *\(start_page: *ROOT:index-uyuni\)/\1/;" antora.yml
 
 
 .PHONY: pdf-all
-pdf-all: # pdf-install pdf-client-config pdf-upgrade pdf-reference pdf-administration pdf-salt pdf-retail pdf-architecture ## Generate PDF versions of all books
+pdf-all: pdf-install pdf-client-config pdf-upgrade pdf-reference pdf-administration pdf-salt pdf-retail pdf-architecture ## Generate PDF versions of all books
 
 
 
