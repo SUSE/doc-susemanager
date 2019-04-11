@@ -76,8 +76,14 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
-	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 suma-site.yml
+antora-suma: ##pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
+		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
+	s/^ # *\(title: *SUSE Manager\)/\1/;\
+	s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
+	s/^ *\(title: *Uyuni\)/#\1/;\
+	s/^ *\(name: *uyuni\)/#\1/;\
+	s/^ *\(start_page: *ROOT:index-uyuni\)/#\1/;" antora.yml
+		docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 suma-site.yml
 
 
 
@@ -228,8 +234,14 @@ pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 # UYUNI DOCUMENTATION BUILD COMMANDS
 
 .PHONY: antora-uyuni
-antora-uyuni: pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
-	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml
+antora-uyuni: ##pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
+		sed -i "s/^ *\(name: *suse-manager\)/#\1/;\
+s/^ *\(title: *SUSE Manager\)/#\1/;\
+s/^ *\(start_page: *ROOT:index-suma\)/#\1/;\
+s/^ *# *\(title: *Uyuni\)/\1/;\
+s/^ *# *\(name: *uyuni\)/\1/;\
+s/^ *# *\(start_page: *ROOT:index-uyuni\)/\1/;" antora.yml
+		docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml
 
 
 
