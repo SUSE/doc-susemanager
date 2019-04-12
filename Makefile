@@ -3,26 +3,30 @@
 # Inspired/modified from Owncloud's documentation Makefile written by Matthew Setter
 SHELL = bash
 
+
 # SUMA Productname and file replacement
 PRODUCTNAME_SUMA ?= 'SUSE Manager'
 FILENAME_SUMA ?= suse_manager
+
 
 # UYUNI Productname and file replacement
 PRODUCTNAME_UYUNI ?= Uyuni
 FILENAME_UYUNI ?= uyuni
 
+
 # PDF Resource Locations
 PDF_FONTS_DIR ?= branding/pdf-resources/fonts
 PDF_THEME_DIR ?= branding/pdf-resources/themes
 
-# PDF Publishing Themes, draft uses a draft watermark.
 
+# PDF Publishing Themes, draft uses a draft watermark.
 # SUMA PDF Themes
 # Available Choices set variable
 # suse-draft
 # suse
 
 PDF_THEME_SUMA ?= suse
+
 
 # UYUNI PDF Themes
 # Available Choices set variable
@@ -34,21 +38,24 @@ PDF_THEME_UYUNI ?= uyuni
 
 REVDATE ?= "$(shell date +'%B %d, %Y')"
 CURDIR ?= .
+
+
 # Build directories for TAR
 HTML_BUILD_DIR ?= build
 PDF_BUILD_DIR ?= build/pdf
 
+
 # SUMA OBS Tarball Filenames
 HTML_OUTPUT_SUMA ?= susemanager-docs_en
 PDF_OUTPUT_SUMA ?= susemanager-docs_en-pdf
+
 
 # UYUNI OBS Tarball Filenames
 HTML_OUTPUT_UYUNI ?= uyuni-docs_en
 PDF_OUTPUT_UYUNI ?= uyuni-docs_en-pdf
 
 
-#TODO allow setting the style, productname, and output filename prefix from the CLI
-
+# Help Menu
 PHONY: help
 help: ## Prints a basic help menu about available targets
 	@IFS=$$'\n' ; \
@@ -67,7 +74,7 @@ help: ## Prints a basic help menu about available targets
 	done
 
 
-
+# Clean up build artifacts
 .PHONY: clean
 clean: ## Remove build artifacts from output directory (Antora and PDF)
 	-rm -rf build/ .cache/ public/
