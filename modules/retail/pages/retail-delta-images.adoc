@@ -1,0 +1,66 @@
+[[retail-delta-images]]
+= Using Delta Images
+// Antora entities
+ifndef::backend-pdf[]
+include::ROOT:partial$entities.adoc[]
+endif::[]
+
+// PDF entities
+ifdef::backend-pdf[]
+include::_partials/entities.adoc[]
+endif::[]
+
+
+
+Using delta images you can save network bandwidth.
+A delta image consists of the differences between two regular images.
+Thus the size of a delta image is small if there are only a few changes between the images.
+Synchronizing such an image to the branch consumes less network bandwidth but it requires some hardware ressource on the branch server to rebuild the installable image.
+
+
+
+== Building Delta Images
+
+With the [command]``retail_create_delta`` tool create a delta image on the {productname} server.
+The tool uses [command]``xdelta3`` internally.
+
+As parameters use the name and the version strings of the target and the source image.
+The format of the parameters must be `<NAME>-<VERSION>` that must correspond to
+the image names and versions available in the pillar.
+For example, if the pillar contains:
+
+----
+images:
+  POS_Image_JeOS6:
+    6.0.0:
+      ...
+    6.0.1:
+      ...
+  POS_Image_Graphical6:
+    6.0.0:
+      ...
+----
+
+Then the command-line command is:
+
+----
+retail_create_delta POS_Image_JeOS6-6.0.1 POS_Image_JeOS6-6.0.0
+----
+
+It will generate the delta from version 6.0.0 to version 6.0.1.
+You will find the resulting delta file in [filename]``/srv/www/os-images`` and the corresponding sls file in [filename]``/srv/susemanager/pillar_data/images/``.
+
+
+
+== Tuning Delta Generation
+
+Performance tuning is possible with the ``-B <VALUE>`` option, which is passed to [command]``xdelta3``.
+With higher values you achieve smaller deltas at the cost of higher memory requirements.
+For more information, see the [command]``xdelta3`` documentation ([command]``man xdelta3``).
+
+
+
+== Image Synchronizing to the Branch Server
+
+When an image is synchronized to the branch server, the ``image-sync-formula`` first checks whether source image is available on the branch server.
+Then the formula eventually decides to download only the delta to save network bandwidth.
