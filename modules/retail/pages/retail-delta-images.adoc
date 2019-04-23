@@ -1,5 +1,5 @@
 [[retail-delta-images]]
-= Using Delta Images
+= Delta Images
 // Antora entities
 ifndef::backend-pdf[]
 include::ROOT:partial$entities.adoc[]
@@ -11,21 +11,20 @@ include::_partials/entities.adoc[]
 endif::[]
 
 
-
-Using delta images you can save network bandwidth.
-A delta image consists of the differences between two regular images.
-Thus the size of a delta image is small if there are only a few changes between the images.
-Synchronizing such an image to the branch consumes less network bandwidth but it requires some hardware ressource on the branch server to rebuild the installable image.
+If you have very large images that you need to synchronize to the branch server, you can use delta images to save network bandwidth.
+A delta image contains only the differences between two regular images.
+If there are only a few changes between two images, the delta image can be very small.
+Synchronizing a delta image to the branch consumes less network bandwidth but it requires some extra hardware resources on the branch server to rebuild the installable image.
 
 
 
 == Building Delta Images
 
-With the [command]``retail_create_delta`` tool create a delta image on the {productname} server.
+The [command]``retail_create_delta`` tool creates a delta image on the {productname} server.
 The tool uses [command]``xdelta3`` internally.
 
-As parameters use the name and the version strings of the target and the source image.
-The format of the parameters must be `<NAME>-<VERSION>` that must correspond to
+Use the name and the version strings of the target and the source image as parameters to the command.
+The format of the parameters must be `<NAME>-<VERSION>` and they must correspond to
 the image names and versions available in the pillar.
 For example, if the pillar contains:
 
@@ -41,14 +40,14 @@ images:
       ...
 ----
 
-Then the command-line command is:
+Then the [command]``retail_create_delta`` command is:
 
 ----
 retail_create_delta POS_Image_JeOS6-6.0.1 POS_Image_JeOS6-6.0.0
 ----
 
-It will generate the delta from version 6.0.0 to version 6.0.1.
-You will find the resulting delta file in [filename]``/srv/www/os-images`` and the corresponding sls file in [filename]``/srv/susemanager/pillar_data/images/``.
+This command will generate the delta image between version 6.0.0 and version 6.0.1.
+The resulting delta file is saved in [filename]``/srv/www/os-images`` and the corresponding {sls} file in [filename]``/srv/susemanager/pillar_data/images/``.
 
 
 
@@ -62,5 +61,5 @@ For more information, see the [command]``xdelta3`` documentation ([command]``man
 
 == Image Synchronizing to the Branch Server
 
-When an image is synchronized to the branch server, the ``image-sync-formula`` first checks whether source image is available on the branch server.
-Then the formula eventually decides to download only the delta to save network bandwidth.
+When an image is synchronized to the branch server, the ``image-sync-formula`` first checks whether the source image is available on the branch server.
+If the source image is available, the delta will be downloaded to save network bandwidth.
