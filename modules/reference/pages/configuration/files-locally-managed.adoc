@@ -1,3 +1,97 @@
+[[configuration-files-local]]
 = Locally Managed Configuration Files
 
+Locally-managed configuration files apply to only one system.
+They may be files in the system's sandbox or files that can be deployed to the system at any time.
+Local files have higher priority than centrally-managed files.
+If a system is subscribed to a configuration channel with a given file and additionally has a locally-managed version of that file, the locally-managed version will be deployed.
 
+The list of all local (override) configuration files for your systems includes the local configuration channels and the sandbox channel for each Provisioning-entitled system.
+
+Click the [guimenu]``Path`` of the file to see its [guimenu]``Config File Details``.
+Click the name of the system to which it belongs to see its menu:System Details[Configuration > Overview] page.
+
+
+
+[[s3-sm-file-macros]]
+== Including Macros in your Configuration Files
+
+
+Being able to store one file and share identical configurations is useful, but what if you have many variations of the same configuration file? What do you do if you have configuration files that differ only in system-specific details, such as host name and MAC address?
+
+Traditional file management would require to upload and distribute each file separately, even if the distinction is nominal and the number of variations is in the hundreds or thousands. {productname} addresses this by allowing the inclusion of macros, or variables, within the configuration files it manages.
+In addition to variables for custom system information, the following standard macros are supported:
+ifdef::showremarks[]
+# 2010-12-21 - ke: will "rhn" stay here? 2010-12-28 - ke: see bug
+    660807#c3 #
+endif::showremarks[]
+
+
+----
+rhn.system.sid
+rhn.system.profile_name
+rhn.system.description
+rhn.system.hostname
+rhn.system.ip_address
+rhn.system.custom_info(key_name)
+rhn.system.net_interface.ip_address(eth_device)
+rhn.system.net_interface.netmask(eth_device)
+rhn.system.net_interface.broadcast(eth_device)
+rhn.system.net_interface.hardware_address(eth_device)
+rhn.system.net_interface.driver_module(eth_device)
+----
+
+
+To use this powerful feature, either upload or create a configuration file via the [guimenu]``Configuration Channel Details`` page.
+Then open its [guimenu]``Configuration File Details`` page and include the supported macros of your choice.
+Ensure that the delimiters used to offset your variables match those set in the [guimenu]``Macro Start Delimiter`` and [guimenu]``Macro End Delimiter`` fields and do not conflict with other characters in the file.
+We recommend that the delimiters be two characters in length and must not contain the percent (``%``) symbol.
+
+For example, you may have a file applicable to all of your servers that differs only in IP address and host name.
+Rather than manage a separate configuration file for each server, you may create a single file, such as [path]``server.conf``, with the IP address and host name macros included.
+
+----
+hostname={| rhn.system.hostname |}
+ip_address={| rhn.system.net_interface.ip_address(eth0) |}
+----
+
+
+ifdef::showremarks[]
+# 2010-12-21 - ke: will "rhn" stay here? #
+endif::showremarks[]
+
+Upon delivery of the file to individual systems, whether through a scheduled action in the {productname} Web interface or at the command line with the {productname} Configuration Client ([command]``mgrcfg-client``), the variables will be replaced with the host name and IP address of the system as recorded in {productname}'s system profile.
+In the above example configuration file the deployed version resembles the following:
+
+----
+hostname=test.example.domain.com
+ip_address=177.18.54.7
+----
+
+
+To capture custom system information, insert the key label into the custom information macro (``rhn.system.custom_info``). For example, if you developed a key labeled "``asset``" you can add it to the custom information macro in a configuration file to have the value substituted on any system containing it.
+The macro would look like this:
+
+----
+asset={@ rhn.system.custom_info(asset) @}
+----
+
+
+When the file is deployed to a system containing a value for that key, the macro gets translated, resulting in a string similar to the following:
+
+----
+asset=Example#456
+----
+
+
+To include a default value, for example, if one is required to prevent errors, you can append it to the custom information macro, like this:
+
+----
+asset={@ rhn.system.custom_info(asset) = 'Asset #' @}
+----
+
+
+This default is overridden by the value on any system containing it.
+
+Using the {productname} Configuration Manager ([command]``mgrcfg-manager``) will not translate or alter files, as this tool is system agnostic. [command]``mgrcfg-manager`` does not depend on system settings.
+Binary files cannot be interpolated.
