@@ -49,7 +49,7 @@ While there are no special requirements for a {vmguest} key, at least the follow
 
 .{vmhost} Activation Key: Minimum Requirements
 * Entitlements: Provisioning, Virtualization Platform.
-* Packages: [package]``mgr-virtualization-host``, [package]``osad``.
+* Packages: [package]``mgr-virtualization-host``, [package]``mgr-osad``.
 +
 If you want to manage the {vmhost} system from {productname} (for example, by executing remote scripts), the package [package]``rhncfg-actions`` needs to be installed as well.
 
@@ -336,7 +336,7 @@ If the {vmhost} is registered as a Salt minion, a final configuration step is ne
 ==== {vmhost} setup on Traditional clients
 
 
-Once the registration process is finished and all packages have been installed, enable the [daemon]``osad`` (Open Source Architecture Daemon).
+Once the registration process is finished and all packages have been installed, enable the [daemon]``mgr-osad`` (Open Source Architecture Daemon).
 On a {sls} system this can be achieved by running the following commands as user {rootuser}:
 
 
@@ -347,17 +347,17 @@ systemctl disable rhnsd
 
 
 ----
-systemctl enable osad
-systemctl start osad
+systemctl enable mgr-osad
+systemctl start mgr-osad
 ----
 
-.[daemon]``osad``Together with [daemon]``rhnsd``
+.[daemon]``mgr-osad``Together with [daemon]``rhnsd``
 IMPORTANT: The [daemon]``rhnsd`` daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
 If many clients are registered with {productname}, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.
 
 However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately.
-Adding [daemon]``osad`` ensures that.
-The [daemon]``osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
+Adding [daemon]``mgr-osad`` ensures that.
+The [daemon]``mgr-osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
 Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [daemon]``rhnsd`` you can only schedule for a time in the future plus up to four hours).
 
 
