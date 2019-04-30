@@ -1,0 +1,54 @@
+[[salt.rate.limiting]]
+= Rate-Limiting
+
+Salt is able to run many commands in parallel on a large number of clients.
+This can potentially create large amounts of load on your infrastructure.
+You can use these rate-limiting features to control the load in your environment.
+
+These features are all configured in the [filename]``/etc/rhn/rhn.conf`` configuration file.
+
+
+
+== Batch Size
+
+Actions are processed in batches.
+This parameter sets the maximum number of clients that can execute a single action in each batch.
+
+Choosing a lower number can prevent system thrashing, but might reduce overall performance as parallelization is reduced.
+
+Adjust the [systemitem]``java.salt_batch_size`` parameter.
+This parameter defaults to 200.
+
+
+
+== Batch Delay
+
+This parameter sets the amount of time, in seconds, to wait after a batch is processed before beginning to process the next batch.
+The first batch will process the number of actions determined in the batch size parameter, and subsequent batches will process fewer actions.
+The exact number of actions processed in subsequent batches is determined by the number of clients that complete actions before the batch delay timer expires.
+
+Choosing a higher value for the batch delay timer will result in larger batches, reducing CPU and I/O load on the Salt master.
+Choosing a smaller value will result in smaller batches, increasing load.
+
+Adjust the [systemitem]``java.salt_batch_delay`` parameter.
+This parameter defaults to 1.0 seconds.
+
+
+
+== Ping Timeout
+
+During Salt batch calls, Salt clients will perform a presence ping.
+This parameter changes the timeout setting for the presence ping, in seconds.
+
+Adjust the [systemitem]``java.salt_presence_ping_timeout`` parameter.
+This parameter defaults to 4 seconds.
+
+
+
+== Job Timeout
+
+During Salt batch calls, a job runs to handles the presence ping  from the clients.
+This parameter changes the timeout setting for gathering the presence ping, in seconds.
+
+Adjust the [systemitem]``java.salt_presence_ping_gather_job_timeout`` parameter.
+This parameter defaults to 1 second.
