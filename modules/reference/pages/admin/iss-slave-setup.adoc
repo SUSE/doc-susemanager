@@ -1,55 +1,15 @@
 [[s3-sattools-iss-slave]]
 = ISS Slave Setup
 
+If you are logged in to an ISS slave, this page lists all masters that the slave has previously synchronized with.
 
-
-
-
-Slave servers receive content synchronized from the master server.
-
-image::admin_iss_configuration_slave.png[scaledwidth=80%]
-
-To securely transfer content to the slave servers, the ORG-SSL certificate from the master server is needed.
-Click menu:Admin[ISS Configuration > Slave Setup].
-In the top right-hand corner, click btn:[Add New Master].
-
-image::admin_iss_configuration_edit_master.png[scaledwidth=80%]
-
-menu:ISS Configuration[Update Master > Master Setup] and fill in the following information:
-
-* Master Fully Qualified Domain Name (FQDN)
-* Filename of this Master's CA Certificate: use the full path to the CA Certificate. For example:
+To add a new master, click btn:[Add new master].
+You will need the master's Fully Qualified Domain Name (FQDN), and the full path to the CA Certificate.
+For example:
 +
-
 ----
 /etc/pki/trust/anchors
 ----
 +
 
-* Default Master?
-
-Click btn:[Add New Master].
-Once the master and slave servers are configured, start the synchronization on the Master server by executing [command]``mgr-inter-sync``:
-
-----
-mgr-inter-sync -c`YOUR-CHANNEL`
-----
-
-
-[[s3-sattools-iss-map-orgs]]
-== Mapping {productname} Master Server Organizations to Slave Organizations
-
-A mapping between organizational names on the master {productname} allows for channel access permissions being set on the master server and propagated when content is synchronized to a slave {productname}.
-Not all organization and channel details need to be mapped for all slaves.
-{productname} administrators can select which permissions and organizations can be synchronized by allowing or omitting mappings.
-
-To complete the mapping, log in to the Slave {productname} as administrator.
-Click menu:Admin[ISS Configuration > Slave Setup] and select a master {productname} by clicking its name.
-Use the drop-down box to map the exported master organization name to a matching local organization in the slave {productname}, then click btn:[Update Mapping].
-
-On the command line, issue the synchronization command on each of the custom channels to obtain the correct trust structure and channel permissions:
-
-----
-mgr-inter-sync -c`YOUR-CHANNEL`
-----
-
+For more information about setting up ISS, see the Inter-Server Synchronization section of the Administration Guide.
