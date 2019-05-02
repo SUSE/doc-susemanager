@@ -91,7 +91,7 @@ antora-suma: clean ##pdf-all-suma ## Build the SUMA Antora static site (See READ
 	s/^ *\(title: *Uyuni\)/#\1/;\
 	s/^ *\(name: *uyuni\)/#\1/;\
 	s/^ *\(start_page: *ROOT:index-uyuni\)/#\1/;" antora.yml
-		docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
+		docker run -u $UID -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
 
 
 
