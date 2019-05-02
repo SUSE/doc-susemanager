@@ -28,14 +28,14 @@ end
 #
 # We style our xrefs in 3 ways:
 #
+#  Specify [MODULE, FILENAME, TITLE]
 # xref:reference:filename.adoc[Title]
-#      module    filename      title
 #
+# Specify [MODULE, SUBDIR, FILENAME, TITLE]
 # xref:reference:systems/filename.adoc[Title]
-#      module    subdir  filename      title
 #
-# xref:reference:/systems/filename.adoc#SECT-ID[Title]
-#      module     subdir  filename     section id  title
+# Specify Specific [MODULE, SUBDIR, FILENAME, SECTION-ID, TITLE]
+# xref:reference:systems/filename.adoc#SECT-ID[Title]
 #
 # These should end up looking like one of the following in PDF:
 #
@@ -44,6 +44,14 @@ end
 # or:
 #
 # [ Reference > Systems > Filename ]
+#
+# without subdir:
+#
+# [ Administration > Image Building]
+#
+# or:
+#
+# [ Administration > Image Building, Section: TITLE]
 #
 # We need to skip internal references <<cve-maintenance>> without the path attribute set Otherwise all of our internal refs are converted into a
 # non clickable link. We need to skip and preserve these.
