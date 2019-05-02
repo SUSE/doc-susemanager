@@ -45,5 +45,5 @@ end
 #
 # [ Reference > Systems > Filename ]
 #
-# We need to skip internal references <<>> without the path attribute set Otherwise all of our internal refs are converted into
+# We need to skip internal references <<cve-maintenance>> without the path attribute set Otherwise all of our internal refs are converted into a
 # non clickable link. We need to skip and preserve these.
