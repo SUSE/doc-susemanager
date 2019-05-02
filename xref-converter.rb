@@ -1,19 +1,53 @@
 class PDFConverter < (Asciidoctor::Converter.for 'pdf')
   register_for 'pdf'
-  puts 'Ooh! Look! A Converter'
   # asciidoctor-pdf -b pdf -r ./tanchor/inline_anchor.rb test.adoc
   def convert_inline_anchor node
-    if node.type == :xref
-      caret = (load_theme node.document).menu_caret_content || %( \u203a )
-      title = node.text
-      path =  node.attr('refid').split(':').map do |element|
-        element.split("-").map {|word| word.capitalize}.join(" ")
-      end
-      path = path.join(caret)
-      %(<strong>[ #{path} #{caret} ] </strong>)
-    else
-      super
+    puts "Ooh! Look! A Converter for #{node.class.inspect} of type #{node.type.inspect} xref #{node.attributes.inspect}"
+    unless node.attr('path')
+      # path == nil means internal reference
+      return super
     end
+    @caret ||= (load_theme node.document).menu_caret_content || %( \u203a )
+    # this should be <module>:{<subdir>/}filename
+    refid = node.attr('refid')
+    unless refid
+      return super
+    end
+    fragment = node.attr('fragment')
+    if fragment
+      return super
+    end
+    puts "path #{node.attr('path').inspect}, refid #{refid.inspect}"
+    # break at :, note: can't use 'module' here (reserved word),
+    xmodule, path = refid.split(':')
+    unless path
+      return super
+    end
+    # break path at /
+    subdir, filename = path.split('/')
+    title = node.text
+    out = [ xmodule.capitalize ]
+    out << subdir.capitalize if subdir
+    out << title
+    puts "\t#{out.join(@caret)}"
+    %(<strong>[ #{out.join(@caret)} ]</strong>)
+#    if node.type == :xref
+#      @caret ||= (load_theme node.document).menu_caret_content || %( \u203a )
+#      puts "node is a #{node.class}"
+#      puts "node.text #{node.text.inspect}"
+#      puts "node.type #{node.type.inspect}"
+#      puts "node.target #{node.target.inspect}"
+#      puts "node.attributes #{node.attributes.inspect}"
+#      exit 1
+#      title = node.text
+#      path =  node.attr('refid').split(':').map do |element|
+#        element.split("-").map {|word| word.capitalize}.join(" ")
+#      end
+#      path = path.join(caret)
+#      %(<strong>[ #{path} #{caret} ] </strong>)
+#    else
+#      super
+#    end
   end
 end
 
@@ -55,3 +89,18 @@ end
 #
 # We need to skip internal references <<cve-maintenance>> without the path attribute set Otherwise all of our internal refs are converted into a
 # non clickable link. We need to skip and preserve these.
+#
+# Example
+#
+# In .adoc
+#   xref:reference:home/home-notification-messages.adoc[Notification Messages]
+# should be converted to
+#   [ Reference > Home > Notification Messages]
+#
+# Generic case
+#
+#  xref:<module>:{<subdir>/}filename.adoc[<title>]
+#  (<subdir>/} is optional
+#
+# [ <Module> > <Subdir> > <title> ]
+#
