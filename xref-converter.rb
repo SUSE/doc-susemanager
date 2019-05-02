@@ -25,3 +25,25 @@ end
 # The presence of the 'path' attribute tells you that it's not an internal reference
 #{title}
 # TODO drop the caret at the end of a the path, if there is a subfolder we need to drop '/' and add a space.
+#
+# We style our xrefs in 3 ways:
+#
+# xref:reference:filename.adoc[Title]
+#      module    filename      title
+#
+# xref:reference:systems/filename.adoc[Title]
+#      module    subdir  filename      title
+#
+# xref:reference:/systems/filename.adoc#SECT-ID[Title]
+#      module     subdir  filename     section id  title
+#
+# These should end up looking like one of the following in PDF:
+#
+# [ Reference > Systems > Filename,  Section: TITLE ]
+#
+# or:
+#
+# [ Reference > Systems > Filename ]
+#
+# We need to skip internal references <<>> without the path attribute set Otherwise all of our internal refs are converted into
+# non clickable link. We need to skip and preserve these.
