@@ -91,7 +91,7 @@ antora-suma: clean ##pdf-all-suma ## Build the SUMA Antora static site (See READ
 	s/^ *\(title: *Uyuni\)/#\1/;\
 	s/^ *\(name: *uyuni\)/#\1/;\
 	s/^ *\(start_page: *ROOT:index-uyuni\)/#\1/;" antora.yml
-		docker run -u $UID -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
+		docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
 
 
 
@@ -113,7 +113,7 @@ pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-refer
 .PHONY: pdf-install-suma
 pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
 	asciidoctor-pdf \
-	    -r ./xref-converter.rb \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -162,7 +162,7 @@ pdf-upgrade-suma: ## Generate PDF version of the SUMA Upgrade Guide
 .PHONY: pdf-reference-suma
 pdf-reference-suma: ## Generate PDF version of the SUMA Reference Manual
 	asciidoctor-pdf \
-	    -r ./xref-converter.rb \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \

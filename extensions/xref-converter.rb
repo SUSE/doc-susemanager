@@ -1,3 +1,9 @@
+###
+### This is the AsciiDoctor-PDF xref-converter template for SUSE/Uyuni Documentation
+###
+### Joseph Cayouette (jcayouette@suse.com), 2019
+### Klaus Kaempf (kkaempf@suse.de), 2019
+###
 class PDFConverter < (Asciidoctor::Converter.for 'pdf')
   register_for 'pdf'
   # asciidoctor-pdf -b pdf -r ./tanchor/inline_anchor.rb test.adoc
