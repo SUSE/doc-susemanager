@@ -18,8 +18,10 @@ Salt commands that are executed from the command line are not subject to these p
 
 Actions are processed in batches.
 This parameter sets the maximum number of clients that can execute a single action in each batch.
+This parameter sets the maximum number of clients that can execute a single action at any one time.
 
 Choosing a lower number can prevent system thrashing, but might reduce overall performance as parallelization is reduced.
+Choosing a lower number will reduce system load and parallelism, but might reduce overall performance for processing actions.
 
 Adjust the [systemitem]``java.salt_batch_size`` parameter.
 Defaults to 200.
@@ -31,9 +33,13 @@ Defaults to 200.
 This parameter sets the amount of time, in seconds, to wait after a batch is processed before beginning to process the next batch.
 The first batch will process the number of actions determined in the batch size parameter, and subsequent batches will process fewer actions.
 The exact number of actions processed in subsequent batches is determined by the number of clients that complete actions before the batch delay timer expires.
+This parameter sets the amount of time, in seconds, to wait after an action is processed before beginning to process the action on the next minion.
+To begin, actions will be processed on the number of minion determined in the batch size parameter.
+As each minion completes, the action begins on a new minion after the specified delay period.
 
 Choosing a higher value for the batch delay timer will result in larger batches, reducing CPU and I/O load on the Salt master.
 Choosing a smaller value will result in smaller batches, increasing load.
+Increasing the delay increases the chance that multiple minions will have completed before the next action is issued, resulting in fewer overall commands, and reducing load.
 
 Adjust the [systemitem]``java.salt_batch_delay`` parameter.
 Defaults to 1.0 seconds.
@@ -53,6 +59,7 @@ Defaults to 4 seconds.
 == Job Timeout
 
 During Salt batch calls, a job runs to handles the presence ping  from the clients.
+During Salt batch calls, a job runs to handles the presence ping from the clients.
 This parameter changes the timeout setting for gathering the presence ping, in seconds.
 
 Adjust the [systemitem]``java.salt_presence_ping_gather_job_timeout`` parameter.
