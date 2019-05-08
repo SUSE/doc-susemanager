@@ -230,12 +230,52 @@ The PXE formula is used to configure PXE booting on the branch server.
 . Navigate to the menu:Formulas[Pxe] tab, and set these parameters:
 * In the [guimenu]``Kernel filename`` field, keep the default value.
 * In the [guimenu]``Initrd filename`` field, keep the default value.
-* In the [guimenu]``Kernel commandline parameters`` field, keep the default value.
+* In the [guimenu]``Kernel command line parameters`` field, keep the default value.
+For more information about possible values, see <<retail.sect.formulas.pxe.kernelparams>>.
 * In the [guimenu]``PXE root directory`` field, enter the path to the saltboot directory (for example, [systemitem]``/srv/saltboot``).
 * In the [guimenu]``Branch id`` field, type a name to use as a branch identifier (for example: [systemitem]``Branch0001``).
 Use only alphanumeric characters for the branch identifier.
 . Click [btn]``Save Formula`` to save your configuration
 . Apply the highstate.
+
+
+
+[[retail.sect.formulas.pxe.kernelparams]]
+=== Kernel Command Line Parameters
+Saltboot supports common kernel parameters and saltboot-specific kernel parameters.
+All the parameters can be entered in the [guimenu]``Kernel Command Line Parameters`` field of the PXE formula.
+
+[systemitem]``kiwidebug=1``::
+starts a shell on tty2 during boot and enables debug log level in Salt.
+
+[systemitem]``MASTER``::
+overrides the Salt master autodetection; for example:
++
+----
+MASTER=myproxy.domain.com
+----
+
+[systemitem]``SALT_TIMEOUT``::
+fallback to the local boot if the Salt master does not apply the saltboot state within this timeout (default: 60s); for example:
++
+----
+SALT_TIMEOUT=300
+----
+
+// see https://bugzilla.suse.com/show_bug.cgi?id=1111348#c3
+[systemitem]``DISABLE_HOSTNAME_ID`` and [systemitem]``DISABLE_UNIQUE_SUFFIX``::
+Option for manipulating the names of the terminals.
+
+[systemitem]``MINION_ID_PREFIX``::
+Branch ID set in the PXE formula form.
+
+[systemitem]``salt_device``
+device that contains the salt configuration.
+
+[systemitem]``root``
+device that contains the already deployed root filesystem.
+It is used for the fallback to local boot.
+
 
 
 [[retail.sect.formulas.saltboot]]
