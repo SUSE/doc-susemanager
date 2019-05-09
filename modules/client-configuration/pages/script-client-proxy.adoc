@@ -1,30 +1,25 @@
 [[script-client-proxy]]
-= Registering Clients on a Proxy with a Script
-
-
-
+= Registering with Bootstrap on a Proxy
 
 
 Registering clients (either traditional or Salt) via {susemgrproxy} with a script is done almost the same way as registering clients directly with the {productname} server.
 The difference is that you create the bootstrap script on the {susemgrproxy} with a command-line tool.
 The bootstrap script then deploys all necessary information to the clients.
-The bootstrap script refers some parameters (such as activation keys or GPG keys) that depend on your specific setup.
+The bootstrap script requires some parameters (such as activation keys or GPG keys) that depend on your specific setup.
 
+.Procedure: Registering clients to a proxy with a bootstrap script
 
 . Create a client activation key on the {productname} server using the {webui}.
-See pass:c[xref:FILENAME.adoc#create.act.keys[]].
-. On the proxy, execute the [command]``mgr-bootstrap`` command-line tool as {rootuser}.
-If needed, use the additional command-line switches to tune your bootstrap script. An important option is [command]``--traditional`` that enables to opt for a traditional client instead of a salt minion.
+See xref:activation-keys[].
+. On the proxy, execute the [command]``mgr-bootstrap`` command line tool as {rootuser}.
+If needed, use the additional command line switches to tune your bootstrap script.
+To install a traditional client instead of a Salt client, ensure you use the [command]``--traditional`` switch.
 +
 To view available options type [command]``mgr-bootstrap --help`` from the command line:
 +
-
 ----
 # mgr-bootstrap --activation-keys=key-string
 ----
-
-. Optionally edit the resulting bootstrap script.
-Execute the bootstrap script on the clients as described in pass:c[xref:FILENAME.adoc#connect.first.client[]].
-
-
-The clients are registered with the {susemgrproxy} specified in the bootstrap script.
++
+. Optional: edit the resulting bootstrap script.
+. Execute the bootstrap script on the clients, following the instructions in xref:run.bootstrap.script[].
