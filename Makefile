@@ -251,7 +251,7 @@ s/^ *\(start_page: *ROOT:index-suma\)/#\1/;\
 s/^ *# *\(title: *Uyuni\)/\1/;\
 s/^ *# *\(name: *uyuni\)/\1/;\
 s/^ *# *\(start_page: *ROOT:index-uyuni\)/\1/;" antora.yml
-		docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:1.1.1 uyuni-site.yml
+		docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:latest uyuni-site.yml
 
 
 
