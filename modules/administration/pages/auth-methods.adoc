@@ -104,3 +104,60 @@ auth       requisite      pam_vas3.so echo_return
 auth       required       pam_deny.so
 account    required       pam_vas3.so no_user_check
 ----
+
+== Authentication Via Single Sign-On (SSON) [tech preview]
+
+=== Single Sign-On
+
+{productname} supports Single Sign-On by implementing the Security Assertion Markup Language (SAML) protocol 2. 
+
+=== Definitions
+
+* Single Sign-On is the authentication process that allows a user to access multiple applications with one set of credentials
+* SAML is a standard for exchanging authentication and authorization data based on XML
+* A SAML Identity Service Provider (IdP) that provides authentication and authorization services to the Service Providers
+* {productname} will be the SAML Service Provider (SP) that consumes the authentication and authorization services
+* {productname} exposes three endpoints required to enable Single Sign-On (see xref:#sson-requirements[Requirements] for the list).
+
+=== What {productname} supports
+
+* Login: via SSO
+* Logout: via Single Logout (SLO) (SP-Initiated) and Single Logout Service (SLS) (IdP-Initiated)
+* Assertion and nameId encryption
+* Assertion signatures
+* Message signatures: AuthNRequest, LogoutRequest, LogoutResponses
+* Enable an Assertion Consumer Service endpoint
+* Enable a Single Logout Service endpoint
+* Publish the SP metadata (which can be signed)
+
+==== What is out scope for {productname} in this guide
+
+* Product choosing and implementation for the Identity Service Provider (IdP)
+* SAML support for other products (please check with the respective product documentation)
+
+[#sson-requirements]
+== Requirements
+
+* An external Identity Service Provider configured (check in your IdP documentation).
+    - You need to configure your IdP by enabling a new application ({productname}) with the following endpoints:
+        - Assertion Consumer Service (or ACS): an endpoint to accept SAML message to establish a session into the Service Provider. The endpoint for ACS in {productname} is: https://YOUR-PRODUCT-HOSTNAME-OR-IP/rhn/manager/ssaml/acs
+        - Single Logout Service (or SLS): an endpoint to initiate a logout request from the IdP. The endpoint for SLS in {productname} is: https://YOUR-PRODUCT-HOSTNAME-OR-IP/rhn/manager/ssaml/sls
+        - Metadata: an endpoint to retrieve {productname} metadata for SAML. The endpoint for Metadata in {productname} is https://YOUR-PRODUCT-HOSTNAME-OR-IP/rhn/manager/ssaml/metadata
+    - The IdP *must* add a SAML:Attribute containing the username of the IdP user domain. This attribute *must* be called `uid`.
+    NOTE: the `uid` passed in the SAML:Attribute *must* be already created in the {productname} user base *before* activating Single Sign-On.
+    Example: after the authentication with the IdP using the user `orgadmin` is successful, you will be logged in into {productname} as the `orgadmin` user, provided that the `orgadmin` user exists in {productname}.
+
+== {productname} Configuration
+
+SSON is *disabled by default*. In order to enable it:
+
+1. Create each user that does not exist in {productname} that you want to be enabled to login via SSON
+2. Edit `/etc/rhn/rhn.conf` and add `java.sson = true` at the end of the file
+3. Configure `/usr/share/rhn/config-defaults/rhn_java_sson.conf` with all the pameters retrieved from your IdP. To find all the occurrences you need to change, search in the file for the two placeholders used to signal that a change is required: `YOUR-PRODUCT` and `YOUR-IDP-ENTITY`. Every parameter comes with a brief explanation of what it is meant for.
+4. Restart spacewalk-service: `spacewalk-service restart`
+
+== Usage
+
+As soon as you visit {productname} URL, you will be redirected to the IdP for SSON where you will be requested to perform authentication.
+Upon successful authentication, you will be redirected to {productname} landing page, already logged in as the user you authenticated with IdP.
+If that does not happen, please check {productname} logs for more information.
