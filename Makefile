@@ -84,7 +84,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
+antora-suma: clean ##pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
 	s/^ # *\(title: *SUSE Manager\)/\1/;\
 	s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
@@ -113,6 +113,7 @@ pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-refer
 .PHONY: pdf-install-suma
 pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -161,6 +162,7 @@ pdf-upgrade-suma: ## Generate PDF version of the SUMA Upgrade Guide
 .PHONY: pdf-reference-suma
 pdf-reference-suma: ## Generate PDF version of the SUMA Reference Manual
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
