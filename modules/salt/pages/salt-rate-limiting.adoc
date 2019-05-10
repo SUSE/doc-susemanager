@@ -14,49 +14,47 @@ Salt commands that are executed from the command line are not subject to these p
 
 
 
-== Batch Size
+== Batching
 
-This parameter sets the maximum number of clients that can execute a single action at the same time.
+There are two parameters that control how actions are sent to clients, one for the batch size, and one for the delay.
 
-Choosing a lower number will reduce system load and parallelism, but might reduce overall performance for processing actions.
+When the Salt master sends a batch of actions to the target minions, it will send it to the number of minions determined in the batch size parameter.
+As each minion completes, the action begins on a new minion after the specified delay period.
 
+Choosing a lower batch size will reduce system load and parallelism, but might reduce overall performance for processing actions.
+
+The batch size parameter sets the maximum number of clients that can execute a single action at the same time.
 Adjust the [systemitem]``java.salt_batch_size`` parameter.
 Defaults to 100.
 
-
-
-== Batch Delay
-
-This parameter sets the amount of time, in seconds, to wait after an action is processed before beginning to process the action on the next minion.
-To begin, actions are processed on the number of minions determined in the batch size parameter.
-As each minion completes, the action begins on a new minion after the specified delay period.
-
 Increasing the delay increases the chance that multiple minions will have completed before the next action is issued, resulting in fewer overall commands, and reducing load.
 
+The batch delay parameter sets the amount of time, in seconds, to wait after an action is processed before beginning to process the action on the next minion.
 Adjust the [systemitem]``java.salt_batch_delay`` parameter.
 Defaults to 1.0 seconds.
 
 
 
-== Ping Timeout
+== Presence Ping Timeout
 
-Salt batch calls begin with the Salt master performing a presence ping on the minions.
-This parameter changes the timeout setting for the presence ping, in seconds.
+There are two parameters that control how presence pings from the Salt master are handled, one for the ping timeout, and one for the ping gather job.
 
-Adjust the [systemitem]``java.salt_presence_ping_timeout`` parameter.
-Defaults to 4 seconds.
+Salt batch calls begin with the Salt master performing a presence ping on the target minions.
+A ping gather job runs on the Salt master to handle the incoming pings from the minions.
 
-
-
-== Ping Gather Job Timeout
-
-During Salt batch calls, a job runs on the Salt clients to handle the presence ping from the master.
-This parameter changes the timeout setting for gathering the presence ping, in seconds.
+The presence ping is an ordinary Salt command, so it is subject to the same timeout parameters as all other Salt commands.
+You can configure the global timeout values in the [filename]``/etc/salt/master.d/custom.conf`` configuration file.
+However, to allow for quicker detection of unresponsive minions, the timeout values for presence pings can be significantly shorter than those used elsewhere.
+Therefore, we recommend that you override the global timeout values by setting specific values for presence pings in [filename]``/etc/rhn/rhn.conf``.
 
 If a minion does not reply to a ping within the allocated time, it will be marked as [systemitem]``not available``, and will be excluded from the command.
 The {webui} will show a [systemitem]``minion is down`` message in this case.
-
 For more information on minion timeouts, see xref:scale-minions.adoc[].
 
+The presence ping timeout parameter changes the timeout setting for the presence ping, in seconds.
+Adjust the [systemitem]``java.salt_presence_ping_timeout`` parameter.
+Defaults to 4 seconds.
+
+The presence ping gather job parameter changes the timeout setting for gathering the presence ping, in seconds.
 Adjust the [systemitem]``java.salt_presence_ping_gather_job_timeout`` parameter.
 Defaults to 1 second.
