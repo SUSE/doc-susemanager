@@ -113,12 +113,12 @@ This feature is provided as a technical preview.
 It is not supported for use in production environments.
 ====
 
-{productname} supports single sign on (SSO) by implementing the Security Assertion Markup Language (SAML){nbsp}2 protocol.
+{productname} supports single sign-on (SSO) by implementing the Security Assertion Markup Language (SAML){nbsp}2 protocol.
 
-Single sign on is an authentication process that allows a user to access multiple applications with one set of credentials.
+Single sign-on is an authentication process that allows a user to access multiple applications with one set of credentials.
 SAML is an XML-based standard for exchanging authentication and authorization data.
 A SAML identity service provider (IdP) provides authentication and authorization services to service providers (SP), such as {productname}.
-{productname} exposes three endpoints which must be enabled for single sign on.
+{productname} exposes three endpoints which must be enabled for single sign-on.
 
 SSO in {productname} supports:
 
@@ -152,12 +152,12 @@ The endpoint for Metadata in {productname} is https://example.com/rhn/manager/ss
 [IMPORTANT]
 ====
 Your IdP must have a SAML:Attribute containing the username of the IdP user domain, called `uid`.
-The `uid` attrribute passed in the SAML:Attribute must be created in the {productname} user base before you activate single sign on.
+The `uid` attrribute passed in the SAML:Attribute must be created in the {productname} user base before you activate single sign-on.
 ====
 
 After the authentication with the IdP using the user `orgadmin` is successful, you will be logged in into {productname} as the `orgadmin` user, provided that the `orgadmin` user exists in {productname}.
 
-Single sign on is disabled by default.
+Single sign-on is disabled by default.
 
 .Procedure: Enabling SSO
 
@@ -165,9 +165,9 @@ Single sign on is disabled by default.
 . Edit `/etc/rhn/rhn.conf` and add this line at the end of the file:
 +
 ----
-java.sson = true
+java.sso = true
 ----
-. Configure `/usr/share/rhn/config-defaults/rhn_java_sson.conf` with the parameters retrieved from your IdP.
+. Configure `/usr/share/rhn/config-defaults/rhn_java_sso.conf` with the parameters retrieved from your IdP.
 To find all the occurrences you need to change, search in the file for the placeholders [systemitem]``YOUR-PRODUCT`` and [systemitem]```YOUR-IDP-ENTITY``.
 Every parameter comes with a brief explanation of what it is meant for.
 . Restart spacewalk-service to pick up the changes:
@@ -176,6 +176,6 @@ Every parameter comes with a brief explanation of what it is meant for.
 spacewalk-service restart
 ----
 
-When you visit the {productname} URL, you will be redirected to the IdP for SSON where you will be requested to authenticate.
+When you visit the {productname} URL, you will be redirected to the IdP for SSO where you will be requested to authenticate.
 Upon successful authentication, you will be redirected to the {productname} {webui}, logged in as the authenticated user.
 If you encounter problems with logging in using SSO, check the {productname} logs for more information.
