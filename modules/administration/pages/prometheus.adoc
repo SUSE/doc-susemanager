@@ -1,4 +1,166 @@
 [[prometheus]]
 = Monitoring with Prometheus
 
-TBD
+Monitoring can be performed in {productname} using Prometheus and Grafana.
+The packages for Prometheus and Grafana are shipped with SUSE Manager Client Tools, as well as packages for several Prometheus exporters.
+{productname} Server and Proxy are now able to provide self-health metrics, or install and manage a limited number of Prometheus exporters on managed client systems.
+
+Prometheus is a monitoring tool, originally built at SoundCloud, that is used to record real-time metrics in a time-series database.
+Unlike other monitoring systems, Prometheus collects metrics using HTTP pulls, allowing for higher performance and scalability.
+Prometheus is an open-source software project, mostly written in Go, and its source code is available at https://github.com/prometheus/.
+
+TODO:: About Grafana ...
+
+Prometheus metrics are time series data, or timestamped values belonging to the same group or dimension.
+A metric is uniquely identified by its name and set of labels.
+
+Example:
+TODO:: This should be an actual image.
+
+----
+   metric name               labels                 timestamp     value
+┌────────┴───────┐  ┌───────────┴───────────┐    ┌──────┴──────┐  ┌─┴─┐
+http_requests_total{status="200", method="GET"}  @1557331801.111  42236
+----
+
+Each application or system being monitored must expose metrics in the format above, either through code instrumentation, or Prometheus exporters.
+
+The different metric types are:
+
+* Counter - cumulative values. ex: number of errors
+* Gauge - can go up or down. ex: temperature
+* Histogram - count observations in buckets
+* Summary - similar to histogram, but provides totals (sum and count)
+
+For more information about metric types, see: https://prometheus.io/docs/concepts/metric_types/
+
+Prometheus has its own query language called PromQL, which is a functional expression language.
+PromQL allows you to filter multi-dimensional time series data.
+It is used in all Prometheus interactions.
+
+In PromQL, an expression can evaluate to one of three types:
+
+* Instant vector: a set of time series containing a single sample for each time series, all sharing the same timestamp
+* Range vector: a set of time series containing a range of data points over time for each time series
+* Scalar: a numeric floating point value.
+
+The core part of any PromQL query is the metric name, for example: ``http_requests_total``.
+Labels can be used as optional selectors.
+This example returns the total number of HTTP requests that have status ``200`` and method ``GET``:
+
+----
+http_requests_total{status="200", method="GET"}
+----
+
+For more information about PromQL, see the official Prometheus documentation: https://prometheus.io/docs/prometheus/latest/querying/basics/).
+
+Exporters are libraries which help in exporting existing metrics from third-party systems as Prometheus metrics.
+Exporters are useful whenever it is not feasible to instrument a given application or system with Prometheus metrics directly.
+Multiple exporters can run on a monitored host to export local metrics.
+
+The Prometheus community provides a list of official exporters, and many others can be found as community contributions.
+For detailed information and an extensive list of exporters, see: https://prometheus.io/docs/instrumenting/exporters/.
+
+With {productname}{nbsp}4, you can set up the Server and Proxy to expose Prometheus metrics to provide insights about {productname} self-health.
+Medtrics are available for these services:
+
+* Hardware and Operating System
+* Java Virtual Machines
+* Apache
+* Squid
+* PostgreSQL
+* {productname} internals
+
+The self-health metrics are made available by {productname} Java application combined with Prometheus standalone exporters, running as systemd daemons.
+
+{productname} requires these packages to be installed on the Server and the Proxy.
+The packages are shipped with {productname} Server and Proxy, but their respective systemd daemons are disabled by default.
+
+These exporter packages are shipped with {productname} Server:
+
+* Node exporter: [systemitem]``golang-github-prometheus-node_exporter``.
+See https://github.com/prometheus/node_exporter.
+* PostgreSQL exporter: [systemitem]``golang-github-wrouesnel-postgres_exporter``.
+See (https://github.com/wrouesnel/postgres_exporter.
+* JMX exporter: [systemitem]``prometheus-jmx_exporter``.
+See https://github.com/prometheus/jmx_exporter.
+* Apache exporter: [systemitem]``golang-github-lusitaniae-apache_exporter``.
+See https://github.com/Lusitaniae/apache_exporter).
+
+These exporter packages are shipped with {productname} Proxy:
+
+* Node exporter: [systemitem]``golang-github-prometheus-node_exporter``.
+See https://github.com/prometheus/node_exporter.
+* Squid exporter: [systemitem]``golang-github-boynux-squid_exporter``.
+See https://github.com/boynux/squid-exporter.
+
+.Procedure: Enabling Monitoring
+
+. In the {productname} {webui}, navigate to menu:Admin[Manager Configuration > Monitoring].
+. Click btn:[Enable services].
+
+TODO:: screenshots and more detailed instructions
+
+== Monitoring Configuration
+
+Prometheus requires some configuration to collect metrics and set up alarms, or to display metrics graphically in Grafana.
+You can configure Prometheus in the static configuration file at [path]``/etc/prometheus/prometheus.yml``.
+It is important to understand how this file is structured.
+For example:
+
+----
+yaml
+- job_name: 'suse-manager-server'
+  static_configs:
+    - targets:
+      - 'suse-manager.local:9100'  # Node exporter
+      - 'suse-manager.local:9187'  # PostgreSQL exporter
+      - 'suse-manager.local:5556'  # JMX exporter (Tomcat)
+      - 'suse-manager.local:5557'  # JMX exporter (Taskomatic)
+      - 'suse-manager.local:9800'  # Taskomatic
+    - targets:
+      - 'suse-manager.local:80'    # Message queue
+      labels:
+        __metrics_path__: /rhn/metrics
+----
+
+For more information about configuring Prometheus, see the official Prometheus documentation: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+
+== Monitoring Managed Systems
+
+Prometheus metrics exporters can also be used on managed client systems.
+The packages are available from the {productname} client tools channels, and can be enabled and configured directly on the {productname} {webui}.
+Currently, two exporters are supported:
+
+  - golang-github-prometheus-node_exporter - Node exporter
+  - golang-github-wrouesnel-postgres_exporter - PostgreSQL exporter
+
+Installing and configuring exporters can be done using a Salt formula.
+
+////
+
+TODO: All this bit!
+
+#### Configuration
+
+  - TODO: describe how to enable the formula
+
+##### Node exporter
+
+  - Node exporter can be enabled or disabled. Currently there are no configuration options.
+
+##### PostgreSQL exporter
+
+  - TODO: describe configuration options
+
+## Grafana
+
+  - Used to query and visualize metrics
+  - Grafana supports multiple backends, not only Prometheus
+  - It is possible to combine data from different sources in the same dashboard
+  - Collection of add-ons and pre-built dashboards
+
+### Visualizing SUSE Manager metrics
+
+  - TODO: Sample SUSE Manager dashboard
+////
