@@ -74,24 +74,19 @@ If you want the dump to be stored somewhere else, change the definition of the v
 == Setup the Target Machine
 
 
-To prepare the target machine (with the example host name ``suma30``) proceed as follows:
+To prepare the target machine (with the example host name ``suma40``) proceed as follows:
 
 [[proc.mgr.migration.setup.target]]
 .Procedure: Setup Target Machine
-. On the target machine install {sls} 12 SP2 including the extension product "`{productname}`" .
+. On the target machine install "`{productname}`" Server with the Unified Installer ({sle} 15 SP1).
 +
-.Background Information on Required Target Machine
-IMPORTANT: It is actually required to install version 12 SP2 on the target machine.
-On that version you will upgrade the PostgreSQL database from version_9.4 to 9.6.
-For more information about the PostgreSQL upgrade, see <<bp.sect.postgresql.prepare.upgrade>>.
-+
-
-. Initiate [command]``yast2 susemanagersetup`` as you would normally do for an installation of {productname}.
-+
-For more information about installing {productname}, see <<sles.installation.within.kvm.jeos>>.
-. On the first {productname} setup screen, ensure that menu:Migrate a SUSE Manager compatible server[] is marked instead of menu:Set up SUSE Manager from scratch[] .
-. On the second screen, enter the name of the source system as menu:Hostname of source SUSE Manager Server[] as well as the domain name. Also enter the database credentials of the source system.
-. On the next screen, you will need to specify the IP address of the {productname} 3 target system. Normally this value should be pre-set to the correct value and you only should need to press kbd:[Enter] . Only in the case of multiple IP addresses you might need to specify the one that should be used during migration.
+For more information about installing {productname}, see <<install-server-unified>>.
+. Initiate [command]``yast2 susemanagersetup`` as you would normally do for a setup of {productname}.
+. On the first {productname} setup screen, ensure that [guimenu]``Migrate a SUSE Manager compatible server`` is marked instead of [guimenu]``Set up SUSE Manager from scratch``.
+. On the second screen, enter the name of the source system as [guimenu]``Hostname of source SUSE Manager Server`` as well as the domain name. Also enter the database credentials of the source system.
+. On the next screen, you need to specify the IP address of the {productname} 4 target system.
+Normally this value should be pre-set to the correct value and you only should need to press kbd:[Enter].
+Only in the case of multiple IP addresses you might need to specify the one that should be used during migration.
 +
 .Faking the Host Name
 IMPORTANT: During the migration process, the target system will fake its host name to be the same as the source system, this is necessary as the host name of a {productname} installation is vital and should not be changed once set.
@@ -103,38 +98,34 @@ Therefore do not be confused when logging in to your systems during migration; t
 .Database Parameters
 IMPORTANT: Specify the database parameters using the same database parameters as the source system is recommended.
 At least, using the the same database credentials as when creating the source or original {productname} database is mandatory.
-+
 
-
-+
-Enter your SCC credentials.
-After all the data has been gathered, {yast}
-will terminate.
+. Enter your SCC credentials.
+After all the data has been gathered, {yast} will terminate.
 
 
 The actual migration will not start automatically but needs to be triggered manually as outlined in <<bp.sec.mgr.migration.performing>>.
 
+
+
 [[bp.sec.mgr.migration.performing]]
 == Performing the Migration
 
-
-A migration is performed by excecuting the following command:
+The migration is performed by excecuting the following command:
 
 ----
 /usr/lib/susemanager/bin/mgr-setup -m
 ----
 
-
 This command reads the data gathered during <<proc.mgr.migration.setup.target>>, sets up {productname} onto a new target machine and transfers all of the data from the source machine.
 As several operations need to be performed on the source machine via SSH, you will be prompted once for the root password of the source machine.
-A temporary SSH key named `migration-key` is created and installed on the source machine, so you need to give the {rootuser}
- password only once.
+A temporary SSH key named `migration-key` is created and installed on the source machine, so you need to give the {rootuser} password only once.
 The temporary SSH key will be deleted after successful migration.
 Ideally, this is all you will need to do.
 
 Depending on the size of the installation, the actual migration will take up to several hours.
-Once finished, you will be prompted to shutdown the source machine, re-configure the network of the target machine to use the same IP address and host name as the original machine and restart it.
-It should now be a fully functional replacement for your previous {productname} 2.1 installation.
+When finished, you will be prompted to shut down the source machine, re-configure the network of the target machine to use the same IP address and host name as the original machine and restart it.
+It should now be a fully functional replacement for your previous {productname} 3.2  installation.
+
 The following numbers illustrate the runtime for dumping and importing a small database:
 
 ----
@@ -151,54 +142,101 @@ For big installations this can take up to several hours.
 You should also account for the time it takes to copy all the package data to the new machine.
 Depending on your network infrastructure and hardware, this can also take a significant amount of time.
 
+
+
 [[bp.sec.mgr.migration.speedup]]
 == Speeding up the Migration
 
-
 A complete migration can consume a lot of time.
 This is caused by the amount of data that must be copied.
-Total migration time can be greatly decreased by eliminating the need to copy data prior to performing the migration (for example, channels, packages, auto-install images, and any additional data). You can gather all data via {yast}
-by running the command [command]``mgr-setup -r``.
+Total migration time can be greatly decreased by eliminating the need to copy data prior to performing the migration (for example, channels, packages, auto-install images, and any additional data).
+You can gather all data via {yast} by running:
+
+----
+mgr-setup -r
+----
 
 Executing [command]``mgr-setup -r`` will copy the data from the old server to the new one.
 This command may be run at any time and your current server will remain fully functional.
-Once the migration has been initiated only data changed since running [command]``mgr-setup -r`` will need to be transferred which will significantly reduces downtime.
+When the migration has been initiated only data changed since running [command]``mgr-setup -r`` will need to be transferred.
+This significantly reduces downtime.
 
 On large installations transfering the database (which involves dumping the database onto the source machine and then importing the dump onto the target system) will still take some time.
 During the database transfer no write operations should occur therefore the migration script will shut down any {productname} database services running on the source machine.
+
+
 
 [[bp.sec.mgr.migration.pkg.extern]]
 == Packages on External Storage
 
 
-Some installations may store the package data on external storage (for example, NFS mount on [path]``/var/spacewalk/packages``
-). You do not need to copy this data to the new machine.
-Edit the script located in [path]``/usr/lib/susemanager/bin/mgr-setup``
- and remove the respective [command]``rsync`` command (located around line 345).
+Some installations may store the package data on external storage (for example, NFS mount on [path]``/var/spacewalk/packages``).
+You do not need to copy this data to the new machine.
+Edit the script located in [path]``/usr/lib/susemanager/bin/mgr-setup`` and remove the respective [command]``rsync`` command (located around line 442).
 
 .Mounting External Storage
 [IMPORTANT]
 ====
 Make sure your external storage is mounted on the new machine before starting the system for the first time.
-Analogue handling for [path]``/srv/www/htdocs/pub``
- if appropriate.
+Analogue handling for [path]``/srv/www/htdocs/pub`` if appropriate.
 
 In general, all needed files and directories, not copied by the migration tool, should be copied to the new server manually.
 ====
 
+
+
 [[bp.sec.mgr.migration.trouble]]
-== Troubleshooting a Broken {webui} after Migration
+== Troubleshooting
 
+=== Broken {webui} after Migration
 
-It is possible that the {webui}
-may break during migration.
+It is possible that the {webui} may break during migration.
 This behavior is not a bug, but a browser caching issue.
 The new machine has the same host name and IP address as the old machine.
 This duplication can confuse some Web browsers.
 If you experience this issue reload the page.
-For example, in Firefox pressing the key combination kbd:[Ctrl+F5]
- should resume normal functionality.
+For example, in Firefox pressing the key combination kbd:[Ctrl+F5] should resume normal functionality.
 
+
+
+=== Not Enough Disk Space
+
+In case of trouble check available disk space.
+It is recommended to have /var/spacewalk and /var/lib/pgsql on separate (XFS) file systems.
+Make sure to remove the subvolume entry in /etc/fstab for the subvolume of /var/lib/pqsql when using a separate file system and reboot the server first before continuing.
+
+
+
+===  Corrupted Database Dump
+
+Check the output of the following command (replace [literal]``<SUMA_3.2_MACHINE>`` with the actual host name of your 3.2 source machine):
+
+----
+ssh root@<SUMA_3.2_MACHINE> "su -s /bin/bash - postgres -c exit"
+----
+
+This command must not produce any output.
+Output can lead to a corrupted transfer of the archive with the database dump. Re-visit your bash environment on the 3.2 source machine (for example, the [filename]``.bashrc`` file) and make sure no extra text is printed on the shell start.
+
+
+=== Retrying to Set Up the New Server
+
+To retry setting up the new server, perform the following step on the new server machine:
+
+. remove /root/.MANAGER_SETUP_COMPLETE
+. stop postgresql and remove /var/lib/pgsql/data
+. set the hostname correctly (it now has the host name from the old {productname} server)
+. correct the /etc/hosts file
+. on the new server check /etc/setup_env.sh and see if the correct database name is set:
++
+----
+MANAGER_DB_NAME='susemanager'
+----
+. reboot the server before running [command]``mgr-setup`` again.
+
+
+
+// FIXME: 2019-05-016, ke: replace it with version 4 output
 [[bp.sec.mgr.migration.example]]
 == Example Session
 
