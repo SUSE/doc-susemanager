@@ -67,29 +67,58 @@ By default, {productname} globally sets `timeout` and `gather_job_timeout` to 12
 So, in the worst case, a Salt call targeting unreachable minions will end up _with 240 seconds of waiting_ until getting a response.
 
 [[bp.chap.salt.minion.scaleability.timeouts.presence]]
-=== A Presence Ping Mechanism for Unreachable Salt Minions
+=== Presence Ping Timeout
+
+There are two parameters that control how presence pings from the Salt master are handled, one for the ping timeout, and one for the ping gather job.
+
+Salt batch calls begin with the Salt master performing a presence ping on the target minions.
+A ping gather job runs on the Salt master to handle the incoming pings from the minions.
+Batched commands will begin only after all minions have either responded to the ping, or timed out.
+
+The presence ping is an ordinary Salt command, but is not subject to the same timeout parameters as all other Salt commands (`timeout`/`gather_job_timeout`), rather, it has its own parameters (`presence_ping_timeout`/`presence_ping_gather_job_timeout`).
+You can configure the global timeout values in the [filename]``/etc/salt/master.d/custom.conf`` configuration file.
+However, to allow for quicker detection of unresponsive minions, the timeout values for presence pings are by default significantly shorter than those used elsewhere.
+You can configure the presence ping parameters in [filename]``/etc/rhn/rhn.conf``, however the default values should be sufficient in most cases.
+
+A lower total presence ping timeout value will increase the chance of false negatives.
+In some cases, a minion might be marked as non-responding, when it is responding, but did not respond quickly enough.
+A higher total presence ping timeout will increase the accuracy of the test, as even slow minions will respond to the presence ping before timing out.
+Additionally, a higher presence ping timeout could limit throughput if you are targeting a large number of minions, when some of them are slow.
+
+If a minion does not reply to a ping within the allocated time, it will be marked as [systemitem]``not available``, and will be excluded from the command.
+The {webui} will show a [systemitem]``minion is down`` message in this case.
+
+For more information on minion timeouts, see xref:scale-minions.adoc[].
+
+The presence ping timeout parameter changes the timeout setting for the presence ping, in seconds.
+Adjust the [systemitem]``java.salt_presence_ping_timeout`` parameter.
+Defaults to 4 seconds.
+
+The presence ping gather job parameter changes the timeout setting for gathering the presence ping, in seconds.
+Adjust the [systemitem]``java.salt_presence_ping_gather_job_timeout`` parameter.
+Defaults to 1 second.
+
+== Batching
+
+There are two parameters that control how actions are sent to clients, one for the batch size, and one for the delay.
+
+When the Salt master sends a batch of actions to the target minions, it will send it to the number of minions determined in the batch size parameter.
+After the specified delay period, commands will be sent to the next batch of minions.
+The number of minions in each subsequent batch is equal to the number of minions that have completed in the previous batch.
+
+Choosing a lower batch size will reduce system load and parallelism, but might reduce overall performance for processing actions.
+
+The batch size parameter sets the maximum number of clients that can execute a single action at the same time.
+Adjust the [systemitem]``java.salt_batch_size`` parameter.
+Defaults to 100.
+
+Increasing the delay increases the chance that multiple minions will have completed before the next action is issued, resulting in fewer overall commands, and reducing load.
+
+The batch delay parameter sets the amount of time, in seconds, to wait after a command is processed before beginning to process the command on the next minion.
+Adjust the [systemitem]``java.salt_batch_delay`` parameter.
+Defaults to 1.0 seconds.
 
 
-In order to prevent waiting until timeouts are reached when some minions are down, {suse}
-introduced a so-called "presence mechanism" for Salt minions.
-
-This presence mechanism checks for unreachable Salt minions when {productname} is performing synchronous calls to these minions, and it excludes unreachable minions from that call.
-Synchronous calls are going to be displaced in favor of asynchronous calls but currently still being used during some workflows.
-
-The presence mechanism triggers a Salt [command]``test.ping`` with a custom and fixed short Salt timeout values.
-Default Salt values for the presence ping are: `timeout
-     = 4` and ``gather_job_timeout = 1``.
-This way, we can quickly detect which targeted minions are unreachable, and then exclude them from the synchronous call.
-
-=== Overriding Salt Presence Timeout Values
-
-{productname} administrators can increase or decrease default presence ping timeout values by removing the comment markers (``\#``) and setting the desired values for `salt_presence_ping_timeout` and `salt_presence_ping_gather_job_timeout` options in [path]``/etc/rhn/rhn.conf``:
-
-----
-# SUSE Manager presence timeouts for Salt minions
-# salt_presence_ping_timeout = 4
-# salt_presence_ping_gather_job_timeout = 1
-----
 
 === Salt SSH Minions (SSH Push)
 
