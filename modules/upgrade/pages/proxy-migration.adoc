@@ -25,10 +25,14 @@ Proxies that are Salt minions cannot be migrated to the new version this way.
 
 == Upgrading SUSE Manager Proxy In-place
 
-First you need to create an autoinstallable distribution based on SLES 15 SP1 because SUSE Manager Proxy 4 is based on this version. Refer to the SUSE Manager documentation on how to create an autoinstallable distribution.
+First you need to create an autoinstallable distribution based on SLES 15 SP1 because SUSE Manager Proxy 4 is based on this version.
+For creating autoinstallable distribution, see xref:#ref.webui.systems.autoinst.distribution.
 
-After that you need to create an autoinstallation profile. In this example the label "proxy4" is being used both for the autoinstallable distribution as well as for the autoinstall profile. Use the following autoinstallation as template and create the autoinstallation profile by uploading the edited file:
+You must create an autoinstallation profile.
+In the following template example the label [literal]``proxy4`` is being used both for the autoinstallable distribution as well as for the autoinstall profile.
+Upload the edited autoinstallation profile to your {productname} server.
 
+----
 <?xml version="1.0"?>
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
@@ -133,12 +137,16 @@ After that you need to create an autoinstallation profile. In this example the l
     </chroot-scripts>
   </scripts>
 </profile>
+----
 
-Make sure all the channels referenced in this file are available and fully synced. Replace the label "proxy4" by the one you chose for your autoinstallation profile.
+Make sure all the channels referenced in this file are available and fully synced.
+Replace the label [literal]``proxy4`` with the one you use for your autoinstallation profile.
 
-In "Kernel Options" enter the following value:
+In [guimenu]``Kernel Options`` enter the following value:
 
+----
 autoupgrade=1 Y2DEBUG=1
+----
 
 The debug setting is not required but can help investigating problems in case something goes wrong. The "autoupgrade" parameter however is vital!
 
