@@ -32,11 +32,10 @@ For larger installations, this number may be increased by editing the following 
 LimitNOFILE=16384
 ----
 
+
+
 [[bp.chap.salt.minion.scaleability.timeouts]]
 == Salt Timeouts
-
-=== Background Information
-
 
 Salt features two timeout parameters called `timeout` and `gather_job_timeout` that are relevant during the execution of Salt commands and jobs--it does not matter whether they are triggered using the command line interface or API.
 These two parameters are explained in the following article.
@@ -54,17 +53,17 @@ salt '*' test.ping
 * Salt master is looking at the Salt RET channel to gather responses from the minions.
 * If Salt master gets all responses from targeted minions, then everything is completed and Salt master will return a response containing all the minion responses.
 
-
 If some of the minions are down during this process, the workflow continues as follows:
 
-. If `timeout` is reached before getting all expected responses from the minions, then Salt master would trigger an aditional job (a Salt [command]``find_job`` job) targeting only pending minions to check whether the job is already running on the minion.
+. If `timeout` is reached before getting all expected responses from the minions, then Salt master would trigger an additional job (a Salt [command]``find_job`` job) targeting only pending minions to check whether the job is already running on the minion.
 . Now `gather_job_timeout` is evaluated. A new counter is now triggered.
 . If this new [command]``find_job`` job responses that the original job is actually running on the minion, then Salt master will wait for that minion's response.
 . In case of reaching `gather_job_timeout` without having any response from the minion (neither for the initial [command]``test.ping`` nor for the [command]``find_job`` job), Salt master will return with only the gathered responses from the responding minions.
 
-
 By default, {productname} globally sets `timeout` and `gather_job_timeout` to 120 seconds.
 So, in the worst case, a Salt call targeting unreachable minions will end up _with 240 seconds of waiting_ until getting a response.
+
+
 
 [[bp.chap.salt.minion.scaleability.timeouts.presence]]
 === Presence Ping Timeout
