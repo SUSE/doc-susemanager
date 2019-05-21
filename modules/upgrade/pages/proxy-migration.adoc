@@ -23,14 +23,27 @@ Proxies that are Salt minions cannot be migrated to the new version this way.
 
 
 
+[[proxy-migration-inplace]]
 == Upgrading SUSE Manager Proxy In-place
 
-First you need to create an autoinstallable distribution based on SLES 15 SP1 because SUSE Manager Proxy 4 is based on this version.
-For creating autoinstallable distribution, see xref:#ref.webui.systems.autoinst.distribution.
 
-You must create an autoinstallation profile.
-In the following template example the label [literal]``proxy4`` is being used both for the autoinstallable distribution as well as for the autoinstall profile.
-Upload the edited autoinstallation profile to your {productname} server.
+
+[[proxy-migration-inplace-prep]]
+=== Preparation
+
+.Procedure: Preparation
+. First you need to create an autoinstallable distribution based on SLE 15 SP1 because the SUSE Manager Proxy 4 product is based on this version.
+For creating an autoinstallable distribution, see xref:#ref.webui.systems.autoinst.distribution.
+. Create an autoinstallation profile.
+For more information, see xref:#proxy-migration-inplace-profile.
+In the following template example the label [literal]``proxy4`` is used for both the autoinstallable distribution and for the autoinstall profile.
+
+
+
+[[proxy-migration-inplace-profile]]
+=== Autoinstallation Profile
+
+Use this autoinstallation profile as an example.
 
 ----
 <?xml version="1.0"?>
@@ -139,20 +152,36 @@ Upload the edited autoinstallation profile to your {productname} server.
 </profile>
 ----
 
-Make sure all the channels referenced in this file are available and fully synced.
-Replace the label [literal]``proxy4`` with the one you use for your autoinstallation profile.
+.Procedure
+. Make sure all the channels referenced in this autoinstallation profile are available and fully synced.
+. Replace the label [literal]``proxy4`` with the one you use for your autoinstallation profile.
 
-In [guimenu]``Kernel Options`` enter the following value:
 
+
+=== Running the In-place Upgrade
+
+
+
+.Procedure
+. In the {webui}, upload the edited autoinstallation profile to your {productname} server.
+. In the [guimenu]``Kernel Options`` field, enter the following value:
++
 ----
 autoupgrade=1 Y2DEBUG=1
 ----
++
+The debug setting is not required but can help investigating problems in case something goes wrong.
+The [literal]``autoupgrade` parameter however is mandatory.
+. Select the proxy from the system list in SUSE Manager, click Provisioning and select the profile just created.
+. Click start autoinstallation.
+The system will download the needed files, change the bootloader entries, reboot and will start the automatic upgrade.
 
-The debug setting is not required but can help investigating problems in case something goes wrong. The "autoupgrade" parameter however is vital!
 
-Now select the proxy from the system list in SUSE Manager, click on Provisioning and select the profile just created. Then click on start autoinstallation. The system will download the needed files, change the bootloader entries, reboot and will start the automatic upgrade.
-Cleanup
 
-After the proxy has completed the automatic upgrade process, it still will have the old channels from SUSE Manager assigned. So in case updates are reported for the proxy, do not apply them, but select the proxy from the system list, click on change channel assignment and deselect the old channels and assign the new ones that have also been used for the upgrade itself.
+=== Cleanup
 
-Now all clients behind the previous SUSE Manager Proxy can access the SUSE Manager Server again and the proxy itself can be managed by SUSE Manager server like before. 
+After the proxy has completed the automatic upgrade process, it still will have the old channels from SUSE Manager assigned.
+So in case updates are reported for the proxy, do not apply them.
+Instead select the proxy from the system list, click change channel assignment. Then deselect the old channels and assign the new ones that have also been used for the upgrade itself.
+
+Now, all the clients connected with the previous SUSE Manager Proxy can access the SUSE Manager Server again and the proxy itself can be managed by the SUSE Manager server as before.
