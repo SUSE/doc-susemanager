@@ -84,7 +84,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: clean ##pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
+antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
 	s/^ # *\(title: *SUSE Manager\)/\1/;\
 	s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
@@ -273,6 +273,7 @@ pdf-all-uyuni: pdf-install-uyuni pdf-client-config-uyuni pdf-upgrade-uyuni pdf-r
 .PHONY: pdf-install-uyuni
 pdf-install-uyuni: ## Generate PDF version of the UYUNI Installation Guide
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -289,6 +290,7 @@ pdf-install-uyuni: ## Generate PDF version of the UYUNI Installation Guide
 .PHONY: pdf-client-config-uyuni
 pdf-client-config-uyuni: ## Generate PDF version of the UYUNI Client Configuraiton Guide
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -305,6 +307,7 @@ pdf-client-config-uyuni: ## Generate PDF version of the UYUNI Client Configurait
 .PHONY: pdf-upgrade-uyuni
 pdf-upgrade-uyuni: ## Generate PDF version of the UYUNI Upgrade Guide
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -321,6 +324,7 @@ pdf-upgrade-uyuni: ## Generate PDF version of the UYUNI Upgrade Guide
 .PHONY: pdf-reference-uyuni
 pdf-reference-uyuni: ## Generate PDF version of the UYUNI Reference Manual
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -337,6 +341,7 @@ pdf-reference-uyuni: ## Generate PDF version of the UYUNI Reference Manual
 .PHONY: pdf-administration-uyuni
 pdf-administration-uyuni: ## Generate PDF version of the UYUNI Administration Guide
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -353,6 +358,7 @@ pdf-administration-uyuni: ## Generate PDF version of the UYUNI Administration Gu
 .PHONY: pdf-salt-uyuni
 pdf-salt-uyuni: ## Generate PDF version of the UYUNI Salt Guide
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -369,6 +375,7 @@ pdf-salt-uyuni: ## Generate PDF version of the UYUNI Salt Guide
 .PHONY: pdf-retail-uyuni
 pdf-retail-uyuni: ## Generate PDF version of the UYUNI Retail Guide
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -385,6 +392,7 @@ pdf-retail-uyuni: ## Generate PDF version of the UYUNI Retail Guide
 .PHONY: pdf-architecture-uyuni
 pdf-architecture-uyuni: ## Generate PDF version of the UYUNI Architecture Guide
 	asciidoctor-pdf \
+	    -r ./extensions/xref-converter.rb \
 		-a productname=$(PRODUCTNAME_UYUNI) \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
