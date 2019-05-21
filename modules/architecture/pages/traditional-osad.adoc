@@ -14,7 +14,7 @@ OSAD has several distinct components:
 
 * The [systemitem]``osa-dispatcher`` service runs on the server, and uses database checks  to determine if clients need to be pinged, or if actions need to be executed.
 
-* The [systemitem]``mgr-osad`` service runs on the client. It responds to pings from [systemitem]``osa-dispatcher`` and runs [command]``mgr_check`` to execute actions when directed to do so.
+* The [systemitem]``osad`` service runs on the client. It responds to pings from [systemitem]``osa-dispatcher`` and runs [command]``mgr_check`` to execute actions when directed to do so.
 
 * The [systemitem]``jabberd`` service is a daemon that uses the [systemitem]``XMPP`` protocol for communication between the client and the server.
 The [systemitem]``jabberd`` service also handles authentication.
@@ -23,8 +23,8 @@ The [systemitem]``jabberd`` service also handles authentication.
 It is triggered by communication from the [systemitem]``osa-dispatcher`` service.
 
 The [systemitem]``osa-dispatcher`` periodically runs a query to check when clients last showed network activity.
-If it finds a client that has not shown activity recently, it will use [systemitem]``jabberd`` to ping all [systemitem]``mgr-osad`` instances running on all clients registered with your {productname} server.
-The [systemitem]``mgr-osad`` instances respond to the ping using [systemitem]``jabberd``, which is running in the background on the server.
+If it finds a client that has not shown activity recently, it will use [systemitem]``jabberd`` to ping all [systemitem]``osad`` instances running on all clients registered with your {productname} server.
+The [systemitem]``osad`` instances respond to the ping using [systemitem]``jabberd``, which is running in the background on the server.
 When the [systemitem]``osa-dispatcher`` receives the response, it marks the client as online.
 If the [systemitem]``osa-dispatcher`` fails to receive a response within a certain period of time, it marks the client as offline.
 
@@ -39,11 +39,11 @@ image::dia-osad.png[]
 
 == Enabling and Configuring OSAD
 
-This section covers enabling the [systemitem]``osa-dispatcher`` and [systemitem]``mgr-osad`` services, and performing initial setup.
+This section covers enabling the [systemitem]``osa-dispatcher`` and [systemitem]``osad`` services, and performing initial setup.
 
 OSAD clients use the fully qualified domain name (FQDN) of the server to communicate with the [systemitem]``osa-dispatcher`` service.
 
-SSL is required for [systemitem]``mgr-osad`` communication.
+SSL is required for [systemitem]``osad`` communication.
 If SSL certificates are not available, the daemon on your client systems will fail to connect.
 Make sure your firewall rules are set to allow the required ports.
 For more information, see pass:c[xref:tab.install.ports.server[Server Ports]].
@@ -60,14 +60,14 @@ systemctl start osa-dispatcher
 The [systemitem]``mgr-osad`` package should be installed on clients only.
 If you install the [systemitem]``mgr-osad`` package on your {productname} Server, it will conflict with the [systemitem]``osa-dispatcher`` package.
 
-. On the client systems, as the root user, start the [systemitem]``mgr-osad`` service:
+. On the client systems, as the root user, start the [systemitem]``osad`` service:
 +
 
 ----
-systemctl start mgr-osad
+systemctl start osad
 ----
 +
-Because [systemitem]``mgr-osad`` and [systemitem]``osa-dispatcher`` are run as services, you can use standard commands to manage them, including [command]``stop``, [command]``restart``, and [command]``status``.
+Because [systemitem]``osad`` and [systemitem]``osa-dispatcher`` are run as services, you can use standard commands to manage them, including [command]``stop``, [command]``restart``, and [command]``status``.
 
 .Configuration and Log Files
 Each OSAD component is configured by local configuration files.
@@ -77,8 +77,8 @@ We recommend you keep the default configuration parameters for all OSAD componen
 |===
 | Component                        | Location | Path to Configuration File
 | [systemitem]``osa-dispatcher``   | Server   | [path]``/etc/rhn/rhn.conf`` Section: [systemitem]``OSA configuration``
-| [systemitem]``mgr-osad``             | Client   | [path]``/etc/sysconfig/rhn/mgr-osad.conf`` [path]``/etc/syseconfig/rhn/up2date``
-| [systemitem]``mgr-osad``  log file   | Client   | [path]``/var/log/mgr-osad``
+| [systemitem]``osad``             | Client   | [path]``/etc/sysconfig/rhn/osad.conf`` [path]``/etc/syseconfig/rhn/up2date``
+| [systemitem]``osad``  log file   | Client   | [path]``/var/log/osad``
 | [systemitem]``jabberd`` log file | Both     | [path]``/var/log/messages``
 |===
 
