@@ -1,0 +1,69 @@
+[[retail.deploy_terminals]]
+= Deploying terminals
+
+For hardware requirements, see xref:retail_chap_components.adoc#retail.sect.components.pos-terminals[Point-of-Service Terminals].
+
+Before terminals can be deployed, ensure you have prepared a saltboot based OS image.
+For how to build OS images, see https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-advanced-topics/html/book.suma.advanced.topics/at.images.html#at.images.kiwi.
+
+Each terminal requires a specific hardware type, which contains information about the product name and terminal manufacturer.
+However, the {susemgr} database does not have this information to begin with.
+In order to tell {susemgr} what image to deploy on each terminal, you can set hardware type groups.
+After you have created your new hardware type group, you can apply the [systemitem]``saltboot-formula`` to the group and configure it for your environment.
+
+After you have registered new terminals, always check the {susemgr} {webui} to ensure your terminal has connected successfully to the branch server, and you have not connected directly to the {susemgr} server by mistake.
+
+
+
+== Create a Hardware Type group
+
+Hardware types allow you to group devices according to manufacturer and device name, so that all devices of a particular type can be managed as one.
+
+You will need to create appropriate hardware types in your system.
+
+Empty profiles can be assigned to a hardware type group either before or after registration.
+If an empty profile is not assigned to a hardware type group before registration, it will be assigned to group that best matches the product information available to it.
+
+For this procedure, you will require the system manufacturer name and product name for your terminal.
+
+.Procedure: Creating a Hardware Type group
+
+. Determine the hardware type group name.
+Prefix the name with [systemitem]``HWTYPE:``, followed by the system manufacturer name and product name, separated by a hyphen.
+For example:
++
+----
+HWTYPE:POSVendor-Terminal1
+----
++
+[IMPORTANT]
+====
+Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type group names.
+Spaces and other non-alphanumeric characters will be removed when the name is processed.
+====
++
+. In the {susemgr} {webui}, navigate to menu:Main Navigation[Systems > System Groups], and click the btn:[Create Group] button.
+. In the [guimenu]``Create System Group`` dialog, create a new system group, using the hardware type group name you created earlier.
+
+Power on your point-of-service terminals.
+The branch server will bootstrap the terminals according to the data you have provided.
+
+
+[[retail.sect.admin.terminal_naming]]
+== Terminal Names
+
+In the {susemgr} {webui}, terminals have a standard naming format which allows you to match the physical device with its record.
+By default, the name uses this format:
+
+----
+BranchName.Manufacturer-ProductName-SerialNumber-MachineID
+----
+
+For example:
+
+----
+B002.TOSHIBA-6140100-41BA03X-c643
+----
+
+You can adjust this behavior by toggling the [systemitem]``DISABLE_HOSTNAME_ID`` and [systemitem]``DISABLE_UNIQUE_SUFFIX`` parameters in the PXE formula settings.
+For more information about the PXE formula, see xref:retail.chap.formulas.adoc#retail.sect.formulas.pxe[PXE Formula].
