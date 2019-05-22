@@ -187,9 +187,15 @@ Keep the server monitored in order to identify possible issues early.
 * Increase the number of Salt master workers so that more requests can run in parallel (otherwise Tomcat and Taskomatic workers will starve waiting for the Salt API, and Salt will not be able to serve files timely). Set parameter [parameter]``worker_threads: 100`` in [path]``/etc/salt/master.d/susemanager.conf`` (affects onboarding and patching).
 ** Increase this parameter further if file management states fail with the error "Unable to manage file: Message timed out"
 ** Note that Salt master workers can consume significant amounts of RAM (typically about 70{nbsp}MB per worker). It is recommended to keep usage monitored when increasing this value and to do so in relatively small increments (eg. 20) until failures are no longer produced.
-* Disable daily comparison of configuration files. Click on menu:Admin[Task Schedules], then on the btn:[compare-configs-default] link, then on the btn:[Disable Schedule] button and finally on btn:[Delete Schedule].
 * Increase the maximum heap memory for the search daemon to be able to index many minions. Set 4 GiB instead of the current default 512 MB: add [parameter]``rhn-search.java.maxmemory=4096`` in [path]``/etc/rhn/rhn.conf`` (affects background indexing only).
+* Consider disabling Taskomatic jobs, especially if the provided functionality is not used:
+** Disable daily comparison of configuration files.
+Click menu:Admin[Task Schedules], then the btn:[compare-configs-default] link, then the btn:[Disable Schedule] button and finally btn:[Delete Schedule].
+** Disable hourly synchronization of Cobbler files.
+Click menu:Admin[Task Schedules], then the btn:[cobbler-sync-default] link, then the btn:[Disable Schedule] button and finally btn:[Delete Schedule].
+** Disable daily run of Gatherer and Subscription Matcher.
+Click menu:Admin[Task Schedules], then the btn:[gatherer-matcher-default] link, then the btn:[Disable Schedule] button and finally btn:[Delete Schedule].
 
-Note that increasing the number of Postgres connections will require more RAM, make sure the {productname} server is monitored and swap is never used.
+Note that increasing the number of PostgreSQL connections will require more RAM, make sure the {productname} server is monitored and swap is never used.
 
 Also note the above settings should be regarded as guidelines{mdash}they have been tested to be safe but care should be exercised when changing them, and consulting support is highly recommended.
