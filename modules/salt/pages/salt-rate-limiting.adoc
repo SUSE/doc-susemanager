@@ -66,3 +66,26 @@ Defaults to 4 seconds.
 The presence ping gather job parameter changes the timeout setting for gathering the presence ping, in seconds.
 Adjust the [systemitem]``java.salt_presence_ping_gather_job_timeout`` parameter.
 Defaults to 1 second.
+
+
+== Disabling the Salt Mine
+
+In older versions, {productname} used a tool called Salt Mine to check minion availability.
+With the introduction of more efficient tools in {productname}{nbsp}3.2, it is no longer required.
+If the Salt mine is running on your system, you can reduce load by disabling it.
+Disable the Salt mine by running this command on the server:
+
+----
+salt '*' state.sls util.mgr_mine_config_clean_up
+----
+
+This will restart the minions and generate some Salt events to be processed by the server.
+However, if you have a large number of minions, handling these events could create excessive load.
+To avoid this, you can execute the command in batch mode with this command:
+
+----
+salt --batch-size 50 '*' state.sls util.mgr_mine_config_clean_up
+----
+
+You will need to wait for this command to finish executing.
+Do not end the process with kbd:[Ctrl+C].
