@@ -5,8 +5,7 @@
 When you have the {susemgr} Server and Branch Server set up, you are ready to deploy point-of-service terminals by following these steps:
 
 . Create hardware type groups
-. Assign the saltboot formula to each hardware type group
-. Configure partitioning and assigned images
+. Assign and configure the saltboot formula for each hardware type group
 . Synchronize images to the terminals
 
 Each procedure is detailed in this section.
@@ -54,26 +53,32 @@ Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type
 Spaces and other non-alphanumeric characters will be removed when the name is processed.
 ====
 +
-. In the {susemgr} {webui}, navigate to menu:Main Navigation[Systems > System Groups], and click the btn:[Create Group] button.
+. In the {susemgr} {webui}, navigate to menu:Systems[System Groups], and click the btn:[Create Group] button.
 . In the [guimenu]``Create System Group`` dialog, create a new system group, using the hardware type group name you created earlier.
 
-Power on your point-of-service terminals.
-The branch server will bootstrap the terminals according to the data you have provided.
 
-== Assign the Saltboot Formula to each Hardware Type Group
-
-.Procedure: Assigning the saltboot formula to a hardware type group
+== Assign and Configure the Saltboot formula for each Hardware Type Group
 
 TBD
-
-== Configure Partitioning and Assigned Images
 
 .Procedure: Configuring partitioning and assigned images
 
-TBD
+. Open the details page for your new hardware type group, and navigate to the [guimenu]``Formulas`` tab.
+. Select the [systemitem]``saltboot-formula`` and click btn:[Save].
+. Navigate to the new menu:Formulas[Saltboot] tab.
+. Configure the Saltboot formula according to the instructions in xref:retail:retail-formulas[].
+. Apply the highstate.
+
 
 == Synchronize images to the Terminals
 
 .Procedure: Synchronizing images to the terminals
 
-TBD
+. Power on your POS terminals.
+The branch server will bootstrap the terminals according to the data you have provided.
+. TODO:Something like this?
+. On the {susemgr} server, run this command:
++
+----
+salt <branch_server_salt_id> state.apply image-sync
+----
