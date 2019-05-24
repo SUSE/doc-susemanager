@@ -9,7 +9,16 @@ Prometheus is a monitoring tool, originally built at SoundCloud, that is used to
 Unlike other monitoring systems, Prometheus collects metrics using HTTP pulls, allowing for higher performance and scalability.
 Prometheus is an open-source software project, mostly written in Go, and its source code is available at https://github.com/prometheus/.
 
-TODO:: About Grafana ...
+Grafana is a tool for data visualization, monitoring and analysis.
+It is used to create dashboards with panels representing specific metrics over a set period of time.
+Grafana is commonly used together with Prometheus, but also supports other data sources such as ElasticSearch, MySQL, PostgreSQL, and Influx DB.
+For more information about Grafana, see: https://grafana.com/docs/.
+
+A Grafana package is included in the SUSE Manager Client Tools for {sle}{nbsp}12 and {sle}{nbsp}15.
+
+
+
+== Prometheus Metrics
 
 Prometheus metrics are time series data, or timestamped values belonging to the same group or dimension.
 A metric is uniquely identified by its name and set of labels.
@@ -34,6 +43,10 @@ The different metric types are:
 
 For more information about metric types, see: https://prometheus.io/docs/concepts/metric_types/
 
+
+
+== PromQL
+
 Prometheus has its own query language called PromQL, which is a functional expression language.
 PromQL allows you to filter multi-dimensional time series data.
 It is used in all Prometheus interactions.
@@ -53,6 +66,10 @@ http_requests_total{status="200", method="GET"}
 ----
 
 For more information about PromQL, see the official Prometheus documentation: https://prometheus.io/docs/prometheus/latest/querying/basics/).
+
+
+
+== Exporters
 
 Exporters are libraries which help in exporting existing metrics from third-party systems as Prometheus metrics.
 Exporters are useful whenever it is not feasible to instrument a given application or system with Prometheus metrics directly.
@@ -94,14 +111,9 @@ See https://github.com/prometheus/node_exporter.
 * Squid exporter: [systemitem]``golang-github-boynux-squid_exporter``.
 See https://github.com/boynux/squid-exporter.
 
-.Procedure: Enabling Monitoring
 
-. In the {productname} {webui}, navigate to menu:Admin[Manager Configuration > Monitoring].
-. Click btn:[Enable services].
 
-TODO:: screenshots and more detailed instructions
-
-== Monitoring Configuration
+== Prometheus Configuration
 
 Prometheus requires some configuration to collect metrics and set up alarms, or to display metrics graphically in Grafana.
 You can configure Prometheus in the static configuration file at [path]``/etc/prometheus/prometheus.yml``.
@@ -126,6 +138,8 @@ yaml
 
 For more information about configuring Prometheus, see the official Prometheus documentation: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
 
+
+
 == Monitoring Managed Systems
 
 Prometheus metrics exporters can also be used on managed client systems.
@@ -137,32 +151,58 @@ See https://github.com/prometheus/node_exporter.
 * PostgreSQL exporter: [systemitem]``golang-github-wrouesnel-postgres_exporter``.
 See (https://github.com/wrouesnel/postgres_exporter.
 
-Installing and configuring exporters can be done using a Salt formula.
+Installing and configuring exporters is done using a Salt formula.
 
-////
 
-TODO: All this bit!
 
-#### Configuration
+== Enable Monitoring
 
-  - TODO: describe how to enable the formula
+.Procedure: Enabling Monitoring
 
-##### Node exporter
+. In the {productname} {webui}, navigate to menu:Admin[Manager Configuration > Monitoring].
+. Click btn:[Enable services].
 
-  - Node exporter can be enabled or disabled. Currently there are no configuration options.
+image::monitoring_enable_services.png[scaledwidth=80%]
 
-##### PostgreSQL exporter
+.Procedure: Configure Prometheus
 
-  - TODO: describe configuration options
+. In the {susemgr} {webui}, open the details page for the server, and navigate to the Formulas tab.
+. Check the [guimenu]``Monitoring`` checkbox to select all monitoring formulas, and click btn:[Save].
+. Apply the highstate.
 
-## Grafana
+.Procedure: Configuring the Node Exporter
 
-  - Used to query and visualize metrics
-  - Grafana supports multiple backends, not only Prometheus
-  - It is possible to combine data from different sources in the same dashboard
-  - Collection of add-ons and pre-built dashboards
+. In the {susemgr} {webui}, open the details page for the server, and navigate to the menu:Formulas[Prometheus Exporters] tab.
+. Check the [guimenu]``Enabled`` checkbox for both the Node Exporter, and the Postgres Exporter.
+. In the [guimenu]``Postgres Exporter`` section, in the [guimenu]``Data Source Namer`` field, enter the path to your data source (for example [systemitem]``postgresql://user:passwd@localhost:5432/database?sslmode=disable``).
+. Click btn:[Save Formula].
+. Apply the highstate.
 
-### Visualizing SUSE Manager metrics
+image::monitoring_configure_formula.png[scaledwidth=80%]
 
-  - TODO: Sample SUSE Manager dashboard
-////
+
+
+== Set up Visualization with Grafana
+
+The Grafana website contains dozens of dashboards uploaded by the community, including an example {productname} dashboard that can help you to get started.
+For more information, see: https://grafana.com/dashboards
+
+To use Grafana with {productname}, you need to have enabled metrics in the {productname} {webui}, and configured your Prometheus instance to collect those metrics.
+
+.Procedure: Setting up Grafana
+
+. Install the [package]``grafana`` package:
++
+----
+zypper in grafana
+----
+. Enable the Grafana service:
++
+----
+systemctl enable --now grafana-server
+----
+. Navigate to port 3000 in your browser.
+
+Grafana settings are configured in [path]``/etc/grafana/grafana.ini``.
+
+TODO:: include direct link for the SUSE Manager dashboard (once uploaded).
