@@ -13,8 +13,6 @@ Each procedure is detailed in this section.
 
 If you have many terminals, and would prefer this to be handled with a script, see xref:retail:retail-mass-config.adoc[].
 
-If you are deploying terminals based on {sls}{nbsp}11, see the notes at the end of this section.
-
 Before terminals can be deployed, ensure you have prepared a Saltboot-based operating system image.
 For how to build OS images, see xref:administration:image-management.adoc[].
 
@@ -81,35 +79,8 @@ Each hardware type group must have the Saltboot formula applied.
 salt <branch_server_salt_id> state.apply image-sync
 ----
 
-== Deploy images to the terminals
 
-.Procedure: Deploying images to the terminals
-
-. Power on your POS terminals.
-. The branch server will bootstrap the terminals according to the data you have provided.
-
-
-== Terminals based on {slsa}{nbsp}11 SP{nbsp}3
-
-POS Terminals based on {sls}{nbsp}11 SP{nbsp}3 can be deployed in much the same way as other terminals, with a few differences.
-
-* You must use the {slsa}{nbsp}11 template
-* {slsa}{nbsp}11 images need to be activated with the [systemitem]``SLES11SP4 i586`` and [systemitem]``SLES11SP4 SDK i586`` channels
-
-[IMPORTANT]
-====
-Ensure that {slsa}{nbsp}11 images are built on the {slsa}{nbsp}11 build host, and {slsa}{nbsp}12 images are built on the {slsa}{nbsp}12 build host.
-Building on the incorrect build host will cause your build to fail.
-====
-
-[WARNING]
-====
-If you are building images for {slsa}{nbsp}11 using profiles from an HTTPS git repository that uses TLS 1.0 or greater, it will fail.
-{slsa}{nbsp}11 does not support later versions of TLS.
-You will need to clone the repository locally in order to use it for building.
-====
-
-== Using a 32-bit default boot image
+=== Using a 32-bit default boot image
 
 If you have 32-bit machines included in your branch, then you must use a 32-bit default boot image.
 
@@ -134,3 +105,12 @@ In this example, the [systemitem]``legacy-6.0.0`` boot image is 32-bit.
 You can set the default boot image in the Image Synchronization formula, by adding the chosen boot image name to the [guimenu]``Synchronize only the listed images`` field.
 
 image::retail_imagesync_formula.png[scaledwidth=80%]
+
+
+
+== Deploy images to the terminals
+
+.Procedure: Deploying images to the terminals
+
+. Power on your POS terminals.
+. The branch server will bootstrap the terminals according to the data you have provided.
