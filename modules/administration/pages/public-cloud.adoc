@@ -1,40 +1,38 @@
-= {productname} in the Public Cloud: {productname} Server and {productname} Proxy in the Public Cloud
-
-include::entities.adoc[]
-
-
-{productname} delivers best-in-class Linux server management capabilities.
-For detailed information about the product please refer to the https://www.suse.com/documentation/suse_manager[SUSEManager] documentation.
-
-The {productname} Server and {productname} Proxy images published by SUSE in selected Public Cloud environments are provided as Bring Your Own Subscription (BYOS) images.
-{productname} Server instances need to be registered with the SUSE Customer Center (SCC).
-Subscriptions of {productname} Proxy instances are handled through their parent {productname} Server.
-After an instance is launched, {productname} needs to be set up and configured following the procedure in the {productname} documentation.
+[[public-cloud]]
+= Public Cloud
 
 
-[[instance-requirements]]
+Some public cloud environments provide images for {productname} Server and Proxy.
+This section discusses what you will require to run {productname} in a public cloud, and how to set up your installation.
+
+[NOTE]
+====
+Public clouds provide {productname} under a Bring Your Own Subscription (BYOS) model.
+This means that you must register them with the {scc}.
+For more information about registering  {productname} with {scc}, see xref:installation:general-requirements.adoc[].
+====
+
+
 == Instance Requirements
 
+Select a public cloud instance that meets the hardware requirements in xref:installation:hardware-requirements.adoc[].
 
-Select an instance size that meets the system requirements as documented in the {productname} documentation.
+In addition, be aware of these important considerations:
 
-* Minimal main memory: >12G
-* The {productname} setup procedure performs a Forward-confirmed reverse DNS lookup. This must succeed in order for the setup procedure to complete successfully and for {productname} to operate as expected. Therefore it is important that the hostname and IP configuration be performed prior to running the {productname} setup procedure.
-* {productname} Server and {productname} Proxy instances are expected to run in a network configuration that provides you control over DNS entries and that is shielded from the Internet at large. Within this network configuration DNS (Domain Name Service) resolution must be provided, such that `hostname -f` returns the FQDN (Full Qualified Domain Name). The DNS resolution is not only important for the {productname} Server procedure but is also important when clients are configured to be managed via {productname}. Configuring DNS is Cloud Framework dependent, please refer to the cloud service provider documentation for detailed instructions.
-* Minimal free disk space for {productname} 15G.
-+
-For Public Cloud instances we recommend that the repositories and the {productname} Server database, and respectively the {productname} Proxy squid cache, be located on an external virtual disk.
-The details for this setup are provided in <<using-separate-storage-volume>>.
-+
-Storing the database and the repositories on an external virtual disk ensures that the data is not lost should the instance need to be terminated for some reason.
+* The {productname} setup procedure performs a forward-confirmed reverse DNS lookup.
+This must succeed in order for the setup procedure to complete successfully and for {productname} to operate as expected.
+Therefore, it is important that the hostname and IP configuration be performed prior to running the {productname} setup procedure.
+* {productname} Server and Proxy instances are expected to run in a network configuration that provides you control over DNS entries, but cannot access the wider internet.
+Within this network configuration DNS resolution must be provided, such that `hostname -f` returns the FQDN.
+DNS resolution is also important for connecting clients.
+DNS is dependent on the cloud framework you  choose, refer to the cloud service provider documentation for detailed instructions.
+* We recommend that you locate software repositories, the server database, and the Proxy squid cache on an external virtual disk.
+This prevents data loss if the instance is unexpectedly terminated.
+Instructions for setting up an external virtual disk are contained in this section.toring the database and the repositories on an external virtual disk ensures that the data is not lost should the instance need to be terminated for some reason.
 
 
-Please ensure that the selected instance type matches the requirements listed above.
-Although we recommend that the database and the repositories are stored on a separate device it is still recommended to set the root volume size of the instance to 20G.
 
-[[setup]]
 == Setup
-
 
 Run an instance of the {productname} Server or {productname} Proxy image as published by SUSE.
 The images are identifiable by the suse, manager, server or proxy, and byos keywords in each public cloud environment.
@@ -129,7 +127,7 @@ If you experience errors during setup, start a new instance, and begin the setup
 
 If you receive a message that there is not enough space available for setup, ensure that your root volume is at least 20GB and double check that the instructions in <<using-separate-storage-volume>> have been completed correctly.
 
-{productname} Server for the Public Cloud comes with a bootstrap data module pre-installed.
+{productname} Server for the public cloud comes with a bootstrap data module pre-installed.
 The bootstrap module contains optimized package lists for bootstrapping instances started from {sle} images published by {suse}.
 If you intend to register such an instance, when you creatr the bootstrap repository run the [command]``mgr-create-bootstrap-repo`` script using this command, to create a bootstrap repository suitable for {sle} 12 SP1 instances.
 
