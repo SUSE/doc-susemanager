@@ -15,7 +15,7 @@ The recommended order for migrations is to first migrate the {productname} serve
 .Using {productname} Proxy 3.2 with {productname} 4
 [NOTE]
 ====
-{productname} Proxy 3.2 is compatible with {productname} Server 4. 
+{productname} Proxy 3.2 is compatible with {productname} Server 4.
 After the server has been migrated to version 4, proxies can be automatically upgraded from the {productname} server using YaST autoinstallation.
 ====
 
@@ -29,8 +29,13 @@ Proxies that are Salt minions cannot be migrated to the new version this way.
 
 .Procedure: Preparing to Upgrade
 . Create an autoinstallation distribution based on SLE 15 SP1.
-This is required because {productname} Proxy 4 is based on this version.
-For information on creating an autoinstallation distribution, see xref:#ref.webui.systems.autoinst.distribution (menu:Main Navigation[Systems > Autoinstallation > Distributions]).
+Use the SLE Installer media.
+This is required because {productname} Proxy 4 is a product of the {sle} 15.1 product family.
+As the [guimenu]``Base Channel`` select [literal]``SLE-Product-SUSE-Manager-Proxy-4.0-Pool for x86_64`` and as the [guimenu]``Installer Generation`` select [literal]``SUSE Linux Enterprise 15``.
++
+image::autoinst_dist_proxy4.png[scaledwidth=80%]
++
+For information on creating an autoinstallation distribution, see xref:#ref.webui.systems.autoinst.distribution (menu:Main Menu[Systems > Autoinstallation > Distributions]).
 . Create an autoinstallation profile.
 xref:#proxy-migration-inplace-profile includes a template autoinstallation profile for your use.
 In this example, the label [literal]``proxy4`` is used for both the autoinstallation distribution and for the autoinstallation profile.
@@ -41,7 +46,7 @@ Replace the label [literal]``proxy4`` with the one you use for your autoinstalla
 [[proxy-migration-inplace-profile]]
 === Autoinstallation Profile
 
-Use this autoinstallation profile as an example.
+Use this autoinstallation profile as an example.  Replace `$redhat_management_server` with the hostname of your server.
 
 ----
 <?xml version="1.0"?>
@@ -158,7 +163,7 @@ autoinstallation profile are available and fully synchronized.
 === Running the In-place Upgrade
 
 .Procedure: Running the In-place Upgrade
-. In the {productname} {webui}, upload the edited autoinstallation profile to your {productname} server (menu:Main Navigation[Systems > Autoinstallation > Profiles]).
+. In the {productname} {webui}, upload the edited autoinstallation profile to your {productname} server (menu:Main Menu[Systems > Autoinstallation > Profiles]).
 . In the [guimenu]``Kernel Options`` field, enter this value:
 +
 ----
@@ -168,7 +173,7 @@ autoupgrade=1 Y2DEBUG=1
 The debug setting is not required but can help with investigating future problems you might encounter.
 The [literal]``autoupgrade`` parameter, however, is mandatory.
 . Select the proxy from the system list in {productname}, click the [guimenu]``Provisioning`` tab, and select the profile you created earlier.
-. Click btn:[Start Autoinstallation].
+. Click btn:[Schedule Autoinstallation and Finish].
 The system will download the needed files, change the bootloader entries, reboot, and start the upgrade.
 
 
@@ -176,8 +181,16 @@ The system will download the needed files, change the bootloader entries, reboot
 === Cleaning Up After the In-place Upgrade
 
 After the proxy has completed the automatic upgrade process, it still will have the old channels from {productname} assigned.
-If the proxy reports that there are updates available, do not apply them.
-Select the proxy from the system list and click [guimenu]``change channel assignment``. 
-Clear the old channels and assign the new ones, which have been used for the upgrade.
+
+[WARNING]
+====
+If the server reports that there are updates available for the proxy, do not apply them.
+====
+
+Select the proxy from the system list and click menu:System Details Page[Software > Software Channels].
+Clear the old channels and assign the new ones, which have been used for the upgrade:
+As the [guimenu]``Base Channel``, select `SLE-Product-SUSE-Manager-Proxy-4.0-Pool for x86_64` and as [guimenu]``Child Channels`` all the recommended channels:
+
+image::proxy_channels.png[scaledwidth=80%]
 
 All the clients connected with the previous {productname} Proxy can access the {productname} Server again and the proxy itself can be managed by the server as before.
