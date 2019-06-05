@@ -61,10 +61,10 @@ The repositories and channels for synchronizing upstream content must be configu
 // SUSE Manager specific instructions
 // Commented out for reviewing purposes ifeval::[{suma-content} == true]
 
-.Procedure: Preparing to Register {ubuntu} Clients
+.Procedure: Preparing to Register {ubuntu} Clients with Custom Channels
 
 . Ensure that you have the appropriate software channels available on your system.
-In the {productname} {webui}, navigate to menu:Software[Channel List  > All].
+In the {productname} {webui}, navigate to menu:Software[Channel List > All].
 You should see a base channel and a child channel for your architecture, for example:
 +
 ----
@@ -73,10 +73,6 @@ You should see a base channel and a child channel for your architecture, for exa
  +- Ubuntu-18.04-SUSE-Manager-Tools for amd64
 ----
 . Create custom repositories to mirror the {ubuntu} packages.
-For more information on creating custom repositories, see xref:administration:channel-management.adoc[].
-+
-This step can be skipped if creating the channels using the `spacewalk-common-channels` utility (see the next item).
-+
 For example:
 +
 For `main`:
@@ -93,11 +89,9 @@ For `main-updates`:
 
 . Create custom channels under the `pool` channel, mirroring the vendor channels.
 +
-For more information on creating custom channels, see xref:administration:channel-management.adoc[].
-+
 Ensure the custom channels you create have `AMD64 Debian` architecture.
 +
-Create the following structure:
+Create this structure:
 +
 ----
  ubuntu-18.04-pool for amd64 (vendor channel)
@@ -107,14 +101,41 @@ Create the following structure:
  +- ubuntu-18.04-amd64-main (custom channel)
  |
  +- ubuntu-18.04-amd64-main-updates (custom channel)
+----
+
+. Associate the custom channels with the appropriate custom repositories.
+. Synchronize the new custom channels.
+You can check the progress of your synchronization from the command line with this command:
 +
 ----
-Alternatively one can use the `spacewalk-common-channels` utility from the `spacewalk-utils` package.
-Ensure the package is installed and open the file `/etc/rhn/spacewalk-common-channels.ini` for editing.
+tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
+----
+. To use bootstrap with {ubuntu}, you will need to create a bootstrap repository.
+You can do this from the command line with [command]``mgr-create-bootstrap-repo``:
 +
-Lookup the sections starting with `ubuntu` and ending with `main` or `updates`. Change the `yumrepo_url` to an existing repository URL.
+----
+mgr-create-bootstrap-repo --with-custom-channels
+----
+
+For more information on creating custom repositories, see xref:administration:channel-management.adoc[].
+
+.Procedure: Preparing to Register {ubuntu} Clients with Spacewalk
+
+Before you begin, ensure you have installed the `spacewalk-common-channels` utility from the `spacewalk-utils` package.
+
+
+. Ensure that you have the appropriate software channels available on your system.
+In the {productname} {webui}, navigate to menu:Software[Channel List  > All].
+You should see a base channel and a child channel for your architecture, for example:
++
+----
+ ubuntu-18.04-pool for amd64
+ |
+ +- Ubuntu-18.04-SUSE-Manager-Tools for amd64
+----
+. Open the [path]``/etc/rhn/spacewalk-common-channels.ini`` file, and locate the sections that begin with [systemitem]``ubuntu`` and end with [systemitem]``main`` or [systemitem]``updates``.
+Change the `yumrepo_url` to an existing repository URL.
 Do not change the `ubuntu-$VERSION-pool-$ARCH` section.
-E.g.:
 +
 ----
 [ubuntu-1804-pool-amd64]
@@ -150,15 +171,12 @@ base_channels = ubuntu-18.04-pool-amd64
 yumrepo_url = http://mirror.example.com/ubuntu/dists/bionic-updates/main/binary-amd64/
 ----
 +
-Then execute the following command. Use the the desired section prefix in the glob expression, e.g. `ubuntu-1604` or `ubuntu-1804`:
+. Use the [command]``spacewalk-common-channels` command to create the required channels and repositories.
+Ensure you use the appropriate version number in this command, either [systemitem]``ubuntu-1604`` or [systeitem]``ubuntu-1804``:
 +
 ----
 spacewalk-common-channels -u <admin_user> -p <admin_pass> -a amd64-deb -v 'ubuntu-1804*'
 ----
-+
-The following step can be skipped because this will create also repositories.
-
-. Associate the custom channels with the appropriate custom repositories.
 . Synchronize the new custom channels.
 You can check the progress of your synchronization from the command line with this command:
 +
@@ -171,6 +189,7 @@ You can  do this from the command line with [command]``mgr-create-bootstrap-repo
 ----
 mgr-create-bootstrap-repo --with-custom-channels
 ----
+
 //endif::[]
 
 
