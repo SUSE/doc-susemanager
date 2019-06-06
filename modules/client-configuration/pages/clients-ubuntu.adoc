@@ -73,7 +73,10 @@ You should see a base channel and a child channel for your architecture, for exa
  +- Ubuntu-18.04-SUSE-Manager-Tools for amd64
 ----
 . Create custom repositories to mirror the {ubuntu} packages.
-For more information on creating custom repositories, see xref:modules/administration/pages/channel-management.adoc[].
+For more information on creating custom repositories, see xref:administration:channel-management.adoc[].
++
+This step can be skipped if creating the channels using the `spacewalk-common-channels` utility (see the next item).
++
 For example:
 +
 For `main`:
@@ -89,10 +92,12 @@ For `main-updates`:
 * Repository Type: deb
 
 . Create custom channels under the `pool` channel, mirroring the vendor channels.
-For more information on creating custom channels, see xref:modules/administration/pages/channel-management.adoc[].
++
+For more information on creating custom channels, see xref:administration:channel-management.adoc[].
++
 Ensure the custom channels you create have `AMD64 Debian` architecture.
 +
-For example:
+Create the following structure:
 +
 ----
  ubuntu-18.04-pool for amd64 (vendor channel)
@@ -102,10 +107,61 @@ For example:
  +- ubuntu-18.04-amd64-main (custom channel)
  |
  +- ubuntu-18.04-amd64-main-updates (custom channel)
++
 ----
+Alternatively one can use the `spacewalk-common-channels` utility from the `spacewalk-utils` package.
+Ensure the package is installed and open the file `/etc/rhn/spacewalk-common-channels.ini` for editing.
++
+Lookup the sections starting with `ubuntu` and ending with `main` or `updates`. Change the `yumrepo_url` to an existing repository URL.
+Do not change the `ubuntu-$VERSION-pool-$ARCH` section.
+E.g.:
++
+----
+[ubuntu-1804-pool-amd64]
+; do not change
+label    = ubuntu-18.04-pool-amd64
+checksum = sha256
+archs    = amd64-deb
+repo_type = deb
+name     = ubuntu-18.04-pool for amd64
+gpgkey_url =
+gpgkey_id =
+gpgkey_fingerprint =
+yumrepo_url = http://localhost/pub/repositories/empty-deb/
+
+[ubuntu-1804-amd64-main]
+label    = ubuntu-1804-amd64-main
+checksum = sha256
+archs    = amd64-deb
+repo_type = deb
+name     = Ubuntu 18.04 LTS AMD64 Main
+base_channels = ubuntu-18.04-pool-amd64
+; change URL
+yumrepo_url = http://mirror.example.com/ubuntu/dists/bionic/main/binary-amd64/
+
+[ubuntu-1804-amd64-updates]
+label    = ubuntu-1804-amd64-main-updates
+name     = Ubuntu 18.04 LTS AMD64 Updates
+archs    = amd64-deb
+repo_type = deb
+checksum = sha256
+base_channels = ubuntu-18.04-pool-amd64
+; change URL
+yumrepo_url = http://mirror.example.com/ubuntu/dists/bionic-updates/main/binary-amd64/
+----
++
+Then execute the following command. Use the the desired section prefix in the glob expression, e.g. `ubuntu-1604` or `ubuntu-1804`:
++
+----
+spacewalk-common-channels -u <admin_user> -p <admin_pass> -a amd64-deb -v 'ubuntu-1804*'
+----
++
+The following step can be skipped because this will create also repositories.
+
 . Associate the custom channels with the appropriate custom repositories.
 . Synchronize the new custom channels.
 You can check the progress of your synchronization from the command line with this command:
++
 ----
 tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
 ----

@@ -26,7 +26,9 @@ Keep in mind {suse} only provides support for [command]``spacewalk-clone-by-date
 +
 
 ----
-{prompt.root}spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7'{prompt.root}spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7-updates'{prompt.root}spacewalk-common-channels -u admin -p`secret`-a x86_64 'spacewalk26-client-centos7'
+spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7'
+spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7-updates'
+spacewalk-common-channels -u admin -p`secret`-a x86_64 'spacewalk26-client-centos7'
 ----
 +
 .Required Channel References
@@ -103,36 +105,37 @@ See the matrix of {productname} clients on the main page of the {productname} wi
 +
 
 ----
-{prompt.root}yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/
+yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/
 ----
 . Import the repo key:
 +
 
 ----
-{prompt.root}rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key
+rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key
 ----
 . Check if there is a different repository that contains Salt. If there is more than one repository listed disable the repository that contains Salt apart from the OBS one.
 +
 
 ----
-{prompt.root}yum list --showduplicates salt
+yum list --showduplicates salt
 ----
 . Install the Salt minion:
 +
 
 ----
-{prompt.root}yum install salt salt-minion
+yum install salt salt-minion
 ----
 . Change the Salt configuration to point to the {productname} server:
 +
 
 ----
-{prompt.root}mkdir -p /etc/salt/minion.d{prompt.root}echo "master:`server_fqdn`" > /etc/salt/minion.d/susemanager.conf
+mkdir -p /etc/salt/minion.d
+echo "master:`server_fqdn`" > /etc/salt/minion.d/susemanager.conf
 ----
 . Restart the minion
 +
 
 ----
-{prompt.root}systemctl restart salt-minion
+systemctl restart salt-minion
 ----
 . Proceed to menu:Main Menu[Salt > Keys] from the {webui} and accept the minion's key.
