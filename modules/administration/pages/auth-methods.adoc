@@ -157,7 +157,11 @@ The `uid` attribute passed in the SAML:Attribute must be created in the {product
 
 After the authentication with the IdP using the user `orgadmin` is successful, you will be logged in into {productname} as the `orgadmin` user, provided that the `orgadmin` user exists in {productname}.
 
-NOTE: Using SSO is mutually exclusive with other types of authentication: it is either enabled or disabled. SSO is disabled by default. 
+[NOTE]
+====
+Using SSO is mutually exclusive with other types of authentication: it is either enabled or disabled.
+SSO is disabled by default.
+====
 
 .Procedure: Enabling SSO
 
@@ -168,23 +172,19 @@ NOTE: Using SSO is mutually exclusive with other types of authentication: it is 
 java.sso = true
 ----
 . Copy parameters you want to customize from `/usr/share/rhn/config-defaults/rhn_java_sso.conf` into `/etc/rhn/rhn.conf` and proceed by inserting the parameters you want to customize by prefixing them with `java.sso.`.
-
-Example:
-
-. in `/usr/share/rhn/config-defaults/rhn_java_sso.conf`:
-
++
+For example, in `/usr/share/rhn/config-defaults/rhn_java_sso.conf`:
 +
 ----
 onelogin.saml2.sp.assertion_consumer_service.url = https://YOUR-PRODUCT-HOSTNAME-OR-IP/rhn/manager/sso/acs
 ----
-
++
 In order to customize it, create the corresponding option in `/etc/rhn/rhn.conf` by prefixing the option name with `java.sso.`:
-
 +
 ----
 java.sso.onelogin.saml2.sp.assertion_consumer_service.url = https://YOUR-PRODUCT-HOSTNAME-OR-IP/rhn/manager/sso/acs
 ----
-
++
 To find all the occurrences you need to change, search in the file for the placeholders [literal]``YOUR-PRODUCT`` and [literal]```YOUR-IDP-ENTITY``.
 Every parameter comes with a brief explanation of what it is meant for.
 . Restart spacewalk-service to pick up the changes:
