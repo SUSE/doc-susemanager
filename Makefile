@@ -113,7 +113,6 @@ pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-refer
 .PHONY: pdf-install-suma
 pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
 	asciidoctor-pdf \
-	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
