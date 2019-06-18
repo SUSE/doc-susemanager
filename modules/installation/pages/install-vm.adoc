@@ -114,11 +114,24 @@ SUSEConnect -p sle-module-server-applications/15.1/x86_64
 SUSEConnect -p sle-module-web-scripting/15.1/x86_64
 SUSEConnect -p sle-module-suse-manager-server/<productnumber>/x86_64
 ----
-// ----
-// SUSEConnect -p SUSE-Manager-Server/<productnumber>/x86_64 -r<SUSE_MANAGER_CODE>
-// ----
++
+TIP: JeOS is configured to install only Required packages. To get all
+features working you should allow to install also recommended packages.
+In `/etc/zypp/zypp.conf` change:
++
 
-. Install [package]#yast2-storage-ng# with all required dependencies (approx. 40 packages, 30 MB when installed).
+----
+solver.onlyRequires = true
+----
++
+
+To:
++
+----
+solver.onlyRequires = false
+----
+
+. Install [package]#yast2-storage-ng# with all required dependencies (approx. 40 packages, 30 MB when installed).
 This basic administration package is required for preparing storage partitions:
 +
 
@@ -136,27 +149,13 @@ zypper in -t package yast2-storage-ng
 | VirtIO Disk 4        | [path]``swap``           | 4{nbsp}GB    | swap
 |===
 
-. If you are still using an older version than {susemgr}{nbsp}3.2 check [path]``/etc/fstab`` for correctness as follows (_updated tools shipped with recent SPs will no longer require human intervention._):
-Remove or comment out this mount point entry for [path]``/var/lib/pgsql/`` in the [path]``/etc/fstab`` file:
+. Exit the partitioner and install the {productname} pattern (approx. 730 packages, 1.4 GB when installed):
 +
 
 ----
-/var/lib/pgsql btrfs subvol=@/var/lib/pgsql 0 0
+zypper in pattern-suma_server
 ----
-+
 
-[WARNING]
-.Remove [path]``pgsql`` from the fstab Configuration File
-====
-If you do not remove the [path]``/var/lib/pgsql/`` line from fstab the first time you shut down the server you will lose your database because of duplicated entries in the fstab file.
-====
-+
-
-. Exit the partitioner and install the {productname} pattern:
-+
-
-----
-zypper in -t pattern suma_server
-----
+. Reboot.
 
 For proceeding with {productname} setup, see xref:installation:server-setup.adoc[SUSE Manager Setup].
