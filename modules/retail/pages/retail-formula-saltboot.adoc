@@ -48,3 +48,47 @@ This will ensure you use the latest available version.
 * In the [guimenu]``Partition encryption password`` field, enter a password if you want to encrypt the partition.
 * In the [guimenu]``Partition flags`` field, leave it empty.
 . Click btn:[Save Formula] to save your formula.
+
+
+
+[[saltboot-formula-partition-types]]
+== Special Partition Types
+
+The Saltboot formula helps you with setting up special partition types.
+
+=== BIOS grub Partition
+
+A BIOS grub partition is needed for local booting from a GPT disk on non-EFI machines.
+For more information, see https://en.wikipedia.org/wiki/BIOS_boot_partition.
+
+In the formula, enter the following options:
+
+----
+Partition Symbolic ID: p1
+Partition Size (MiB): 50
+Partition Flags: bios_grub
+----
+
+Leave the other fields empty.
+
+=== EFI Partition
+
+An EFI partition is needed for local booting on EFI machines, [guimenu]``Partition Table Type`` must be GPT.
+For more information, see https://en.wikipedia.org/wiki/EFI_system_partition.
+
+In the formula, enter the following options:
+----
+Partition Symbolic ID: p1
+Partition Size (MiB): 500
+Device Mount Point: /boot/efi
+Filesystem Format: vfat
+Partition Flags: boot
+----
+
+Leave the other fields empty.
+
+
+=== `msdos` Disklabel Limitations
+
+On `msdos` disk label it is possible to create maximally 4 primary partitions, extended partitions are not supported.
+This limitation is not present on `GPT` disk label.
