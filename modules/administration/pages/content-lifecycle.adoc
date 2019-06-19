@@ -13,8 +13,6 @@ This is achieved through a series of environments that your software channels ca
 Most environment lifecycles include at least test and production environments, but you can have as many environments as you require.
 
 
-== Managing Content Lifecycle Projects
-
 .Procedure: Creating a Content Lifecycle Project
 
 . In the {productname} {webui}, navigate to menu:Content Lifecycle[Content Lifecycle Projects], and click btn:[Create Project]
@@ -24,7 +22,7 @@ The [guimenu]``Label`` field only accepts lowercase letters, numbers, periods (`
 . Click the btn:[Create] button to create your project and return to the project page.
 . Click btn:[Attach/Detach Sources].
 . In the [guimenu]``Sources`` dialog, select the source type, and select a base channel for your project.
-The available child channels for the selected base channel will be displayed, including information on whether the channel is mandatory or recommended.
+The available child channels for the selected base channel are displayed, including information on whether the channel is mandatory or recommended.
 . Check the child channels you require, and click btn:[Save] to return to the project page.
 The software channels you selected should now be showing.
 . Click btn:[Attach/Detach Filters].
@@ -37,49 +35,56 @@ The [guimenu]``Name`` field only accepts lowercase letters, numbers, periods (``
 You can select the order of the environments in the lifecycle by selecting an environment in the [guimenu]``Insert before`` field when you create it.
 
 [NOTE]
-.Content Filters
 ====
-Content Filters are global in your organization and can be shared in multiple projects.
+Content filters are global in your organization and can be shared between projects.
 ====
 
 [NOTE]
-.Adding environment in existing project
 ====
-When you add an environment to an existing project that has already some sources built, the newly added environment will be populated with the content of its predecessor environment.
+If your project already contains built sources, when you add an environment it will automatically populate with the existing content.
+Content will be drawn from the previous environment of the cycle if it had one.
+If there is no previous environment, it will be left empty until the project sources are built again.
 ====
 
-.Procedure: Using a Content Lifecycle Project
 
 
-=== Building Content Project
-Once you create a project, define environments, attach sources (and possibly filters), you can built the project for the first time.
+== Build a Content Lifecycle Project
+
+When you have created your project, defined environments, and attached sources and filters, you can build the project for the first time.
 
 Building applies filters to the attached sources and clones them to the first environment in the project.
 
-. In the {productname} {webui}, navigate to menu:Content Lifecycle[Content Lifecycle Projects], and select the project you wish to build
-. Review the attached sources and filters
-. Click btn:[Build]
-. Check the build progress in the [guimenu]``Environment Lifecycle`` section
+.Procedure: Building a Content Lifecycle Project
 
-After the build is finished, the environment version is increased by one and the built sources (e.g. software channels) can be assigned to systems.
+. In the {productname} {webui}, navigate to menu:Content Lifecycle[Content Lifecycle Projects], and select the project you want to build.
+. Review the attached sources and filters, and click btn:[Build].
+. You can monitor build progress in the [guimenu]``Environment Lifecycle`` section.
 
-=== Promoting Environment in Content Project
+After the build is finished, the environment version is increased by one and the built sources, such as software channels, can be assigned to your systems.
+
+
+
+== Promote Environments
+
 When the project has been built, the built sources can be sequentially promoted to the environments.
 
-. In the project screen, scroll to the [guimenu]``Environment Lifecycle`` section
-. Find the environment you wish to promote to its successor
-. Click btn:[Promote]
-. Check the build progress in the [guimenu]``Environment Lifecycle`` section
+.Procedure: Promoting Environments
 
-=== Assigning systems to Environment
-The built and promote actions produce a tree of software channels. In order to add the systems to the environment, assign the software channels (base and children) to your system via menu:Software[Software Channels] in the [guimenu]``System Details`` page for a system.
+. In the {productname} {webui}, navigate to menu:Content Lifecycle[Content Lifecycle Projects], and select the project you want to work with.
+. In the [guimenu]``Environment Lifecycle`` section, locate the environment to promote to its successor, and click btn:[Promote].
+. You can monitor build progress in the [guimenu]``Environment Lifecycle`` section.
+
+
+
+=== Assign Systems to Environments
+
+When you build and promote content lifecycle projects, it creates a tree of software channels.
+To add systems to the environment, assign the base and child software channels to your system using menu:Software[Software Channels] in the [guimenu]``System Details`` page for the system.
 
 [NOTE]
-.Current Limitation: Changing channel assignment after building or promoting
 ====
-When the project is built with **adding** new sources, you need to revisit your channel assignments to systems as the newly added cloned channels are not assigned to systems automatically.
+Newly added cloned channels are not assigned to systems automatically.
+If you add or promote sources you will need to manually check and update your channel assignments.
 
-The same goes for the promote operation.
-
-The automatic assignment is going to be addressed in future versions.
+Automatic assignment is intended to be added to {productname} in a future version.
 ====
