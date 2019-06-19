@@ -130,6 +130,7 @@ pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
 .PHONY: pdf-client-config-suma
 pdf-client-config-suma: ## Generate PDF version of the SUMA Client Configuraiton Guide
 	asciidoctor-pdf \
+		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -146,6 +147,7 @@ pdf-client-config-suma: ## Generate PDF version of the SUMA Client Configuraiton
 .PHONY: pdf-upgrade-suma
 pdf-upgrade-suma: ## Generate PDF version of the SUMA Upgrade Guide
 	asciidoctor-pdf \
+		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -179,6 +181,7 @@ pdf-reference-suma: ## Generate PDF version of the SUMA Reference Manual
 .PHONY: pdf-administration-suma
 pdf-administration-suma: ## Generate PDF version of the SUMA Administration Guide
 	asciidoctor-pdf \
+		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -195,6 +198,7 @@ pdf-administration-suma: ## Generate PDF version of the SUMA Administration Guid
 .PHONY: pdf-salt-suma
 pdf-salt-suma: ## Generate PDF version of the SUMA Salt Guide
 	asciidoctor-pdf \
+		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -211,6 +215,7 @@ pdf-salt-suma: ## Generate PDF version of the SUMA Salt Guide
 .PHONY: pdf-retail-suma
 pdf-retail-suma: ## Generate PDF version of the SUMA Retail Guide
 	asciidoctor-pdf \
+		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -227,6 +232,7 @@ pdf-retail-suma: ## Generate PDF version of the SUMA Retail Guide
 .PHONY: pdf-architecture-suma
 pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 	asciidoctor-pdf \
+		-r ./extensions/xref-converter.rb \
 		-a productname=$(PRODUCTNAME) \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
