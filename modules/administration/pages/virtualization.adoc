@@ -337,28 +337,30 @@ Salt 2019.2.0 or later is required on the virtual host in order for the salt-bas
 
 
 Once the registration process is finished and all packages have been installed, enable [daemon]``osad`` (open source architecture daemon).
-On a {sls} system this can be achieved by running the following commands as user {rootuser}:
+On {sls} 12 systems and later, it can be achieved by running the following commands as user {rootuser}:
 
 
 ----
-systemctl stop rhnsd
-systemctl disable rhnsd
+service rhnsd stop
+service rhnsd disable
 ----
 
 
 ----
-systemctl enable osad
-systemctl start osad
+service osad enable
+service osad start
 ----
 
-.Using [daemon]``osad`` with [daemon]``rhnsd``
-IMPORTANT: The [daemon]``rhnsd`` daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
+.Using [systemitem]``osad`` with [systemitem]``rhnsd``
+IMPORTANT: [systemitem]``rhnsd``  checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
 If many clients are registered with {productname}, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.
 
-However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately, which can be done by adding [daemon]``osad``.
-The [daemon]``osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
-Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [daemon]``rhnsd`` you can only schedule for a time in the future plus up to four hours).
-
+However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately, which can be done by adding [systemitem]``osad``.
+The [systemitem]``osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
+// FIXME: check it with the systemd.timer
+////
+Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [systemitem]``rhnsd`` you can only schedule for a time in the future plus up to four hours).
+////
 
 
 [[sec.virtualization.autoinstall.installation]]
@@ -399,7 +401,7 @@ In case an installation has failed, you can btn:[Reschedule] it from this page o
 You do not have to configure the installation again.
 
 If the event log does not contain enough information to locate a problem, log in to the {vmhost} console and read the log file for your package manager.
-If you are using the [daemon]``rhnsd``, you may alternatively immediately trigger any scheduled actions by calling [command]``mgr_check`` on the {vmhost}.
+If you are using [systemitem]``rhnsd``, you may alternatively immediately trigger any scheduled actions by calling [command]``mgr_check`` on the {vmhost}.
 Increase the command's verbosity by using the options [option]``-v``, [option]``-vv``, or [option]``-vvv``, respectively.
 ====
 
