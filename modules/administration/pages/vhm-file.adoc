@@ -1,0 +1,85 @@
+[[vhm-file]]
+= File-based Virtual Hosts
+
+In a VMWare environment where direct connection to the {susemgr} is not possible, a JSON file can be exported from the ESXi or vSphere host and later imported into {productname}.
+
+After selecting menu:Create[File-Based] enter a label and URL leading to the location of this file.
+
+
+image::systems_virtual_host_managers_file.png[scaledwidth=80%]
+
+
+.VMWare vCenter Installations without Direct Access
+[NOTE]
+====
+The file-based is not meant to be used with manually crafted files.
+It only meant to be used with the output of [command]``virtual-host-gatherer`` against some other module.
+File-based is suitable for VMWare vCenter installations for which no direct API access is possible from the {susemgr}.
+
+The solution is to run [command]``virtual-host-gatherer`` from somewhere else in the network and save the produced JSON data for further processing.
+====
+
+
+The following JSON data is an example of the exported information in the file:
+
+----
+{
+    "examplevhost": {
+        "10.11.12.13": {
+            "cpuArch": "x86_64",
+            "cpuDescription": "AMD Opteron(tm) Processor 4386",
+            "cpuMhz": 3092.212727,
+            "cpuVendor": "amd",
+            "hostIdentifier": "'vim.HostSystem:host-182'",
+            "name": "11.11.12.13",
+            "os": "VMware ESXi",
+            "osVersion": "5.5.0",
+            "ramMb": 65512,
+            "totalCpuCores": 16,
+            "totalCpuSockets": 2,
+            "totalCpuThreads": 16,
+            "type": "vmware",
+            "vms": {
+                "vCenter": "564d6d90-459c-2256-8f39-3cb2bd24b7b0"
+            }
+        },
+        "10.11.12.14": {
+            "cpuArch": "x86_64",
+            "cpuDescription": "AMD Opteron(tm) Processor 4386",
+            "cpuMhz": 3092.212639,
+            "cpuVendor": "amd",
+            "hostIdentifier": "'vim.HostSystem:host-183'",
+            "name": "10.11.12.14",
+            "os": "VMware ESXi",
+            "osVersion": "5.5.0",
+            "ramMb": 65512,
+            "totalCpuCores": 16,
+            "totalCpuSockets": 2,
+            "totalCpuThreads": 16,
+            "type": "vmware",
+            "vms": {
+                "49737e0a-c9e6-4ceb-aef8-6a9452f67cb5": "4230c60f-3f98-2a65-f7c3-600b26b79c22",
+                "5a2e4e63-a957-426b-bfa8-4169302e4fdb": "42307b15-1618-0595-01f2-427ffcddd88e",
+                "NSX-gateway": "4230d43e-aafe-38ba-5a9e-3cb67c03a16a",
+                "NSX-l3gateway": "4230b00f-0b21-0e9d-dfde-6c7b06909d5f",
+                "NSX-service": "4230e924-b714-198b-348b-25de01482fd9"
+            }
+        }
+    }
+}
+----
+
+For more information, see the man page on your {productname} server for [command]``virtual-host-gatherer``:
+
+----
+man virtual-host-gatherer
+----
+
+
+The `README` file provided with the package provides background information about the `type` of a hypervisor, etc.:
+
+----
+/usr/share/doc/packages/virtual-host-gatherer/README.md
+----
+
+The man page and the `README` file also contain example configuration files for your reference.
