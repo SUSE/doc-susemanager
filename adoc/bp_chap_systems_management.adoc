@@ -21,8 +21,9 @@ For general information about Salt clients, see <<salt.gs.guide.intro>>.
 == Traditional Contact Method (rhnsd)
 
 The {productname} daemon ([command]``rhnsd``) runs on traditional client systems and periodically connects with {productname} to check for new updates and notifications.
+The daemon is started by [path]``/etc/init.d/rhnsd``.
 It is only still in use on {sle} 11 and {rhnminrelease6}{mdash}these are systems that are not based on systemd.
-On later systems, a systemd timer ([systemitem]``rhnsd.timer``) is used and controlled by the [systemitem]``rhnsd.service``.
+On later systems, a systemd timer ([systemitem]``rhnsd.timer``) is used and controlled by [systemitem]``rhnsd.service``.
 
 
 By default, rhnsd will check every 4 hours for new actions, therefore it may take some time for your clients to begin updating after actions have been scheduled for them.
@@ -48,15 +49,13 @@ All items left of the [systemitem]``Python XMLRPC server`` block represent proce
 image::rhnsd-taigon.png[scaledwidth=80]
 
 
-=== Configuring {productname} rhnsd Daemon
-
+=== Configuring {productname} rhnsd Daemon or Timer
 
 The {productname} daemon can be configured by editing the file on the client:
 
 ----
 /etc/sysconfig/rhn/rhnsd
 ----
-
 
 This is the configuration file the rhnsd initialization script uses.
 An important parameter for the daemon is its check-in frequency.
@@ -72,11 +71,45 @@ The minimum allowed time interval is one hour (60 minutes).
 If you set the interval below one hour, it will change back to the default of 4 hours (240 minutes).
 ====
 
+On systemd-based systems (for example, SLE 12 and later), the default time interval is set in [path]``/etc/systemd/system/timers.target.wants/rhnsd.timer``:
+
+----
+[Timer]
+OnCalendar=00/4:00
+RandomizedDelaySec=30min
+----
+
+You can create an overriding drop-in file of [path]``rhnsd.timer`` with:
+
+----
+systemctl edit rhnsd.timer
+----
+
+For example, if you want configure a two hour time interval, enter:
+
+----
+[Timer]
+OnCalendar=00/2:00
+----
+
+On write, the file will be saved as [path]``/etc/systemd/system/rhnsd.timer.d/override.conf``.
+For more information about system timers, see the manpages of [command]``systemd.timer`` and [command]``systemctl``.
 
 
-=== Viewing rhnsd Daemon Status
 
-You can view the status of rhnsd by typing the command [command]``service rhnsd status`` as {rootuser}.
+=== Viewing rhnsd Daemon or Timer Status
+
+As the {rootuser} you may view the status of the [systemitem]``rhnsd`` daemon with:
+
+----
+/etc/init.d/rhnsd status
+----
+
+And the status of the [systemitem]``rhnsd`` service with:
+
+----
+service rhnsd status
+----
 
 
 
