@@ -1,53 +1,98 @@
 [[virt-xenkvm]]
 = Virtualization with Xen and KVM
 
+Xen and KVM virtualized clients can be managed directly in {productname}.
+
+To begin, you will need to set up a virtual host on your {productname} Server.
+You can then set up autoinstallation using {ay} or {kickstart} for future virtual hosts, and for virtual guests.
+
+This section also includes information about administering your virtual guests after they have been installed.
 
 
 
+== Host Setup
 
 
+A {vmhost} system serving as a target for autoinstalling {vmguest}s from {productname} must be capable of running guest operating systems.
+This requires either {kvm} or {xen} being properly set up.
+For installation instructions for {sls} systems refer to the [ref]_SLES Virtualization Guide_ available from https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html.
+For instructions on setting up a {rhel} {vmhost} refer to your {rhel} documentation.
+
+Since {productname} uses [library]``libvirt`` for {vmguest} installation and management, the [daemon]``libvirtd`` needs to run on the {vmhost}.
+The default [library]``libvirt`` configuration is sufficient to install and manage {vmguest}s from {productname}.
+However, in case you want to access the VNC console of a {vmguest} as a non-{rootuser} user, you need to configure [library]``libvirt`` appropriately.
+Configuration instructions for [library]``libvirt`` on {sls} are available in the [ref]_SLES Virtualization Guide_ available from https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html available from http://www.suse.com/documentation/sles11/.
+For instructions for a {rhel} {vmhost} refer to your {rhel} documentation.
+
+Apart from being able to serve as a host for {kvm} or {xen} guests, which are managed by [library]``libvirt``, a {vmhost} must be registered with {productname}.
 
 
+. Make sure either {kvm} or {xen} is properly set up.
+. Make sure the [daemon]``libvirtd`` is running.
+. Register the {vmhost} with {productname}:
++
+** Create a bootstrap script on the {productname} as described in <<generate.bootstrap.script>>.
+** Download the bootstrap script from `susemanager.example.com/pub/bootstrap/bootstrap.sh` to the {vmhost}.
+** Edit the bootstrap script according to your needs.
+   The minimal requirement is to include the activation key for the {vmhost} (see <<sec.virtualzation.autoinstall.req-mgr.keys>> for details).
+   We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).
+** Execute the bootstrap script to register the {vmhost}.
++
+
+[IMPORTANT]
+====
+Salt minions must be restarted after enabling the Virtualization Host entitlement in order to see virtual machine changes in {productname} instantly.
+====
+
+[[sec.virtualization.autoinstall.req_vmhost.salt]]
+==== {vmhost} setup on Salt clients
 
 
+If the {vmhost} is registered as a Salt minion, a final configuration step is needed in order to gather all the guest VMs defined on the {vmhost}:
 
 
+. From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type`` ``Virtualization Host`` and confirm with btn:[Update Properties].
+. Schedule a Hardware Refresh. On the menu:System Details[Hardware] page click btn:[Schedule Hardware Refresh].
+
+Salt 2019.2.0 or later is required on the virtual host in order for the salt-based virtualization features to fully work on it.
+
+[[sec.virtualization.autoinstall.req_vmhost.traditional]]
+=== {vmhost} setup on Traditional clients
 
 
+Once the registration process is finished and all packages have been installed, enable [daemon]``osad`` (open source architecture daemon).
+On {sls} 12 systems and later, it can be achieved by running the following commands as user {rootuser}:
 
 
+----
+service rhnsd stop
+service rhnsd disable
+----
 
 
+----
+service osad enable
+service osad start
+----
 
+.Using [systemitem]``osad`` with [systemitem]``rhnsd``
+IMPORTANT: [systemitem]``rhnsd``  checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
+If many clients are registered with {productname}, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately, which can be done by adding [systemitem]``osad``.
+The [systemitem]``osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
+// FIXME: check it with the systemd.timer
+////
+Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [systemitem]``rhnsd`` you can only schedule for a time in the future plus up to four hours).
 ////
 
-Old content below here
+
+
+== Autoinstallation
+
+You can automatically install {xen} and {kvm} guests using {ay} or {kickstart} profiles.
+Additonally, you can automatically register the guestss, so they can immediately be managed by {productname}.
+
 
 The following documentation is valid in the context of traditional clients.
 Salt minions must be treated differently:
@@ -65,21 +110,18 @@ Currently, virtual machines from other virtualization solutions such as VMware* 
 
 
 [[sec.virtualization.autoinstall]]
-== Autoinstalling {vmguest}s
+=== Autoinstalling {vmguest}s
 
 With {productname} you can automatically deploy {xen} and {kvm} {vmguest}s using {ay} or {kickstart} profiles.
 It is also possible to automatically register the {vmguest}s, so they can immediately be managed by {productname}.
 
-[[sec.virtualization.autoinstall.req_mgr]]
-=== Requirements on {productname}
+
 
 
 Setting up and managing {vmguest}s with {productname} does not require special configuration options.
 However, you need to provide activation keys for the {vmhost} and the {vmguest}s, an autoinstallable distribution and an autoinstallation profile.
 To automatically register {vmguest}s with {productname}, a bootstrap script is needed.
 
-[[sec.virtualzation.autoinstall.req-mgr.keys]]
-==== Activation Keys
 
 
 Just like any other client, {vmhost} and {vmguest}s need to be registered with {productname} using activation keys.
@@ -94,7 +136,7 @@ If you want to manage the {vmhost} system from {productname} (for example, by ex
 
 
 [[sec.virtualzation.autoinstall.req-mgr.inst-source]]
-==== Setting up an Autoinstallable Distribution
+=== Setting up an Autoinstallable Distribution
 
 
 To autoinstall clients from {productname}, you need to provide an "`autoinstallable distribution`", also referred to as autoinstallable tree or installation source.
@@ -169,7 +211,7 @@ Save your settings by clicking btn:[Update Autoinstallable Distribution].
 
 
 [[sec.virtualzation.autoinstall.req-mgr.profile]]
-==== Providing an Autoinstallation Profile
+=== Providing an Autoinstallation Profile
 
 Autoinstallation profiles ({ay} or {kickstart} files) contain all the installation and configuration data needed to install a system without user intervention.
 They may also contain scripts that will be executed after the installation has completed.
@@ -183,7 +225,7 @@ For more information, examples and HOWTOs on {ay} profiles, refer to [ref]_SUSE 
 For more information on {kickstart} profiles, refer to your {rhel} documentation.
 
 
-==== {sle} 15 Systems
+=== {sle} 15 Systems
 
 You need the installation media to setup the distribution.
 Starting with version 15, there is only one installation media.
@@ -215,7 +257,7 @@ It is also recommended to add the following modules:
 
 
 [[sec.virtualzation.autoinstall.req-mgr.profile.upload]]
-===== Uploading an Autoinstallation Profile
+=== Uploading an Autoinstallation Profile
 
 
 . Log in to the {productname} Web interface and open menu:Systems[Autoinstallation > Profiles > Upload New Kickstart/AutoYaST File].
@@ -244,7 +286,7 @@ Be sure to review the [guimenu]``Partitioning`` tab to verify these settings whe
 
 
 [[sec.virtualzation.autoinstall.req-mgr.profile.generate]]
-===== Creating a Kickstart Profile
+=== Creating a Kickstart Profile
 
 [NOTE]
 ====
@@ -278,7 +320,7 @@ You may browse through the various tabs of the profile and modify the settings a
 
 
 [[sec.virtualzation.autoinstall.req-mgr.profile.scripts]]
-===== Adding a Registration Script to the Autoinstallation Profile
+=== Adding a Registration Script to the Autoinstallation Profile
 
 
 A {vmguest} that is autoinstalled does not get automatically registered.
@@ -324,84 +366,6 @@ profile already contains a `<scripts>` section, do not add a second one, but rat
 . Click menu:Update[] to save the changes.
 
 
-[[sec.virtualization.autoinstall.req_vmhost]]
-=== {vmhost} Setup
-
-
-A {vmhost} system serving as a target for autoinstalling {vmguest}s from {productname} must be capable of running guest operating systems.
-This requires either {kvm} or {xen} being properly set up.
-For installation instructions for {sls} systems refer to the [ref]_SLES Virtualization Guide_ available from https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html.
-For instructions on setting up a {rhel} {vmhost} refer to your {rhel} documentation.
-
-Since {productname} uses [library]``libvirt`` for {vmguest} installation and management, the [daemon]``libvirtd`` needs to run on the {vmhost}.
-The default [library]``libvirt`` configuration is sufficient to install and manage {vmguest}s from {productname}.
-However, in case you want to access the VNC console of a {vmguest} as a non-{rootuser} user, you need to configure [library]``libvirt`` appropriately.
-Configuration instructions for [library]``libvirt`` on {sls} are available in the [ref]_SLES Virtualization Guide_ available from https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html available from http://www.suse.com/documentation/sles11/.
-For instructions for a {rhel} {vmhost} refer to your {rhel} documentation.
-
-Apart from being able to serve as a host for {kvm} or {xen} guests, which are managed by [library]``libvirt``, a {vmhost} must be registered with {productname}.
-
-
-. Make sure either {kvm} or {xen} is properly set up.
-. Make sure the [daemon]``libvirtd`` is running.
-. Register the {vmhost} with {productname}:
-+
-** Create a bootstrap script on the {productname} as described in <<generate.bootstrap.script>>.
-** Download the bootstrap script from `susemanager.example.com/pub/bootstrap/bootstrap.sh` to the {vmhost}.
-** Edit the bootstrap script according to your needs.
-   The minimal requirement is to include the activation key for the {vmhost} (see <<sec.virtualzation.autoinstall.req-mgr.keys>> for details).
-   We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).
-** Execute the bootstrap script to register the {vmhost}.
-+
-
-[IMPORTANT]
-====
-Salt minions must be restarted after enabling the Virtualization Host entitlement in order to see virtual machine changes in {productname} instantly.
-====
-
-[[sec.virtualization.autoinstall.req_vmhost.salt]]
-==== {vmhost} setup on Salt clients
-
-
-If the {vmhost} is registered as a Salt minion, a final configuration step is needed in order to gather all the guest VMs defined on the {vmhost}:
-
-
-. From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type`` ``Virtualization Host`` and confirm with btn:[Update Properties].
-. Schedule a Hardware Refresh. On the menu:System Details[Hardware] page click btn:[Schedule Hardware Refresh].
-
-Salt 2019.2.0 or later is required on the virtual host in order for the salt-based virtualization features to fully work on it.
-
-[[sec.virtualization.autoinstall.req_vmhost.traditional]]
-==== {vmhost} setup on Traditional clients
-
-
-Once the registration process is finished and all packages have been installed, enable [daemon]``osad`` (open source architecture daemon).
-On {sls} 12 systems and later, it can be achieved by running the following commands as user {rootuser}:
-
-
-----
-service rhnsd stop
-service rhnsd disable
-----
-
-
-----
-service osad enable
-service osad start
-----
-
-.Using [systemitem]``osad`` with [systemitem]``rhnsd``
-IMPORTANT: [systemitem]``rhnsd``  checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
-If many clients are registered with {productname}, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.
-
-However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately, which can be done by adding [systemitem]``osad``.
-The [systemitem]``osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
-// FIXME: check it with the systemd.timer
-////
-Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [systemitem]``rhnsd`` you can only schedule for a time in the future plus up to four hours).
-////
-
-
 [[sec.virtualization.autoinstall.installation]]
 === Autoinstalling {vmguest}s
 
@@ -443,6 +407,13 @@ If the event log does not contain enough information to locate a problem, log in
 If you are using [systemitem]``rhnsd``, you may alternatively immediately trigger any scheduled actions by calling [command]``mgr_check`` on the {vmhost}.
 Increase the command's verbosity by using the options [option]``-v``, [option]``-vv``, or [option]``-vvv``, respectively.
 ====
+
+
+
+
+
+
+
 
 
 
