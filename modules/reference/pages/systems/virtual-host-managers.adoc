@@ -1,174 +1,36 @@
 [[ref.webui.systems.virt-host-managers]]
 = Virtual Host Managers
 
-Third party hypervisors and hypervisor managers such as VMWare vCenter are called "`Virtual Host Managers`" (VHM).
+Third party hypervisors and hypervisor managers are called Virtual Host Managers (VHMs).
 VHMs can manage one or more virtual hosts, and each virtual host can contain one or more virtual guests.
+VHMs can be based on VMWare, or created from a file.
 
-To create a VHM, navigate to menu:Systems[Virtual Host Managers] in the {webui}.
-In the upper right of the page, click btn:[Create] and select either [guimenu]``VMware-based`` or [guimenu]``File-based``.
-Continue according to one of the following procedures.
 
-After it has been created and configured, data collection will be run automatically using Taskomatic.
-You can also begin data collection from your VHMs manually through the {webui}, by navigating to menu:Systems[Virtual Host Managers], selecting the appropriate VHM, and clicking btn:[Refresh Data].
+.Procedure: Creating a VMWare VHM
+
+. In the {productname} {webui}, navigate to menu:Systems[Virtual Host Managers].
+. Click btn:[Create] and select [guimenu]``VMware-based``.
+. Enter the location of your VMware-based virtual host.
+. Enter a [guimenu]``Label``, [guimenu]``Hostname``, [guimenu]``Port``, [guimenu]``Username`` and [guimenu]``Password`` for your VHM.
+. Click the btn:[Add Virtual Host Manager] button.
+
+
+.Procedure: Creating a File-based VHM
+
+. In the {productname} {webui}, navigate to menu:Systems[Virtual Host Managers].
+. Click btn:[Create] and select [guimenu]``File-based``.
+. Enter the location of a JSON file for your VHM.
+This is usually exported directly from the ESXi or vSphere host.
+. Enter a [guimenu]``Label``, [guimenu]``Hostname``, [guimenu]``Port``, [guimenu]``Username`` and [guimenu]``Password`` for your VHM.
+. Click the btn:[Add Virtual Host Manager] button.
+
+
+After your VHM has been created and configured, Taskomatic will run data collection automatically.
+You can also begin data collection manually through the {webui}, by navigating to menu:Systems[Virtual Host Managers], selecting the appropriate VHM, and clicking btn:[Refresh Data].
 
 {productname} ships with a tool called [command]``virtual-host-gatherer`` that can connect to VHMs using their API, and request information about virtual hosts.
-[command]``virtual-host-gatherer`` maintains the concept of optional modules, where each module enables a specific Virtual Host Manager.
+[command]``virtual-host-gatherer`` maintains the concept of optional modules, where each module enables a specific VHM.
 This tool is automatically invoked nightly by Taskomatic.
-Log files for the [command]``virtual-host-gatherer`` tool are located at [path]``/avr/log/rhn/gather.log``.
+Log files for the [command]``virtual-host-gatherer`` tool are located at [path]``/var/log/rhn/gather.log``.
 
-
-
-[[ref.webui.systems.virt-host-managers.vmware]]
-== VMware-Based
-
-
-After selecting menu:Create[VMware-based] enter the location of your VMware-based virtual host.
-Enter a [guimenu]``Label``, [guimenu]``Hostname``, [guimenu]``Port``, [guimenu]``Username`` and [guimenu]``Password``.
-Finally click the btn:[Add Virtual Host Manager] button.
-For detailed information on working with a VMware-based Virtual Host Manager, see xref:administration:virtual-hosts.adoc[].
-
-
-image::systems_virtual_host_managers_vmware.png[scaledwidth=80%]
-
-
-
-[[ref.webui.systems.virt-host-managers.file]]
-== File-Based
-
-In a VMWare environment where direct connection to the {susemgr} is not possible, a JSON file can be exported from the ESXi or vSphere host and later imported into {productname}.
-
-After selecting menu:Create[File-Based] enter a label and URL leading to the location of this file.
-
-
-image::systems_virtual_host_managers_file.png[scaledwidth=80%]
-
-
-.VMWare vCenter Installations without Direct Access
-[NOTE]
-====
-The file-based is not meant to be used with manually crafted files.
-It only meant to be used with the output of [command]``virtual-host-gatherer`` against some other module.
-File-based is suitable for VMWare vCenter installations for which no direct API access is possible from the {susemgr}.
-
-The solution is to run [command]``virtual-host-gatherer`` from somewhere else in the network and save the produced JSON data for further processing.
-====
-
-
-The following JSON data is an example of the exported information in the file:
-
-----
-{
-    "examplevhost": {
-        "10.11.12.13": {
-            "cpuArch": "x86_64",
-            "cpuDescription": "AMD Opteron(tm) Processor 4386",
-            "cpuMhz": 3092.212727,
-            "cpuVendor": "amd",
-            "hostIdentifier": "'vim.HostSystem:host-182'",
-            "name": "11.11.12.13",
-            "os": "VMware ESXi",
-            "osVersion": "5.5.0",
-            "ramMb": 65512,
-            "totalCpuCores": 16,
-            "totalCpuSockets": 2,
-            "totalCpuThreads": 16,
-            "type": "vmware",
-            "vms": {
-                "vCenter": "564d6d90-459c-2256-8f39-3cb2bd24b7b0"
-            }
-        },
-        "10.11.12.14": {
-            "cpuArch": "x86_64",
-            "cpuDescription": "AMD Opteron(tm) Processor 4386",
-            "cpuMhz": 3092.212639,
-            "cpuVendor": "amd",
-            "hostIdentifier": "'vim.HostSystem:host-183'",
-            "name": "10.11.12.14",
-            "os": "VMware ESXi",
-            "osVersion": "5.5.0",
-            "ramMb": 65512,
-            "totalCpuCores": 16,
-            "totalCpuSockets": 2,
-            "totalCpuThreads": 16,
-            "type": "vmware",
-            "vms": {
-                "49737e0a-c9e6-4ceb-aef8-6a9452f67cb5": "4230c60f-3f98-2a65-f7c3-600b26b79c22",
-                "5a2e4e63-a957-426b-bfa8-4169302e4fdb": "42307b15-1618-0595-01f2-427ffcddd88e",
-                "NSX-gateway": "4230d43e-aafe-38ba-5a9e-3cb67c03a16a",
-                "NSX-l3gateway": "4230b00f-0b21-0e9d-dfde-6c7b06909d5f",
-                "NSX-service": "4230e924-b714-198b-348b-25de01482fd9"
-            }
-        }
-    }
-}
-----
-
-For more information, see the man page on your {productname} server for [command]``virtual-host-gatherer``:
-
-----
-man virtual-host-gatherer
-----
-
-
-The `README` file provided with the package provides background information about the `type` of a hypervisor, etc.:
-
-----
-/usr/share/doc/packages/virtual-host-gatherer/README.md
-----
-
-The man page and the `README` file also contain example configuration files for your reference.
-
-
-
-== Configuring Virtual Host Managers using the XMLRPC API
-
-VHMs can be managed manually using the {webui}, or programtically using XMLRPC.
-If you want to to manage your VHMs with XMLRPC, you will need to configure them to use the XMLRPC APIs.
-
-The following APIs allow you to get a list of available [command]``virtual-host-manager`` modules and the parameters they require:
-
-* {empty}
-+
-
-----
-virtualhostmanager.listAvailableVirtualHostGathererModules(session)
-----
-* {empty}
-+
-
-----
-virtualhostmanager.getModuleParameters(session, moduleName)
-----
-
-
-The following APIs allow you to create and delete VHMs.
-The module parameter map must match the map returned by `virtualhostmanager.getModuleParameters` to work correctly:
-
-* {empty}
-+
-
-----
-virtualhostmanager.create(session, label, moduleName, parameters)
-----
-* {empty}
-+
-
-----
-virtualhostmanager.delete(session, label)
-----
-
-
-The following APIs return information about configured VHMs:
-
-* {empty}
-+
-
-----
-virtualhostmanager.listVirtualHostManagers(session)
-----
-* {empty}
-+
-
-----
-virtualhostmanager.getDetail(session, label)
-----
+For more information on VHMs, see xref:administration:virtual-hosts.adoc[].

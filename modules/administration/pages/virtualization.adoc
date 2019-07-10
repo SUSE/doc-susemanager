@@ -315,6 +315,10 @@ Apart from being able to serve as a host for {kvm} or {xen} guests, which are ma
 ** Execute the bootstrap script to register the {vmhost}.
 +
 
+[IMPORTANT]
+====
+Salt minions must be restarted after enabling the Virtualization Host entitlement in order to see virtual machine changes in {productname} instantly.
+====
 
 [[sec.virtualization.autoinstall.req_vmhost.salt]]
 ==== {vmhost} setup on Salt clients
@@ -332,28 +336,30 @@ Salt 2019.2.0 or later is required on the virtual host in order for the salt-bas
 ==== {vmhost} setup on Traditional clients
 
 
-Once the registration process is finished and all packages have been installed, enable [daemon]``osad`` (open source architecture daemon).
-On a {sls} system this can be achieved by running the following commands as user {rootuser}:
+When the registration process is finished and all packages have been installed, enable [daemon]``osad`` (open source architecture daemon).
+On {sls} 12 systems and later, it can be achieved by running the following commands as user {rootuser}:
 
 
 ----
-systemctl stop rhnsd
-systemctl disable rhnsd
+service rhnsd stop
+service rhnsd disable
 ----
 
 
 ----
-systemctl enable osad
-systemctl start osad
+service osad enable
+service osad start
 ----
 
-.Using [daemon]``osad`` with [daemon]``rhnsd``
-IMPORTANT: The [daemon]``rhnsd`` daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
-If many clients are registered with {productname}, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.
+.Using [systemitem]``osad`` with [systemitem]``rhnsd``
+IMPORTANT: [systemitem]``rhnsd``  checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
+If many clients are registered with {productname}, this long interval ensures a certain level of load balancing because not all clients act on a scheduled action at the same time. 
+For setting the time interval, see xref:client-configuration:contact-methods.adoc[].
 
-However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately, which can be done by adding [daemon]``osad``.
-The [daemon]``osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
-Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [daemon]``rhnsd`` you can only schedule for a time in the future plus up to four hours).
+However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately, which can be done by adding [systemitem]``osad``.
+The [systemitem]``osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
+Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [systemitem]``rhnsd`` you can only schedule for a time in the future plus up to four hours).
+
 
 
 
@@ -361,7 +367,7 @@ Alternatively you may schedule actions to be carried out at a fixed time in the 
 === Autoinstalling {vmguest}s
 
 
-Once all requirements on the {productname} and the {vmhost} are met, you can start to autoinstall {vmguest}s on the host.
+When all requirements on the {productname} and the {vmhost} are met, you can start to autoinstall {vmguest}s on the host.
 Note that {vmguest}s will not be automatically registered with {productname}, therefore we strongly recommend to modify the autoinstallation profile as described in <<sec.virtualzation.autoinstall.req-mgr.profile.scripts>>.
 {vmguest}s need to be registered to manage them with {productname}.
 Proceed as follows to autoinstall a {vmguest}.
@@ -391,11 +397,11 @@ If a guest installation starts while another one is still running, the running i
 To view the installation log, click menu:Events[History] on the [guimenu]``Session Status`` page.
 On the [guimenu]``System History Event`` page you can click a [guimenu]``Summary`` entry to view a detailed log.
 
-In case an installation has failed, you can btn:[Reschedule] it from this page once you have corrected the problem.
+In case an installation has failed, you can btn:[Reschedule] it from this page when you have corrected the problem.
 You do not have to configure the installation again.
 
 If the event log does not contain enough information to locate a problem, log in to the {vmhost} console and read the log file for your package manager.
-If you are using the [daemon]``rhnsd``, you may alternatively immediately trigger any scheduled actions by calling [command]``rhn_check`` on the {vmhost}.
+If you are using [systemitem]``rhnsd``, you may alternatively immediately trigger any scheduled actions by calling [command]``mgr_check`` on the {vmhost}.
 Increase the command's verbosity by using the options [option]``-v``, [option]``-vv``, or [option]``-vvv``, respectively.
 ====
 
