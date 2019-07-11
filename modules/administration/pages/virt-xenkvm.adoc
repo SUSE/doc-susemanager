@@ -12,79 +12,50 @@ This section also includes information about administering your virtual guests a
 
 == Host Setup
 
+The way that you set up Xen or KVM on a VM host depends on what operating system you want to use on its associated guests.
 
-A {vmhost} system serving as a target for autoinstalling {vmguest}s from {productname} must be capable of running guest operating systems.
-This requires either {kvm} or {xen} being properly set up.
-For installation instructions for {sls} systems refer to the [ref]_SLES Virtualization Guide_ available from https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html.
-For instructions on setting up a {rhel} {vmhost} refer to your {rhel} documentation.
+For {suse} operating systems, see the {slsa} Virtualization Guide available from https://www.suse.com/documentation/sles-15/book_virt/data/book_virt.html.
 
-Since {productname} uses [library]``libvirt`` for {vmguest} installation and management, the [daemon]``libvirtd`` needs to run on the {vmhost}.
-The default [library]``libvirt`` configuration is sufficient to install and manage {vmguest}s from {productname}.
-However, in case you want to access the VNC console of a {vmguest} as a non-{rootuser} user, you need to configure [library]``libvirt`` appropriately.
-Configuration instructions for [library]``libvirt`` on {sls} are available in the [ref]_SLES Virtualization Guide_ available from https://www.suse.com/documentation/sles-12/book_virt/data/book_virt.html available from http://www.suse.com/documentation/sles11/.
-For instructions for a {rhel} {vmhost} refer to your {rhel} documentation.
+For {rhel} operating systems, refer to the Red Hat documentation for your version.
 
-Apart from being able to serve as a host for {kvm} or {xen} guests, which are managed by [library]``libvirt``, a {vmhost} must be registered with {productname}.
+{productname} uses [systemitem]``libvirt`` to install and manage guests.
+You must have the [daemon]``libvirtd`` package installed on your host.
+In most cases, the default settings are usually sufficient, and you should not need to adjust them.
+However, if you want to access the VNC console on your guests as a non-root user, you will need to perform some configuration changes.
+For more information about how to set this up, consult the relevant documentation for your operating system.
 
+You will require a bootstrap script on the {productname} Server.
+Your bootstrap script must include the activation key for your host.
+We also recommend that you include your GPG key for additional security.
+For more on creating a bootstrap script, see xref:client-configuration:registration-bootstrap.adoc[].
 
-. Make sure either {kvm} or {xen} is properly set up.
-. Make sure the [daemon]``libvirtd`` is running.
-. Register the {vmhost} with {productname}:
-+
-** Create a bootstrap script on the {productname} as described in <<generate.bootstrap.script>>.
-** Download the bootstrap script from `susemanager.example.com/pub/bootstrap/bootstrap.sh` to the {vmhost}.
-** Edit the bootstrap script according to your needs.
-   The minimal requirement is to include the activation key for the {vmhost} (see <<sec.virtualzation.autoinstall.req-mgr.keys>> for details).
-   We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).
-** Execute the bootstrap script to register the {vmhost}.
-+
+When your bootstrap script is ready, execute it on the host to register it with the {productname} Server.
+For more on client registration, see xref:client-configuration:manual-registration-overview.adoc[].
 
-[IMPORTANT]
-====
-Salt minions must be restarted after enabling the Virtualization Host entitlement in order to see virtual machine changes in {productname} instantly.
-====
+For Salt clients, you will need to enable the [systemitem]``Virtualization Host`` entitlement.
+This allows you to see VM changes instantly.
+To do this, in the {productname} {webui}, navigate to the [guimenu]``System Details`` page for the host, and click on the [guimenu]``Properties`` tab.
+In the [guimenu]``Add-On System Types`` section, check [guimenu]``Virtualization Host``, and click btn:[Update Properties] to save the changes.
+You will need to scedhule a hardware refresh to activate the change.
+Navigate to menu:System Details[Hardware], and click btn:[Schedule Hardware Refresh].
 
-[[sec.virtualization.autoinstall.req_vmhost.salt]]
-==== {vmhost} setup on Salt clients
+By default, VM hosts use the [systemitem]``rhnsd`` service to check for scheduled actions every four hours, in order to load balance in environments where there are a lot of clients.
+This can create delays of up to four hours before an action is carried out.
+When you are managing VM guests, this long delay is not always ideal, especially for actions like rebooting a guest.
+To address this, you can disable the [systemitem]``rhnsd`` service, and enable the [daemon]``osad`` service.
+The [daemon]``osad`` service receives commands using a jabber protocol, and will execute commands instantly.
 
-
-If the {vmhost} is registered as a Salt minion, a final configuration step is needed in order to gather all the guest VMs defined on the {vmhost}:
-
-
-. From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type`` ``Virtualization Host`` and confirm with btn:[Update Properties].
-. Schedule a Hardware Refresh. On the menu:System Details[Hardware] page click btn:[Schedule Hardware Refresh].
-
-Salt 2019.2.0 or later is required on the virtual host in order for the salt-based virtualization features to fully work on it.
-
-[[sec.virtualization.autoinstall.req_vmhost.traditional]]
-=== {vmhost} setup on Traditional clients
-
-
-Once the registration process is finished and all packages have been installed, enable [daemon]``osad`` (open source architecture daemon).
-On {sls} 12 systems and later, it can be achieved by running the following commands as user {rootuser}:
-
+To disable the [systemitem]``rhnsd`` service, and enable the [daemon]``osad`` daemon, run these commands as the root user:
 
 ----
 service rhnsd stop
 service rhnsd disable
 ----
 
-
 ----
 service osad enable
 service osad start
 ----
-
-.Using [systemitem]``osad`` with [systemitem]``rhnsd``
-IMPORTANT: [systemitem]``rhnsd``  checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
-If many clients are registered with {productname}, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.
-
-However, when managing {vmguest}s, you usually want actions like rebooting a {vmguest} to be carried out immediately, which can be done by adding [systemitem]``osad``.
-The [systemitem]``osad`` daemon receives commands over the jabber protocol from {productname} and commands are instantly executed.
-// FIXME: check it with the systemd.timer
-////
-Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with [systemitem]``rhnsd`` you can only schedule for a time in the future plus up to four hours).
-////
 
 
 
