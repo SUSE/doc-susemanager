@@ -3,30 +3,23 @@
 
 include::entities.adoc[]
 
+This section explains some command line tools such as mgrcfg-client, mgrcfg-manager, mgr-actions-control, or mgr-sync.
 
-== Installing Command Line Tool Packages
 
-In addition to the SUSE Manager Web interface, SUSE Manager offers two command line tools for managing (Traditional) system configuration files :
+== Command Line Tools on Traditional Clients
 
-* The Configuration Client (*mgrcfg-client*)
-* The Configuration Manager (*mgrcfg-manager*)
+In addition to the SUSE Manager Web interface, SUSE Manager offers two command line tools for managing configuration files on _traditional_ clients:
 
-You can use the *mgrcfg-actions* tool to _enable_ and _disable_ configuration management on client systems.
+* The Configuration Client (*mgrcfg-client*, part of the [package]``mgr-cfg-client` package)
+* The Configuration Manager (*mgrcfg-manager*, part of the [package]``mgr-cfg-management`` package)
 
-To work with these tools install them from the SUSE Manager Tools child channel as root.
+You can use the *mgr-actions-control* tool (part of the [package]``mgr-cfg-actions`` package) to _enable_ and _disable_ configuration management on client systems.
 
-----
-zypper in rhncfg-manager
-----
+To work with these tools install them with the {webui}.
+Select the client's details page, then check whether these packages are already installed; click menu:System Details[Software > Packages > List/Remove] and, for example, enter `mgr-` as a search term.
+If the packages are not listed here, click the [guimenu]``Install`` sub-tab and select the packages for installation.
 
-----
-zypper in rhncfg-actions
-----
 
-Install the following package on client systems:
-----
-zypper in rhncfg-client
-----
 
 [TIP]
 .Configuration File Backups
@@ -38,7 +31,7 @@ The backup retains its filename but has a _.rhn-cfg-backup_ extension appended.
 
 
 [[mgr.actions.control]]
-== Actions Control  (mgr-actions-control)
+=== Actions Control  (mgr-actions-control)
 
 The Actions Control (*mgr-actions-control*) application is used to enable and disable configuration management on a system.
 Client systems cannot be managed in this fashion by default.
@@ -49,10 +42,12 @@ This tool allows SUSE Manager administrators to enable or disable specific modes
 * Using the diff command to find out what is currently managed on a system with what is available
 * Running remote commands
 
-These various modes are enabled/disabled by placing/removing files and directories in the [path]``/etc/sysconfig/rhn/allowed-actions/`` directory.
-Due to the default permissions of the [path]``/etc/sysconfig/rhn/`` directory, Actions Control has to be run by someone with root access.
+These various modes are enabled or disabled by placing or removing files and directories in the [path]``/etc/sysconfig/rhn/allowed-actions/`` directory.
+Because of to the default permissions of the [path]``/etc/sysconfig/rhn/`` directory, Actions Control has to be run by someone with root access.
 
-=== General command line options
+
+
+==== General command line options
 
 There is a manpage available, as for most command line tools.
 First, decide which scheduled actions should be enabled for use by system administrators.
@@ -109,7 +104,7 @@ A common option is [command]``mgr-actions-control --enable-all``.
 
 
 [[mgrcfg.client.tool]]
-== Configuration Client  (mgrcfg-client)
+=== Configuration Client  (mgrcfg-client)
 
 The Configuration Client (mgrcfg-client) is installed on and run from an individual client system to gain knowledge about how SUSE Manager deploys configuration files to the client.
 
@@ -121,7 +116,7 @@ The Configuration Client offers these primary modes:
 * diff
 * verify
 
-=== Listing Configuration Files
+==== Listing Configuration Files
 
 To list the configuration files for the machine and the labels of the config channels containing them, issue the command:
 
@@ -160,7 +155,7 @@ As a result, the version of the configuration file in config-channel-14 is not d
 
 
 [[getting.a.config.file]]
-=== Downloading a Config File
+==== Downloading a Config File
 
 To download the most relevant configuration file for the machine, issue the command:
 
@@ -183,7 +178,7 @@ Refer to Section "System Details" (Chapter 4, Systems, User Guide) for instructi
 
 
 [[viewing.config.channels]]
-=== Viewing Config Channels
+==== Viewing Config Channels
 
 To view the labels and names of the config channels that apply to the system, issue the command:
 
@@ -216,7 +211,7 @@ May be used multiple times.
 Show help message and exit.
 
 [[diff.between.config.files]]
-=== Differentiating between Config Files
+==== Differentiating between Config Files
 
 To view the differences between the config files deployed on the system and those stored by SUSE Manager, issue the command:
 
@@ -245,7 +240,7 @@ In addition, you can include the [option]``--topdir`` option to compare config f
 
 
 [[verify.config.files]]
-=== Verifying Config Files
+==== Verifying Config Files
 
 To quickly determine if client configuration files are different from those associated with it via SUSE Manager, issue the command:
 
@@ -276,7 +271,7 @@ Show help message and exit.
 
 
 [[the.configuration.manager]]
-== Configuration Manager (mgrcfg-manager)
+=== Configuration Manager (mgrcfg-manager)
 
 The Configuration Manager (*mgrcfg-manager*) is designed to maintain SUSE Manager's central repository of config files and channels, not those located on client systems.
 This tool offers a command line alternative to the configuration management features in the SUSE Manager Web interface.
@@ -328,7 +323,7 @@ mgrcfg-manager diff-revisions --help
 
 
 [[creating.a.config.channel]]
-=== Creating a Config Channel
+==== Creating a Config Channel
 
 To create a config channel for your organization, issue the command:
 
@@ -342,7 +337,7 @@ Once you have created a config channel, use the remaining modes listed above to 
 
 
 [[adding.files.to.a.config.channel]]
-=== Adding Files to a Config Channel
+==== Adding Files to a Config Channel
 
 To add a file to a config channel, specify the channel label and the local file to be uploaded:
 
@@ -401,7 +396,7 @@ Change the value from 128 to whatever limit you need in kilobytes.
 
 
 [[diff.between.latest.config.files]]
-=== Differentiating between Latest Config Files
+==== Differentiating between Latest Config Files
 
 To view the differences between the config files on disk and the latest revisions in a channel, issue the command:
 
@@ -440,7 +435,7 @@ Show help message and exit.
 
 
 [[diff.between.various.versions]]
-=== Differentiating between Various Versions
+==== Differentiating between Various Versions
 
 To compare different versions of a file across channels and revisions, use the *-r* flag to indicate which revision of the file should be compared and the *-n* flag to identify the two channels to be checked.
 Specify only one file name here since you are comparing the file against another version of itself.
@@ -486,7 +481,7 @@ Show help message and exit.
 
 
 [[downloading.all.files.in.a.channel]]
-=== Downloading All Files in a Channel
+==== Downloading All Files in a Channel
 
 To download all the files in a channel to disk, create a directory and issue the following command:
 
@@ -526,7 +521,7 @@ You should see the contents of the file as the output.
 
 
 [[listing.all.files.in.a.channel]]
-=== Listing All Files in a Channel
+==== Listing All Files in a Channel
 
 To list all the files in a channel, issue the command:
 
@@ -558,7 +553,7 @@ Show help message and exit.
 
 
 [[listing.all.config.channels]]
-=== Listing All Config Channels
+==== Listing All Config Channels
 To list all of your organization's configuration channels, issue the command:
 
 ----
@@ -579,7 +574,7 @@ This does not list *local_override* or *server_import* channels.
 
 
 [[removing.a.file.from.a.channel]]
-=== Removing a File from a Channel
+==== Removing a File from a Channel
 To remove a file from a channel, issue the command:
 
 ----
@@ -602,7 +597,7 @@ Show help message and exit.
 
 
 [[deleting.a.config.channel]]
-=== Deleting a Config Channel
+==== Deleting a Config Channel
 
 To remove a config channel in your organization, issue the command:
 
@@ -620,7 +615,7 @@ Config channel example-channel removed
 
 
 [[determine.the.number.of.file.revisions]]
-===  Determining the Number of File Revisions
+====  Determining the Number of File Revisions
 
 To find out how many revisions (from *1 to N* where N is an integer greater than 0) of a file/path are in a channel, issue the following command:
 
@@ -638,7 +633,7 @@ Analyzing files in config channel example-channel \
 
 
 [[update.a.file.in.a.channel]]
-=== Updating a File in a Channel
+==== Updating a File in a Channel
 
 To create a new revision of a file in a channel (or to add the first revision to that channel if none existed before for the given path), issue the following command:
 
@@ -678,7 +673,7 @@ Show help message and exit.
 
 
 [[uploading.multiple.files.at.once]]
-=== Uploading Multiple Files at Once
+==== Uploading Multiple Files at Once
 
 To upload multiple files to a config channel from a local disk at once, issue the command:
 
