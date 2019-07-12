@@ -61,139 +61,82 @@ service osad start
 
 == Autoinstallation
 
-You can automatically install {xen} and {kvm} guests using {ay} or {kickstart} profiles.
-Additonally, you can automatically register the guestss, so they can immediately be managed by {productname}.
 
+You can use {ay} or {kickstart} to automatically install and register Xen and KVM guests.
 
-The following documentation is valid in the context of traditional clients.
-Salt minions must be treated differently:
+You will require an activation key for the VM host you want to register the guests to, and for each guest.
+Your activation key must have the [systemitem]``provisioning`` and [systemitem]``Virtualization Platform`` entitlements.
+Your activation key must also have access to the [package]``mgr-virtualization-host`` and  [package]``mgr-osad`` packages.
+For more on creating activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
 
-* Autoinstallation is not supported, but creation of a guest from a template disk image is supported.
+If you want to automatically register the guests with {productname} after installation, you will need to create a bootstrap script.
+For more on creating a bootstrap script, see xref:client-configuration:registration-bootstrap.adoc[].
 
-.Limitation to Xen and KVM Guests
-[WARNING]
-====
-Autoinstalling and managing {vmguest}s via {productname} is limited to {xen} and {kvm} guests.
-{productname} uses [library]``libvirt`` for virtual machine management.
-Currently, virtual machines from other virtualization solutions such as VMware* or VirtualBox*, are recognized as {vmguest}s, but cannot be managed from within {productname}.
-====
-
-
-
-[[sec.virtualization.autoinstall]]
-=== Autoinstalling {vmguest}s
-
-With {productname} you can automatically deploy {xen} and {kvm} {vmguest}s using {ay} or {kickstart} profiles.
-It is also possible to automatically register the {vmguest}s, so they can immediately be managed by {productname}.
-
-
-
-
-Setting up and managing {vmguest}s with {productname} does not require special configuration options.
-However, you need to provide activation keys for the {vmhost} and the {vmguest}s, an autoinstallable distribution and an autoinstallation profile.
-To automatically register {vmguest}s with {productname}, a bootstrap script is needed.
-
-
-
-Just like any other client, {vmhost} and {vmguest}s need to be registered with {productname} using activation keys.
-Find details on how to set up activation keys at <<create.act.keys>>.
-While there are no special requirements for a {vmguest} key, at least the following requirements must be met for the {vmhost} activation key.
-
-.{vmhost} Activation Key: Minimum Requirements
-* Entitlements: Provisioning, Virtualization Platform.
-* Packages: [package]``mgr-virtualization-host``, [package]``mgr-osad``.
-+
-If you want to manage the {vmhost} system from {productname} (for example, by executing remote scripts), the package [package]``mgr-cfg-actions`` needs to be installed as well.
-
-
-[[sec.virtualzation.autoinstall.req-mgr.inst-source]]
-=== Setting up an Autoinstallable Distribution
-
-
-To autoinstall clients from {productname}, you need to provide an "`autoinstallable distribution`", also referred to as autoinstallable tree or installation source.
-This installation source needs to be made available through the file system of the {productname} host.
-It can for example be a mounted local or remote directory or a "`loop-mounted`" ISO image.
-It must match the following requirements:
-
-* Kernel and initrd location:
-
-.{rhel} / Generic RPM
-** images/pxeboot/vmlinuz
-** images/pxeboot/initrd.img
-
-
-.SUSE
-** boot/[replaceable]``arch``/loader/initrd
-** boot/[replaceable]``arch``/loader/linux
-* The menu:Base Channel[] needs to match the autoinstallable distribution.
-
-
-.Autoinstallation package sources
 [IMPORTANT]
 ====
-There is a fundamental difference between {rhel} and {suse} systems regarding the package sources for autoinstallation.
-The packages for a {rhel} installation are being fetched from the menu:Base Channel[].
-Packages for installing {suse} systems are being fetched from the autoinstallable distribution.
-
-As a consequence, the autoinstallable distribution for a {suse} system has to be a complete installation source (same as for a regular installation).
+Autoinstallation of VM guests works only if they are configured as Traditional clients.
+Salt clients can be created using a template disk image, but not by using {ay} or {kickstart}.
 ====
 
-.Procedure: Creating Autoinstallable Distribution
-. Make sure an installation source is available from a local directory.
-The data source can be any kind of network resource, a local directory or an ISO image (which has to be "`loop-mounted`" ).
-Files and directories must be world readable.
-. Log in to the {productname} {webui} and navigate to menu:Systems[Autoinstallation > Distributions > Create Distribution].
-. Fill out the form [guimenu]``Create Autoinstallable Distribution`` as follows:
-+
+=== Create an Autoinstallable Distribution
 
-[guimenu]``Distribution Label``:::
-Choose a unique name for the distribution.
-Only letters, numbers, hyphens, periods, and underscores are allowed; the minimum length is 4 characters.
-This field is mandatory.
+You will need to create an autoinstallable distribution on the VM host to be able to autoinstall clients from {productanme}.
+The distribution can be made available from a mounted local or remote directory, or on a loop-mounted ISO image.
 
-[guimenu]``Tree Path``:::
-Absolute local disk path to installation source.
-This field is mandatory.
+The configuration of the autoinstallable distribution will differ depending on whether you are using a {slsa} or {rhel} operating system on your guests.
+The packages for a {rhel} installation are fetched from the associated base channel.
+Packages for installing {suse} systems are fetched from the autoinstallable distribution.
+Therefore, for {slsa} systems, the autoinstallable distribution must be a complete installation source.
 
-[guimenu]``Base Channel``:::
-Channel matching the installation source.
-This channel is the package source for non-{suse} installations.
-This field is mandatory.
+.Paths for autoinstallable distributions
+[cols="1,1,1", options="header"]
+|===
+| Operating System Type | Kernel Location | initrd Location
+| {rhel} | [path]``images/pxeboot/vmlinuz``    | [path]``images/pxeboot/initrd.img``
+| {slsa} | [path]``boot/<arch>/loader/initrd`` | [path]``boot/<arch>/loader/linux``
+|===
 
-[guimenu]``Installer Generation``:::
-Operating system version matching the installation source.
-This field is mandatory.
+In all cases, ensure that the base channel matches the autoinstallable distribution.
 
-[guimenu]``Kernel Options``:::
-Options passed to the kernel when booting for the installation.
-There is no need to specify the [option]``install=`` parameter since it will automatically be added.
-Moreover, the parameters [option]``self_update=0 pt.options=self_update`` are added automatically to prevent AutoYaST from updating itself during the system installation.
-This field is optional.
-
-[guimenu]``Post Kernel Options``:::
-Options passed to the kernel when booting the installed system for the first time.
-This field is optional.
-. Save your settings by clicking btn:[Create Autoinstallable Distribution].
+Before you begin, ensure you have a installation media available to your VM Host.
+It can be on a network resource, a local directory, or an loop-mounted ISO image.
+Additionally, ensure that all files and directories are world-readable.
 
 
-To edit an existing [guimenu]``Autoinstallable Distribution``, go to menu:Systems[Autoinstallation > Distributions] and click on a [guimenu]``Label``.
-Save your settings by clicking btn:[Update Autoinstallable Distribution].
+.Procedure: Creating an autoinstallable distribution
+
+. In the {productname} {webui}, navigate to menu:Systems[Autoinstallation > Distributions] and click btn:[Create Distribution].
+. In the [guimenu]``Create Autoinstallable Distribution`` section, use these parameters:
+* In the [guimenu]``Distribution Label`` section, type a unique name for the distribution.
+Use only letters, numbers, hyphens (``-``), periods  (``.``), and underscores (``_``), and ensure the name is longer than four characters.
+* In the [guimenu]``Tree Path`` section, type an absolute path to the installation source.
+* In the [guimenu]``Base Channel`` section, select the channel that matches the installation source.
+This channel is used as the package source for non-{suse} installations.
+* In the [guimenu]``Installer Generation`` section, select the operating system version that matches the installation source.
+* In the [guimenu]``Kernel Options`` section, type any options to be passed to the kernel when booting for the installation.
+The [option]``install=`` parameter and the [option]``self_update=0 pt.options=self_update`` parameter are added by default.
+* In the [guimenu]``Post Kernel Options`` section, type any options to  be passed to the kernel when booting the installed system for the first time.
+. Click btn:[Create Autoinstallable Distribution] to save.
+
+When you have created an autoinstallable distribution, you can edit it by navigating to  menu:Systems[Autoinstallation > Distributions] and selecting the distribution you want to edit.
 
 
 
-[[sec.virtualzation.autoinstall.req-mgr.profile]]
-=== Providing an Autoinstallation Profile
+=== Create an Autoinstallation Profile
 
-Autoinstallation profiles ({ay} or {kickstart} files) contain all the installation and configuration data needed to install a system without user intervention.
-They may also contain scripts that will be executed after the installation has completed.
+Autoinstallation profiles contain all the installation and configuration data needed to install a system.
+They can also contain scripts to be executed after the installation is complete.
 
-All profiles can be uploaded to {productname} and be edited afterwards.
-Kickstart profiles can also be created from scratch with {productname}.
+{kickstart} profiles can be created using the {productname} {webui}.
+You can also create {ay} or {kickstart} autoinstallation profiles by hand, upload them to {productname}, and edit them later.
 
-A minimalist {ay} profile including a script for registering the client with {productname} is listed in <<advanced.topics.app.ay.example-simple>>.
+An example {ay} profile that includes a script for registering the client with {productname} is available in xref:administration:autoyast-example.adoc[].
 
-For more information, examples and HOWTOs on {ay} profiles, refer to [ref]_SUSE Linux Enterprise AutoYaST_ (https://www.suse.com/documentation/sles-12/book_autoyast/data/book_autoyast.html).
-For more information on {kickstart} profiles, refer to your {rhel} documentation.
+For more on {ay}, see xref:client-configuration:autoyast.adoc[].
+For more on {kickstart}, refer to the Red Hat documentation for your installation.
+
+
+// Lana you're up to here.
 
 
 === {sle} 15 Systems
@@ -390,6 +333,9 @@ Increase the command's verbosity by using the options [option]``-v``, [option]``
 
 [[sec.virtualization.vmguest-manage]]
 == Managing {vmguest}s
+
+
+If you want to manage the {vmhost} system from {productname} (for example, by executing remote scripts), the package [package]``mgr-cfg-actions`` needs to be installed as well.
 
 Basic {vmguest} management actions such as restarting or shutting down a virtual machine as well as changing the CPU and memory allocation can be carried out in the {productname} Web interface if the following requirements are met:
 
