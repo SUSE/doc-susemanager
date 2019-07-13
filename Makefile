@@ -74,6 +74,38 @@ help: ## Prints a basic help menu about available targets
 	done
 
 
+.PHONY: indexer toolchain help html serve
+indexer: toolchain html serve
+
+
+.PHONY: toolchain
+toolchain: ## Installs Node Version Manager(NVM), Node LTS, lunr.js and antora dependencies
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash \
+
+	source "$(HOME)/.nvm/nvm.sh" && nvm install --lts
+
+
+
+
+# Install Antora (and other dependencies) if it does not exist
+#node_modules/.bin/antora:
+#	npm i
+
+# Install serve (and other dependencies) if it does not exist
+#node_modules/.bin/serve:
+#	npm i
+
+#dependencies: node_modules/.bin/antora node_modules/.bin/serve
+
+#html: dependencies
+#	node_modules/.bin/antora --generator=./generator/generator.js antora-playbook.yml
+
+#serve: html
+#	node_modules/.bin/serve build/
+
+
+
+
 # Clean up build artifacts
 .PHONY: clean
 clean: ## Remove build artifacts from output directory (Antora and PDF)
@@ -84,14 +116,15 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
-		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
-	s/^ # *\(title: *SUSE Manager\)/\1/;\
-	s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
-	s/^ *\(title: *Uyuni\)/#\1/;\
-	s/^ *\(name: *uyuni\)/#\1/;\
-	s/^ *\(start_page: *ROOT:index-uyuni\)/#\1/;" antora.yml
-		docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
+antora-suma: clean #pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
+
+		#sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
+	#s/^ # *\(title: *SUSE Manager\)/\1/;\
+	#s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
+	#s/^ *\(title: *Uyuni\)/#\1/;\
+	#s/^ *\(name: *uyuni\)/#\1/;\
+	#s/^ *\(start_page: *ROOT:index-uyuni\)/#\1/;" antora.yml; \
+	#	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
 
 
 
