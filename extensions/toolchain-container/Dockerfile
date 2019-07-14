@@ -20,7 +20,7 @@ ADD ./versions.txt /root/versions.txt
 RUN xargs -L 1 rbenv install < /root/versions.txt
 RUN gem update --system
 RUN rbenv global 2.6.3
-
+# testing username
 
 # Add Ruby 2.6.3
 #ADD add_ruby.sh /root/add_ruby.sh
