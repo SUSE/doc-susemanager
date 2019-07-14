@@ -2,6 +2,7 @@
 # Author: Joseph Cayouette
 # Inspired/modified from Owncloud's documentation Makefile written by Matthew Setter
 SHELL = bash
+UNAME := $(shell uname)
 
 
 # SUMA Productname and file replacement
@@ -77,12 +78,42 @@ help: ## Prints a basic help menu about available targets
 .PHONY: indexer toolchain help html serve
 indexer: toolchain html serve
 
-
+# (Homebrew, git, ruby, rbenv, nvm, node lts, antora, asciidoctor, asciidoctor-pdf, lunr.js)
 .PHONY: toolchain
-toolchain: ## Installs Node Version Manager(NVM), Node LTS, lunr.js and antora dependencies
-	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash \
+toolchain: ## Installs toolchain dependencies for OpenSUSE Leap 15.x and OSX
 
-	source "$(HOME)/.nvm/nvm.sh" && nvm install --lts
+ifeq ($(UNAME), Linux)
+# Install Toolchain on OpenSUSE Leap 15, 15.1
+
+endif
+ifeq ($(UNAME), Darwin)
+# Install Toolchain on OSX
+# Install the Homebrew Package Manager for OSX
+	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install | ruby \
+# Install rbenv
+	- brew install rbenv \
+# Upgrade rbenv
+	- brew upgrade rbenv \
+# Install git
+	- brew install git \
+# Upgrade git
+	- brew upgrade git \
+# Install Ruby version 2.6.1
+	- rbenv install 2.6.1 \
+# Set Global Ruby Version
+	- rbenv global 2.6.1 \
+# Install NVM Node version manager
+	curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash \
+# Source NVM Scripts
+	source "$(HOME)/.nvm/nvm.sh" && nvm install --lts \
+# Install Antora 2.0
+	npm i -g @antora/cli@2.0 @antora/site-generator-default@2.0
+# Install Asciidoctor
+
+endif
+
+
+
 
 
 
@@ -117,7 +148,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: clean #pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
-
+	antora suma-site.yml
 		#sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
 	#s/^ # *\(title: *SUSE Manager\)/\1/;\
 	#s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
