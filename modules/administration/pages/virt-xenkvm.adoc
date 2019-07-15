@@ -36,7 +36,7 @@ For Salt clients, you will need to enable the [systemitem]``Virtualization Host`
 This allows you to see VM changes instantly.
 To do this, in the {productname} {webui}, navigate to the [guimenu]``System Details`` page for the host, and click on the [guimenu]``Properties`` tab.
 In the [guimenu]``Add-On System Types`` section, check [guimenu]``Virtualization Host``, and click btn:[Update Properties] to save the changes.
-You will need to scedhule a hardware refresh to activate the change.
+You will need to schedule a hardware refresh to activate the change.
 Navigate to menu:System Details[Hardware], and click btn:[Schedule Hardware Refresh].
 
 By default, VM hosts use the [systemitem]``rhnsd`` service to check for scheduled actions every four hours, in order to load balance in environments where there are a lot of clients.
@@ -103,17 +103,17 @@ It can be on a network resource, a local directory, or an loop-mounted ISO image
 Additionally, ensure that all files and directories are world-readable.
 
 
-.Procedure: Creating an autoinstallable distribution
+.Procedure: Creating an Autoinstallable Distribution
 
 . In the {productname} {webui}, navigate to menu:Systems[Autoinstallation > Distributions] and click btn:[Create Distribution].
 . In the [guimenu]``Create Autoinstallable Distribution`` section, use these parameters:
 * In the [guimenu]``Distribution Label`` section, type a unique name for the distribution.
 Use only letters, numbers, hyphens (``-``), periods  (``.``), and underscores (``_``), and ensure the name is longer than four characters.
-* In the [guimenu]``Tree Path`` section, type an absolute path to the installation source.
-* In the [guimenu]``Base Channel`` section, select the channel that matches the installation source.
+* In the [guimenu]``Tree Path`` field, type an absolute path to the installation source.
+* In the [guimenu]``Base Channel`` field, select the channel that matches the installation source.
 This channel is used as the package source for non-{suse} installations.
-* In the [guimenu]``Installer Generation`` section, select the operating system version that matches the installation source.
-* In the [guimenu]``Kernel Options`` section, type any options to be passed to the kernel when booting for the installation.
+* In the [guimenu]``Installer Generation`` field, select the operating system version that matches the installation source.
+* In the [guimenu]``Kernel Options`` field, type any options to be passed to the kernel when booting for the installation.
 The [option]``install=`` parameter and the [option]``self_update=0 pt.options=self_update`` parameter are added by default.
 * In the [guimenu]``Post Kernel Options`` section, type any options to  be passed to the kernel when booting the installed system for the first time.
 . Click btn:[Create Autoinstallable Distribution] to save.
@@ -122,31 +122,16 @@ When you have created an autoinstallable distribution, you can edit it by naviga
 
 
 
-=== Create an Autoinstallation Profile
+=== Create and Upload an Autoinstallation Profile
 
 Autoinstallation profiles contain all the installation and configuration data needed to install a system.
 They can also contain scripts to be executed after the installation is complete.
 
-{kickstart} profiles can be created using the {productname} {webui}.
-You can also create {ay} or {kickstart} autoinstallation profiles by hand, upload them to {productname}, and edit them later.
+{kickstart} profiles can be created using the {productname} {webui}, by navigating to menu:Systems[Autoinstallation > Profiles], clicking btn:[Create New Kickstart File], and following the prompts.
+You can also create {ay} or {kickstart} autoinstallation profiles by hand.
 
 An example {ay} profile that includes a script for registering the client with {productname} is available in xref:administration:autoyast-example.adoc[].
-
-For more on {ay}, see xref:client-configuration:autoyast.adoc[].
-For more on {kickstart}, refer to the Red Hat documentation for your installation.
-
-
-// Lana you're up to here.
-
-
-=== {sle} 15 Systems
-
-You need the installation media to setup the distribution.
-Starting with version 15, there is only one installation media.
-You will use the same one for {slsa}, {sleda}, and all the other {sle} 15 based products.
-
-In the {ay} profile specify which product is to be installed.
-For installing {sls} use the following snippet in [path]``autoyast.xml``:
+If you are using {ay} to install {slsa}, you will also need to include this snippet:
 
 ----
 <products config:type="list">
@@ -154,111 +139,57 @@ For installing {sls} use the following snippet in [path]``autoyast.xml``:
 </products>
 ----
 
-Then specify all the required modules as ``add-on`` in [path]``autoyast.xml``.
-This is a minimal ``SLE-Product-SLES15-Pool`` selection that will result in a working installation and can be managed by {productname}:
+For more on {ay}, see xref:client-configuration:autoyast.adoc[].
 
-* SLE-Manager-Tools15-Pool
-* SLE-Manager-Tools15-Updates
-* SLE-Module-Basesystem15-Pool
-* SLE-Module-Basesystem15-Updates
-* SLE-Product-SLES15-Updates
-
-It is also recommended to add the following modules:
-
-* SLE-Module-Server-Applications15-Pool
-* SLE-Module-Server-Applications15-Updates
+For more on {kickstart}, see xref:client-configurastion:kickstart.adoc[], or refer to the Red Hat documentation for your installation.
 
 
+.Procedure: Uploading an Autoinstallation Profile
 
-[[sec.virtualzation.autoinstall.req-mgr.profile.upload]]
-=== Uploading an Autoinstallation Profile
+. In the {productname} {webui}, navigate to menu:Systems[Autoinstallation > Profiles] and click btn:[Upload Kickstart/AutoYaST File].
+. In the [guimenu]``Create Autoinstallation Profile`` section, use these parameters:
+* In the [guimenu]``Label`` field, type a unique name for the profile.
+Use only letters, numbers, hyphens (``-``), periods  (``.``), and underscores (``_``), and ensure the name is longer than six characters.
+* In the [guimenu]``Autoinstall Tree`` field, select the autoinstallable distribution you created earlier.
+* In the [guimenu]``Virtualization Type`` field, select the relevant Guest type (for example, [parameter]``KVM Virtualized Guest``.
+Do not choose [guimenu]``Xen Virtualized Host`` here.
+* OPTIONAL: If you want to manually create your autoinstallation profile, you can type it directly into the [guimenu]``File Contents`` field.
+If you have a file already created, leave the [guimenu]``File Contents`` field blank.
+* In the [guimenu]``File to Upload`` field, click btn:[Choose File], and use the system dialog to select the file to upload.
+If the file is successfully uploaded, the filename will be shown in the [guimenu]``File to Upload`` field.
+* The contents of the uploaded file will be shown in the [guimenu]``File Contents`` field.
+If you need to make edits, you can do so directly.
+. Click btn:[Create] to save your changes and store the profile.
 
-
-. Log in to the {productname} Web interface and open menu:Systems[Autoinstallation > Profiles > Upload New Kickstart/AutoYaST File].
-. Choose a unique name for the profile.
-  Only letters, numbers, hyphens, periods, and underscores are allowed; the minimum length is 6 characters.
-  This field is mandatory.
-. Choose an [guimenu]``Autoinstallable Tree`` from the drop-down menu.
-  If no [guimenu]``Autoinstallable Tree`` is available, you need to add an Autoinstallable Distribution.
-  Refer to <<sec.virtualzation.autoinstall.req-mgr.inst-source>> for instructions.
-. Choose a [guimenu]``Virtualization Type`` from the drop-down menu. {kvm} and {xen} (para-virtualized and fully-virtualized) are available. Do not choose [guimenu]``Xen Virtualized Host`` here.
-. Scroll down to the [guimenu]``File to Upload`` dialog, click btn:[Browse] to select it, then click btn:[Upload File].
-. The uploaded file will be displayed in the [guimenu]``File Contents`` section, where you can edit it.
-. Click btn:[Create] to store the profile.
-
-
-To edit an existing profile, go to menu:Systems[Autoinstallation > Profiles] and click on a [guimenu]``Label``.
+When you have created an autoinstallation profile, you can edit it by navigating to  menu:Systems[Autoinstallation > Profiles] and selecting the profile you want to edit.
 Make the desired changes and save your settings by clicking btn:[Create].
 
-.Editing existing {kickstart} profiles
-[NOTE]
+[IMPORTANT]
 ====
-If you are changing the [guimenu]``Virtualization Type`` of an existing {kickstart} profile, it may also modify the bootloader and partition options, potentially overwriting any user customizations.
-Be sure to review the [guimenu]``Partitioning`` tab to verify these settings when changing the [guimenu]``Virtualization Type``.
-====
-
-
-
-[[sec.virtualzation.autoinstall.req-mgr.profile.generate]]
-=== Creating a Kickstart Profile
-
-[NOTE]
-====
-Currently it is only possible to create autoinstallation profiles for {rhel} systems.
-If installing a {sls} system, you need to upload an existing {ay} profile as described in <<sec.virtualzation.autoinstall.req-mgr.profile.upload>>.
+If you change the [guimenu]``Virtualization Type`` of an existing {kickstart} profile, it might also modify the bootloader and partition options, potentially overwriting any custom settings.
+Carefully review the [guimenu]``Partitioning`` tab to verify these settings before making changes.
 ====
 
-[[pro.at.virtualzation.autoinstall.ks.profile.generate]]
-. Log in to the {productname} Web interface and go to menu:Systems[Autoinstallation > Profiles > Create New Kickstart File].
-. Choose a unique name for the profile.
-  The minimum length is 6 characters. This field is mandatory.
-. Choose a [guimenu]``Base Channel``.
-  This channel is the package source for non-{suse} installations and must match the [guimenu]``Autoinstallable Tree``.
-  This field is mandatory.
-. Choose an [guimenu]``Autoinstallable Tree`` from the drop-down menu.
-  If no [guimenu]``Autoinstallable Tree`` is available, you need to add an Autoinstallable Distribution.
-  Refer to <<sec.virtualzation.autoinstall.req-mgr.inst-source>> for instructions.
-. Choose a [guimenu]``Virtualization Type`` from the drop-down menu.
-  {kvm} and {xen} (para-virtualized and fully-virtualized) are available.
-  Do not choose [guimenu]``Xen Virtualized Host`` here.
-. Click the btn:[Next] button.
-. Select the location of the distribution files for the installation of your {vmguest}s.
-  There should already be a [guimenu]``Default Download Location`` filled out and selected for you on this screen.
-  Click the btn:[Next] button.
-. Choose a {rootuser} password for the {vmguest}s.
-  Click the btn:[Finish] button to generate the profile.
+
+
+=== Automatically Register Guests
+
+
+When you install VM guests automatically, they are not registered to {productname}.
+If you want your guests to be automatically registered as soon as they are installed, you can add a section to the autoinstallation profile that invokes a bootstrap script, and registers the guests.
+
+This section gives instructions for adding a bootstrap script to an existing {ay} profile.
+
+For more on creating a bootstrap script, see xref:client-configuration:registration-bootstrap.adoc[].
+For instructions on how to do this for {kickstart], refer to the Red Hat documentation for your installation.
+
+.Procedure: Adding a Bootstrap Script to an {ay} Profile
+
+. Ensure your bootstrap script contains the activation key for the VM guests you want to register with it, and that is located on the host at [path]``/srv/www/htdocs/pub/bootstrap_vm_guests.sh``.
+. In the {productname} {webui}, navigate to menu:Systems[Autoinstallation > Profiles], and select the {ay} profile to associate this script with.
+. In the [guimenu]``File Contents`` field, add this snippet at the end of the file, immediately before the closing ``</profile>`` tag.
+Ensure you replace the example IP address in the snippet with the correct IP address for your {productname} Server:
 +
-This completes {kickstart} profile creation.
-After generating a profile, you are taken to the newly-created {kickstart} profile.
-You may browse through the various tabs of the profile and modify the settings as you see fit, but this is not necessary as the default settings should work well for the majority of cases.
-
-
-[[sec.virtualzation.autoinstall.req-mgr.profile.scripts]]
-=== Adding a Registration Script to the Autoinstallation Profile
-
-
-A {vmguest} that is autoinstalled does not get automatically registered.
-Adding a section to the autoinstallation profile that invokes a bootstrap script for registration will fix this.
-The following procedure describes adding a corresponding section to an {ay} profile.
-Refer to your {rhel} documentation for instructions on adding scripts to a {kickstart} file.
-
-
-. First, provide a bootstrap script on the {productname}:
-+
-** Create a bootstrap script for {vmguest}s on the {productname} as described in <<generate.bootstrap.script>>.
-** Log in as {rootuser} to the konsole of {productname} and go to [path]``/srv/www/htdocs/pub/bootstrap``.
-   Copy [path]``bootstrap.sh`` (the bootstrap script created in the previous step) to for example, [path]``bootstrap_vm_guests.sh`` in the same directory.
-** Edit the newly created file according to your needs.
-   The minimal requirement is to include the activation key for the {vmguest}s (see <<sec.virtualzation.autoinstall.req-mgr.keys>> for details).
-   We strongly recommend to also include one or more GPG keys (for example, your organization key and package signing keys).
-. Log in to the {productname} Web interface and go to menu:Systems[Autoinstallation > Profiles].
-  Click on the profile that is to be used for autoinstalling the {vmguest}s to open it for editing.
-+
-Scroll down to the menu:File Contents[] section where you can edit the {ay} XML file.
-Add the following snippet at the end of the XML file right before the closing `</profile>` tag and replace the given IP address with the address of the {productname} server.
-See <<advanced.topics.app.ay.example-simple>>for an example script.
-+
-
 ----
 <scripts>
   <init-scripts config:type="list">
@@ -272,57 +203,34 @@ See <<advanced.topics.app.ay.example-simple>>for an example script.
 </scripts>
 ----
 +
-.Only one `<scripts>` section allowed
-IMPORTANT: If your {ay}
-profile already contains a `<scripts>` section, do not add a second one, but rather place the `<script>` part above within the existing `<scripts>` section!
-+
+. Click menu:Update[] to save your changes.
 
-. Click menu:Update[] to save the changes.
-
-
-[[sec.virtualization.autoinstall.installation]]
-=== Autoinstalling {vmguest}s
-
-
-Once all requirements on the {productname} and the {vmhost} are met, you can start to autoinstall {vmguest}s on the host.
-Note that {vmguest}s will not be automatically registered with {productname}, therefore we strongly recommend to modify the autoinstallation profile as described in <<sec.virtualzation.autoinstall.req-mgr.profile.scripts>>.
-{vmguest}s need to be registered to manage them with {productname}.
-Proceed as follows to autoinstall a {vmguest}.
-
-.No parallel Autoinstallations on {vmhost}
 [IMPORTANT]
 ====
-It is not possible to install more than one {vmguest} at a time on a single {vmhost}.
-When scheduling more than one autoinstallation with {productname} make sure to choose a timing, that starts the next installation after the previous one has finished.
-If a guest installation starts while another one is still running, the running installation will be cancelled.
+If your {ay} profile already contains a ``<scripts>`` section, do not add a second one.
+Place the bootstrap snippet inside the existing ``<scripts>`` section.
 ====
 
 
-. In the {webui} click the menu:Main Menu[Systems > Systems] tab.
-. Click the {vmhost}'s name to open its [guimenu]``System Status`` page.
-. Open the form for creating a new {vmguest} by clicking menu:Virtualization[Provisioning].
-  Fill out the form by choosing an autoinstallation profile and by specifying a name for the {vmguest} (must not already exist on {vmhost}).
-  Choose a proxy if applicable and enter a schedule.
-  To change the {vmguest}'s hardware profile and configuration options, click btn:[Advanced Options].
-. Finish the configuration by clicking btn:[Schedule Autoinstallation and Finish].
-  The [guimenu]``Session Status`` page opens for you to monitor the autoinstallation process.
+=== Autoinstall VM Guests
 
 
-.Checking the Installation Log
-[NOTE]
+Once you have everything set up, you can start to autoinstall your VM guests.
+
+[IMPORTANT]
 ====
-To view the installation log, click menu:Events[History] on the [guimenu]``Session Status`` page.
-On the [guimenu]``System History Event`` page you can click a [guimenu]``Summary`` entry to view a detailed log.
-
-In case an installation has failed, you can btn:[Reschedule] it from this page once you have corrected the problem.
-You do not have to configure the installation again.
-
-If the event log does not contain enough information to locate a problem, log in to the {vmhost} console and read the log file for your package manager.
-If you are using [systemitem]``rhnsd``, you may alternatively immediately trigger any scheduled actions by calling [command]``mgr_check`` on the {vmhost}.
-Increase the command's verbosity by using the options [option]``-v``, [option]``-vv``, or [option]``-vvv``, respectively.
+Each VM host can only install one guest at a time.
+If you are scheduling more than one autoinstallation, make sure you time them so that the next installation does not begin before the previous one has completed.
+If a guest installation starts while another one is still running, the running installation will be canceled.
 ====
 
 
+. In the {productname} {webui}, navigate to menu:Systems[Overview], and select the VM host you want to install guests on.
+. Navigate to the [guiitem]``Virtualization`` tab, and the [guimenu]``Provisioning`` subtab.
+. Select the autoinstallation profile you want to use, and specify a unique name for the guest.
+. Choose a proxy if applicable and enter a schedule.
+. To change the guest's hardware profile and configuration options, click btn:[Advanced Options].
+. Click btn:[Schedule Autoinstallation and Finish] to complete.
 
 
 
@@ -331,7 +239,20 @@ Increase the command's verbosity by using the options [option]``-v``, [option]``
 
 
 
-[[sec.virtualization.vmguest-manage]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+[sec.virtualization.vmguest-manage]]
 == Managing {vmguest}s
 
 
