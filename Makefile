@@ -112,12 +112,6 @@ ifeq ($(UNAME), Darwin)
 
 endif
 
-
-
-
-
-
-
 # Install Antora (and other dependencies) if it does not exist
 #node_modules/.bin/antora:
 #	npm i
@@ -136,7 +130,6 @@ endif
 
 
 
-
 # Clean up build artifacts
 .PHONY: clean
 clean: ## Remove build artifacts from output directory (Antora and PDF)
@@ -148,14 +141,14 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: clean #pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
-	antora suma-site.yml
+	#antora suma-site.yml
 		#sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
 	#s/^ # *\(title: *SUSE Manager\)/\1/;\
 	#s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
 	#s/^ *\(title: *Uyuni\)/#\1/;\
 	#s/^ *\(name: *uyuni\)/#\1/;\
 	#s/^ *\(start_page: *ROOT:index-uyuni\)/#\1/;" antora.yml; \
-	#	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
+	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
 
 
 
