@@ -19,23 +19,18 @@ ENV CONFIGURE_OPTS --disable-install-doc
 ADD ./versions.txt /root/versions.txt
 RUN xargs -L 1 rbenv install < /root/versions.txt
 RUN rbenv global 2.6.3
-RUN gem install asciidoctor
-RUN gem install asciidoctor-pdf -v 1.5.0.alpha.18
+RUN bash -c -l 'gem install asciidoctor'
+RUN bash -c -l 'gem install asciidoctor-pdf -v 1.5.0.alpha.18'
 
 # Add NVM and NODE LTS
-#RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-#ENV PATH /root/.nvm/bin:$PATH
-#RUN echo export NVM_DIR="/root/.nvm" >> /root/.bashrc
-#RUN source /root/.bashrc
-#RUN bash -c -l nvm install --lts
-#RUN npm i -g yarn
-#RUN yarn global add @antora/cli@2.0
-#RUN yarn global add @antora/site-generator-default@2.0
-
-
-# Add the toolchain packages (Asciidoctor, Asciidoctor-pdf, antora)
-#ADD add_packages.sh /root/add_packages.sh
-#RUN /root/add_packages.sh
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+RUN echo export NVM_DIR="/root/.nvm" >> /root/.bashrc
+RUN source /root/.bashrc
+COPY uid-number.js /usr/lib64/node_modules/npm10/node_modules/uid-number/
+RUN bash -c -l nvm install --lts
+RUN npm i -g yarn
+RUN yarn global add @antora/cli@2.0
+RUN yarn global add @antora/site-generator-default@2.0
 
 WORKDIR /workspace
 

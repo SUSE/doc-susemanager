@@ -140,7 +140,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: clean #pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
+antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 	#antora suma-site.yml
 		#sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
 	#s/^ # *\(title: *SUSE Manager\)/\1/;\
@@ -169,7 +169,7 @@ pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-refer
 
 .PHONY: pdf-install-suma
 pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
-	asciidoctor-pdf \
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
 	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
@@ -186,7 +186,7 @@ pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
 
 .PHONY: pdf-client-config-suma
 pdf-client-config-suma: ## Generate PDF version of the SUMA Client Configuraiton Guide
-	asciidoctor-pdf \
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
 		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
@@ -203,7 +203,7 @@ pdf-client-config-suma: ## Generate PDF version of the SUMA Client Configuraiton
 
 .PHONY: pdf-upgrade-suma
 pdf-upgrade-suma: ## Generate PDF version of the SUMA Upgrade Guide
-	asciidoctor-pdf \
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
 		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
@@ -220,8 +220,8 @@ pdf-upgrade-suma: ## Generate PDF version of the SUMA Upgrade Guide
 
 .PHONY: pdf-reference-suma
 pdf-reference-suma: ## Generate PDF version of the SUMA Reference Manual
-	asciidoctor-pdf \
-	    -r ./extensions/xref-converter.rb \
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
+		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
@@ -237,7 +237,7 @@ pdf-reference-suma: ## Generate PDF version of the SUMA Reference Manual
 
 .PHONY: pdf-administration-suma
 pdf-administration-suma: ## Generate PDF version of the SUMA Administration Guide
-	asciidoctor-pdf \
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
 		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
@@ -254,7 +254,7 @@ pdf-administration-suma: ## Generate PDF version of the SUMA Administration Guid
 
 .PHONY: pdf-salt-suma
 pdf-salt-suma: ## Generate PDF version of the SUMA Salt Guide
-	asciidoctor-pdf \
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
 		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
@@ -271,7 +271,7 @@ pdf-salt-suma: ## Generate PDF version of the SUMA Salt Guide
 
 .PHONY: pdf-retail-suma
 pdf-retail-suma: ## Generate PDF version of the SUMA Retail Guide
-	asciidoctor-pdf \
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
 		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
@@ -288,7 +288,7 @@ pdf-retail-suma: ## Generate PDF version of the SUMA Retail Guide
 
 .PHONY: pdf-architecture-suma
 pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
-	asciidoctor-pdf \
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
 		-r ./extensions/xref-converter.rb \
 		-a productname=$(PRODUCTNAME) \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
