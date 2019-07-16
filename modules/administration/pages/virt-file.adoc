@@ -1,74 +1,33 @@
 [[virt-file]]
 = Virtualization with Other Third Party Providers
 
+If you want to use a third-party virtualization provider other than Xen, KVM, or VMware,  you can import a JSON configuration file to {productname}.
 
+Similarly, if you have a VMWare installation that does not provide direct access to the API, a file-based VHM will provide you with some basic management features.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-////
-
-Old content below here
-
-In a VMWare environment where direct connection to the {susemgr} is not possible, a JSON file can be exported from the ESXi or vSphere host and later imported into {productname}.
-
-After selecting menu:Create[File-Based] enter a label and URL leading to the location of this file.
-
-
-image::systems_virtual_host_managers_file.png[scaledwidth=80%]
-
-
-.VMWare vCenter Installations without Direct Access
 [NOTE]
 ====
-The file-based option is not meant to be used with manually crafted files.
-It is only meant to be used with the output of [command]``virtual-host-gatherer`` against some other module.
-File-based is suitable for VMWare vCenter installations for which no direct API access is possible from the {susemgr}.
-
-The solution is to run [command]``virtual-host-gatherer`` from somewhere else in the network and save the produced JSON data for further processing.
+This option is for importing files that have been created with the [command]``virtual-host-gatherer`` tool.
+It is not designed for manually created files.
 ====
 
 
-The following JSON data is an example of the exported information in the file:
+.Procedure: Exporting and Importing a JSON File
+
+. Export the JSON configuration file by running [command]``virtual-host-gatherer`` on the VM network.
+. Save the produced file to a location accessible by your {productname} Server.
+. In the {productname} {webui}, navigate to menu:Systems[Virtual Host Managers].
+. Click btn:[Create] and select [guimenu]``File-based``.
+. In the [guimenu]``Add a file-based Virtual Host Manager`` section, use these parameters:
+* In the [guimenu]``Label`` field, type a custom name for your VHM.
+* In the [guimenu]``Url`` field, type the path to your exported JSON configuration file.
+. Click btn:[Create] to save your changes and create the VHM.
+. On the [guimenu]``Virtual Host Managers`` page select the new VHM.
+. On the [guimenu]``Properties`` page, click btn:[Refresh Data] to inventory the new VHM.
+
+
+
+.Example: Exported JSON configuration file:
 
 ----
 {
