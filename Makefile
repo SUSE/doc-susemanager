@@ -75,19 +75,26 @@ help: ## Prints a basic help menu about available targets
 	done
 
 
-.PHONY: indexer toolchain help html serve
-indexer: toolchain html serve
+#.PHONY: indexer toolchain help html serve
+#indexer: toolchain html serve
+
+# Clean up build artifacts
+.PHONY: clean
+clean: ## Remove build artifacts from output directory (Antora and PDF)
+	-rm -rf build/ .cache/ public/
 
 # (Homebrew, git, ruby, rbenv, nvm, node lts, antora, asciidoctor, asciidoctor-pdf, lunr.js)
-.PHONY: toolchain
-toolchain: ## Installs toolchain dependencies for OpenSUSE Leap 15.x and OSX
+.PHONY: setup-toolchain
+setup-toolchain: ## Installs our toolchain for building docs on OpenSUSE Leap 15.x and OSX
 
 ifeq ($(UNAME), Linux)
 # Install Toolchain on OpenSUSE Leap 15, 15.1
-
+	sudo zypper in docker docker-compose \
+	cd install-toolchain/ && docker-compose up \
+	docker images
 endif
 ifeq ($(UNAME), Darwin)
-# Install Toolchain on OSX
+# Install Toolchain on OSX IN PROGRESS TODO: Swapp to docker-compose like Leap 15/15.1
 # Install the Homebrew Package Manager for OSX
 	curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install | ruby \
 # Install rbenv
@@ -112,28 +119,6 @@ ifeq ($(UNAME), Darwin)
 
 endif
 
-# Install Antora (and other dependencies) if it does not exist
-#node_modules/.bin/antora:
-#	npm i
-
-# Install serve (and other dependencies) if it does not exist
-#node_modules/.bin/serve:
-#	npm i
-
-#dependencies: node_modules/.bin/antora node_modules/.bin/serve
-
-#html: dependencies
-#	node_modules/.bin/antora --generator=./generator/generator.js antora-playbook.yml
-
-#serve: html
-#	node_modules/.bin/serve build/
-
-
-
-# Clean up build artifacts
-.PHONY: clean
-clean: ## Remove build artifacts from output directory (Antora and PDF)
-	-rm -rf build/ .cache/ public/
 
 
 # SUMA DOCUMENTATION BUILD COMMANDS

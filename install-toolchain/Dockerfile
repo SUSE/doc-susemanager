@@ -16,7 +16,7 @@ RUN echo 'eval "$(rbenv init -)"' >> /etc/profile
 
 # Install Ruby
 ENV CONFIGURE_OPTS --disable-install-doc
-ADD ./versions.txt /root/versions.txt
+ADD versions.txt /root/versions.txt
 RUN xargs -L 1 rbenv install < /root/versions.txt
 RUN rbenv global 2.6.3
 RUN bash -c -l 'gem install asciidoctor'
