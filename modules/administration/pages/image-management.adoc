@@ -234,22 +234,18 @@ When you associate an activation key with an image profile you are ensuring any 
 === Example Dockerfile and add_packages Script
 
 
-This section contains an example Dockerfile.
-You specify a Dockerfile that will be used during image building when creating an image profile.
-A Dockerfile and any associated scripts should be stored within an internal or external Github or Gitlab repository:
+This section contains an example `Dockerfile`.
+You specify a `Dockerfile` that will be used during image building when creating an image profile.
+A `Dockerfile` and any associated scripts should be stored within an external or internal Github or Gitlab repository.
 
-[IMPORTANT]
-.Required Dockerfile Lines
-====
-The Dockerfile provides access to a specific repository version served by {productname}.
-This example Dockerfile is used by {productname} to trigger a build job on a build host minion.
-The [command]``ARG`` parameters ensure that the image that is built is associated with the desired repository version served by {productname}.
-The [command]``ARG`` parameters also allow you to build image versions of {sls} which may differ from the version of {sls} used by the build host itself.
+The `Dockerfile` provides access to a specific repository version served by {productname}.
+The following example `Dockerfile` is used by {productname} to trigger a build job on a build host.
+The [option]``ARG`` parameters ensure that the built image is associated with the desired repository version served by {productname}.
+The [option]``ARG`` parameters also allow you to build image versions of {sls} which may differ from the version of {sls} used by the build host itself.
 
 For example: The [comand]``ARG repo`` parameter and the [command]``echo`` command pointing to the repository file, creates and then injects the correct path into the repository file for the desired channel version.
 
 _The repository version is determined by the activation key that you assigned to your image profile._
-====
 
 ----
 FROM registry.example.com/sles12sp2
@@ -281,7 +277,7 @@ RUN /root/add_packages.sh
 RUN rm -f /etc/zypp/repos.d/susemanager:dockerbuild.repo
 ----
 
-This is an example [path]``add_packages.sh`` script for use with your Dockerfile:
+This is an example [path]``add_packages.sh`` script for use with your `Dockerfile`:
 
 ----
 #!/bin/bash
@@ -295,8 +291,8 @@ zypper --non-interactive in python python-xml aaa_base aaa_base-extras net-tools
 [NOTE]
 .Packages Required for Inspecting Your Images
 ====
-To inspect images and provide the package and product list of a container to the {productname} {webui} you will need to install [package]#python# and [package]#python-xml# within the container.
-If these packages remain uninstalled, your images will still build, but the package and product list will be unavailable from the {webui}.
+To inspect images and provide the package and product list of a container to the {productname} {webui} you must install [package]#python# and [package]#python-xml# within the container.
+Without these packages your images will still build, but the package and product list will be unavailable from the {webui}.
 ====
 
 
@@ -310,8 +306,8 @@ You can select menu:Images[Build] from the left navigation bar, or click the bui
 
 image::images_image_build.png[scaledwidth=80%]
 
-.Procedure: Build an Image
-. For this example select menu:Images[Build].
+.Procedure: Building an Image
+. Select menu:Images[Build].
 . Add a different tag name if you want a version other than the default ``latest`` (only relevant to containers).
 . Select [guimenu]``Build Profile`` and [guimenu]``Build Host``.
 +
@@ -322,7 +318,6 @@ image::images_image_build.png[scaledwidth=80%]
 Notice the [guimenu]``Profile Summary`` to the right of the build fields.
 When you have selected a build profile, detailed information about the selected profile will be displayed in this area.
 ====
-+
 
 . To schedule a build click the btn:[Build] button.
 
@@ -333,12 +328,12 @@ When you have selected a build profile, detailed information about the selected 
 
 
 You can import and inspect arbitrary images.
-Select menu:Images[Images] from the left navigation bar.
+Select menu:Images[Image List] from the left navigation bar.
 Complete the text boxes of the [guimenu]``Import`` dialog.
-Once it has processed, the imported image will be listed on the [guimenu]``Images`` page.
+When it has processed, the imported image will be listed on the [guimenu]``Image List`` page.
 
-.Procedure: Import an Image
-. From menu:Images[Images] click btn:[Import] to open the [guimenu]``Import Image`` dialog.
+.Procedure: Importing an Image
+. From menu:Images[Image list] click btn:[Import] to open the [guimenu]``Import Image`` dialog.
 . In the [guimenu]``Import Image`` dialog complete these fields:
 +
 
@@ -357,13 +352,12 @@ The build host that will pull and inspect the image.
 Activation key:::
 The activation key that provides the path to the software channel that the image will be inspected with.
 
-+
-For confirmation, click btn:[Import].
+. For confirmation, click btn:[Import].
 
 The entry for the image is created in the database, and an ``Inspect Image`` action on {productname} is scheduled.
 
-Once it has been processed, you can find the imported image in the ``Images`` list.
-It has a different icon in the ``Build`` column, to indicate that the image is imported (see screenshot).
+When it has been processed, you can find the imported image in the ``Image List``.
+It has a different icon in the ``Build`` column, to indicate that the image is imported.
 The status icon for the imported image can also be seen on the ``Overview`` tab for the image.
 
 
