@@ -136,6 +136,17 @@ antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README
 	docker run -u 1000 -v `pwd`:/antora --rm -t antora/antora:latest suma-site.yml
 
 
+.PHONY: api-suma
+api-suma: ## Build api docs from sources on ibs
+	docker run -u 1000 -it -v `pwd`:/documents/ asciidoctor/docker-asciidoctor asciidoctor-pdf \
+		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
+		-a pdf-style=$(PDF_THEME_SUMA) \
+		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
+		-a productname=$(PRODUCTNAME_SUMA) \
+		-a revdate=$(REVDATE) \
+		--base-dir . \
+		--out-file $(PDF_BUILD_DIR)/$(FILENAME_SUMA)_api_guide.pdf \
+		susemanager_api_doc_db5.adoc
 
 # SUMA
 .PHONY: obs-packages-suma
