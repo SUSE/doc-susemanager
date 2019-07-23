@@ -9,7 +9,7 @@
 == Image Building Overview
 
 {productname} enables system administrators to build containers, systems, and virtual images.
-{productname} helps with creating Image Stores and managing Image Profiles.
+{productname} helps with creating image stores and managing image profiles.
 
 {productname} supports two distinct build types:
 
@@ -32,7 +32,7 @@ image::image-building.png[scaledwidth=80%]
 The containers feature is available for Salt minions running {sls} 12 or later.
 Before you begin, ensure your environment meets these requirements:
 
-* An existing external GitHub or internal GitLab repository containing a Dockerfile and configuration scripts (example scripts are provided in this chapter).
+* An existing external GitHub or internal GitLab repository containing a `Dockerfile` and configuration scripts (example scripts are provided in this chapter).
 * A properly configured image registry.
 +
 
@@ -46,8 +46,8 @@ For additional information on setting up Portus as a registry provider, see the 
 
 For more information on Containers or CaaS Platform, see:
 
-* https://www.suse.com/documentation/sles-12/book_sles_docker/data/book_sles_docker.html[SUSE Linux Enterprise Server 12 SP3 Docker Guide]
-* https://www.suse.com/documentation/suse-caasp-2/[SUSE CaaS Platform 2 Documentation]
+* https://www.suse.com/documentation/sles-15/book_sles_docker/data/book_sles_docker.html[SUSE Linux Enterprise Server Docker Guide]
+* https://www.suse.com/documentation/suse-caasp-3/[SUSE CaaS Platform 3 Documentation]
 
 
 
@@ -57,15 +57,18 @@ For more information on Containers or CaaS Platform, see:
 
 To build images with {productname}, you will need to create and configure a build host.
 Container build hosts are Salt minions running {sle} 12 or later.
-This section guides you though the initial configuration for a build host.
+This section guides you through the initial configuration for a build host.
 
-From the {productname} {webui} perform these steps to configure a build host.
+From the {productname} {webui} perform these steps to configure a build host:
 
 
 . Select a minion to be designated as a build host from the menu:Systems[Overview] page.
-. From the [guimenu]``System Details`` page for the selected minion assign the containers modules by going to menu:Software[Software Channels] and enabling [guimenu]``SLE-Module-Containers12-Pool`` and [guimenu]``SLE-Module-Containers12-Updates``. Confirm by clicking btn:[Change Subscriptions].
-. From the menu:System Details[Properties] page, enable [guimenu]``Add-on System Type`` and ``Container Build Host`` and confirm by clicking btn:[Update Properties].
-. Install all required packages by applying ``Highstate``. From the system details page select menu:States[Highstate] and click [guimenu]``Apply Highstate``.
+. From the [guimenu]``System Details`` page of the selected minion assign the containers modules.
+Go to menu:Software[Software Channels] and enable the containers module (for example, [guimenu]``SLE-Module-Containers15-Pool`` and [guimenu]``SLE-Module-Containers15-Updates``).
+Confirm by clicking btn:[Change Subscriptions].
+. From the menu:System Details[Properties] page, enable ``Container Build Host`` from the [guimenu]``Add-on System Types`` list and confirm by clicking btn:[Update Properties].
+. Install all required packages by applying ``Highstate``.
+From the system details page select menu:States[Highstate] and click [guimenu]``Apply Highstate``.
 Alternatively, apply Highstate from the {productname} Server command line:
 +
 ----
@@ -83,14 +86,15 @@ Create an activation key associated with the channel that your images will use.
 [NOTE]
 .Relationship Between Activation Keys and Image Profiles
 ====
-To build containers, you will need an activation key that is associated with a channel other than "SUSE Manager Default".
+To build containers, you will need an activation key that is associated with a channel other than `SUSE Manager Default`.
 ====
 
 image::systems_create_activation_key.png[scaledwidth=80%]
 
-. Select menu:Main Menu[Systems > Activation Keys].
+. Select menu:Systems[Activation Keys].
 . Click btn:[Create Key].
-. Enter a [guimenu]``Description`` and a [guimenu]``Key`` name. Use the drop-down menu to select the [guimenu]``Base Channel`` to associate with this key.
+. Enter a [guimenu]``Description`` and a [guimenu]``Key`` name.
+Use the drop-down menu to select the [guimenu]``Base Channel`` to associate with this key.
 . Confirm with btn:[Create Activation Key].
 
 For more information, see <<bp.key.managment>>.
@@ -101,17 +105,18 @@ For more information, see <<bp.key.managment>>.
 === Creating an Image Store
 
 
-Define a location to store all of your images by creating an Image Store.
+Define a location to store all of your images by creating an image store.
 
 image::images_image_stores.png[scaledwidth=80%]
 
-. Select menu:Main Menu[Images > Stores].
+. Select menu:Images[Stores].
 . Click [guimenu]``Create`` to create a new store.
 +
 
 image::images_image_stores_create.png[scaledwidth=80%]
 
-. {productname} currently provides support only for the ``Registry`` store type. Define a name for the image store in the [guimenu]``Label`` field.
+. {productname} currently provides support only for the ``Registry`` store type.
+Define a name for the image store in the [guimenu]``Label`` field.
 . Provide the path to your image registry by filling in the [guimenu]``URI`` field, as a fully qualified domain name (FQDN) for the container registry host (whether internal or external).
 +
 
@@ -120,7 +125,7 @@ registry.example.com
 ----
 +
 
-The Registry URI can also be used to specify an image store on a used registry.
+The Registry URI can also be used to specify an image store on a registry that is already in use.
 +
 
 ----
@@ -135,17 +140,17 @@ registry.example.com:5000/myregistry/myproject
 === Creating an Image Profile
 
 
-Manage Image Profiles from the ``Image Profile`` page.
+Manage image profiles from the [guimenu]``Image Profile`` page.
 
 image::images_image_profiles.png[scaledwidth=80%]
 
 .Procedure: Create an Image Profile
-. To create an image profile select menu:Image[Profiles] and click btn:[Create].
+. To create an image profile select menu:Images[Profiles] and click btn:[Create].
 +
 
 image::images_image_create_profile.png[scaledwidth=80%]
 
-. Provide a name for the image profile by filling in the menu:Label[] field.
+. Provide a name for the image profile by filling in the [guimenu]``Label`` field.
 +
 
 [NOTE]
@@ -154,7 +159,7 @@ Only lowercase characters are permitted in container labels.
 If your container image tag is in a format such as `myproject/myimage`, make sure your image store registry URI contains the `/myproject` suffix.
 ====
 
-. Use a `Dockerfile` as the `Image Type`
+. Use a `Dockerfile` as the `Image Type`.
 
 . Use the drop-down menu to select your registry from the `Target Image Store` field.
 
@@ -162,46 +167,48 @@ If your container image tag is in a format such as `myproject/myimage`, make sur
 
 .Github Path Options
 * Github single user project repository
-
++
 ----
 https://github.com/USER/project.git#branchname:folder
 ----
 
 * Github organization project repository
-
++
 ----
 https://github.com/ORG/project.git#branchname:folder
 ----
 
-* Github token authentication:
-
+* Github token authentication
++
 If your git repository is private and not publicly accessible, you need to modify the profile's git URL to include authentication.
 Use this URL format to authenticate with a Github token:
-
++
 ----
 https://USER:<AUTHENTICATION_TOKEN>@github.com/USER/project.git#master:/container/
 ----
 
 .Gitlab Path Options
 * Gitlab single user project repository
-
++
 ----
 https://gitlab.example.com/USER/project.git#master:/container/
 ----
 
 * Gitlab groups project repository
++
 ----
 https://gitlab.example.com/GROUP/project.git#master:/container/
 ----
 
 * Gitlab token authentication
++
 If your git repository is private and not publicly accessible, you need to modify the profile's git URL to include authentication.
 Use this URL format to authenticate with a Gitlab token:
-
++
 ----
 https://gitlab-ci-token:<AUTHENTICATION_TOKEN>@gitlab.example.com/USER/project.git#master:/container/
 ----
-
++
 [IMPORTANT]
 .Specifying a Github or Gitlab Branch
 ====
@@ -209,15 +216,15 @@ If a branch is not specified, the `master` branch will be used by default.
 If a `folder` is not specified the image sources (`Dockerfile` sources) are expected to be in the root directory of the Github or Gitlab checkout.
 ====
 
-. Select an `Activation Key`.  Activation Keys ensure that images using a profile are assigned to the correct channel and packages.
+. Select an `Activation Key`.
+Activation Keys ensure that images using a profile are assigned to the correct channel and packages.
 +
 
 [NOTE]
 .Relationship Between Activation Keys and Image Profiles
 ====
 When you associate an activation key with an image profile you are ensuring any image using the profile will use the correct software channel and any packages in the channel.
-====
-+
+===
 
 . Click the btn:[Create] button.
 
