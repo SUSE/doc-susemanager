@@ -250,7 +250,7 @@ pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 # UYUNI DOCUMENTATION BUILD COMMANDS
 
 .PHONY: antora-uyuni
-antora-uyuni: clean pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
+antora-uyuni: clean ##pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
 		sed -i "s/^ *\(name: *suse-manager\)/#\1/;\
 s/^ *\(title: *SUSE Manager\)/#\1/;\
 s/^ *\(start_page: *ROOT:index-suma\)/#\1/;\
