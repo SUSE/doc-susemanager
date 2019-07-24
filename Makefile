@@ -30,8 +30,8 @@ PDF_THEME_SUMA ?= suse-draft
 
 # UYUNI PDF Themes
 # Available Choices set variable
-# uyuni-depreciated-draft
-# uyuni-depreciated
+# uyuni-draft
+# uyuni
 
 PDF_THEME_UYUNI ?= uyuni
 
@@ -82,7 +82,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # SUMA DOCUMENTATION BUILD COMMANDS
 
-# To build for suma-webui or uyuni-depreciated you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
+# To build for suma-webui or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
@@ -250,7 +250,7 @@ pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 # UYUNI DOCUMENTATION BUILD COMMANDS
 
 .PHONY: antora-uyuni
-antora-uyuni: clean ##pdf-all-uyuni-depreciated ## Build the UYUNI Antora static site (See README for more information)
+antora-uyuni: clean pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
 		sed -i "s/^ *\(name: *suse-manager\)/#\1/;\
 s/^ *\(title: *SUSE Manager\)/#\1/;\
 s/^ *\(start_page: *ROOT:index-suma\)/#\1/;\
