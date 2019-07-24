@@ -30,8 +30,8 @@ PDF_THEME_SUMA ?= suse-draft
 
 # UYUNI PDF Themes
 # Available Choices set variable
-# uyuni-draft
-# uyuni
+# uyuni-depreciated-draft
+# uyuni-depreciated
 
 PDF_THEME_UYUNI ?= uyuni
 
@@ -82,9 +82,9 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # SUMA DOCUMENTATION BUILD COMMANDS
 
-# To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
+# To build for suma-webui or uyuni-depreciated you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
+antora-suma: clean #pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
 	s/^ # *\(title: *SUSE Manager\)/\1/;\
 	s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
@@ -106,7 +106,7 @@ obs-packages-suma: clean pdf-all-suma antora-suma ## Generate SUMA OBS tar files
 
 
 .PHONY: pdf-all-suma
-pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-reference-suma pdf-administration-suma pdf-salt-suma pdf-retail-suma ##pdf-architecture-suma ## Generate PDF versions of all SUMA books
+pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-reference-suma pdf-administration-suma pdf-salt-suma pdf-retail-suma ##pdf-architecture-suma-webui ## Generate PDF versions of all SUMA books
 
 
 
@@ -250,7 +250,7 @@ pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 # UYUNI DOCUMENTATION BUILD COMMANDS
 
 .PHONY: antora-uyuni
-antora-uyuni: clean ##pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
+antora-uyuni: clean ##pdf-all-uyuni-depreciated ## Build the UYUNI Antora static site (See README for more information)
 		sed -i "s/^ *\(name: *suse-manager\)/#\1/;\
 s/^ *\(title: *SUSE Manager\)/#\1/;\
 s/^ *\(start_page: *ROOT:index-suma\)/#\1/;\
