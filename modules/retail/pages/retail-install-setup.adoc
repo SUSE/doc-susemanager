@@ -1,15 +1,16 @@
 [[retail-install-setup]]
 = Setting up
 
-When you have installed the {smr} packages, you need to set up your environment by following these steps:
+When you have installed the [guimenu]``SUSE Manager for Retail Server`` and the [guimenu]``SUSE Manager Retail Branch Server``, you need to set up your environment by following these steps:
 
 . Install the build host and register it to {susemgr}
 . Configure the build host
 . Create required system group
 
-Branch server installation steps:
+Branch server setup steps:
 
-. Install the branch server and register it to {susemgr}
+// already done:
+// . Install the branch server and register it to {susemgr}
 . Assign and configure branch server formulas
 . Synchronize images to the branch servers
 
@@ -55,7 +56,7 @@ Check that the build host has these packages installed after you have run Highst
 - kiwi
 - kiwi-desc-saltboot
 
-If any package is missing, make sure the ``SUSE Manager 3.2 Tools`` repository is available on the build host and install any missing packages manually using ``zypper install``.
+If any package is missing, make sure the ``SUSE Manager Tools`` repository is available on the build host and install any missing packages manually using ``zypper install``.
 ====
 
 
@@ -88,28 +89,17 @@ With a limited feature set, {susemgrproxy} 3.2 is also possible.
 Do not install the branch server as a traditionally managed client.
 ====
 
-// Wondering whether that's actually meant...
-// ke, 2019-06-19
 For instructions to install Salt-based proxy minions and register them to {susemgr}, see xref:installation:install-proxy-unified.adoc[].
 
-The activation key should have the following channels:
+The activation key should have the following channels, pools and respective updates:
 
-// FIXME: check this listing. 2019-06-19, ke
 ----
-- SLES 12 SP3 (SP4 in the future) as a base
-  - SLES Pool
-    - SLES Update
-- SUSE Manager 3.2 Tools
-  - SUSE Manager 3.2 Tools Pool
-    - SUSE Manager 3.2 Tools Update
-- SUSE Manager 3.2 Proxy
-  - SUSE Manager 3.2 Proxy Pool
-    - SUSE Manager 3.2 Proxy Update
-- SUSE Manager 3.2 Proxy for Retail
-  - SUSE Manager 3.2 Proxy for Retail Pool
-    - SUSE Manager 3.2 Proxy for Retail Update
+- SUSE Manager Retail Branch Server 4.0 x86_64
+  - Basesystem Module 15 SP1 x86_64
+  - Server Applications Module 15 SP1 x86_64
+    - SUSE Manager Proxy Module 4.0 x86_64
+      - SUSE Manager Retail Branch Server Module 4.0 x86_64
 ----
-
 
 For mass deployments, see xref:retail:retail-mass-config.adoc[].
 
@@ -164,7 +154,7 @@ salt <branch_server_salt_id> state.apply image-sync
 POS Terminals based on {sls}{nbsp}11 SP{nbsp}3 can be deployed in much the same way as other terminals, with a few differences.
 
 * You must use the {slsa}{nbsp}11 template
-* * {slsa}{nbsp}11 images need to be activated with the [systemitem]``SLES11 SP3 i586`` and [systemitem]``SLEPOS 11 SP3 i586`` channels
+* {slsa}{nbsp}11 images need to be activated with the [systemitem]``SLES11 SP3 i586`` and [systemitem]``SLEPOS 11 SP3 i586`` channels
 
 [IMPORTANT]
 ====
