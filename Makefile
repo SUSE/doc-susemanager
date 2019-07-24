@@ -84,7 +84,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # To build for suma-webui or uyuni-depreciated you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
-antora-suma: clean #pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
+antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
 	s/^ # *\(title: *SUSE Manager\)/\1/;\
 	s/^ # *\(start_page: *ROOT:index-suma\)/\1/;\
