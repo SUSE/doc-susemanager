@@ -1,3 +1,7 @@
+// 2019-07-24, ke: Is it supported on Salt minions only?
+// This seems to indicate it: "Installing and configuring exporters is done using a Salt formula."
+// If yes, we'd better replace "mananged clients" with the term "Salt minions".
+
 [[prometheus]]
 = Monitoring with Prometheus
 
@@ -5,16 +9,19 @@ Monitoring can be performed in {productname} using Prometheus and Grafana.
 The packages for Prometheus are shipped with SUSE Manager Client Tools, these packages also include several Prometheus exporters.
 {productname} Server and Proxy are now able to provide self-health metrics, or install and manage a limited number of Prometheus exporters on managed client systems.
 
-Prometheus is a monitoring tool, originally built at SoundCloud, that is used to record real-time metrics in a time-series database.
+// I do not see why we should mention where this was started; we do not do this elsewhere
+Prometheus is a monitoring tool that is used to record real-time metrics in a time-series database.
 Unlike other monitoring systems, Prometheus collects metrics using HTTP pulls, allowing for higher performance and scalability.
-Prometheus is an open-source software project, mostly written in Go, and its source code is available at https://github.com/prometheus/.
+Prometheus is an open-source software project, mostly written in Go.
+Its source code is available at https://github.com/prometheus/.
 
-Grafana is a tool for data visualization, monitoring and analysis.
+Grafana is a tool for data visualization, monitoring, and analysis.
 It is used to create dashboards with panels representing specific metrics over a set period of time.
 Grafana is commonly used together with Prometheus, but also supports other data sources such as ElasticSearch, MySQL, PostgreSQL, and Influx DB.
-For more information about Grafana, see: https://grafana.com/docs/.
+For more information about Grafana, see https://grafana.com/docs/.
 
 A Prometheus package is included in the SUSE Manager Client Tools for {sle}{nbsp}12 and {sle}{nbsp}15.
+
 
 
 == Prometheus Metrics
@@ -30,16 +37,16 @@ A metric is uniquely identified by its name and set of labels.
 http_requests_total{status="200", method="GET"}  @1557331801.111  42236
 ----
 
-Each application or system being monitored must expose metrics in the format above, either through code instrumentation, or Prometheus exporters.
+Each application or system being monitored must expose metrics in the format above, either through code instrumentation or Prometheus exporters.
 
 The different metric types are:
 
-* Counter - cumulative values. ex: number of errors
-* Gauge - can go up or down. ex: temperature
+* Counter - cumulative values. For example, number of errors
+* Gauge - can go up or down. For example, temperature
 * Histogram - count observations in buckets
 * Summary - similar to histogram, but provides totals (sum and count)
 
-For more information about metric types, see: https://prometheus.io/docs/concepts/metric_types/
+For more information about metric types, see https://prometheus.io/docs/concepts/metric_types/.
 
 
 
@@ -52,14 +59,10 @@ It is used in all Prometheus interactions.
 In PromQL, an expression can evaluate to one of three types:
 
 * Instant vector: a set of time series containing a single sample for each time series, all sharing the same timestamp
-
 * Range vector: a set of time series containing a range of data points over time for each time series
-
 * Scalar: a numeric floating point value
 
-
-
-The core part of any PromQL query is the metric name, for example: *http_requests_total*.
+The core part of any PromQL query is the metric name, for example, *http_requests_total*.
 Labels can be used as optional selectors.
 This example returns the total number of HTTP requests that have status *200* and method *GET*:
 
@@ -67,20 +70,20 @@ This example returns the total number of HTTP requests that have status *200* an
 http_requests_total{status="200", method="GET"}
 ----
 
-For more information about PromQL, see the official Prometheus documentation: https://prometheus.io/docs/prometheus/latest/querying/basics/).
+For more information about PromQL, see the official Prometheus documentation at https://prometheus.io/docs/prometheus/latest/querying/basics/.
 
 
 
 == Exporters
 
-Exporters are libraries which help in exporting existing metrics from third-party systems as Prometheus metrics.
+Exporters are libraries that help with exporting metrics from third-party systems as Prometheus metrics.
 Exporters are useful whenever it is not feasible to instrument a given application or system with Prometheus metrics directly.
 Multiple exporters can run on a monitored host to export local metrics.
 
-The Prometheus community provides a list of official exporters, and many others can be found as community contributions.
-For detailed information and an extensive list of exporters, see: https://prometheus.io/docs/instrumenting/exporters/.
+The Prometheus community provides a list of official exporters, and more can be found as community contributions.
+For detailed information and an extensive list of exporters, see https://prometheus.io/docs/instrumenting/exporters/.
 
-With {productname}{nbsp}4, you can set up the Server and Proxy to expose Prometheus metrics to provide insights about {productname} self-health.
+With {productname}{nbsp}4, you can set up the Server and Proxy to expose Prometheus metrics to provide insights about self-health of {productname}.
 Metrics are available for these services:
 
 * Hardware and Operating System
@@ -104,7 +107,7 @@ See https://github.com/wrouesnel/postgres_exporter.
 * JMX exporter: [systemitem]``prometheus-jmx_exporter``.
 See https://github.com/prometheus/jmx_exporter.
 * Apache exporter: [systemitem]``golang-github-lusitaniae-apache_exporter``.
-See https://github.com/Lusitaniae/apache_exporter).
+See https://github.com/Lusitaniae/apache_exporter.
 
 These exporter packages are shipped with {productname} Proxy:
 
@@ -134,8 +137,8 @@ zypper in golang-github-prometheus-prometheus
 ----
 systemctl enable --now prometheus
 ----
-. Confirm that the Prometheus interface is loading correctly.
-In your browser, navigate to the URL of the server where Prometheus is installed, on port 9090 (for example, [path]``http://example.com:9090``).
+. Check that the Prometheus interface is loading correctly.
+In your browser, navigate to the URL of the server where Prometheus is installed, and listen on port 9090 (for example, [literal]``http://example.com:9090``).
 
 
 
@@ -162,7 +165,7 @@ yaml
         __metrics_path__: /rhn/metrics
 ----
 
-For more information about configuring Prometheus, see the official Prometheus documentation: https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+For more information about configuring Prometheus, see the official Prometheus documentation at https://prometheus.io/docs/prometheus/latest/configuration/configuration/
 
 
 
@@ -194,29 +197,30 @@ image::monitoring_enable_services.png[scaledwidth=80%]
 
 .Procedure: Configuring Monitoring Formulas
 
-. In the {susemgr} {webui}, open the details page for the server, and navigate to the Formulas tab.
+. In the {susemgr} {webui}, open the details page of the system to be monitored, and navigate to the [guimenu]``Formulas`` tab.
 . Check the [guimenu]``Monitoring`` checkbox to select all monitoring formulas, and click btn:[Save].
 . Apply the highstate.
 
 
 .Procedure: Configuring the Exporters
 
-. In the {susemgr} {webui}, open the details page for the server, and navigate to the menu:Formulas[Prometheus Exporters] tab.
-. Check the [guimenu]``Enabled`` checkbox for both the Node Exporter, and the Postgres Exporter.
-. In the [guimenu]``Postgres Exporter`` section, in the [guimenu]``Data Source Namer`` field, enter the path to your data source (for example [systemitem]``postgresql://user:passwd@localhost:5432/database?sslmode=disable``).
+. In the {susemgr} {webui}, open the details page of the system to be monitored, and navigate to the menu:Formulas[Prometheus Exporters] tab.
+. Check the [guimenu]``Enabled`` checkbox for both the Node and the Postgres Exporter.
+. In the [guimenu]``Postgres Exporter`` section, in the [guimenu]``Data Source Namer`` field, enter the path to your data source (for example, [systemitem]``postgresql://user:passwd@localhost:5432/database?sslmode=disable``).
 . Click btn:[Save Formula].
 . Apply the highstate.
 
 image::monitoring_configure_formula.png[scaledwidth=80%]
 
 
+
 == Visualization with Grafana
 
 The Grafana website contains dozens of dashboards uploaded by the community.
-For an example {productname} dashboard to help you to get started, see https://grafana.com/dashboards/10277.
-For more information, see: https://grafana.com/dashboards
+For an example of the {productname} dashboard, see https://grafana.com/dashboards/10277.
+For more information about dashbords, see https://grafana.com/dashboards
 
-To use Grafana with {productname}, you need to have enabled metrics in the {productname} {webui}, and configured your Prometheus instance to collect those metrics.
+To use Grafana with {productname}, you must enable metrics in the {productname} {webui} and configure your Prometheus instance to collect those metrics.
 
 
 ////
