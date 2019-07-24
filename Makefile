@@ -15,8 +15,8 @@ FILENAME_UYUNI ?= uyuni
 
 
 # PDF Resource Locations
-PDF_FONTS_DIR ?= branding/pdf-resources/fonts
-PDF_THEME_DIR ?= branding/pdf-resources/themes
+PDF_FONTS_DIR ?= branding/pdf/fonts
+PDF_THEME_DIR ?= branding/pdf/themes
 
 
 # PDF Publishing Themes, draft uses a draft watermark.
