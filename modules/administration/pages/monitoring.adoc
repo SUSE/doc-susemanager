@@ -1,18 +1,12 @@
-// 2019-07-24, ke: Is it supported on Salt minions only?
-// This seems to indicate it: "Installing and configuring exporters is done using a Salt formula."
-// If yes, we'd better replace "mananged clients" with the term "Salt minions".
-
-[[prometheus]]
+[[monitoring]]
 = Monitoring with Prometheus
 
-Monitoring can be performed in {productname} using Prometheus and Grafana.
-The packages for Prometheus are shipped with SUSE Manager Client Tools, these packages also include several Prometheus exporters.
-{productname} Server and Proxy are now able to provide self-health metrics, or install and manage a limited number of Prometheus exporters on managed client systems.
+You can monitor your {productname} environment using Prometheus and Grafana.
+{productname} Server and Proxy are able to provide self-health metrics, or install and manage a limited number of Prometheus exporters on Salt clients.
 
-// I do not see why we should mention where this was started; we do not do this elsewhere
 Prometheus is a monitoring tool that is used to record real-time metrics in a time-series database.
-Unlike other monitoring systems, Prometheus collects metrics using HTTP pulls, allowing for higher performance and scalability.
-Prometheus is an open-source software project, mostly written in Go.
+Prometheus collects metrics using HTTP pulls, allowing for higher performance and scalability.
+Prometheus is an open-source software project, written in Go.
 Its source code is available at https://github.com/prometheus/.
 
 Grafana is a tool for data visualization, monitoring, and analysis.
@@ -20,7 +14,7 @@ It is used to create dashboards with panels representing specific metrics over a
 Grafana is commonly used together with Prometheus, but also supports other data sources such as ElasticSearch, MySQL, PostgreSQL, and Influx DB.
 For more information about Grafana, see https://grafana.com/docs/.
 
-A Prometheus package is included in the SUSE Manager Client Tools for {sle}{nbsp}12 and {sle}{nbsp}15.
+Prometheus and Grafana packages are included in the SUSE Manager Client Tools for {sle}{nbsp}12 and {sle}{nbsp}15.
 
 
 
@@ -169,10 +163,10 @@ For more information about configuring Prometheus, see the official Prometheus d
 
 
 
-== Monitoring Managed Systems
+== Monitoring Salt Clients
 
-Prometheus metrics exporters can also be used on managed client systems.
-The packages are available from the {productname} client tools channels, and can be enabled and configured directly on the {productname} {webui}.
+Prometheus metrics exporters can also be used on Salt clients.
+The packages are available from the {productname} client tools channels, and can be enabled and configured directly in the {productname} {webui}.
 Currently, two exporters are supported:
 
 * Node exporter: [systemitem]``golang-github-prometheus-node_exporter``.
@@ -182,7 +176,7 @@ See https://github.com/wrouesnel/postgres_exporter.
 
 Installing and configuring exporters is done using a Salt formula.
 
-
+When you have the exporters installed and configured, you can manually configure monitoring, or set up service discovery so that Prometheus automatically starts scraping metrics from systems as they are enabled.
 
 == Enable and Configure Monitoring
 
@@ -214,6 +208,31 @@ image::monitoring_configure_formula.png[scaledwidth=80%]
 
 
 
+.Procedure: Enable Service Discovery
+
+[IMPORTANT]
+====
+This feature is a technical preview available in {productname} 4.0.2 and later.
+It should not be used in production systems.
+====
+
+. Open the Prometheus static configuration file at [path]``/etc/prometheus/prometheus.yml``.
+. Add or update the scrape configurations section:
++
+----
+job_name: 'suma'
+uyuni_sd_configs:
+host: "http://your-suse-manager-server-url"
+username: "apiuser"
+password: "password"
+----
+. Save the configuration file and restart the Prometheus service:
++
+----
+systemctl restart prometheus
+----
+
+
 == Visualization with Grafana
 
 The Grafana website contains dozens of dashboards uploaded by the community.
@@ -223,7 +242,6 @@ For more information about dashboards, see https://grafana.com/dashboards
 To use Grafana with {productname}, you must enable metrics in the {productname} {webui} and configure your Prometheus instance to collect those metrics.
 
 
-////
 .Procedure: Setting up Grafana
 
 . Install the [package]``grafana`` package:
@@ -241,4 +259,3 @@ systemctl enable --now grafana-server
 image::monitoring_grafana_example.png[scaledwidth=80%]
 
 Grafana settings are configured in [path]``/etc/grafana/grafana.ini``.
-////
