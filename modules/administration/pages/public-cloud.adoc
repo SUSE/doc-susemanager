@@ -9,32 +9,33 @@ This section discusses what you will require to run {productname} in a public cl
 ====
 Public clouds provide {productname} under a Bring Your Own Subscription (BYOS) model.
 This means that you must register them with the {scc}.
-For more information about registering  {productname} with {scc}, see xref:installation:general-requirements.adoc[].
+For more information about registering {productname} with {scc}, see xref:installation:general-requirements.adoc[].
 ====
 
 Depending on the public cloud network you are using, you can locate the {productname} installation images by searching for the  keywords [package]``suse``, [package]``manager``, [package]``proxy``, or [package]``BYOS``.
+
+
 
 == Instance Requirements
 
 Select a public cloud instance that meets the hardware requirements in xref:installation:hardware-requirements.adoc[].
 
-In addition, be aware of these important considerations:
+In addition, be aware of these considerations:
 
 * The {productname} setup procedure performs a forward-confirmed reverse DNS lookup.
 This must succeed in order for the setup procedure to complete successfully and for {productname} to operate as expected.
-Therefore, it is important that the hostname and IP configuration be performed prior to running the {productname} setup procedure.
-* {productname} Server and Proxy instances are expected to run in a network configuration that provides you control over DNS entries, but cannot access the wider internet.
-Within this network configuration DNS resolution must be provided, such that `hostname -f` returns the FQDN.
+Therefore, it is important to perform hostname and IP configuration prior to running the {productname} setup procedure.
+* {productname} server and proxy instances are expected to run in a network configuration that provides you control over DNS entries, but cannot access the wider internet.
+Within this network configuration DNS resolution must be provided: `hostname -f` must return the fully-qualified domain name (FQDN).
 DNS resolution is also important for connecting clients.
-DNS is dependent on the cloud framework you  choose, refer to the cloud service provider documentation for detailed instructions.
-* We recommend that you locate software repositories, the server database, and the Proxy squid cache on an external virtual disk.
+DNS is dependent on the cloud framework you choose, refer to the cloud service provider documentation for detailed instructions.
+* We recommend that you locate software repositories, the server database, and the proxy squid cache on an external virtual disk.
 This prevents data loss if the instance is unexpectedly terminated.
 Instructions for setting up an external virtual disk are contained in this section.
 
 
 
 == Network Setup
-
 
 On a public cloud service, you must run {productname} within a restricted network, such as VPC private subnet with an appropriate firewall setting.
 The instance must only be able to be accessed by machines in your specified IP ranges.
@@ -44,10 +45,11 @@ The instance must only be able to be accessed by machines in your specified IP r
 A world-accessible {productname} instance violates the terms of the {productname} EULA, and it will not be supported by {suse}.
 ====
 
-When you are setting up your networking environment, you will need to ensure that you allow https, in order to be able access the {productname} {webui}.
+To be able accessing the {productname} {webui} allow HTTPS, when you are setting up your networking environment.
 
 
-=== Set the hostname
+
+=== Set the Hostname
 
 {productname} requires a stable and reliable hostname.
 Changing the hostname at a later point can create errors.
@@ -55,13 +57,13 @@ Changing the hostname at a later point can create errors.
 In most public cloud environments, the method shown in this section will work correctly.
 However, you will have to perform the same modification for every client.
 
-You might prefer to manage DNS resolution by creating a DNS entry in your network environmentinstead.
+You might prefer to manage DNS resolution by creating a DNS entry in your network environment instead.
 
 You can also manage hostname resolution by editing the [path]``/etc/resolv.conf`` file.
 Depending on the order of your setup, if you start the {productname} instance prior to setting up DNS services the file may not contain the appropriate [systemitem]``search`` directive.
 Check that the proper search directive exists in [path]``/etc/resolv.conf`` and add it if it is missing.
 
-.Procedure: Setting the host name locally
+.Procedure: Setting the hostname locally
 
 . Disable hostname setup by editing the DHCP configuration file at [path]``/etc/sysconfig/network/dhcp``, and adding this line:
 +
@@ -73,45 +75,47 @@ Ensure you use the system name, not the FQDN.
 For example, if the FQDN is [path]``system_name.example.com``, the system name is [path]``system_name``, and the domain name is [path]``example.com``.
 +
 ----
-hostnamectl set-hostname system_name
+# hostnamectl set-hostname system_name
 ----
 . Create a DNS entry in your network environment for domain name resolution, or force correct resolution by editing the [path]``/etc/hosts`` file:
 +
 ----
-$ echo "${local_address} suma.cloud.net suma" >> /etc/hosts
+# echo "${local_address} suma.cloud.net suma" >> /etc/hosts
 ----
 +
-You can find the local address by checking your public cloud web console, or from the command line :
+You can find the local address by checking your public cloud web console, or from the command line:
 +
 * Amazon EC2 instance:
 +
 ----
-$ ec2metadata --local-ipv4
+# ec2metadata --local-ipv4
 ----
 * Google Compute Engine:
 +
 ----
-$ gcemetadata --query instance --network-interfaces --ip
+# gcemetadata --query instance --network-interfaces --ip
 ----
 +
 * Microsoft Azure:
 +
 ----
-$ azuremetadata --internal-ip
+# azuremetadata --internal-ip
 ----
 
-=== Set up DNS resolution
+
+=== Set up DNS Resolution
 
 You will need to update the DNS records for the instance within the DNS service of your network environment.
 Refer to the cloud service provider documentation for detailed instructions:
-*** http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-dns.html[ DNS setup on Amazon EC2]
-*** https://cloud.google.com/compute/docs/networking[ DNS setup on Google Compute Engine]
-*** https://azure.microsoft.com/en-us/documentation/articles/dns-operations-recordsets[ DNS setup on Microsoft Azure]
+* http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/vpc-dns.html[DNS setup on Amazon EC2]
+* https://cloud.google.com/compute/docs/networking[DNS setup on Google Compute Engine]
+* https://azure.microsoft.com/en-us/documentation/articles/dns-operations-recordsets[DNS setup on Microsoft Azure]
 
-If you run a {productname} Server instance, you can run YaST after the instance is launched to ensure the external storage is attached and prepared correctly, and that DNS resolution is set up as described:
+If you run a {productname} Server instance,  ensure the external storage is attached and prepared correctly, and that DNS resolution is set up as described.
+Start the ``susemanager_setup`` with {yast}:
 
 ----
-$ /sbin/yast2 susemanager_setup
+# /sbin/yast2 susemanager_setup
 ----
 
 
