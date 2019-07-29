@@ -15,8 +15,8 @@ FILENAME_UYUNI ?= uyuni
 
 
 # PDF Resource Locations
-PDF_FONTS_DIR ?= branding/pdf-resources/fonts
-PDF_THEME_DIR ?= branding/pdf-resources/themes
+PDF_FONTS_DIR ?= branding/pdf/fonts
+PDF_THEME_DIR ?= branding/pdf/themes
 
 
 # PDF Publishing Themes, draft uses a draft watermark.
@@ -82,7 +82,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # SUMA DOCUMENTATION BUILD COMMANDS
 
-# To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
+# To build for suma-webui or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
@@ -106,14 +106,13 @@ obs-packages-suma: clean pdf-all-suma antora-suma ## Generate SUMA OBS tar files
 
 
 .PHONY: pdf-all-suma
-pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-reference-suma pdf-administration-suma pdf-salt-suma pdf-retail-suma ##pdf-architecture-suma ## Generate PDF versions of all SUMA books
+pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-reference-suma pdf-administration-suma pdf-salt-suma pdf-retail-suma ##pdf-architecture-suma-webui ## Generate PDF versions of all SUMA books
 
 
 
 .PHONY: pdf-install-suma
 pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
 	asciidoctor-pdf \
-	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
