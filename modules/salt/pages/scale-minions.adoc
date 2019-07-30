@@ -4,7 +4,7 @@
 
 
 
-== Salt Minion Onboarding Rate
+== Salt Client Onboarding Rate
 
 
 The rate at which SUSE Manager can on-board minions (accept Salt keys) is limited and depends on hardware resources.
@@ -32,6 +32,8 @@ For larger installations, this number may be increased by editing the following 
 ----
 LimitNOFILE=16384
 ----
+
+
 
 [[bp.chap.salt.minion.scaleability.timeouts]]
 == Salt Timeouts
@@ -67,14 +69,19 @@ If some of the minions are down during this process, the workflow continues as f
 By default, {productname} globally sets `timeout` and `gather_job_timeout` to 120 seconds.
 So, in the worst case, a Salt call targeting unreachable minions will end up _with 240 seconds of waiting_ until getting a response.
 
+
+////
+This content is superceded by the content in modules/salt/pages/salt-rate-limiting.adoc
+Commenting rather than deleting for now, in case there's content in here that needs to be resurrected. LKB 2019-06-12
+
 [[bp.chap.salt.minion.scaleability.timeouts.presence]]
-=== A Presence Ping Mechanism for Unreachable Salt Minions
+=== A Presence Ping Mechanism for Unreachable Salt Clients
 
 
 In order to prevent waiting until timeouts are reached when some minions are down, {suse}
-introduced a so-called "presence mechanism" for Salt minions.
+introduced a so-called "presence mechanism" for Salt clients.
 
-This presence mechanism checks for unreachable Salt minions when {productname} is performing synchronous calls to these minions, and it excludes unreachable minions from that call.
+This presence mechanism checks for unreachable Salt clients when {productname} is performing synchronous calls to these minions, and it excludes unreachable minions from that call.
 Synchronous calls are going to be displaced in favor of asynchronous calls but currently still being used during some workflows.
 
 The presence mechanism triggers a Salt [command]``test.ping`` with a custom and fixed short Salt timeout values.
@@ -87,10 +94,12 @@ This way, we can quickly detect which targeted minions are unreachable, and then
 {productname} administrators can increase or decrease default presence ping timeout values by removing the comment markers (``\#``) and setting the desired values for `salt_presence_ping_timeout` and `salt_presence_ping_gather_job_timeout` options in [path]``/etc/rhn/rhn.conf``:
 
 ----
-# SUSE Manager presence timeouts for Salt minions
+# SUSE Manager presence timeouts for Salt clients
 # salt_presence_ping_timeout = 4
 # salt_presence_ping_gather_job_timeout = 1
 ----
+
+////
 
 === Salt SSH Minions (SSH Push)
 
