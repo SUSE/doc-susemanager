@@ -5,14 +5,17 @@ You can monitor your {productname} environment using Prometheus and Grafana.
 {productname} Server and Proxy are able to provide self-health metrics, or install and manage a limited number of Prometheus exporters on Salt clients.
 
 Prometheus is a monitoring tool that is used to record real-time metrics in a time-series database.
-Prometheus collects metrics using HTTP pulls, allowing for higher performance and scalability.
-Prometheus is an open-source software project, written in Go.
-Its source code is available at https://github.com/prometheus/.
+It is an open-source software project, written in Go.
+Metrics are collected using HTTP pulls, allowing for higher performance and scalability.
+For more information about Prometheus, see https://prometheus.io/docs/.
 
 Grafana is a tool for data visualization, monitoring, and analysis.
 It is used to create dashboards with panels representing specific metrics over a set period of time.
 Grafana is commonly used together with Prometheus, but also supports other data sources such as ElasticSearch, MySQL, PostgreSQL, and Influx DB.
 For more information about Grafana, see https://grafana.com/docs/.
+
+You need to install Prometheus and Grafana on a machine separate from the {productname} Server.
+We recommend you use a managed client as your monitoring server.
 
 Prometheus and Grafana packages are included in the SUSE Manager Client Tools for {sle}{nbsp}12 and {sle}{nbsp}15.
 
@@ -114,14 +117,14 @@ See https://github.com/boynux/squid-exporter.
 
 == Install and Configure Prometheus
 
-Prometheus is installed from a package, and needs configuration before you can use it to gather metrics.
+Prometheus is installed on your monitoring server from a package, and needs configuration before you can use it to gather metrics.
 
 
 
 === Installing Prometheus
 
 .Procedure: Installing Prometheus
-. Install the [package]``golang-github-prometheus-prometheus`` package:
+. On the monitoring server, install the [package]``golang-github-prometheus-prometheus`` package:
 +
 ----
 zypper in golang-github-prometheus-prometheus
@@ -176,7 +179,10 @@ See https://github.com/wrouesnel/postgres_exporter.
 
 Installing and configuring exporters is done using a Salt formula.
 
-When you have the exporters installed and configured, you can manually configure monitoring, or set up service discovery so that Prometheus automatically starts scraping metrics from systems as they are enabled.
+When you have the exporters installed and configured, you can enable and configure monitoring.
+You can do this directly through the {productname} {webui}, or set up service discovery.
+Service discovery instructs Prometheus to automatically scrape metrics from systems as they are enabled.
+
 
 == Enable and Configure Monitoring
 
@@ -207,7 +213,6 @@ image::monitoring_enable_services.png[scaledwidth=80%]
 image::monitoring_configure_formula.png[scaledwidth=80%]
 
 
-
 .Procedure: Enable Service Discovery
 
 [IMPORTANT]
@@ -216,7 +221,7 @@ This feature is a technical preview available in {productname} 4.0.2 and later.
 It should not be used in production systems.
 ====
 
-. Open the Prometheus static configuration file at [path]``/etc/prometheus/prometheus.yml``.
+. On the monitoring server, open the Prometheus static configuration file at [path]``/etc/prometheus/prometheus.yml``.
 . Add or update the scrape configurations section:
 +
 ----
