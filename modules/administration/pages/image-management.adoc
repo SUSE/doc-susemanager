@@ -59,11 +59,11 @@ To build images with {productname}, you will need to create and configure a buil
 Container build hosts are Salt clients running {sle} 12 or later.
 This section guides you through the initial configuration for a build host.
 
-From the {productname} {webui} perform these steps to configure a build host:
+From the {productname} {webui}, perform these steps to configure a build host:
 
 
-. Select a minion to be designated as a build host from the menu:Systems[Overview] page.
-. From the [guimenu]``System Details`` page of the selected minion assign the containers modules.
+. Select a Salt client to be designated as a build host from the menu:Systems[Overview] page.
+. From the [guimenu]``System Details`` page of the selected client assign the containers modules.
 Go to menu:Software[Software Channels] and enable the containers module (for example, [guimenu]``SLE-Module-Containers15-Pool`` and [guimenu]``SLE-Module-Containers15-Updates``).
 Confirm by clicking btn:[Change Subscriptions].
 . From the menu:System Details[Properties] page, enable ``Container Build Host`` from the [guimenu]``Add-on System Types`` list and confirm by clicking btn:[Update Properties].
@@ -72,7 +72,7 @@ From the system details page select menu:States[Highstate] and click [guimenu]``
 Alternatively, apply Highstate from the {productname} Server command line:
 +
 ----
-salt '$your_minion' state.highstate
+salt '$your_client' state.highstate
 ----
 
 
@@ -368,7 +368,7 @@ The status icon for the imported image can also be seen on the ``Overview`` tab 
 
 These are some known problems when working with images:
 
-* HTTPS certificates to access the registry or the git repositories should be deployed to the minion by a custom state file.
+* HTTPS certificates to access the registry or the git repositories should be deployed to the client by a custom state file.
 * SSH git access using Docker is currently unsupported.
 You may test it, but SUSE will not provide support.
 * If the [package]#python# and [package]#python-xml# packages are not installed in your images during the build process, Salt cannot run within the container and reporting of installed packages or products will fail.
@@ -422,9 +422,9 @@ To build all kinds of images with {productname}, create and configure a build ho
 OS image build hosts are Salt clients running {sls}{nbsp}12 (SP3 or later) or 15.
 This procedure will guide you through the initial configuration for a build host.
 
-From the {productname} {webui} perform these steps to configure a build host:
+From the {productname} {webui}, perform these steps to configure a build host:
 
-. Select a minion that will be designated as a build host from the menu:Systems[Overview] page.
+. Select a client that will be designated as a build host from the menu:Systems[Overview] page.
 . From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type:`` [guimenu]``OS Image Build Host`` and confirm with btn:[Update Properties].
 +
 image::os-image-build-host.png[scaledwidth=80%]
@@ -436,7 +436,7 @@ From the system details page select menu:States[Highstate] and click btn:[Apply 
 Alternatively, apply Highstate from the {productname} Server command line:
 +
 ----
-salt '$your_minion' state.highstate
+salt '$your_client' state.highstate
 ----
 
 // FIXME: shall we also mention: ?
@@ -726,7 +726,7 @@ If the built image type is `PXE`, a Salt pillar will also be generated.
 Image pillars are stored in the `/srv/susemanager/pillar_data/images/` directory and the Salt subsystem can access details about the generated image.
 Details include where the pillar is located and provided, image checksums, information needed for network boot, and more.
 
-The generated pillar is available to all connected minions.
+The generated pillar is available to all connected clients.
 ====
 
 
@@ -753,7 +753,7 @@ For more on how to refresh a public certificate RPM, see <<at.images.kiwi.buildh
 
 The section contains some known issues when working with images.
 
-* HTTPS certificates used to access the HTTP sources or Git repositories should be deployed to the minion by a custom state file, or configured manually.
+* HTTPS certificates used to access the HTTP sources or Git repositories should be deployed to the client by a custom state file, or configured manually.
 * Importing Kiwi-based images is not supported.
 
 
