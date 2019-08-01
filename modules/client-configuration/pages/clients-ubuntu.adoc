@@ -17,7 +17,7 @@ However, the root user on {ubuntu} is disabled by default, so in order to use bo
 Other supported features:
 
 * Synchronizing [systemitem]``.deb`` channels
-* Assigning [systemitem]``.deb`` channels to minions
+* Assigning [systemitem]``.deb`` channels to clients
 * GPG signing [systemitem]``.deb`` repositories
 * Information displayed in System details pages
 * Package install, update, and remove
@@ -37,6 +37,34 @@ Some actions are not yet supported:
 == Prepare to Register {ubuntu} Clients
 
 Some preparation is required on before you can register {ubuntu} clients to {productname} Server.
+
+// ifndef works for displaying content when building uyuni
+// ifdef does not show the content for uyuni
+
+ifeval::[{uyuni-ubuntu} == true]
+
+. Install spacewalk-utils package
++
+----
+# sudo zypper in spacewalk-utils
+----
+
+. As root add the Ubuntu channels (for example the channels for Ubuntu 18.04)
++
+
+----
+# spacewalk-common-channels ubuntu-1804-pool-amd64 ubuntu-1804-amd64-main ubuntu-1804-amd64-main-update ubuntu-1804-amd64-main-security ubuntu-1804-amd64-universe ubuntu-1804-amd64-uyuni-client
+----
+
+. Synchronize the new custom channels. Check synchronization progress from the command line with:
++
+----
+tailf  /var/log/rhn/reposync/<CHANNEL-NAME>
+----
+
+endif::[]
+
+
 
 Before you begin, ensure you have the {ubuntu} product enabled, and have synchronized the {ubuntu} channels:
 
