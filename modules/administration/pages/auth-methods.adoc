@@ -2,48 +2,55 @@
 = Authentication Methods
 
 
+
 == Authentication Via PAM
 
 
-As security measures become increasingly complex, SUSE Manager supports network-based authentication systems via Pluggable Authentication Modules (PAM). PAM is a suite of libraries that allows to integrate SUSE Manager with a centralized authentication mechanism, thus eliminating the need to remember multiple passwords.
-SUSE Manager supports LDAP, Kerberos, and other network-based authentication systems via PAM.
-To enable SUSE Manager to use PAM in your organization's authentication infrastructure, follow the steps below.
+As security measures become increasingly complex, {productname} supports network-based authentication systems via Pluggable Authentication Modules (PAM).
+PAM is a suite of libraries that allows to integrate {productname} with a centralized authentication mechanism, thus eliminating the need to remember multiple passwords.
+{productname} supports LDAP, Kerberos, and other network-based authentication systems via PAM.
+To enable {productname} to use PAM in your organization's authentication infrastructure, follow the steps below.
 
 
-. Set up a PAM service file (default location: [path]``/etc/pam.d/susemanager`` ) then enforce its use by adding the following line to [path]``/etc/rhn/rhn.conf`` :
+. Set up a PAM service file (default location: [path]``/etc/pam.d/susemanager``).
+Enforce its use by adding the following line to [path]``/etc/rhn/rhn.conf``:
 +
 
 ----
 pam_auth_service = susemanager
 ----
 +
-NOTE: This assumes the PAM service file is named susemanager.
+NOTE: This assumes the PAM service file is named [path]``susemanager``.
 +
 
-. To enable a new or existing user to authenticate with PAM, proceed to the menu:Create User[] page and select the checkbox labeled Pluggable Authentication Modules (PAM) positioned below the password and password confirmation fields.
-. To authenticate a {slsa} system against Kerberos add the following lines to [path]``/etc/pam.d/susemanager`` :
+. Navigate to the menu:Create User[] page to enable a new or existing user to authenticate with PAM
+. Select the checkbox labeled [guimenu]``Pluggable Authentication Modules (PAM)`` positioned below the password and password confirmation fields.
+. To authenticate a {slsa} system against Kerberos add the following lines to [path]``/etc/pam.d/susemanager``:
 +
 
 ----
 #%PAM-1.0
- auth     include        common-auth
- account  include        common-account
- password include        common-password
- session  include        common-session
+auth     include        common-auth
+account  include        common-account
+password include        common-password
+session  include        common-session
 ----
 +
-NOTE: To register a Red Hat Enterprise Linux System against Kerberos add the following lines to [path]``/etc/pam.d/susemanager``
+NOTE: To register a Red Hat Enterprise Linux System with Kerberos add the following lines to [path]``/etc/pam.d/susemanager``:
 
 ----
 #%PAM-1.0
- auth        required      pam_env.so
- auth        sufficient    pam_krb5.so no_user_check
- auth        required      pam_deny.so
- account     required      pam_krb5.so no_user_check
+auth        required      pam_env.so
+auth        sufficient    pam_krb5.so no_user_check
+auth        required      pam_deny.so
+account     required      pam_krb5.so no_user_check
 ----
 +
 
-. YaST can now be used to configure PAM, when packages such as yast2-ldap-client and yast2-kerberos-client are installed; for detailed information on configuring PAM, see the SUSE Linux Enterprise Server Security Guide https://www.suse.com/documentation/sles-12/book_security/data/part_auth.html. This example is not limited to Kerberos; it is generic and uses the current server configuration. Note that only network based authentication services are supported.
+YaST can now be used to configure PAM, when packages such as [package]``yast2-ldap-client`` and [package]``yast2-kerberos-client`` are installed.
+For information about configuring PAM, see the SUSE Linux Enterprise Server Security Guide https://www.suse.com/documentation/sles-15/book_security/data/part_auth.html.
+This example is not limited to Kerberos; it is generic and uses the current server configuration.
+Only network based authentication services are supported.
 +
 .Changing Passwords
 IMPORTANT: Changing the password on the SUSE Manager Web interface changes only the local password on the SUSE Manager server.
