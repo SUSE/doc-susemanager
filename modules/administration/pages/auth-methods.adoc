@@ -59,41 +59,33 @@ In the above example, for instance, the Kerberos password will not be changed.
 
 
 
-
 == Authentication Via eDirectory and PAM
-
 
 . First check to ensure eDirectory authentication is working with your current OS for example:
 +
 
 ----
-#getent passwd
+getent passwd
 ----
-. If users are returned from eDirectory then create the following file:
-+
-
-----
-# cat /etc/pam.d/susemanager
-----
-. And add the following content:
+. If users are returned from eDirectory then create the [filename]``/etc/pam.d/susemanager`` and add the following content:
 +
 
 ----
 #%PAM-1.0
- auth     include        common-auth
- account  include        common-account
- password include        common-password
- session  include        common-session
- #
+auth     include        common-auth
+account  include        common-account
+password include        common-password
+session  include        common-session
 ----
-. Finally add the following lines to the {productname} conf file:
+
+. Finally add the following line to the {productname} conf file [filename]``/etc/rhn/rhn.conf``:
 +
 
 ----
-# grep -i pam /etc/rhn/rhn.conf
- pam_auth_service = susemanager
+pam_auth_service = susemanager
 ----
-. You may now create users with the same id that appears on eDirectory and mark the Use PAM check-box from the SUSE Manager WebUI.
+
+You may now create users with the same id that appears on eDirectory and enable the [guimenu]``Use PAM`` check-box in the {productname} {webui}.
 
 
 
