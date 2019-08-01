@@ -40,29 +40,44 @@ Some preparation is required on before you can register {ubuntu} clients to {pro
 
 // ifndef works for displaying content when building uyuni
 // ifdef does not show the content for uyuni
+// ifeval works for displaying content
 
-ifeval::[{uyuni-ubuntu} == true]
+ifeval::[{uyuni-content} == true]
+
+.**Procedure: Install spacewalk-utils and Add the Ubuntu Channels**
 
 . Install spacewalk-utils package
 +
 ----
-# sudo zypper in spacewalk-utils
+sudo zypper in spacewalk-utils
 ----
 
 . As root add the Ubuntu channels (for example the channels for Ubuntu 18.04)
 +
 
 ----
-# spacewalk-common-channels ubuntu-1804-pool-amd64 ubuntu-1804-amd64-main ubuntu-1804-amd64-main-update ubuntu-1804-amd64-main-security ubuntu-1804-amd64-universe ubuntu-1804-amd64-uyuni-client
+sudo spacewalk-common-channels ubuntu-1804-pool-amd64 ubuntu-1804-amd64-main \
+ubuntu-1804-amd64-main-update ubuntu-1804-amd64-main-security \
+ubuntu-1804-amd64-universe ubuntu-1804-amd64-uyuni-client
 ----
 
-. Synchronize the new custom channels. Check synchronization progress from the command line with:
+. Synchronize the new custom channels. You can check the progress of your synchronization from the command line with this command:
 +
 ----
-tailf  /var/log/rhn/reposync/<CHANNEL-NAME>
+tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
+----
+. To use bootstrap with {ubuntu}, you will need to create a bootstrap repository.
+You can do this from the command line with [command]``mgr-create-bootstrap-repo``:
++
+----
+mgr-create-bootstrap-repo --with-custom-channels
 ----
 
+For more information on creating custom repositories, see xref:administration:channel-management.adoc[].
+
 endif::[]
+
+ifeval::[{suma-content} == true]
 
 
 
@@ -146,8 +161,11 @@ mgr-create-bootstrap-repo --with-custom-channels
 ----
 
 For more information on creating custom repositories, see xref:administration:channel-management.adoc[].
+endif::[]
 
 ////
+// UPDATE August 2019: jcayouette: I do not think this commented section is relevant, can we remove it?
+
 // To be enabled once spacewalk-utils support status is clarified
 .Procedure: Preparing to Register {ubuntu} Clients with Spacewalk
 
@@ -208,50 +226,13 @@ Ensure you use the appropriate version number in this command, either [systemite
 spacewalk-common-channels -u <admin_user> -p <admin_pass> -a amd64-deb -v 'ubuntu-1804*'
 ----
 ////
-. Synchronize the new custom channels.
-You can check the progress of your synchronization from the command line with this command:
-+
-----
-tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*
-----
-. To use bootstrap with {ubuntu}, you will need to create a bootstrap repository.
-You can  do this from the command line with [command]``mgr-create-bootstrap-repo``:
-+
-----
-mgr-create-bootstrap-repo --with-custom-channels
-----
 
-//endif::[]
-
-
-
-// Uyuni specific instructions
-ifeval::[{suma-content} == false]
-
-.Procedure: Preparing to Register {ubuntu} Clients
-
-. On the client, open the [filename]``/etc/apt/sources.list.d/suma_client_tools.list`` file, and add this line:
-+
-----
-deb https://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products:/debian/xUbuntu_16.04/ /
-----
-for Ubuntu 16.04 or
-+
-----
-deb https://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products:/debian/xUbuntu_18.04/ /
-----
-for Ubuntu 18.04.
-+
-Make sure the `main` and `universe` upstream repositories are enabled.
-
-endif::[]
-
-
+== Enable the {ubuntu} Root User
 
 The root user on {ubuntu} is disabled by default.
 You can enable it by editing the [filename]``sudoers`` file.
 
-.Procedure: Granting Root User Access
+.**Procedure: Granting Root User Access**
 
 . On the client, edit the [filename]``sudoers`` file:
 +
