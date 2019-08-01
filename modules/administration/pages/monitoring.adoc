@@ -15,7 +15,7 @@ Grafana is commonly used together with Prometheus, but also supports other data 
 For more information about Grafana, see https://grafana.com/docs/.
 
 You need to install Prometheus and Grafana on a machine separate from the {productname} Server.
-We recommend you use a managed client as your monitoring server.
+We recommend you use a managed Salt client as your monitoring server.
 
 Prometheus and Grafana packages are included in the SUSE Manager Client Tools for {sle}{nbsp}12 and {sle}{nbsp}15.
 
@@ -118,10 +118,14 @@ See https://github.com/boynux/squid-exporter.
 == Install and Configure Prometheus
 
 Prometheus is installed on your monitoring server from a package, and needs configuration before you can use it to gather metrics.
+We recommend you use a managed Salt client as your monitoring server.
 
 
 
 === Installing Prometheus
+
+If your monitoring server is a {productname} client, you can install the Prometheus package using the {productname} {webui}.
+Otherwise you can download and install the package on your monitoring server manually.
 
 .Procedure: Installing Prometheus
 . On the monitoring server, install the [package]``golang-github-prometheus-prometheus`` package:
@@ -136,6 +140,7 @@ systemctl enable --now prometheus
 ----
 . Check that the Prometheus interface is loading correctly.
 In your browser, navigate to the URL of the server where Prometheus is installed, and listen on port 9090 (for example, [literal]``http://example.com:9090``).
+
 
 
 
@@ -179,7 +184,7 @@ See https://github.com/wrouesnel/postgres_exporter.
 
 Installing and configuring exporters is done using a Salt formula.
 
-When you have the exporters installed and configured, you can enable and configure monitoring.
+When you have the exporters installed and configured, you can begin using Prometheus to scrape metrics from monitored systems.
 You can do this directly through the {productname} {webui}, or set up service discovery.
 Service discovery instructs Prometheus to automatically scrape metrics from systems as they are enabled.
 
@@ -246,6 +251,8 @@ For more information about dashboards, see https://grafana.com/dashboards
 
 To use Grafana with {productname}, you must enable metrics in the {productname} {webui} and configure your Prometheus instance to collect those metrics.
 
+If your monitoring server is a {productname} client, you can install the Grafana package using the {productname} {webui}.
+Otherwise you can download and install the package on your monitoring server manually.
 
 .Procedure: Setting up Grafana
 
