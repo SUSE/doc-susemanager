@@ -117,6 +117,7 @@ pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/installation/examples \
 		-a imagesdir=modules/installation/assets/images \
 		-a revdate=$(REVDATE) \
@@ -134,6 +135,7 @@ pdf-client-config-suma: ## Generate PDF version of the SUMA Client Configuraiton
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/client-configuration/examples \
 		-a imagesdir=modules/client-configuration/assets/images \
 		-a revdate=$(REVDATE) \
@@ -151,6 +153,7 @@ pdf-upgrade-suma: ## Generate PDF version of the SUMA Upgrade Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/upgrade/examples \
 		-a imagesdir=modules/upgrade/assets/images \
 		-a revdate=$(REVDATE) \
@@ -168,6 +171,7 @@ pdf-reference-suma: ## Generate PDF version of the SUMA Reference Manual
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/reference/examples \
 		-a imagesdir=modules/reference/assets/images \
 		-a revdate=$(REVDATE) \
@@ -185,6 +189,7 @@ pdf-administration-suma: ## Generate PDF version of the SUMA Administration Guid
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/administration/examples \
 		-a imagesdir=modules/administration/assets/images \
 		-a revdate=$(REVDATE) \
@@ -202,6 +207,7 @@ pdf-salt-suma: ## Generate PDF version of the SUMA Salt Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/salt/examples \
 		-a imagesdir=modules/salt/assets/images \
 		-a revdate=$(REVDATE) \
@@ -219,6 +225,7 @@ pdf-retail-suma: ## Generate PDF version of the SUMA Retail Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/retail/examples \
 		-a imagesdir=modules/retail/assets/images \
 		-a revdate=$(REVDATE) \
@@ -237,6 +244,7 @@ pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/architecture/examples \
 		-a imagesdir=modules/architecture/assets/images \
 		-a revdate=$(REVDATE) \
