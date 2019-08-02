@@ -320,32 +320,27 @@ For more options, such as setting hostname or IP addresses, refer to the Cobbler
 
 ////
 
-[[advanced.topics.cobbler.templates]]
-== Using Cobbler Templates
+== Kickstart Templates
 
-The {productname} web interface allows you to create variables for use with Kickstart distributions and profiles.
-For more information on creating Kickstart profile variables, refer to xref:reference:systems/autoinst-distributions.adoc[].
+Kickstart files are used to automate {rhel} client installations.
+Kickstart templates are used to describe how to create Kickstart files.
+To help with creating Kickstart templates, you can create Kickstart variables within the {productname} {webui}.
+This allows you to create and manage large numbers of profiles and systems, without having to manually create Kickstart files for each.
 
-Kickstart variables are part of an infrastructure change in {productname} to support templating in Kickstart files.
-Kickstart templates are files that describe how to build Kickstart files, rather than creating specific Kickstarts.
-The templates are shared by various profiles and systems that have their own variables and corresponding values.
-These variables modify the templates and a template engine parses the template and variable data into a usable Kickstart file.
-Cobbler uses an advanced template engine called Cheetah that provides support for templates, variables, and snippets.
+Kickstart templates are shared by various profiles and systems that can each have their own variables and values.
+These variables modify the templates, and a template engine parses the template and variables into a usable Kickstart file.
 
-Advantages of using templates include:
+Cobbler uses a template engine called Cheetah that provides support for templates, variables, and snippets.
 
-* Robust features that allow administrators to create and manage large amounts of profiles or systems without duplication of effort or manually creating Kickstarts for every unique situation.
-* While templates can become complex and involve loops, conditionals and other enhanced features and syntax, you can also create simpler Kickstart files without such complexity.
+For more information on creating Kickstart profile variables, see xref:reference:systems/autoinst-distributions.adoc[].
 
 
-
-[[advanced.topics.cobbler.templates.usage]]
-=== Using Templates
+=== Kickstart Template Syntax
 
 Kickstart templates can have static values for certain common items such as PXE image file names, subnet addresses, and common paths such as [path]``/etc/sysconfig/network-scripts/``.
 However, templates differ from standard Kickstart files in their use of variables.
 
-For example, a standard Kickstart file may have a networking section similar to this:
+For example, a standard Kickstart file might have a networking section like this:
 
 ----
 network --device=eth0 --bootproto=static --ip=192.168.100.24 \
@@ -362,17 +357,15 @@ network --device=$net_dev --bootproto=static --ip=$ip_addr \
 These variables are substituted with the values set in your Kickstart profile variables or in your system detail variables.
 If the same variable is defined in both the profile and the system detail, then the system detail variable takes precedence.
 
-[NOTE]
-====
-The template for the autoinstallation has syntax rules which relies on punctuation symbols.
+
+Kickstart templates use syntax rules that rely on punctuation symbols.
 To avoid clashes, they need to be properly treated.
-====
 
-In case the autoinstallation scenario contains any shell script using variables like ``$(example)``, its content should be escaped by using the backslash symbol: ``\$(example)``.
-
-If the variable named `example` is defined in the autoinstallation snippet, the templating engine will evaluate `$example` with its content.
+If the template contains shell script variables like ``$(example)``, the content needs to be escaped with a backslash: ``\$(example)``.
+If the variable is defined in the template, the templating engine will evaluate it correctly.
 If there is no such variable, the content will be left unchanged.
 Escaping the kbd:[$] symbol will prevent the templating engine from evaluating the symbol as an internal variable.
+
 Long scripts or strings can be escaped by wrapping them with the `\#raw` and `\#end raw` directives.
 For example:
 
@@ -385,7 +378,8 @@ done
 #end raw
 ----
 
-Also, pay attention to scenarios like this:
+Any line with a kbd:[#] symbol followed by a whitespace is treated as a comment and is therefore not evaluated.
+For example:
 
 ----
 #start some section (this is a comment)
@@ -393,22 +387,17 @@ echo "Hello, world"
 #end some section (this is a comment)
 ----
 
-Any line with a kbd:[#] symbol followed by a whitespace is treated as a comment and is therefore not evaluated.
-
-For more information about Kickstart templates, refer to the Cobbler project page at:
-
+For more information about Kickstart templates and Cobbler, see
 https://fedorahosted.org/cobbler/wiki/KickstartTemplating
 
 
 
-[[advanced.topics.cobbler.templates.snippets]]
 === Kickstart Snippets
 
-If you have common configurations across all Kickstart templates and profiles, you can use the Snippets feature of Cobbler to take advantage of code reuse.
+Kickstart snippets are sections of Kickstart code that can be called by a [option]``$SNIPPET()`` function.
+The snippet is parsed by Cobbler and substituted with the contents of the snippet.
 
-Kickstart snippets are sections of Kickstart code that can be called by a [option]``$SNIPPET()`` function that will be parsed by Cobbler and substituted with the contents of the snippet.
-
-For example, you might have a common hard drive partition configuration for all servers, such as:
+This example sets up a snippet for a common hard drive partition configuration:
 
 ----
 clearpart --all
@@ -422,7 +411,7 @@ volgroup vg00 pv.00
 logvol /var --name=var vgname=vg00 --fstype ext3 --size=5000
 ----
 
-Save this snippet of the configuration to a file like [path]``my_partition`` and place the file in [path]``/var/lib/cobbler/snippets/``, where Cobbler can access it.
+Save this snippet of the configuration to a file in [path]``/var/lib/cobbler/snippets/``, where Cobbler can access it.
 
 Use the snippet by calling the [option]``$SNIPPET()`` function in your Kickstart templates.
 For example:
@@ -431,7 +420,7 @@ For example:
 $SNIPPET('my_partition')
 ----
 
-Wherever you invoke that function, the Cheetah parser will substitute the function with the snippet of code contained in the [path]``my_partition`` file.
+Cobbler will parse the function with the snippet of code contained in the [path]``my_partition`` file.
 
 
 ////
@@ -491,26 +480,26 @@ This command, running on the system to be replaced, will start the provisioning 
 
 ////
 
-[[advanced.topics.cobbler.buildiso]]
-== Building ISOs with Cobbler
 
-Some environments might lack PXE support.
-The Cobbler [command]``buildiso`` command creates a ISO boot image containing a set of distributions and kernels, and a menu similar to PXE network installations.
-Define the name and output location of the boot ISO using the [option]``--iso`` option.
+== Build ISOs with Cobbler
 
+Cobbler can create ISO boot images that contain a set of distributions, kernels, and a menu, that work similar to a PXE installation.
 
 [NOTE]
-.ISO Build Directory
 ====
-Depending on Cobbler-related systemd settings (see [path]``/usr/lib/systemd/system/cobblerd.service``) writing ISO images to public [path]``tmp`` directories will not work.
+Building ISOs with Cobbler is not supported on {ibmz}.
 ====
+
+The Cobbler [command]``buildiso`` command takes parameters to define the name and output location of the boot ISO.
+For example:
 
 ----
 cobbler buildiso --iso=/path/to/boot.iso
 ----
 
 The boot ISO includes all profiles and systems by default.
-Limit these profiles and systems using the [option]``--profiles`` and [option]``--systems`` options.
+You can limit which profiles and systems are used, with the [option]``--profiles`` and [option]``--systems`` options.
+For example:
 
 ----
 cobbler buildiso --systems="system1,system2,system3" \
@@ -519,84 +508,52 @@ cobbler buildiso --systems="system1,system2,system3" \
 
 [NOTE]
 ====
-Building ISOs with the [command]``cobbler buildiso`` command is supported for all architectures except the {zsystems} architecture.
+If you cannot write an ISO image to a public [path]``tmp`` directory, check your systemd settings in [path]``/usr/lib/systemd/system/cobblerd.service``.
 ====
 
 
 
-[[advanced.topics.cobbler.baremetal]]
+
 == Bare Metal Provisioning
 
 Systems that have not yet been provisioned are called bare metal systems.
 You can provision bare metal systems using Cobbler.
 Once a bare metal system has been provisioned in this way, it will appear in the [guilabel]``Systems`` list, where you can perform regular provisioning with autoinstallation, for a completely unattended installation.
 
-
-[[advanced.topics.cobbler.baremetal.requirements]]
-=== Bare Metal Provisioning System Requirements
-
-To successfully provision a bare metal system, you will require a fully patched {productname} server, version 2.1 or higher.
+To successfully provision a bare metal system, you will require a fully patched {productname} server.
 
 The system to be provisioned must have x86_64 architecture, with at least 2&#160;GB RAM, and be capable of PXE booting.
 
-The server uses TFTP to provision the bare metal client, so the appropriate port and networks must be configured correctly in order for provisioning to be successful. In particular, ensure that you have a DHCP server, and have set the [option]``next-server`` parameter to the {productname} server IP address or hostname.
+The server uses TFTP to provision the bare metal client, so the appropriate port and networks must be configured correctly in order for provisioning to be successful.
+In particular, ensure that you have a DHCP server, and have set the [option]``next-server`` parameter to the {productname} server IP address or hostname.
 
 
-[[advanced.topics.cobbler.baremetal.enabling]]
-=== Enabling Bare Metal Systems Management
+=== Enable Bare Metal Systems Management
 
-Bare metal systems management can be enabled or disabled in the {webui} by clicking menu:Admin[SUSE Manager Configuration > Bare-metal systems].
+Bare metal systems management can be enabled or disabled in the {productanme} {webui} by navigating to menu:Admin[SUSE Manager Configuration > Bare-metal systems].
 
 [NOTE]
 ====
-New systems are added to the organization of the administrator who enabled the bare metal systems management feature. To change the organization, log in as an Administrator of the required organization, and re-enable the feature.
+New systems are added to the organization of the administrator who enabled the bare metal systems management feature.
+To change the organization, log in as an Administrator of the required organization, and re-enable the feature.
 ====
 
-Once the feature has been enabled, any bare metal system connected to the server network will be automatically added to the organization when it is powered on.
+When the feature has been enabled, any bare metal system connected to the server network will be automatically added to the organization when it is powered on.
 The process can take a few minutes, and the system will automatically shut down once it is complete.
 After the reboot, the system will appear in the [guilabel]``Systems`` list.
 Click on the name of the system to see basic information, or go to the [guilabel]``Properties``, [guilabel]``Notes``, and [guilabel]``Hardware`` tabs for more details.
 You can migrate bare metal systems to other organizations if required, using the [guilabel]``Migrate`` tab.
 
 
-[[advanced.topics.cobbler.baremetal.provisioning]]
-=== Provisioning Bare Metal Systems
+=== Provision Bare Metal Systems
 
 Provisioning bare metal systems is similar to provisioning other systems, and can be done using the [guilabel]``Provisioning`` tab.
 However, you will not be able to schedule provisioning, it will happen automatically as soon as the system is configured and powered on.
 
 [NOTE]
-.Bare Metal and System Set Manager
 ====
-System Set Manager can be used with bare metal systems, although not all features will be available, because bare metal systems do not have an operating system installed.
-This limitation also applies to mixed sets that contain bare metal systems; all features will be re-enabled if the bare metal systems are removed from the set.
-====
-
-
-[[advanced.topics.cobbler.baremetal.troubleshooting]]
-=== Troubleshooting Bare Metal Systems
-
-If a bare metal system on the network is not automatically added to the [guilabel]``Systems`` list, check these things first:
-
-* You must have the [path]``pxe-default-image`` package installed.
-* File paths and parameters must be configured correctly. Check that the [path]``vmlinuz0`` and [path]``initrd0.img`` files, which are provided by [path]``pxe-default-image``, are in the locations specified in the [path]``rhn.conf`` configuration file.
-* Ensure the networking equipment connecting the bare metal system to the {productname} server is working correctly, and that you can reach the {productname} server IP address from the server.
-* The bare metal system to be provisioned must have PXE booting enabled in the boot sequence, and must not be attempting to boot an operating system.
-* The DHCP server must be responding to DHCP requests during boot. Check the PXE boot messages to ensure that:
-** the DHCP server is assigning the expected IP address
-** the DHCP server is assigning the the {productname} server IP address as [option]``next-server`` for booting.
-* Ensure Cobbler is running, and that the Discovery feature is enabled.
-
-If you see a blue Cobbler menu shortly after booting, discovery has started.
-If it does not complete successfully, temporarily disable automatic shutdown in order to help diagnose the problem. To disable automatic shutdown:
-
-. Select [option]``pxe-default-profile`` in the Cobbler menu with the arrow keys, and press the Tab key before the timer expires.
-. Add the kernel boot parameter [option]``spacewalk-finally=running`` using the integrated editor, and press Enter to continue booting.
-. Enter a shell with the username [option]``root`` and password [option]``linux`` to continue debugging.
-
-[IMPORTANT]
-.Duplicate profiles
-====
-Due to a technical limitation, it is not possible to reliably distinguish a new bare metal system from a system that has previously been discovered.
-Therefore, we recommended that you do not power on bare metal systems multiple times, as this will result in duplicate profiles.
+System Set Manager can be used with bare metal systems.
+However, not all SSM features are available, because bare metal systems do not have an operating system installed.
+This also applies to mixed sets that contain bare metal systems.
+All features will be re-enabled if the bare metal systems are removed from the set.
 ====
