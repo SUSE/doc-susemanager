@@ -9,6 +9,11 @@
 As security measures become increasingly complex, {productname} supports network-based authentication systems via Pluggable Authentication Modules (PAM).
 PAM is a suite of libraries that allows to integrate {productname} with a centralized authentication mechanism, thus eliminating the need to remember multiple passwords.
 {productname} supports LDAP, Kerberos, and other network-based authentication systems via PAM.
+
+
+
+=== Enabling PAM
+
 To enable {productname} to use PAM in your organization's authentication infrastructure, follow the steps below.
 
 
@@ -59,7 +64,7 @@ In the above example, for instance, the Kerberos password will not be changed.
 
 
 
-== Authentication Via eDirectory and PAM
+=== Authentication Via eDirectory and PAM
 
 . First check to ensure eDirectory authentication is working with your current OS for example:
 +
@@ -89,11 +94,10 @@ You may now create users with the same id that appears on eDirectory and enable 
 
 
 
-== Example Quest VAS Active Directory Authentication Template
+=== Example Quest VAS Active Directory Authentication Template
 
 
-If you are using Quest VAS for active directory authentication, you can use the following [path]``/etc/pam.d/susemanager``
- file.
+If you are using Quest VAS for active directory authentication, you can use the following [path]``/etc/pam.d/susemanager`` file.
 
 ----
 #%PAM-1.0
@@ -103,6 +107,8 @@ auth       requisite      pam_vas3.so echo_return
 auth       required       pam_deny.so
 account    required       pam_vas3.so no_user_check
 ----
+
+
 
 == Authentication Via Single Sign-On (SSO)
 
@@ -125,7 +131,7 @@ SSO in {productname} supports:
 * Log out with service provider-initiated single logout (SLO), and Identity service provider single logout service (SLS).
 * Assertion and nameId encryption.
 * Assertion signatures.
-* Message signatures with AuthNRequest, LogoutRequest, LogoutResponses.
+* Message signatures with AuthNRequest, LogoutRequest, and LogoutResponses.
 * Enable an Assertion consumer service endpoint.
 * Enable a single logout service endpoint.
 * Publish the SP metadata (which can be signed).
@@ -133,8 +139,11 @@ SSO in {productname} supports:
 SSO in {productname} does not support:
 
 * Product choosing and implementation for the Identity Service Provider (IdP).
-* SAML support for other products (please check with the respective product documentation).
+* SAML support for other products (please, check with the respective product documentation).
 
+
+
+=== Prerequisites
 
 Before you begin, you will need to have configured an external Identity Service Provider with these parameters.
 Check your IdP documentation for instructions.
@@ -156,6 +165,10 @@ The `uid` attribute passed in the SAML:Attribute must be created in the {product
 
 After the authentication with the IdP using the user `orgadmin` is successful, you will be logged in into {productname} as the `orgadmin` user, provided that the `orgadmin` user exists in {productname}.
 
+
+
+=== Enabling SOO
+
 [NOTE]
 ====
 Using SSO is mutually exclusive with other types of authentication: it is either enabled or disabled.
@@ -170,9 +183,10 @@ SSO is disabled by default.
 ----
 java.sso = true
 ----
-. Copy parameters you want to customize from `/usr/share/rhn/config-defaults/rhn_java_sso.conf` into `/etc/rhn/rhn.conf` and proceed by inserting the parameters you want to customize by prefixing them with `java.sso.`.
+. Find the parameters you want to customize in `/usr/share/rhn/config-defaults/rhn_java_sso.conf`.
+Insert the parameters you want to customize into `/etc/rhn/rhn.conf` and prefix them with `java.sso.`.
 +
-For example, in `/usr/share/rhn/config-defaults/rhn_java_sso.conf`:
+For example, in `/usr/share/rhn/config-defaults/rhn_java_sso.conf` find:
 +
 ----
 onelogin.saml2.sp.assertion_consumer_service.url = https://YOUR-PRODUCT-HOSTNAME-OR-IP/rhn/manager/sso/acs
@@ -186,7 +200,7 @@ java.sso.onelogin.saml2.sp.assertion_consumer_service.url = https://YOUR-PRODUCT
 +
 To find all the occurrences you need to change, search in the file for the placeholders [literal]``YOUR-PRODUCT`` and [literal]```YOUR-IDP-ENTITY``.
 Every parameter comes with a brief explanation of what it is meant for.
-. Restart spacewalk-service to pick up the changes:
+. Restart the spacewalk service to pick up the changes:
 +
 ----
 spacewalk-service restart
