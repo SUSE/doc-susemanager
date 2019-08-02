@@ -1,16 +1,10 @@
 [[client-cfg-cobbler]]
 = Cobbler
 
+Cobbler is an installation server that allows you to perform unattended system installations.
+It can be used on server, client, or guest systems, and in virtual environments.
 
-[[at.introduction.cobbler]]
-== Introduction
-
-{productname} features the Cobbler server, which allows administrators to centralize system installation and provisioning infrastructure.
-Cobbler is an installation server that provides various methods of performing unattended system installations.
-It can be used on server, workstation, or guest systems, in full or para-virtualized environments.
-
-Cobbler offers several tools for pre-installation guidance, automated installation file management, installation environment management, and more.
-This section explains some of the supported features of Cobbler, including:
+This section explains the Cobbler features most commonly used with {productname}:
 
 * Installation environment analysis using the [command]``cobbler check`` command
 * Multi-site installation server configuration using the [command]``cobbler replicate`` command
@@ -20,13 +14,12 @@ This section explains some of the supported features of Cobbler, including:
 For more detailed Cobbler documentation, see http://cobbler.github.io/manuals/.
 
 [IMPORTANT]
-.Supported Cobbler Functions
 ====
-{suse} only support those Cobbler functions that are either listed within our formal documentation or available via the web interface and API.
+{suse} only supports Cobbler functions that are available in the {productname} {webui}, or through the {productname} API.
+All features documented here are supported.
 ====
 
-[NOTE]
-.Cobbler and {smr}
+[IMPORTANT]
 ====
 Cobbler is not currently supported within {smr} environments.
 If you intend to use your installation with {smr} formulas, do not configure Cobbler.
@@ -34,113 +27,90 @@ If you intend to use your installation with {smr} formulas, do not configure Cob
 
 
 
-[[advanced.topics.cobbler.reqs]]
 == Cobbler Requirements
 
 To use Cobbler for system installation with PXE, you will require a TFTP server. {productname} installs a TFTP server by default.
-To PXE boot systems, you will require a DHCP server, or have access to a network DHCP server. Edit the [path]``/etc/dhcp.conf`` configuration file to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
+To PXE boot systems, you will require a DHCP server, or have access to a network DHCP server.
+Edit the [path]``/etc/dhcp.conf`` configuration file to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
 
 Cobbler requires an open HTTP port to synchronize data between the Server and the Proxy.
 By default, Cobbler uses port 80, but you can configure it to use port 443 instead if that suits your environment.
 
 
 [IMPORTANT]
-.Correct Hostname Configuration
 ====
-Cobbler uses hostnames as a unique key for each system.
-If you are using the [option]``pxe-default-image`` to onboard bare metal systems, make sure every system has a unique hostname.
-Non-unique hostnames will cause all systems with the same hostname to have the configuration filess overwritten when a provisioning profile is assigned.
+Cobbler uses host names as a unique key for each system.
+If you are using the [option]``pxe-default-image`` to onboard bare metal systems, make sure every system has a unique host name.
+Non-unique host names will cause all systems with the same host name to have the configuration files overwritten when a provisioning profile is assigned.
 ====
 
 
 
-[[advanced.topics.cobbler.reqs.settings]]
-=== Configuring Cobbler with /etc/cobbler/settings
+== Configure Cobbler
 
 Cobbler configuration is primarily managed using the [path]``/etc/cobbler/settings`` file.
 Cobbler will run with the default settings unchanged.
 All configurable settings are explained in detail in the [path]``/etc/cobbler/settings`` file, including information on each setting, and recommendations.
 
+// Removed tshooting language not found error, only applies to sles 12 & SUMA 2.1/3: https://www.suse.com/support/kb/doc/?id=7018334 LKB 2018-08-02
 
-[NOTE]
-.Supported Languages
-====
-If {productname} complains that language ``en`` was not found within the list of supported languages available at [path]``/usr/share/YaST2/data/languages``, remove the [option]``lang`` parameter in the [path]``/etc/cobbler/settings`` file, or add a valid parameter such as ``en_US``.
-
-For more on this topic, see https://www.suse.com/support/kb/doc?id=7018334.
-====
-
-
-
-[[advanced.topics.cobbler.req.dhcp]]
-=== Cobbler and DHCP
 
 Cobbler uses DHCP to automate bare metal installations from a PXE boot server.
 You must have administrative access to the network's DHCP server, or be able to configure DHCP directly on the the Cobbler server.
 
+If you have an existing DHCP server, you will need to edit the DHCP configuration file so that it points to the Cobbler server and PXE boot image.
 
-
-[[advanced.topics.cobbler.reqs.dhcp.notmanaged]]
-==== Configuring an Existing DHCP Server
-
-If you have existing DHCP server, you will need to edit the DHCP configuration file so that it points to the Cobbler server and PXE boot image.
-
-As root on the DHCP server, edit the [path]``/etc/dhcpd.conf`` file and append a new class with options for performing PXE boot installation.
+.Procedure: Configuring DHCP for Cobbler
+. On the DHCP server, as root, open the [path]``/etc/dhcpd.conf`` file.
+. Append a new class with options for performing PXE boot installation.
 For example:
-
-====
++
 ----
 allow booting;
-allow bootp; <1>
-class "PXE" <2>
-{match if substring(option vendor-class-identifier, 0, 9) = "PXEClient"; <3>
-next-server 192.168.2.1; <4>
-filename "pxelinux.0";} <5>
+allow bootp;
+class "PXE"
+{match if substring(option vendor-class-identifier, 0, 9) = "PXEClient";
+next-server 192.168.2.1;
+filename "pxelinux.0";}
 ----
-<1> Enable network booting with the [systemitem]``bootp`` protocol.
-<2> Create a class called ``PXE``.
-<3> A system configured to have PXE first in its boot priority identifies itself as ``PXEClient``.
-<4> As a result, the DHCP server directs the system to the Cobbler server at ``192.168.2.1``.
-<5> The DHCP server retrieves the [path]``pxelinux.0``bootloader file.
-====
-
-
-[[advanced.topics.cobbler.reqs.dhcp.kvm]]
-==== Setting up PXE Boot in KVM
-
-It is possible to set up PXE booting in KVM, however we do not recommend you use this method for production systems.
-
-Edit the network XML description with [command]``virsh``:
-
-. Produce an XML dump of the current description:
 +
+This example:
 
+* Enables the [systemitem]``bootp`` protocol for network booting.
+* Creates a class called ``PXE``.
+* Identifies systems as ``PXEClient`` if they are configured with PXE as the first boot priority.
+* Directs PXEClients to the Cobbler server at ``192.168.2.1``.
+* Retrieves the [path]``pxelinux.0``bootloader file.
++
+. Save the file.
+
+
+
+.Procedure: Configuring PXE Boot in KVM
+While it is possible to use KVM with PXE booting, it can be unreliable.
+We do not recommend you use this on production systems.
+
+. Use the [command]``virsh`` command to produce a dump of the current network XML description:
++
 ----
 virsh net-dumpxml --inactive network > network.xml
 ----
 
-. Open the XML dump file at [path]``network.xml`` with a text editor and add a [systemitem]``bootp`` parameter within the [systemitem]``<dhcp>``` element:
+. Open the XML dump file at [path]``network.xml`` and add a [systemitem]``bootp`` parameter within the [systemitem]``<dhcp>``` element:
 +
-
 ----
 <bootp file='/pxelinux.0' server='192.168.100.153'/>
 ----
 
-. Install the updated description:
+. Use the [command]``virsh`` command to install the updated description:
 +
-
 ----
 virsh net-define network.xml
 ----
++
+Alternatively, you can use the [command]``net-edit`` subcommand, which will also perform some error checking.
 
-Alternatively, use the [command]``net-edit`` subcommand, which will also perform some error checking.
-
-
-
-[[at.cobbler.bootp.kvm]]
-.Minimal Network XML Description for KVM
-
-====
+.Example: Minimal Network XML Description for KVM
 ----
 <network>
   <name>default</name>
@@ -156,103 +126,74 @@ Alternatively, use the [command]``net-edit`` subcommand, which will also perform
   <ip address='192.168.100.1' netmask='255.255.255.0'>
     <dhcp>
       <range start='192.168.100.128' end='192.168.100.254'/>
-      <bootp file='/pxelinux.0' server='192.168.100.153'/> <1>
+      <bootp file='/pxelinux.0' server='192.168.100.153'/>
 </dhcp>
   </ip>
 </network>
 ----
-<1> `bootp` statement that directs to the PXE server.
-====
 
 
 
-[[advanced.topics.cobbler.reqs.tftp]]
-=== TFTP
+== TFTP
 
 {productname} uses the [daemon]``atftpd`` daemon, but it can also use TFTP.
-The [daemon]``atftpd`` daemon is the recommended method for PXE serviices, and is installed by default.
-Usually, you do not have to change its configuration, but if you have to, use the {yast} Services Manager.
+The [daemon]``atftpd`` daemon is the recommended method for PXE services, and is installed by default.
+The default configuration works in most cases.
+However, if you need to change the configuration, do so using {yast} Services Manager.
 
-
-Before TFTP can serve the [path]``pxelinux.0`` boot image, you must start the tftp service.
+The TFTP service must be running so it can serve the [path]``pxelinux.0`` boot image.
 Start {yast} and use menu:System[Services Manager] to configure the [daemon]``tftpd`` daemon.
 
+You can also synchronize Cobbler-generated TFTP contents to a {productname} Proxy.
 
+.Procedure: Installing TFTP
 
-[[advanced.topics.cobbler.reqs.sync.tftp]]
-=== Syncing TFTP Contents to {productname} Proxies
-
-It is possible to synchronize Cobbler-generated TFTP contents to {productname} proxies to perform PXE booting using proxies.
-
-
-
-==== Installation
-
-On the {productname} Server as the root user, install the [systemitem]``susemanager-tftpsync`` package:
-
+. On the {productname} Server, as root, install the [systemitem]``susemanager-tftpsync`` package:
++
 ----
 zypper install susemanager-tftpsync
 ----
-
-
-On the {susemgrproxy} systems as the root user , install the [systemitem]``susemanager-tftpsync-recv`` package:
-
+. On the {productname} Proxy, as root user, install the [systemitem]``susemanager-tftpsync-recv`` package:
++
 ----
 zypper install susemanager-tftpsync-recv
 ----
 
+.Procedure: Configuring TFTP on a Proxy
+
+. On the {productname} Proxy, as root, run the [command]``configure-tftpsync.sh`` script.
+. The script will interactively ask you for details on the host names and IP addresses of the {productname} Server and Proxy, as well for the location of the [path]``tftpboot`` directory on the Proxy.
+
+For more information, use the [command]``configure-tftpsync.sh --help`` command.
 
 
-==== Configuring {susemgrproxy}
+.Procedure: Configuring TFTP on a Server
 
-Execute [path]``configure-tftpsync.sh`` on the {susemgrproxy} systems.
-
-This setup script asks for hostnames and IP addresses of the {productname} server and the proxy.
-Additionally, it asks for the `tftpboot` directory on the proxy.
-For more information, see the output of [command]``configure-tftpsync.sh --help``.
-
-
-
-==== Configuring {productname} Server
-
-As the root user, execute [path]``configure-tftpsync.sh`` on {productname} Server:
-
+. On the {productname} Server, as root, run the [command]``configure-tftpsync.sh`` script.
++
 ----
 configure-tftpsync.sh proxy1.example.com proxy2.example.com
 ----
-
-Execute [command]``cobbler sync`` to initially push the files to the proxy systems.
-This will succeed if all listed proxies are properly configured.
-
-[NOTE]
-.Changing the List of Proxy Systems
-====
-You can call [command]``configure-tftpsync.sh`` to change the list of proxy systems.
-You must always provide the full list of proxy systems.
-====
+. Run the [command]``cobbler sync`` command to push the files to the proxy.
+This will fail if you have not configured the proxies correctly.
+. If you want to change the list of proxies later on, you can use the [command]``configure-tftpsync.sh`` script to edit them.
 
 
 [NOTE]
-.Reinstalling a Configured Proxy
 ====
-If you reinstall an already configured proxy and want to push all the files again you must remove the cache file at [path]``/var/lib/cobbler/pxe_cache.json`` before you can call [command]``cobbler sync`` again.
+If you reinstall an already configured proxy and want to push all the files again, you must remove the cache file at [path]``/var/lib/cobbler/pxe_cache.json`` before you call [command]``cobbler sync``.
 ====
 
 
+== Synchronize and Start the Cobbler Service
 
-==== Requirements
-
-The {productname} Server must be able to access the {susemgrproxy} systems directly.
+The {productname} Server must be able to access the {productname} Proxy systems directly.
 You cannot push using a proxy.
 
+Before you start the Cobbler service, check that all the prerequisites are configured according to your requirements.
+You can do this by running the [command]``cobbler check`` command.
 
-
-[[advanced.topics.cobbler.reqs.service]]
-=== Syncing and Starting the Cobbler Service
-
-Before starting the Cobbler service, run a check to make sure that all the prerequisites are configured according to your requirements using the [command]``cobbler check`` command.
-
-If configuration is correct, start the {productname} server with this command:
+When your configuration is correct, start the {productname} service:
 
 ----
 /usr/sbin/spacewalk-service start
@@ -261,8 +202,7 @@ If configuration is correct, start the {productname} server with this command:
 [WARNING]
 ====
 Do not start or stop the [command]``cobblerd`` service independent of the {productname} service.
-Doing so may cause errors and other issues.
-
+Doing so can cause errors.
 Always use [command]``/usr/sbin/spacewalk-service`` to start or stop {productname}.
 ====
 
