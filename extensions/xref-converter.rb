@@ -8,7 +8,7 @@ class PDFConverter < (Asciidoctor::Converter.for 'pdf')
   register_for 'pdf'
   # asciidoctor-pdf -b pdf -r ./tanchor/inline_anchor.rb test.adoc
   def convert_inline_anchor node
-    puts "Ooh! Look! A Converter for #{node.class.inspect} of type #{node.type.inspect} xref #{node.attributes.inspect}"
+    #puts "Ooh! Look! A Converter for #{node.class.inspect} of type #{node.type.inspect} xref #{node.attributes.inspect}"
     unless node.attr('path')
       # path == nil means internal reference
       return super
@@ -23,7 +23,7 @@ class PDFConverter < (Asciidoctor::Converter.for 'pdf')
     if fragment
       return super
     end
-    puts "path #{node.attr('path').inspect}, refid #{refid.inspect}"
+    #puts "path #{node.attr('path').inspect}, refid #{refid.inspect}"
     # break at :, note: can't use 'module' here (reserved word),
     xmodule, path = refid.split(':')
     unless path
@@ -35,7 +35,7 @@ class PDFConverter < (Asciidoctor::Converter.for 'pdf')
     out = [ xmodule.capitalize ]
     out << subdir.capitalize if subdir
     out << title
-    puts "\t#{out.join(@caret)}"
+    #puts "\t#{out.join(@caret)}"
     %(<strong>[ #{out.join(@caret)} ]</strong>)
 #    if node.type == :xref
 #      @caret ||= (load_theme node.document).menu_caret_content || %( \u203a )

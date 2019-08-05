@@ -7,16 +7,16 @@ SHELL = bash
 # SUMA Productname and file replacement
 PRODUCTNAME_SUMA ?= 'SUSE Manager'
 FILENAME_SUMA ?= suse_manager
-
+SUMA_CONTENT ?= true
 
 # UYUNI Productname and file replacement
 PRODUCTNAME_UYUNI ?= Uyuni
 FILENAME_UYUNI ?= uyuni
-
+UYUNI_CONTENT ?= true
 
 # PDF Resource Locations
-PDF_FONTS_DIR ?= branding/pdf-resources/fonts
-PDF_THEME_DIR ?= branding/pdf-resources/themes
+PDF_FONTS_DIR ?= branding/pdf/fonts
+PDF_THEME_DIR ?= branding/pdf/themes
 
 
 # PDF Publishing Themes, draft uses a draft watermark.
@@ -82,7 +82,7 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # SUMA DOCUMENTATION BUILD COMMANDS
 
-# To build for suma or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
+# To build for suma-webui or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
 		sed -i "s/^ # *\(name: *suse-manager\)/\1/;\
@@ -106,18 +106,18 @@ obs-packages-suma: clean pdf-all-suma antora-suma ## Generate SUMA OBS tar files
 
 
 .PHONY: pdf-all-suma
-pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-reference-suma pdf-administration-suma pdf-salt-suma pdf-retail-suma ##pdf-architecture-suma ## Generate PDF versions of all SUMA books
+pdf-all-suma: pdf-install-suma pdf-client-config-suma pdf-upgrade-suma pdf-reference-suma pdf-administration-suma pdf-salt-suma pdf-retail-suma ##pdf-architecture-suma-webui ## Generate PDF versions of all SUMA books
 
 
 
 .PHONY: pdf-install-suma
 pdf-install-suma: ## Generate PDF version of the SUMA Installation Guide
 	asciidoctor-pdf \
-	    -r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/installation/examples \
 		-a imagesdir=modules/installation/assets/images \
 		-a revdate=$(REVDATE) \
@@ -135,6 +135,7 @@ pdf-client-config-suma: ## Generate PDF version of the SUMA Client Configuraiton
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/client-configuration/examples \
 		-a imagesdir=modules/client-configuration/assets/images \
 		-a revdate=$(REVDATE) \
@@ -152,6 +153,7 @@ pdf-upgrade-suma: ## Generate PDF version of the SUMA Upgrade Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/upgrade/examples \
 		-a imagesdir=modules/upgrade/assets/images \
 		-a revdate=$(REVDATE) \
@@ -169,6 +171,7 @@ pdf-reference-suma: ## Generate PDF version of the SUMA Reference Manual
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/reference/examples \
 		-a imagesdir=modules/reference/assets/images \
 		-a revdate=$(REVDATE) \
@@ -186,6 +189,7 @@ pdf-administration-suma: ## Generate PDF version of the SUMA Administration Guid
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/administration/examples \
 		-a imagesdir=modules/administration/assets/images \
 		-a revdate=$(REVDATE) \
@@ -203,6 +207,7 @@ pdf-salt-suma: ## Generate PDF version of the SUMA Salt Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/salt/examples \
 		-a imagesdir=modules/salt/assets/images \
 		-a revdate=$(REVDATE) \
@@ -220,6 +225,7 @@ pdf-retail-suma: ## Generate PDF version of the SUMA Retail Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/retail/examples \
 		-a imagesdir=modules/retail/assets/images \
 		-a revdate=$(REVDATE) \
@@ -238,6 +244,7 @@ pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 		-a pdf-style=$(PDF_THEME_SUMA) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_SUMA) \
+		-a suma-content=$(SUMA_CONTENT) \
 		-a examplesdir=modules/architecture/examples \
 		-a imagesdir=modules/architecture/assets/images \
 		-a revdate=$(REVDATE) \
@@ -272,7 +279,7 @@ obs-packages-uyuni: clean pdf-all-uyuni antora-uyuni ## Generate UYUNI OBS tar f
 
 
 .PHONY: pdf-all-uyuni
-pdf-all-uyuni: pdf-install-uyuni pdf-client-config-uyuni pdf-upgrade-uyuni pdf-reference-uyuni pdf-administration-uyuni pdf-salt-uyuni pdf-retail-uyuni pdf-architecture-uyuni ## Generate PDF versions of all UYUNI books
+pdf-all-uyuni: pdf-install-uyuni pdf-client-config-uyuni pdf-upgrade-uyuni pdf-reference-uyuni pdf-administration-uyuni pdf-salt-uyuni pdf-retail-uyuni ##pdf-architecture-uyuni ## Generate PDF versions of all UYUNI books
 
 
 
@@ -284,6 +291,7 @@ pdf-install-uyuni: ## Generate PDF version of the UYUNI Installation Guide
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_UYUNI) \
+		-a uyuni-content=$(UYUNI_CONTENT) \
 		-a examplesdir=modules/installation/examples \
 		-a imagesdir=modules/installation/assets/images \
 		-a revdate=$(REVDATE) \
@@ -294,13 +302,14 @@ pdf-install-uyuni: ## Generate PDF version of the UYUNI Installation Guide
 
 
 .PHONY: pdf-client-config-uyuni
-pdf-client-config-uyuni: ## Generate PDF version of the UYUNI Client Configuraiton Guide
+pdf-client-config-uyuni: ## Generate PDF version of the UYUNI Client Configuration Guide
 	asciidoctor-pdf \
 		-r ./extensions/xref-converter.rb \
 		-a pdf-stylesdir=$(PDF_THEME_DIR)/ \
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_UYUNI) \
+		-a uyuni-content=$(UYUNI_CONTENT) \
 		-a examplesdir=modules/client-configuration/examples \
 		-a imagesdir=modules/client-configuration/assets/images \
 		-a revdate=$(REVDATE) \
@@ -318,6 +327,7 @@ pdf-upgrade-uyuni: ## Generate PDF version of the UYUNI Upgrade Guide
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_UYUNI) \
+		-a uyuni-content=$(UYUNI_CONTENT) \
 		-a examplesdir=modules/upgrade/examples \
 		-a imagesdir=modules/upgrade/assets/images \
 		-a revdate=$(REVDATE) \
@@ -335,6 +345,7 @@ pdf-reference-uyuni: ## Generate PDF version of the UYUNI Reference Manual
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_UYUNI) \
+		-a uyuni-content=$(UYUNI_CONTENT) \
 		-a examplesdir=modules/reference/examples \
 		-a imagesdir=modules/reference/assets/images \
 		-a revdate=$(REVDATE) \
@@ -352,6 +363,7 @@ pdf-administration-uyuni: ## Generate PDF version of the UYUNI Administration Gu
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_UYUNI) \
+		-a uyuni-content=$(UYUNI_CONTENT) \
 		-a examplesdir=modules/administration/examples \
 		-a imagesdir=modules/administration/assets/images \
 		-a revdate=$(REVDATE) \
@@ -369,6 +381,7 @@ pdf-salt-uyuni: ## Generate PDF version of the UYUNI Salt Guide
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_UYUNI) \
+		-a uyuni-content=$(UYUNI_CONTENT) \
 		-a examplesdir=modules/salt/examples \
 		-a imagesdir=modules/salt/assets/images \
 		-a revdate=$(REVDATE) \
@@ -386,6 +399,7 @@ pdf-retail-uyuni: ## Generate PDF version of the UYUNI Retail Guide
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME_UYUNI) \
+		-a uyuni-content=$(UYUNI_CONTENT) \
 		-a examplesdir=modules/retail/examples \
 		-a imagesdir=modules/retail/assets/images \
 		-a revdate=$(REVDATE) \
@@ -404,6 +418,7 @@ pdf-architecture-uyuni: ## Generate PDF version of the UYUNI Architecture Guide
 		-a pdf-style=$(PDF_THEME_UYUNI) \
 		-a pdf-fontsdir=$(PDF_FONTS_DIR) \
 		-a productname=$(PRODUCTNAME) \
+		-a uyuni-content=$(UYUNI_CONTENT) \
 		-a examplesdir=modules/architecture/examples \
 		-a imagesdir=modules/architecture/assets/images \
 		-a revdate=$(REVDATE) \
