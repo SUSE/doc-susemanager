@@ -21,7 +21,7 @@ For in depth information covering kGraft use, see https://www.suse.com/documenta
 To work with SLE Live Patching the following expectations are assumed:
 
 * {productname} fully updated.
-* At least 1 Salt Minion running SLES 12 SP1 or later and registered with {productname} .
+* At least 1 Salt Minion running SLES 12 SP1 or later and registered with {productname}.
 * The matching SLES 12 SPx channels including the SLE Live Patching child channel fully synced.
 
 
@@ -29,7 +29,7 @@ To work with SLE Live Patching the following expectations are assumed:
 == Live Patching Setup
 
 
-. Subscribe all systems to be managed via live patching to your fully synced live patching child channels within your systems base channel by browsing to menu:Software[Software Channels] . Select both live patching channels and change subscription.
+. Subscribe all systems to be managed via live patching to your fully synced live patching child channels within your systems base channel by browsing to menu:Software[Software Channels]. Select both live patching channels and change subscription.
 +
 NOTE: When subscribing to a channel that contains a product, the product package will automatically be installed on traditionaly registered systems and added to the package state on Salt managed systems.
 For Salt managed systems please apply the highstate to push these changes to your systems.
@@ -76,7 +76,11 @@ Spacewalk Password:
 Channel tree:
 
  1. sles{sles-version}-sp{sp-ver}-pool-x86_64
-      \__ sle-live-patching{sles-version}-pool-x86_64-sp{sp-ver}\__ sle-live-patching{sles-version}-updates-x86_64-sp{sp-ver}\__ sle-manager-tools{sles-version}-pool-x86_64-sp{sp-ver}\__ sle-manager-tools{sles-version}-updates-x86_64-sp{sp-ver}\__ sles{sles-version}-sp{sp-ver}-updates-x86_64
+      \__ sle-live-patching{sles-version}-pool-x86_64-sp{sp-ver}
+      \__ sle-live-patching{sles-version}-updates-x86_64-sp{sp-ver}
+      \__ sle-manager-tools{sles-version}-pool-x86_64-sp{sp-ver}
+      \__ sle-manager-tools{sles-version}-updates-x86_64-sp{sp-ver}
+      \__ sles{sles-version}-sp{sp-ver}-updates-x86_64
 ----
 . Now use the _--init_ argument to automatically create a new development clone of the original vendor channel:
 +
@@ -119,8 +123,8 @@ You will also add the SLE Live Patching child channels to your client.
 ----
 {prompt.root}spacewalk-manage-channel-lifecycle --promote -c dev-sles{sles-version}-sp{sp-ver}-pool-x86_64
 ----
-. From the {productname} {webui} under the menu:Systems[] tab select your client system to view the menu:System Details[] page. Select menu:Software[Software Channels]. From the Software Channels page you can edit which channels a system is subscribed to. Select the new base software channel, in this case it should be [systemitem]``test-sles12-sp3-pool-x86_64``. Click the menu:Confirm[] button to switch the Base Software Channel and finalize it by clicking the menu:Modify Base Software Channel[] button.
-. From the menu:Software Channels[] page select and add both SLE Live Patching child channels by clicking the menu:Change Subscriptions[] button.
+. From the {productname} {webui} under the [guimenu]``Systems`` tab select your client system to view the menu:System Details[] page. Select menu:Software[Software Channels]. From the Software Channels page you can edit which channels a system is subscribed to. Select the new base software channel, in this case it should be [systemitem]``test-sles12-sp3-pool-x86_64``. Click the btn:[Confirm] button to switch the Base Software Channel and finalize it by clicking the btn:[Modify Base Software Channel] button.
+. From the menu:Software Channels[] page select and add both SLE Live Patching child channels by clicking the btn:[Change Subscriptions] button.
 
 
 [[live.patching.applying]]
@@ -130,7 +134,7 @@ You will also add the SLE Live Patching child channels to your client.
 The following procedure will guide you through selecting and viewing available CVE Patches (Common Vulnerabilities and Exposures) then applying these kernel updates using the new SLE Live Patching feature.
 
 
-. Select your SLES {sles-version} SP{sp-ver} minion from the menu:Systems[] page to view its menu:System Details[] . Once you have added the SLES {sles-version} SP{sp-ver} Updates child channel to your client, you should see several `Critical` software updates available. Click on `Critical` to see a list of available patches. Select any of these patches listed with the following synopsis: __Important: Security update for the Linux kernel__. All fixed security bugs will be listed along with their number. For example:(CVE-2016-8666)
+. Select your SLES {sles-version} SP{sp-ver} minion from the [guimenu]``Systems`` page to view its menu:System Details[] . Once you have added the SLES {sles-version} SP{sp-ver} Updates child channel to your client, you should see several `Critical` software updates available. Click on `Critical` to see a list of available patches. Select any of these patches listed with the following synopsis: __Important: Security update for the Linux kernel__. All fixed security bugs will be listed along with their number. For example:(CVE-2016-8666)
 +
 .Reboot Icon
 IMPORTANT: Normal or non-live kernel patches always require a reboot.
