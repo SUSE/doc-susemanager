@@ -23,20 +23,3 @@ for k in $(salt-key -l un|grep -v Unaccepted); do salt-key -y -a $k; sleep 15; d
 Clients which have not been on-boarded, (clients running with unaccepted Salt keys) consume resources, in particular inbound network bandwidth for ~2.5 Kb/s per client.
 1000 idle clients will consume around ~2.5 Mb/s, and this number will drop to almost 0 once on-boarding has been completed.
 Limit non-onboarded systems for optimal performance.
-
-
-=== Salt SSH Clients (SSH Push)
-
-
-Salt SSH clients are slightly different that regular clients (zeromq). Salt SSH clients do not use Salt PUB/RET channels but a wrapper Salt command inside of an SSH call.
-Salt `timeout` and `gather_job_timeout` are not playing a role here.
-
-{productname} defines a timeout for SSH connections in [path]``/etc/rhn/rhn.conf``:
-
-----
-# salt_ssh_connect_timeout = 180
-----
-
-
-The presence ping mechanism is also working with SSH clients.
-In this case, {productname} will use `salt_presence_ping_timeout` to override the default timeout value for SSH connections.
