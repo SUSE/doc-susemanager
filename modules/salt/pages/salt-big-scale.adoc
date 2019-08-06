@@ -30,3 +30,25 @@ The minimum requirements for the {productname} Server are:
 ====
 Large installations require regular Salt minions, suggestions in this chapter assume no traditional clients or Salt SSH minions are employed.
 ====
+
+[TIP]
+.Number of clients per {productname} Proxy
+====
+{productname} Proxy's main functionality is to implement a local cache for content served to clients from the Server, thus, employing {productname} Proxies can substantially reduce download time for clients and Server egress bandwidth usage.
+
+The choice of the number of clients per {productname} Proxy affects the download time and should be done taking into account the network structure and available bandwidth.
+
+It is recommended to size the count of clients per Proxy by estimating the download time of typical content, eg. package upgrades for a quarter, if quarterly patching of clients is the expected use case.
+
+Here is a rough example calculation of the total time needed to transfer 400MB worth of upgrades through a physical link speed of 1 GB/s to 3000 clients:
+
+----
+400 MB  * 3000 / 119 MB/s / 60 = 169 min
+----
+
+Formula is:
+
+----
+Size of updates * Number of clients / Theoretical download speed / 60
+----
+====
