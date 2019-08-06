@@ -1,0 +1,27 @@
+== Big Scale Deployment (1000 Clients or More)
+
+{productname} can be installed and used in large and small installations. For installations with more than 1000 clients per {productname} Server, adequate hardware sizing and parameter tuning must be performed.
+
+[NOTE]
+.Maximum number of clients
+====
+There is no hard maximum number of supported systems. Any number of factors can greatly affect how many clients can reasonably be used in a particular installation, including which features are used, how the systems are configured and the hardware configuration.
+====
+
+=== Hardware and infrastructure
+
+Appropriate hardware is an absolute necessity for big scale deployments, but be aware that not all problems can be solved with better hardware.
+
+The minimum requirements for the {productname} Server are:
+
+* 8 recent {x86} cores. Note that only x86-64-based {productname} deployments are currently supported for large installations this stage
+* 32 GiB of RAM. 64 GiB or more for installations with thousands of clients
+* fast I/O storage devices, such as locally-attached SSDs. Locally-attached RAID-0 SSDs for PostgreSQL data directories are recommended
+* if the SUSE Manager Server is virtualized, the `elevator=noop` kernel option should always be set for optimal I/O performance
+
+{productname} Proxy instances are also required:
+
+* use one {productname} Proxy per 500-1000 clients
+** the exact number of clients should be chosen taking network bandwidth considerations into account (see below)
+* {productname} Proxy instances require at least 2 recent {x86} cores, 16 GiB of RAM and sufficient storage for caching
+* clients should never be directly attached to the {productname} Server (except possibly a small number for testing purposes)
