@@ -105,3 +105,65 @@ salt --batch-size 50 '*' state.sls util.mgr_mine_config_clean_up
 
 You will need to wait for this command to finish executing.
 Do not end the process with kbd:[Ctrl+C].
+
+
+=== Tuning
+==== When is tuning needed?
+
+{productname} Server and Proxy are installed with parameter default values that are expected to work well on any small-to-medium scale installation (below 1000 clients). Tuning should not be needed and is discouraged for small-to-medium installations.
+
+For multi-thousand client installations, tuning is required for correct operation.
+
+[WARNING]
+====
+Parameters described below can have severe and catastrophic performance impacts on your Server when improperly adjusted, in some cases also disrupting functionality completely.
+
+Care should be taken when changing values, and performance should be monitored before and after each change, reverting any steps that do not produce the expected effect.
+
+Testing of these altered values should also be performed within a test environment whenever possible.
+
+ifeval::[{suma-content} == true]
+SUSE Support and SUSE Consulting can help and should be involved in tuning
+
+SUSE will not be able to provide support for catastrophic failure when these advanced parameters are modified without consultation.
+endif::[]
+====
+
+==== Tuning workflow
+
+===== First installation
+
+First of all, determine the "Tuning inputs" described in the paragraph below. Those are design variables, or design constraints, of your {productname} deployment and will be needed to determine all other variables later.
+
+Then, consult the "Dependency graph" below:
+
+* Tuning inputs are represented by graph nodes in a rectangle on top
+* each node is connected with arrows to parameters that might need tuning. Consult the relevant parameter sections below for more information about recommended values
+* tuning one parameter might require tuning other parameters, or changing hardware, or the infrastructure. Follow the arrows going out of each node that represent a parameter that has changed and repeat the process until no more nodes need to be visited
+
+===== Re-tuning an existing installation
+
+Re-tuning should be attempted:
+
+ - whenever "Tuning inputs" (see First installation) change significantly,
+ - if some special conditions arise that require a certain parameter to be changed (eg. specific warnings appear in logs, as detailed below) or
+ - if performance is not satisfactory.
+
+In that case, re-visit the "Dependency graph" following the same procedure described in First installation, starting from the nodes where significant change has happened.
+
+===== Dependency graph
+
+image::parameter_graph.svg[Tuning dependency graph]
+
+Key:
+
+* 3d boxes represent hardware design variables or constraints
+* ellipses represent software/system design variables or constraints
+* rectangles represent configurable parameters, color-coded by configuration file
+** red: Apache `httpd` configuration files
+** blue: Salt configuration files
+** brown: Tomcat configuration files
+** grey: PostgreSQL configuration files
+** violet: `/etc/rhn/rhn.conf`
+* dashed arrows: a variable or constraint might require a change to another parameter
+* solid arrows: changing a configuration parameter requires checking another one, as failure to adapt it might create issues
