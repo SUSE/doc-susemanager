@@ -52,3 +52,56 @@ Formula is:
 Size of updates * Number of clients / Theoretical download speed / 60
 ----
 ====
+
+
+=== Operation Recommendations
+
+==== Salt Client Onboarding Rate
+
+
+The rate at which SUSE Manager can onboard clients (accept Salt keys) is limited and depends on hardware resources.
+Onboarding clients at a faster rate than SUSE Manager is configured for will build up a backlog of unprocessed keys slowing the process and potentially exhausting resources.
+It is recommended to limit the acceptance key rate programmatically.
+A safe starting point would be to onboard a client every 15 seconds, which can be implemented via the following command:
+
+----
+for k in $(salt-key -l un|grep -v Unaccepted); do salt-key -y -a $k; sleep 15; done
+----
+
+[[bp.chap.salt.minion.scaleability.unaccepted]]
+==== Clients Running with Unaccepted Salt Keys
+
+
+Clients which have not been onboarded, (clients running with unaccepted Salt keys) consume resources, in particular inbound network bandwidth for ~2.5 Kb/s per client.
+1000 idle clients will consume around ~2.5 Mb/s, and this number will drop to almost 0 once onboarding has been completed.
+Limit non-onboarded systems for optimal performance.
+
+== Disabling the Salt Mine
+
+In older versions, {productname} used a tool called Salt mine to check client availability.
+The Salt mine would cause clients to contact the server every hour, which created significant load.
+With the introduction of a more efficient mechanism in {productname}{nbsp}3.2, the Salt mine is no longer required.
+Instead, the {productname} server uses Taskomatic to ping only the clients that appear to have been offline for twelve hours or more, with all clients being contacted at least once in every twenty four hour period by default.
+You can adjust this by changing the [systemitem]``web.system_checkin_threshold`` parameter in [path]``rhn.conf``.
+The value is expressed in days, and the default value is [literal]``1``.
+
+Newly registered Salt clients will have the Salt mine disabled by default.
+If the Salt mine is running on your system, you can reduce load by disabling it.
+This is especially effective if you have a large number of clients.
+
+Disable the Salt mine by running this command on the server:
+
+----
+salt '*' state.sls util.mgr_mine_config_clean_up
+----
+
+This will restart the clients and generate some Salt events to be processed by the server.
+If you have a large number of clients, handling these events could create excessive load.
+To avoid this, you can execute the command in batch mode with this command:
+
+----
+salt --batch-size 50 '*' state.sls util.mgr_mine_config_clean_up
+----
+
+You will need to wait for this command to finish executing.
+Do not end the process with kbd:[Ctrl+C].
