@@ -31,6 +31,7 @@ The minimum requirements for the {productname} Server are:
 Large installations require regular Salt minions, suggestions in this chapter assume no traditional clients or Salt SSH minions are employed.
 ====
 
+
 [TIP]
 .Number of clients per {productname} Proxy
 ====
@@ -51,6 +52,14 @@ Formula is:
 ----
 Size of updates * Number of clients / Theoretical download speed / 60
 ----
+====
+
+
+[TIP]
+.Start Small and Scale Up
+====
+Always start small and scale up gradually.
+Keep the server monitored in order to identify possible issues early.
 ====
 
 
@@ -106,6 +115,17 @@ salt --batch-size 50 '*' state.sls util.mgr_mine_config_clean_up
 You will need to wait for this command to finish executing.
 Do not end the process with kbd:[Ctrl+C].
 
+== Disable unnecessary Taskomatic jobs
+
+In order to minimize wasted resources, consider disabling some non-essential Taskomatic jobs, especially if the provided functionality is not used.
+
+Jobs that are safe to disable include:
+* the daily comparison of configuration files.
+Click menu:Admin[Task Schedules], then the btn:[compare-configs-default] link, then the btn:[Disable Schedule] button and finally btn:[Delete Schedule].
+* the hourly synchronization of Cobbler files.
+Click menu:Admin[Task Schedules], then the btn:[cobbler-sync-default] link, then the btn:[Disable Schedule] button and finally btn:[Delete Schedule].
+* the daily run of Gatherer and Subscription Matcher.
+Click menu:Admin[Task Schedules], then the btn:[gatherer-matcher-default] link, then the btn:[Disable Schedule] button and finally btn:[Delete Schedule].
 
 === Tuning
 ==== When is tuning needed?
@@ -181,7 +201,7 @@ The number of expected channels to manage, including any vendor-provided, third-
 
 ===== Client count
 
-The total number of expected clients.
+The total number of actual or expected clients. It is important to tune any parameters below in advance of a client count increase, whenever possible.
 
 ===== OS mix
 
@@ -320,6 +340,20 @@ The expected maximum amount of concurrent users interacting with the Web UI plus
 * Value guideline: 20 (default) - 200
 * Location: `/etc/rhn/rhn.conf`
 * After changing, also check for adjustment: `hibernate.c3p0.max_size`, `thread_pool`
+* More information on this parameter available at: http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html
+
+==== `org.quartz.scheduler.idleWaitTime`
+* Description: cycle time for Taskomatic. Decreasing this value lowers Taskomatic's latency.
+* Tune when: client count is in the thousands
+* Value guideline: 1000 - 5000 (default). Note that the value is expressed in milliseconds
+* Location: `/etc/rhn/rhn.conf`
+* More information on this parameter available at: http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html
+
+==== `MinionActionExecutor.parallel_threads`
+* Description: number of Taskomatic threads dedicated to sending commands to Salt clients as a result of Actions being executed.
+* Tune when: client count is in the thousands
+* Value guideline: 1 (default) - 10
+* Location: `/etc/rhn/rhn.conf`, full parameter name is `taskomatic.com.redhat.rhn.taskomatic.task.MinionActionExecutor.parallel_threads`
 
 ==== `rhn-search.java.maxmemory`
 * Description: the maximum amount of memory that the `rhn-search` service can use.
