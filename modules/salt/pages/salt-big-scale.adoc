@@ -80,6 +80,13 @@ A safe starting point would be to onboard a client every 15 seconds, which can b
 for k in $(salt-key -l un|grep -v Unaccepted); do salt-key -y -a $k; sleep 15; done
 ----
 
+==== Salt Clients and the RNG
+
+All communication to and from Salt Clients is encrypted, and especially during onboarding Salt employs asymmetric cryptography that requires available entropy from the Random Number Generator (RNG) facility from the kernel. If sufficient entropy is not available, that will result in significant slowdowns. Especially when running SUSE Manager in a virtualized environment, make sure enough entropy is present or change the virtualization host options in that sense.
+
+You can check the amount of available entropy with the command `cat /proc/sys/kernel/random/entropy_avail`, it should never be below 100-200).
+
+
 [[bp.chap.salt.minion.scaleability.unaccepted]]
 ==== Clients Running with Unaccepted Salt Keys
 
