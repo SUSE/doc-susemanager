@@ -54,8 +54,8 @@ The hard limit applies to all processes belonging to the jabber user, and accoun
 
 == jabberd Database Corruption
 
-``SYMPTOMS``: After a disk is full error or a disk crash event, the jabberd database may have become corrupted.
-jabberd may then fail to start during spacewalk-service start:
+``SYMPTOMS``: After _a disk is full error_ or a _disk crash event_, the [systemitem]``jabberd`` database may have become corrupted.
+[systemitem]``jabberd`` may then fail starting Spacewalk services:
 
 ----
 Starting spacewalk services...
@@ -65,8 +65,7 @@ Starting spacewalk services...
    Terminating jabberd processes...
 ----
 
-
-/var/log/messages shows more details:
+[path]``/var/log/messages`` shows more details:
 
 ----
 jabberd/sm[31445]: starting up
@@ -76,29 +75,35 @@ jabberd/sm[31445]: db: corruption detected! close all jabberd processes and run 
 jabberd/router[31437]: shutting down
 ----
 
-``CURE``: Remove the jabberd database and restart.
-Jabberd will automatically re-create the database:
+``CURE``: Remove the [systemitem]``jabberd`` database and restart.
+[systemitem]``jabberd`` will automatically re-create the database.
+Enter at the command prompt:
 
 ----
 spacewalk-service stop
- rm -Rf /var/lib/jabberd/db/*
- spacewalk-service start
+rm -rf /var/lib/jabberd/db/*
+spacewalk-service start
 ----
 
+//   ke, 2019-08-08: not sure whether we want this here:
 
+////
 An alternative approach would be to test another database, but SUSE Manager does not deliver drivers for this:
 
 ----
 rcosa-dispatcher stop
- rcjabberd stop
- cd /var/lib/jabberd/db
- rm *
- cp /usr/share/doc/packages/jabberd/db-setup.sqlite .
- sqlite3 sqlite.db < db-setup.sqlite
- chown jabber:jabber *
- rcjabberd start
- rcosa-dispatcher start
+rcjabberd stop
+cd /var/lib/jabberd/db
+rm *
+cp /usr/share/doc/packages/jabberd/db-setup.sqlite .
+sqlite3 sqlite.db < db-setup.sqlite
+chown jabber:jabber *
+rcjabberd start
+rcosa-dispatcher start
 ----
+////
+
+
 
 == Capturing XMPP Network Data for Debugging Purposes
 
@@ -107,13 +112,34 @@ If you are experiencing bugs regarding OSAD, it can be useful to dump network me
 The following procedures provide information on capturing data from both the client and server side.
 
 .Procedure: Server Side Capture
-. Install the [package]#tcpdump# package on the SUSE Manager Server as root: [command]``zypper in tcpdump ``
-. Stop the OSA dispatcher and Jabber processes with [command]``rcosa-dispatcher stop`` and [command]``rcjabberd stop.``
-. Start data capture on port 5222: [command]``tcpdump -s 0 port 5222 -w server_dump.pcap``
-. Start the OSA dispatcher and Jabber processes: [command]``rcosa-dispatcher start`` and [command]``rcjabberd start``.
-. Open a second terminal and execute the following commands: [command]``rcosa-dispatcher start`` and [command]``rcjabberd start``.
-. Operate the SUSE Manager server and clients so the bug you formerly experienced is reproduced.
-. Once you have finished your capture re-open terminal 1 and stop the capture of data with: kbd:[CTRL+c]
+. Install the [package]#tcpdump# package on the {productname} server as root:
++
+
+----
+zypper in tcpdump
+----
+. Stop the OSA dispatcher and Jabber processes:
++
+
+----
+rcosa-dispatcher stop
+rcjabberd stop
+----
+. Start data capture on port 5222:
++
+
+----
+tcpdump -s 0 port 5222 -w server_dump.pcap
+----
+. Open a second terminal and start the OSA dispatcher and Jabber processes:
++
+
+----
+rcosa-dispatcher start
+rcjabberd start
+----
+. Operate the {productname} server and clients so the bug you formerly experienced is reproduced.
+. When you have finished your capture re-open the first terminal and stop the data capture with kbd:[CTRL+c].
 
 
 .Procedure: Client Side Capture
