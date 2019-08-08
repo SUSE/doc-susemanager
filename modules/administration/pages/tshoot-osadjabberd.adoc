@@ -1,6 +1,25 @@
 [[troubleshooting-osad-jabberd]]
 = Troubleshooting OSAD and jabberd
 
+////
+PUT THIS COMMENT AT THE TOP OF TROUBLESHOOTING SECTIONS
+
+Troubleshooting format:
+
+One sentence each:
+Cause: What created the problem?
+Consequence: What does the user see when this happens?
+Fix: What can the user do to fix this problem?
+Result: What happens after the user has completed the fix?
+
+If more detailed instructions are required, put them in a "Resolving" procedure:
+.Procedure: Resolving Widget Wobbles
+. First step
+. Another step
+. Last step
+////
+
+
 
 == Open File Count Exceeded
 
@@ -10,15 +29,20 @@
 Each client requires one permanently open TCP connection and each connection requires one file handler.
 The result is jabberd begins to queue and refuse connections.
 
-``CURE``: Edit the [path]``/etc/security/limits.conf``
- to something similar to the following: `jabbersoftnofile<#clients + 100>
-    jabberhardnofile<#clients + 1000>`
+``CURE``: Edit the [path]``/etc/security/limits.conf`` to something similar to the following:
+----
+jabber   soft   nofile   <#clients + 100>
+jabber   hard   nofile   <#clients + 1000>
+----
 
 This will vary according to your setup.
-For example in the case of 5000 clients: `jabbersoftnofile5100 jabberhardnofile6000`
+For example, in the case of 5000 clients:
+----
+jabber   soft   nofile   5100
+jabber   hard   nofile   6000
+----
 
-Ensure you update the [path]``/etc/jabberd/c2s.xml``
- max_fds parameter as well.
+Ensure you update the [path]``/etc/jabberd/c2s.xml`` `max_fds` parameter as well.
 For example: `<max_fds>6000</max_fds>`
 
 ``EXPLANATION``: The soft file limit is the limit of the maximum number of open files for a single process.
