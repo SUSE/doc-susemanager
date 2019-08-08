@@ -2,77 +2,74 @@
 = Managing {rhel} Clients
 
 
+This section contains information about managing traditional and Salt clients running {rhel} operating systems.
 
 
 
-The following sections provide guidance on managing Red Hat Expanded Support clients, this includes Salt clients and traditional systems.
+== Set up a {rhel} Client
 
-[[bp.expanded-support.resclients.server]]
-== Server Configuration for {rhel} Channels
+Ensure that your client meets these requirements before you start:
 
+* 8{nbsp}GB RAM or more
+* Two or more physical or virtual CPU cores
+* Access to {rhel} installation and subscription media
+* An LVM or an NFS mount is recommended
 
-This section provides guidance on server configuration for {rhel} Channels provided by {suse}.
+You will need to ensure you provision enough disk space.
+The [path]``/var/spacewalk`` directory contains all mirrored RPMs,  and can take a significant amount of disk space.
+For example, the {rhel}{nbsp}6 x86_64 channels require over 90{nbsp}GB.
 
-* Minimum of 8 GB RAM and at least two physical or virtual CPUs. Taskomatic will use one of these CPUs.
-* Taskomatic requires of minimum of 3072 MB RAM. This should be set in [path]``/etc/rhn/rhn.conf``:
-+
+Taskomatic will use one CPU core, and requires at least 3072{nbsp}MB RAM.
+To ensure that Taskomatic has access to enough memory, open the [path]``/etc/rhn/rhn.conf`` configuration file, and add this line:
 
 ----
 taskomatic.java.maxmemory=3072
 ----
-* Provision enough disk space. [path]``/var/spacewalk`` contains all mirrored RPMs. For example, {rhel} 6 x86_64 channels require 90 GB and more.
-* LVM or an NFS mount is recommended.
-* Access to RHEL 5/6/7 Subscription Media.
 
-
-.Access to RHEL Media or Repositories
 [WARNING]
 ====
-Access to Red Hat base media repositories and RHEL installation media is the responsibility of the user.
-Ensure that all your RHEL systems obtain support from RHEL or all your RHEL systems obtain support from {suse}.
-If you do not follow these practices you may violate terms with Red Hat.
+You are responsible for arranging access to Red Hat base media repositories and RHEL installation media.
+You must obtain support from either Red Hat or {suse} for all your RHEL systems.
+If you do not do this, you might be violating your terms with Red Hat.
 ====
 
-[[bp.expanded-support.resclients.tips]]
-== {rhel} Channel Management Tips
 
 
-This section provides tips on {rhel} channel management.
+== {rhel} Channel Management
 
-* The base parent distribution {rhel} channel per architecture contains zero packages. No base media is provided by {suse}. The RHEL media or installation ISOs should be added as child channels of the {rhel} parent channel.
-* The {rhel} and tools channels are provided by SUSE Customer Center (SCC) using [command]``mgr-sync``.
-* It can take up to 24 hours for an initial channel synchronization to complete.
-* When you have completed the initial synchronization process of any {rhel} channel it is recommended to clone the channel before working with it. This provides you with a backup of the original synchronization.
+The base {rhel} software channel does not contain any packages.
+This is because {suse} does not provide {rhel} base media.
+You will need to obtain base media from Red Hat, which you can then add as a child channel to the {rhel} parent channel.
 
+The {rhel} and tools channels are provided by SUSE Customer Center (SCC).
+You can synchronize your client with the [command]``mgr-sync`` command to get them.
 
-== Mirroring RHEL Media into a Channel
-
-
+Because the {rhel} channels are particularly large, it can take up to 24 hours for an initial channel synchronization to complete.
+When you have completed the initial synchronization, we recommended you clone the channel before working with it.
+This provides you with a backup of the original synchronization data.
 
 The following procedure guides you through setup of the RHEL media as a {productname} channel.
 All packages on the RHEL media will be mirrored into a child channel located under RES 5/6/7 distribution per architecture.
 
-.Procedure: Mirroring RHEL Media into a Channel
-. Create a new Channel by log in to the {webui} and selecting menu:Channels[Manage Software Channels > Create Channel] .
-. Fill in basic channel details and add the channel as a child to the corresponding RES 5/6/7 distribution channel per architecture from SCC. The base parent channel should contain zero packages.
-. Modify the RES 5/6/7 activation key to include this new child channel.
-. As {rootuser} on the {productname} command line copy the ISO to the [path]``/tmp`` directory.
-
+.Procedure: Setting up a {rhel} Channel
+. In the {productname} {webui}, navigate to menu:Channels[Manage Software Channels], and click btn:[Create Channel].
+. Fill in the channel details, and add the channel as a child to the corresponding {rhel} distribution channel for your architecture.
+The base parent channel will not contain any packages.
+. Modify the associated activation key to include your new child channel.
+. At the command prompt, as root, copy your installation disk image to the [path]``/tmp`` directory.
 . Create a directory to contain the media content:
 +
-
 ----
 mkdir -p /srv/www/htdocs/pub/rhel
 ----
 . Mount the ISO:
 +
-
 ----
 mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel
 ----
-. Start [command]``spacewalk-repo-sync`` to synchronize {rhel} 7 packages:
+. Synchronize the packages with [command]``spacewalk-repo-sync``:
 +
-
+For {rhel} 7:
 ----
 spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/
 Repo URL: https://127.0.0.1/pub/rhel/
@@ -82,7 +79,7 @@ Packages to sync:              [...]
 [...]
 ----
 +
-To synchronize RES 5/6 packages:
+For {rhel} 5 or {rhel} 6:
 +
 ----
 spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
@@ -93,22 +90,27 @@ Packages to sync:              [...]
 [...]
 ----
 
-. When the channel has completed the synchronization process you can use the channel as any normal {productname} channel.
-
-
-Attempting to synchronize the repository will sometimes fail with this error:
-
+Sometimes, the [command]``spacewalk-repo-sync`` will stop running during a synchronization, which will give this error:
 ----
 [Errno 256] No more mirrors to try.
 ----
 
-To troubleshoot this error, look at the HTTP protocol to determine if [command]``spacewalk-repo-sync`` is running:
+If this occurs, you can run [command]``spacewalk-repo-sync`` in debugging mode to determine the error.
 
-.procedure: Debug spacewalk-repo-sync
-. Start debugging mode with [command]``export URLGRABBER_DEBUG=DEBUG``
-. Check the output of [command]``/usr/bin/spacewalk-repo-sync --channel _<channel-label>_ --type yum``
-. If you want to disable debug mode, use [command]``unset URLGRABBER_DEBUG``
+Start debugging mode:
+----
+export URLGRABBER_DEBUG=DEBUG
+----
 
+Check the output:
+----
+/usr/bin/spacewalk-repo-sync --channel _<channel-label>_ --type yum
+----
+
+Disable debug mode:
+----
+unset URLGRABBER_DEBUG``
+----
 
 
 
