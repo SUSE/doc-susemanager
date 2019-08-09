@@ -153,7 +153,6 @@ This section contains information about the available parameters.
 | Value recommendation | The same value as `MaxClients`
 | Location             | [path]``/etc/tomcat/server.xml``
 | Example              | `<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" URIEncoding="UTF-8" address="127.0.0.1" maxThreads="200" connectionTimeout="20000"/>`
-| After changing       |
 | More information     | https://tomcat.apache.org/tomcat-9.0-doc/config/http.html
 |===
 
@@ -171,7 +170,6 @@ This section contains information about the available parameters.
 | Location             | [path]``/etc/sysconfig/tomcat``
 | Example              | `JAVA_OPTS="... -Xmx8G ..."`
 | After changing       | Check the Memory Usage section in this document
-| Notes                |
 | More information     | https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html
 |===
 
@@ -184,7 +182,6 @@ This section contains information about the available parameters.
 | Description          | Estimation of the total memory available to PostgreSQL for caching.
                          It is the explicitly reserved memory (`shared_buffers` parameter) plus any memory used by the kernel as cache/buffer.
 | Tune when            | Hardware RAM or memory usage increase significantly
-| Value default        |
 | Value recommendation | Start with 75% of total RAM.
                          For finer settings, use `shared_buffers` + free memory + buffer/cache memory.
                          Free and buffer/cache can be determined via the `free -m` command (`free` and `buff/cache` in the output respectively)
@@ -210,7 +207,6 @@ This section contains information about the available parameters.
 | After changing       | Check `hibernate.c3p0.max_size`, as each thread consumes a PostgreSQL connection, starvation might happen if the allocated connection pool is insufficient.
                          Check `thread_pool`, as each thread might perform Salt API calls, starvation might happen if the allocated Salt thread pool is insufficient.
                          Check Tomcat `-Xmx`, as each thread consumes memory, `OutOfMemoryException` might be raised if insufficient.
-| Notes                |
 | More information     | `man rhn.conf`
 |===
 
@@ -228,7 +224,6 @@ This section contains information about the available parameters.
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `hibernate.c3p0.max_size = 100`
 | After changing       | Check `max_connections` for adjustment.
-| Notes                |
 | More information     | https://www.mchange.com/projects/c3p0/#maxPoolSize
 |===
 
@@ -248,7 +243,6 @@ This section contains information about the available parameters.
 | Example              | `max_connections = 250`
 | After changing       | Check the Memory Usage section in this document.
                          Monitor memory usage closely before and after the change.
-| Notes                |
 | More information     | https://www.postgresql.org/docs/10/runtime-config-connection.html#GUC-MAX-CONNECTIONS
 |===
 
@@ -266,7 +260,6 @@ This section contains information about the available parameters.
 | Example              | `java.salt_batch_size = 300`
 | After changing       | Check the Memory Usage section in this document.
                          Monitor memory usage closely before and after the change.
-| Notes                |
 | More information     | xref:reference:salt-rate-limiting.adoc[Salt Rate Limiting]
 |===
 
@@ -285,8 +278,6 @@ This section contains information about the available parameters.
 | Value recommendation | 4-400 seconds
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `java.salt_presence_ping_timeout = 40`
-| After changing       |
-| Notes                |
 | More information     | xref:reference:salt-timeouts.adoc[Salt Timeouts]
 |===
 
@@ -306,8 +297,6 @@ This section contains information about the available parameters.
 | Value recommendation | 1-100 seconds
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `java.salt_presence_ping_gather_job_timeout = 10`
-| After changing       |
-| Notes                |
 | More information     | xref:reference:salt-timeouts.adoc[Salt Timeouts]
 |===
 
@@ -327,7 +316,6 @@ This section contains information about the available parameters.
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `java.taskomatic_channel_repodata_workers = 4`
 | After changing       | Check `taskomatic.java.maxmemory` for adjustment, as every new thread will consume memory
-| Notes                |
 | More information     | `man rhn.conf`
 |===
 
@@ -345,7 +333,6 @@ This section contains information about the available parameters.
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `taskomatic.java.maxmemory = 8192`
 | After changing       | Check the Memory Usage section in this document.
-| Notes                |
 | More information     | `man rhn.conf`
 |===
 
@@ -363,7 +350,6 @@ This section contains information about the available parameters.
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `org.quartz.threadPool.threadCount = 100`
 | After changing       | Check `hibernate.c3p0.max_size` and `thread_pool` for adjustment
-| Notes                |
 | More information     | http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html
 |===
 
@@ -380,8 +366,6 @@ This section contains information about the available parameters.
 | Value recommendation | 1000-5000 ms
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `org.quartz.scheduler.idleWaitTime = 1000`
-| After changing       |
-| Notes                |
 | More information     | http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html
 |===
 
@@ -397,9 +381,6 @@ This section contains information about the available parameters.
 | Value recommendation | 1-10
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `taskomatic.com.redhat.rhn.taskomatic.task.MinionActionExecutor.parallel_threads = 10`
-| After changing       |
-| Notes                |
-| More information     |
 |===
 
 
@@ -415,8 +396,6 @@ This section contains information about the available parameters.
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `rhn-search.java.maxmemory = 4096`
 | After changing       | Check the Memory Usage section in this document.
-| Notes                |
-| More information     |
 |===
 
 
@@ -445,12 +424,10 @@ This section contains information about the available parameters.
 | Description          | The amount of memory allocated by PostgreSQL every time a connection needs to do a sort or hash operation.
                          Every connection (as specified by `max_connections`) might make use of an amount of memory equal to a multiple of `work_mem`.
 | Tune when            | Individual query operations are too slow, and value is below 5 MB
-| Value default        |
 | Value recommendation | 2-20 MB
 | Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
 | Example              | `work_mem = 10MB`
 | After changing       | check if the {productname} Server might need additional RAM.
-| Notes                |
 | More information     | https://www.postgresql.org/docs/10/runtime-config-resource.html#GUC-WORK-MEM
 |===
 
@@ -469,7 +446,6 @@ This section contains information about the available parameters.
 | Location             | [path]``/etc/salt/master.d/susemanager.conf``, in the `rest_cherrypy` section.
 | Example              | `thread_pool: 100`
 | After changing       | Check `socket_queue_size` and `worker_threads` for adjustment.
-| Notes                |
 | More information     | https://docs.saltstack.com/en/latest/ref/netapi/all/salt.netapi.rest_cherrypy.html#performance-tuning
 |===
 
@@ -488,7 +464,6 @@ This section contains information about the available parameters.
 | Example              | `worker_threads: 50`
 | After changing       | Check the Memory Usage section in this document.
                          Monitor memory usage closely before and after the change.
-| Notes                |
 | More information     | https://docs.saltstack.com/en/latest/ref/configuration/master.html#worker-threads
 |===
 
@@ -504,8 +479,6 @@ This section contains information about the available parameters.
 | Value recommendation | 1-60. For 128 GiB of RAM, 10 is expected to give good results.
 | Location             | [path]``/etc/sysctl.conf``
 | Example              | `vm.swappiness = 20`
-| After changing       |
-| Notes                |
 | More information     | https://www.suse.com/documentation/sles-15/book_sle_tuning/data/cha_tuning_memory_vm.html
 |===
 
