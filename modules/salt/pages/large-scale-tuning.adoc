@@ -179,25 +179,6 @@ This section contains information about the available parameters.
 
 
 
-=== `effective_cache_size`
-
-[cols="1,1"]
-|===
-| Description          | Estimation of the total memory available to PostgreSQL for caching.
-                         It is the explicitly reserved memory (`shared_buffers` parameter) plus any memory used by the kernel as cache/buffer.
-| Tune when            | Hardware RAM or memory usage increase significantly
-| Value recommendation | Start with 75% of total RAM.
-                         For finer settings, use `shared_buffers` + free memory + buffer/cache memory.
-                         Free and buffer/cache can be determined via the `free -m` command (`free` and `buff/cache` in the output respectively)
-| Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
-| Example              | `effective_cache_size = 24GB`
-| After changing       | Check the Memory Usage section in this document
-| Notes                | This is an estimation for the query planner, not an allocation.
-| More information     | https://www.postgresql.org/docs/10/runtime-config-query.html#GUC-EFFECTIVE-CACHE-SIZE
-|===
-
-
-
 === `java.message_queue_thread_pool_size`
 
 [cols="1,1"]
@@ -212,42 +193,6 @@ This section contains information about the available parameters.
                          Check `thread_pool`, as each thread might perform Salt API calls, starvation might happen if the allocated Salt thread pool is insufficient.
                          Check Tomcat `-Xmx`, as each thread consumes memory, `OutOfMemoryException` might be raised if insufficient.
 | More information     | `man rhn.conf`
-|===
-
-
-=== `hibernate.c3p0.max_size`
-
-[cols="1,1"]
-|===
-| Description          | Maximum number of PostgreSQL connections simultaneously available to both Tomcat and Taskomatic.
-                         If any of those components requires more concurrent connections, their requests will be queued.
-| Tune when            | `java.message_queue_thread_pool_size` or `maxThreads` increase significantly, or when `org.quartz.threadPool.threadCount` has changed significantly.
-                         Each thread consumes one connection in Taskomatic and Tomcat, having more threads than connections might result in starving.
-| Value default        | 20
-| Value recommendation | 100 to 200, higher than the maximum of `java.message_queue_thread_pool_size + maxThreads` and `org.quartz.threadPool.threadCount`
-| Location             | [path]``/etc/rhn/rhn.conf``
-| Example              | `hibernate.c3p0.max_size = 100`
-| After changing       | Check `max_connections` for adjustment.
-| More information     | https://www.mchange.com/projects/c3p0/#maxPoolSize
-|===
-
-
-
-=== `max_connections`
-
-[cols="1,1"]
-|===
-| Description          | Maximum number of PostgreSQL connections available to applications.
-                         More connections allow for more concurrent threads/workers in various components (in particular Tomcat and Taskomatic), which generally improves performance.
-                         However, each connection consumes resources, in particular `work_mem` megabytes per sort operation per connection.
-| Tune when            | `hibernate.c3p0.max_size` changes significantly, as that parameter determines the maximum number of connections available to Tomcat and Taskomatic
-| Value default        | 400
-| Value recommendation | `2 * hibernate.c3p0.max_size + 50`, if less than 1000
-| Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
-| Example              | `max_connections = 250`
-| After changing       | Check the Memory Usage section in this document.
-                         Monitor memory usage closely before and after the change.
-| More information     | https://www.postgresql.org/docs/10/runtime-config-connection.html#GUC-MAX-CONNECTIONS
 |===
 
 
@@ -389,6 +334,24 @@ This section contains information about the available parameters.
 
 
 
+=== `hibernate.c3p0.max_size`
+
+[cols="1,1"]
+|===
+| Description          | Maximum number of PostgreSQL connections simultaneously available to both Tomcat and Taskomatic.
+                         If any of those components requires more concurrent connections, their requests will be queued.
+| Tune when            | `java.message_queue_thread_pool_size` or `maxThreads` increase significantly, or when `org.quartz.threadPool.threadCount` has changed significantly.
+                         Each thread consumes one connection in Taskomatic and Tomcat, having more threads than connections might result in starving.
+| Value default        | 20
+| Value recommendation | 100 to 200, higher than the maximum of `java.message_queue_thread_pool_size + maxThreads` and `org.quartz.threadPool.threadCount`
+| Location             | [path]``/etc/rhn/rhn.conf``
+| Example              | `hibernate.c3p0.max_size = 100`
+| After changing       | Check `max_connections` for adjustment.
+| More information     | https://www.mchange.com/projects/c3p0/#maxPoolSize
+|===
+
+
+
 === `rhn-search.java.maxmemory`
 
 [cols="1,1"]
@@ -421,6 +384,25 @@ This section contains information about the available parameters.
 
 
 
+=== `max_connections`
+
+[cols="1,1"]
+|===
+| Description          | Maximum number of PostgreSQL connections available to applications.
+                         More connections allow for more concurrent threads/workers in various components (in particular Tomcat and Taskomatic), which generally improves performance.
+                         However, each connection consumes resources, in particular `work_mem` megabytes per sort operation per connection.
+| Tune when            | `hibernate.c3p0.max_size` changes significantly, as that parameter determines the maximum number of connections available to Tomcat and Taskomatic
+| Value default        | 400
+| Value recommendation | `2 * hibernate.c3p0.max_size + 50`, if less than 1000
+| Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
+| Example              | `max_connections = 250`
+| After changing       | Check the Memory Usage section in this document.
+                         Monitor memory usage closely before and after the change.
+| More information     | https://www.postgresql.org/docs/10/runtime-config-connection.html#GUC-MAX-CONNECTIONS
+|===
+
+
+
 === `work_mem`
 
 [cols="1,1"]
@@ -433,6 +415,25 @@ This section contains information about the available parameters.
 | Example              | `work_mem = 10MB`
 | After changing       | check if the {productname} Server might need additional RAM.
 | More information     | https://www.postgresql.org/docs/10/runtime-config-resource.html#GUC-WORK-MEM
+|===
+
+
+
+=== `effective_cache_size`
+
+[cols="1,1"]
+|===
+| Description          | Estimation of the total memory available to PostgreSQL for caching.
+                         It is the explicitly reserved memory (`shared_buffers` parameter) plus any memory used by the kernel as cache/buffer.
+| Tune when            | Hardware RAM or memory usage increase significantly
+| Value recommendation | Start with 75% of total RAM.
+                         For finer settings, use `shared_buffers` + free memory + buffer/cache memory.
+                         Free and buffer/cache can be determined via the `free -m` command (`free` and `buff/cache` in the output respectively)
+| Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
+| Example              | `effective_cache_size = 24GB`
+| After changing       | Check the Memory Usage section in this document
+| Notes                | This is an estimation for the query planner, not an allocation.
+| More information     | https://www.postgresql.org/docs/10/runtime-config-query.html#GUC-EFFECTIVE-CACHE-SIZE
 |===
 
 
@@ -470,6 +471,7 @@ This section contains information about the available parameters.
                          Monitor memory usage closely before and after the change.
 | More information     | https://docs.saltstack.com/en/latest/ref/configuration/master.html#worker-threads
 |===
+
 
 
 === `swappiness`
