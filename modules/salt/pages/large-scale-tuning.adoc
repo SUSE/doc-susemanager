@@ -110,6 +110,7 @@ Includes `spacecmd`, `spacewalk-clone-by-date`, and similar.
 This section contains information about the available parameters.
 
 
+[[max-clients]]
 === `MaxClients`
 
 [cols="1,1"]
@@ -122,22 +123,23 @@ This section contains information about the available parameters.
 | Value recommendation | 150-500
 | Location             | [path]``/etc/apache2/server-tuning.conf``, in the `prefork.c` section
 | Example              | `MaxClients = 200`
-| After changing       | Immediately change `ServerLimit` and check `maxThreads` for possible adjustment.
+| After changing       | Immediately change xref:server-limit[`ServerLimit`] and check xref:max-threads[`maxThreads`] for possible adjustment.
 | Notes                | This parameter was renamed to `MacRequestWorkers`, both names are valid.
 | More information     | https://httpd.apache.org/docs/2.4/en/mod/mpm_common.html#maxrequestworkers
 |===
 
 
 
+[[server-limit]]
 === `ServerLimit`
 
 [cols="1,1"]
 |===
 | Description          | The number of Apache httpd processes serving HTTP requests simultaneously.
-                         The number must equal `MaxClients`.
-| Tune when            | `MaxClients` changes
+                         The number must equal xref:max-clients[`MaxClients`].
+| Tune when            | xref:max-clients[`MaxClients`] changes
 | Value default        | 150
-| Value recommendation | The same value as `MaxClients`
+| Value recommendation | The same value as xref:max-clients[`MaxClients`]
 | Location             | [path]``/etc/apache2/server-tuning.conf``, in the `prefork.c` section
 | Example              | `ServerLimit = 200`
 | More information     | https://httpd.apache.org/docs/2.4/en/mod/mpm_common.html#serverlimit
@@ -145,15 +147,16 @@ This section contains information about the available parameters.
 
 
 
+[[max-threads]]
 === `maxThreads`
 
 [cols="1,1"]
 |===
 | Description          | The number of Tomcat threads dedicated to serving HTTP requests
-| Tune when            | `MaxClients` changes.
-                         `maxThreads` must always be equal or greater than `MaxClients`
+| Tune when            | xref:max-clients[`MaxClients`] changes.
+                         `maxThreads` must always be equal or greater than xref:max-clients[`MaxClients`]
 | Value default        | 150
-| Value recommendation | The same value as `MaxClients`
+| Value recommendation | The same value as xref:max-clients[`MaxClients`]
 | Location             | [path]``/etc/tomcat/server.xml``
 | Example              | `<Connector port="8009" protocol="AJP/1.3" redirectPort="8443" URIEncoding="UTF-8" address="127.0.0.1" maxThreads="200" connectionTimeout="20000"/>`
 | More information     | https://tomcat.apache.org/tomcat-9.0-doc/config/http.html
@@ -161,12 +164,13 @@ This section contains information about the available parameters.
 
 
 
+[[tomcat-xmx]]
 === Tomcat's `-Xmx`
 
 [cols="1,1"]
 |===
 | Description          | The maximum amount of memory Tomcat can use
-| Tune when            | `java.message_queue_thread_pool_size` is increased or
+| Tune when            | xref:java-message-queue-thread-pool-size[`java.message_queue_thread_pool_size`] is increased or
 `OutOfMemoryException` errors appear in `/var/log/rhn/rhn_web_ui.log`
 | Value default        | 1{nbsp}GiB
 | Value recommendation | 4-8{nbsp}GiB
@@ -178,6 +182,7 @@ This section contains information about the available parameters.
 
 
 
+[[java-message-queue-thread-pool-size]]
 === `java.message_queue_thread_pool_size`
 
 [cols="1,1"]
@@ -188,14 +193,15 @@ This section contains information about the available parameters.
 | Value recommendation | 50 - 150
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `java.message_queue_thread_pool_size = 50`
-| After changing       | Check `hibernate.c3p0.max_size`, as each thread consumes a PostgreSQL connection, starvation might happen if the allocated connection pool is insufficient.
-                         Check `thread_pool`, as each thread might perform Salt API calls, starvation might happen if the allocated Salt thread pool is insufficient.
-                         Check Tomcat `-Xmx`, as each thread consumes memory, `OutOfMemoryException` might be raised if insufficient.
+| After changing       | Check xref:hibernate-c3p0-max-size[`hibernate.c3p0.max_size`], as each thread consumes a PostgreSQL connection, starvation might happen if the allocated connection pool is insufficient.
+                         Check xref:thread-pool[`thread_pool`], as each thread might perform Salt API calls, starvation might happen if the allocated Salt thread pool is insufficient.
+                         Check xref:tomcat-xmx[Tomcat's `-Xmx`], as each thread consumes memory, `OutOfMemoryException` might be raised if insufficient.
 | More information     | `man rhn.conf`
 |===
 
 
 
+[[java-salt-batch-size]]
 === `java.salt_batch_size`
 
 [cols="1,1"]
@@ -213,6 +219,7 @@ This section contains information about the available parameters.
 
 
 
+[[java-salt-presence-ping-timeout]]
 === `java.salt_presence_ping_timeout`
 
 [cols="1,1"]
@@ -231,12 +238,13 @@ This section contains information about the available parameters.
 
 
 
+[[java-salt-presence-ping-gather-job-timeout]]
 === `java.salt_presence_ping_gather_job_timeout`
 
 [cols="1,1"]
 |===
 | Description          | Before any Action is executed on a client, a presence ping is executed to make sure the client is reachable.
-                         After `java.salt_presence_ping_timeout` seconds have elapsed without a response, a second command (`find_job`) is sent to the client for a final check.
+                         After xref:java-salt-presence-ping-timeout[`java.salt_presence_ping_timeout`] seconds have elapsed without a response, a second command (`find_job`) is sent to the client for a final check.
                          This parameter sets the number of seconds after the second command after which the client is definitely considered offline.
                          Having many clients typically means some will respond faster than others, so this timeout could be raised to accommodate for the slower ones.
 | Tune when            | Client count increases significantly, or some clients are responding correctly but too slowly, and {productname} excludes them from calls.
@@ -250,6 +258,7 @@ This section contains information about the available parameters.
 
 
 
+[[java-taskomatic-channel-repodata-workers]]
 === `java.taskomatic_channel_repodata_workers`
 
 [cols="1,1"]
@@ -263,19 +272,20 @@ This section contains information about the available parameters.
 | Value recommendation | 2-10
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `java.taskomatic_channel_repodata_workers = 4`
-| After changing       | Check `taskomatic.java.maxmemory` for adjustment, as every new thread will consume memory
+| After changing       | Check xref:taskomatic-java-maxmemory[`taskomatic.java.maxmemory`] for adjustment, as every new thread will consume memory
 | More information     | `man rhn.conf`
 |===
 
 
 
+[[taskomatic-java-maxmemory]]
 === `taskomatic.java.maxmemory`
 
 [cols="1,1"]
 |===
 | Description          | The maximum amount of memory Taskomatic can use.
                          Generation of metadata, especially for some OSs, can be memory-intensive, so this parameter might need raising depending on the managed OS mix.
-| Tune when            | `java.taskomatic_channel_repodata_workers` increases, OSs are added to {productname} (particularly {rhel} or {ubuntu}), or `OutOfMemoryException` errors appear in `/var/log/rhn/rhn_taskomatic_daemon.log`.
+| Tune when            | xref:java-taskomatic-channel-repodata-workers[`java.taskomatic_channel_repodata_workers`] increases, OSs are added to {productname} (particularly {rhel} or {ubuntu}), or `OutOfMemoryException` errors appear in `/var/log/rhn/rhn_taskomatic_daemon.log`.
 | Value default        | 2048 MiB
 | Value recommendation | 2048-16384 MiB
 | Location             | [path]``/etc/rhn/rhn.conf``
@@ -286,6 +296,7 @@ This section contains information about the available parameters.
 
 
 
+[[org-quartz-threadPool-threadCount]]
 === `org.quartz.threadPool.threadCount`
 
 [cols="1,1"]
@@ -297,12 +308,13 @@ This section contains information about the available parameters.
 | Value recommendation | 20-200
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `org.quartz.threadPool.threadCount = 100`
-| After changing       | Check `hibernate.c3p0.max_size` and `thread_pool` for adjustment
+| After changing       | Check xref:hibernate-c3p0-max-size[`hibernate.c3p0.max_size`] and xref:thread-pool[`thread_pool`] for adjustment
 | More information     | http://www.quartz-scheduler.org/documentation/2.4.0-SNAPSHOT/configuration.html
 |===
 
 
 
+[[org-quartz-scheduler-idleWaitTime]]
 === `org.quartz.scheduler.idleWaitTime`
 
 [cols="1,1"]
@@ -319,6 +331,7 @@ This section contains information about the available parameters.
 
 
 
+[[MinionActionExecutor-parallel-threads]]
 === `MinionActionExecutor.parallel_threads`
 
 [cols="1,1"]
@@ -333,24 +346,26 @@ This section contains information about the available parameters.
 
 
 
+[[hibernate-c3p0-max-size]]
 === `hibernate.c3p0.max_size`
 
 [cols="1,1"]
 |===
 | Description          | Maximum number of PostgreSQL connections simultaneously available to both Tomcat and Taskomatic.
                          If any of those components requires more concurrent connections, their requests will be queued.
-| Tune when            | `java.message_queue_thread_pool_size` or `maxThreads` increase significantly, or when `org.quartz.threadPool.threadCount` has changed significantly.
+| Tune when            | xref:java-message-queue-thread-pool-size[`java.message_queue_thread_pool_size`] or xref:max-threads[`maxThreads`] increase significantly, or when xref:org-quartz-threadPool-threadCount[`org.quartz.threadPool.threadCount`] has changed significantly.
                          Each thread consumes one connection in Taskomatic and Tomcat, having more threads than connections might result in starving.
 | Value default        | 20
-| Value recommendation | 100 to 200, higher than the maximum of `java.message_queue_thread_pool_size + maxThreads` and `org.quartz.threadPool.threadCount`
+| Value recommendation | 100 to 200, higher than the maximum of xref:java-message-queue-thread-pool-size[`java.message_queue_thread_pool_size`] + xref:max-threads[`maxThreads`] and xref:org-quartz-threadPool-threadCount[`org.quartz.threadPool.threadCount`]
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `hibernate.c3p0.max_size = 100`
-| After changing       | Check `max_connections` for adjustment.
+| After changing       | Check xref:max-connections[`max_connections`] for adjustment.
 | More information     | https://www.mchange.com/projects/c3p0/#maxPoolSize
 |===
 
 
 
+[[rhn-search-java-maxmemory]]
 === `rhn-search.java.maxmemory`
 
 [cols="1,1"]
@@ -366,6 +381,7 @@ This section contains information about the available parameters.
 
 
 
+[[shared-buffers]]
 === `shared_buffers`
 
 [cols="1,1"]
@@ -377,22 +393,22 @@ This section contains information about the available parameters.
 | Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
 | Example              | `shared_buffers = 8192MB`
 | After changing       | Check the Memory Usage section in this document.
-| Notes                | The value is formatted as `<N>MB`, where `<N>` is the number of MiB to allocate.
 | More information     | https://www.postgresql.org/docs/10/runtime-config-resource.html#GUC-SHARED-BUFFERS
 |===
 
 
 
+[[max-connections]]
 === `max_connections`
 
 [cols="1,1"]
 |===
 | Description          | Maximum number of PostgreSQL connections available to applications.
                          More connections allow for more concurrent threads/workers in various components (in particular Tomcat and Taskomatic), which generally improves performance.
-                         However, each connection consumes resources, in particular `work_mem` megabytes per sort operation per connection.
-| Tune when            | `hibernate.c3p0.max_size` changes significantly, as that parameter determines the maximum number of connections available to Tomcat and Taskomatic
+                         However, each connection consumes resources, in particular xref:work-mem[`work_mem`] megabytes per sort operation per connection.
+| Tune when            | xref:hibernate-c3p0-max-size[`hibernate.c3p0.max_size`] changes significantly, as that parameter determines the maximum number of connections available to Tomcat and Taskomatic
 | Value default        | 400
-| Value recommendation | `2 * hibernate.c3p0.max_size + 50`, if less than 1000
+| Value recommendation | 2 * xref:hibernate-c3p0-max-size[hibernate.c3p0.max_size] + 50, if less than 1000
 | Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
 | Example              | `max_connections = 250`
 | After changing       | Check the Memory Usage section in this document.
@@ -402,12 +418,13 @@ This section contains information about the available parameters.
 
 
 
+[[work-mem]]
 === `work_mem`
 
 [cols="1,1"]
 |===
 | Description          | The amount of memory allocated by PostgreSQL every time a connection needs to do a sort or hash operation.
-                         Every connection (as specified by `max_connections`) might make use of an amount of memory equal to a multiple of `work_mem`.
+                         Every connection (as specified by xref:max-connections[`max_connections`]) might make use of an amount of memory equal to a multiple of `work_mem`.
 | Tune when            | Individual query operations are too slow, and value is below 5 MB
 | Value recommendation | 2-20 MB
 | Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
@@ -418,15 +435,16 @@ This section contains information about the available parameters.
 
 
 
+[[effective-cache-size]]
 === `effective_cache_size`
 
 [cols="1,1"]
 |===
 | Description          | Estimation of the total memory available to PostgreSQL for caching.
-                         It is the explicitly reserved memory (`shared_buffers` parameter) plus any memory used by the kernel as cache/buffer.
+                         It is the explicitly reserved memory (xref:shared-buffers[`shared_buffers`]) plus any memory used by the kernel as cache/buffer.
 | Tune when            | Hardware RAM or memory usage increase significantly
 | Value recommendation | Start with 75% of total RAM.
-                         For finer settings, use `shared_buffers` + free memory + buffer/cache memory.
+                         For finer settings, use xref:shared-buffers[`shared_buffers`] + free memory + buffer/cache memory.
                          Free and buffer/cache can be determined via the `free -m` command (`free` and `buff/cache` in the output respectively)
 | Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
 | Example              | `effective_cache_size = 24GB`
@@ -437,31 +455,33 @@ This section contains information about the available parameters.
 
 
 
+[[thread-pool]]
 === `thread_pool`
 
 [cols="1,1"]
 |===
 | Description          | The number of worker threads serving Salt API HTTP requests.
                          A higher number can improve parallelism of {productname} Server-initiated Salt operations, but will consume more memory.
-| Tune when            | `java.message_queue_thread_pool_size` or `org.quartz.threadPool.threadCount` are changed.
+| Tune when            | xref:java-message-queue-thread-pool-size[`java.message_queue_thread_pool_size`] or xref:org-quartz-threadPool-threadCount[`org.quartz.threadPool.threadCount`] are changed.
                          Starvation can occur when there are more Tomcat or Taskomatic threads making simultaneous Salt API calls than there are Salt API worker threads.
 | Value default        | 100
-| Value recommendation | 100-500, but should be higher than the sum of `java.message_queue_thread_pool_size` and `org.quartz.threadPool.threadCount`
+| Value recommendation | 100-500, but should be higher than the sum of xref:java-message-queue-thread-pool-size[`java.message_queue_thread_pool_size`] and xref:org-quartz-threadPool-threadCount[`org.quartz.threadPool.threadCount`]
 | Location             | [path]``/etc/salt/master.d/susemanager.conf``, in the `rest_cherrypy` section.
 | Example              | `thread_pool: 100`
-| After changing       | Check `socket_queue_size` and `worker_threads` for adjustment.
+| After changing       | Check xref:worker-threads[`worker_threads`] for adjustment.
 | More information     | https://docs.saltstack.com/en/latest/ref/netapi/all/salt.netapi.rest_cherrypy.html#performance-tuning
 |===
 
 
 
+[[worker-threads]]
 === `worker_threads`
 
 [cols="1,1"]
 |===
 | Description          | The number of `salt-master` worker threads that process commands and replies from minions and the Salt API.
                          Increasing this value, assuming sufficient resources are available, allows Salt to process more data in parallel from minions without timing out, but will consume significantly more RAM (typically about 70 MiB per thread).
-| Tune when            | Client count increases significantly, `thread_pool` increases significantly, or `SaltReqTimeoutError` or `Message timed out` errors appear in `/var/log/salt/master`.
+| Tune when            | Client count increases significantly, xref:thread-pool[`thread_pool`] increases significantly, or `SaltReqTimeoutError` or `Message timed out` errors appear in `/var/log/salt/master`.
 | Value default        | 8
 | Value recommendation | 8-200
 | Location             | [path]``/etc/salt/master.d/tuning.conf``
@@ -473,6 +493,7 @@ This section contains information about the available parameters.
 
 
 
+[[swappiness]]
 === `swappiness`
 
 [cols="1,1"]
@@ -503,8 +524,8 @@ This includes Taskomatic, Tomcat, and `rhn-search`.
 These services support a configurable memory cap.
 The Salt master::
 Depends on many factors and can only be estimated.
-Measure PostgreSQL reserved memory by checking `shared_buffers`, permanently.
-You can also multiply `work_mem` and `max_connections`, and multiply by three for a worst case estimate of per-query RAM.
+Measure PostgreSQL reserved memory by checking xref:shared-buffers[`shared_buffers`], permanently.
+You can also multiply xref:work-mem[`work_mem`] and xref:max-connections[`max_connections`], and multiply by three for a worst case estimate of per-query RAM.
 You will also need to check OS buffers and caches, which are used by PostgreSQL to host copies of database data.
 These often automatically occupy any available RAM.
 
