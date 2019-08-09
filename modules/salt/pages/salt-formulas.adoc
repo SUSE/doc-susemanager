@@ -845,6 +845,8 @@ File roots are configured on the salt-master ({productname}) located in:
 [[best.practice.salt.formulas.using]]
 == Using Salt Formulas with {productname}
 
+// I think we can probably crib from Retail for this section, and split it up. LKB 2019-08-01
+
 The following procedure provides an overview on using Salt Formulas with {productname}.
 
 
@@ -865,7 +867,7 @@ Salt will ensure that only modified values are adjusted and restart or reinstall
 
 For more information about Salt formulas, see https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
 
-For more information about using Salt formulas in a {smr} environment, see xref:retail:retail-formulas-intro.adoc[].
+For information about using Salt formulas in a {smr} environment, see xref:retail:retail-formulas-intro.adoc[].
 
 
 
@@ -1016,3 +1018,39 @@ Then it will start the VSFTP service (``vsftpd``).
 
 
 For more information about setting up and tuning Vsftpd, see the documentation coming with the [package]``vsftpd`` package ([path]``/usr/share/doc/packages/vsftpd/`` when the package is installed).
+
+
+
+=== CPU Mitigation Formula
+
+
+CPU mitigations have been introduced to improve security on CPUs affected by vulnerabilities such as Meltdown and Spectre.
+The mitigations are available in {sles} 12 SP3 and later.
+
+The CPU Mitigation formula allows you to control which mitigations are enabled.
+
+[WARNING]
+====
+By disabling the CPU mitigations, you are removing your protection from these vulnerabilities.
+Do not disable CPU mitigations unless you are aware of the risks of doing so.
+====
+
+There are four possible options within the CPU Mitigation formula:
+
+Auto::
+If a vulnerable CPU type is detected, all mitigations are enabled.
+If any other CPU type is detected, all mitigations are disabled.
+
+Auto + No SMT::
+This option works in the same way as [parameter]``Auto``, but it leaves the symmetric multi-threading (SMT) mitigation disabled at all times.
+This can be useful if you experience an L1 terminal fault side-channel problem.
+// This error will need further info. LKB 2018-08-01
+
+Off::
+All mitigations are disabled.
+This setting gives the highest performance, but compromises your security.
+Do not use this setting where untrusted code might be used.
+
+Manual::
+Allows you to control mitigations directly on the client, instead of using the formula.
+For more information about CPU mitigations in the kernel, see https://www.suse.com/documentation/suse-best-practices/singlehtml/SBP-Spectre-Meltdown-L1TF/SBP-Spectre-Meltdown-L1TF.html
