@@ -82,23 +82,28 @@ Start from the node where significant change has happened.
 
 This section contains information about environmental variables (inputs to the tuning process).
 
+[[network-bandwidth]]
 Network Bandwidth::
 A measure of the typically available egress bandwith from the {productname} Server host to the clients or {productname} Proxy hosts.
 This should take into account network hardware and topology as well as possible capacity limits on switches, routers, and other network equipment between the Server and clients.
 
+[[channel-count]]
 Channel count::
 The number of expected channels to manage.
 Includes any vendor-provided, third-party, and cloned or staged channels.
 
+[[client-count]]
 Client count::
 The total number of actual or expected clients.
 It is important to tune any parameters in advance of a client count increase, whenever possible.
 
+[[os-mix]]
 OS mix::
 The number of distinct operating system versions that managed clients have installed.
 This is ordered by family ({sle}, openSUSE, {rhel}, or {ubuntu} based).
 Storage and computing requirements are different in each case.
 
+[[user-count]]
 User count::
 The expected maximum amount of concurrent users interacting with the Web UI plus the number of programs simultaneously using the XMLRPC API.
 Includes `spacecmd`, `spacewalk-clone-by-date`, and similar.
@@ -118,7 +123,7 @@ This section contains information about the available parameters.
 | Description          | The maximum number of HTTP requests served simultaneously by Apache httpd.
                          Proxies, {webui}, and XMLRPC API clients each consume one.
                          Requests exceeding the parameter will be queued and might result in timeouts.
-| Tune when            | User count and Proxy count increase significantly and this line appears in [path]``/var/log/apache2/error_log``: [systemitem]``[...] [mpm_prefork:error] [pid ...] AH00161: server reached MaxRequestWorkers setting, consider raising the MaxRequestWorkers setting``.
+| Tune when            | xref:user-count[User count] and Proxy count increase significantly and this line appears in [path]``/var/log/apache2/error_log``: [systemitem]``[...] [mpm_prefork:error] [pid ...] AH00161: server reached MaxRequestWorkers setting, consider raising the MaxRequestWorkers setting``.
 | Value default        | 150
 | Value recommendation | 150-500
 | Location             | [path]``/etc/apache2/server-tuning.conf``, in the `prefork.c` section
@@ -176,7 +181,7 @@ This section contains information about the available parameters.
 | Value recommendation | 4-8{nbsp}GiB
 | Location             | [path]``/etc/sysconfig/tomcat``
 | Example              | `JAVA_OPTS="... -Xmx8G ..."`
-| After changing       | Check the Memory Usage section in this document
+| After changing       | Check xref:memory-usage[memory usage]
 | More information     | https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html
 |===
 
@@ -188,7 +193,7 @@ This section contains information about the available parameters.
 [cols="1,1"]
 |===
 | Description          | Maximum number of threads in Tomcat dedicated to asynchronous operations, including handling of incoming Salt events
-| Tune when            | Client count increases significantly
+| Tune when            | xref:client-count[Client count] increases significantly
 | Value default        | 5
 | Value recommendation | 50 - 150
 | Location             | [path]``/etc/rhn/rhn.conf``
@@ -207,12 +212,12 @@ This section contains information about the available parameters.
 [cols="1,1"]
 |===
 | Description          | The maximum amount of minions concurrently executing a scheduled Action.
-| Tune when            | Client count reaches several thousands and Actions are not executed quickly enough.
+| Tune when            | xref:client-count[Client count] reaches several thousands and Actions are not executed quickly enough.
 | Value default        | 200
 | Value recommendation | 200-500
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `java.salt_batch_size = 300`
-| After changing       | Check the Memory Usage section in this document.
+| After changing       | Check xref:memory-usage[memory usage].
                          Monitor memory usage closely before and after the change.
 | More information     | xref:reference:salt-rate-limiting.adoc[Salt Rate Limiting]
 |===
@@ -227,7 +232,7 @@ This section contains information about the available parameters.
 | Description          | Before any Action is executed on a client, a presence ping is executed to make sure the client is reachable.
                          This parameter sets the amount of time before a second command (`find_job`) is sent to the client to verify its presence.
                          Having many clients typically means some will respond faster than others, so this timeout could be raised to accommodate for the slower ones.
-| Tune when            | Client count increases significantly, or some clients are responding correctly but too slowly, and {productname} excludes them from calls.
+| Tune when            | xref:client-count[Client count] increases significantly, or some clients are responding correctly but too slowly, and {productname} excludes them from calls.
                          This line appears in [path]``/var/log/rhn/rhn_web_ui.log``: [systemitem]``"Got no result for <COMMAND> on minion <MINION_ID> (minion did not respond in time)"``
 | Value default        | 4 seconds
 | Value recommendation | 4-400 seconds
@@ -247,7 +252,7 @@ This section contains information about the available parameters.
                          After xref:java-salt-presence-ping-timeout[`java.salt_presence_ping_timeout`] seconds have elapsed without a response, a second command (`find_job`) is sent to the client for a final check.
                          This parameter sets the number of seconds after the second command after which the client is definitely considered offline.
                          Having many clients typically means some will respond faster than others, so this timeout could be raised to accommodate for the slower ones.
-| Tune when            | Client count increases significantly, or some clients are responding correctly but too slowly, and {productname} excludes them from calls.
+| Tune when            | xref:client-count[Client count] increases significantly, or some clients are responding correctly but too slowly, and {productname} excludes them from calls.
                          This line appears in [path]``/var/log/rhn/rhn_web_ui.log``: [systemitem]``"Got no result for <COMMAND> on minion <MINION_ID> (minion did not respond in time)"``
 | Value default        | 1 second
 | Value recommendation | 1-100 seconds
@@ -267,7 +272,7 @@ This section contains information about the available parameters.
                          Channel-altering operations include the addition of a patch, the removal of a package or a repository synchronization run.
                          This parameter specifies the maximum number of Taskomatic threads that {productname} will use to recompute the channel metadata.
                          Channel metadata computation is both CPU-bound and memory-heavy, so raising this parameter and operating on many channels simultaneously could cause Taskomatic to consume significant resources, but channels will be available to clients sooner.
-| Tune when            | Channel count increases significantly (more than 50), or more concurrent operations on channels are expected.
+| Tune when            | xref:channel-count[Channel count] increases significantly (more than 50), or more concurrent operations on channels are expected.
 | Value default        | 2
 | Value recommendation | 2-10
 | Location             | [path]``/etc/rhn/rhn.conf``
@@ -284,13 +289,13 @@ This section contains information about the available parameters.
 [cols="1,1"]
 |===
 | Description          | The maximum amount of memory Taskomatic can use.
-                         Generation of metadata, especially for some OSs, can be memory-intensive, so this parameter might need raising depending on the managed OS mix.
+                         Generation of metadata, especially for some OSs, can be memory-intensive, so this parameter might need raising depending on the managed xref:os-mix[OS mix].
 | Tune when            | xref:java-taskomatic-channel-repodata-workers[`java.taskomatic_channel_repodata_workers`] increases, OSs are added to {productname} (particularly {rhel} or {ubuntu}), or `OutOfMemoryException` errors appear in `/var/log/rhn/rhn_taskomatic_daemon.log`.
 | Value default        | 2048 MiB
 | Value recommendation | 2048-16384 MiB
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `taskomatic.java.maxmemory = 8192`
-| After changing       | Check the Memory Usage section in this document.
+| After changing       | Check xref:memory-usage[memory usage].
 | More information     | `man rhn.conf`
 |===
 
@@ -303,7 +308,7 @@ This section contains information about the available parameters.
 |===
 | Description          | The number of Taskomatic worker threads.
                          Increasing this value allows Taskomatic to serve more clients in parallel.
-| Tune when            | Client count increases significantly
+| Tune when            | xref:client-count[Client count] increases significantly
 | Value default        | 20
 | Value recommendation | 20-200
 | Location             | [path]``/etc/rhn/rhn.conf``
@@ -321,7 +326,7 @@ This section contains information about the available parameters.
 |===
 | Description          | Cycle time for Taskomatic.
                          Decreasing this value lowers the latency of Taskomatic.
-| Tune when            | Client count is in the thousands.
+| Tune when            | xref:client-count[Client count] is in the thousands.
 | Value default        | 5000 ms
 | Value recommendation | 1000-5000 ms
 | Location             | [path]``/etc/rhn/rhn.conf``
@@ -337,7 +342,7 @@ This section contains information about the available parameters.
 [cols="1,1"]
 |===
 | Description          | Number of Taskomatic threads dedicated to sending commands to Salt clients as a result of Actions being executed.
-| Tune when            | Client count is in the thousands.
+| Tune when            | xref:client-count[Client count] is in the thousands.
 | Value default        | 1
 | Value recommendation | 1-10
 | Location             | [path]``/etc/rhn/rhn.conf``
@@ -371,12 +376,12 @@ This section contains information about the available parameters.
 [cols="1,1"]
 |===
 | Description          | The maximum amount of memory that the `rhn-search` service can use.
-| Tune when            | Client count increases significantly, and `OutOfMemoryException` errors appear in `journalctl -u rhn-search`.
+| Tune when            | xref:client-count[Client count] increases significantly, and `OutOfMemoryException` errors appear in `journalctl -u rhn-search`.
 | Value default        | 512 MiB
 | Value recommendation | 512-4096 MiB
 | Location             | [path]``/etc/rhn/rhn.conf``
 | Example              | `rhn-search.java.maxmemory = 4096`
-| After changing       | Check the Memory Usage section in this document.
+| After changing       | Check xref:memory-usage[memory usage].
 |===
 
 
@@ -392,7 +397,7 @@ This section contains information about the available parameters.
 | Value recommendation | 25-40% of total RAM
 | Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
 | Example              | `shared_buffers = 8192MB`
-| After changing       | Check the Memory Usage section in this document.
+| After changing       | Check xref:memory-usage[memory usage].
 | More information     | https://www.postgresql.org/docs/10/runtime-config-resource.html#GUC-SHARED-BUFFERS
 |===
 
@@ -411,7 +416,7 @@ This section contains information about the available parameters.
 | Value recommendation | 2 * xref:hibernate-c3p0-max-size[hibernate.c3p0.max_size] + 50, if less than 1000
 | Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
 | Example              | `max_connections = 250`
-| After changing       | Check the Memory Usage section in this document.
+| After changing       | Check xref:memory-usage[memory usage].
                          Monitor memory usage closely before and after the change.
 | More information     | https://www.postgresql.org/docs/10/runtime-config-connection.html#GUC-MAX-CONNECTIONS
 |===
@@ -448,7 +453,7 @@ This section contains information about the available parameters.
                          Free and buffer/cache can be determined via the `free -m` command (`free` and `buff/cache` in the output respectively)
 | Location             | [path]``/var/lib/pgsql/data/postgresql.conf``
 | Example              | `effective_cache_size = 24GB`
-| After changing       | Check the Memory Usage section in this document
+| After changing       | Check xref:memory-usage[memory usage]
 | Notes                | This is an estimation for the query planner, not an allocation.
 | More information     | https://www.postgresql.org/docs/10/runtime-config-query.html#GUC-EFFECTIVE-CACHE-SIZE
 |===
@@ -481,12 +486,12 @@ This section contains information about the available parameters.
 |===
 | Description          | The number of `salt-master` worker threads that process commands and replies from minions and the Salt API.
                          Increasing this value, assuming sufficient resources are available, allows Salt to process more data in parallel from minions without timing out, but will consume significantly more RAM (typically about 70 MiB per thread).
-| Tune when            | Client count increases significantly, xref:thread-pool[`thread_pool`] increases significantly, or `SaltReqTimeoutError` or `Message timed out` errors appear in `/var/log/salt/master`.
+| Tune when            | xref:client-count[Client count] increases significantly, xref:thread-pool[`thread_pool`] increases significantly, or `SaltReqTimeoutError` or `Message timed out` errors appear in `/var/log/salt/master`.
 | Value default        | 8
 | Value recommendation | 8-200
 | Location             | [path]``/etc/salt/master.d/tuning.conf``
 | Example              | `worker_threads: 50`
-| After changing       | Check the Memory Usage section in this document.
+| After changing       | Check xref:memory-usage[memory usage].
                          Monitor memory usage closely before and after the change.
 | More information     | https://docs.saltstack.com/en/latest/ref/configuration/master.html#worker-threads
 |===
@@ -510,6 +515,7 @@ This section contains information about the available parameters.
 
 
 
+[[memory-usage]]
 === Memory Usage
 
 Adjusting some of the parameters listed in this section can result in a higher amount of RAM being used by various components.
