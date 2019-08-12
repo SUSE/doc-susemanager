@@ -41,15 +41,15 @@ The base {rhel} software channel does not contain any packages.
 This is because {suse} does not provide {rhel} base media.
 You will need to obtain base media from Red Hat, which you can then add as a child channel to the {rhel} parent channel.
 
-The {rhel} and tools channels are provided by SUSE Customer Center (SCC).
+The {rhel} and tools channels are provided by {SSC}.
 You can synchronize your client with the [command]``mgr-sync`` command to get them.
 
 Because the {rhel} channels are particularly large, it can take up to 24 hours for an initial channel synchronization to complete.
 When you have completed the initial synchronization, we recommended you clone the channel before working with it.
 This provides you with a backup of the original synchronization data.
 
-The following procedure guides you through setup of the RHEL media as a {productname} channel.
-All packages on the RHEL media will be mirrored into a child channel located under RES 5/6/7 distribution per architecture.
+The following procedure guides you through setup of the {rhel} media as a {productname} channel.
+All packages on the media will be mirrored into a child channel located under the distribution name and architecture.
 
 .Procedure: Setting up a {rhel} Channel
 . In the {productname} {webui}, navigate to menu:Channels[Manage Software Channels], and click btn:[Create Channel].
@@ -70,6 +70,7 @@ mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel
 . Synchronize the packages with [command]``spacewalk-repo-sync``:
 +
 For {rhel} 7:
++
 ----
 spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/
 Repo URL: https://127.0.0.1/pub/rhel/
@@ -79,7 +80,7 @@ Packages to sync:              [...]
 [...]
 ----
 +
-For {rhel} 5 or {rhel} 6:
+For {rhel} 6:
 +
 ----
 spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
@@ -114,50 +115,55 @@ unset URLGRABBER_DEBUG``
 
 
 
-== Registering RES Salt Clients with {productname}
-
-This section will guide you through registering RHEL clients with {productname}.
-
-This section assumes you have updated your server to the latest patch level.
-
-=== Synchronizing Appropriate {rhel} Channels
+== Register {rhel} Salt Clients
 
 
-Ensure you have the corresponding {rhel} product enabled and required channels have been fully synchronized:
+Before you register {rhel} Salt clients to your {productname} Server, check that you have the corresponding {rhel} product enabled, and the required channels are fully synchronized.
 
-.RHEL 7.x
+You will also need an activation key associated with the {rhel} channel.
+For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+
+[IMPORTANT]
+====
+Missing packages will cause your registtration to fail.
+For {rhel} clients, packages are contained on the {rhel} installation media.
+Ensure you have loop-mounted the installation media, and added it as a child channel to the base {rhel} channel.
+====
+
+
+{rhel} 7::
 * Product: {rhel} 7
-* Mandatory channels: [systemitem]``rhel-x86_64-server-7`` , [systemitem]``res7-suse-manager-tools-x86_64`` , [systemitem]``res7-x86_64`` systemitem>
+* Mandatory channels: [systemitem]``rhel-x86_64-server-7`` , [systemitem]``res7-suse-manager-tools-x86_64`` , [systemitem]``res7-x86_64``
 
 
-.RHEL 6.x
+{rhel} 6::
 * Product: {rhel} 6
 * Mandatory channels: [systemitem]``rhel-x86_64-server-6`` , [systemitem]``res6-suse-manager-tools-x86_64`` , [systemitem]``res6-x86_64``
 
 
-.Checking Synchronization Progress
-[TIP]
-====
-To check if a channel has finished synchronizing you can do one of the following:
+There are two ways to check if a channel has finished synchronizing:
 
-* From the {productname}{webui} browse to menu:Admin[Setup Wizard] and select the menu:SUSE Products[] tab. Here you will find a percent completion bar for each product.
+* In the {productname}{webui}, navigate to menu:Admin[Setup Wizard] and select the menu:SUSE Products[] tab.
+This dialog displays a completion bar for each product when they are being synchronized.
+* You can also check the synchronization log file at the command prompt.
+Use the [command]``cat`` or [command]``tailf`` command to view the [path]``/var/log/rhn/reposync/channel-label.log`` file.
+If you use this method, remember that base channels can contain multiple child channels.
+Each of the child channels will generate its own log during the synchronization progress.
+You will need to check all the base and child channel log files to be sure that the synchronization is complete.
 
-* Alternatively, you may check the synchronization log file located under [path]``/var/log/rhn/reposync/channel-label.log`` using cat or the tailf command. Keep in mind that base channels can contain multiple child channels. Each of these child channels will generate its own log during the synchronization progress. Do not assume a channel has finished synchronizing until you have checked all relevant log files including base and child channels.
-
-====
-
-
-Create an activation key associated with the {rhel} channel.
-
-=== Creating a Bootstrap Repository
+When you are ready to register your {rhel} Salt client, follow the instructions in xref:client-configuration:registration-overview.adoc[].
 
 
-The following procedure demonstrate creating a bootstrap repository for RHEL:
 
 
-. On the server command line as root, create a bootstrap repo for RHEL with the following command:
+
+////
+This is all duplicated content. LKB 2018-08-31
+
+.Procedure: Registering a bootstrap repository:
+
+ . At the command prompt on the {productname} Server, as root, create a bootstrap repository for {rhel}:
 +
-
 ----
 mgr-create-bootstrap-repo RHEL_activation_channel_key
 ----
@@ -200,16 +206,11 @@ chmod +x res7-bootstrap.sh
 
 . From the {productname} {webui} select menu:Salt[Keys] and accept the new client's key.
 
+////
 
 
-.Troubleshooting Bootstrap
-[IMPORTANT]
-====
-If bootstrapping a client fails it is usually caused by missing packages.
-These missing packages are contained on the RHEL installation media.
-The RHEL installation media should be loop mounted and added as a child channel to the {rhel} channel.
-See the warning in <<bp.expanded-support.resclients>> on access to RHEL Media.
-====
+////
+I'm fairly certain this isn't supported, which is why we took it out of the SLE instructions. LKB 2018-08-12
 
 == Manual Salt Client Registration
 
@@ -244,3 +245,5 @@ systemctl start salt-minion
 ----
 
 . From the {productname} {webui} select the menu:Salt[Keys] and accept the new client's key.
+
+////
