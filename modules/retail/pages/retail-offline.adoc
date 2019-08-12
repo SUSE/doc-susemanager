@@ -1,0 +1,41 @@
+[[retail.offline]]
+= Offline Use
+
+If the {susemgr} Server is offline, you can still perform some operations on the terminals.
+This is useful if the connection between the branch server and the terminals is unstable or has low bandwidth.
+This feature uses caching to perform updates.
+
+[IMPORTANT]
+====
+Offline features are available only for {susemgr} Server 4.0 and above.
+You must have the Saltboot and PXE formula packages installed.
+====
+
+== Offline Terminal Reboot
+
+If the {susemgr} Server is offline, and a terminal is rebooted, it will fall back to a previously installed image.
+
+This will occur in these situations:
+* If the Saltboot formula has not started within a specified time (default value is 60 seconds).
+* If the terminal does not acknowledge that the Saltboot formula has started.
+* If the root partition is specified on the kernel command line (handled by the PXE formula), is mountable (and is not encrypted), and contains [path]``/etc/ImageVersion`` (which is created by Kiwi).
+
+You can adjust the timeout value by changing the [parameter]``SALT_TIMEOUT`` kernel parameter.
+The parameter is measured in seconds, and defaults to [systemitem]``60``.
+
+----
+SALT_TIMEOUT = 60
+----
+
+For more about kernel parameters, see xref:retail:retail-formula-pxe.adoc[].
+
+
+== Offline Terminal Updates
+
+If there is low bandwidth or an unstable connection between the branch server and the terminal, images can be cached in advance and the upgrade performed on the terminals later on.
+
+To set this up:
+
+* Create a service partition on the terminal, which will be used for caching the images.
+* Download the image to the terminal during regular operations, when a connection is present.
+* Reboot the terminal, during which the image will be replaced from the cache.
