@@ -34,6 +34,25 @@ The [guimenu]``Name`` field only accepts lowercase letters, numbers, periods (``
 . Continue creating environments until you have all the  environments for your lifecycle completed.
 You can select the order of the environments in the lifecycle by selecting an environment in the [guimenu]``Insert before`` field when you create it.
 
+== Advanced: Filter types
+{productname} allows you to create various types of filters to control the content on project build. Below is the list of supported filters:
+
+- package filtering:
+  - by name,
+  - by name, epoch, version, release and architecture.
+- patch filtering:
+  - by advisory name,
+  - by synopsis,
+  - by date,
+  - by affected package.
+
+=== Filter ``rule`` parameter
+Moreover, each filter has ``rule`` parameter set to either ``Allow`` or ``Deny`` value. The filters are processed as follows:
+- if a package or patch satisfies a ``Deny`` filter, it will be excluded from the result,
+- if a package or patch satisfies an ``Allow`` filter, it will be included in the result (even if it was excluded a ``Deny`` filter).
+
+This behavior is useful when you want to exclude large number of packages or patches using a general ``Deny`` filter and "cherry-pick" specific packages or patches with specific ``Allow`` filters.
+
 [NOTE]
 ====
 Content filters are global in your organization and can be shared between projects.
