@@ -71,3 +71,20 @@ This should be restricted for other server in this private network.
 
 ==== Network
 
+. DHCP must not set the host name.
+Check [path]``/etc/sysconfig/network/dhcp`` if `DHCLIENT_SET_HOSTNAME` is set to [literal]``no``.
+Change it if needed:
++
+
+----
+DHCLIENT_SET_HOSTNAME="no"
+----
+. Create the needed DNS Zones in Azure first.
+For more information, see the documentation from Microsoft Azure.
+
+. On the command line, add the system to the [path]``/etc/hosts`` file; replace [literal]``<ip_address>`` with the IP address of the server:
++
+
+// hostname -i?
+----
+echo "<ip_address> $(hostname -f) $(hostname)" >> /etc/hosts
