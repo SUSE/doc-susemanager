@@ -1,3 +1,48 @@
 [[public-cloud-azure]]
 = SUSE Manager Server in Azure
 
+
+
+== Resource Requirements
+
+
+
+=== Image and VM (Virtual Machine)
+
+Image Resource::
+``SUSE Manager Server 4 BYOS``
++
+
+The image is a pre-built image created by {suse}.
+It is based on JeoS, and SUSE Manager is pre-installed but not configured. Configuring SUSE Manager has to be done manually with {yast}.
+
+VM (Virtual Machine)::
+Recommended VM size is `B2ms`. This contains:
++
+
+. 2 vCPUs
+. 8 GB RAM
+. Up to 4 data disks
+. Max IOPS 2400
+. Temporary storage disk of 16Gb.
+Data on this disk will be destroyed after the guest has been switched off.
+
+
+
+=== Disk Partitoning
+
+The OS disk is 30 GiB and for storage account type select `Standard HDD`.
+
+Add 3 additional data disks:
+
+Data Disk 0::
+Size 64 GiB on Premium SSD. This will [path]``/var/lib/pgsql``
+
+Data Disk 1::
+Size 512 GiB on Standard SSD. This will be mounted at [path]``/var/spacewalk``
+
+Data Disk 2::
+Size 128 GiB on Standard SSD. This will be mounted at [path]``/var/cache``
+
+
+
