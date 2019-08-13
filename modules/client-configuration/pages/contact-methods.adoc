@@ -1,80 +1,48 @@
 [[contact-methods]]
-= Contact Methods
+= Contact Methods for Traditional Clients
+
+There are a number of ways that the {productname} Server can communicate with traditional clients.
+Which one you use depends on your network architecture.
+
+This section contains information about the various contact methods available.
+It does not apply to Salt clients.
 
 
-
-
-== Selecting a Contact Method
-
-{productname} provides several methods for communication between client and server.
-All commands your {productname} server sends its clients to do will be routed through one of them.
-Which one you select will depend on your network infrastructure.
-The following sections provide a starting point for selecting a method which best suits your network environment.
-
-.Contact Methods and Salt
-[NOTE]
-====
-This chapter is only relevant for traditional clients as Salt clients (minions) utilize a Salt specific contact method.
-For general information about Salt clients, see <<salt.gs.guide.intro>>.
-====
-
-[[bp.contact.methods.rhnsd]]
-== Default (the {productname} Daemon rhnsd)
+== {productname} Daemon (rhnsd)
 
 
 The {productname} daemon ([command]``rhnsd``) runs on traditional client systems and periodically connects with {productname} to check for new updates and notifications.
-The daemon is started by [path]``/etc/init.d/rhnsd``.
-It is only still in use on {sle} 11 and {rhnminrelease6}{mdash}these are systems that are not based on systemd.
-On later systems, a systemd timer ([systemitem]``rhnsd.timer``) is used and controlled by [systemitem]``rhnsd.service``.
 
-By default, it will check every 4 hours for new actions, therefore it may take some time for your clients to begin updating after actions have been scheduled for them.
+It is only used on {sle}{nbsp}11 and {rhnminrelease6}, as these systems do not use systemd.
+On later operating systems, a systemd timer ([systemitem]``rhnsd.timer``) is used and controlled by [systemitem]``rhnsd.service``.
+
+Start the daemon with [command]``/etc/init.d/rhnsd``.
+
+By default, it will check every four hours for new actions.
+This means it can take some time for clients to execute scheduled actions.
 
 To check for updates, [systemitem]``rhnsd`` runs the external [systemitem]``mgr_check`` program located in [path]``/usr/sbin/``.
 This is a small application that establishes the network connection to {productname}.
 The SUSE Manager daemon does not listen on any network ports or talk to the network directly.
-All network activity is done via the [systemitem]``mgr_check`` utility.
-
-.Auto accepting (EULAs)
-[WARNING]
-====
-When new packages or updates are installed on the client using {productname}, any end user licence agreements (EULAs) are automatically accepted.
-To review a package EULA, open the package detail page in the {webui}.
-====
-
+All network activity is performed by the [systemitem]``mgr_check`` utility.
 
 This figure provides an overview of the default [systemitem]``rhnsd`` process path.
 All items left of the [systemitem]``Python XMLRPC server`` block represent processes running on a {productname} client.
 
-.rhnsd Contact Method
-
 image::rhnsd-taigon.png[scaledwidth=80]
 
 
-=== Configuring {productname} rhnsd Daemon or Timer
 
+=== Configure rhnsd
 
-The {productname} daemon can be configured by editing the file on the client:
+The `rhnsd` initialization script has a configuration file on the client system at [path]``/etc/sysconfig/rhn/rhnsd``.
 
-----
-/etc/sysconfig/rhn/rhnsd
-----
-
-This is the configuration file the rhnsd initialization script uses.
 An important parameter for the daemon is its check-in frequency.
 The default interval time is four hours (240 minutes).
-If you modify the configuration file, you must as {rootuser} restart the daemon with:
+The minimum allowed time interval is one hour (60 minutes).
+If you set the interval below one hour, it will change back to the default of 4 hours (240 minutes).
 
-----
-/etc/init.d/rhnsd restart
-----
-
-.Minimum Allowed Check-in Parameter
-[IMPORTANT]
-====
-The minimum allowed time interval is one hour (60 minutes). If you set the interval below one hour, it will change back to the default of 4 hours (240 minutes).
-====
-
-On systemd-based systems (for example, SLE 12 and later), the default time interval is set in [path]``/etc/systemd/system/timers.target.wants/rhnsd.timer``:
+On {sle}{nbsp}12 and later, the default time interval is set in [path]``/etc/systemd/system/timers.target.wants/rhnsd.timer``, in this section:
 
 ----
 [Timer]
@@ -82,67 +50,63 @@ OnCalendar=00/4:00
 RandomizedDelaySec=30min
 ----
 
-You can create an overriding drop-in file of [path]``rhnsd.timer`` with:
+You can create an overriding drop-in file for [path]``rhnsd.timer`` using [command]``systemctl``:
 
 ----
 systemctl edit rhnsd.timer
 ----
 
-For example, if you want configure a two hour time interval, enter:
+For example, if you want configure a two hour time interval:
 
 ----
 [Timer]
 OnCalendar=00/2:00
 ----
 
-On write, the file will be saved as [path]``/etc/systemd/system/rhnsd.timer.d/override.conf``.
-For more information about system timers, see the manpages of [command]``systemd.timer`` and [command]``systemctl``.
+The file will be saved as [path]``/etc/systemd/system/rhnsd.timer.d/override.conf``.
 
+For more information about system timers, see the [command]``systemd.timer`` and [command]``systemctl`` manpages.
 
+If you modify the `rhnsd` configuration file, execute this command as root to restart the daemon and pick up your changes:
+----
+/etc/init.d/rhnsd restart
+----
 
-=== Viewing rhnsd Daemon Status
-
-As the {rootuser} you may view the status of [command]``rhnsd`` with:
+To see the status of `rhnsd`, use this command as root:
 ----
 /etc/init.d/rhnsd status
 ----
 
 
-[[bp.contact.methods.ssh.push]]
+
 == Push via SSH
 
 
-Push via SSH is intended to be used in environments where your clients cannot reach the {productname} server directly to regularly check in and, for example, fetch package updates.
+Push via SSH is used in environments where clients cannot reach the {productname} Server directly.
+In this environment, clients are located in a firewall-protected zone called a DMZ.
+No system within the DMZ is authorized to open a connection to the internal network, including the {productname} Server.
 
-In detail, this feature enables a {productname} located within an internal network to manage clients located on a "`Demilitarized Zone`" (DMZ) outside of the firewall protected network.
-Due to security reasons, no system on a DMZ is authorized to open a connection to the internal network and therefore your {productname} server.
-The solution is to configure Push via SSH which utilizes an encrypted tunnel from your {productname} server on the internal network to the clients located on the DMZ.
-After all actions/events are executed, the tunnel is closed.
-The server will contact the clients in regular intervals (using SSH) to check in and perform all actions and events.
+The push via SSH method creates an encrypted tunnel from the {productname} Server on the internal network to the clients located on the DMZ.
+After all actions and events are executed, the tunnel is closed.
 
-.Push via SSH Unsupported Actions
+The server uses SSH to contact the clients at regular intervals, checking in and performing scheduled actions and events.
+
+
 [IMPORTANT]
 ====
-Certain actions are currently not supported on scheduled clients which are managed via Push via SSH.
-This includes re-installation of systems using the provisioning module.
+Re-installing systems using the provisioning model is not currently supported on clients managed with push via SSH.
 ====
 
 
-The following figure provides an overview of the Push via SSH process path.
-All items left of the [systemitem]``Taskomatic``
- block represent processes running on a {productname} client.
-
-.Push via SSH Contact Method
+This image demonstrates the push via SSH process path.
+All items left of the [systemitem]``Taskomatic`` block represent processes running on a {productname} client.
 
 image::sshpush-taigon.png[scaledwidth=80%]
 
 
-[[bp.contact.methods.ssh.push.requirements]]
-=== Configuring the Server for Push via SSH
-
-
-For tunneling connections via SSH, two available port numbers are required, one for tunneling HTTP and the second for tunneling via HTTPS (HTTP is only necessary during the registration process). The port numbers used by default are `1232` and `1233`.
-To overwrite these, add two custom port numbers greater than 1024 to [path]``/etc/rhn/rhn.conf`` like this:
+For tunneling connections via SSH, two available port numbers are required, one for tunneling HTTP and the second for tunneling via HTTPS (HTTP is only necessary during the registration process).
+The port numbers used by default are `1232` and `1233`.
+To overwrite these, you can add two custom port numbers greater than 1024 to [path]``/etc/rhn/rhn.conf``:
 
 ----
 ssh_push_port_http = high_port_1
@@ -150,7 +114,7 @@ ssh_push_port_https = high_port_2
 ----
 
 
-If you would like your clients to be contacted via their hostnames instead of an IP address, set the following option:
+If you would like your clients to be contacted using their hostnames instead of an IP address, set this option:
 
 ----
 ssh_push_use_hostname = true
@@ -165,57 +129,39 @@ Set [systemitem]``taskomatic.ssh_push_workers`` in [path]``/etc/rhn/rhn.conf``:
 taskomatic.ssh_push_workers = number
 ----
 
-[[bp.contact.methods.ssh.push.sudo]]
-=== Using sudo with Push via SSH
+
+For security reasons, you might want to use sudo with SSH, to access the system as an unprivileged user instead of as root.
 
 
-For security reasons you may desire to use sudo and SSH into a system as a user other than {rootuser}.
-The following procedure will guide you through configuring sudo for use with Push via SSH.
-
-.sudo Requirements
-[NOTE]
-====
-The packages [path]``spacewalk-taskomatic >= 2.1.165.19`` and [path]``spacewalk-certs-tools => 2.1.6.7`` are required for using sudo with Push via SSH.
-====
-
-[[pro.bp.contact.methods.ssh.push.sudo]]
-.Procedure: Configuring sudo
-
-[[pro.bp.contact.methods.ssh.push.sudo.user]]
-. Set the following parameter on the server located in [path]``/etc/rhn/rhn.conf``.
+.Procedure: Configuring Unprivileged SSH Access
+. Ensure you have the latest [path]``spacewalk-taskomatic`` and [path]``spacewalk-certs-tools`` packages installed on the {productname} Server.
+. On each client system, create an appropriate unprivileged user on each client system.
+. On each client system, open the [path]``/etc/sudoers`` file and comment out these lines:
 +
-
-----
-ssh_push_sudo_user = <user>
-----
-+
-The server will use sudo to ssh as the configured [replaceable]``user``.
-. You must create the user specified in <<pro.bp.contact.methods.ssh.push.sudo.user>> on each of your clients and the following parameters should be commented out within each client's [path]``/etc/sudoers`` file:
-+
-
 ----
 #Defaults targetpw   # ask for the password of the target user i.e. root
 #ALL    ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!
 ----
-. Add the following lines beneath the `\## User privilege specification` section of each client's [path]``/etc/sudoers`` file:
+. On each client system, in the `User privilege specification` section, add these lines:
 +
-
 ----
 <user> ALL=(ALL) NOPASSWD:/usr/sbin/mgr_check
 <user> ALL=(ALL) NOPASSWD:/home/<user>/enable.sh
 <user> ALL=(ALL) NOPASSWD:/home/<user>/bootstrap.sh
 ----
-. On each client add the following two lines to the [path]``/home/user/.bashrc`` file:
+. On each client system, in the [path]``/home/user/.bashrc`` file, add these lines:
 +
-
 ----
 PATH=$PATH:/usr/sbin
 export PATH
 ----
+. On the {productname} Server, in the [path]``/etc/rhn/rhn.conf`` configuration file, add or amend this line to include the unprivileged username:
++
+----
+ssh_push_sudo_user = <user>
+----
 
-
-=== Client Registration
-
+// Lana you're up to here!
 
 As your clients cannot reach the server, you will need to register your clients from the server.
 A tool for performing registration of clients from the server is included with {productname} and is called [command]``mgr-ssh-push-init``.
