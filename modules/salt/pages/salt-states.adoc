@@ -139,41 +139,41 @@ If you do not adjust these pillars directly, {productname} will fall back to the
 ----
 base:
   '*':
-    - rpm_download_points
+    - pkg_download_points
 ----
 +
-This example directs Salt to look at the [filename]``rpm_download_points.sls`` file to determine the base URL to use.
+This example directs Salt to look at the [filename]``pkg_download_points.sls`` file to determine the base URL to use.
 You can adjust this file to target different clients or groups, depending on your environment.
 +
-. Remain in [path]``/srv/pillar/`` and create a file called [filename]``rpm_download_points.sls`` with the base URLs you want to use.
+. Remain in [path]``/srv/pillar/`` and create a file called [filename]``pkg_download_points.sls`` with the base URLs you want to use.
 For example:
 +
 ----
-rpm_download_point_protocol: http
-rpm_download_point_host: example.com
-rpm_download_point_port: 444
+pkg_download_point_protocol: http
+pkg_download_point_host: example.com
+pkg_download_point_port: 444
 ----
 . OPTIONAL: If you want to use external pillars, for example Group IDs, open the master configuration file and set the [systemitem]``ext_pillar_first`` parameter to [systemitem]``true``.
 You can then use Group IDs to set conditional values, for example:
 +
 ----
 {% if pillar['group_ids'] is defined and 8 in pillar['group_ids'] %}
-  rpm_download_point_protocol: http
-  rpm_download_point_host: example.com
-  rpm_download_point_port: 444
+  pkg_download_point_protocol: http
+  pkg_download_point_host: example.com
+  pkg_download_point_port: 444
 {%else%}
-  rpm_download_point_protocol: ftp
-  rpm_download_point_host: example.com
-  rpm_download_point_port: 445
+  pkg_download_point_protocol: ftp
+  pkg_download_point_host: example.com
+  pkg_download_point_port: 445
 {%- endif %}
 ----
 . OPTIONAL: You can also use grains to set conditional values, for example:
 ----
 {% if grains['fqdn'] == 'client1.example.com' %}
-    rpm_download_point: example1.com
+    pkg_download_point: example1.com
 {% elif grains['fqdn'] == 'client2.example.com'' %}
-    rpm_download_point: example2.com
+    pkg_download_point: example2.com
 {%else%}
-    rpm_download_point: example.com
+    pkg_download_point: example.com
 {% endif %}
 ----
