@@ -1,17 +1,15 @@
 [[contact-methods]]
-= Contact Methods for Traditional Clients
+= Contact Methods
 
-There are a number of ways that the {productname} Server can communicate with traditional clients.
+There are a number of ways that the {productname} Server can communicate with traditional and Salt clients.
 Which one you use depends on your network architecture.
-
-This section contains information about the various contact methods available.
-It does not apply to Salt clients.
 
 
 == {productname} Daemon (rhnsd)
 
 
 The {productname} daemon ([command]``rhnsd``) runs on traditional client systems and periodically connects with {productname} to check for new updates and notifications.
+It does not apply to Salt clients.
 
 It is only used on {sle}{nbsp}11 and {rhnminrelease6}, as these systems do not use systemd.
 On later operating systems, a systemd timer ([systemitem]``rhnsd.timer``) is used and controlled by [systemitem]``rhnsd.service``.
@@ -82,14 +80,17 @@ To see the status of `rhnsd`, use this command as root:
 == Push via SSH
 
 
-Push via SSH is used in environments where clients cannot reach the {productname} Server directly.
+Push via SSH is used in environments where traditional clients cannot reach the {productname} Server directly.
 In this environment, clients are located in a firewall-protected zone called a DMZ.
 No system within the DMZ is authorized to open a connection to the internal network, including the {productname} Server.
 
-The push via SSH method creates an encrypted tunnel from the {productname} Server on the internal network to the clients located on the DMZ.
+The Push via SSH method creates an encrypted tunnel from the {productname} Server on the internal network to the clients located on the DMZ.
 After all actions and events are executed, the tunnel is closed.
 
 The server uses SSH to contact the clients at regular intervals, checking in and performing scheduled actions and events.
+
+This contact method works for traditional clients only.
+For Salt clients, use Push via Salt SSH.
 
 
 [IMPORTANT]
@@ -161,68 +162,53 @@ export PATH
 ssh_push_sudo_user = <user>
 ----
 
-// Lana you're up to here!
 
-As your clients cannot reach the server, you will need to register your clients from the server.
-A tool for performing registration of clients from the server is included with {productname} and is called [command]``mgr-ssh-push-init``.
-This tool expects a client's hostname or IP address and the path to a valid bootstrap script located in the server's filesystem for registration as parameters.
+Because clients are in the DMZ and cannot reach the server, you need to use the [command]``mgr-ssh-push-init`` tool to register them with the {productname} Server.
 
-.Specifying Ports for Tunneling before Registering Clients
-[IMPORTANT]
-====
-The ports for tunneling need to be specified before the first client is registered.
-Clients already registered before changing the port numbers must be registered again, otherwise the server will not be able to contact them anymore.
-====
+To use the tool, you will need the client hostname or IP address, and the path to a valid bootstrap script on the {productname} Server.
+For more information about bootstrapping, see xref:client-configuration:registration-bootstrap.adoc[].
 
-.[command]``mgr-ssh-push-init`` Disables rhnsd
+The bootstrap script will need to have an activation key associated with it that is configured for Push via SSH.
+For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+
+Before you begin, you need to ensure that you have specified which ports to use for SSH tunneling.
+If you have registered clients before changing the port numbers, they will need to be registered again.
+
 [NOTE]
 ====
-The [command]``mgr-ssh-push-init`` command disables the [systemitem]``rhnsd`` daemon which normally checks for updates every 4 hours.
-Because your clients cannot reach the server without using the Push via SSH contact method, the [systemitem]``rhnsd`` daemon is disabled.
+Clients that are managed with Push via SSH cannot reach the server directly.
+When you use the [command]``mgr-ssh-push-init`` tool, the [systemitem]``rhnsd`` daemon is disabled.
 ====
 
 
-For registration of systems which should be managed via the Push via SSH tunnel contact method, it is required to use an activation key that is configured to use this method.
-Normal [systemitem]``Push via SSH`` is unable to reach the server.
-For managing activation keys, see <<bp.key.managment>>.
-
-Run the following command as {rootuser} on the server to register a client:
-
+.Procedure: Registering Clients with Push via SSH
+. At the command prompt on the {productname} Server, as root, execute this command:
++
 ----
 # mgr-ssh-push-init --client <client> --register \
 /srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel
 ----
-
-
-To enable a client to be managed using Push via SSH (without tunneling), the same script may be used.
-Registration is optional since it can also be done from within the client in this case. [command]``mgr-ssh-push-init`` will also automatically generate the necessary SSH key pair if it does not yet exist on the server:
-
-----
-# mgr-ssh-push-init --client <client> --register bootstrap_script
-----
-
-
-When using the Push via SSH tunnel contact method, the client is configured to connect to  {productname} using the high ports mentioned above.
-Tools like [command]``mgr_check`` and [command]``zypper`` will need an active SSH session with the proper port forwarding options in order to access the {productname} API.
-To verify the Push via SSH tunnel connection manually, run the following command on the {productname} server:
-
++
+OPTIONAL: You can remove the [command]``--tunnel`` option, if you do not want to use tunneling.
+. Verify that the SSH connection is active:
++
 ----
 # ssh -i /root/.ssh/id_susemanager -R <high_port>:<susemanager>:443 \
 <client> zypper ref
 ----
 
-[[bp.contact.methods.ssh.push.api.support]]
-=== API Support for Push via SSH
 
 
-The contact method to be used for managing a server can also be modified via the API.
-The following example code (python) shows how to set a system's contact method to ``ssh-push``.
+.Example: API Access to Push via SSH
+
+You can use the API to manage which contact method to use.
+This example Python code sets the contact method to ``ssh-push``.
+
 Valid values are:
 
 * `default` (pull)
 * `ssh-push`
 * `ssh-push-tunnel`
-
 
 ----
 client = xmlrpclib.Server(SUMA_HOST + "/rpc/api", verbose=0)
@@ -230,138 +216,111 @@ key = client.auth.login(SUMA_LOGIN, SUMA_PASSWORD)
 client.system.setDetails(key, 1000012345, {'contact_method' : 'ssh-push'})
 ----
 
-.Migration and Management via Push via SSH
-[NOTE]
-====
-When a system should be migrated and managed using Push via SSH, it requires setup using the [systemitem]``mgr-ssh-push-init`` script before the server can connect via SSH.
-This separate command requires human interaction to install the server's SSH key onto the managed client ({rootuser} password).
-The following procedure illustrates how to migrate an already registered system:
-====
-
-.Procedure: Migrating Registered Systems
-. Setup the client using the [systemitem]``mgr-ssh-push-init`` script (without [option]``--register``).
-. Change the client's contact method to `ssh-push` or `ssh-push-tunnel` respectively (via API or Web UI).
 
 
-Existing activation keys can also be edited via API to use the Push via SSH contact method for clients registered with these keys:
+If you have a client that has already been registered, and you want to migrate it to use Push via SSH, some extra steps are required.
+You can use the [command]``mgr-ssh-push-init`` tool to set up your client.
 
+
+.Procedure: Migrating Registered Systems to Push via SSH
+. At the command prompt on the {productname} Server, as root, set up the client:
++
+----
+# mgr-ssh-push-init --client <client> \
+/srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel
+----
+. Using the {productname} {webui}, change the client's contact method to `ssh-push` or `ssh-push-tunnel`.
+. OPTIONAL: If you need to edit an existing activation key, you can do so with this command:
++
 ----
 client.activationkey.setDetails(key, '1-mykey', {'contact_method' : 'ssh-push'})
 ----
 
-[[bp.contact.methods.ssh.push.proxy.support]]
-=== Proxy Support with Push via SSH
 
 
-It is possible to use Push via SSH to manage systems that are connected to the {productname} server via a proxy.
-To register a system, run [systemitem]``mgr-ssh-push-init`` on the proxy system for each client you wish to register.
-Update your proxy with the latest packages to ensure the registration tool is available.
-It is necessary to copy the ssh key to your proxy.
-This can be achieved by executing the following command from the server:
+You can also use Push via SSH for clients that connect using a {productname} Proxy.
+Ensure your proxy is updated before you begin.
 
+.Procedure: Registering Clients with Push via SSH to a Proxy
+. At the command prompt on the {productname} Proxy, as root, set up the client:
++
+----
+# mgr-ssh-push-init --client <client> \
+/srv/www/htdocs/pub/bootstrap/bootstrap_script --tunnel
+----
+. At the command prompt on the {productname} Server, copy the SSH key to the proxy:
++
 ----
 mgr-ssh-push-init --client <proxy>
 ----
 
-[[bp.contact.methods.saltssh.push]]
+
+
 == Push via Salt SSH
 
 
-Push via Salt SSH is intended to be used in environments where your Salt clients cannot reach the {productname} server directly to regularly checking in and, for example, fetch package updates.
+Push via Salt SSH is used in environments where Salt clients cannot reach the {productname} Server directly.
+In this environment, clients are located in a firewall-protected zone called a DMZ.
+No system within the DMZ is authorized to open a connection to the internal network, including the {productname} Server.
 
-.Push via SSH
-[NOTE]
-====
-This feature is not related to Push via SSH for the traditional clients.
-For Push via SSH, see <<bp.contact.methods.ssh.push>>.
-====
+The Push via Salt SSH method creates an encrypted tunnel from the {productname} Server on the internal network to the clients located on the DMZ.
+After all actions and events are executed, the tunnel is closed.
 
-=== Overview
+The server uses the [command]``salt-ssh`` tool to contact the clients at regular intervals, checking in and performing scheduled actions and events.
 
-.Push via Salt SSH Contact Method
+This contact method works for Salt clients only.
+For traditional clients, use Push via SSH.
+
+This image demonstrates the Push via Salt SSH process path.
+All items left of the [systemitem]``Taskomatic`` block represent processes running on a {productname} client.
 
 image::salt-ssh-contact-taigon.png[scaledwidth=80%]
 
 
-Salt provides "`Salt SSH`" ([command]``salt-ssh``), a feature to manage clients from a server.
-It works without installing Salt related software on clients.
-Using Salt SSH there is no need to have clients connected to the Salt master.
-Using this as a {productname} connect method, this feature provides similar functionality for Salt clients as the traditional Push via SSH feature for traditional clients.
+To use Push via Salt SSH, you must have the SSH daemon running on the client, and reachable by the [systemitem]``salt-api`` daemon running on the {productname} Server.
+Additionally, Python must be available on the remote system, and be a version supported by Salt.
 
-This feature allows:
-
-* Managing Salt entitled systems with the Push via SSH contact method using Salt SSH.
-* Bootstrapping such systems.
-
-
-=== Requirements
-
-* SSH daemon must be running on the remote system and reachable by the [systemitem]``salt-api`` daemon (typically running on the {productname} server).
-* Python must be available on the remote system (Python must be supported by the installed Salt).
-Currently: python 2.6.
-
-
-.Unsupported Systems
 [NOTE]
 ====
-{rhel} and CentOS versions <= 5 are not supported because they do not have Python 2.6 by default.
+{rhel}{nbsp}5, {centos}{nbsp}5, and earlier are not supported, as they use unsupported versions of Python.
 ====
 
-=== Bootstrapping
+
+.Procedure: Registering Clients with Push via Salt SSH
+. In the {productname} {webui}, navigate to menu:Systems[Bootstrapping] and complete the appropriate fields.
+. Select an activation key with the Push via SSH contact method configured.
+For more information about activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+. Check the [systemitem]``Manage system completely via SSH`` checkbox.
+. Click btn:[Bootstrap] to begin registration.
+. Confirm that the system has been registered correctly by navigating to menu:Systems[Overview].
 
 
-To bootstrap a Salt SSH system, proceed as follows:
+When you are configuring Push via Salt SSH, you can modify parameters that are used when a system is registered, including the host, activation key, and password.
+The password is used only for bootstrapping, it is not saved anywhere.
+All future SSH sessions are authorized via a key/certificate pair.
+These parameters are configured in menu:Systems[Bootstrapping].
+
+You can also configure persistent parameters that are are used system-wide, including the sudo user.
+For more information on configuring the sudo user, see the Push via SSH section in this chapter.
 
 
-. Open the menu:Bootstrap Minions[] dialog in the Web UI (menu:Systems[Bootstrapping]).
-. Fill out the required fields. Select an menu:Activation Key[] with the menu:Push via SSH[] contact method configured. For more information about activation keys, see <<ref.webui.systems.activ-keys>>.
-. Check the menu:Manage system completely via SSH[] option.
-. Confirm with clicking the menu:Bootstrap[] button.
-
-
-Now the system will be bootstrapped and registered in {productname}.
-If done successfully, it will appear in the menu:Systems[] list.
-
-=== Configuration
-
-
-There are two kinds of parameters for Push via Salt SSH:
-
-* Bootstrap-time parameters {mdash} configured in the menu:Bootstrapping[] page:
-** Host
-** Activation key
-** Password {mdash} used only for bootstrapping, not saved anywhere; all future SSH sessions are authorized via a key/certificate pair
-* Persistent parameters {mdash} configured {productname}-wide:
-** sudo user {mdash} same as in <<bp.contact.methods.ssh.push.sudo>>.
-
-
-=== Action Execution
-
-
-The Push via Salt SSH feature uses a taskomatic job to execute scheduled actions using [command]``salt-ssh``.
+The Push via Salt SSH feature uses taskomatic to execute scheduled actions using [command]``salt-ssh``.
 The taskomatic job periodically checks for scheduled actions and executes them.
-While on traditional clients with SSH push configured only [command]``rhn_check`` is executed via SSH, the Salt SSH push job executes a complete [command]``salt-ssh`` call based on the scheduled action.
+Unlike Push via SSH on traditional clients, the Push via Salt SSH feature executes a complete [command]``salt-ssh`` call based on the scheduled action.
 
-=== Known Limitation
+There are some features that are not yet supported on Push via Salt SSH.
+These features will not work on Salt SSH clients:
 
-* OpenSCAP auditing is not available on Salt SSH clients.
-
-
-* Beacons do not work with Salt SSH.
+* OpenSCAP auditing
+* Beacons, resulting in:
 ** Installing a package on a system using [command]``zypper`` will not invoke the package refresh.
 ** Virtual Host functions (for example, a host to guests) will not work if the virtual host system is Salt SSH-based.
 
 
-=== For More Information
+For more information about Salt SSH, see https://docs.saltstack.com/en/latest/topics/ssh/.
 
 
-For more information, see:
 
-* https://wiki.microfocus.com/index.php/SUSE_Manager/SaltSSHServerPush
-* https://docs.saltstack.com/en/latest/topics/ssh/
-
-
-[[bp.contact.methods.osad]]
 == OSAD
 
 
@@ -369,10 +328,9 @@ OSAD is an alternative contact method between {productname} and its clients.
 By default, {productname} uses [systemitem]``rhnsd``, which contacts the server every four hours to execute scheduled actions.
 OSAD allows registered client systems to execute scheduled actions immediately.
 
-.Keep [systemitem]``rhnsd`` Running
 [NOTE]
 ====
-Use OSAD only in addition to [systemitem]``rhnsd``.
+Use OSAD in addition to [systemitem]``rhnsd``.
 If you disable [systemitem]``rhnsd`` your client will be shown as not checking in after 24 hours.
 ====
 
@@ -385,16 +343,6 @@ The [systemitem]``jabberd`` service also handles authentication.
 * The [command]``mgr_check`` tool runs on the client to execute actions.
 It is triggered by communication from the [systemitem]``osa-dispatcher`` service.
 
-////
-Note: I've commented this out, because the diagram is pretty ugly, and I'm not sure it adds value to the text -LKB
-The following figure represents the osad contact method.
-All items left of the [systemitem]``osa-dispatcher`` block represent running processes on the client.
-
-.osad Contact Method
-
-image::osad.png[scaledwidth=80%]
-////
-
 The [systemitem]``osa-dispatcher`` periodically runs a query to check when clients last showed network activity.
 If it finds a client that has not shown activity recently, it will use [systemitem]``jabberd`` to ping all [systemitem]``osad`` instances running on all clients registered with your {productname} server.
 The [systemitem]``osad`` instances respond to the ping using [systemitem]``jabberd``, which is running in the background on the server.
@@ -406,12 +354,6 @@ The [systemitem]``osa-dispatcher`` periodically checks clients for actions that 
 If an outstanding action is found, it uses [systemitem]``jabberd`` to execute [command]``mgr_check`` on the client, which will then execute the action.
 
 
-
-=== Enabling and Configuring OSAD
-
-
-This section covers enabling the [systemitem]``osa-dispatcher`` and [systemitem]``osad`` services, and performing initial setup.
-
 OSAD clients use the fully qualified domain name (FQDN) of the server to communicate with the [systemitem]``osa-dispatcher`` service.
 
 SSL is required for [systemitem]``osad`` communication.
@@ -421,20 +363,16 @@ For more information, see <<tab.install.ports.server>>.
 
 
 .Procedure: Enabling OSAD
-. On your {productname} server, as the root user, start the [systemitem]``osa-dispatcher`` service:
+. At the command prompt on the {productname} Server, as root, start the [systemitem]``osa-dispatcher`` service:
 +
-
 ----
 systemctl start osa-dispatcher
 ----
-
-. On each client machine, install the [systemitem]``mgr-osad`` package from the [systemitem]``Tools`` child channel.
+. On each client, install the [systemitem]``mgr-osad`` package from the [systemitem]``Tools`` child channel.
 The [systemitem]``mgr-osad`` package should be installed on clients only.
 If you install the [systemitem]``mgr-osad`` package on your {productname} Server, it will conflict with the [systemitem]``osa-dispatcher`` package.
-
-. On the client systems, as the root user, start the [systemitem]``osad`` service:
+. On each client, as root, start the [systemitem]``osad`` service:
 +
-
 ----
 systemctl start osad
 ----
@@ -442,9 +380,7 @@ systemctl start osad
 Because [systemitem]``osad`` and [systemitem]``osa-dispatcher`` are run as services, you can use standard commands to manage them, including [command]``stop``, [command]``restart``, and [command]``status``.
 
 
-.Configuration and Log Files
-
-Each OSAD component is configured by local configuration files.
+Each OSAD component is configured using local configuration files.
 We recommend you keep the default configuration parameters for all OSAD components.
 
 
@@ -453,7 +389,7 @@ We recommend you keep the default configuration parameters for all OSAD componen
 | Component                        | Location | Path to Configuration File
 | [systemitem]``osa-dispatcher``   | Server   | [path]``/etc/rhn/rhn.conf`` Section: [systemitem]``OSA configuration``
 | [systemitem]``osad``             | Client   | [path]``/etc/sysconfig/rhn/osad.conf``
-| [systemitem]``osad`` log file   | Client   | [path]``/var/log/osad``
+| [systemitem]``osad`` log file    | Client   | [path]``/var/log/osad``
 | [systemitem]``jabberd`` log file | Both     | [path]``/var/log/messages``
 |===
 
