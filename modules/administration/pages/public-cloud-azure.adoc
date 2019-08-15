@@ -88,6 +88,7 @@ For more information, see the documentation from Microsoft Azure.
 // hostname -i?
 ----
 echo "<ip_address> $(hostname -f) $(hostname)" >> /etc/hosts
+----
 
 
 
@@ -96,3 +97,69 @@ echo "<ip_address> $(hostname -f) $(hostname)" >> /etc/hosts
 For this configuration three extra data disks have been added.
 For Azure it is recommended not to use LVM.
 If more disk space is needed a disk can be extended in the Azure portal, and then the filesystem can be expanded with [command]``xfs_growfs``.
+
+. Disk [path]``/dev/sda`` is partitioned in 4 partitions containing the OS.
+. Disk [path]``/dev/sdb`` is the temporary storage disk and should not be used.
+. Disk [path]``/dev/sdc`` will contain [path]``/var/lib/pgsql``
+. Disk [path]``/dev/sdd`` will contain [path]``/var/spacewalk``
+. Disk [path]``/dev/sde`` will contain [path]``/var/cache``
+
+To create the need data disks use use this command sequence on the command line:
+
+----
+for d in sdc sdd sde; do
+  parted --script /dev/$d mklabel gpt mkpart primary xfs 0% 100%
+  mkfs.xfs /dev/${d}1
+done
+mkdir /cachetmp
+mount /dev/sde1 /cachetmp
+cp -a /var/cache/* /cachetmp/
+umount /cachetmp
+echo "$(blkid /dev/sdc1|awk -F " " '{ print $2 }') /var/lib/pgsql xfs defaults,noatime 0 0" >> /etc/fstab
+echo "$(blkid /dev/sdd1|awk -F " " '{ print $2 }') /var/spacewalk xfs defaults,noatime 0 0" >> /etc/fstab
+echo "$(blkid /dev/sde1|awk -F " " '{ print $2 }') /var/cache     xfs defaults,noatime 0 0" >> /etc/fstab
+mkdir -p /var/spacewalk
+mount /var/spacewalk
+chown -R wwwrun:root /var/spacewalk
+mount /var/lib/pgsql
+chown -R postgres:postgres /var/lib/pgsql
+mv /var/cache /var/cache.old
+mkdir /var/cache
+mount /var/cache
+rm -r /var/cache.old
+----
+
+
+
+=== Registration
+
+To be able to install updates, register {productname} against {scc} (SCC).
+On the command line, enter (replace [literal]``<mail-address>`` and [literal]``<registration code>`` with your data:
+
+----
+SUSEConnect -e <mail-address> -r <registration code>
+----
+
+
+
+=== Install Additional Packages
+
+With [command]``zypper``, install the following packages:
+
+----
+zypper -n in spacecmd mlocate sysstat
+----
+
+
+
+=== Update the Server with the Latest Patches and Reboot
+
+Apply the latest updates and reboot the server:
+
+----
+zypper -n up -l
+reboot
+----
+
+
+
