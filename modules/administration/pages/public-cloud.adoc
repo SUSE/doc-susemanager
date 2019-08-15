@@ -14,6 +14,8 @@ For more information about registering {productname} with {scc}, see xref:instal
 
 Depending on the public cloud network you are using, you can locate the {productname} installation images by searching for the  keywords [package]``suse``, [package]``manager``, [package]``proxy``, or [package]``BYOS``.
 
+For ``SUSE Manager Server in Azure``, see xref:administration:public-cloud-azure.adoc[].
+
 
 
 == Instance Requirements
@@ -77,14 +79,10 @@ For example, if the FQDN is [path]``system_name.example.com``, the system name i
 ----
 # hostnamectl set-hostname system_name
 ----
-. Create a DNS entry in your network environment for domain name resolution, or force correct resolution by editing the [path]``/etc/hosts`` file:
+. Create a DNS entry in your network environment for domain name resolution, or force correct resolution by editing the [path]``/etc/hosts`` file.
+You can find the IP address by checking your public cloud web console, or from the command line:
 +
-----
-# echo "${local_address} suma.cloud.net suma" >> /etc/hosts
-----
-+
-You can find the local address by checking your public cloud web console, or from the command line:
-+
+
 * Amazon EC2 instance:
 +
 ----
@@ -95,11 +93,18 @@ You can find the local address by checking your public cloud web console, or fro
 ----
 # gcemetadata --query instance --network-interfaces --ip
 ----
-+
 * Microsoft Azure:
 +
 ----
 # azuremetadata --internal-ip
+----
++
+
+In the following command, replace [literal]``<ip_address>`` with IP address you retrieve from the command line above:
++
+
+----
+# echo "<ip_address> suma.cloud.net suma" >> /etc/hosts
 ----
 
 
@@ -130,16 +135,17 @@ If you experience errors during setup, start a new instance, and begin the setup
 
 If you receive a message that there is not enough space available for setup, ensure that your root volume is at least 20 GB and double check that the instructions in <<using-separate-storage-volume>> have been completed correctly.
 
+// REMARK check this; will it still work for sle 15?
 {productname} Server for the public cloud comes with a bootstrap data module pre-installed.
 The bootstrap module contains optimized package lists for bootstrapping instances started from {sle} images published by {suse}.
-If you intend to register such an instance, when you creatr the bootstrap repository run the [command]``mgr-create-bootstrap-repo`` script using this command, to create a bootstrap repository suitable for {sle} 12 SP1 instances.
+If you intend to register such an instance, when you create the bootstrap repository run the [command]``mgr-create-bootstrap-repo`` script using this command, to create a bootstrap repository suitable for {sle} 12 SP1 instances.
 
 ----
 $ mgr-create-bootstrap-repo --datamodule=mgr_pubcloud_bootstrap_data -c SLE-12-SP1-x86_64
 ----
 
 
-See https://www.suse.com/documentation/suse-manager-3/book.suma.getting-started/data/create_tools_repository.html[Creating the SUSE Manager Tools Repository] for more information on bootstrapping.
+See xref:client-configuration:creating-a-tools-repository.adoc[] for more information on bootstrapping.
 
 Prior to registering instances started from on demand images remove the following packages from the instance to be registered:
 ... cloud-regionsrv-client
@@ -170,10 +176,10 @@ file that contains the *susecloud.net* reference.
 +
 Launch the instance, optionally with external storage configured.
 If you use external storage (recommended), prepare it according to <<using-separate-storage-volume>>.
-It is recommended but not required to prepare the storage before configuring {productname} proxy, as the suma-webui-storage script will migrate any existing cached data to the external storage.
+It is recommended but not required to prepare the storage before configuring {productname} proxy, as the suma-storage script will migrate any existing cached data to the external storage.
 After preparing the instance, register the system with the parent SUSE Manager, which could be a {productname} Server or another {productname} Proxy.
-See the https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_proxyquick/book_susemanager_proxyquick.html[ SUSE Manager Proxy Setup guide] for details.
-Once registered, run
+See the xref:installation:proxy-setup.adoc[] for details.
+When registered, run
 +
 
 ----
@@ -352,4 +358,4 @@ Each operating system stores the minion ID file in a slightly different location
 |===
 
 
-Once you have deleted the minion ID file, re-run the bootstrap script, and restart the client to see the cloned system in {productname} with the new ID.
+When you have deleted the minion ID file, re-run the bootstrap script, and restart the client to see the cloned system in {productname} with the new ID.
