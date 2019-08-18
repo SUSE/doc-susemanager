@@ -1,51 +1,60 @@
 [[clients-centos]]
-= Preparing Channels and Repositories for CentOS Traditional Clients
+= Registering {centos} Clients
+
+
+This section contains information about registering traditional and Salt clients running {centos} operating systems.
 
 
 
+== Set up a {centos} Client
 
-This following section provides an example procedure for configuring CentOS channels and repositories and finally registering a CentOS client with {productname}.
+The [package]``spacewalk-utils`` package contains a number of upstream command line tools required for client administration.
+You will also require the [command]``spacewalk-common-channels`` tool.
+Keep in mind {suse} only provides support for [command]``spacewalk-clone-by-date`` and [command]``spacewalk-manage-channel-lifecycle`` tools.
 
-These steps will be identical for Scientific Linux and Fedora.
+The [path]``/etc/rhn/spacewalk-common-channels.ini`` configuration file must contain the channel references you want to add.
+If a channel is not listed, check the latest version for updates: https://github.com/spacewalkproject/spacewalk/tree/master/utils
 
-.Procedure: Preparing Channels and Repositories
-. As {rootuser} install [package]#spacewalk-utils# on your {productname} server:
+You will also need an activation key associated with the {centos} channel.
+For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+
+
+.Procedure: Adding Channels and Repositories
+
+. At the command prompt on the {productname} Server, as root, install the [package]``spacewalk-utils`` package:
 +
-
 ----
 zypper in spacewalk-utils
 ----
+. Add the {centos} base, updates, and client channels using the [command]``spacewalk-common-channels`` script:
 +
-.Supported Tools
-IMPORTANT: The [package]#spacewalk-utils# package contains a collection of upstream command line tools which provide assistance with spacewalk administrative operations.
-You will be using the [command]``spacewalk-common-channels`` tool.
-Keep in mind {suse} only provides support for [command]``spacewalk-clone-by-date`` and [command]``spacewalk-manage-channel-lifecycle`` tools.
-+
-
-. Run the [command]``spacewalk-common-channels`` script to add the CentOS7 base, updates, and Spacewalk client channels.
-+
-
 ----
 spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7'
 spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7-updates'
 spacewalk-common-channels -u admin -p`secret`-a x86_64 'centos7-uyuni-client-x86_64'
 ----
-+
-.Required Channel References
-NOTE: The [path]``/etc/rhn/spacewalk-common-channels.ini`` must contain the channel references to be added.
-If a channel is not listed, check the latest version here for updates: https://github.com/spacewalkproject/spacewalk/tree/master/utils
-+
 
-. From the {webui} select menu:Main Menu[Software > Manage Software Channels > Overview]. Select the base channel you want to synchronize, in this case ``CentOS7 (x86_64)``. Select menu:Repositories[Sync]. Check the channels you want to synchronize and then click the btn:[Sync Now] button or, optionally, schedule a regular synchronization time.
-. Copy all relevant GPG keys to [path]``/srv/www/htdocs/pub``. Depending on what distribution you are interested in managing these could include an EPEL key, SUSE keys, Red Hat keys, and CentOS keys. After copying these you can reference them in a comma-delimited list within your bootstrap script (see <<proc.bp.expanded-support.centos-repos.trad.bsscript>>).
-** CentOS7 key files: http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7
-** EPEL key file: http://mirrors.kernel.org/fedora-epel/RPM-GPG-KEY-EPEL-7
-** Spacewalk key: http://spacewalk.redhat.com/yum/RPM-GPG-KEY-spacewalk-2015
-** Red Hat keys: http://www.redhat.com/contact/security-response-team/gpg-keys.html
-. Install and setup a CentOS 7 client with the default installation packages.
-. Ensure the client machine can resolve itself and your {productname} server via DNS. Validate that there is an entry in [path]``/etc/hosts`` for the real IP address of the client.
-. Create an activation key (``centos7``) on the {productname} server that points to the correct parent/child channels, including the CentOS base repo, updates, and Spacewalk client.
+.Procedure: Synchronizing {centos} Clients
 
+. In the {productname} {webui}, navigate to menu:Main Menu[Software > Manage], and select the base channel you want to synchronize.
+. In the [guimenu]``Repositories`` tab, navigate to the [guimenu]``Sync`` subtab, and click btn:[Sync Now].
+You can also create a regular synchronization schedule on this page.
+
+When you have prepared you {productname} Server, you can install your {centos} client using your preferred installation media and method.
+
+.Procedure: Setting up a {centos} Client
+
+. At the command prompt, copy all relevant GPG keys to [path]``/srv/www/htdocs/pub``.
+If you intend to use a bootstrap script to register your client, you can add the GPG keys to your bootstrap script.
+. Check that the client machine can resolve itself and your {productname} Server using DNS.
+. Check that there is an entry in [path]``/etc/hosts`` for the real IP address of the client.
+. Create an activation key called `centos7` on the {productname} Server that points to the correct parent and child channels, including the {centos} base repository, updates, and client channels.
+
+When you are ready to register your {centos} client, follow the instructions in xref:client-configuration:registration-overview.adoc[].
+
+
+////
+This is all duplicated content. LKB 2018-08-31
 
 Now prepare the bootstrap script.
 
@@ -99,6 +108,13 @@ CentOS uses patches originating from CentOS is not officially supported by {suse
 See the matrix of {productname} clients on the main page of the {productname} wiki, linked from the [ref]_Quick Links_ section: https://wiki.microfocus.com/index.php?title=SUSE_Manager
 
 ====
+
+////
+
+
+////
+I'm fairly certain this isn't supported, which is why we took it out of the SLE instructions. LKB 2018-08-12
+
 
 .Procedure: Register a CentOS 7 Client
 . Add the Open Build Service repo for Salt:
