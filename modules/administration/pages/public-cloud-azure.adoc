@@ -1,111 +1,54 @@
 [[public-cloud-azure]]
-= SUSE Manager Server in Azure
+= {productname} with Azure
+
+You can use {productname} Server and Proxy with the Microsoft Azure public cloud.
+This section discusses what you will need for running {productname} in Azure, and how to set up your installation.
 
 
+== Configure the Azure Cloud Instance
 
-== Resource Requirements
-
-
-
-=== Image and VM (Virtual Machine)
-
-Image Resource::
-``SUSE Manager Server 4 BYOS``
-+
-
+Use the ``SUSE Manager Server 4 BYOS`` image.
 The image is a pre-built image created by {suse}.
 It is based on JeoS, and SUSE Manager is pre-installed but not configured.
 Configuring SUSE Manager has to be done manually with {yast}.
 
-VM (Virtual Machine)::
-Recommended VM size is `B2ms`. This contains:
-+
+When you create your Azure virtual machine, choose the `B2ms` size.
+The `B2ms` VM contains:
 
 * 2 vCPUs
 * 8 GB RAM
 * Up to 4 data disks
 * Max IOPS 2400
 * Temporary storage disk of 16Gb.
+
 Data on this disk will be destroyed after the guest has been switched off.
 
+When you are setting up disk partitioning, we recommend:
 
+* 30{nbsp}GB for the disk running the operating system
+* Select `Standard HDD` for the storage account type
 
-=== Disk Partitoning
+You will also require three additional data disks:
 
-The OS disk is 30 GiB and for storage account type select `Standard HDD`.
+* Disk 0: 64{nbsp}GB on Premium SSD, mounted at [path]``/var/lib/pgsql``
+* Disk 1: 512{nbsp}GB on Standard SSD, mounted at [path]``/var/spacewalk``
+* Disk 2: 128{nbsp}GB on Standard SSD, mounted at [path]``/var/cache``
 
-Add 3 additional data disks:
+[NOTE]
+====
+Do not use LVM with Azure.
+If you need more disk space, extend a disk in the Azure portal, then extend the filesystem with [command]``xfs_growfs``.
+====
 
-Data Disk 0::
-Size 64 GiB on Premium SSD. This will [path]``/var/lib/pgsql``
+Partition the disks like this:
 
-Data Disk 1::
-Size 512 GiB on Standard SSD. This will be mounted at [path]``/var/spacewalk``
+* [path]``/dev/sda``: 4 partitions containing the OS
+* [path]``/dev/sdb``: temporary storage disk, do not use
+* [path]``/dev/sdc``: contains [path]``/var/lib/pgsql``
+* [path]``/dev/sdd``: contains [path]``/var/spacewalk``
+* [path]``/dev/sde``: contains [path]``/var/cache``
 
-Data Disk 2::
-Size 128 GiB on Standard SSD. This will be mounted at [path]``/var/cache``
-
-
-
-// REMARK: I guess you do this in your Azure instance
-=== Network Configuration
-
-Created a separate private network.
-The IP range is `10.0.0.0/24`.
-// REMARK: Where do you configure this?
-The {productname} Server will have the internal IP Address `10.0.0.4` and will be reachable from the outside with IP `10.89.171.101`.
-The firewall has been configured to only allow inbound for port `22`, `80`, and `443` to IP Address `10.0.0.4`.
-So if other servers are added in this network they cannot be reached from outside the network.
-Outbound is open from the private network.
-// REMARK: Was does this mean?
-This should be restricted for other server in this private network.
-
-
-
-== Configuring SUSE Manager Server
-
-
-
-=== Before You Begin
-
-
-
-==== Network
-
-* DHCP must not set the host name.
-Check [path]``/etc/sysconfig/network/dhcp`` if `DHCLIENT_SET_HOSTNAME` is set to [literal]``no``.
-Change it if needed:
-+
-
-----
-DHCLIENT_SET_HOSTNAME="no"
-----
-* Create the needed DNS Zones in Azure first.
-For more information, see the documentation from Microsoft Azure.
-
-* On the command line, add the system to the [path]``/etc/hosts`` file; replace [literal]``<ip_address>`` with the IP address of the server:
-+
-
-// REMARK: hostname -i?
-----
-echo "<ip_address> $(hostname -f) $(hostname)" >> /etc/hosts
-----
-
-
-
-==== Disks
-
-For this configuration three extra data disks have been added.
-For Azure it is recommended not to use LVM.
-If more disk space is needed a disk can be extended in the Azure portal, and then the filesystem can be expanded with [command]``xfs_growfs``.
-
-* Disk [path]``/dev/sda`` is partitioned in 4 partitions containing the OS.
-* Disk [path]``/dev/sdb`` is the temporary storage disk and should not be used.
-* Disk [path]``/dev/sdc`` will contain [path]``/var/lib/pgsql``
-* Disk [path]``/dev/sdd`` will contain [path]``/var/spacewalk``
-* Disk [path]``/dev/sde`` will contain [path]``/var/cache``
-
-To create the need data disks use use this command sequence on the command line:
+You can use these commands to create the disks:
 
 ----
 for d in sdc sdd sde; do
@@ -131,54 +74,79 @@ rm -r /var/cache.old
 ----
 
 
+// REMARK: I guess you do this in your Azure instance
+When you are setting up networking, we recommend that you create a separate private network, with the IP range `10.0.0.0/24`.
+// REMARK: Where do you configure this?
 
-==== Registration
+Configure the {productname} Server to use the internal IP address `10.0.0.4`.
+Ensure it is accessible from outside the network with IP `10.89.171.101`.
 
-To be able to install updates, register SUSE Manager against {scc} (SCC).
-On the command line, enter (replace [literal]``<mail-address>`` and [literal]``<registration code>`` with your data:
+Configure the firewall to only allow inbound traffic on ports `22`, `80`, and `443` to IP Address `10.0.0.4`.
+In this environment, if other servers are added to the network they can not be reached from outside the network.
 
-----
-SUSEConnect -e <mail-address> -r <registration code>
-----
+Outbound is open from the private network.
+// REMARK: Was does this mean?
+This should be restricted for other servers in this private network.
+
+You will need to set the DNS zones in Azure before you can configure the {productname} Server.
+For more information on setting DNS zones, see the Azure documentation.
 
 
 
-==== Install Additional Packages
+== Configure {productname} Server
 
-With [command]``zypper``, install the following packages:
+Ensure that your {productname} Server is registered with {scc}.
 
+When your server is registered, install these extra packages:
 ----
 zypper -n in spacecmd mlocate sysstat
 ----
 
-
-
-==== Update the Server with the Latest Patches and Reboot
-
 Apply the latest updates and reboot the server:
-
 ----
 zypper -n up -l
 reboot
 ----
 
-
-
-==== Server Check
-
-After the server is rebooted, check that all filesystems are mounted and that postgrsql is running:
-
+Check that all filesystems are mounted and that PostgreSQL is running:
 ----
 mount
 service postgresql status
 ----
 
+Complete {productname} Server installation and configuration.
+For more information, see xref:installation:server-setup.adoc[]
+
+We recommend you configure the {productname} Server so that DHCP does not set the host name.
+Check [path]``/etc/sysconfig/network/dhcp`` and ensure that `DHCLIENT_SET_HOSTNAME` is set to [literal]``no``:
+----
+DHCLIENT_SET_HOSTNAME="no"
+----
+
+Add the Azure client to the [path]``/etc/hosts`` file.
+At the command prompt, replace [literal]``<ip_address>`` with the IP address of the server:
+// REMARK: hostname -i?
+----
+echo "<ip_address> $(hostname -f) $(hostname)" >> /etc/hosts
+----
 
 
+{productname} Server has a default administration user.
+In Azure, the system administrator user is called [literal]``admin``.
+The `admin` user's password is built with two parts.
+The first part can be found by using this command:
+----
+azuremetadata --instance-name
+----
 
-=== SUSE Manager Setup Configuration
+The second part of the password is [literal]``-suma``
 
-// REMARK: Do we want to list the details here?  Or is such a general xref good enough?
+Alternatively, you can check the [path]``/var/log/susemanager_firstuser.log`` file.
+
+
+////
+
+REMARK: Do we want to list the details here?  Or is such a general xref good enough?
 
 For the SUSE Manager setup configuration in general, see xref:installation:server-setup.adoc[], _procedure "{productname} Setup"_.
 
@@ -194,19 +162,4 @@ Make sure also to remember this password.
 
 With these settings the installation can be started.
 The installation will finish without further input.
-
-When the installation is finished, an administration user will be created automatically.
-For Azure the system administrator user is called [literal]``admin`` and the password is built as follows:
-
-* The first part can be found with:
-+
-
-----
-azuremetadata --instance-name
-----
-* The second part is [literal]``-suma``
-
-Alternatively, you can check the [path]``/var/log/susemanager_firstuser.log`` file.
-
-This completes the installation of SUSE Manager.
-From now on the server behaves identical as a non-Azure SUSE Manager Server.
+////
