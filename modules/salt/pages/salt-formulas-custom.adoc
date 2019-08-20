@@ -441,12 +441,7 @@ select_something:
 ----
 
 
-// Lana you're up to here!
-
-.Example: Simple edit-group
-
-See the following *edit-group* example:
-
+.Example: Basic edit-group
 ----
 partitions:
   $name: "Hard Disk Partitions"
@@ -470,22 +465,18 @@ partitions:
       size: 5000
 ----
 
-After clicking btn:[Add] for one time you will see <<fig-formula-custom-harddisk-partitions>> filled with the default values.
-The formula itself is called [path]``hd-partitions`` and will appear as [guimenu]``Hd Partitions`` in the {webui}.
+Click btn:[Add] to fill the form with the default values.
 
-.`edit-group` Example in the {webui}
-[[fig-formula-custom-harddisk-partitions]]
+The formula is called [path]``hd-partitions`` and will appear as [guimenu]``Hd Partitions`` in the {webui}.
+
 image::formula-custom-harddisk-partitions.png[]
 
 To remove the definition of a partition click the minus symbol in the title line of an inner group.
-When form fields are properly filled confirm with clicking btn:[Save Formula] in the upper right corner of the formula.
+
+When you are finished, click btn:[Save Formula].
 
 
-[[salt.formulas.ex.edit-group-nesting]]
-=== edit-group Example with Nesting
-
-See the following *edit-group* example:
-
+.Example: Nested edit-group
 ----
 users:
   $name: "Users"
@@ -515,37 +506,33 @@ users:
 
 
 
-[[best.practice.salt.formulas.writing]]
 == Writing Salt Formulas
 
-Salt formulas are pre-written Salt states, which may be configured with pillar data.
-You can parametrize state files using Jinja.
-Jinja allows you to access pillar data by using the following syntax.
-This syntax works best when you are uncertain whether a pillar value exists as it will throw an error:
+Salt formulas are pre-written Salt states.
+You can use Jinja to configure formulas with pillar data.
 
+Basic Jinja syntax is:
 ----
 pillar.some.value
 ----
 
-When you are sure a pillar exists you may also use the following syntax:
-
+When you are sure a pillar exists, use this syntax:
 ----
 salt['pillar.get']('some:value', 'default value')
 ----
 
-You may also replace the `pillar` value with `grains` (for example, ``grains.some.value``) allowing access to grains.
+You can also replace the `pillar` value with `grains`.
+For example, ``grains.some.value``.
 
-Using data this way allows you to make a formula configurable.
-The following code snippet will install a package specified in the pillar ``package_name``:
-
+Using data this way makes the formula configurable.
+In this example, a specified package is installed in the ``package_name`` pillar:
 ----
 install_a_package:
   pkg.installed:
     - name: {{ pillar.package_name }}
 ----
 
-You may also use more complex constructs such as `if/else` and `for-loops` to provide greater functionality:
-
+You can also use more complex constructs such as `if/else` and `for-loops` to provide greater functionality:
 ----
 {% if pillar.installSomething %}
 something:
@@ -557,7 +544,6 @@ anotherPackage:
 ----
 
 Another example:
-
 ----
 {% for service in pillar.services %}
 start_{{ service }}:
@@ -568,16 +554,15 @@ start_{{ service }}:
 
 Jinja also provides other helpful functions.
 For example, you can iterate over a dictionary:
-
 ----
 {% for key, value in some_dictionary.items() %}
 do_something_with_{{ key }}: {{ value }}
 {% endfor %}
 ----
 
-You may want to have Salt manage your files (for example, configuration files for a program), and you can change these with pillar data.
-For example, the following snippet shows how you can manage a file using Salt:
+You can have Salt manage your files (for example, configuration files for a program), and change them with pillar data.
 
+In this example, Salt copies the file [path]``salt-file_roots/my_state/files/my_program.conf`` on the server to [path]``/etc/my_program/my_program.conf`` on the client and template it with Jinja:
 ----
 /etc/my_program/my_program.conf:
   file.managed:
@@ -585,28 +570,23 @@ For example, the following snippet shows how you can manage a file using Salt:
     - template: jinja
 ----
 
-
-Salt will copy the file [path]``salt-file_roots/my_state/files/my_program.conf`` on the salt master to [path]``/etc/my_program/my_program.conf`` on the client and template it with Jinja.
-This allows you to use Jinja in the file, exactly like shown above for states:
-
+This example allows you to use Jinja in the file, like the previous example for states:
 ----
 some_config_option = {{ pillar.config_option_a }}
 ----
 
 
+== Separate Data
 
-[[best.practice.salt.formulas.data]]
-== Separating Data
+Separating data from a state can increase flexibility and make it easier to re-use.
+You can do this by writing values into a separate file named [path]``map.jinja``.
+This file must be within the same directory as the state files.
 
-It is often a good idea to separate data from a state to increase its flexibility and add re-usability value.
-This is often done by writing values into a separate file named [path]``map.jinja``.
-This file should be placed within the same directory as your state files.
+This example sets `data` to a dictionary with different values, depending on which system the state runs on.
+It will also merge data with the pillar using the `some.pillar.data` value so you can access `some.pillar.data.value` by using ``data.value``.
 
-The following example will set `data` to a dictionary with different values, depending on which system the state runs on.
-It will also merge data with the pillar using the `some.pillar.data` value so you can access `some.pillar.data.value` by just using ``data.value``.
-
-You can also choose to override defined values from pillars (for example, by overriding `some.pillar.data.package` in the example).
-
+You can choose to override defined values from pillars.
+For example, by overriding `some.pillar.data.package` in this example:
 ----
 {% set data = salt['grains.filter_by']({
     'Suse': {
@@ -620,10 +600,10 @@ You can also choose to override defined values from pillars (for example, by ove
 }, merge=salt['pillar.get']('some:pillar:data')) %}
 ----
 
-After creating a map file like the above example, you can maintain compatibility with multiple system types while accessing "deep" pillar data in a simpler way.
+When you have created a map file, you can maintain compatibility with multiple system types while accessing deep pillar data in a simpler way.
+
 Now you can import and use `data` in any file.
 For example:
-
 ----
 {% from "some_folder/map.jinja" import data with context %}
 
@@ -632,9 +612,8 @@ install_package_a:
     - name: {{ data.package }}
 ----
 
-You can also define multiple variables by copying the `{% set ...%}` statement with different values and then merge it with other pillars.
+You can define multiple variables by copying the `{% set ...%}` statement with different values and then merge it with other pillars.
 For example:
-
 ----
 {% set server = salt['grains.filter_by']({
     'Suse': {
@@ -649,82 +628,49 @@ For example:
 ----
 
 To import multiple variables, separate them with a comma.
-For Example:
-
+For example:
 ----
 {% from "map.jinja" import server, client with context %}
 ----
 
-Formulas utilized with {productname} should follow formula conventions listed in the official documentation:
-
-* https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html
+For more information about conventions to use when writing formulas, see https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html.
 
 
 
-[[best.practice.salt.formulas.pillardata]]
-== {productname} Generated Pillar Data
+== Generated Pillar Data
 
-When pillar data is generated (for example, after applying the highstate) the following external pillar script generates pillar data for packages, group ids, etc. and includes all pillar data for a system:
-
+Pillar data is generated by {productname} when events occur like generating the highstate.
+You can use an external pillar script to generate pillar data for packages and group IDs, and include all pillar data for a system:
 ----
 /usr/share/susemanager/modules/pillar/suma_minion.py
 ----
 
-The process is executed as follows:
+The process is executed like this:
 
-. The `suma_minion.py` script starts and finds all formulas for a system (by checking the `group_formulas.json` and `server_formulas.json` files).
-. `suma_minion.py` loads the values for each formula (groups and from the system) and merges them with the highstate (default: if no values are found, a group overrides a system if $scope: group etc.).
-. `suma_minion.py` also includes a list of formulas applied to the system in a pillar named formulas.
+. The `suma_minion.py` script starts and finds all formulas for a system by checking the `group_formulas.json` and `server_formulas.json` files.
+. The script loads the values for each formula (groups and from the system) and merges them with the highstate.
+By default, if no values are found, a group overrides a system if `$scope: group`.
+. The script also includes a list of formulas applied to the system in a pillar named ``formulas``.
+
 This structure makes it possible to include states.
-The top file (in this case specifically generated by the `mgr_master_tops.py` script) includes a state called formulas for each system.
-This includes the `formulas.sls` file located in:
-+
-----
-/usr/share/susemanager/formulas/states/
-----
-+
-Or:
-+
-----
-/usr/share/salt-formulas/states/
-----
-+
-The content looks similar to the following:
-+
+In this example, the top file is specifically generated by the `mgr_master_tops.py` script.
+The top file includes a state called ``formulas`` for each system.
+This includes the `formulas.sls` file located in [path]``/usr/share/susemanager/formulas/states`` or [path]``/usr/share/salt-formulas/states/``.
+The content looks similar to this:
 ----
 include: {{ pillar["formulas"] }}
 ----
-+
-This pillar includes all formulas, that are specified in pillar data generated from the external pillar script.
+
+This pillar includes all formulas that are specified in the pillar data generated from the external pillar script.
 
 
-
-[[best.practice.salt.formulas.req]]
-== Formula Requirements
-
-Formulas should be designed/created directly after a {productname} installation, but if you encounter any issues check the following:
+Formulas should be created directly after a {productname} installation.
+If you encounter any problems with formulas check these things first:
 
 * The external pillar script (``suma_minion.py``) must include formula data.
 * Data is saved to [path]``/srv/susemanager/formula_data`` and the [path]``pillar`` and [path]``group_pillar`` sub-directories.
-These should be automatically generated by the server.
+These directories should be automatically generated by the server.
 * Formulas must be included for every client listed in the top file.
-Currently this process is initiated by the [path]``mgr_master_tops.py`` script which includes the `formulas.sls` file located in:
-+
-----
-/usr/share/susemanager/formulas/states/
-----
-+
-Or:
-+
-----
-/usr/share/salt-formulas/states/
-----
-+
-
+Currently this process is initiated by the [path]``mgr_master_tops.py`` script which includes the `formulas.sls` file located in [path]``/usr/share/susemanager/formulas/states/`` or [path]``/usr/share/salt-formulas/states/``.
 This directory must be a salt file root.
-File roots are configured on the salt-master ({productname}) located in:
-+
-
-----
-/etc/salt/master.d/susemanager.conf
-----
+File roots are configured on the salt-master ({productname}) located at [path]``/etc/salt/master.d/susemanager.conf``.
