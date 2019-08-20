@@ -1,0 +1,83 @@
+[[installation-public-cloud-requirements]]
+= Public Cloud Requirements
+
+
+
+
+
+
+This section details the public cloud specific requirements for {productname}.
+
+[NOTE]
+====
+Public clouds provide {productname} under a Bring Your Own Subscription (BYOS) model.
+This means that you must register them with the {scc}.
+For more information about registering {productname} with {scc}, see xref:installation:general-requirements.adoc[].
+====
+
+Depending on the public cloud network you are using, you can locate the {productname} installation images by searching for the  keywords [package]``suse``, [package]``manager``, [package]``proxy``, or [package]``BYOS``.
+
+
+== Instance Requirements
+
+Select a public cloud instance that meets the hardware requirements in xref:installation:hardware-requirements.adoc[].
+
+In addition, be aware of these considerations:
+
+* The {productname} setup procedure performs a forward-confirmed reverse DNS lookup.
+This must succeed in order for the setup procedure to complete successfully and for {productname} to operate as expected.
+Therefore, it is important to perform hostname and IP configuration prior to running the {productname} setup procedure.
+* {productname} Server and Proxy instances are expected to run in a network configuration that provides you control over DNS entries, but cannot access the wider internet.
+Within this network configuration DNS resolution must be provided: `hostname -f` must return the fully-qualified domain name (FQDN).
+DNS resolution is also important for connecting clients.
+DNS is dependent on the cloud framework you choose, refer to the cloud service provider documentation for detailed instructions.
+* We recommend that you locate software repositories, the server database, and the proxy squid cache on an external virtual disk.
+This prevents data loss if the instance is unexpectedly terminated.
+Instructions for setting up an external virtual disk are contained in this section.
+
+== Network Requirements
+
+On a public cloud service, you must run {productname} within a restricted network, such as VPC private subnet with an appropriate firewall setting.
+The instance must only be able to be accessed by machines in your specified IP ranges.
+
+[WARNING]
+====
+A world-accessible {productname} instance violates the terms of the {productname} EULA, and it will not be supported by {suse}.
+====
+
+To access the {productname} {webui}, allow HTTPS when you set up your networking environment.
+
+== Using Separate Storage Volume
+
+
+We recommend that the repositories and the database for {productname} be stored on a virtual storage device.
+This best practice will avoid data loss in cases where the {productname} instance may need to be terminated.
+These steps *must* be performed *prior* to running the YaST {productname}  setup procedure.
+
+
+. Provision a disk device in the public cloud environment, refer to the cloud service provider documentation for detailed instructions. The size of the disk is dependent on the number of distributions and channels you intend to manage with {productname}.
+For sizing information refer to https://www.suse.com/support/kb/doc.php?id=7015050[SUSE Manager sizing examples]. A rule of thumb is 25 GB per distribution per channel.
+. Once attached the device appears as Unix device node in your instance. For the following command to work this device node name is required. In many cases the attached storage appears as [path]``/dev/sdb``. In order to check which disk devices exists on your system, call the following command:
++
+
+----
+$ hwinfo --disk | grep -E "Device File:"
+----
+. With the device name at hand the process of re-linking the directories in the filesystem {productname} uses to store data is handled by the suma-storage script. In the following example we use [path]``/dev/sdb`` as the device name.
++
+[WARNING]
+====
+Depending on Public Cloud framework and instance type, the instance may have an ephermal storage volume attached, which may be device [path]``/dev/sdb``. Data on this storage will be discarded when the virtual machine is rebooted. Make sure you do *not* use ephermal storage as {productname} storage volume.
+====
++
+
+----
+$ /usr/bin/suma-storage /dev/sdb
+----
+
+
+After the call all database and repository files used by SUSE Manager Server are moved to the newly created xfs based storage.
+In case your instance is a {productname} Proxy, the script will move the Squid cache, which caches the software packages, to the newly created storage.
+The xfs partition is mounted below the path [path]``/manager_storage``.
+
+
