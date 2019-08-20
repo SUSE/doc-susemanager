@@ -18,7 +18,7 @@ Salt commands that are executed from the command line are not subject to these p
 
 There are two parameters that control how actions are sent to clients, one for the batch size, and one for the delay.
 
-When the Salt master sends a batch of actions to the target clients, it will send it to the number of clients determined in the batch size parameter.
+When the {productname} Server sends a batch of actions to the target clients, it will send it to the number of clients determined in the batch size parameter.
 After the specified delay period, commands will be sent to the next batch of clients.
 The number of clients in each subsequent batch is equal to the number of clients that have completed in the previous batch.
 
@@ -34,12 +34,14 @@ The batch delay parameter sets the amount of time, in seconds, to wait after a c
 Adjust the [systemitem]``java.salt_batch_delay`` parameter.
 Defaults to 1.0 seconds.
 
+
+
 == Disabling the Salt Mine
 
 In older versions, {productname} used a tool called Salt mine to check client availability.
 The Salt mine would cause clients to contact the server every hour, which created significant load.
 With the introduction of a more efficient mechanism in {productname}{nbsp}3.2, the Salt mine is no longer required.
-Instead, the {productname} server uses Taskomatic to ping only the clients that appear to have been offline for twelve hours or more, with all clients being contacted at least once in every twenty four hour period by default.
+Instead, the {productname} Server uses Taskomatic to ping only the clients that appear to have been offline for twelve hours or more, with all clients being contacted at least once in every twenty four hour period by default.
 You can adjust this by changing the [systemitem]``web.system_checkin_threshold`` parameter in [path]``rhn.conf``.
 The value is expressed in days, and the default value is [literal]``1``.
 
@@ -48,7 +50,6 @@ If the Salt mine is running on your system, you can reduce load by disabling it.
 This is especially effective if you have a large number of clients.
 
 Disable the Salt mine by running this command on the server:
-
 ----
 salt '*' state.sls util.mgr_mine_config_clean_up
 ----
@@ -56,7 +57,6 @@ salt '*' state.sls util.mgr_mine_config_clean_up
 This will restart the clients and generate some Salt events to be processed by the server.
 If you have a large number of clients, handling these events could create excessive load.
 To avoid this, you can execute the command in batch mode with this command:
-
 ----
 salt --batch-size 50 '*' state.sls util.mgr_mine_config_clean_up
 ----

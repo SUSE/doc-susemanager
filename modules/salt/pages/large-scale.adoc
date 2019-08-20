@@ -30,7 +30,7 @@ For installations with thousands of clients, use 64{nbsp}GB or more.
 * Fast I/O storage devices, such as locally-attached SSDs.
 For PostgreSQL data directories, we recommend locally-attached RAID-0 SSDs.
 
-If the {productname} Server is virtualized, enable the `elevator=noop` kernel command line option, for optimal I/O performance.
+If the {productname} Server is virtualized, enable the `elevator=noop` kernel command line option, for the best input/output performance.
 You can check the current status with [command]``cat /sys/block/<DEVICE>/queue/scheduler``.
 This command will display a list of available schedulers with the currently active one in brackets.
 To change the scheduler before a reboot, use [command]``echo noop > /sys/block/<DEVICE>/queue/scheduler``.
@@ -39,7 +39,7 @@ The minimum requirements for the {productname} Proxy are:
 
 * One {productname} Proxy per 500-1000 clients, depending on available network bandwidth.
 * Two or more recent {x86_64} CPU cores.
-* 16{nbsp}GiB RAM, and sufficient storage for caching.
+* 16{nbsp}GB RAM, and sufficient storage for caching.
 
 Clients should never be directly attached to the {productname} Server in production systems.
 
@@ -94,7 +94,7 @@ for k in $(salt-key -l un|grep -v Unaccepted); do salt-key -y -a $k; sleep 15; d
 
 === Salt Clients and the RNG
 
-All communication to and from Salt Clients is encrypted.
+All communication to and from Salt clients is encrypted.
 During client onboarding, Salt uses asymmetric cryptography, which requires available entropy from the Random Number Generator (RNG) facility in the kernel.
 If sufficient entropy is not available from the RNG, it will significantly slow down communications.
 This is especially true in virtualized environments.
@@ -117,10 +117,10 @@ Limit the number of non-onboarded clients for optimal performance.
 
 === Disabling the Salt Mine
 
-In older versions, {productname} used a facility called Salt mine to check client availability.
+In older versions, {productname} used a tool called Salt mine to check client availability.
 The Salt mine would cause clients to contact the server every hour, which created significant load.
 With the introduction of a more efficient mechanism in {productname}{nbsp}3.2, the Salt mine is no longer required.
-Instead, the {productname} server uses Taskomatic to ping only the clients that appear to have been offline for twelve hours or more, with all clients being contacted at least once in every twenty four hour period by default.
+Instead, the {productname} Server uses Taskomatic to ping only the clients that appear to have been offline for twelve hours or more, with all clients being contacted at least once in every twenty four hour period by default.
 You can adjust this by changing the [systemitem]``web.system_checkin_threshold`` parameter in [path]``rhn.conf``.
 The value is expressed in days, and the default value is [literal]``1``.
 
@@ -129,12 +129,16 @@ If the Salt mine is running on your system, you can reduce load by disabling it.
 This is especially effective if you have a large number of clients.
 
 Disable the Salt mine by running this command on the server:
+----
+salt '*' state.sls util.mgr_mine_config_clean_up
+----
 
+This will restart the clients and generate some Salt events to be processed by the server.
+If you have a large number of clients, handling these events could create excessive load.
+To avoid this, you can execute the command in batch mode with this command:
 ----
 salt --batch-size 50 '*' state.sls util.mgr_mine_config_clean_up
 ----
-
-Note that this will restart the `salt-minion` service on clients and generate some Salt events to be processed by the server.
 
 You will need to wait for this command to finish executing.
 Do not end the process with kbd:[Ctrl+C].
@@ -158,7 +162,7 @@ We recommend disabling these jobs:
 * Hourly synchronization of Cobbler files: [systemitem]``cobbler-sync-default``
 * Daily gatherer and subscription matcher: [systemitem]``gatherer-matcher-default``
 
-Please do not attempt disabling any other job, as that might prevent the correct functioning of {productname}.
+Do not attempt to disable any other jobs, as it could prevent {productname} from functioning correctly.
 
 
 === Swap and Monitoring
