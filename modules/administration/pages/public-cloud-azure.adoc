@@ -12,15 +12,13 @@ The image is a pre-built image created by {suse}.
 It is based on JeoS, and SUSE Manager is pre-installed but not configured.
 Configuring SUSE Manager has to be done manually with {yast}.
 
-When you create your Azure virtual machine, choose the `B2ms` size.
-The `B2ms` VM contains:
-
-* 2{nbsp}vCPUs
-* 8{nbsp}GB RAM
+When you create your Azure virtual machine, choose something `like d8s_v3` with 8{nbsp}vCPUs and 32{nbsp}GB RAM.
+////
 * Up to 4 data disks
 * Max IOPS 2400
 * Temporary storage disk of 16{nbsp}GB.
 Data on this disk will be destroyed after the guest has been switched off.
+////
 
 When you are setting up disk partitioning, we recommend:
 
@@ -78,7 +76,7 @@ When you are setting up networking, we recommend that you create a separate priv
 // REMARK: Where do you configure this?
 
 Configure the {productname} Server to use the internal IP address `10.0.0.4`.
-Ensure it is accessible from outside the network with IP `10.89.171.101`.
+Ensure it is also accessible from outside the network with a fixed IP address.
 
 Configure the firewall to only allow inbound traffic on ports `22`, `80`, and `443` to IP address `10.0.0.4`.
 In this environment, if other servers are added to the network they cannot be reached from outside the network.
@@ -98,8 +96,9 @@ Ensure that your {productname} Server is registered with {scc}.
 
 When your server is registered, install these extra packages:
 ----
-zypper -n in spacecmd mlocate sysstat
+zypper -n in spacecmd spacewalk-utils mlocate sysstat
 ----
+// spacecmd will be installed by default next time
 
 Apply the latest updates and reboot the server:
 ----
