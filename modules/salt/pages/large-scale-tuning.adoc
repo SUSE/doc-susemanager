@@ -7,7 +7,7 @@ For installations with more than 1000 clients per {productname} Server, adequate
 [WARNING]
 ====
 The instructions in this section can have severe and catastrophic performance impacts when improperly used.
-In some cases, they can cause your {productname} to completely cease functioning.
+In some cases, they can cause {productname} to completely cease functioning.
 Always test changes before implementing them in a production environment.
 During implementation, take care when changing parameters.
 Monitor performance before and after each change, and revert any steps that do not produce the expected result.
@@ -56,24 +56,25 @@ image::parameter_graph.svg[Tuning dependency graph]
 
 .Key to the Dependency Graph
 * 3D boxes are hardware design variables or constraints
-* Oval-shaped borders are software or system design variables or constraints
-* Rectangle-shaped borders are configurable parameters, color-coded by configuration file
+* Oval-shaped boxes are software or system design variables or constraints
+* Rectangle-shaped boxes are configurable parameters, color-coded by configuration file:
 ** Red: Apache `httpd` configuration files
 ** Blue: Salt configuration files
 ** Brown: Tomcat configuration files
 ** Grey: PostgreSQL configuration files
 ** Purple: `/etc/rhn/rhn.conf`
-* Dashed lines indicate a variable or constraint that might require a change to another parameter
-* Solid lines indicate that changing a configuration parameter requires checking another one to prevent issues
+* Dashed connecting lines indicate a variable or constraint that might require a change to another parameter
+* Solid connecting lines indicate that changing a configuration parameter requires checking another one to prevent issues
 
 
 After the initial tuning has been completed, you will need to consider tuning again in these cases:
 
 * If your tuning inputs change significantly
-* If special conditions arise that require a certain parameter to be changed (for example, if specific warnings appear in a log file)
+* If special conditions arise that require a certain parameter to be changed.
+For example, if specific warnings appear in a log file.
 * If performance is not satisfactory
 
-To re-tune your installation, you will need to visit the dependency graph again.
+To re-tune your installation, you will need to use the dependency graph again.
 Start from the node where significant change has happened.
 
 
@@ -85,7 +86,7 @@ This section contains information about environmental variables (inputs to the t
 [[network-bandwidth]]
 Network Bandwidth::
 A measure of the typically available egress bandwith from the {productname} Server host to the clients or {productname} Proxy hosts.
-This should take into account network hardware and topology as well as possible capacity limits on switches, routers, and other network equipment between the Server and clients.
+This should take into account network hardware and topology as well as possible capacity limits on switches, routers, and other network equipment between the server and clients.
 
 [[channel-count]]
 Channel count::
@@ -105,7 +106,7 @@ Storage and computing requirements are different in each case.
 
 [[user-count]]
 User count::
-The expected maximum amount of concurrent users interacting with the Web UI plus the number of programs simultaneously using the XMLRPC API.
+The expected maximum amount of concurrent users interacting with the {webui} plus the number of programs simultaneously using the XMLRPC API.
 Includes `spacecmd`, `spacewalk-clone-by-date`, and similar.
 
 
@@ -123,13 +124,13 @@ This section contains information about the available parameters.
 | Description          | The maximum number of HTTP requests served simultaneously by Apache httpd.
                          Proxies, {webui}, and XMLRPC API clients each consume one.
                          Requests exceeding the parameter will be queued and might result in timeouts.
-| Tune when            | xref:user-count[User count] and Proxy count increase significantly and this line appears in [path]``/var/log/apache2/error_log``: [systemitem]``[...] [mpm_prefork:error] [pid ...] AH00161: server reached MaxRequestWorkers setting, consider raising the MaxRequestWorkers setting``.
+| Tune when            | xref:user-count[User count] and proxy count increase significantly and this line appears in [path]``/var/log/apache2/error_log``: [systemitem]``[...] [mpm_prefork:error] [pid ...] AH00161: server reached MaxRequestWorkers setting, consider raising the MaxRequestWorkers setting``.
 | Value default        | 150
 | Value recommendation | 150-500
 | Location             | [path]``/etc/apache2/server-tuning.conf``, in the `prefork.c` section
 | Example              | `MaxClients = 200`
 | After changing       | Immediately change xref:server-limit[`ServerLimit`] and check xref:max-threads[`maxThreads`] for possible adjustment.
-| Notes                | This parameter was renamed to `MacRequestWorkers`, both names are valid.
+| Notes                | This parameter was renamed to `MaxRequestWorkers`, both names are valid.
 | More information     | https://httpd.apache.org/docs/2.4/en/mod/mpm_common.html#maxrequestworkers
 |===
 
@@ -192,7 +193,7 @@ This section contains information about the available parameters.
 
 [cols="1,1"]
 |===
-| Description          | Maximum number of threads in Tomcat dedicated to asynchronous operations, including handling of incoming Salt events
+| Description          | The maximum number of threads in Tomcat dedicated to asynchronous operations, including handling of incoming Salt events
 | Tune when            | xref:client-count[Client count] increases significantly
 | Value default        | 5
 | Value recommendation | 50 - 150
@@ -211,8 +212,8 @@ This section contains information about the available parameters.
 
 [cols="1,1"]
 |===
-| Description          | The maximum amount of minions concurrently executing a scheduled Action.
-| Tune when            | xref:client-count[Client count] reaches several thousands and Actions are not executed quickly enough.
+| Description          | The maximum number of minions concurrently executing a scheduled action.
+| Tune when            | xref:client-count[Client count] reaches several thousands and actions are not executed quickly enough.
 | Value default        | 200
 | Value recommendation | 200-500
 | Location             | [path]``/etc/rhn/rhn.conf``
@@ -229,7 +230,7 @@ This section contains information about the available parameters.
 
 [cols="1,1"]
 |===
-| Description          | Before any Action is executed on a client, a presence ping is executed to make sure the client is reachable.
+| Description          | Before any action is executed on a client, a presence ping is executed to make sure the client is reachable.
                          This parameter sets the amount of time before a second command (`find_job`) is sent to the client to verify its presence.
                          Having many clients typically means some will respond faster than others, so this timeout could be raised to accommodate for the slower ones.
 | Tune when            | xref:client-count[Client count] increases significantly, or some clients are responding correctly but too slowly, and {productname} excludes them from calls.
@@ -248,7 +249,7 @@ This section contains information about the available parameters.
 
 [cols="1,1"]
 |===
-| Description          | Before any Action is executed on a client, a presence ping is executed to make sure the client is reachable.
+| Description          | Before any action is executed on a client, a presence ping is executed to make sure the client is reachable.
                          After xref:java-salt-presence-ping-timeout[`java.salt_presence_ping_timeout`] seconds have elapsed without a response, a second command (`find_job`) is sent to the client for a final check.
                          This parameter sets the number of seconds after the second command after which the client is definitely considered offline.
                          Having many clients typically means some will respond faster than others, so this timeout could be raised to accommodate for the slower ones.
@@ -341,7 +342,7 @@ This section contains information about the available parameters.
 
 [cols="1,1"]
 |===
-| Description          | Number of Taskomatic threads dedicated to sending commands to Salt clients as a result of Actions being executed.
+| Description          | Number of Taskomatic threads dedicated to sending commands to Salt clients as a result of actions being executed.
 | Tune when            | xref:client-count[Client count] is in the thousands.
 | Value default        | 1
 | Value recommendation | 1-10
@@ -507,7 +508,7 @@ This section contains information about the available parameters.
                          Setting a lower parameter typically reduces swap usage and results in better performance, especially when RAM memory is abundant.
 | Tune when            | RAM increases, or swap is used when RAM memory is sufficient.
 | Value default        | 60
-| Value recommendation | 1-60. For 128 GiB of RAM, 10 is expected to give good results.
+| Value recommendation | 1-60. For 128{nbsp}GB of RAM, 10 is expected to give good results.
 | Location             | [path]``/etc/sysctl.conf``
 | Example              | `vm.swappiness = 20`
 | More information     | https://www.suse.com/documentation/sles-15/book_sle_tuning/data/cha_tuning_memory_vm.html
@@ -528,15 +529,15 @@ Stop all {productname} services and inspect the output of [command]``free -h``.
 Java-based components::
 This includes Taskomatic, Tomcat, and `rhn-search`.
 These services support a configurable memory cap.
-The Salt master::
+The {productname} Server::
 Depends on many factors and can only be estimated.
 Measure PostgreSQL reserved memory by checking xref:shared-buffers[`shared_buffers`], permanently.
 You can also multiply xref:work-mem[`work_mem`] and xref:max-connections[`max_connections`], and multiply by three for a worst case estimate of per-query RAM.
-You will also need to check OS buffers and caches, which are used by PostgreSQL to host copies of database data.
+You will also need to check the operating system buffers and caches, which are used by PostgreSQL to host copies of database data.
 These often automatically occupy any available RAM.
 
 It is important that the {productname} Server has sufficient RAM to accommodate all of these processes, especially OS buffers and caches, to have reasonable PostgreSQL performance.
-We recommend you keep several GiB available at all times, and more as the database size on disk increases.
+We recommend you keep several gigabytes available at all times, and add more as the database size on disk increases.
 
 Whenever the expected amount of memory available for OS buffers and caches changes, update the `effective_cache_size` parameter to have PostgreSQL use it correctly.
 You can calculate the total available by finding the total RAM available, less the expected memory usage.
