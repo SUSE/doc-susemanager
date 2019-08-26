@@ -108,7 +108,7 @@ For example, if your proxy is in the US and your {productname} is in DE, enter `
 +
 
 Cname Aliases (Separated by Space)::
-Use this if your proxy server can be accessed through various DNS CNAME aliases.
+Use this if your proxy can be accessed through various DNS CNAME aliases.
 Otherwise it can be left empty.
 
 CA Password::
@@ -146,7 +146,7 @@ To check the status of the proxy system and its clients, click the proxy system'
 [[proxy.pxe.sync]]
 === Synchronize Profiles and System Information
 
-To enable PXE boot through a proxy server, additional software must be installed and configured on both the {productname} Server and the {susemgrproxy} Server.
+To enable PXE boot through a proxy, additional software must be installed and configured on both the {productname} Server and the {susemgrproxy}.
 
 . On the {productname} Server install [package]#susemanager-tftpsync#:
 +
@@ -155,7 +155,7 @@ To enable PXE boot through a proxy server, additional software must be installed
 zypper in susemanager-tftpsync
 ----
 
-. On the {susemgrproxy} Server install [package]#susemanager-tftpsync-recv#:
+. On the {susemgrproxy} install [package]#susemanager-tftpsync-recv#:
 +
 
 ----
@@ -174,11 +174,11 @@ It asks for hostname and IP address of the {productname} Server and of the proxy
 Additionally, it asks for the tftpboot directory on the proxy.
 
 // 2019-08-23, ke: It is not clear what this means:
-. On the {productname} Server, run [command]``configure-tftpsync.sh`` to configure the upload to the {susemgrproxy} server:
+. On the {productname} Server, run [command]``configure-tftpsync.sh`` to configure the upload to the {susemgrproxy}:
 +
 
 ----
-configure-tftpsync.sh FQDN_of_Proxy_Server
+configure-tftpsync.sh FQDN_of_Proxy
 ----
 
 . To start an initial synchronization on the {productname} Server run:
@@ -200,10 +200,10 @@ For more information about Cobbler, see xref:client-configuration:cobbler.adoc[C
 
 {productname} is using Cobbler to provide provisioning.
 PXE (tftp) is installed and activated by default.
-To enable systems to find the PXE boot on the {susemgrproxy} server add the following to the DHCP configuration for the zone containing the systems to be provisioned:
+To enable systems to find the PXE boot on the {susemgrproxy} add the following to the DHCP configuration for the zone containing the systems to be provisioned:
 
 ----
-next-server: <IP_Address_of_SUSE_Manager_Proxy_Server>
+next-server: <IP_Address_of_SUSE_Manager_Proxy>
 filename: "pxelinux.0"
 ----
 
@@ -224,12 +224,12 @@ If you do not use the reactivation key, you will need to re-registered all the c
 [[proxy.migration3.replace]]
 .Procedure: Replacing a {susemgrproxy} and Keeping the Clients Registered
 . Before starting the actual migration procedure, save the data from the old proxy, if needed.
-Consider copying important data to a central place that can also be accessed by the new proxy server.
+Consider copying important data to a central place that can also be accessed by the new proxy.
 // REMARK: 2019-08-23, ke: this is unclear
 // ** Copy the scripts that are still needed.
 // ** Copy the activation keys from the previous server.
 // Of course, it is always better to re-create the keys.
-. Shutdown the proxy server.
+. Shutdown the proxy.
 . Install a new {susemgrproxy}{nbsp}{productnumber}, following xref:install-proxy-unified.adoc[Proxy Installation].
 . In the {productname} {webui} select the newly installed {susemgrproxy} and delete it from the systems list.
 [[step.at.proxy.migration3.replace.react]]
