@@ -1,98 +1,92 @@
 [[bp.sp.migration.version]]
-= Migrating {productname} from Version 3.1 to 3.2
+= Migrating from Version 3.1 to 3.2
 
 
+Migrating {productname} from version 3.1 to 3.2 can be done using either the {yast} Online Migration tool, or with the Zypper command line tool.
 
-The migration can either be done with the Online Migration tool ({yast}) or with the Zypper command line tool.
+// So on my desktop, YaST calls it "online upgrades". We should check this terminology. LKB 2019-08-21
 
-.Requirements
 {productname} {productnumber} requires {slsa} 12 SP3 or later, with PostgreSQL version 9.6.
 Check the release notes for more information about these requirements.
 If you want to upgrade from an earlier version of {productname}, check the relevant product documentation.
 
-[NOTE]
-.Reduce Installation Size
+[WARNING]
 ====
-When performing the migration, {yast} will install all recommended packages.
-Especially in the case of custom minimal installations, this may increase the installation size of the system significantly.
+Before migrating to SLES 12 SP3 or later, check whether PostgreSQL is already updated to version 9.6.
+For more information, see xref:upgrade:db-migration.adoc[].
+====
 
-To change this default behavior and allow only required packages, adjust [path]``/etc/zypp/zypp.conf`` and set the following variable:
+[IMPORTANT]
+====
+Upgrades should be run from a text console, rather than a graphical interface like GNOME.
+If you are logged into a GNOME session running on the machine you are going to update, you will need to switch to a text console.
+This does not apply if you are logged in from a remote machine (unless you are running a VNC session with GNOME).
+====
 
+
+== Migrate Using {yast}
+
+To perform the migration with {yast}, use the Online Migration tool.
+
+.Procedure: Migrating with {yast}
+
+. From the command prompt, as root, launch the {yast} online migration tool:
++
+----
+yast2 migration
+----
+{yast} will show the possible migration targets with detailed summaries.
+// I've removed the graphical option, because we tell people to use a text console. LKB 2019-08-21
+. Select the appropriate target, and follow the prompts to complete the migration.
+. Ensure the spacewalk services are running:
++
+----
+spacewalk-service start
+----
+
+
+If the process fails, check these issues first:
+
+* If {yast} does not have the online migration module available, install the [package]``yast2-migration`` package.
+After installing, restart {yast} to ensure the module is available.
+* If there are older updates available, {yast} will notify you and ask to install them first.
+We strongly recommend you install all updates before performing the upgrade.
+
+During the migration, {yast} will install all recommended packages.
+This can significantly increase the installation size of the system.
+To only install required packages, open the [path]``/etc/zypp/zypp.conf`` configuration file and set this variable:
 ----
 solver.onlyRequires = true
-installRecommends=false # or commented
+installRecommends=false
 ----
 
-This changes the behavior of all package operations, such as the installation of patches or new packages.
-====
+This changes the behavior of all future package operations.
 
 
 
-[[bp.sp.migration.version.yast]]
-== Using {yast}
+== Migrate Using Zypper
 
-[WARNING]
-.Checking PostgreSQL Version
-====
-Before migrating to SLES 12 SP3 or later, check whether PostgreSQL is already updated to version 9.6.
-For more information, see <<bp.postgresql.database.migration>>.
-====
 
-To perform the migration with {yast}, use the menu:Online Migration[] tool:
+To perform the migration with Zypper, use the migration tool.
 
-.Procedure: Migrating using {yast}
-. If you are logged into a GNOME session running on the machine you are going to update, switch to a text console.
-Running the update from within a GNOME session is not recommended.
-This does not apply when being logged in from a remote machine (unless you are running a VNC session with GNOME).
 
-. Start in {yast}menu:System[Online Migration] ([command]``yast2 migration``).
-{yast} will show possible migration targets with detailed summaries.
+.Procedure: Migrating with Zypper
+. From the command prompt, as root, launch the Zypper migration tool:
 +
-
-In case of trouble, resolve the following issues first:
+----
+zypper migration
+----
+Zypper will show the possible migration targets with detailed summaries.
+. Select the appropriate target, and follow the prompts to complete the migration.
+. Ensure the spacewalk services are running:
 +
-
-** If the menu:Online Migration[] is not available, install the [package]#yast2-migration# package and its dependencies.
-Restart {yast} , otherwise the newly installed module will not be shown in the control center.
-
-** If there are "`old`" online updates available for installation, the migration tool will warn and ask to install them now before starting the actual migration.
-It is recommended to install all updates before proceeding.
+----
+spacewalk-service start
+----
 
 
+If the process fails, check these issues first:
 
-[[bp.sp.migration.version.zypper]]
-== Using zypper
-
-
-[WARNING]
-.Checking PostgreSQL Version
-====
-Before migrating to SLES 12 SP3 or later, check whether PostgreSQL is already updated to version 9.6.
-For more information, see <<bp.postgresql.database.migration>>.
-====
-
-
-To perform the migration with Zypper on the command-line, use the [command]``zypper migration`` subcommand tool:
-
-.Procedure: Migrating using [command]``zypper migration``
-. If you are logged into a GNOME session running on the machine you are going to update, switch to a text console.
-Running the update from within a GNOME session is not recommended.
-This does not apply when being logged in from a remote machine (unless you are running a VNC session with GNOME).
-
-. The [command]``zypper migration`` subcommand show possible migration targets and a summary.
-+
-
-In case of trouble, resolve the following issues first:
-+
-
-** If the [command]``migration`` subcommand is not available install the [package]#zypper-migration-plugin# package and its dependencies.
-** If there are "`old`" online updates available for installation, the migration tool will warn and ask to install them now before starting the actual migration.
-It is recommended to install all updates before proceeding.
-
-. If more than one migration target is available for your system, select one from the list (specify the number).
-
-. Read the notification and update the {productname} database schema as described ([command]``spacewalk-schema-upgrade``).
-
-. Make sure {productname} is up and running ([command]``spacewalk-service start``).
-
-After finishing the migration procedure {productname} 3.2 on {slsa} 12 SP3 or later is available to be used.
+* If {zypper}  does not have the migration tool available, install the [package]``zypper-migration-plugin`` package.
+* If there are older updates available, Zypper will notify you and ask to install them first.
+We strongly recommend you install all updates before performing the upgrade.
