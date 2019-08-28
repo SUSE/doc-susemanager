@@ -7,7 +7,6 @@ This section contains a number of suggestions for hardening your security postur
 The primary focus is to reduce the likelihood that a bad actor could access Salt clients in the case of a breach of the {productname} Server.
 In this case, we assume that the Salt master is running on the {productname} Server.
 
-
 To begin, there are some built-in mechanisms that make the {productname} Server less vulnerable to bad actors.
 The Salt master runs as a non-privileged user, and the Salt API only listens on localhost, not an external address.
 
@@ -38,18 +37,18 @@ The key is is regenerated every 24 hours, or whenever a client is removed.
 Client pillar data is also encrypted with AES.
 In this case, a new AES session key is created every time a pillar is refreshed.
 
-Running Salt commands as root may be avoided by additional configuration in Salt. This allows for administrators to run salt commands as his or her user id and enables better auditing.
 
-If implementing non-root users, additional security may be added such as only allowing specific salt commands. Salt even allows for limiting the passing of specific predicates (arguments) to those limited commands.
+You do not need to run Salt commands as root.
+This requires some additional configuration, so that administrators can run Salt commands using their user ID.
+Adjusting this also allows for improved auditing.
 
-User authentication to Active Directory or some other authentication server such as some other LDAP server may be configured for command line commands by enabling external authentication.
+You can add additional user-level controls, such as only allowing specific Salt commands.
+When you have selected a subset of allowed Salt commands, you can further limit the arguments that are accepted for each command.
 
-Of course {productname} may authenticate to an LDAP server with RBAC.
+You can configure additional user authentication mechanisms, by connecting to an Active Directory or other user authentication mechanism.
+You can also enable external authentication methods like LDAP for command line access.
+When you set up LDAP, it is also possible to connect to the LDAP server using RBAC.
 
-Jobs issued through {productname} will be logged in the database. Jobs issues at the command line will be logged in /var/log/salt/master. Jobs may be logged to a remote server by implementing an external master job cache.
-
-We need to get engineering's approval, but showed at SaltConf integration the {productname} with SaltStack Enterprise. This may provide additional management, auditing, integration, and oversite.
-
-In some situations (multi-master, multi-tenant) Salt masters may be managed by an upstream master. This would need to be implemented carefully on a {productname} system, but could allow for remote management of security settings, reacting to any unauthorized changes, and enforcement of the proper state of the {productname}/Salt Master system. This should also get approval from engineering.
-
-We could dive deeper into each of these things if you think the customer needs it, but at a high level there are many proactive actions that may be taken to avoid a security breach.
+Jobs issued through the {productname} {webui} are logged in a database.
+Jobs issues at the command line are logged to [path]``/var/log/salt/master``.
+Jobs can also be logged to a remote server, by using an external master job cache.
