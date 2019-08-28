@@ -1,0 +1,55 @@
+[[security-hardening]]
+= Security Hardening
+
+While no implementation is ever completely secure from bad actors, there are some things you can do within {productname} to improve your security.
+
+This section contains a number of suggestions for hardening your security posture.
+The primary focus is to reduce the likelihood that a bad actor could access Salt clients in the case of a breach of the {productname} Server.
+In this case, we assume that the Salt master is running on the {productname} Server.
+
+
+To begin, there are some built-in mechanisms that make the {productname} Server less vulnerable to bad actors.
+The Salt master runs as a non-privileged user, and the Salt API only listens on localhost, not an external address.
+
+Additionally, Salt clients cannot send jobs to the Salt master in the default configuration.
+This can be manually adjusted, but it is not recommended.
+
+There are a limited number of ports required for clients to communicate with the server, which simplifies network management.
+The only required ports are 4505 and 4506.
+Ports 80 and 443 are only used for package repositories, and they secured with SSL trusted certificates and GPG keys.
+
+The server never initiates a TCP handshake with a client.
+Clients initiate every connection, and the communication is bi-drectional after initiation.
+
+Each client creates a set of RSA keys.
+The public key is accepted by the server when a new system is added.
+If the keys are secure on the server, only clients with the correct private keys can be authenticated.
+The keys should be secured by specific users.
+
+For extra key security, you can implement a key policy.
+A key policy that allows only pre-seeded keys on the master is the most secure.
+Additionally, you can implement a key policy that allows clients to communicate only with a master that has a specific digital fingerprint.
+
+You can also implement a key size limit to increase security.
+
+All data between the server and clients is encrypted with a shared AES key.
+The key is is regenerated every 24 hours, or whenever a client is removed.
+
+Client pillar data is also encrypted with AES.
+In this case, a new AES session key is created every time a pillar is refreshed.
+
+Running Salt commands as root may be avoided by additional configuration in Salt. This allows for administrators to run salt commands as his or her user id and enables better auditing.
+
+If implementing non-root users, additional security may be added such as only allowing specific salt commands. Salt even allows for limiting the passing of specific predicates (arguments) to those limited commands.
+
+User authentication to Active Directory or some other authentication server such as some other LDAP server may be configured for command line commands by enabling external authentication.
+
+Of course {productname} may authenticate to an LDAP server with RBAC.
+
+Jobs issued through {productname} will be logged in the database. Jobs issues at the command line will be logged in /var/log/salt/master. Jobs may be logged to a remote server by implementing an external master job cache.
+
+We need to get engineering's approval, but showed at SaltConf integration the {productname} with SaltStack Enterprise. This may provide additional management, auditing, integration, and oversite.
+
+In some situations (multi-master, multi-tenant) Salt masters may be managed by an upstream master. This would need to be implemented carefully on a {productname} system, but could allow for remote management of security settings, reacting to any unauthorized changes, and enforcement of the proper state of the {productname}/Salt Master system. This should also get approval from engineering.
+
+We could dive deeper into each of these things if you think the customer needs it, but at a high level there are many proactive actions that may be taken to avoid a security breach.
