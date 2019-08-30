@@ -1,28 +1,22 @@
 [[db-migration]]
 = Database Migration
 
-If you want to upgrade {productname} 3.2 to {productname} 4 you must check whether {productname} 3.2 is already based PostgreSQL version 10.  If yes, you can skip this section.  If it is based on a older version such as 9.6 you must migrate PostgreSQL to version 10 first.
+This is about PostgreSQL database migration.
+
+If you want to upgrade {productname} 3.2 to {productname} 4 you must check whether {productname} 3.2 is already based PostgreSQL version 10.
+If yes, you can skip this section.
+If it is based on a older one such as version 9.6 you must migrate PostgreSQL to version 10 first.
+For more information about migrating PostgreSQL 9.6 to version 10, see xref:db-migration.adoc#db-migration-prepare[].
+If you still run PostgreSQL 9.4 on {productname} 3.2 see the 3.2 product documentation at https://www.suse.com/documentation/suse-manager-3/3.2/susemanager-best-practices/html/book.suma.best.practices/bp.sp.migration.html#sp.migration.postgresql.
+Direct migration from PostgreSQL 9.4 to version 10 is not supported.
 
 
 
 
-
-When you installed {productname} Server 3.1 or earlier on {sls}{nbsp}12{nbsp}SP2 or earlier, it was based on a PostgreSQL{nbsp}9.4 database.
-PostgreSQL{nbsp}9.4 can be upgraded to PostgreSQL{nbsp}9.6.
-
-{productname}{nbsp}3 uses PostgreSQL{nbsp}9.4 by default.
-{sls}{nbsp}12{nbsp}SP3 uses PostgreSQL{nbsp}9.6 by default.
-
-This chapter provides information on managing your PostgreSQL database, and provides instructions for upgrading your database to PostgreSQL{nbsp}9.6.
-
-{productname}{nbsp}3.1 on {sls}{nbsp}12{nbsp}SP3 and {productname}{nbsp}3.2 use PostgreSQL{nbsp}9.6 by default.
-If you use one of those you can skip this section.
-
-
-
+[[db-migration-prepare]]
 == Prepare to Upgrade
 
-Before you begin the upgrade, prepare your existing system and create a database backup.
+Before you begin the upgrade, prepare your existing 3.2 system and create a database backup.
 
 PostgreSQL stores data at [path]``/var/lib/pgsql/data/``, and logs to [path]``/var/lib/pgsql/data/pg_xlog/``.
 
@@ -34,25 +28,27 @@ PostgreSQL stores data at [path]``/var/lib/pgsql/data/``, and logs to [path]``/v
 psql --version
 ----
 +
-If you are using PostgreSQL{nbsp}9.4, you can upgrade to PostgreSQL{nbsp}9.6.
+If you are using PostgreSQL{nbsp}9.6, you can upgrade to PostgreSQL{nbsp}10.
 . Check the active smdba version:
 +
 ----
 rpm -q smdba
 ----
 +
-PostgreSQL{nbsp}9.6 requires smdba version 1.5.8 or later.
+PostgreSQL{nbsp}10 requires ``smdba`` version 1.5.8 or later.
 . Perform a database backup.
 For more information on backing up, see xref:administration:backup-restore.adoc[].
 
-[WARNING]
-====
-Always create a database backup before performing a migration.
-====
 
 
 
 == Upgrade PostgreSQL
+
+[WARNING]
+====
+Always create a database backup before performing a migration.
+For more information about a database backup, see xref:db-migration.adoc#db-migration-prepare[].
+====
 
 PostgreSQL upgrades can be performed in two ways: a regular upgrade, or a fast upgrade.
 A regular upgrade will create a complete copy of the database, so you will need double the existing database size of space available.
