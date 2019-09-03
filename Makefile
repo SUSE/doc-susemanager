@@ -82,6 +82,10 @@ clean: ## Remove build artifacts from output directory (Antora and PDF)
 
 # SUMA DOCUMENTATION BUILD COMMANDS
 
+.PHONY: validate-suma
+validate-suma: ## Validates page references and prints a report (Does not build the site)
+	NODE_PATH="$(npm -g root)" antora --generator @antora/xref-validator suma-site.yml
+
 # To build for suma-webui or uyuni you need to comment out the correct name/title in the antora.yml file. (TODO remove this manual method.)
 .PHONY: antora-suma
 antora-suma: clean pdf-all-suma ## Build the SUMA Antora static site (See README for more information)
@@ -255,6 +259,12 @@ pdf-architecture-suma: ## Generate PDF version of the SUMA Architecture Guide
 
 
 # UYUNI DOCUMENTATION BUILD COMMANDS
+
+.PHONY: validate-uyuni
+validate-uyuni: ## Validates page references and prints a report (Does not build the site)
+	NODE_PATH="$(npm -g root)" antora --generator @antora/xref-validator uyuni-site.yml
+
+
 
 .PHONY: antora-uyuni
 antora-uyuni: clean pdf-all-uyuni ## Build the UYUNI Antora static site (See README for more information)
