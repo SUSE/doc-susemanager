@@ -13,8 +13,57 @@ You will need to stop the spacewalk, SAP, and database services, along with any 
 . Apply the latest updates.
 See xref:upgrade:server-upgrade.adoc[].
 . Update to the latest service pack, if required.
-See xref:upgrade:sp-migration.adoc[].
+See xref:upgrade:migrate-4x-4x.adoc[].
 . Reboot the server.
 . Check if the configuration is still correct.
 . On Salt systems, apply the highstate.
 . Start any stopped services.
+
+
+
+== Keep the Server Patched
+
+As with any &sles; system, you are encouraged to install package updates on the {susemgr} Server when they arrive.
+You install these update with {yast} online update or with ``zypper up`` or ``zypper patch``).
+Preferable, you will run these commands during a maintenance window; for more information, see xref:administration:maintenance-window.adoc#maintenance-window[].
+
+By default, several update channels are configured and enabled on the {susemgr} Server.
+Thus improved packages will become available automatically.
+Check whether the update channels are actually available:
+
+----
+zypper lr
+----
+
+Shortened output:
+
+----
+Name                                                   | Enabled | GPG Check | Refresh
+-------------------------------------------------------+---------+-----------+--------
+SLE-Module-Basesystem15-SP1-Pool                       | Yes     | (r ) Yes  | No     
+SLE-Module-Basesystem15-SP1-Updates                    | Yes     | (r ) Yes  | Yes    
+SLE-Module-Python2-15-SP1-Pool                         | Yes     | (r ) Yes  | No     
+SLE-Module-Python2-15-SP1-Updates                      | Yes     | (r ) Yes  | Yes    
+SLE-Product-SUSE-Manager-Server-4.0-Pool               | Yes     | (r ) Yes  | No     
+SLE-Product-SUSE-Manager-Server-4.0-Updates            | Yes     | (r ) Yes  | Yes    
+SLE-Module-SUSE-Manager-Server-4.0-Pool                | Yes     | (r ) Yes  | No     
+SLE-Module-SUSE-Manager-Server-4.0-Updates             | Yes     | (r ) Yes  | Yes    
+SLE-Module-Server-Applications15-SP1-Pool              | Yes     | (r ) Yes  | No     
+SLE-Module-Server-Applications15-SP1-Updates           | Yes     | (r ) Yes  | Yes    
+SLE-Module-Web-Scripting15-SP1-Pool                    | Yes     | (r ) Yes  | No     
+SLE-Module-Web-Scripting15-SP1-Updates                 | Yes     | (r ) Yes  | Yes    
+----
+
+From time to time, all the package updates are bundled and released as a maintenance update.
+If you will install such a MU, the version number will get increased from say 4.0.1 to 4.0.2.
+
+With zypper migration you will update from, say, version 4.0.x to 4.1.x:
+
+----
+zypper migration
+----
+
+This is also known as a Service Pack (SP) migration.
+
+To keep SUMA 4 patched, you either connect directly to SCC or use RMT as a local installation source.
+
