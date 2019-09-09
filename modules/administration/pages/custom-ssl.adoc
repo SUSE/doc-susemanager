@@ -3,7 +3,7 @@
 
 You can use custom certificates with {productname} and {productname} Proxy.
 
-This section covers how to use a third party SSL certificate authority with a new {productname} installation, replacing a self-signed certificate with a third party certificate, and how to replace existing third party certificates.
+This section covers how to use a third party SSL certificate authority with a new {productname} installation, replacing existing third party certificates, and replacing a self-signed certificate with a third party certificate.
 
 Before you begin, ensure you have:
 
@@ -69,12 +69,35 @@ configure-proxy.sh
 
 
 
+== Replace Existing Custom Certificates
+
+If your existing custom certificates have become corrupted or stopped working for any reason, you can generate a new certificate from the existing CA.
+
+.Procedure: Replacing an Existing Custom Certificate
+
+. On the {productname} Server, at the command prompt, regenerate the certificate:
++
+----
+rhn-ssl-tool --gen-server --dir="/root/ssl-build" --set-country="COUNTRY" \
+--set-state="STATE" --set-city="CITY" --set-org="ORGANIZATION" \
+--set-org-unit="ORGANIZATION UNIT" --set-email="name@example.com" \
+--set-hostname="susemanager.example.top" --set-cname="example.com"
+----
+Ensure that the [systemitem]``set-cname`` parameter is the fully-qualified domain name of your {productname} Server.
+You can use the the [systemitem]``set-cname`` parameter multiple times if you require multiple aliases.
+. Install the RPM that contains the newly generated certificate:
++
+----
+rpm -Uhv /root/ssl-build/lnx0259a/rhn-org-httpd-ssl-key-pair-lnx0259a-1.0-2.noarch.rpm
+----
+. Restart services to pick up the changes:
++
+----
+spacewalk-service restart
+----
+
+
+
 == Replace Self-Signed Certificates with Custom Certificates
-
-TBD
-
-
-
-== Replace Existing Custom Certificates.
 
 TBD
