@@ -1,20 +1,9 @@
 [[bp.sp.migration.version]]
-= Migrating from Version 3.1 to 3.2
+= Migrating from Version 4 to 4.x
 
-
-Migrating {productname} from version 3.1 to 3.2 can be done using either the {yast} Online Migration tool, or with the Zypper command line tool.
+Migrating {productname} from version 4 to 4.x (when available) can be done using either the {yast} Online Migration tool, or with the Zypper command line tool.
 
 // So on my desktop, YaST calls it "online upgrades". We should check this terminology. LKB 2019-08-21
-
-{productname} {productnumber} requires {slsa} 12 SP3 or later, with PostgreSQL version 9.6.
-Check the release notes for more information about these requirements.
-If you want to upgrade from an earlier version of {productname}, check the relevant product documentation.
-
-[WARNING]
-====
-Before migrating to SLES 12 SP3 or later, check whether PostgreSQL is already updated to version 9.6.
-For more information, see xref:upgrade:db-migration.adoc[].
-====
 
 [IMPORTANT]
 ====
@@ -44,7 +33,6 @@ yast2 migration
 spacewalk-service start
 ----
 
-
 If the process fails, check these issues first:
 
 * If {yast} does not have the online migration module available, install the [package]``yast2-migration`` package.
@@ -54,10 +42,10 @@ We strongly recommend you install all updates before performing the upgrade.
 
 During the migration, {yast} will install all recommended packages.
 This can significantly increase the installation size of the system.
-To only install required packages, open the [path]``/etc/zypp/zypp.conf`` configuration file and set this variable:
+To only install required packages, open the [path]``/etc/zypp/zypp.conf`` configuration file and set thes variables:
 ----
 solver.onlyRequires = true
-installRecommends=false
+installRecommends = false
 ----
 
 This changes the behavior of all future package operations.
@@ -65,7 +53,6 @@ This changes the behavior of all future package operations.
 
 
 == Migrate Using Zypper
-
 
 To perform the migration with Zypper, use the migration tool.
 
