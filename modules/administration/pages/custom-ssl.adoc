@@ -1,97 +1,68 @@
 [[custom-ssl]]
-= Using a Custom SSL Certificate
+= Custom SSL Certificates
+
+You can use custom certificates with {productname} and {productname} Proxy.
+
+This section covers how to use a third party SSL certificate authority with a new {productname} installation, replacing a self-signed certificate with a third party certificate, and how to replace existing third party certificates.
+
+Before you begin, ensure you have:
+
+* A certificate authority (CA) SSL public certificate
+* An SSL private key
+* An SSL public certificate
+
+Your key and certificate files must be in PEM format.
+
+The host name of the SSL keys and certificates must match the host name of the machine you deploy them on.
+
+If you want to use intermediate certificates, you need to merge the intermediate and root CA certificates into one file.
+Ensure that the intermediate certificate comes first in the combined file.
 
 
+== Custom Certificates for New Installations
 
+By default, {productname} uses a self-signed certificate.
+After you have completed the initial setup, you can replace the default certificate with a custom certificate.
 
+.Procedure: Installing Custom Certificates on a New {productname} Server
 
-
-The following section will guide you through using a custom certificate with {productname} {productnumber} and {susemgrproxy} {productnumber}.
-
-
-
-
-[[bp.cert.custom.req]]
-== Prerequisites
-
-
-The following list provides requirements for using a custom certificate.
-
-* A Certificate Authority (CA) SSL public certificate file
-* A Web server SSL private key file
-* A Web server SSL public certificate file
-* Key and Certificate files must be in PEM format
-
-
-.Hostname and SSL Keys
-[IMPORTANT]
-====
-The hostname of the web server's SSL keys and relevant certificate files must match the hostname of the machine which they will be deployed on.
-====
-
-.Intermediate Certificates
-[TIP]
-====
-In case you want to use CAs with intermediate certificates, merge the intermediate and root CA certificates into one file.
-It is important that the intermediate certificate comes first within the combined file.
-====
-
-
-
-
-[[bp.cert.custom.setup]]
-== Setup
-
-
-After completing {yast}
-firstboot procedures, export your current environment variables and point them to the correct SSL files to be imported.
-Running these commands will make the default certificate obsolete after executing the [command]``yast2 susemanagersetup`` command.
-For more information on {yast}
- firstboot, see https://www.suse.com/documentation/suse-manager-3/singlehtml/suse_manager21/book_susemanager_install/book_susemanager_install.html#sec.manager.inst.setup.
-[[bp.cert.custom.setup.proc]]
-
-
-[[bp.cert.custom.setup.proc.export]]
-. Export the environment variables and point to the SSL files to be imported:
+. Install the {productname} Server according to the instructions in xref:installation:install-intro.adoc[].
+. Complete the initial setup according to xref:installation:server-setup.adoc[].
+. At the command prompt, point the SSL environment variables to the custom certificate file locations:
 +
-
 ----
-export CA_CERT=`path_to_CA_certificate_file`export SERVER_KEY=`path_to_web_server_key`export SERVER_CERT=`path_to_web_server_certificate`
+export CA_CERT=`path_to_CA_certificate_file`
+export SERVER_KEY=`path_to_web_server_key`
+export SERVER_CERT=`path_to_web_server_certificate`
 ----
-. Execute {productname} setup with
+. Complete {productname} setup:
 +
-
 ----
 yast2 susemanagersetup
 ----
 +
-Proceed with the default setup.
-Upon reaching the Certificate Setup window during {yast}
-installation, fill in random values, as these will be overridden with the values specified in <<bp.cert.custom.setup.proc.export>>.
+When you are prompted for certificate details during setup, fill in random values.
+The values will be overridden by the values you specified at the command prompt.
+
+[NOTE]
+====
+Execute the [command]``yast2 susemanagersetup`` command from the same shell you exported the environment variables from.
+====
+
+
+== Custom Certificates for New Proxy Installations
+
+By default, {productname} Proxy uses a self-signed certificate.
+After you have completed the initial setup, you can replace the default certificate with a custom certificate.
+
+.Procedure: Installing Custom Certificates on a New {productname} Proxy
+
+. Install the {productname} Proxy according to the instructions in xref:installation:install-intro.adoc[].
+. Complete the initial setup according to xref:installation:proxy-setup.adoc[].
+. At the command prompt, run:
 +
-.Shell Requirements
-NOTE: Make sure that you execute [command]``yast2
-      susemanagersetup`` from within the same shell the environment variables were exported from.
-+
-
-
-
-[[bp.cert.custom.proxy]]
-== Using a Custom Certificate with {susemgrproxy}
-
-
-After completing the installation with yast found in <<advanced.topics.proxy.quickstart>> continue with a modified <<at.manager.proxy.run.confproxy>> procedure:
-
-[[bp.cert.custom.proxy.proc]]
-
-. Execute [command]``configure-proxy.sh``.
-. When prompted with:
-+
-
 ----
-Do you want to import existing certificates?
+configure-proxy.sh
 ----
-+
-Answer with kbd:[y]
-.
-. Continue by following the script prompts.
+. At the ``Do you want to import existing certificates?`` prompt, type kbd:[y]
+. Follow the prompts to complete setup.
