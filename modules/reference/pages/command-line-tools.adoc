@@ -696,23 +696,24 @@ Show help message and exit.
 
 
 [[syncing.suse.mgr.repositories.scc]]
-== Syncing SUSE Manager Repositories from SCC (mgr-sync)
+== Synchronize SUSE Manager Repositories from SCC (mgr-sync)
 
 [command]``mgr-sync`` should be used if SUSE Manager is connected to SUSE Customer Center (SCC).
 With [command]``mgr-sync`` you may add or synchronize products and channels.
 The [command]``mgr-sync`` command also enables and refreshes SCC data.
 
-
-By default, log rotation of [path]``spacewalk-repo-sync`` is disabled.
-This logfile is run by a cron job, and managed by a configuration file.
-You can enable log rotation by editing the configuration file at [path]``etc/sysconfig/rhn/reposync`` and setting the [command]``MAX_DAYS`` parameter.
-This will permit the deletion of files that are older than the specified period of time.
-
+By default, [command]``mgr-sync`` writes basic debug information to [path]``/var/log/rhn/mgr-sync.log``.
+Get more debugging information with [option]``--debug`` or by adding [literal]``mgrsync.debug = <DEBUGLEVEL>`` to [path]``/etc/rhn/rhn.conf``.
+Settings in [path]``~/.mgr-sync`` will supersede values from [path]``rhn.conf``. For example, if you set
+----
+mgrsync.debug = ""
+----
+in [path]``~/.mgr-sync``, the value in [path]``rhn.conf`` will have no effect. 
 
 [IMPORTANT]
 .Admin credentials
 ====
-[command]``mgr-sync`` now requires the username/password of a *SUSE Manager administrator*.
+[command]``mgr-sync`` requires username and password of a *SUSE Manager administrator*.
 Most functions are available as part of the public API.
 ====
 
