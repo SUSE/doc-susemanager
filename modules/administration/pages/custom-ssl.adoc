@@ -3,7 +3,7 @@
 
 You can use custom certificates with {productname} and {productname} Proxy.
 
-This section covers how to use a third party SSL certificate authority with a new {productname} installation, replacing existing third party certificates, and replacing a self-signed certificate with a third party certificate.
+This section covers how to use a third party SSL certificate authority with a new {productname} installation, and replacing existing certificate with new custom certificates.
 
 Before you begin, ensure you have:
 
@@ -69,13 +69,13 @@ configure-proxy.sh
 
 
 
-== Replace Existing Custom Certificates
+== Re-Create Existing Certificates
 
-If your existing custom certificates have become corrupted or stopped working for any reason, you can generate a new certificate from the existing CA.
+If your existing custom certificates have expired or stopped working for any reason, you can generate a new certificate from the existing CA.
 
-.Procedure: Replacing an Existing Custom Certificate
+.Procedure: Re-Creating an Existing Certificate
 
-. On the {productname} Server, at the command prompt, regenerate the certificate:
+. On the {productname} Server, at the command prompt, regenerate the server certificate:
 +
 ----
 rhn-ssl-tool --gen-server --dir="/root/ssl-build" --set-country="COUNTRY" \
@@ -98,6 +98,98 @@ spacewalk-service restart
 
 
 
-== Replace Self-Signed Certificates with Custom Certificates
+== Create New Certificates
 
-TBD
+If you need to create entirely new certificates for an existing installation, you will need to delete the old certificates before you begin.
+
+.Procedure: Creating New Certificates
+
+. On the {productname} Server, at the command prompt, move the old certificate directory to a new location:
++
+----
+mv /root/ssl-build /root/old-ssl-build
+----
+. Generate a new CA certificate:
++
+----
+rhn-ssl-tool --gen-ca --dir="/root/ssl-build" --set-country="COUNTRY" \
+--set-state="STATE" --set-city="CITY" --set-org="ORGANIZATION" \
+--set-org-unit="ORGANIZATION UNIT" --set-common-name="SUSE Manager CA Certificate" \
+--set-email="name@example.com"
+----
+. Generate a new server certificate:
++
+----
+rhn-ssl-tool --gen-server --dir="/root/ssl-build" --set-country="COUNTRY" \
+--set-state="STATE" --set-city="CITY" --set-org="ORGANIZATION" \
+--set-org-unit="ORGANIZATION UNIT" --set-email="name@example.com" \
+--set-hostname="susemanager.example.top" --set-cname="example.com"
+----
+Ensure that the [systemitem]``set-cname`` parameter is the fully-qualified domain name of your {productname} Server.
+You can use the the [systemitem]``set-cname`` parameter multiple times if you require multiple aliases.
+. Generate the CA certificate RPM:
++
+----
+rhn-ssl-tool --gen-ca --rpm-only --dir="/root/ssl-build" \
+--from-ca-cert=`path_to_certificate_file`
+----
+. Generate the server certificate RPM:
++
+----
+rhn-ssl-tool --gen-server --rpm-only --dir="/root/ssl-build" \
+--from-server-key=`path_to_server_key_file` \
+--from-server-cert=`path_to_server certificate_file`
+----
+You will need to generate a server certificate RPM for each proxy, using their host names and cnames.
+. Create a new CA file that combines the old and new certificate details, and generate a new RPM:
++
+----
+mkdir /root/combined-ssl-build
+cp /root/old-ssl-build/RHN-ORG-TRUSTED-SSL-CERT /root/combined-ssl-build/
+cat /root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT >> /root/combined-ssl-build/RHN-ORG-TRUSTED-SSL-CERT
+cp /root/old-ssl-build/*.rpm /root/combined-ssl-build/
+rhn-ssl-tool --gen-ca --rpm-only --dir="/root/combined-ssl-build"
+----
+// I would like to split up these steps, I think. LKB 2019-09-10
+. Deploy the CA certificate on the server:
++
+----
+/usr/bin/rhn-deploy-ca-cert.pl --source-dir /root/combined-ssl-build \
+--target-dir /srv/www/htdocs/pub/ --trust-dir=/etc/pki/trust/anchors/
+----
+
+When you have completed this procedure, you can deploy the new certificate on your clients.
+
+
+.Procedure: Deploying Certificates on Traditional Clients
+
+. On the client, create a new custom channel using these details:
++
+* Name: SSL-CA-Channel
+* Label: ssl-ca-channel
+* Parent Channel: <choose the parent channel of a clients>
+* Summary: SSL-CA-Channel
+
++
+For more on creating custom channels, see xref:administration:channel-management.adoc[].
+. Upload the CA certificate RPM to the channel:
++
+----
+rhnpush -c ssl-ca-channel --nosig \
+--ca-chain=/srv/www/htdocs/pub/RHN-ORG-TRUSTED-SSL-CERT \
+/root/combined-ssl-build/rhn-org-trusted-ssl-cert-1.0-2.noarch.rpm
+----
+. Subscribe all clients to the new ``SSL-CA-Channel`` channel.
+. Install the CA certificate RPM on all clients by updating the channel.
+
+.Procedure: Deploying Certificates on Salt Clients
+
+// Does the above procedure also work for Salt? LKB 2019-09-10
+
+. On the client, in the {productname} {webui}, navigate to menu:Salt[Remote Commands].
+. In the first field, enter [guimenu]``salt-call state.apply certs``.
+In the second field, after the ``@``, enter [guimenu]``*``.
+Click btn:[Find Targets].
+. Check that the appropriate clients are displayed, and click btn:[Run Command] to deploy the certificates on the clients.
+
+image::deploy_cert_salt.png[scaledwidth=80%]
