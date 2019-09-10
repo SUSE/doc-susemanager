@@ -27,6 +27,17 @@ As with any {sle} system, you are encouraged to install package updates on the {
 You can install these update with {yast} online update (see SLE Administration Guide, Chapter Common Tasks, https://www.suse.com/documentation/sles-15/book_sle_admin/data/cha_onlineupdate_you.html) or with ``zypper up`` or ``zypper patch`` (see SLE Administration Guide, Chapter Common Tasks, Section Managing Software with Command Line Tools, https://www.suse.com/documentation/sles-15/book_sle_admin/data/sec_zypper.html).
 Preferable, you will run such a tool within a maintenance window; for more information, see xref:administration:maintenance-window.adoc#maintenance-window[].
 
+//// complete procedure, also see above:
+1. Log in as root user to the SUSE Manager server.
+2. Stop the Spacewalk service:
+   spacewalk-service stop
+3. Apply the patch using either zypper patch or YaST Online Update.
+4. Upgrade the database schema:
+    spacewalk-schema-upgrade
+5. Start the Spacewalk service:
+    spacewalk-service start
+////
+
 By default, several update channels are configured and enabled for the {susemgr} Server.
 Thus improved packages will become available automatically.
 Check whether the update channels are actually available:
@@ -57,6 +68,7 @@ SLE-Module-Web-Scripting15-SP1-Updates                 | Yes     | (r ) Yes  | Y
 Additionally, from time to time all the package updates are bundled and released as a maintenance update.
 If you want to  install such a MU, the version number of the {susemgr} product will get increased from 4.0.1 to 4.0.2, for example.
 You can verify the version number at the botton of the navigation bar.
+You can also fetch the version number with the [literal]``api.getVersion()`` XMLRPC API call.
 
 With [command]``zypper migration`` you will update the product from version 4.0.x to 4.1.x, for example:
 
