@@ -8,12 +8,14 @@ This section covers how to use a third party SSL certificate authority with a ne
 Before you begin, ensure you have:
 
 * A certificate authority (CA) SSL public certificate
-* An SSL private key
-* An SSL public certificate
+* An SSL server key
+* An SSL server certificate
 
 Your key and certificate files must be in PEM format.
 
-The host name of the SSL keys and certificates must match the host name of the machine you deploy them on.
+The host name of the SSL keys and certificates must match the fully qualified host name of the machine you deploy them on.
+You can configure the host name of the certificate by editing the ``X509v3 Subject Alternative Name`` section of the certificate itself.
+You can also list multiple host names if your environment requires it.
 
 If you want to use intermediate certificates, you need to merge the intermediate and root CA certificates into one file.
 Ensure that the intermediate certificate comes first in the combined file.
@@ -85,7 +87,9 @@ rhn-ssl-tool --gen-server --dir="/root/ssl-build" --set-country="COUNTRY" \
 ----
 Ensure that the [systemitem]``set-cname`` parameter is the fully-qualified domain name of your {productname} Server.
 You can use the the [systemitem]``set-cname`` parameter multiple times if you require multiple aliases.
-. Install the RPM that contains the newly generated certificate:
+. Install the RPM that contains the newly generated certificate.
+Check that you have the latest version of the RPM before running this command.
+The version number is incremented every time you re-create the certificates.
 +
 ----
 rpm -Uhv /root/ssl-build/lnx0259a/rhn-org-httpd-ssl-key-pair-lnx0259a-1.0-2.noarch.rpm
@@ -102,6 +106,15 @@ spacewalk-service restart
 
 If you need to create entirely new certificates for an existing installation, you will need to delete the old certificates before you begin.
 
+[IMPORTANT]
+====
+Be careful with this procedure!
+It is possible to break the trust chain between the server and clients using this procedure.
+If that happens, you will need an administrative user to log in to every client and deploy the CA directly.
+====
+
+
+
 .Procedure: Creating New Certificates
 
 . On the {productname} Server, at the command prompt, move the old certificate directory to a new location:
@@ -109,7 +122,7 @@ If you need to create entirely new certificates for an existing installation, yo
 ----
 mv /root/ssl-build /root/old-ssl-build
 ----
-. Generate a new CA certificate:
+. Generate a new CA certificate and create an RPM:
 +
 ----
 rhn-ssl-tool --gen-ca --dir="/root/ssl-build" --set-country="COUNTRY" \
@@ -117,7 +130,7 @@ rhn-ssl-tool --gen-ca --dir="/root/ssl-build" --set-country="COUNTRY" \
 --set-org-unit="ORGANIZATION UNIT" --set-common-name="SUSE Manager CA Certificate" \
 --set-email="name@example.com"
 ----
-. Generate a new server certificate:
+. Generate a new server certificate and create an RPM:
 +
 ----
 rhn-ssl-tool --gen-server --dir="/root/ssl-build" --set-country="COUNTRY" \
@@ -127,19 +140,7 @@ rhn-ssl-tool --gen-server --dir="/root/ssl-build" --set-country="COUNTRY" \
 ----
 Ensure that the [systemitem]``set-cname`` parameter is the fully-qualified domain name of your {productname} Server.
 You can use the the [systemitem]``set-cname`` parameter multiple times if you require multiple aliases.
-. Generate the CA certificate RPM:
 +
-----
-rhn-ssl-tool --gen-ca --rpm-only --dir="/root/ssl-build" \
---from-ca-cert=`path_to_certificate_file`
-----
-. Generate the server certificate RPM:
-+
-----
-rhn-ssl-tool --gen-server --rpm-only --dir="/root/ssl-build" \
---from-server-key=`path_to_server_key_file` \
---from-server-cert=`path_to_server certificate_file`
-----
 You will need to generate a server certificate RPM for each proxy, using their host names and cnames.
 . Create a new CA file that combines the old and new certificate details, and generate a new RPM:
 +
