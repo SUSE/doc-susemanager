@@ -1,19 +1,223 @@
 [[content-lifecycle]]
 = Content Lifecycle Management Examples
 
+
 This section contains some common examples of content lifecycles.
 Use these examples to build your own personalised implementation.
 
+[#create-proj-for-patch-cycle]
 == Create a Project for a Monthly Patch Cycle
 
+[#create-a-filter]
+=== Create a Filter
 
-== Update the Project for a Monthly Patch Cycle to the next month
-
-
-== Enhance the Project for a Monthly Patch Cycle for Livepatching
-
-
-== Update the Project for next patch month
+In this procedure you will create a filter that excludes all patches released after a specified date.
+This filter is useful for your CLM projects that follow a monthly patch cycle.
 
 
-== Switch to a new kernel version for live patching
+.Procedure: Create the "By Date" Filter
+. Go to menu:Main Menu[Content Lifecycle > Filters] and click on btn:[Create Filter].
+
+. Enter a **Filter Name** such as __Exclude patches by date__ and from the **Filter Type** dropdown menu select **Patch (issued after)**.
+
+. Select the date and time, in this case: __August 1st, 2019 00:00am__ and click on btn:[Save].
+
+Your filter is saved and may be used for all new Projects.
+
+
+[#add-filter-to-proj]
+=== Add a Filter to a Project
+
+.Procedure: Add a Filter to a Project
+. Go to menu:Main Menu[Content Lifecycle > Projects] and select a Project from the list.
+
+. Click on btn:[Attach/Detach Filters] link. In the modal popup all available Filters
+are listed.
+
+. Select the new **Exclude patches by date** filter then click on btn:[Save].
+
+
+[#apply-filter-to-env]
+=== Apply the Filter to an Environment
+
+The Filter is now added to your filter list, but has not been applied to the project.
+To apply the filter you need to build the first environment.
+
+.Procedure: Using the Filter
+. Build the first environment.
+Click on the btn:[Build] button to initiate the build process.
+
+. OPTIONAL: Add a _Message_ for tracking the build history.
+
+. Check that the filter has worked correctly by using the new channels on a test server.
+If the tests complete successfully, promote the content to the next environment with the btn:[Promote] button.
+
+The build will take longer if you have a large number of filters, or they are very complex.
+
+[TIP]
+====
+Promotion creates a 1:1 copy of the metadata contained in the current environment to the next one. Filters determine which metadata will be used to define your channels and their content(packages).
+====
+
+[#exclude-a-patch]
+=== Exclude a Patch
+
+Initial tests can help you discover issues.
+When such issues are found you must exclude the problem patch which was released before __August 1st, 2019 00:00am__.
+For example our problem patch was given the name of: *SUSE-15-2019-1807*.
+
+.Procedure: Exclude a Patch
+. Go to menu:Main Menu[Content Lifecycle > Filters] and click on btn:[Create Filter].
+
+. Enter a **Filter Name** for example __Exclude openjdk patch__ and from the **Filter Type** dropdown select **Patch (matches Advisory Name)**.
+
+. Enter **SUSE-15-2019-1807** as __Advisory Name__ and click on btn:[Save].
+
+. Go to menu:Main Menu[Content Lifecycle > Projects] and select your Project from the list.
+
+. Click on btn:[Attach/Detach Filters] link, select also **Exclude openjdk patch: ...**
+from list and click on btn:[Save].
+
+Rebuilding a previous environment with the btn:[Build] button includes the new exclude filter with the former **by date** filter.
+
+
+[#include-a-patch]
+=== Include a Patch
+
+.Scenario: Include a Patch
+You receive a call from your Security Team.
+They inform you that an important security patch was released several days after __August 1st__.
+The name of the new patch is **SUSE-15-2019-2071**. You need to include this new patch into your next patch cycle.
+
+[IMPORTANT]
+====
+Use the btn:[Allow] Filters rule to select patches from a full source and add them to a previous environment.
+The btn:[Allow] filters rule overrides the exclude function of the btn:[Deny] filter rule.
+====
+
+.Procedure: Include a Patch
+. Go to menu:Main Menu:[Content Lifecycle > Filters] and click on btn:[Create Filter].
+
+. Enter a __Filter Name__ such as **Include kernel security fix**.
+
+. Select **Patch (Advisory Name)** as the __Filter Type__.
+
+. Select *equals* or *matches* as the __Matcher__.
+
+. Enter **SUSE-15-2019-2071** as Advisory name, click on the btn:[Allow] radio button.
+
+. Click btn:[Save] to store the Filter.
+
+. Go to menu:Main Menu[Content Lifecycle > Projects] and select your Project from the list.
+
+. Click on btn:[Attach/Detach Filters] link then select also **Include kernel security patch: ...** from the dropdown list.
+
+. Click on btn:[Save].
+
+. Rebuild the environment by clicking the btn:[Build] button.
+The required patch is now included in your patch cycle.
+
+
+[#update-a-patch-cycle]
+== Update an Existing Monthly Patch Cycle
+
+When a monthly patch cycle is over you can update the patch cycle for the new month.
+
+.Procedure: Update a Monthly Patch Cycle
+. Change the date of the **by date** filter to __September 1st__.
+Alternatively, create a new filter and change the assignment to the project.
+
+. Check if the exclude filter for **SUSE-15-2019-1807** can be detached from the project.
+There may be a new patch available for fixing this issue.
+
+. Detach the **include** filter. The filter is included by default.
+
+. Complete updating your filters then rebuild the project to create a new environment with
+patches for September 1st.
+
+
+[#enhance-project-with-livepatching]
+== Enhance a Project with Livepatching
+
+This section will help you setup filters to aid you in creating proper environments for livepatching.
+
+[IMPORTANT]
+====
+
+There are some important things to keep in mind when opting to use the livepatching feature:
+
+* Use only **one** kernel version on your systems. The livepatching packages are installed with a specific kernel.
+
+* Livepatching updates are shipped together in one patch.
+
+* Each kernel patch that begins a new series of live patching kernels will display the **required reboot**
+flag. These kernel patches come with livepatching tools. After installation you must reboot the system once before the following year.
+
+* Install livepatches that **only match** the installed kernel version.
+
+* Live patches comes as standalone patches. You must **exclude all** normal kernel patches
+which contain a higher kernel version than the one you have installed on your systems.
+====
+
+
+=== Exclude Packages with a Higher Kernel Version
+
+In this example you will update your systems with patch *SUSE-15-2019-1244* which contains *kernel-default-4.12.14-150.17.1-x86_64*.
+
+You need to exclude all patches which contain a higher version of kernel-default.
+
+Procedure: Exclude Packages with a Higher Kernel Version
+
+. Go to menu:Main Menu[Content Lifecycle > Filters] and click on btn:[Create Filter].
+
+. Enter a Filter Name such as **Exclude kernel greater than 4.12.14-150.17.1**
+
+. Select **Patch contains package with version greater than** from the Filter Type dropdown.
+
+. Enter the following values in the available fields:
+
+* Package Name: `kernel-default`
+* Epoch: `<empty>`
+* Version: `4.12.14`
+* Release: `150.17.1`
+
+. Click on btn:[Save] to store the Filter.
+
+. Go to menu:Main Menu[Content Lifecycle > Projects] and select your Project from the list.
+
+. Click on btn:[Attach/Detach Filters] link.
+
+. Select **Exclude kernel greater than 4.12.14-150.17.1: ...** from the list and click on btn:[Save].
+
+
+Once you click the btn:[Build] button a new environment will be created that contains all kernel patches up to the version you have installed.
+
+NOTE: All kernel patches with higher kernel versions are removed. Live patching kernels
+will stay available as long as they are not the first in a series.
+
+
+
+== Update the Project for Next Patch Month
+
+To update the project to the next patch month you operate similar to the case before.
+Important is, that you do not change the "Exclude kernel greater than 4.12.14-150.17.1: ..."
+Filter. With it you keep normal kernel-updates away, but take the latest live patches
+up to the selected month.
+
+
+== Switch to a New Kernel Version for Live Patching
+
+Live Patching for a specific kernel version is only available for one year. After one year
+you must update the kernel on your systems. The following changes of the environment
+should be executed:
+
+.Procedure: Switch to a New Kernel Version
+. Decide which kernel version you will upgrade to. For example: `4.12.14-150.32.1`
+. Create a new kernel version Filter.
+. Detach the previous filter **Exclude kernel greater than 4.12.14-150.17.1** and attach the new filter.
+
+Rebuild the environment by clicking the btn:[Build] button. The new
+environment will contain all kernel patches up to the new kernel version you have selected.
+Systems using these channels will see the kernel update and you may install it.
+This process requires a reboot, but the new kernel is good for one year.
+All packages installed during this time frame will match the current live patching kernel filter.
