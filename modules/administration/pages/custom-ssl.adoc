@@ -104,7 +104,10 @@ spacewalk-service restart
 
 == Create and Replace CA and Server Certificates
 
-If you need to create entirely new certificates for an existing installation, you will need to delete the old certificates before you begin.
+If you need to create entirely new certificates for an existing installation, you need to create a combined certificate first.
+Clients will authenticate to the certificate with both the old and new details.
+Then you can go ahead and remove the old details.
+This maintains the chain of trust.
 
 [IMPORTANT]
 ====
@@ -142,6 +145,12 @@ Ensure that the [systemitem]``set-cname`` parameter is the fully-qualified domai
 You can use the the [systemitem]``set-cname`` parameter multiple times if you require multiple aliases.
 +
 You will need to generate a server certificate RPM for each proxy, using their host names and cnames.
+
+
+When you have new certificates, you can create the combined RPMs to authenticate the clients.
+
+.Procedure: Create Combined Certificate RPMs
+
 . Create a new CA file that combines the old and new certificate details, and generate a new RPM:
 +
 ----
@@ -159,10 +168,10 @@ rhn-ssl-tool --gen-ca --rpm-only --dir="/root/combined-ssl-build"
 --target-dir /srv/www/htdocs/pub/ --trust-dir=/etc/pki/trust/anchors/
 ----
 
-When you have completed this procedure, you can deploy the new certificate on your clients.
+When you have the combined RPMs, you can deploy the combined certificates to your clients.
 
 
-.Procedure: Deploying Certificates on Traditional Clients
+.Procedure: Deploying Combined Certificates on Traditional Clients
 
 . On the client, create a new custom channel using these details:
 +
@@ -183,7 +192,9 @@ rhnpush -c ssl-ca-channel --nosig \
 . Subscribe all clients to the new ``SSL-CA-Channel`` channel.
 . Install the CA certificate RPM on all clients by updating the channel.
 
-.Procedure: Deploying Certificates on Salt Clients
+
+
+.Procedure: Deploying Combined Certificates on Salt Clients
 
 // Does the above procedure also work for Salt? LKB 2019-09-10
 
@@ -194,3 +205,85 @@ Click btn:[Find Targets].
 . Check that the appropriate clients are displayed, and click btn:[Run Command] to deploy the certificates on the clients.
 
 image::deploy_cert_salt.png[scaledwidth=80%]
+
+When you have every client trusting both the old and new certificates, you can go ahead and replace the server certificate on the {productname} Server and Proxies.
+
+
+
+.Procedure: Replace Server Certificate on the Server
+
+. On the {productname} Server, at the command prompt, install the RPM from the [path]``ssl-build`` directory:
++
+----
+rpm -Uhv ssl-build/susemanager/rhn-org-httpd-ssl-key-pair-susemanager-1.0-2.noarch.rpm
+----
+. Restart services to pick the changes:
++
+----
+spacewalk-service restart
+----
+
+
+
+.Procedure: Replace Server Certificate on the Proxy
+
+. On the {productname} Proxy, at the command prompt, install the RPM from the [path]``ssl-build`` directory:
++
+----
+rpm -Uhv ssl-build/susemanager-proxy/rhn-org-httpd-ssl-key-pair-susemanager-proxy-1.0-2.noarch.rpm
+----
+. Restart services to pick up the changes:
++
+----
+spacewalk-service restart
+----
+
+
+When you have replaced the server certificates on your server and any proxies, you need to update the certificate with only the new details all the clients.
+This is done by adding it to the client channels you set up previously.
+
+
+
+.Procedure: Adding the New Certificates to the Client Channel
+
+. Copy the combined certificate RPM into the [path]``/root/ssl-build/`` directory:
++
+----
+cp /root/combined-ssl-build/*.rpm /root/ssl-build/
+----
+. Generate a new RPM with from the new certificates.
+Check the release number carefully to ensure you have the right certificate file:
++
+----
+rhn-ssl-tool --gen-ca --rpm-only --dir="/root/ssl-build"
+----
+. Install the new local certificates on the {productname} Server:
++
+----
+/usr/bin/rhn-deploy-ca-cert.pl --source-dir /root/ssl-build \
+--target-dir /srv/www/htdocs/pub/ --trust-dir=/etc/pki/trust/anchors/
+----
+. Restart services to pick up the changes:
++
+----
+spacewalk-service restart
+----
+. Upload the new RPM into the channel:
++
+----
+rhnpush -c ssl-ca-channel --nosig \
+--ca-chain=/srv/www/htdocs/pub/RHN-ORG-TRUSTED-SSL-CERT \
+/root/ssl-build/rhn-org-trusted-ssl-cert-1.0-3.noarch.rpm
+----
+
+
+When you have the new certificate in the channel, you can use the {productname} {webui} to update it on all clients by synchronizing them with the channel.
+Alternatively, for Salt clients, you can use menu:Salt[Remote Commands].
+
+To complete the process, you need to update the database with this command:
+
+----
+/usr/bin/rhn-ssl-dbstore --ca-cert=/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT
+----
+
+If you use bootstrap, remember to also update your bootstrap scripts to reflect the new certificate information.
