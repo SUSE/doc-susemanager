@@ -29,7 +29,8 @@ If you intend to use your installation with {smr} formulas, do not configure Cob
 
 == Cobbler Requirements
 
-To use Cobbler for system installation with PXE, you will require a TFTP server. {productname} installs a TFTP server by default.
+To use Cobbler for system installation with PXE, you will require a TFTP server.
+{productname} installs a TFTP server by default.
 To PXE boot systems, you will require a DHCP server, or have access to a network DHCP server.
 Edit the [path]``/etc/dhcp.conf`` configuration file to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
 
@@ -127,7 +128,7 @@ Alternatively, you can use the [command]``net-edit`` subcommand, which will also
     <dhcp>
       <range start='192.168.100.128' end='192.168.100.254'/>
       <bootp file='/pxelinux.0' server='192.168.100.153'/>
-</dhcp>
+    </dhcp>
   </ip>
 </network>
 ----
@@ -205,6 +206,27 @@ Do not start or stop the [command]``cobblerd`` service independent of the {produ
 Doing so can cause errors.
 Always use [command]``/usr/sbin/spacewalk-service`` to start or stop {productname}.
 ====
+
+////
+=== Background Information about the Synchronization Process
+
+// Taken from https://bugzilla.suse.com/show_bug.cgi?id=1141603
+// To be edited!!!
+
+A sync is basically a rebuild of every file cobbler touched. I will try give you an impression with an numbered list.
+
+1. Run Pre-Sync-Triggers (this can be any number of shell scripts to my knowledge)
+2. Delete all files and directories which are not allowed in /var/www/cobbler
+3. Create all needed folders
+4. Delete all elements inside the folders.
+5. Generate the tftpd directory
+6. Write the DHCP files (if management is enabled)
+7. Do the same with DNS
+8. Clean the Cache
+9. If rsync management is enabled do that
+10. Run Post-Sync-Triggers (this can also be any number of shell scripts to my knowledge)
+
+////
 
 
 ////
