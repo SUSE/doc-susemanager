@@ -3,6 +3,8 @@
 
 If you work on a {productname} Server with scheduled maintenance windows, you might find it difficult to remember all the things that you need to during that critical downtime.
 
+As with any {sle} system, you are encouraged to install package updates on the {susemgr} Server when they arrive.
+
 This section contains a checklist for your maintenance window, with links to further information on performing each of the steps, if you need it.
 
 
@@ -13,8 +15,74 @@ You will need to stop the spacewalk, SAP, and database services, along with any 
 . Apply the latest updates.
 See xref:upgrade:server-upgrade.adoc[].
 . Update to the latest service pack, if required.
-See xref:upgrade:sp-migration.adoc[].
+See xref:upgrade:migrate-4x-4x.adoc[].
 . Reboot the server.
 . Check if the configuration is still correct.
 . On Salt systems, apply the highstate.
 . Start any stopped services.
+
+
+You can install updates using your package manager.
+For information on using {yast}, see https://www.suse.com/documentation/sles-15/book_sle_admin/data/cha_onlineupdate_you.html).
+For information on using zypper, see https://www.suse.com/documentation/sles-15/book_sle_admin/data/sec_zypper.html).
+
+////
+
+Preferable, you will run such a tool within a maintenance window; for more information, see xref:administration:maintenance-window.adoc#maintenance-window[].
+
+ complete procedure, also see above:
+1. Log in as root user to the SUSE Manager server.
+2. Stop the Spacewalk service:
+   spacewalk-service stop
+3. Apply the patch using either zypper patch or YaST Online Update.
+4. Upgrade the database schema:
+    spacewalk-schema-upgrade
+5. Start the Spacewalk service:
+    spacewalk-service start
+////
+
+By default, several update channels are configured and enabled for the {susemgr} Server.
+New and updated packages will become available automatically.
+
+To keep {susemgr} up to date, you must have it connected directly to {scc}.
+Alternatively, for disconnected environments, you can use {rmtool} (RMT) as a local installation source.
+
+You can check that the update channels are available on your system with this command:
+
+----
+zypper lr
+----
+
+The output will look similar to this:
+
+----
+Name                                                   | Enabled | GPG Check | Refresh
+-------------------------------------------------------+---------+-----------+--------
+SLE-Module-Basesystem15-SP1-Pool                       | Yes     | (r ) Yes  | No
+SLE-Module-Basesystem15-SP1-Updates                    | Yes     | (r ) Yes  | Yes
+SLE-Module-Python2-15-SP1-Pool                         | Yes     | (r ) Yes  | No
+SLE-Module-Python2-15-SP1-Updates                      | Yes     | (r ) Yes  | Yes
+SLE-Product-SUSE-Manager-Server-4.0-Pool               | Yes     | (r ) Yes  | No
+SLE-Product-SUSE-Manager-Server-4.0-Updates            | Yes     | (r ) Yes  | Yes
+SLE-Module-SUSE-Manager-Server-4.0-Pool                | Yes     | (r ) Yes  | No
+SLE-Module-SUSE-Manager-Server-4.0-Updates             | Yes     | (r ) Yes  | Yes
+SLE-Module-Server-Applications15-SP1-Pool              | Yes     | (r ) Yes  | No
+SLE-Module-Server-Applications15-SP1-Updates           | Yes     | (r ) Yes  | Yes
+SLE-Module-Web-Scripting15-SP1-Pool                    | Yes     | (r ) Yes  | No
+SLE-Module-Web-Scripting15-SP1-Updates                 | Yes     | (r ) Yes  | Yes
+----
+
+{productname} releases maintenance updates (MUs) to provide newer packages.
+Maintenance updates are indicated with a new version number.
+For example, the major release 4.0 will be incremented to 4.0.1 when an MU is released.
+
+You can verify which version you are running by looking at the bottom of the navigation bar in the {webui}.
+You can also fetch the version number with the [literal]``api.getVersion()`` XMLRPC API call.
+
+To upgrade to the latest MU, you can use the [command]``zypper migration`` command at the command prompt:
+
+----
+zypper migration
+----
+
+This procedure is also known as a Service Pack (SP) migration.
