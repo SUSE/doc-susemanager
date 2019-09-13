@@ -1,12 +1,23 @@
 [[content-lifecycle]]
 = Content Lifecycle Management Examples
 
-
 This section contains some common examples of how you can use content lifecycle management.
 Use these examples to build your own personalised implementation.
 
+
+
 [#create-proj-for-patch-cycle]
-== Create a Project for a Monthly Patch Cycle
+== Creating a Project for a Monthly Patch Cycle
+
+
+
+* Creating a filter for a project
+* Adding a filter to a project
+* Applying the filter to a new build environment
+* Excluding a patch from a project
+* Including a patch in a project
+
+
 
 [#create-a-filter]
 === Create a Filter for the Project
@@ -25,10 +36,11 @@ This filter is useful for your CLM projects that follow a monthly patch cycle.
 Your filter is saved and may be used for all new Projects.
 
 
-[#add-filter-to-proj]
-=== Add the Filter to the Project
 
-.Procedure: Add a Filter to a Project
+[#add-filter-to-proj]
+=== Adding the Filter to the Project
+
+.Procedure: Adding the Filter to the Project
 . Go to menu:Main Menu[Content Lifecycle > Projects] and select a Project from the list.
 
 . Click on btn:[Attach/Detach Filters] link. In the modal popup all available Filters
@@ -37,13 +49,14 @@ are listed.
 . Select the new **Exclude patches by date** filter then click on btn:[Save].
 
 
+
 [#apply-filter-to-env]
-=== Apply the Filter to the Environment
+=== Applying the Filter to the Environment
 
 The Filter is now added to your filter list, but has not been applied to the project.
 To apply the filter you need to build the first environment.
 
-.Procedure: Using the Filter
+.Procedure: Applying the Filter to the New Environment
 . Build the first environment.
 Click on the btn:[Build] button to initiate the build process.
 
@@ -59,14 +72,16 @@ The build will take longer if you have a large number of filters, or they are ve
 Promotion creates a 1:1 copy of the metadata contained in the current environment to the next one. Filters determine which metadata will be used to define your channels and their content(packages).
 ====
 
+
+
 [#exclude-a-patch]
-=== Exclude a Patch from the Project
+=== Excluding a Patch from the Project
 
 Initial tests can help you discover issues.
 When such issues are found you must exclude the problem patch which was released before __August 1st, 2019 00:00am__.
 For example our problem patch was given the name of: *SUSE-15-2019-1807*.
 
-.Procedure: Exclude a Patch
+.Procedure: Excluding a Patch from a Project
 . Go to menu:Main Menu[Content Lifecycle > Filters] and click on btn:[Create Filter].
 
 . Enter a **Filter Name** for example __Exclude openjdk patch__ and from the **Filter Type** dropdown select **Patch (matches Advisory Name)**.
@@ -81,10 +96,10 @@ from list and click on btn:[Save].
 Rebuilding a previous environment with the btn:[Build] button includes the new exclude filter with the former **by date** filter.
 
 
-[#include-a-patch]
-=== Include a Patch in the Project
 
-.Scenario: Include a Patch
+[#include-a-patch]
+=== Including a Patch in the Project
+
 You receive a call from your Security Team.
 They inform you that an important security patch was released several days after __August 1st__.
 The name of the new patch is **SUSE-15-2019-2071**. You need to include this new patch into your next patch cycle.
@@ -95,7 +110,7 @@ Use the btn:[Allow] Filters rule to select patches from a full source and add th
 The btn:[Allow] filters rule overrides the exclude function of the btn:[Deny] filter rule.
 ====
 
-.Procedure: Include a Patch
+.Procedure: Including a Patch in a Project
 . Go to menu:Main Menu:[Content Lifecycle > Filters] and click on btn:[Create Filter].
 
 . Enter a __Filter Name__ such as **Include kernel security fix**.
@@ -118,6 +133,7 @@ The btn:[Allow] filters rule overrides the exclude function of the btn:[Deny] fi
 The required patch is now included in your patch cycle.
 
 
+
 [#update-a-patch-cycle]
 == Update an Existing Monthly Patch Cycle
 
@@ -134,6 +150,7 @@ There may be a new patch available for fixing this issue.
 
 . Complete updating your filters then rebuild the project to create a new environment with
 patches for September 1st.
+
 
 
 [#enhance-project-with-livepatching]
@@ -158,6 +175,8 @@ flag. These kernel patches come with livepatching tools. After installation you 
 * Live patches comes as standalone patches. You must **exclude all** normal kernel patches
 which contain a higher kernel version than the one you have installed on your systems.
 ====
+
+
 
 [#exclude-higher-kernel-version]
 === Exclude Packages with a Higher Kernel Version
@@ -196,6 +215,7 @@ NOTE: All kernel patches with higher kernel versions are removed. Live patching 
 will stay available as long as they are not the first in a series.
 
 
+
 [#update-project-for-next-patch-month]
 == Update the Project for Next Patch Month
 
@@ -204,6 +224,7 @@ To update the project to the next patch month you operate similar to the case be
 Important is, that you do not change the "Exclude kernel greater than 4.12.14-150.17.1: ..."
 Filter. With it you keep normal kernel-updates away, but take the latest live patches
 up to the selected month.
+
 
 
 [#switch-kernel-version-for-live-patching]
