@@ -196,15 +196,11 @@ rhnpush -c ssl-ca-channel --nosig \
 
 .Procedure: Deploying Combined Certificates on Salt Clients
 
-// Does the above procedure also work for Salt? LKB 2019-09-10
-
-. On the client, in the {productname} {webui}, navigate to menu:Salt[Remote Commands].
-. In the first field, enter [guimenu]``salt-call state.apply certs``.
-In the second field, after the ``@``, enter [guimenu]``*``.
-Click btn:[Find Targets].
-. Check that the appropriate clients are displayed, and click btn:[Run Command] to deploy the certificates on the clients.
-
-image::deploy_cert_salt.png[scaledwidth=80%]
+. In the {productname} {webui}, navigate to menu:Systems[Overview].
+. Check all your Salt Clients to add them to the System Set Manager (SSM).
+. Navigate to menu:Systems[System Set Manager > Overview].
+. In the [guimenu]``States`` field, click btn:[Apply] to apply the system states.
+. In the [guimenu]``Highstate`` page, click btn:[Apply Highstate] to propagate the changes to the clients.
 
 When you have every client trusting both the old and new certificates, you can go ahead and replace the server certificate on the {productname} Server and Proxies.
 
@@ -237,9 +233,10 @@ rpm -Uhv ssl-build/susemanager-proxy/rhn-org-httpd-ssl-key-pair-susemanager-prox
 ----
 spacewalk-service restart
 ----
+. Test that all clients still operate as expected and can use SSL to reach the {productname} Server and any proxies.
 
 
-When you have replaced the server certificates on your server and any proxies, you need to update the certificate with only the new details all the clients.
+When you have replaced the server certificates on your server and any proxies, you need to update the certificate with only the new details on all the clients.
 This is done by adding it to the client channels you set up previously.
 
 
@@ -277,8 +274,18 @@ rhnpush -c ssl-ca-channel --nosig \
 ----
 
 
-When you have the new certificate in the channel, you can use the {productname} {webui} to update it on all clients by synchronizing them with the channel.
-Alternatively, for Salt clients, you can use menu:Salt[Remote Commands].
+When you have the new certificate in the channel, you can use the {productname} {webui} to update it on all clients and proxies, by synchronizing them with the channel.
+Alternatively, for Salt clients, you can use menu:Salt[Remote Commands], or apply the highstate.
+
+
+You will also need to update your proxies to remove the copy of the certificate and the associated RPM.
+Your proxies must have the same certificate content as the server.
+Check the [path]``/srv/www/htdocs/pub/`` directory and ensure it contains:
+
+----
+RHN-ORG-TRUSTED-SSL-CERT
+rhn-org-trusted-ssl-cert-*.noarch.rpm
+----
 
 To complete the process, you need to update the database with this command:
 
