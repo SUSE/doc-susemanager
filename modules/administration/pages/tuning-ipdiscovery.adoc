@@ -1,0 +1,30 @@
+[[tuning-changelogs]]
+= Tuning IP Discovery
+
+We don't have exactly this, and most customers we've been working with
+prefer explicit on-boarding to discovery.
+
+But depending on the use case there are features in SUSE Manager that
+can certainly help with discovery:
+
+Salt has a scanning roster:
+https://docs.saltstack.com/en/latest/ref/roster/all/salt.roster.scan.html
+
+This, combined with the salt-ssh command, could be used to find all
+systems in a network range that
+
+a) have an open SSH port
+b) can be accessed with a known ssh password or have a
+known ssh key deployed
+
+SUSE Manager has a PXE-based discovery system:
+Cobbler in SUSE Manager can be configured to serve a discovery image to
+any system that PXE boots without any further configuration available.
+Those systems will be put into the SUSE Manager database with their
+hardware inventory and can later be installed from SUSE Manager via PXE.
+
+The virtual host managers
+With virtual host managers (available for VMware and implicitly for
+KVM/Xen, if the host is known to SUSE Manager) we can discover running
+VMs and match them to existing system profiles in manager. This could
+also be used to detect systems that aren't onboarded yet.
