@@ -12,7 +12,7 @@ The parameter defaults to [systemitem]``0``, which means unlimited.
 java.max_changelog_entries = 0
 ----
 
-If you set this parameter (remember you need to restart the services with `spacewalk-services restart), it will come into effect only for new packages when they are synchronized.
+If you set this parameter (remember you need to restart the services with `spacewalk-service restart`), it will come into effect only for new packages when they are synchronized.
 
 You might like to delete the cached data to remove older data.
 
@@ -28,11 +28,11 @@ You can delete cached data from the command line, using the SQL interface:
 ----
 # spacewalk-sql -i
 yourdatabase=# DELETE FROM rhnPackageRepodata;
-yourdatabase=#  INSERT INTO rhnRepoRegenQueue (id, CHANNEL_LABEL, REASON, FORCE)
-(SELECT sequence_nextval('rhn_repo_regen_queue_id_seq'),
-        C.label,
-        'package summary modification',
-        'Y'
-   FROM rhnChannel C);
+yourdatabase=# INSERT INTO rhnRepoRegenQueue (id, CHANNEL_LABEL, REASON, FORCE)
+               (SELECT sequence_nextval('rhn_repo_regen_queue_id_seq'),
+                       C.label,
+                       'package summary modification',
+                       'Y'
+                FROM rhnChannel C);
 yourdatabase=#  \q
 ----
