@@ -2,32 +2,29 @@
 = Tuning Client Discovery
 
 By default, {productname} expects you to register individual clients, either manually or through automation.
-However, it is possible to use Salt features to allow {productname} to discover Salt clients that connect using an IP address from within a specified range.
+However, it is possible to configure {productname} to discover clients according to certain criteria.
 
-We don't have exactly this, and most customers we've been working with
-prefer explicit on-boarding to discovery.
 
-But depending on the use case there are features in SUSE Manager that
-can certainly help with discovery:
 
-Salt has a scanning roster:
-https://docs.saltstack.com/en/latest/ref/roster/all/salt.roster.scan.html
+== PXE Boot Discovery
 
-This, combined with the salt-ssh command, could be used to find all
-systems in a network range that
+You can use Cobbler to discover any client that boots using PXE.
+When a client PXE boots, Cobbler would serve them an operating system image.
+The client would then be recorded in the database with an inventory of their hardware, until they are ready to be installed.
 
-a) have an open SSH port
-b) can be accessed with a known ssh password or have a
-known ssh key deployed
 
-SUSE Manager has a PXE-based discovery system:
-Cobbler in SUSE Manager can be configured to serve a discovery image to
-any system that PXE boots without any further configuration available.
-Those systems will be put into the SUSE Manager database with their
-hardware inventory and can later be installed from SUSE Manager via PXE.
 
-The virtual host managers
-With virtual host managers (available for VMware and implicitly for
-KVM/Xen, if the host is known to SUSE Manager) we can discover running
-VMs and match them to existing system profiles in manager. This could
-also be used to detect systems that aren't onboarded yet.
+=== Network Range Discovery
+
+You can use the Salt scanning roster function, and the ``salt-ssh`` command to find all clients that connect from within a given IP range.
+This will identify all clients within the IP range that have an open SSH port, and can be accessed with known SSH credentials.
+
+For more information about the Salt scanning roster feature, see link:https://docs.saltstack.com/en/latest/ref/roster/all/salt.roster.scan.html[].
+
+
+
+== Virtual Host Discovery
+
+In virtualized environments that use a virtual host manager, the VHM can be configured to discover running virtual machines.
+Discovered clients are than matched to existing system profiles.
+This method can also be used to detect sclients that have not been onboarded.
