@@ -4,6 +4,9 @@
 While {productname} provides all required channels, you might find it useful to create custom channels specific to your environment.
 {productname} Administrators and Channel Administrators have channel management authority, which gives them the ability to create and manage their own custom channels.
 
+Custom channels give you the ability to create your own software packages and repositories, which you can use to update your clients.
+They also allow you to use software provided by third party vendors in your environment.
+
 Before you create a custom channel, determine which base channel you want to associate it with, and which repositories you want to use for content.
 
 This section gives more detail on how to create, administer, and delete custom channels.
@@ -18,7 +21,12 @@ You will need to create the channel in the {productname} {webui} and create a re
 You can select a vendor channel as the base channel if you want to use packages provided by a vendor.
 Alternatively, select ``none`` to make your custom channel a base channel.
 
-If you include a package with [systemitem]``-release`` at the end of the package name in your channel, it will be automatically installed when the channel is assigned.
+Custom channels will sometimes require additional security settings.
+Many third party vendors secure packages with GPG.
+If you want to use GPG-protected packages in your custom channel, you will need to trust the GPG key which has been used to sign the metadata.
+You can then check the [guimenu]``Has Signed Metadata?`` check box to match the package metadata against the trusted GPG keys.
+// We need to create a section on importing GPG keys and change this to point there: https://github.com/SUSE/spacewalk/issues/9474 LKB 2019-09-18
+For more information on importing GPG keys, see xref:reference:systems/autoinst-gpg-and-ssl-keys.adoc[].
 
 [IMPORTANT]
 ====
@@ -27,7 +35,7 @@ Do not create child channels containing packages that are not compatible with th
 
 
 
-.Procedure: Create a custom channel
+.Procedure: Creating a Custom Channel
 
 . In the {productname} {webui}, navigate to menu:Software[Manage > Channels], and click btn:[Create Channel].
 . On the [guimenu]``Create Software Channel`` page, give your channel a name (for example, [systemitem]``My Tools SLES 15 SP1 x86_64``) and a label (for example, [systemitem]``my-tools-sles15sp1-x86_64``).
@@ -38,21 +46,30 @@ Ensure that you choose the compatible parent channel for your packages.
 . Provide any additional information in the contact details, channel access control, and GPG fields, as required for your environment.
 . Click btn:[Create Channel].
 
-.Procedure: Create a software repository
+
+
+.Procedure: Creating a Software Repository
 
 . In the {productname} {webui}, navigate to menu:Software[Manage > Repositories], and click btn:[Create Repository].
 . On the [guimenu]``Create Repository`` page, give your repository a label (for example, [systemitem]``my-tools-sles15sp1-x86_64-repo``).
 . In the [guimenu]``Repository URL`` field, provide the path to the directory with the [path]``repodata`` file (for example, [systemitem]``file:///opt/mytools/``).
 You can use any valid addressing protocol in this field.
 . Uncheck the [guimenu]``Has Signed Metadata?`` check box.
-. Provide any additional information in the SSL fields, as required for your environment.
+. OPTIONAL: Complete the SSL fields if your repository requires client certificate authentication.
 . Click btn:[Create Repository].
-. Synchronize your new repository with your custom channel by navigating to menu:Software[Manage > Channels], clicking the name of your newly created custom channel, and navigating to the [guimenu]``Repositories`` tab.
-. Ensure the repository you want to synchronize is checked, and click btn:[Update Repositories].
+
+
+
+.Procedure: Assigning the Repository to a Channel
+
+. Assign your new repository to your custom channel by navigating to menu:Software[Manage > Channels], clicking the name of your newly created custom channel, and navigating to the [guimenu]``Repositories`` tab.
+. Ensure the repository you want to assign to the channel is checked, and click btn:[Update Repositories].
 . Navigate to the [guimenu]``Sync`` tab and click btn:[Sync Now] to synchronize immediately.
 You can also set an automated synchronization schedule on this tab.
 
-.Procedure: Add custom channels to an activation key
+
+
+.Procedure: Adding Custom Channels to an Activation Key
 
 . In the {productname} {webui}, navigate to menu:Systems[Activation Keys], and select the key you want to add the custom channel to.
 . On the [guiemnu]``Details`` tab, in the [guimenu]``Child Channels`` listing, select the channel to associate.
