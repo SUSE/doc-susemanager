@@ -25,11 +25,33 @@ Cobbler is not currently supported within {smr} environments.
 If you intend to use your installation with {smr} formulas, do not configure Cobbler.
 ====
 
+////
+=== Background Information about the Synchronization Process
+
+// Taken from https://bugzilla.suse.com/show_bug.cgi?id=1141603
+// To be edited!!!
+
+A sync is basically a rebuild of every file cobbler touched. I will try give you an impression with an numbered list.
+
+1. Run Pre-Sync-Triggers (this can be any number of shell scripts to my knowledge)
+2. Delete all files and directories which are not allowed in /var/www/cobbler
+3. Create all needed folders
+4. Delete all elements inside the folders.
+5. Generate the tftpd directory
+6. Write the DHCP files (if management is enabled)
+7. Do the same with DNS
+8. Clean the Cache
+9. If rsync management is enabled do that
+10. Run Post-Sync-Triggers (this can also be any number of shell scripts to my knowledge)
+
+////
+
 
 
 == Cobbler Requirements
 
-To use Cobbler for system installation with PXE, you will require a TFTP server. {productname} installs a TFTP server by default.
+To use Cobbler for system installation with PXE, you will require a TFTP server.
+{productname} installs a TFTP server by default.
 To PXE boot systems, you will require a DHCP server, or have access to a network DHCP server.
 Edit the [path]``/etc/dhcp.conf`` configuration file to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
 
@@ -127,7 +149,7 @@ Alternatively, you can use the [command]``net-edit`` subcommand, which will also
     <dhcp>
       <range start='192.168.100.128' end='192.168.100.254'/>
       <bootp file='/pxelinux.0' server='192.168.100.153'/>
-</dhcp>
+    </dhcp>
   </ip>
 </network>
 ----
@@ -136,13 +158,13 @@ Alternatively, you can use the [command]``net-edit`` subcommand, which will also
 
 == TFTP
 
-{productname} uses the [daemon]``atftpd`` daemon, but it can also use TFTP.
-The [daemon]``atftpd`` daemon is the recommended method for PXE services, and is installed by default.
+{productname} uses the [daemon]``tftp`` daemon.
+The [daemon]``tftp`` daemon is the recommended method for PXE services, and is installed by default.
 The default configuration works in most cases.
-However, if you need to change the configuration, do so using {yast} Services Manager.
+However, if you need to change the configuration, use the {yast} Services Manager.
 
 The TFTP service must be running so it can serve the [path]``pxelinux.0`` boot image.
-Start {yast} and use menu:System[Services Manager] to configure the [daemon]``tftpd`` daemon.
+Start {yast} and use menu:System[Services Manager] to configure the [daemon]``tftp`` daemon.
 
 You can also synchronize Cobbler-generated TFTP contents to a {productname} Proxy.
 
@@ -190,21 +212,22 @@ If you reinstall an already configured proxy and want to push all the files agai
 The {productname} Server must be able to access the {productname} Proxy systems directly.
 You cannot push using a proxy.
 
-Before you start the Cobbler service, check that all the prerequisites are configured according to your requirements.
-You can do this by running the [command]``cobbler check`` command.
-
-When your configuration is correct, start the {productname} service:
-
-----
-/usr/sbin/spacewalk-service start
-----
-
 [WARNING]
 ====
 Do not start or stop the [command]``cobblerd`` service independent of the {productname} service.
 Doing so can cause errors.
 Always use [command]``/usr/sbin/spacewalk-service`` to start or stop {productname}.
 ====
+
+Check that all the prerequisites the Cobbler service requires, are configured according to your requirements.
+You can do this by running the [command]``cobbler check`` command.
+
+// Does this work and makes sense?
+When you had to change the configuration, restart the {productname} service:
+
+----
+/usr/sbin/spacewalk-service restart
+----
 
 
 ////
@@ -257,7 +280,7 @@ For information about creating and configuring Kickstart and {ay} profiles in th
 Use the [command]``cobbler`` command as root to create profiles from the command line:
 
 ----
-cobbler profile add --name=string --distro=string [--kickstart=url] \
+cobbler profile add --name=string --distro=string [--autoinstall=url] \
   [--virt-file-size=gigabytes] [--virt-ram=megabytes]
 ----
 
@@ -268,7 +291,7 @@ A unique label for the profile, such as `sles12webserver` or ``sles12workstation
 The distribution that will be used for this profile.
 For adding distributions, see pass:c[xref:FILENAME.adoc#advanced.topics.cobbler.adddistro[]].
 
-[option]``--kickstart=``[replaceable]``url``::
+[option]``--autoinstall=``[replaceable]``url``::
 The location of the Kickstart file (if available).
 
 [option]``--virt-file-size=``[replaceable]``gigabytes``::
@@ -388,7 +411,8 @@ echo "Hello, world"
 ----
 
 For more information about Kickstart templates and Cobbler, see
-https://fedorahosted.org/cobbler/wiki/KickstartTemplating
+https://cobbler.github.io/manuals/2.8.0/3/5_-_Kickstart_Templating.html.
+
 
 
 
