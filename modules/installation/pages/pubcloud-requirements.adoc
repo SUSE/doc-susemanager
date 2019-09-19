@@ -1,7 +1,9 @@
 [[public-cloud-requirements]]
 = Public Cloud Requirements
 
-This section details the public cloud specific requirements for {productname}.
+You can run {productname} Server on a cloud instance from a third-party provider such as Amazon EC2, or Microsoft Azure.
+
+This section details the requirements for using {productname} on a public cloud instance.
 
 [NOTE]
 ====
@@ -17,16 +19,18 @@ Depending on the public cloud framework you are using, you can locate the {produ
 
 Select a public cloud instance type that meets the hardware requirements in xref:installation:hardware-requirements.adoc[].
 
-In addition, be aware of these considerations:
+Before you begin, here are some other considerations:
 
 * The {productname} setup procedure performs a forward-confirmed reverse DNS lookup.
-This must succeed in order for the setup procedure to complete successfully and for {productname} to operate as expected.
-Therefore, it is important to perform hostname and IP configuration prior to running the {productname} setup procedure.
-* {productname} Server and Proxy instances are expected to run in a network configuration that provides you control over DNS entries, but cannot be accessed from the internet at large.
+This must succeed in order for the setup procedure to complete and for {productname} to operate as expected.
+It is important to perform hostname and IP configuration before you set up {productname}.
+* {productname} Server and Proxy instances need to run in a network configuration that provides you control over DNS entries, but cannot be accessed from the internet at large.
 * Within this network configuration DNS resolution must be provided: `hostname -f` must return the fully-qualified domain name (FQDN).
 * DNS resolution is also important for connecting clients.
 * DNS is dependent on the cloud framework you choose, refer to the cloud service provider documentation for detailed instructions.
-* We recommend that you locate software repositories, the server database, and the proxy squid cache on an external virtual disk. This prevents data loss if the instance is unexpectedly terminated. Instructions for setting up an external virtual disk are contained in this section.
+* We recommend that you locate software repositories, the server database, and the proxy squid cache on an external virtual disk.
+This prevents data loss if the instance is unexpectedly terminated.
+This section includes instructions for setting up an external virtual disk.
 
 == Network Requirements
 
@@ -40,32 +44,37 @@ A world-accessible {productname} instance violates the terms of the {productname
 
 To access the {productname} {webui}, allow HTTPS when configuring the network access controls.
 
-== Using Separate Storage Volume
 
 
-We recommend that the repositories and the database for {productname} be stored on a virtual storage device.
-This best practice will avoid data loss in cases where the {productname} instance may need to be terminated.
-These steps *must* be performed *prior* to running the YaST {productname}  setup procedure.
+== Separate Storage Volumes
 
+We recommend that the repositories and the database for {productname} are stored on a virtual storage device.
+This will help to avoid data loss in cases where the {productname} instance is terminated.
+You must set this up before you run the YaST {productname} setup procedure.
 
-. Provision a disk device in the public cloud environment, refer to the cloud service provider documentation for detailed instructions. The size of the disk is dependent on the number of distributions and channels you intend to manage with {productname}.
-For sizing information refer to https://www.suse.com/support/kb/doc.php?id=7015050[SUSE Manager sizing examples]. A rule of thumb is 25 GB per distribution per channel.
-. Once attached the virtual disk will appear as Unix device node in your instance. The name of the device node is dependend on the cloud framework used, and possibly the instance type selected. Find all the available storage device names with the follwing command:
-+
+Provision a disk device in the public cloud environment, according the cloud service provider's documentation.
+The size of the disk is dependent on the number of distributions and channels you intend to manage with {productname}.
+We recommend at least 25{nbsp}GB for each distribution, and each channel.
+For more information on disk sizes, see https://www.suse.com/support/kb/doc.php?id=7015050[SUSE Manager sizing examples].
+
+When you attached the virtual disk, it will appear in your instance as a Unix device node.
+The name of the device node will vary depending on your provider, and the instance type selected.
+
+Use this command to find all available storage devices:
 
 ----
 $ hwinfo --disk | grep -E "Device File:"
 ----
-. If you are uncertain about the device to choose you can use the `lsblk` command to correlate the size of the devices with their names. Choose the name that matches with the size of the virtual disk you created and attached to the instance.
-. With the device name determined you can use the provided `suma-storage` script to set up the external disk as the data base and repository storage location.
-+
+
+If you not sure which device to choose, use the [command]``lsblk`` command to see the name and size of each device.
+Choose the name that matches with the size of the virtual disk you are looking for.
+
+Use the [command]``suma-storage`` command with the device name to set up the external disk as the location for the database and repositories:
 
 ----
-$ /usr/bin/suma-storage DEVICENAME
+$ /usr/bin/suma-storage <devicename>
 ----
 
-`DEVICENAME` needs to be replaces by the previously determined name for the attached virtual disk.
+The external storage will be set up as an XFS partition mounted at [path]``/manager_storage``.
 
-After the call all database and repository files used by SUSE Manager Server are moved to the newly created xfs based storage.
-In case your instance is a {productname} Proxy, the script will move the Squid cache, which caches the software packages, to the newly created storage.
-The xfs partition is mounted below the path [path]``/manager_storage``.
+If you are installing a proxy, the [command]``suma-storage`` command will also move the Squid cache to the external storage location.
