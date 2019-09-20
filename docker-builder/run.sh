@@ -10,16 +10,16 @@ make clean
 make book-to-set-uyuni
 
 # Create all Uyuni (Single HTML)
-make uyuni-html
+#make uyuni-html
 
 # Uyuni OBS Packages
-make uyuni-dist
+#make uyuni-dist
 
 # Uyuni HTML Single/Chunked books
-make uyuni-advanced-html
-make uyuni-best-practices-html
-make uyuni-getting-started-html
-make uyuni-reference-html
+#make uyuni-advanced-html
+#make uyuni-best-practices-html
+#make uyuni-getting-started-html
+#make uyuni-reference-html
 
 # Uyuni PDF
 #make uyuni-getting-started-pdf
@@ -52,6 +52,8 @@ make uyuni-reference-html
 
 # SUMA for Retail
 
-#make retail-getting-started-html
+make retail-getting-started-html
+make retail-getting-started-pdf
 
-
+make retail-migration-html
+make retail-migration-pdf
