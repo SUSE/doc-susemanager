@@ -11,11 +11,7 @@ include::entities.adoc[]
 This sections contains notes on administering your {smr} installation.
 For general administration tasks, see the {susemgr} documentation at https://www.suse.com/documentation/suse-manager-3/
 
-[[retail.sect.admin.branch_network_config]]
-== Branch Server Network Configuration
 
-The branch server can be configured to use networking in many different ways.
-The most common ways provide either a dedicated or shared LAN for terminals.
 
 [[retail.sect.admin.branch_mass_config]]
 == Branch server mass configuration
@@ -104,93 +100,88 @@ Spaces and other non-alphanumeric characters will be removed when the name is pr
 [[retail.sect.admin.terminal_naming]]
 == Terminal Names
 
-.Procedure: Set up a Branch Server with a Dedicated LAN
+In the {susemgr} {webui}, terminals have a standard naming format which allows you to match the physical device with its record.
+By default, the name uses this format:
 
-In this configuration, the branch server requires at least two network interfaces: one acts as a WAN to communicate with the central server, and the other one acts as an isolated LAN to communicate with terminals.
-This configuration allows for the branch server to provide DHCP, DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
+----
+BranchName.Manufacturer-ProductName-SerialNumber-MachineID
+----
 
-. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. In the [guimenu]``Branch Network`` section, set these parameters:
-* Keep [guimenu]``Dedicated NIC`` checked
-* In the [guimenu]``NIC`` field, enter the name of the network device that is connected to the internal LAN.
-* In the [guimenu]``IP`` field, enter the static IP address to be assigned to the branch server on the internal LAN.
-* In the [guimenu]``Netmask`` field, enter the network mask of the internal LAN.
-. Check [guimenu]``Enable Route`` if you want the branch server to route traffic from internal LAN to WAN.
-* Check [guimenu]``Enable NAT`` if you want the branch server to convert addresses from internal LAN to WAN.
-* Select the [guimenu]``bind`` DNS forwarder mode.
-* Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
-* Specify the working directory, and the directory owner and group.
-. Click [btn]``Save`` to save your changes.
+For example:
+
+----
+B002.TOSHIBA-6140100-41BA03X-c643
+----
+
+You can adjust this behavior by toggling the [systemitem]``DISABLE_HOSTNAME_ID`` and [systemitem]``DISABLE_UNIQUE_SUFFIX`` parameters in the PXE formula settings.
+For more information about the PXE formula, see xref:retail.chap.formulas.adoc#retail.sect.formulas.pxe[PXE Formula].
 
 
-.Procedure: Set up a Branch Server with a Shared Network
 
-In this configuration, the branch server has only one network interface card which is used to connect to the central server as well as the terminals.
-This configuration allows for the branch server to provide DNS, TFTP, PXE and FTP services to terminals, which are configured through {smr} formulas in the {susemgr} {webui}.
-Optionally, the branch server can also provide DHCP services in this configuration.
+[[retail.sect.admin.terminal_mass_config]]
+== Terminal mass configuration
+
+If you are working in an environment with many terminals, you might find it easier to configure the terminals automatically with a pre-defined configuration file, rather than configuring each terminal individually.
+
+In order to do this, you will need to have your infrastructure planned out ahead of time, including the IP addresses, hostnames, and domain names of branch servers and terminals.
+You will also require the hardware (MAC) addresses of each terminal.
 
 [NOTE]
 ====
-If DHCP services are not provided by the branch server, ensure that your external DHCP configuration is set correctly:
-
-* The [systemitem]``next-server`` option must point to the branch server for PXE boot to work
-* The [systemitem]``filename`` option must correctly identify the network boot program (by default, this is [path]``/boot/pxelinux``)
-* The [systemitem]``domain-name-servers`` option must point to the branch server for correct host name resolution
+The settings specified in the configuration file cannot always be successfully applied.
+In cases where there is a conflict, {susemgr} will ignore the request in the file.
+This is especially important when designating hostnames.
+You should always check the details have been applied as expected after using this configuration method.
 ====
 
-. In the {susemgr} {webui}, open the details page for the branch server, and navigate to the [guimenu]``Formulas`` tab.
-. In the [guimenu]``Branch Network`` section, set these parameters:
-* Keep [guimenu]``Dedicated NIC`` unchecked
-* Select which services to enable on the branch server’s firewall.
-Ensure you include DNS, TFTP and FTP services.
-* Select the [guimenu]``bind`` DNS forwarder mode.
-* Check DNS forwarder fallback if you want to rely on an external DNS if the branch DNS fails.
-* Specify the working directory, and the directory owner and group.
-. Click [btn]``Save`` to save your changes.
-. Apply the salt state and synchronize your settings:
+
+=== Configure multiple terminals
+
+.Procedure: Configuring multiple terminals
+
+. Create a YAML file describing the infrastructure you intend to install, specifying the hardware address for each terminal.
+An example YAML file is at the end of this chapter, for you to reference.
+. On a clean {susemgr} installation, import the YAML file you have created:
 +
 ----
-salt $branch_server_id state.apply image-sync
+retail_yaml --from-yaml filename.yaml
 ----
++
+You can use the [command]``retail_yaml --help`` command for additional options.
+. In the {susemgr} {webui}, check that your systems are listed and displaying correctly, and the formulas you require are available.
+. Create activation keys for each of your branch servers, connect them using bootstrap, and configure them as proxy servers.
+For further information on these steps, see the {susemgr} documentation.
+. Apply highstate to apply your configuration changes.
+In the [guimenu]``States`` tab, click btn:[Apply Highstate].
+. Connect your terminals according to your infrastructure plan.
 
 
+If you need to change your configuration, you can edit the YAML file at any time, and use the [command]``retail_yaml --from-yaml`` command to upload the new configuration.
 
-[[retail.sect.admin.branch_mass_config]]
-== Branch Server Mass Configuration
-
-You can either configure branch servers one by one using formulas (*TODO* see xxx) or create system groups of branch servers (*TODO* see yyy) or with a flexible command-line script.
-Such a command-line script is suitable to do a mass configuration of branch servers.
-
-
-
-// https://gitlab.suse.de/SLEPOS/SUMA_Retail/tree/master/python-susemanager-retail
-For mass deployments use the script coming with the [package]``python-susemanager-retail`` package.
-Install it on the central server.
-When installed call it on the command-line with [command]``retail_yaml``.
-This is the [command]``retail_yaml --help`` output:
-
+If you have a current configuration that you would like to export to a YAML file, use:
 ----
-usage: retail_yaml [-h] [--api-host API_HOST] [--api-user API_USER]
-                   [--api-pass API_PASS] [--from-yaml FROM_YAML]
-                   [--to-yaml TO_YAML]
-
-Initialize Branch Server
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --api-host API_HOST   API host
-  --api-user API_USER   API user
-  --api-pass API_PASS   API password
-  --from-yaml FROM_YAML
-                        initialize retail system from YAML file
-  --to-yaml TO_YAML     save structure of retail system to YAML file
+retail_yaml --to-yaml filename.yaml
 ----
+This can be a good way to create a basic mass configuration file.
+However it is important to check the file before using it, as some mandatory configuration entries will be missing.
 
-The actual settings are filled in a ``YAML`` file that you will read with the [option]``--from-yaml`` option.
-Here is the documentated [path]``example.yml`` coming with the package:
+[IMPORTANT]
+====
+When you are designing your configuration and creating the YAML file, ensure the branch server ID matches the fully qualified hostname, and the Salt ID.
+If these do not match, the bootstrap script could fail.
+====
 
+
+
+== Example YAML file for mass configuration
+
+// Ensure this section stays at the end of the chapter, its location is referenced earlier in this file. -LKB
+
+You can use the [command]``retail_yaml`` command to import configuration parameters from a pre-prepared YAML file.
+This section contains a commented example YAML file for you to reference.
+
+.Example: YAML mass terminal configuration file
 ----
-# /usr/share/doc/packages/python-susemanager-retail/example.yml
 branches:
 # there are 2 possible setups: with / without dedicated NIC
 #
@@ -199,14 +190,15 @@ branches:
     branch_prefix: branch1      # optional, default guessed from salt id
     server_name: branchserver1  # optional, default guessed from salt id
     server_domain: branch1.cz   # optional, default guessed from salt id
-    dedicated_nic: eth1         # optional
-    salt_ip: 10.100.24.130      # ip of salt master / broker for terminals, mandatory
+    nic: eth1                   # nic used for connecting terminals, default taken from hw info in SUMA
+    dedicated_nic: true         # set to true if the terminals are on separate network
+    salt_cname: branchserver1.branch1.cz      # hostname of salt master / broker for terminals, mandatory
+    configure_firewall: true    # modify firewall configuration
     branch_ip: 192.168.2.1      # default for dedicated NIC: 192.168.1.1
     netmask: 255.255.255.0      # default for dedicated NIC: 255.255.255.0
     dyn_range:                  # default for dedicated NIC: 192.168.1.10 - 192.168.1.250
         - 192.168.2.10
         - 192.168.2.250
-
 # without dedicated NIC
 # the DHCP formula is not used, DHCP is typically provided by a router
 # the network parameters can be autodetected if the machine is already connected to SUSE Manager
@@ -214,13 +206,39 @@ branches:
     branch_prefix: branch2      # optional, default guessed from salt id
     server_name: branchserver2  # optional, default guessed from salt id
     server_domain: branch2.cz   # optional, default guessed from salt id
-    salt_ip: 10.100.24.130      # ip of salt master / broker for terminals, mandatory
+    salt_cname: branchserver2.branch1.cz      # FQDN of salt master / broker for terminals, mandatory
     branch_ip: 192.168.2.1      # optional, default taken from SUMA data if the machine is registered
     netmask: 255.255.255.0      # optional, default taken from SUMA data if the machine is registered
-
-
+    exclude_formulas:           # optional, do not configure listed formulas
+      - dhcp                    # without dedicated NIC the dhcp service is typically provided by a router
+    hwAddress: 11:22:33:44:55:66 # optional, required to connect pre-configured entry with particular machine
+                                 # during onboarding
+    terminals:                       # configuration of static terminal entries
+      hostname1:                     # hostname
+        hwAddress: aa:aa:aa:bb:bb:bb # required as unique id of a terminal
+        IP: 192.168.2.50             # required for static dhcp and dns entry
+        saltboot:                    # optional, alternative 1: configure terminal-specific pillar data
+          partitioning:              # partitioning pillar as described in saltboot documentation
+            disk1:
+              device: /dev/sda
+              disklabel: msdos
+              partitions:
+                p1:
+                  flags: swap
+                  format: swap
+                  size_MiB: 2000.0
+                p2:
+                  image: POS_Image_JeOS6
+                  mountpoint: /
+              type: DISK
+      hostname2:                     # hostname
+        hwAddress: aa:aa:aa:bb:bb:cc # required as unique id of a terminal
+        IP: 192.168.2.51             # required for static dhcp and dns entry
+        hwtype: IBMCORPORATION-4838910 # optional, alternative 2: assign the terminal to hwtype group
+        # if neither of hwtype nor saltboot is specified, a group is assigned according to hwtype
+        # reported by bios on the first boot
 hwtypes:
-  IBM CORPORATION-4838910:      # HWTYPE string (manufacturer-model) as returned by bios
+  IBMCORPORATION-4838910:      # HWTYPE string (manufacturer-model) as returned by bios
     description: 4838-910       # freetext description
     saltboot:
       partitioning:             # partitioning pillar as described in saltboot documentation
@@ -253,40 +271,6 @@ hwtypes:
               mountpoint: /
           type: DISK
 ----
-
-For details about network settings and ``hwtypes`` related settings, see above.
-
-
-
-[[retail.sect.admin.deploy_terminals]]
-== Deploying Terminals
-
-TODO: https://github.com/SUSE/spacewalk/issues/5613
-
-Each terminal requires a specific hardware type, which contains information about the product name and terminal manufacturer.
-However, the {susemgr} database does not have this information to begin with.
-In order to tell {susemgr} what image to deploy on each terminal, you can set hardware type groups.
-
-
-.Procedure: Create a Hardware Type Group
-
-For this procedure, you will require the system manufacturer name and product name for your terminal.
-
-. Determine the hardware type group name.
-Prefix the name with [systemitem]``HWTYPE:``, followed by the system manufacturer name and product name, separated by a hyphen.
-For example:
-+
-----
-HWTYPE:POSVendor-Terminal1
-----
-+
-[NOTE]
-====
-Only use colons (``:``), hyphens (``-``) or underscores (``_``) in hardware type group names.
-Spaces and other non-alphanumeric characters will be removed when the name is processed.
-====
-+
-. TODO: Apply hardware type
 
 
 
