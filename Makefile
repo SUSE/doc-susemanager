@@ -152,6 +152,7 @@ xml/book_retail_getting_started.xml: adoc/retail*.adoc
 
 retail-getting-started-html: suma xml-retail
 	daps -d DC-retail-getting-started html
+	daps -d DC-retail-getting-started html --single
 
 retail-getting-started-pdf: suma xml-retail
 	daps -d DC-retail-getting-started pdf
@@ -165,6 +166,7 @@ xml/book_retail-migration.xml: adoc/retail_migr*.adoc
 
 retail-migration-html: suma xml-retail-migration
 	daps -d DC-retail-migration html
+	daps -d DC-retail-migration html --single
 
 retail-migration-pdf: suma xml-retail-migration
 	daps -d DC-retail-migration pdf
