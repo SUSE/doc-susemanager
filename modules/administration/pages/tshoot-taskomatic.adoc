@@ -1,6 +1,5 @@
-[[troubleshooting-packages]]
-= Troubleshooting Package Inconsistencies
-
+[[troubleshooting-taskomatic]]
+= Troubleshooting Taskomatic
 ////
 PUT THIS COMMENT AT THE TOP OF TROUBLESHOOTING SECTIONS
 
@@ -19,14 +18,17 @@ If more detailed instructions are required, put them in a "Resolving" procedure:
 . Last step
 ////
 
-Packages on a client can sometimes be locked, which creates problems with metadata regeneration.
+If taskomatic crashes or has failed to terminate a process, it can cause problems with metadata generation.
 When this occurs, package updates will be available in the {webui}, but will not appear on the client, and attempts to update the client will fail.
-Check package locks and exclude lists to determine if packages are locked or excluded on the client.
+To correct this, determine if any processes are running, or if a crash could have occurred.
 When you have located the problematic process, the metadata can be regenerated and synchronization occurs as expected.
 
-.Procedure: Resolving Package Inconsistencies
+.Procedure: Resolving Taskomatic Problems
 
-. On the client, check package locks and exclude lists to determine if packages are locked or excluded:
+. On the server, check the [path]``/var/log/rhn/rhn_taskomatic_daemon.log`` file to determine if any processes are still running or a crash occurred.
+. Restart taskomatic:
 +
-* On an Expanded Support Platform, check [path]``/etc/yum.conf`` and search for ``exclude=``.
-* On {sle}, use the [command]``zypper locks`` command.
+----
+service taskomatic restart
+----
++
