@@ -15,7 +15,7 @@ You must obtain support from either Red Hat or {suse} for all your RHEL systems.
 If you do not do this, you might be violating your terms with Red Hat.
 ====
 
-Ensure that your server meets the requirements outlined at installation:hardware-requirements.adoc
+Ensure that your {productname} Server meets the requirements outlined at installation:hardware-requirements.adoc
 
 Taskomatic will use one CPU core, and requires at least 3072{nbsp}MB RAM.
 
@@ -31,6 +31,42 @@ systemctl restart taskomatic
 ----
 
 == {rhel} Channel Management
+
+=== Adding {rhel} product from SCC
+
+Before you register {rhel} clients to your {productname} Server, check that you have the corresponding {rhel} product enabled, and the required channels are fully synchronized.
+
+You will also need an activation key associated with the {rhel} channel.
+For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+
+{rhel} 7::
+* Product: {rhel} 7
+* Mandatory channels: [systemitem]``rhel-x86_64-server-7`` , [systemitem]``res7-suse-manager-tools-x86_64`` , [systemitem]``res7-x86_64``
+
+
+{rhel} 6::
+* Product: {rhel} 6
+* Mandatory channels: [systemitem]``rhel-x86_64-server-6`` , [systemitem]``res6-suse-manager-tools-x86_64`` , [systemitem]``res6-x86_64``
+
+
+There are two ways to check if a channel has finished synchronizing:
+
+* In the {productname}{webui}, navigate to menu:Admin[Setup Wizard] and select the menu:SUSE Products[] tab.
+This dialog displays a completion bar for each product when they are being synchronized.
+* You can also check the synchronization log file at the command prompt.
+Use the [command]``cat`` or [command]``tail -f`` command to view the [path]``/var/log/rhn/reposync/channel-label.log`` file.
+If you use this method, remember that base channels can contain multiple child channels.
+Each of the child channels will generate its own log during the synchronization progress.
+You will need to check all the base and child channel log files to be sure that the synchronization is complete.
+
+[IMPORTANT]
+====
+Missing packages will cause your registration to fail.
+For {rhel} clients, packages are contained on the {rhel} installation media.
+Ensure you have loop-mounted the installation media, and added it as a child channel to the base {rhel} channel.
+====
+
+=== Adding {rhel} media
 
 The base {rhel} software channel does not contain any packages.
 This is because {suse} does not provide {rhel} base media.
@@ -100,145 +136,14 @@ export URLGRABBER_DEBUG=DEBUG
 
 Check the output:
 ----
-/usr/bin/spacewalk-repo-sync --channel _<channel-label>_ --type yum
+/usr/bin/spacewalk-repo-sync --channel <channel-label> --type yum
 ----
 
 Disable debug mode:
 ----
-unset URLGRABBER_DEBUG``
+unset URLGRABBER_DEBUG
 ----
-
-
 
 == Register {rhel} Clients
 
-
-Before you register {rhel} clients to your {productname} Server, check that you have the corresponding {rhel} product enabled, and the required channels are fully synchronized.
-
-You will also need an activation key associated with the {rhel} channel.
-For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
-
-[IMPORTANT]
-====
-Missing packages will cause your registration to fail.
-For {rhel} clients, packages are contained on the {rhel} installation media.
-Ensure you have loop-mounted the installation media, and added it as a child channel to the base {rhel} channel.
-====
-
-
-{rhel} 7::
-* Product: {rhel} 7
-* Mandatory channels: [systemitem]``rhel-x86_64-server-7`` , [systemitem]``res7-suse-manager-tools-x86_64`` , [systemitem]``res7-x86_64``
-
-
-{rhel} 6::
-* Product: {rhel} 6
-* Mandatory channels: [systemitem]``rhel-x86_64-server-6`` , [systemitem]``res6-suse-manager-tools-x86_64`` , [systemitem]``res6-x86_64``
-
-
-There are two ways to check if a channel has finished synchronizing:
-
-* In the {productname}{webui}, navigate to menu:Admin[Setup Wizard] and select the menu:SUSE Products[] tab.
-This dialog displays a completion bar for each product when they are being synchronized.
-* You can also check the synchronization log file at the command prompt.
-Use the [command]``cat`` or [command]``tail -f`` command to view the [path]``/var/log/rhn/reposync/channel-label.log`` file.
-If you use this method, remember that base channels can contain multiple child channels.
-Each of the child channels will generate its own log during the synchronization progress.
-You will need to check all the base and child channel log files to be sure that the synchronization is complete.
-
 When you are ready to register your {rhel} client, follow the instructions in xref:client-configuration:registration-overview.adoc[].
-
-
-
-
-
-////
-This is all duplicated content. LKB 2018-08-31
-
-.Procedure: Registering a bootstrap repository:
-
- . At the command prompt on the {productname} Server, as root, create a bootstrap repository for {rhel}:
-+
-----
-mgr-create-bootstrap-repo RHEL_activation_channel_key
-----
-+
-If you use a dedicated channel per RHEL version, specify it with the [literal]``--with-custom-channel`` option.
-
-. Rename [command]``bootstrap.sh`` to [command]``resversion-boostrap.sh``:
-+
-
-----
-cp bootstrap.sh res7-bootstrap.sh
-----
-
-
-== Register a Salt Client via Bootstrap
-
-
-The following procedure will guide you through registering a Salt client using the bootstrap script.
-
-.Procedure: Registration Using the Bootstrap Script
-. For your new client download the bootstrap script from the {productname} server:
-+
-
-----
-wget --no-check-certificate https://`server`/pub/bootstrap/res7-bootstrap.sh
-----
-. Add the appropriate res-gpg-pubkey-#####-#####.key to the `ORG_GPG_KEY` key parameter, comma delimited in your [command]``res7-bootstrap.sh`` script. These are located on your {productname} server at:
-+
-
-----
-http://`server`/pub/
-----
-. Make the [command]``res7-bootstrap.sh`` script executable and run it. This will install necessary Salt packages from the bootstrap repository and start the Salt client service:
-+
-
-----
-chmod +x res7-bootstrap.sh
-./res7-boostrap.sh
-----
-
-. From the {productname} {webui} select menu:Salt[Keys] and accept the new client's key.
-
-////
-
-
-////
-I'm fairly certain this isn't supported, which is why we took it out of the SLE instructions. LKB 2018-08-12
-
-== Manual Salt Client Registration
-
-
-The following procedure will guide you through the registration of a Salt client manually.
-
-
-. Add the bootstrap repository:
-+
-
-----
-yum-config-manager --add-repo https://`server`/pub/repositories/res/7/bootstrap
-----
-. Install the [package]#salt-minion# package:
-+
-
-----
-yum install salt-minion
-----
-. Edit the Salt client configuration file to point to the {productname} server:
-+
-
-----
-mkdir /etc/salt/minion.d
-echo "master:`server_fqdn`" > /etc/salt/minion.d/susemanager.conf
-----
-. Start the client service:
-+
-
-----
-systemctl start salt-minion
-----
-
-. From the {productname} {webui} select the menu:Salt[Keys] and accept the new client's key.
-
-////
