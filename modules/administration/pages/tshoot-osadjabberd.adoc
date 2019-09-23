@@ -23,18 +23,25 @@ If more detailed instructions are required, put them in a "Resolving" procedure:
 
 == Open File Count Exceeded
 
-The number of maximum files that a jabber user can open is lower than the number of connected clients.
-OSAD clients cannot contact the SUSE Manager Server, and jabberd requires long periods of time to respond on port 5222.
-Each client requires one permanently open TCP connection and each connection requires one file handler.
+If you receive an ``open file count exceeded`` error, it could be because the maximum number of files that jabber can open is lower than the number of connected OSAD clients.
 
-To resolve OSAD connection problems, edit such lines in [path]``/etc/security/limits.conf``:
+If this occurs, OSAD clients cannot contact the SUSE Manager Server, and jabberd will take an excessive amount of time to respond on port 5222.
+
+[[NOTE]]
+====
+This fix is only required if you have more than 8192 clients connected using OSAD.
+In this case, we recommend you consider using Salt clients instead.
+For more information about tuning large scale installations, see xref:salt:large-scale.adoc[].
+====
+
+You can increase the number of files available to jabber by editing these lines [path]``/etc/security/limits.conf``:
 
 ----
 jabber   soft   nofile   <#clients + 100>
 jabber   hard   nofile   <#clients + 1000>
 ----
 
-Itwill vary according to your setup.
+The exact details will vary depending on your environment.
 For example, in the case of 5000 clients:
 
 ----
@@ -45,13 +52,16 @@ jabber   hard   nofile   6000
 Ensure you also update the `max_fds` parameter in [path]``/etc/jabberd/c2s.xml``.
 For example: `<max_fds>6000</max_fds>`
 
-The soft file limit is the limit of the maximum number of open files for a single process.
-In {productname} the highest consuming process is c2s, which opens a connection per client.
-100 additional files are added, here, to accommodate for any non-connection file that c2s requires to work correctly.
-The hard limit applies to all processes belonging to the jabber user, and accounts for open files from the router, s2s and sm processes additionally.
+The soft file limit is the maximum number of open files for a single process.
+In {productname} the highest consuming process is ``c2s``, which opens a connection per client.
+100 additional files are added, here, to accommodate for any non-connection file that ``c2s`` requires to work correctly.
+The hard limit applies to all processes belonging to jabber, and also accounts for open files from the router, ``c2s`` and ``sm`` processes.
 
 
 
+
+////
+Delinking per https://github.com/SUSE/spacewalk/issues/9516 LKB 2019-09-23
 == jabberd Database Corruption
 
 ``SYMPTOMS``: After _a disk is full error_ or a _disk crash event_, the [systemitem]``jabberd`` database may have become corrupted.
@@ -84,6 +94,7 @@ spacewalk-service stop
 rm -rf /var/lib/jabberd/db/*
 spacewalk-service start
 ----
+////
 
 //   ke, 2019-08-08: not sure whether we want this here:
 
@@ -104,6 +115,8 @@ rcosa-dispatcher start
 ////
 
 
+////
+Delinking per https://github.com/SUSE/spacewalk/issues/9516 LKB 2019-09-23
 
 == Capturing XMPP Network Data for Debugging Purposes
 
