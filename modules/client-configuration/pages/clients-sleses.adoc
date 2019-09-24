@@ -1,0 +1,167 @@
+[[clients-sleses]]
+= Registering {sleses} Clients
+
+This section contains information about registering traditional and Salt clients running {sleses} operating systems ({slesesa} for the rest of the guide)
+
+{slesesa} clients can be initally based {rhel} or {centos}.
+
+[WARNING]
+====
+{slesesa} clients are also called sometimes RES or {redhat} {slesa})
+For {rhel} based clients tou are responsible for arranging access to {rhela} or {centos} base media repositories installation media.
+ifeval::[{suma-content} == true]
+You must obtain support from {suse} for all your {slesesa} systems.
+endif::[]
+ifeval::[{uyuni-content} == true]
+{suse} does not provide support for {slesesa} systems on Uyuni.
+endif::[]
+====
+
+== Server requirements
+
+Ensure that your {productname} Server meets the requirements outlined at xref:installation:hardware-requirements.adoc[].
+
+Taskomatic will use one CPU core, and requires at least 3072{nbsp}MB RAM.
+
+To ensure that Taskomatic has access to enough memory, open the [path]``/etc/rhn/rhn.conf`` configuration file, add this line:
+
+----
+taskomatic.java.maxmemory=3072
+----
+
+Restart Taskomatic:
+----
+systemctl restart taskomatic
+----
+
+== {slesesa} Channel Management
+
+[IMPORTANT]
+====
+Missing packages will cause your registration to fail.
+For {slesesa} clients, some required packages are contained on the {rhel} installation media or the {centos} installation media.
+Ensure you follow the whole procedure before trying to register any {slesa} client
+====
+
+=== Add {slesesa} product from SCC
+
+The {slesesa} product is provided by {scc}, including the client tools.
+
+Because the {slesesa} channels are particularly large, it can take up to 24 hours for an initial channel synchronization to complete.
+When you have completed the initial synchronization, we recommended you clone the channel before working with it.
+This provides you with a backup of the original synchronization data.
+
+Before you register {slesesa} clients to your {productname} Server, check that you have the corresponding {slesesa} product enabled, and the required channels are fully synchronized.
+
+You need to select two different sets of channels, one for {slesesa} and the other for the Client Tools.
+
+{slesesa} 6::
+* "RHEL6 Base x86_64" and "SUSE Linux Enterprise Client Tools RES6 x86_64" at the WebUI, or [systemitem]``rhel-x86_64-server-6`` and [systemitem]``res6-suse-manager-tools-x86_64`` at CLI. This adds the packages for the {slesesa} Client Tools 
+* "RHEL Expanded Support 6" at the WebUI, or [systemitem]``res6-x86_64`` at CLI. This adds the packages for the {slesesa} Operating System.
+
+// I suggest adding scripts
+
+{slesesa} 7::
+* "RHEL7 Base x86_64" and "SUSE Linux Enterprise Client Tools RES7 x86_64" at the WebUI, or [systemitem]``rhel-x86_64-server-7`` and [systemitem]``res7-suse-manager-tools-x86_64`` at CLI. This adds the packages for the {slesesa} Client Tools 
+* "RHEL Expanded Support 7" at the WebUI, or [systemitem]``res7-x86_64`` at CLI. This adds the packages for the {slesesa} Operating System.
+
+// I suggest adding scripts
+
+You can synchronize the channels with [command]``mgr-sync``.
+
+There are two ways to check if a channel has finished synchronizing:
+
+* In the {productname} {webui}, navigate to menu:Admin[Setup Wizard] and select the menu:SUSE Products[] tab.
+This dialog displays a completion bar for each product when they are being synchronized.
+* You can also check the synchronization log file at the command prompt.
+
+Use the [command]``cat`` or [command]``tail -f`` command to view the [path]``/var/log/rhn/reposync/channel-label.log`` file.
+
+If you use this method, remember that base channels can contain multiple child channels.
+
+Each of the child channels will generate its own log during the synchronization progress.
+
+You will need to check all the base and child channel log files to be sure that the synchronization is complete.
+
+You will also need an activation key associated with the correct {slesesa} channels (6 or 7)
+
+For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+
+=== Add {rhel} or {centos} Media
+
+The Base {slesesa} channel does not contain any packages.
+
+This is because {suse} does not provide {rhel} or {centos} base media.
+
+You will need to obtain base media from {redhat} or {centos}, which you can then add as a child channel to the {slesesa} parent channel.
+
+The following procedure guides you through setup of the {rhel} or {centos} media as a {productname} channel.
+
+All packages on the media will be mirrored into a child channel located under the distribution name and architecture.
+
+.Procedure: Setting up a {rhel} or {centos} Channel
+
+. In the {productname} {webui}, navigate to menu:Channels[Manage Software Channels], and click btn:[Create Channel].
+. Fill in the channel details, and add the channel as a child to the corresponding {rhel} or {centos} distribution channel for your architecture.
+The base parent channel will not contain any packages.
+. Modify the associated activation key to include your new child channel.
+. At the command prompt, as root, copy your installation disk image to the [path]``/tmp`` directory.
+. Create a directory to contain the media content (you can replace [path]``/rhel`` with [path]``/centos`` if you are using {centos}
++
+----
+mkdir -p /srv/www/htdocs/pub/rhel
+----
+. Mount the ISO:
++
+----
+mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel
+----
+. Synchronize the packages with [command]``spacewalk-repo-sync``:
++
+For {rhel} or {centos} 7:
++
+----
+spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/
+Repo URL: https://127.0.0.1/pub/rhel/
+Packages in repo:              [...]
+Packages already synced:       [...]
+Packages to sync:              [...]
+[...]
+----
++
+For {rhel} or {centos} 6:
++
+----
+spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
+Repo URL: https://127.0.0.1/pub/rhel/Server/
+Packages in repo:              [...]
+Packages already synced:       [...]
+Packages to sync:              [...]
+[...]
+----
+
+Sometimes, the [command]``spacewalk-repo-sync`` will stop running during a synchronization, which will give this error:
+----
+[Errno 256] No more mirrors to try.
+----
+
+If this occurs, you can run [command]``spacewalk-repo-sync`` in debugging mode to determine the error.
+
+Start debugging mode:
+----
+export URLGRABBER_DEBUG=DEBUG
+----
+
+Check the output:
+----
+/usr/bin/spacewalk-repo-sync --channel <channel-label> --type yum
+----
+
+Disable debug mode:
+----
+unset URLGRABBER_DEBUG
+----
+
+== Register {slesesa} Clients
+
+When you are ready to register your {slesesa} client, follow the instructions in xref:client-configuration:registration-overview.adoc[].
