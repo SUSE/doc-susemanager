@@ -8,9 +8,13 @@ This section contains information about registering traditional and Salt clients
 
 == Set up a {centos} Client
 
+ifeval::[{suma-content} == true]
+
 The [package]``spacewalk-utils`` package contains a number of upstream command line tools required for client administration.
 You will also require the [command]``spacewalk-common-channels`` tool.
 Keep in mind {suse} only provides support for [command]``spacewalk-clone-by-date`` and [command]``spacewalk-manage-channel-lifecycle`` tools.
+
+endif::[]
 
 The [path]``/etc/rhn/spacewalk-common-channels.ini`` configuration file must contain the channel references you want to add.
 If a channel is not listed, check the latest version for updates: https://github.com/spacewalkproject/spacewalk/tree/master/utils
@@ -18,6 +22,8 @@ If a channel is not listed, check the latest version for updates: https://github
 You will also need an activation key associated with the {centos} channel.
 For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
 
+
+ifeval::[{suma-content} == true]
 
 .Procedure: Adding Channels and Repositories
 
@@ -33,6 +39,28 @@ spacewalk-common-channels -u admin -p `secret` -a x86_64 'centos7'
 spacewalk-common-channels -u admin -p `secret` -a x86_64 'centos7-updates'
 spacewalk-common-channels -u admin -p `secret` -a x86_64 'centos7-uyuni-client-x86_64'
 ----
+
+endif::[]
+
+
+
+ifeval::[{uyuni-content} == true]
+
+.Procedure: Adding Channels and Repositories
+
+. At the command prompt on the {productname} Server, as root, install the [package]``spacewalk-utils`` package:
++
+----
+zypper in spacewalk-utils
+----
+. Add the {centos} base, updates, and client channels using the [command]``centos6-uyuni-client`` script:
++
+----
+centos6-uyuni-client -u admin -p `secret` -a x86_64 'centos7'
+centos6-uyuni-client -u admin -p `secret` -a x86_64 'centos7-updates'
+----
+
+endif::[]
 
 .Procedure: Synchronizing {centos} Clients
 
