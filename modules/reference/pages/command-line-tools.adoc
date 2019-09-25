@@ -696,9 +696,66 @@ Show help message and exit.
 
 
 [[spacewalk-repo-sync]]
-== Synchronize yum Repositories into SUSE Manager Channels (spacewalk-repo-sync)
+== Synchronize yum Repositories into {productname} Channels (spacewalk-repo-sync)
 
-With [command]``spacewalk-repo-sync`` you synchronize yum repositories into {productname} channels.
+[command]``spacewalk-repo-sync`` is an important tool on {productname}, which works most of the time in the background.
+With [command]``spacewalk-repo-sync`` you mainly synchronize yum repositories into {productname} channels.
+
+But for debugging or solving smaller issues it is useful to run it directly with special parameters.
+
+
+
+=== Normal Channel Synchronization
+
+Basic operation:
+
+[command]``spacewalk-repo-sync --list``::
+List all custom channels and the repositories assigned to them.
+[command]``spacewalk-repo-sync  --channel <custom-channel>``::
+Synchronize a single channel ``<custom-channel>`` to all repositories assigned to it with the {webui} or the API.
+
+
+
+=== Solve Checksum Problems
+
+Use the [option]``--deep-verify`` option to ignore cached package checksums, and thus solving checksum problems.
+
+
+
+=== Force Re-import Patches (Errata)
+
+Use the [option]``--force-all-errata`` to force re-importing all the patches (errata).
+To speed it up you can combine it with the [option]``--no-packages`` option.
+
+To find the root cause of synchronization problems it often helps to view the HTTP log when command]``spacewalk-repo-sync`` is running.
+
+. Set and export the [systemitem]``URLGRABBER_DEBUG``:
++
+----
+export URLGRABBER_DEBUG=DEBUG
+----
+. Run the synchronization command:
++
+
+----
+/usr/bin/spacewalk-repo-sync --channel <channel-label> --type yum
+----
+
+When debugging is done, disable the debug mode:
+
+----
+unset URLGRABBER_DEBUG
+----
+
+
+
+=== Increase Debug Level
+
+Use [option]``-vvv``
+
+
+
+=== For More Information 
 
 For a complete list of command line option, see the [command]``spacewalk-repo-sync`` manpage ([command]``man spacewalk-repo-sync``).
 
