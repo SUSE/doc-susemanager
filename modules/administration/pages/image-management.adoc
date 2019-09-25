@@ -56,14 +56,14 @@ For more information on Containers or CaaS Platform, see:
 === Create a Build Host
 
 
-To build images with {productname}, you will need to create and configure a Build Host.
-Container Build Hosts are Salt clients running {sle} 12 or later.
-This section guides you through the initial configuration for a Build Host.
+To build images with {productname}, you will need to create and configure a build host.
+Container build hosts are Salt clients running {sle} 12 or later.
+This section guides you through the initial configuration for a build host.
 
-From the {productname} {webui}, perform these steps to configure a Build Host:
+From the {productname} {webui}, perform these steps to configure a build host:
 
 
-. Select a Salt client to be designated as a Build Host from the menu:Systems[Overview] page.
+. Select a Salt client to be designated as a build host from the menu:Systems[Overview] page.
 . From the [guimenu]``System Details`` page of the selected client assign the containers modules.
 Go to menu:Software[Software Channels] and enable the containers module (for example, [guimenu]``SLE-Module-Containers15-Pool`` and [guimenu]``SLE-Module-Containers15-Updates``).
 Confirm by clicking btn:[Change Subscriptions].
@@ -82,11 +82,11 @@ salt '$your_client' state.highstate
 === Create an Activation Key for Containers
 
 
-The containers built using {productname} will use channel(s) associated to the Activation Key as repositories when building the image. This section will guide you into creating an ad-hoc Activation Key for this purpose.
+The containers built using {productname} will use channel(s) associated to the activation key as repositories when building the image. This section will guide you into creating an ad-hoc activation key for this purpose.
 
 [NOTE]
 ====
-To build a container, you will need an Activation Key that is associated with a channel other than `SUSE Manager Default`.
+To build a container, you will need an activation key that is associated with a channel other than `SUSE Manager Default`.
 ====
 
 image::systems_create_activation_key.png[scaledwidth=80%]
@@ -227,13 +227,13 @@ If a `folder` is not specified the image sources (Dockerfile sources) are expect
 ====
 
 . Select an `Activation Key`.
-Activation Keys ensure that images using a profile are assigned to the correct channel and packages.
+Activation keys ensure that images using a profile are assigned to the correct channel and packages.
 +
 
 .Relationship Between Activation Keys and Image Profiles
 [NOTE]
 ====
-When you associate an Activation Key with an image profile you are ensuring any image using the profile will use the correct software channel and any packages in the channel.
+When you associate an activation key with an image profile you are ensuring any image using the profile will use the correct software channel and any packages in the channel.
 ====
 
 . Click the btn:[Create] button.
@@ -249,11 +249,11 @@ An Image Profile that can be reused is published at https://github.com/SUSE/mana
 [NOTE]
 ====
 The [option]``ARG`` parameters ensure that the built image is associated with the desired repository version served by {productname}.
-The [option]``ARG`` parameters also allow you to build image versions of {sls} which may differ from the version of {sls} used by the Build Host itself.
+The [option]``ARG`` parameters also allow you to build image versions of {sls} which may differ from the version of {sls} used by the build host itself.
 
 For example: The [comand]``ARG repo`` parameter and the [command]``echo`` command pointing to the repository file, creates and then injects the correct path into the repository file for the desired channel version.
 
-The repository version is determined by the Activation Key that you assigned to your image profile.
+The repository version is determined by the activation key that you assigned to your image profile.
 ====
 
 [NOTE]
@@ -343,10 +343,10 @@ Image version:::
 The version of the image in the registry.
 
 Build host:::
-The Build Host that will pull and inspect the image.
+The build host that will pull and inspect the image.
 
 Activation key:::
-The Activation Key that provides the path to the software channel that the image will be inspected with.
+The activation key that provides the path to the software channel that the image will be inspected with.
 
 . For confirmation, click btn:[Import].
 
@@ -391,7 +391,7 @@ Kiwi image configuration files and configuration scripts must be accessible in o
 
 * git repository
 * HTTP hosted tarball
-* Local Build Host directory
+* Local build host directory
 
 For an example of a complete Kiwi repository served by git, see https://github.com/SUSE/manager-build-profiles/tree/master/OSImage
 
@@ -409,13 +409,13 @@ For more information, see the documentation of the underlying system.
 === Create a Build Host
 
 
-To build all kinds of images with {productname}, create and configure a Build Host.
-OS Image Build Hosts are Salt clients running {sls}{nbsp}12 (SP3 or later) or 15.
-This procedure will guide you through the initial configuration for a Build Host.
+To build all kinds of images with {productname}, create and configure a build host.
+OS Image build hosts are Salt clients running {sls}{nbsp}12 (SP3 or later) or 15.
+This procedure will guide you through the initial configuration for a build host.
 
-From the {productname} {webui}, perform these steps to configure a Build Host:
+From the {productname} {webui}, perform these steps to configure a build host:
 
-. Select a client that will be designated as a Build Host from the menu:Systems[Overview] page.
+. Select a client that will be designated as a build host from the menu:Systems[Overview] page.
 . From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type:`` [guimenu]``OS Image Build Host`` and confirm with btn:[Update Properties].
 +
 image::os-image-build-host.png[scaledwidth=80%]
@@ -431,7 +431,7 @@ salt '$your_client' state.highstate
 ----
 
 .{productname} Web Server Public Certificate RPM
-Build Host provisioning copies the {productname} certificate RPM to the Build Host.
+Build host provisioning copies the {productname} certificate RPM to the build host.
 This certificate is used for accessing repositories provided by {productname}.
 
 The certificate is packaged in RPM by the `mgr-package-rpm-certificate-osimage` package script.
@@ -449,7 +449,7 @@ However if the certificate path was changed or unavailable, you will need to cal
 
 The RPM package with the certificate is stored in a salt-accessible directory such as `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 
-The RPM package with the certificate is provided in the local Build Host repository `/var/lib/Kiwi/repo`.
+The RPM package with the certificate is provided in the local build host repository `/var/lib/Kiwi/repo`.
 
 
 [IMPORTANT]
@@ -474,13 +474,13 @@ Make sure your build source Kiwi configuration contains `rhn-org-trusted-ssl-cer
 [[at.images.kiwi.buildchannels]]
 === Create an Activation Key for OS Images
 
-Create an Activation Key associated with the channel that your OS Images will use as repositories when building the image.
+Create an activation key associated with the channel that your OS Images will use as repositories when building the image.
 
 Activation keys are mandatory for OS Image building.
 
 [NOTE]
 ====
-To build OS Images, you will need an Activation Key that is associated with a channel other than `SUSE Manager Default`.
+To build OS Images, you will need an activation key that is associated with a channel other than `SUSE Manager Default`.
 ====
 
 image::systems_create_activation_key.png[scaledwidth=80%]
@@ -532,7 +532,7 @@ image::images_image_create_profile_kiwi.png[scaledwidth=80%]
 . Enter a [guimenu]``Config URL`` to the directory containing the Kiwi configuration files:
 .. git URI
 .. HTTPS tarball
-.. Path to Build Host local directory
+.. Path to build host local directory
 . Select an [guimenu]``Activation Key``.
 Activation keys ensure that images using a profile are assigned to the correct channel and packages.
 +
@@ -540,7 +540,7 @@ Activation keys ensure that images using a profile are assigned to the correct c
 [NOTE]
 .Relationship Between Activation Keys and Image Profiles
 ====
-When you associate an Activation Key with an image profile you are ensuring any image using the profile will use the correct software channel and any packages in the channel.
+When you associate activation key with an image profile you are ensuring any image using the profile will use the correct software channel and any packages in the channel.
 ====
 +
 
@@ -583,11 +583,11 @@ URL to the tar archive, compressed or uncompressed, hosted on the webserver.
 https://myimagesourceserver.example.org/MyKiwiImage.tar.gz
 ----
 
-** Path to the directory on the Build Host
+** Path to the directory on the build host
 +
 
 Enter the path to the directory with the Kiwi build system sources.
-This directory must be present on the selected Build Host.
+This directory must be present on the selected build host.
 +
 
 ----
@@ -720,9 +720,9 @@ Building an image requires of several dependent steps.
 When the build fails, investigation of Salt states results can help you to identify the source of the failure.
 Usual checks when the build fails:
 
-* The Build Host can access the build sources
-* There is enough disk space for the image on both the Build Host and the {productname} server
-* The Activation Key has the correct channels associated with it
+* The build host can access the build sources
+* There is enough disk space for the image on both the build host and the {productname} server
+* The activation key has the correct channels associated with it
 * The build sources used are valid
 * The RPM package with the {productname} public certificate is up to date and available at `/usr/share/susemanager/salt/images/rhn-org-trusted-ssl-cert-osimage-1.0-1.noarch.rpm`.
 For more on how to refresh a public certificate RPM, see <<at.images.kiwi.buildhost>>.
