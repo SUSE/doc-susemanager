@@ -37,7 +37,7 @@ During the next few paragraphs, you will learn how to import the {redhat} CA and
 Entitlement certificates have embedded expiration dates tied to the length of the support subscription. You must repeat this process with updated entitlement certificates as needed to avoid disruption in channel mirroring.
 ====
 
-==== Entitlement Certificate
+=== Entitlement Certificate
 
 {redhat} Subscription Manager is a local service which tracks installed products and subscriptions on a local system to help manage subscription assignments. To obtain your certificates, you must register your system using this subscription manager tool supplied by {redhat}.
 
@@ -55,11 +55,11 @@ cd /etc/pki/entitlement/
 
 You will see two files with the data file format extension .pem (Program Editor macro). One is the certificate, and the other is the key and it has the word “key” in the file name.
 
-==== {redhat} CA Certificate
+=== {redhat} CA Certificate
 
 The next step is to get the {redhat} CA Certificate file. It is located on this same {redhat} system in the file [path]``/etc/rhsm/ca/redhat-uep.pem``. Place this file in the same location where, in the previous section, you put the entitlement certificate.
 
-==== Obtain Repository URL list
+=== Obtain Repository URL list
 
 Use the subscription manager tool to obtain the URL’s of the repositories you want to mirror:
 
@@ -67,7 +67,7 @@ Use the subscription manager tool to obtain the URL’s of the repositories you 
 subscription-manager repos
 ----
 
-==== Import
+=== Import
 
 Now you are ready to import the {redhat} CA Certificate and Entitlement Certificate into {productname} Server for software repository mirroring. You must create three entries here: one each for the entitlement certificate, the entitlement key, and the {redhat} certificate.
 
@@ -81,23 +81,23 @@ Now you are ready to import the {redhat} CA Certificate and Entitlement Certific
 
 Enter the following values, and ensure you enter the date:
 
-**Description:** Entitlement-Cert-date
-**Type:** Ensure you select SSL
-**Select file to upload:** Browse to where you saved the Entitlement Certificate .pem file and select it.
+* **Description:** Entitlement-Cert-date
+* **Type:** Ensure you select SSL
+* **Select file to upload:** Browse to where you saved the Entitlement Certificate .pem file and select it.
 
 Click the btn:[Create Key] at the bottom.
 
 Repeat the above steps for the Entitlement Key and change the values to match the following:
 
-**Description:** Entitlement-key-date
-**Type:** SSL
-**Select file to upload:** Browse to the location where you saved the Entitlement key .pem file and select it.
+* **Description:** Entitlement-key-date
+* **Type:** SSL
+* **Select file to upload:** Browse to the location where you saved the Entitlement key .pem file and select it.
 
 Repeat the above steps for the {redhat} CA Certificate (redhat-uep) and change the values to match the following:
 
-**Description:** redhat-uep
-**Type:** SSL
-**Select file to upload:** Browse to the location where you saved the {redhat} CA Certificate and select it.
+* **Description:** redhat-uep
+* **Type:** SSL
+* **Select file to upload:** Browse to the location where you saved the {redhat} CA Certificate and select it.
 
 You now have imported the Entitlement certificate, the Entitlement key and the {redhat} CA into {productname} Server for use. Your outcome should look like the screen below:
 
@@ -120,12 +120,12 @@ Click **Create Repository**. The following screen opens, where you can enter the
 
 Fill in the fields with values, following the example below:
 
-**Repository Label:** rhel-7-server-rpms
-**Repository URL:** https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/
-**Has Signed Metadata?:** Uncheck (Uncheck for all Red Hat Enterprise Repositories)
-**SSL CA Certificate:** redhat-uep
-**SSL Client Certificate:** Entitlement-Cert-date
-**SSL Client Key:** Entitlement-Key-date
+* **Repository Label:** rhel-7-server-rpms
+* **Repository URL:** https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/
+* **Has Signed Metadata?:** Uncheck (Uncheck for all Red Hat Enterprise Repositories)
+* **SSL CA Certificate:** redhat-uep
+* **SSL Client Certificate:** Entitlement-Cert-date
+* **SSL Client Key:** Entitlement-Key-date
 
 Leave other filed with the default values.
 
@@ -141,13 +141,13 @@ On your {productname} Server {webui}, navigate to menu:Software[Manage > Channel
 
 Click **Create Channel** and fill in the fields with at least the following values (change according to your {rhela} version):
 
-**Channel Name:** RHEL 7 x86_64
-**Channel Label:** rhel7-x86_64-server
-**Parent Channel:** None
-**Architecture:** x86_64
-**Repository Checksum Type:** sha1
-**Channel Summary:** RHEL 7 x86_64
-**Organization Sharing:** Public
+* **Channel Name:** RHEL 7 x86_64
+* **Channel Label:** rhel7-x86_64-server
+* **Parent Channel:** None
+* **Architecture:** x86_64
+* **Repository Checksum Type:** sha1
+* **Channel Summary:** RHEL 7 x86_64
+* **Organization Sharing:** Public
 
 
 After you have filled in the values, click again **Create Channel**.
@@ -169,13 +169,13 @@ Click the [guimenu]``Sync`` tab, and set your preferred recurring schedule for s
 
 Click **Create Channel** and fill in the fields with at least the following values (change according to your {rhela} version):
 
-**Channel Name:** RHEL 7 x86_64
-**Channel Label:** rhel7-x86_64-extras
-**Parent Channel:** rhel7-x86_64-server (from drop-down box)
-**Architecture:** x86_64
-**Repository Checksum Type:** sha1
-**Channel Summary:** RHEL 7 x86_64 Extras
-**Organization Sharing:** Public
+* **Channel Name:** RHEL 7 x86_64
+* **Channel Label:** rhel7-x86_64-extras
+* **Parent Channel:** rhel7-x86_64-server (from drop-down box)
+* **Architecture:** x86_64
+* **Repository Checksum Type:** sha1
+* **Channel Summary:** RHEL 7 x86_64 Extras
+* **Organization Sharing:** Public
 
 
 After you have filled in the values, click again **Create Channel**.
@@ -214,12 +214,7 @@ SUSE Manager subscriptions entitle everyone to the tools channels for {sleses} (
 
 You can use [command]``mgr-sync`` to do it from CLI.
 
-// I am not sure we need this, as we instruct users to sync the repositories, including "os" (pool) and updates. I asked clarification from Donald.
-//2. Follow the instructions to synchronize your base media as a child repository for your distribution based on Red Hat Enterprise Linux, as explained in the SUSE Manager Wiki:
-//
-//https://wiki.microfocus.com/index.php/SUSE_Manager/Sync_RHEL_media
-
-3. Add the new channels to the activation key you created previously.
+2. Add the new channels to the activation key you created previously.
 
 endif::[]
 ifeval::[{uyuni-content} == true]
@@ -232,21 +227,21 @@ Click **Create Repository**. The following screen opens, where you can enter the
 
 Fill in the fields with values, following the example below:
 
-**Repository Label:** centos7-uyuni-client
-**Repository URL:** https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable:/CentOS7-Uyuni-Client-Tools/CentOS_7/
-**Has Signed Metadata?:** Uncheck
+* **Repository Label:** centos7-uyuni-client
+* **Repository URL:** https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable:/CentOS7-Uyuni-Client-Tools/CentOS_7/
+* **Has Signed Metadata?:** Uncheck
 
 Leave other filed with the default values.
 
 2. Click **Create Channel** and fill in the fields with at least the following values (change according to your {rhela} version and architecture):
 
-**Channel Name:** Uyuni Client Tools for CentOS 7 (x86_64)
-**Channel Label:** centos7-uyuni-client-x86_64
-**Parent Channel:** rhel7-x86_64-server
-**Architecture:** x86_64
-**Repository Checksum Type:** sha1
-**Channel Summary:** Uyuni Client Tools for CentOS 7 (x86_64)
-**Organization Sharing:** Public
+* **Channel Name:** Uyuni Client Tools for CentOS 7 (x86_64)
+* **Channel Label:** centos7-uyuni-client-x86_64
+* **Parent Channel:** rhel7-x86_64-server
+* **Architecture:** x86_64
+* **Repository Checksum Type:** sha1
+* **Channel Summary:** Uyuni Client Tools for CentOS 7 (x86_64)
+* **Organization Sharing:** Public
 
 After you have filled in the values, click again btn:[Create Channel].
 

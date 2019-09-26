@@ -5,11 +5,11 @@ This section contains information about registering traditional and Salt clients
 
 [WARNING]
 ====
-{centos} Clients are completely based on {centos} and unrelated to {sleses} Clients (also known as RES or {redhat} {slesa})
+{centos} Clients are completely based on {centos} and unrelated to {sleses} Clients (also known as RES or {redhat} {slesesa})
 You are responsible for arranging access to {centos} base media repositories and {centos} installation media, as well as connecting {productname} Server to {centos} Content Delivery Network
 ifeval::[{suma-content} == true]
 {suse} does not provide support for {centos} operating system.
-Currently {centos} works with {productname} but support is not provided
+Currently {productname} allows managing {centos} but support is not provided.
 endif::[]
 ====
 
@@ -34,29 +34,6 @@ systemctl restart taskomatic
 
 .Procedure: Add the Channels and Repositories
 
-ifeval::[{suma-content} == true]
-SUSE Manager subscriptions entitle everyone to the tools channels for {sleses} (also known as Red Hat Expanded Support or RES). Any Red Hat Enterprise Linux system should use these to create the proper bootstrap repository for either traditional or salt-minion connectivity.
-
-1. Add the corresponding required {slesesa} channels and allow it to synchronize from SUSE Customer Center.
-
-{slesesa} 6::
-* "RHEL6 Base x86_64" and "SUSE Linux Enterprise Client Tools RES6 x86_64" at the WebUI, or [systemitem]``rhel-x86_64-server-6`` and [systemitem]``res6-suse-manager-tools-x86_64`` at CLI.
-
-{slesesa} 7::
-* "RHEL7 Base x86_64" and "SUSE Linux Enterprise Client Tools RES7 x86_64" at the WebUI, or [systemitem]``rhel-x86_64-server-7`` and [systemitem]``res7-suse-manager-tools-x86_64`` at CLI.
-
-You can use [command]``mgr-sync`` to do it from CLI.
-
-// I am not sure we need this, as we instruct users to sync the repositories, including "os" (pool) and updates. I asked clarification from Donald.
-//2. Follow the instructions to synchronize your base media as a child repository for your distribution based on Red Hat Enterprise Linux, as explained in the SUSE Manager Wiki:
-//
-//https://wiki.microfocus.com/index.php/SUSE_Manager/Sync_RHEL_media
-
-3. Add the new channels to the activation key you created previously.
-
-endif::[]
-
-ifeval::[{uyuni-content} == true]
 The [package]``spacewalk-utils`` package contains a number of command line tools required for client administration, including [command]``spacewalk-common-channels`` tool.
 
 ifeval::[{suma-content} == true]
@@ -72,20 +49,26 @@ At the command prompt on the {productname} Server, as root, install the [package
 zypper in spacewalk-utils
 ----
 
+// Because of the way mgr-create-bootstrap-repo works and because we don't have CentOS products at SCC, SUSE Manager users MUST use the same procedure as at Uyuni
+// They CANNOT use RES Client Tools.
+
 Add the {centos} base, updates, and client channels using the [command]``spacewalk-common-channels`` script (adapt to your CentOS version and architecture):
 ----
 spacewalk-common-channels -a x86_64 centos7 centos7-uyuni-client centos7-uyuni-client
 ----
 
+[IMPORTANT]
+====
+The Client Tools that [command]``spacewalk-common-channels`` adds come from {uyuni} and not from {suse}
+====
+
 .Procedure: Syncronize {centos} repositories
 
-In the {productname} {webui}, navigate to menu:Main Menu[Software > Manage], and select the base channel you want to synchronize.
+In the {productname} {webui}, navigate to menu:Main Menu[Software > Manage], and for each {centos} channel, ckick on it.
 
 . In the [guimenu]``Repositories`` tab, navigate to the [guimenu]``Sync`` subtab, and click btn:[Sync Now].
 You can also create a regular synchronization schedule on this page.
 endif::[]
-
-When you have prepared you {productname} Server, you can install your {centos} client using your preferred installation media and method.
 
 == Create an activation key
 
