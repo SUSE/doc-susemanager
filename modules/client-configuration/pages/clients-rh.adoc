@@ -3,21 +3,22 @@
 
 This section contains information about registering traditional and Salt clients running {rhel} operating systems.
 
-[WARNING]
+[IMPORTANT]
 ====
-{rhel} Clients are completely based on {redhat} and unrelated to {sleses} Clients (also known as RES or {redhat} {slesa})
-You are responsible for arranging access to {redhat} base media repositories and {rhela} installation media, as well as connecting {productname} Server to {redhat} Content Delivery Network
-You must obtain support from either {redhat} all your {rhela} systems.
+{rhel} clients are based on {redhat} and are unrelated to {sleses}, RES, {redhat}, or {slesa}.
+You are responsible for arranging access to {redhat} base media repositories and {rhela} installation media, as well as connecting {productname} Server to the {redhat} content delivery network.
+You must obtain support from {redhat} for all your {rhela} systems.
 If you do not do this, you might be violating your terms with {redhat}.
 ====
 
-== Server requirements
 
-Ensure that your {productname} Server meets the requirements outlined at xref:installation:hardware-requirements.adoc[].
 
-Taskomatic will use one CPU core, and requires at least 3072{nbsp}MB RAM.
+== Server Requirements
 
-To ensure that Taskomatic has access to enough memory, open the [path]``/etc/rhn/rhn.conf`` configuration file, add this line:
+Before you begin, check that your {productname} Server meets the requirements at xref:installation:hardware-requirements.adoc[].
+
+Taskomatic uses one CPU core, and requires at least 3072{nbsp}MB of RAM.
+To ensure that taskomatic has access to enough memory, open the [path]``/etc/rhn/rhn.conf`` configuration file, and add this line:
 
 ----
 taskomatic.java.maxmemory=3072
@@ -28,78 +29,88 @@ Restart Taskomatic:
 systemctl restart taskomatic
 ----
 
-== Import {redhat} Entitlement and CA Certificate
+== Import Entitlements and CA Certificate
 
-During the next few paragraphs, you will learn how to import the {redhat} CA and entitlement certificate.
+{redhat} clients require a {redhat} certificate authority (CA) and entitlement certificate.
 
-[WARNING]
-====
-Entitlement certificates have embedded expiration dates tied to the length of the support subscription. You must repeat this process with updated entitlement certificates as needed to avoid disruption in channel mirroring.
-====
+Entitlement certificates are embedded with expiration dates, which match the length of the support subscription.
+To avoid disruption, you will need to repeat this process at the end of every support subscription period.
 
-=== Entitlement Certificate
+{redhat} supply a subscription manager tool to manage subscription assignments.
+It runs locally to track installed products and subscriptions.
+Clients must be registered with the subscription manager to obtain certificates.
 
-{redhat} Subscription Manager is a local service which tracks installed products and subscriptions on a local system to help manage subscription assignments. To obtain your certificates, you must register your system using this subscription manager tool supplied by {redhat}.
+.Procedure: Registering Clients to Subscription Manager
 
-1. Register with the subscription manager tool from your {redhat} client. It will prompt you for your user name and password for authentication on the {redhat} Portal:
-
+. On the client system, at the command prompt, register with the subscription manager tool:
++
 ----
 subscription-manager register
 ----
-
-2. Navigate to the location of your entitlement certificate and key, and copy these files to where your Web browser connected to {productname} Server can open them:
-
++
+Enter your {redhat} Portal username and password when prompted.
+. Copy your entitlement certificate and key from the client system, to a location that the {productname} Server can access:
++
 ----
-cd /etc/pki/entitlement/
+cp /etc/pki/entitlement/ /<example>/entitlement/
+----
++
+[NOTE]
+====
+Your entitlement certificate and key will both have a file extension of [path]``.pem``.
+The key will also have [path]``key`` in the filename.
+====
++
+. Copy the {redhat} CA Certificate file from the client system, to the same web location as the entitlement certificate and key:
++
+----
+cp /etc/rhsm/ca/redhat-uep.pem /example/entitlement
 ----
 
-You will see two files with the data file format extension .pem (Program Editor macro). One is the certificate, and the other is the key and it has the word “key” in the file name.
 
-=== {redhat} CA Certificate
+To manage repositories on your {redhat} client, you need to import the CA and entitlement certificates to the {productname} Server.
+This requires three entries: one each for the entitlement certificate, the entitlement key, and the {redhat} certificate.
 
-The next step is to get the {redhat} CA Certificate file. It is located on this same {redhat} system in the file [path]``/etc/rhsm/ca/redhat-uep.pem``. Place this file in the same location where, in the previous section, you put the entitlement certificate.
 
-=== Obtain Repository URL list
 
-Use the subscription manager tool to obtain the URL’s of the repositories you want to mirror:
+.Procedure: Importing Certificates to the Server
+
+. On the {productname} Server {webui}, navigate to menu:Systems[Autoinstallation > GPG and SSL Keys].
++
+// Maybe we  should add a screenshot, as we have at the current guide: https://documentation.suse.com/sbp/all/html/SBP-sumaforrhel/index.html#sec-import
+// Not necessary, it's pretty simple to navigate to a page. LKB
+
+. Click btn:[Create Stored Key/Cert] and set these parameters for the entitlement certificate:
+* In the [guimenu]``Description`` field, type [systemitem]``Entitlement-Cert-date``.
+* In the [guimenu]``Type`` field, select [systemitem]``SSL``
+* In the [guimenu]``Select file to upload`` field, browse to the location where you saved the entitlement certificate, and select the [path]``.pem`` certificate file.
+. Click btn:[Create Key].
+. Click btn:[Create Stored Key/Cert] and set these parameters for the entitlement key:
+* In the [guimenu]``Description`` field, type [systemitem]``Entitlement-key-date``.
+* In the [guimenu]``Type`` field, select [systemitem]``SSL``
+* In the [guimenu]``Select file to upload`` field, browse to the location where you saved the entitlement key, and select the [path]``.pem`` key file.
+. Click btn:[Create Key].
+. Click btn:[Create Stored Key/Cert] and set these parameters for the {redhat} certificate:
+* In the [guimenu]``Description`` field, type [systemitem]``redhat-uep``.
+* In the [guimenu]``Type`` field, select [systemitem]``SSL``
+* In the [guimenu]``Select file to upload`` field, browse to the location where you saved the {redhat} certificate, and select the certificate file.
+. Click btn:[Create Key].
+
+// put the screenshot here as a result. LKB
+
+
+// Lana, you're up to here! 2019-09-27
+
+== Repository Management
+
+
+
+You can use the subscription manager tool to get the URLs of the repositories you want to mirror:
 
 ----
 subscription-manager repos
 ----
 
-=== Import
-
-Now you are ready to import the {redhat} CA Certificate and Entitlement Certificate into {productname} Server for software repository mirroring. You must create three entries here: one each for the entitlement certificate, the entitlement key, and the {redhat} certificate.
-
-* In the {productname} {webui}, navigate to menu:Systems[Autoinstallation > GPG and SSL Keys].
-
-// Maybe we  should add a screenshot, as we have at the current guide: https://documentation.suse.com/sbp/all/html/SBP-sumaforrhel/index.html#sec-import
-
-* Click **Create Stored Key/Cert** on the right. Another screen opens where you can fill in the required information.
-
-// Another screenshot.
-
-Enter the following values, and ensure you enter the date:
-
-* **Description:** Entitlement-Cert-date
-* **Type:** Ensure you select SSL
-* **Select file to upload:** Browse to where you saved the Entitlement Certificate .pem file and select it.
-
-Click the btn:[Create Key] at the bottom.
-
-Repeat the above steps for the Entitlement Key and change the values to match the following:
-
-* **Description:** Entitlement-key-date
-* **Type:** SSL
-* **Select file to upload:** Browse to the location where you saved the Entitlement key .pem file and select it.
-
-Repeat the above steps for the {redhat} CA Certificate (redhat-uep) and change the values to match the following:
-
-* **Description:** redhat-uep
-* **Type:** SSL
-* **Select file to upload:** Browse to the location where you saved the {redhat} CA Certificate and select it.
-
-You now have imported the Entitlement certificate, the Entitlement key and the {redhat} CA into {productname} Server for use. Your outcome should look like the screen below:
 
 == Create Software Repositories
 
