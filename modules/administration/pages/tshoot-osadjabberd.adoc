@@ -34,20 +34,29 @@ In this case, we recommend you consider using Salt clients instead.
 For more information about tuning large scale installations, see xref:salt:large-scale.adoc[].
 ====
 
-You can increase the number of files available to jabber by editing these lines [path]``/etc/security/limits.conf``:
+You can increase the number of files available to jabber by editing the [systemitem]``LimitNOFILE`` service file in [command]``systemd``.
 
+.Procedure: Adjusting the Maximum File Count
+
+. At the command prompt, as root, open the [path]``/etc/systemd/system/httpd.service.d/local.conf`` in yourr preferred editor.
+. Add or edit this section:
++
 ----
-jabber   soft   nofile   <#clients + 100>
-jabber   hard   nofile   <#clients + 1000>
+[Unit]
+LimitNOFILE=
+LimitNOFILE=<newvalue>
+----
++
+The value you choose will vary depending on your environment.
+For example, if you have 5000 clients, increase the value to 6000:
++
+----
+#/etc/systemd/system/httpd.service.d/local.conf
+[Unit]
+LimitNOFILE=
+LimitNOFILE=6000
 ----
 
-The exact details will vary depending on your environment.
-For example, in the case of 5000 clients:
-
-----
-jabber   soft   nofile   5100
-jabber   hard   nofile   6000
-----
 
 Ensure you also update the `max_fds` parameter in [path]``/etc/jabberd/c2s.xml``.
 For example: `<max_fds>6000</max_fds>`
@@ -56,7 +65,6 @@ The soft file limit is the maximum number of open files for a single process.
 In {productname} the highest consuming process is ``c2s``, which opens a connection per client.
 100 additional files are added, here, to accommodate for any non-connection file that ``c2s`` requires to work correctly.
 The hard limit applies to all processes belonging to jabber, and also accounts for open files from the router, ``c2s`` and ``sm`` processes.
-
 
 
 
