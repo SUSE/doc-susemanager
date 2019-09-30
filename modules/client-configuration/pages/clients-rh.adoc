@@ -99,10 +99,8 @@ This requires three entries: one each for the entitlement certificate, the entit
 // put the screenshot here as a result. LKB
 
 
-// Lana, you're up to here! 2019-09-27
 
 == Repository Management
-
 
 
 You can use the subscription manager tool to get the URLs of the repositories you want to mirror:
@@ -111,168 +109,162 @@ You can use the subscription manager tool to get the URLs of the repositories yo
 subscription-manager repos
 ----
 
+You can use these repository URLs to create custom repositories.
+This allows you to mirror only the content you need to manage your clients.
 
-== Create Software Repositories
-
-[WARNING]
+[IMPORTANT]
 ====
-Use the output of repository URL’s obtained earlier from the subscription manager tool to create other repositories to which you are entitled. Mirror only the content which you need to manage your systems.
-====
-
-To mirror the software from the {redhat} CDN, you need to create custom channels and repositories in {productname} Server that are linked to the CDN with their respective URL. This will only work if you have entitlements to these products in your {redhat} Portal. To create these software repositories you need to perform the following actions.
-
-On your {productname} Server {webui}, navigate to menu:Software[Manage > Repositories].
-
-// Maybe a screenshot could help, as the original guide.
-
-Click **Create Repository**. The following screen opens, where you can enter the required information to create the repository.
-
-// Maybe a screenshot could help, as the original guide.
-
-Fill in the fields with values, following the example below:
-
-* **Repository Label:** rhel-7-server-rpms
-* **Repository URL:** https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/
-* **Has Signed Metadata?:** Uncheck (Uncheck for all Red Hat Enterprise Repositories)
-* **SSL CA Certificate:** redhat-uep
-* **SSL Client Certificate:** Entitlement-Cert-date
-* **SSL Client Key:** Entitlement-Key-date
-
-Leave other filed with the default values.
-
-These steps need to be repeated for the Products / Repository URLs you define for your environment.
-
-== Create Software Channel Delivery
-
-Next step is to create corresponding channels to which you assign these repositories.
-
-On your {productname} Server {webui}, navigate to menu:Software[Manage > Channels].
-
-=== Parent Channels Example
-
-Click **Create Channel** and fill in the fields with at least the following values (change according to your {rhela} version):
-
-* **Channel Name:** RHEL 7 x86_64
-* **Channel Label:** rhel7-x86_64-server
-* **Parent Channel:** None
-* **Architecture:** x86_64
-* **Repository Checksum Type:** sha1
-* **Channel Summary:** RHEL 7 x86_64
-* **Organization Sharing:** Public
-
-
-After you have filled in the values, click again **Create Channel**.
-
-Click the [guimenu]``Repositories`` tab, and mark the checkbox next to the appropriate repository, and then click btn:[Update repositories].
-
-// Add a screenshot
-
-Click the [guimenu]``Sync`` tab, and set your preferred recurring schedule for synchronization for this repository. Select btn:[Sync Now] to launch the synchronization immediately.
-
-[WARNING]
-====
-{rhel} OS channels can grow to be very large. Thus it can take several hours to complete mirroring.
+You can only create custom versions of {redhat} repositories if you have the correct entitlements in your {redhat} Portal.
 ====
 
-// add a screenshot
+.Procedure: Creating Custom Repositories
 
-=== Child Channels example
+. On the {productname} Server {webui}, navigate to menu:Software[Manage > Repositories].
+. Click btn:[Create Repository] and set these parameters for the entitlement certificate:
+* In the [guimenu]``Repository Label`` field, type [systemitem]``rhel-7-server-rpms``.
+* In the [guimenu]``Repository URL`` field, type the URL of the repository to mirror.
+For example, [systemitem]``https://cdn.redhat.com/content/dist/rhel/server/7/7Server/x86_64/os/``.
+* In the [guimenu]``Has Signed Metadata?`` field, uncheck all Red Hat Enterprise Repositories.
+* In the [guimenu]``SSL CA Certificate`` field, select [systemitem]``redhat-uep``.
+* In the [guimenu]``SSL Client Certificate`` field, select [systemitem]``Entitlement-Cert-date``.
+* In the [guimenu]``SSL Client Key`` field, select [systemitem]``Entitlement-Key-date``.
+* Leave all other fields as the default values.
+. Click btn:[Create Repository]
+. Repeat for every repository you want to define.
 
-Click **Create Channel** and fill in the fields with at least the following values (change according to your {rhela} version):
 
-* **Channel Name:** RHEL 7 x86_64
-* **Channel Label:** rhel7-x86_64-extras
-* **Parent Channel:** rhel7-x86_64-server (from drop-down box)
-* **Architecture:** x86_64
-* **Repository Checksum Type:** sha1
-* **Channel Summary:** RHEL 7 x86_64 Extras
-* **Organization Sharing:** Public
+When you have created the custom repositories, you can create corresponding custom channels.
+
+.Procedure: Creating Custom Channels
+
+. On the {productname} Server {webui}, navigate to menu:Software[Manage > Channels].
+. Click btn:[Create Channel] and set these parameters for the entitlement certificate.
+Ensure you use the correct {rhela} version:
+* In the [guimenu]``Channel Name`` field, type [systemitem]``RHEL 7 x86_64``.
+* In the [guimenu]``Channel Label`` field, type [systemitem]``rhel7-x86_64-server``.
+* In the [guimenu]``Parent Channel`` field, select [systemitem]``None``.
+* In the [guimenu]``Architecture`` field, select [systemitem]``x86_64``.
+* In the [guimenu]``Repository Checksum Type`` field, select [systemitem]``sha1``.
+* In the [guimenu]``Channel Summary`` field, type [systemitem]``RHEL 7 x86_64``.
+* In the [guimenu]``Organization Sharing`` field, select [systemitem]``Public``.
+. Click btn:[Create Channel].
+. Navigate to the [guimenu]``Repositories`` tab, check the appropriate repository, and click btn:[Update repositories].
+. OPTIONAL: Navigate to the [guimenu]``Sync`` tab to set a recurring schedule for synchronization of this repository.
+. Click btn:[Sync Now] to begin synchronization immediately.
 
 
-After you have filled in the values, click again **Create Channel**.
-
-Click the [guimenu]``Repositories`` tab, and mark the checkbox next to the appropriate repository, and then click btn:[Update repositories].
-
-// Add a screenshot
-
-Click the [guimenu]``Syn`` tab, and set your preferred recurring schedule for synchronization for this repository. You can also select btn:[Sync Now] to launch the synchronization immediately.
-
-[WARNING]
+[NOTE]
 ====
-Some of the {rhel} channels can grow to be very large. Thus it can take several hours to complete mirroring.
+{rhel} channels can be very large.
+Synchronization can sometimes take several hours.
 ====
 
-// add a screenshot
 
-== Activation key
+When you have created the custom channels and synchronized them with the repositories, you can create child channels.
 
-Now you can proceed to create the activation key in the {productname} Server {webui}, and assign appropriate channels to it.
+.Procedure: Creating Child Channels
 
-== Registration
+. On the {productname} Server {webui}, navigate to menu:Software[Manage > Channels].
+. Click btn:[Create Channel] and set these parameters for the entitlement certificate.
+Ensure you use the correct {rhela} version:
+* In the [guimenu]``Channel Name`` field, type [systemitem]``RHEL 7 x86_64``.
+* In the [guimenu]``Channel Label`` field, type [systemitem]``rhel7-x86_64-extras``.
+* In the [guimenu]``Parent Channel`` field, select [systemitem]``rhel7-x86_64-server``.
+* In the [guimenu]``Architecture`` field, select [systemitem]``x86_64``.
+* In the [guimenu]``Repository Checksum Type`` field, select [systemitem]``sha1``.
+* In the [guimenu]``Channel Summary`` field, type [systemitem]``RHEL 7 x86_64 Extras``.
+* In the [guimenu]``Organization Sharing`` field, select [systemitem]``Public``.
+. Click btn:[Create Channel].
+. Navigate to the [guimenu]``Repositories`` tab, check the appropriate repository, and click btn:[Update repositories].
+. OPTIONAL: Navigate to the [guimenu]``Sync`` tab to set a recurring schedule for synchronization of this repository.
+. Click btn:[Sync Now] to begin synchronization immediately.
 
-=== Add Client Tools channels
+
+[NOTE]
+====
+{rhel} channels can be very large.
+Synchronization can sometimes take several hours.
+====
+
+
+== Register Clients
+
+When you have set up all the custom channels, you can add the client tools, and register clients.
+
+For this section, you will require an activation key.
+For more information about activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+
 
 ifeval::[{suma-content} == true]
-SUSE Manager subscriptions entitle everyone to the tools channels for {sleses} (also known as Red Hat Expanded Support or RES). Any Red Hat Enterprise Linux system should use these to create the proper bootstrap repository for either traditional or salt-minion connectivity.
 
-1. Add the corresponding required {slesesa} channels and allow it to synchronize from SUSE Customer Center.
+Your {susemanager} subscription entitles you to the tools channels for {sleses} (also known as {redhat} Expanded Support or RES).
+You must use the client tools channel to create the bootstrap repository.
+This procedure applies to both traditional and Salt minions.
 
-{slesesa} 6::
-* "RHEL6 Base x86_64" and "SUSE Linux Enterprise Client Tools RES6 x86_64" at the WebUI, or [systemitem]``rhel-x86_64-server-6`` and [systemitem]``res6-suse-manager-tools-x86_64`` at CLI.
 
-{slesesa} 7::
-* "RHEL7 Base x86_64" and "SUSE Linux Enterprise Client Tools RES7 x86_64" at the WebUI, or [systemitem]``rhel-x86_64-server-7`` and [systemitem]``res7-suse-manager-tools-x86_64`` at CLI.
+.Procedure: Adding Client Tools Channels
 
-You can use [command]``mgr-sync`` to do it from CLI.
-
-2. Add the new channels to the activation key you created previously.
+. On the {productname} Server, add the appropriate {slesesa} channels:
++
+* For {slesesa} 6:
++
+From the {webui}, add [systemitem]``RHEL6 Base x86_64`` and [systemitem]``SUSE Linux Enterprise Client Tools RES6 x86_64``.
++
+From the command prompt, add [systemitem]``rhel-x86_64-server-6`` and [systemitem]``res6-suse-manager-tools-x86_64``.
++
+* For {slesesa} 7:
++
+From the {webui}, add [systemitem]``RHEL7 Base x86_64`` and [systemitem]``SUSE Linux Enterprise Client Tools RES7 x86_64``.
++
+From the command prompt, add [systemitem]``rhel-x86_64-server-7`` and [systemitem]``res7-suse-manager-tools-x86_64``.
+.  Synchronize the {productname} Server with the {SCC}.
+You can do this using the {webui}, or by running [command]``mgr-sync`` at the command prompt. to do it from CLI.
+. Add the new channel to your activation key.
 
 endif::[]
+
+
 ifeval::[{uyuni-content} == true]
 
 // spacewalk-common-channels can't be used because centosX-uyuni-client requires centos7 channel as well, which a RHEL user would not need.
 
-1. On your {productname} Server {webui}, navigate to menu:Software[Manage > Repositories].
+.Procedure: Adding Client Tools Channels
 
-Click **Create Repository**. The following screen opens, where you can enter the required information to create the repository.
+. On the {productname} Server {webui}, navigate to menu:Software[Manage > Repositories].
+. Click btn:[Create Repository] and set these parameters for the entitlement certificate:
+* In the [guimenu]``Repository Label`` field, type [systemitem]``centos7-uyuni-client``.
+* In the [guimenu]``Repository URL`` field, type the URL of the repository to mirror.
+For example, [systemitem]``https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable:/CentOS7-Uyuni-Client-Tools/CentOS_7/``.
+* In the [guimenu]``Has Signed Metadata?`` field, uncheck all Red Hat Enterprise Repositories.
+* Leave all other fields as the default values.
+. Click btn:[Create Repository]
+. Navigate to menu:Software[Manage > Channels].
+. Click btn:[Create Channel] and set these parameters:
+Ensure you use the correct {rhela} version:
+* In the [guimenu]``Channel Name`` field, type [systemitem]``Uyuni Client Tools for CentOS 7 (x86_64)``.
+* In the [guimenu]``Channel Label`` field, type [systemitem]``centos7-uyuni-client-x86_64``.
+* In the [guimenu]``Parent Channel`` field, select [systemitem]``rhel7-x86_64-server``.
+* In the [guimenu]``Architecture`` field, select [systemitem]``x86_64``.
+* In the [guimenu]``Repository Checksum Type`` field, select [systemitem]``sha1``.
+* In the [guimenu]``Channel Summary`` field, type [systemitem]``Uyuni Client Tools for CentOS 7 (x86_64)``.
+* In the [guimenu]``Organization Sharing`` field, select [systemitem]``Public``.
+. Click btn:[Create Channel].
+. Navigate to the [guimenu]``Repositories`` tab, check the [systemitem]``centos7-uyuni-client`` repository, and click btn:[Update repositories].
+. OPTIONAL: Navigate to the [guimenu]``Sync`` tab to set a recurring schedule for synchronization of this repository.
+. Click btn:[Sync Now] to begin synchronization immediately.
+. Add the new channel to your activation key.
 
-Fill in the fields with values, following the example below:
-
-* **Repository Label:** centos7-uyuni-client
-* **Repository URL:** https://download.opensuse.org/repositories/systemsmanagement:/Uyuni:/Stable:/CentOS7-Uyuni-Client-Tools/CentOS_7/
-* **Has Signed Metadata?:** Uncheck
-
-Leave other filed with the default values.
-
-2. Click **Create Channel** and fill in the fields with at least the following values (change according to your {rhela} version and architecture):
-
-* **Channel Name:** Uyuni Client Tools for CentOS 7 (x86_64)
-* **Channel Label:** centos7-uyuni-client-x86_64
-* **Parent Channel:** rhel7-x86_64-server
-* **Architecture:** x86_64
-* **Repository Checksum Type:** sha1
-* **Channel Summary:** Uyuni Client Tools for CentOS 7 (x86_64)
-* **Organization Sharing:** Public
-
-After you have filled in the values, click again btn:[Create Channel].
-
-Click the [guimenu]``Repositories`` tab, and mark the checkbox for ``centos7-uyuni-client``, and then click btn:[Update repositories].
-
-Click the [guimenu]``Sync``tab, and set your preferred recurring schedule for synchronization for this repository. Select btn:[Sync Now] to launch the synchronization immediately.
-
-3. Add the new channel to the activation key you created previously
 endif::[]
 
-=== Bootstrap Repository Creation
 
-Create a bootstrap repository for your Red Hat Enterprise Linux clients with
+
+== Register Clients
+
+To register you {redhat} clients, you will need a bootstrap repository.
+Create the bootstrap repository at the command prompt, with this command:
 
 ----
 mgr-create-bootstrap-repo --with-custom-channels
 ----
 
-Ensure that it completes without error.
-
-== Register {rhela} Clients
-
-When you are ready to register your {rhel} client, follow the instructions in xref:client-configuration:registration-overview.adoc[].
+For more information on registering your clients, see xref:client-configuration:registration-overview.adoc[].
