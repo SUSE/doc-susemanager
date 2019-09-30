@@ -25,12 +25,8 @@ pam_auth_service = susemanager
 NOTE: This assumes the PAM service file is named [path]``susemanager``.
 +
 
-. In the {productname} {webui}, navigate to menu:Create User[] and enable a new or existing user to authenticate with PAM
-. Check the [guimenu]``Pluggable Authentication Modules (PAM)`` checkbox.
-It is below the password and password confirmation fields.
-. To authenticate a {slsa} system against Kerberos, add these lines to [path]``/etc/pam.d/susemanager``:
+. A standard [path]``/etc/pam.d/susemanager`` file should look like this. It configures {productname} to use the system wide pam configuration:
 +
-
 ----
 #%PAM-1.0
 auth     include        common-auth
@@ -38,75 +34,25 @@ account  include        common-account
 password include        common-password
 session  include        common-session
 ----
-+
-To authenticate a {rhel} system against Kerberos, add these lines to [path]``/etc/pam.d/susemanager``:
 
-----
-#%PAM-1.0
-auth        required      pam_env.so
-auth        sufficient    pam_krb5.so no_user_check
-auth        required      pam_deny.so
-account     required      pam_krb5.so no_user_check
-----
+. Restart the {productname} Services after a configuration change
+. In the {productname} {webui}, navigate to menu:Create User[] and enable a new or existing user to authenticate with PAM
+. Check the [guimenu]``Pluggable Authentication Modules (PAM)`` checkbox.
+It is below the password and password confirmation fields.
 +
 
-YaST can be used to configure PAM.
-You will need to install the [package]``yast2-ldap-client`` and [package]``yast2-kerberos-client`` packages.
-For more information about configuring PAM, see the SUSE Linux Enterprise Server Security Guide https://www.suse.com/documentation/sles-15/book_security/data/part_auth.html.
-This is a generic example that will also work for other network-based authentication methods.
-+
 .Changing Passwords
 IMPORTANT: Changing the password on the {productname} {webui} changes only the local password on the {productname} Server.
 If PAM is enabled for that user, the password might not be used at all.
 In the above example, for instance, the Kerberos password will not be changed.
+Use the password change mechanism of your network service to change the password for these users.
 
 
-
-=== Authentication with eDirectory and PAM
-
-. First check to ensure eDirectory authentication is working with your current OS for example:
-+
-
-----
-getent passwd
-----
-. If users are returned from eDirectory then create the [filename]``/etc/pam.d/susemanager`` and add the following content:
-+
-
-----
-#%PAM-1.0
-auth     include        common-auth
-account  include        common-account
-password include        common-password
-session  include        common-session
-----
-
-. Add these lines to the {productname} configuration file at [filename]``/etc/rhn/rhn.conf``:
-+
-
-----
-pam_auth_service = susemanager
-----
-
-You can now create users with the same ID used by eDirectory, and check the [guimenu]``Use PAM`` checkbox in the {productname} {webui}.
-
-
-
-// === Example Quest VAS Active Directory Authentication Template
-
-
-// If you are using Quest VAS for active directory authentication, you can use this [path]``/etc/pam.d/susemanager`` file.
-
-.Example of Quest VAS Active Directory Authentication Template
-----
-#%PAM-1.0
-auth       required       pam_env.so
-auth       sufficient     pam_vas3.so no_user_check
-auth       requisite      pam_vas3.so echo_return
-auth       required       pam_deny.so
-account    required       pam_vas3.so no_user_check
-----
-
+To configure the system wide authentication you can use YaST.
+You will need to install the [package]``yast2-ldap-client`` and [package]``yast2-kerberos-client`` packages.
+For more information about configuring PAM, see the SUSE Linux Enterprise Server Security Guide https://www.suse.com/documentation/sles-15/book_security/data/part_auth.html.
+This is a generic example that will also work for other network-based authentication methods.
+It describes also how to configure the use of an Active Directory Service.
 
 
 == Authentication Via Single Sign-On (SSO)
