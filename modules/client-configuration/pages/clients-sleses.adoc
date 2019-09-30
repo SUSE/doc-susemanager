@@ -1,29 +1,41 @@
 [[clients-sleses]]
 = Registering {sleses} Clients
 
-This section contains information about registering traditional and Salt clients running {sleses} operating systems ({slesesa} for the rest of the guide)
+This section contains information about registering traditional and Salt clients running {sleses} ({slesesa}) operating systems.
 
-{slesesa} clients can be initally based {rhel} or {centos}.
+{slesesa} clients are based on {rhel} or {centos}.
 
-[WARNING]
+They are sometimes also called SLESES, RES or {redhat} {slesesa}.
+
+
+[IMPORTANT]
 ====
-{slesesa} clients are also called sometimes SLESES, RES or {redhat} {slesesa})
-For {rhel} based clients you are responsible for arranging access to {rhela} or {centos} base media repository installation media.
+You are responsible for arranging access to {redhat} or {centos} base media repositories and installation media.
+====
+
 ifeval::[{suma-content} == true]
-You must obtain support from {suse} for all your {slesesa} systems.
-endif::[]
-ifeval::[{uyuni-content} == true]
-{suse} does not provide support for {slesesa} systems on Uyuni.
-endif::[]
+[IMPORTANT]
 ====
+You must obtain support from {suse} for all your {slesesa} systems.
+====
+endif::[]
+
+
+ifeval::[{uyuni-content} == true]
+[IMPORTANT]
+====
+{suse} does not provide support for {slesesa} systems on {uyuni}.
+====
+endif::[]
+
+
 
 == Server Requirements
 
 Before you begin, check that your {productname} Server meets the requirements at xref:installation:hardware-requirements.adoc[].
 
-Taskomatic will use one CPU core, and requires at least 3072{nbsp}MB RAM.
-
-To ensure that Taskomatic has access to enough memory, open the [path]``/etc/rhn/rhn.conf`` configuration file, add this line:
+Taskomatic uses one CPU core, and requires at least 3072{nbsp}MB of RAM.
+To ensure that taskomatic has access to enough memory, open the [path]``/etc/rhn/rhn.conf`` configuration file, and add this line:
 
 ----
 taskomatic.java.maxmemory=3072
@@ -34,97 +46,121 @@ Restart Taskomatic:
 systemctl restart taskomatic
 ----
 
-== {slesesa} Channel Management
 
-[IMPORTANT]
-====
-Missing packages will cause your registration to fail.
-For {slesesa} clients, some required packages are contained on the {rhel} installation media or the {centos} installation media.
-Ensure you follow the whole procedure before trying to register any {slesesa} client
-====
 
-=== Add {slesesa} Product from SCC
+== Add Client Tools
 
-The {slesesa} product is provided by {scc}, including the client tools.
 
-[IMPORTANT]
-====
-Because the {slesesa} channels are particularly large, it can take up to 24 hours for an initial channel synchronization to complete.
-When you have completed the initial synchronization, we recommended you clone the channel before working with it.
-This provides you with a backup of the original synchronization data.
-====
+For {slesesa} clients, some required packages are contained on the {rhel} or {centos} installation media.
+You must have these packages installed before you can register a {slesesa} client.
+
+The {slesesa} product is provided by {scc}.
+This also includes the client tools package.
 
 Before you register {slesesa} clients to your {productname} Server, check that you have the corresponding {slesesa} product enabled, and the required channels are fully synchronized.
 
 You need to select two different sets of channels, one for {slesesa} and the other for the Client Tools.
 
-{slesesa} 6::
-* "RHEL6 Base x86_64" and "SUSE Linux Enterprise Client Tools RES6 x86_64" at the WebUI, or [systemitem]``rhel-x86_64-server-6`` and [systemitem]``res6-suse-manager-tools-x86_64`` at CLI. This adds the packages for the {slesesa} Client Tools.
-* "RHEL Expanded Support 6" at the WebUI, or [systemitem]``res6-x86_64`` at CLI. This adds the packages for the {slesesa} Operating System.
+You will need an activation key associated with the correct {slesesa} channels.
+For more information about activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
 
-// I suggest adding a screenshot
 
-{slesesa} 7::
-* "RHEL7 Base x86_64" and "SUSE Linux Enterprise Client Tools RES7 x86_64" at the WebUI, or [systemitem]``rhel-x86_64-server-7`` and [systemitem]``res7-suse-manager-tools-x86_64`` at CLI. This adds the packages for the {slesesa} Client Tools.
-* "RHEL Expanded Support 7" at the WebUI, or [systemitem]``res7-x86_64`` at CLI. This adds the packages for the {slesesa} Operating System.
 
-// I suggest adding screenshot
+.Procedure: Adding Client Tools Channels
 
-You can synchronize the channels with [command]``mgr-sync``.
+. On the {productname} Server, add the appropriate {slesesa} channels:
++
+* For {slesesa} 6:
++
+From the {webui}, add [systemitem]``RHEL6 Base x86_64`` and [systemitem]``SUSE Linux Enterprise Client Tools RES6 x86_64``.
++
+From the command prompt, add [systemitem]``rhel-x86_64-server-6`` and [systemitem]``res6-suse-manager-tools-x86_64``.
++
+* For {slesesa} 7:
++
+From the {webui}, add [systemitem]``RHEL7 Base x86_64`` and [systemitem]``SUSE Linux Enterprise Client Tools RES7 x86_64``.
++
+From the command prompt, add [systemitem]``rhel-x86_64-server-7`` and [systemitem]``res7-suse-manager-tools-x86_64``.
+.  Synchronize the {productname} Server with the {SCC}.
+You can do this using the {webui}, or by running [command]``mgr-sync`` at the command prompt. to do it from CLI.
+. Add the new channel to your activation key.
+
 
 There are two ways to check if a channel has finished synchronizing:
 
-* In the {productname} {webui}, navigate to menu:Admin[Setup Wizard] and select the menu:SUSE Products[] tab.
+// This isn't included in the RH section, should it be (at ~L180) ? LKB 2019-09-30
+
+* In the {productname} {webui}, navigate to menu:Admin[Setup Wizard] and select the [guimenu]``SUSE Products`` tab.
++
 This dialog displays a completion bar for each product when they are being synchronized.
-* You can also check the synchronization log file at the command prompt.
-
-Use the [command]``tail -f`` command to view the [path]``/var/log/rhn/reposync/channel-label.log`` file.
-
-If you use this method, remember that base channels can contain multiple child channels.
-
-Each of the child channels will generate its own log during the synchronization progress.
-
+* Check the synchronization log file at the command prompt with [command]``tail -f /var/log/rhn/reposync/channel-label.log`` file.
++
+Each child channel will generate its own log during the synchronization progress.
 You will need to check all the base and child channel log files to be sure that the synchronization is complete.
 
-You will also need an activation key associated with the correct {slesesa} channels (6 or 7)
 
-For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+[NOTE]
+====
+The {slesesa} channels can be very large.
+The initial channel synchronization can sometimes take up to 24 hours.
 
-=== Add {rhel} or {centos} Media
+When the initial synchronization is complete, we recommended you clone the channel before you work with it.
+This gives you a backup of the original synchronization data.
+====
 
-The Base {slesesa} channel does not contain any packages.
 
-This is because {suse} does not provide {rhel} or {centos} base media.
 
-You will need to obtain base media from {redhat} or {centos}, which you can then add as a child channel to the {slesesa} parent channel.
+=== Add Base Media
 
-The following procedure guides you through setup of the {rhel} or {centos} media as a {productname} channel.
 
-All packages on the media will be mirrored into a child channel located under the distribution name and architecture.
+The base {slesesa} channel does not contain any packages, because {suse} does not provide {rhel} or {centos} base media.
+You will need to obtain base media from {redhat} or {centos}, which you can add as a child channel to the {slesesa} parent channel.
 
-.Procedure: Setting up a {rhel} or {centos} Channel
+You can use {productname} custom channels to set up the {rhel} or {centos} media.
+All packages on the base media are mirrored into a child channel.
 
-. In the {productname} {webui}, navigate to menu:Channels[Manage Software Channels], and click btn:[Create Channel].
-. Fill in the channel details, and add the channel as a child to the corresponding {rhel} or {centos} distribution channel for your architecture.
-The base parent channel will not contain any packages.
-. Modify the associated activation key to include your new child channel.
-. At the command prompt, as root, copy your installation disk image to the [path]``/tmp`` directory.
-. Create a directory to contain the media content (you can replace [path]``/rhel`` with [path]``/centos`` if you are using {centos}.
+
+
+.Procedure: Creating a {rhel} or {centos} Custom Channel
+
+. In the {productname} {webui}, navigate to menu:Software[Manage > Channels].
+. Click btn:[Create Channel] and set these parameters:
+* In the [guimenu]``Channel Name`` field, type a name for your channel, specifying the OS name and architecture.
+* In the [guimenu]``Channel Label`` field, type a label for your channel, specifying the OS name and architecture.
+* In the [guimenu]``Parent Channel`` field, select the corresponding {rhel} or {centos} distribution channel for your architecture.
+The parent channel will not contain any packages.
+* In the [guimenu]``Architecture`` field, select the appropriate architecture.
+* In the [guimenu]``Repository Checksum Type`` field, select [systemitem]``sha1``.
+* In the [guimenu]``Channel Summary`` field, type a summary for your channel, specifying the OS name and architecture.
+* In the [guimenu]``Organization Sharing`` field, select [systemitem]``Public``.
+. Click btn:[Create Channel].
+. Add the new channel to your activation key.
+
+
+When you have created the custom child channel, you can add the base media image to the channel.
+
+
+
+.Procedure: Adding Base Media to Custom Channels
+
+. On the {productname} Server command prompt, as root, copy the base media image to the [path]``/tmp`` directory.
+. Create a directory to contain the media content.
+Replace [command]``<os_name>`` with either ``rhel``  or ``centos``:
 +
 ----
-mkdir -p /srv/www/htdocs/pub/rhel
+mkdir -p /srv/www/htdocs/pub/<os_name>
 ----
-. Mount the ISO:
+. Mount the image:
 +
 ----
-mount -o loop /tmp/name_of_iso /srv/www/htdocs/pub/rhel
+mount -o loop /tmp/<iso_filename> /srv/www/htdocs/pub/<os_name>
 ----
-. Synchronize the packages with [command]``spacewalk-repo-sync``:
+. Synchronize the packages
 +
 For {rhel} or {centos} 7:
 +
 ----
-spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/
+spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/<os_name>/
 Repo URL: https://127.0.0.1/pub/rhel/
 Packages in repo:              [...]
 Packages already synced:       [...]
@@ -135,20 +171,22 @@ Packages to sync:              [...]
 For {rhel} or {centos} 6:
 +
 ----
-spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/rhel/Server/
-Repo URL: https://127.0.0.1/pub/rhel/Server/
-Packages in repo:              [...]
-Packages already synced:       [...]
-Packages to sync:              [...]
-[...]
+spacewalk-repo-sync -c channel_name -u https://127.0.0.1/pub/<os_name>/Server/
 ----
 
-Sometimes, the [command]``spacewalk-repo-sync`` will stop running during a synchronization, which will give this error:
+
+
+=== Troubleshooting Synchronization
+
+// This isn't included in the RH section, should it be (at ~L260) ? LKB 2019-09-30
+
+Sometimes, the [command]``spacewalk-repo-sync`` command will stop running during a synchronization, and give this error:
+
 ----
 [Errno 256] No more mirrors to try.
 ----
 
-If this occurs, you can run [command]``spacewalk-repo-sync`` in debugging mode to determine the error.
+If this occurs, run [command]``spacewalk-repo-sync`` in debugging mode to determine the error.
 
 Start debugging mode:
 ----
@@ -165,6 +203,10 @@ Disable debug mode:
 unset URLGRABBER_DEBUG
 ----
 
+
+
 == Register {slesesa} Clients
 
-When you are ready to register your {slesesa} client, follow the instructions in xref:client-configuration:registration-overview.adoc[].
+You {slesesa} clients are now ready to be registered.
+
+For more information on registering your clients, see xref:client-configuration:registration-overview.adoc[].
