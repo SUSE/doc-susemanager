@@ -696,7 +696,7 @@ Show help message and exit.
 
 
 [[spacewalk-repo-sync]]
-== Synchronize Repositories  with spacewalk-repo-sync
+== Synchronize Repositories with spacewalk-repo-sync
 
 The [command]``spacewalk-repo-sync`` tool synchronizes software repositories into {productname} channels.
 This usually happens automatically, but you can run it manually if required.
@@ -726,11 +726,20 @@ This can help with solving checksum problems.
 
 Use the [option]``--force-all-errata`` option to force re-importing all the patches.
 To make this command run faster, you can use the [option]``--no-packages`` option.
-This option excludes packages from the operation. 
+This option excludes packages from the operation.
 
 To find the root cause of synchronization problems you can look at the HTTP log as [command]``spacewalk-repo-sync`` is running.
 
-. Set and export the [systemitem]``URLGRABBER_DEBUG``:
+. Set and export [systemitem]``ZYPP_MEDIA_CURL_DEBUG``.
+This setting will allow downloading the metadata output by Zypper.
+Thus the following command will log the HTTP conversation into [path]``/var/log/zypper.log``:
++
+
+----
+ZYPP_MEDIA_CURL_DEBUG=2 spacewalk-repo-sync --channel <channel-label>
+----
+
+. Set and export [systemitem]``URLGRABBER_DEBUG`` for the RPM downloading part:
 +
 ----
 export URLGRABBER_DEBUG=DEBUG
@@ -756,9 +765,9 @@ unset URLGRABBER_DEBUG
 
 For a complete list of command line options, see the [command]``spacewalk-repo-sync`` manpage:
 
- ----
- man spacewalk-repo-sync
- ----
+----
+man spacewalk-repo-sync
+----
 
 
 
