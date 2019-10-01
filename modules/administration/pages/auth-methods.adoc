@@ -1,31 +1,24 @@
 [[auth-methods]]
 = Authentication Methods
 
+{productname} supports several different authentication methods.
+This section discusses pluggable authentication modules (PAM) and single sign-on (SSO).
 
 
-== Authentication Via PAM
 
-{productname} supports network-based authentication systems via Pluggable Authentication Modules (PAM).
+== Authenticate with PAM
+
+{productname} supports network-based authentication systems using pluggable authentication modules (PAM).
 PAM is a suite of libraries that allows you to integrate {productname} with a centralized authentication mechanism, eliminating the need to remember multiple passwords.
-{productname} supports LDAP, Kerberos, and other network-based authentication systems via PAM.
+{productname} supports LDAP, Kerberos, and other network-based authentication systems using PAM.
 
 
 
-=== Enable PAM
+.Procedure: Enabling PAM
 
-. Create a PAM service file.
-PAM service files are located in [path]``/etc/pam.d/susemanager`` by default.
-Enforce its use by adding this line to [path]``/etc/rhn/rhn.conf``:
-+
-
-----
-pam_auth_service = susemanager
-----
-+
-NOTE: This assumes the PAM service file is named [path]``susemanager``.
-+
-
-. A standard [path]``/etc/pam.d/susemanager`` file should look like this. It configures {productname} to use the system wide pam configuration:
+. Create a PAM service file at [path]``/etc/pam.d/susemanager``.
+A standard [path]``/etc/pam.d/susemanager`` file should look like this.
+It configures {productname} to use the system wide PAM configuration:
 +
 ----
 #%PAM-1.0
@@ -34,28 +27,40 @@ account  include        common-account
 password include        common-password
 session  include        common-session
 ----
-
-. Restart the {productname} Services after a configuration change
-. In the {productname} {webui}, navigate to menu:Create User[] and enable a new or existing user to authenticate with PAM
+. Enforce the use of the service file by adding this line to [path]``/etc/rhn/rhn.conf``:
++
+----
+pam_auth_service = susemanager
+----
++
+In this example, the PAM service file is called [systemitem]``susemanager``.
+. Restart the {productname} services after a configuration change.
+. In the {productname} {webui}, navigate to [menuitem]``Create User`` and enable a new or existing user to authenticate with PAM.
 . Check the [guimenu]``Pluggable Authentication Modules (PAM)`` checkbox.
 It is below the password and password confirmation fields.
-+
 
-.Changing Passwords
-IMPORTANT: Changing the password on the {productname} {webui} changes only the local password on the {productname} Server.
-If PAM is enabled for that user, the password might not be used at all.
+
+
+[IMPORTANT]
+====
+Changing the password in the {productname} {webui} changes only the local password on the {productname} Server.
+If PAM is enabled for that user, this password might not be used at all.
 In the above example, for instance, the Kerberos password will not be changed.
 Use the password change mechanism of your network service to change the password for these users.
+====
 
 
-To configure the system wide authentication you can use YaST.
+To configure system-wide authentication you can use YaST.
 You will need to install the [package]``yast2-ldap-client`` and [package]``yast2-kerberos-client`` packages.
-For more information about configuring PAM, see the SUSE Linux Enterprise Server Security Guide https://documentation.suse.com/sles/15-SP1/html/SLES-all/part-auth.html.
-This is a generic example that will also work for other network-based authentication methods.
-It describes also how to configure the use of an Active Directory Service.
 
 
-== Authentication Via Single Sign-On (SSO)
+For more information about configuring PAM, the SUSE Linux Enterprise Server Security Guide contains a generic example that will also work for other network-based authentication methods.
+It also describes how to configure an Active Directory Service.
+For more information, see https://documentation.suse.com/sles/15-SP1/html/SLES-all/part-auth.html.
+
+
+
+== Authenticate with Single Sign-On (SSO)
 
 [IMPORTANT]
 ====
