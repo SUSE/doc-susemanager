@@ -22,6 +22,7 @@ We strongly recommend that you contact SUSE Consulting to assist with this proce
 ====
 
 
+
 == Prepare to Migrate
 
 The source system must be running {productname} 3.2 with all the latest updates applied.
@@ -33,7 +34,7 @@ It is important that PostgreSQL 10 is already running on your {productname} 3.
 For more information, see xref:db-migration.adoc[].
 ====
 
-During migration, the database on the source system needs to get exported, or dumped.
+During migration, the database on the source system needs to get dumped.
 The dump is compressed, and temporarily stored on the target system.
 The compression is done using [command]``gzip`` using the default compression options.
 Maximum compression only yields about 10% of space savings.
@@ -85,6 +86,9 @@ Do not change the hostname during the process.
 Be careful when you log in to your systems during migration, as they will both show the same hostname.
 ====
 
+To speed up the actual migration and thus reducing the database downtime, you can copy the system data in advance.
+For more information, see <<migration.troubleshooting.systemdata>>.
+
 
 
 == Migration
@@ -108,7 +112,14 @@ When you have received the `migration successful`` message, you need to reconfig
 You will also need to restart the target system before it can be used.
 
 
-== Copy Data to the Target System
+
+[[migration.troubleshooting]]
+== Troubleshooting
+
+
+
+[[migration.troubleshooting.systemdata]]
+==== Copy System Data to the Target System
 
 A complete migration can consume a lot of time.
 This is caused by the amount of data that must be copied.
@@ -143,6 +154,10 @@ The second time you run the command, only the data that has changed will be tran
 While the data migration is in progress, the database services will be shut down.
 This is to ensure that no data is written to the database during the migration.
 
+
+
+[[migration.troubleshooting.pkgdata]]
+=== Intergrate Externally Stored Package Data
 
 .Procedure: Migrating Data on an External Storage Device
 
