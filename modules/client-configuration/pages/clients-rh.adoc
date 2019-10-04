@@ -257,6 +257,103 @@ Ensure you use the correct {rhela} version:
 
 endif::[]
 
+== Optional: Disable {rhel} subscription-manager yum plugins
+
+.Procedure: Create a configuration salt state to deploy the configuration file.
+
+. On the {productname} Server {webui}, navigate to menu:Configuration[Channels].
+. Click btn:[Create State Channel]
+* In the [guimenu]``Name`` field, type [systemitem]``subscription-manager: disable yum plugins``.
+* In the [guimenu]``Label`` field, type [systemitem]``subscription-manager-disable-yum-plugins``.
+* In the [guimenu]``Description`` field, type [systemitem]``subscription-manager: disable yum plugins``.
+* In the [guimenu]``SLS Contents`` field, leave it empty.
+. Click btn:[Create Config Channel]
+. Click btn:[Create Configuration File]
+* In the [guimenu]``Filename/Path``` field type [systemitem]``/etc/yum/pluginconf.d/subscription-manager.conf``.
+* In the [guimenu]``File Contents``` field type:
+----
+[main]
+enabled=0
+----
+. Click btn:[Create Configuration File]
+. Take note of the value of the field [guimenu]``Salt Filesystem Path```.
+. Click on the name of the Configuration Channel.
+. Click on [guimenu]``View/Edit 'init.sls' File``
+* In the [guimenu]``File Contents`` field, type:
+----
+configure_subscription-manager-disable-yum-plugins:
+  cmd.run:
+    - name: subscription-manager config --rhsm.auto_enable_yum_plugins=0
+    - watch:
+      - file: /etc/yum/pluginconf.d/subscription-manager.conf
+  file.managed:
+    - name: /etc/yum/pluginconf.d/subscription-manager.conf
+    - source: salt:///etc/yum/pluginconf.d/subscription-manager.conf
+----
+. Click btn:[Update Configuration File]
+
+.Procedure: Create a system group for RHEL systems
+
+. On the {productname} Server {webui}, navigate to menu:Systems[System Groups].
+. Click btn:[Create Group]
+* In the [guimenu]``Name`` field, type [systemitem]``rhel-systems``.
+* In the [guimenu]``Description`` field, type [systemitem]``All RHEL systems``.
+. Click btn:[Create Group]
+. Click [guimenu]``States`` tab
+. Click [guimenu]``Configuration Channels`` tab
+. Type [systemitem]``subscription-manager: disable yum plugins`` at the search box.
+. Click btn:[Search] and the state will appear.
+. Click the checkbox for the state at the [systemitem]``Assign`` column.
+. Click btn:[Save changes]
+. Click btn:[Confirm]
+
+If you already have RHEL systems added to ${productname}, assign them to the new system group, and then apply the highstate.
+
+.Procedure: Add the system group to your RHEL activation keys.
+
+You need to modify the activation keys you used for RHEL systems to include the system group created above.
+
+. On the {productname} Server {webui}, navigate to menu:Systems[Activation Keys].
+. For each the Activation Keys you used for RHEL systems, click on it and:
+. Navigate to the [guimenu]``Groups`` tab, and theb [guimenu]``Join`` subtab.
+. Check [systemitem]``Select rhel-systems```
+. Click btn:[Join Selected Groups]
+
+== Trust GPG Keys on Clients
+
+ifeval::[{suma-content} == true]
+By default, {rhel} does not trust the GPG key for {productname} {slesesa} client tools.
+endif::[]
+ifeval::[{uyuni-content} == true]
+By default, {rhel} does not trust the GPG key for {productname} {centos} client tools.
+endif::[]
+
+The clients can be successfully bootstrapped without the GPG key being trusted.
+
+However, they will not be able to install new client tool packages or update them.
+
+If this occurs, add this key to the [systemitem]``ORG_GPG_KEY=`` parameter in all {rhel} bootstrap scripts:
+
+ifeval::[{suma-content} == true]
+----
+sle12-gpg-pubkey-39db7c82.key
+----
+endif::[]
+ifeval::[{uyuni-content} == true]
+----
+uyuni-gpg-pubkey-0d20833e.key
+----
+endif::[]
+
+You do not need to delete any previously stored keys.
+
+If you are boostrapping clients from the {productname} {webui}, you will need to use a salt state to trust the key.
+Create the salt state and assign it to the organization.
+You can then use an activation key and configuration channels to deploy the key to the clients.
+
+endif::[]
+
+.Procedure: Adding Client Tools Channels
 
 
 == Register Clients
