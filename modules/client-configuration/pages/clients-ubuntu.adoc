@@ -156,7 +156,28 @@ This dialog displays a completion bar for each product when they are being synch
 Each child channel will generate its own log during the synchronization progress.
 You will need to check all the base and child channel log files to be sure that the synchronization is complete.
 
+ifeval::[{uyuni-content} == true]
 
+== Trust GPG Keys on Clients
+
+By default, {ubuntu} does not trust the GPG key for {productname} {ubuntu} client tools.
+
+The clients can be successfully bootstrapped without the GPG key being trusted.
+
+However, they will not be able to install new client tool packages or update them.
+
+To fix this, add this key to the [systemitem]``ORG_GPG_KEY=`` parameter in all {ubuntu} bootstrap scripts:
+----
+uyuni-gpg-pubkey-0d20833e.key
+----
+
+You do not need to delete any previously stored keys.
+
+If you are boostrapping clients from the {productname} {webui}, you will need to use a salt state to trust the key.
+Create the salt state and assign it to the organization.
+You can then use an activation key and configuration channels to deploy the key to the clients.
+
+endif::[]
 
 == Root Access
 
