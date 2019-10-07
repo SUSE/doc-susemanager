@@ -1,23 +1,26 @@
 [[bp.sp.migration.version]]
-= Migrating from Version 4 to 4.x
+= Upgrading from Version 4 to 4.x
 
-Migrating {productname} from version 4 to 4.x (when available) can be done using either the {yast} Online Migration tool, or with the Zypper command line tool.
+Upgrading {productname} from version 4 to 4.x (when available) can be done using either with the {yast} Online Migration tool or the Zypper command line tool.
+This procedure is also known as SP migration (service pack migration).
+During this procedure you do not replace the server; instead it is an in-place upgrade.
+Example: [literal]``4.0.x`` → [literal]``4.1.0``.
 
 // So on my desktop, YaST calls it "online upgrades". We should check this terminology. LKB 2019-08-21
 
 [IMPORTANT]
 ====
-Migrations should be run from a text console, rather than a graphical interface like GNOME.
+Upgrades should be run from a text console, rather than a graphical interface like GNOME.
 If you are logged into a GNOME session running on the machine you are going to migrate, you will need to switch to a text console.
 This does not apply if you are logged in from a remote machine (unless you are running a VNC session with GNOME).
 ====
 
 
-== Migrate Using {yast}
+== Upgrade Using {yast}
 
-To perform the migration with {yast}, use the Online Migration tool.
+To perform the upgrade with {yast}, use the Online Migration tool.
 
-.Procedure: Migrating with {yast}
+.Procedure: Upgrading with {yast}
 
 . From the command prompt, as root, launch the {yast} online migration tool:
 +
@@ -48,11 +51,12 @@ If the process fails, check these issues first:
 * If {yast} does not have the online migration module available, install the [package]``yast2-migration`` package.
 After installing, restart {yast} to ensure the module is available.
 * If there are older updates available, {yast} will notify you and ask to install them first.
-You must install all updates before performing the migration.
+You must install all package updates before performing the migration.
+For more information, see xref:server-update.adoc[].
 
 // Does this also apply if you use zypper?  If yes, we must repeat this
 // sentence below.
-During the migration, {yast} will install all recommended packages.
+During the upgrade, {yast} will install all recommended packages.
 This can significantly increase the installation size of the system.
 To only install required packages, open the [path]``/etc/zypp/zypp.conf`` configuration file and set these variables:
 
@@ -65,12 +69,12 @@ This changes the behavior of all future package operations.
 
 
 
-== Migrate Using Zypper
+== Upgrade Using Zypper
 
-To perform the migration with Zypper, use the migration tool.
+To perform the upgrade with Zypper, use the Zypper migration tool.
 
 
-.Procedure: Migrating with Zypper
+.Procedure: Upgrading with Zypper
 . From the command prompt, as root, launch the Zypper migration tool:
 +
 ----
@@ -90,4 +94,11 @@ If the process fails, check these issues first:
 
 * If Zypper does not have the migration tool available, install the [package]``zypper-migration-plugin`` package.
 * If there are older updates available, Zypper will notify you and ask to install them first.
-You must install all updates before performing the migration.
+You must install all updates before performing the upgrade.
+
+
+
+== Database Schema Upgrade
+
+Most likely, you also must upgrade the database schema.
+For more information, see xref:server-update.adoc[], Procedure "Upgrading the Database Schema".
