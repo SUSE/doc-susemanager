@@ -1,9 +1,10 @@
 [[kubernetes]]
 = Kubernetes
 
-You can use {productname} to manage {k8s} containerized clients in addition to regular traditional or Salt clients.
+You can use {productname} to manage {k8s} clusters.
 
-{productname} manages {k8s} clusters with a virtual host manager.
+{productname} communicates with your {k8s} clusters using a virtual host manager.
+This allows {productname} to obtain and report information about your clusters, including the ability to do CVE audits, and report if containers are outdated.
 For more information on virtual host managers, see xref:client-configuration:virt-vmware.adoc[]
 
 
@@ -22,7 +23,11 @@ You will also require:
 
 {k8s} clusters are registered with {productname} as a virtual host manager (VHM).
 
-You register and authorize your {k8s} cluster using a [path]``kubeconfig`` file with the {k8s} command line tool ``kubectl``.
+You will need a ``kubeconfig`` file to register and authorize your {k8s} cluster.
+You can get a ``kubeconfig`` file using the {k8s} command line tool ``kubectl``.
+If you are using {caasp}, you can download the file from the Velum interface.
+
+
 
 .Procedure: Creating a {k8s} VHM
 . In the {productname} {webui}, navigate to menu:Systems[Virtual Host Managers].
@@ -93,7 +98,8 @@ You might need to redeploy the image.
 . Click btn:[Create] to create an image profile.
 You will need to use a dockerfile that is suitable to deploy to {k8s}.
 . Navigate to menu:Images[Build] to build an image with the new profile.
-. Use the [command]``kubectl`` tool to deploy the image into one of the registered {k8s} clusters.
+. Deploy the image into one of the registered {k8s} clusters.
+You can do this with the [command]``kubectl`` tool.
 
 The updated data should now be available in the image list at menu:Images[Image List].
 
@@ -101,7 +107,7 @@ The updated data should now be available in the image list at menu:Images[Image 
 
 // This procedure needs help. LKB 2019-10-03
 .Procedure: Importing a Previously Deployed Image
-. In the {productname} {webui}, navigate to menu:Images[Image List], and select the existing image that you want to import.
+. In the {productname} {webui}, navigate to menu:Images[Image List], and upload the existing image that you want to import.
 . Add the registry owning the image as an image store.
 . Navigate to menu:Images[Image List] and click btn:[Import].
 . Complete the fields and click btn:[Import].
@@ -114,8 +120,9 @@ The updated data should now be available in the image list at menu:Images[Image 
 
 . In the {productname} {webui}, navigate to menu:Images[Image List], locate the row that contains the image you want to rebuild, and click btn:[Details].
 . Navigate to the [guimenu]``Build Status`` section, and click btn:[Rebuild].
+The rebuild can take some time to complete.
 
-The runtime status of the image should now be updated in the image list at menu:Images[Image List].
+When the rebuild has successfully completed, the runtime status of the image is updated in the image list at menu:Images[Image List].
 This shows that the instances are running a previous build of the image.
 
 [NOTE]
