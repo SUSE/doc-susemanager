@@ -24,7 +24,7 @@ If some of the clients are down during this process, the workflow continues as f
 
 . If `timeout` is reached before getting all expected responses from the clients, then Salt master would trigger an aditional job (a Salt [command]``find_job`` job) targeting only pending clients to check whether the job is already running on the client.
 . Now `gather_job_timeout` is evaluated. A new counter is now triggered.
-. If this new [command]``find_job`` job responses that the original job is actually running on the client, then Salt master will wait for that client's response.
+. If this new [command]``find_job`` job responses that the original job is actually running on the client, then Salt master will wait for that client's response for another `gather_job_timeout` interval before issuing another [command]``find_job``
 . In case of reaching `gather_job_timeout` without having any response from the client (neither for the initial [command]``test.ping`` nor for the [command]``find_job`` job), Salt master will return with only the gathered responses from the responding clients.
 
 
@@ -61,7 +61,7 @@ Defaults to 1 second.
 
 == Salt SSH Clients (SSH Push)
 
-Salt SSH clients are slightly different that regular clients (zeromq). Salt SSH clients do not use Salt PUB/RET channels but a wrapper Salt command inside of an SSH call.
+Salt SSH clients are slightly different than regular clients (zeromq). Salt SSH clients do not use Salt PUB/RET channels but a wrapper Salt command inside of an SSH call.
 Salt `timeout` and `gather_job_timeout` are not playing a role here.
 
 {productname} defines a timeout for SSH connections in [path]``/etc/rhn/rhn.conf``:
