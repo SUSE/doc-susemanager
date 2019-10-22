@@ -4,7 +4,7 @@
 This section contains a comprehensive list of ports that are used for various communications within {productname}.
 
 You will not need to open all of these ports.
-Some ports only need to be opened if you are using the service.
+Some ports only need to be opened if you are using the service that requires them.
 
 This image shows the main ports used in {productname}:
 
@@ -18,24 +18,20 @@ image::ports_diagram.png[]
 .External Port Requirements for {productname} Server
 |===
 | Port number | Direction | Protocol | Used By | Notes
-| 67          | Inbound   | TCP/UDP  | DHCP    | Required when {productname} is configured as a DHCP server for systems requesting IP addresses.
-| 69          | Inbound   | TCP/UDP  | TFTP | Used when {productname} is configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems.
-| 80          | Inbound   | TCP      | HTTP | Client and proxy server requests travel via HTTP or HTTPS.
-Port 80 (http) is not used to serve the {webui}, and is closed in most installations.
-Port 80 is used temporarily for some bootstrap repositories and automated installations.
-| 80          | Outbound  | TCP      | HTTP | Used to contact {scc}/{ncc}.
-| 443         | Inbound   | TCP      | HTTPS | All {webui}, client, and proxy server requests travel via HTTP or HTTPS.
-| 443         | Outbound  | TCP      | HTTPS | {productname} uses this port to reach {scc} (unless running in a disconnected mode with RMT or SMT{mdash}as described in <<disconnect-setup>>)
-| 4505         | Inbound  | TCP | salt | Required by the Salt-master to accept communication requests via TCP from clients.
-The connection is initiated by the client and remains open to allow the master to send commands.
-This port uses a publish/subscribe topology; the client subscribes to notifications from the master.
-| 4506        | Inbound  | TCP | salt | Required by the Salt-master to accept communication requests via TCP from clients.
-The connection is initiated by the client and is open only when needed.
-Usually, clients will open this port when they have to report results to the master, such as when a command received on port 4505 has finished.
-This port uses a request/response topology; the client sends requests to the master.
-| 5222        | Inbound   | TCP      | osad  | When you wish to push actions to clients this port is required by the [systemitem]``osad`` daemon running on your client systems.
-| 5269        | Inbound/Outbound | TCP | jabberd | Needed if you push actions to or via a {susemgrproxy}.
-| 8050         | Inbound | TCP | websockify | Needed to access graphical console of virtual machines from {productname} web interface.
+| 67          | Inbound   | TCP/UDP  | DHCP    | Required only if clients are requesting IP addresses from the server.
+| 69          | Inbound   | TCP/UDP  | TFTP | Required if server is used as a PXE server for automated client installation.
+| 80          | Inbound   | TCP      | HTTP | Required temporarily for some bootstrap repositories and automated installations.
+Port 80 is not used to serve the {webui}.
+| 80          | Outbound  | TCP      | HTTP | Used to contact {scc}.
+| 443         | Inbound   | TCP      | HTTPS | {webui}, client, and proxy requests.
+| 443         | Outbound  | TCP      | HTTPS | Used to contact {scc}.
+| 4505         | Inbound  | TCP | salt | Required to accept communication requests from clients.
+The client initiates the connection, and it stays open to receive commands from the Salt master.
+| 4506        | Inbound  | TCP | salt | Required to accept communication requests from clients.
+The client initiates the connection, and it stays open to report results back to the Salt master.
+| 5222        | Inbound   | TCP      | osad  | Required to push OSAD actions to clients.
+| 5269        | Inbound/Outbound | TCP | jabberd | Required to push actions to a proxy.
+| 8050         | Inbound | TCP | websockify | Required to access the graphical console of virtual machines with the {webui}.
 | 25151        |         | TCP | Cobbler |
 |===
 
