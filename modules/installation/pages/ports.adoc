@@ -25,8 +25,7 @@ Port 80 (http) is not used to serve the {webui}, and is closed in most installat
 Port 80 is used temporarily for some bootstrap repositories and automated installations.
 | 80          | Outbound  | TCP      | HTTP | Used to contact {scc}/{ncc}.
 | 443         | Inbound   | TCP      | HTTPS | All {webui}, client, and proxy server requests travel via HTTP or HTTPS.
-| 443         | Outbound  | TCP      | HTTPS | {productname} uses this port to reach {scc} (unless running in a disconnected mode with RMT or SMT{mdash}as described in <<disconnect-setup>>)| 5222        | Inbound   | TCP      | osad  | When you wish to push actions to clients this port is required by the [systemitem]``osad`` daemon running on your client systems.
-| 5269        | Inbound/Outbound | TCP | jabberd | Needed if you push actions to or via a {susemgrproxy}.
+| 443         | Outbound  | TCP      | HTTPS | {productname} uses this port to reach {scc} (unless running in a disconnected mode with RMT or SMT{mdash}as described in <<disconnect-setup>>)
 | 4505         | Inbound  | TCP | salt | Required by the Salt-master to accept communication requests via TCP from clients.
 The connection is initiated by the client and remains open to allow the master to send commands.
 This port uses a publish/subscribe topology; the client subscribes to notifications from the master.
@@ -34,8 +33,10 @@ This port uses a publish/subscribe topology; the client subscribes to notificati
 The connection is initiated by the client and is open only when needed.
 Usually, clients will open this port when they have to report results to the master, such as when a command received on port 4505 has finished.
 This port uses a request/response topology; the client sends requests to the master.
-| 25151        |         | TCP | Cobbler |
+| 5222        | Inbound   | TCP      | osad  | When you wish to push actions to clients this port is required by the [systemitem]``osad`` daemon running on your client systems.
+| 5269        | Inbound/Outbound | TCP | jabberd | Needed if you push actions to or via a {susemgrproxy}.
 | 8050         | Inbound | TCP | websockify | Needed to access graphical console of virtual machines from {productname} web interface.
+| 25151        |         | TCP | Cobbler |
 |===
 
 
@@ -65,13 +66,17 @@ So if process A opens a TCP connection to process B (for example, port 22), then
 
 == External Proxy Ports
 
-[cols="1,1,1,1", options="header"]
+[cols="1,1,1,1,1", options="header"]
 .External Port Requirements for {productname} Proxy
 |===
-| Port number | Direction | Protocol | Notes
-| 22          | Inbound   |          |Required when using ssh-push or ssh-push-tunnel contact methods.
+| Port number | Direction | Protocol | Used By | Notes
+| 22          | Inbound   |          | | Required when using ssh-push or ssh-push-tunnel contact methods.
 Check-in on clients connected to a {productname} Proxy will be initiated on the {productname} Server and "`hop through`" through to clients.
-| 80          | Outbound  |           | Used to reach {productname}.
+| 67          | Inbound   | TCP/UDP  | DHCP    | Required when {productname} is configured as a DHCP server for systems requesting IP addresses.
+| 69          | Inbound   | TCP/UDP  | TFTP | Used when {productname} is configured as a PXE server and allows installation and re-installation of PXE-boot enabled systems.
+| 80          | Outbound  |           | | Used to reach {productname}.
+| 443         | Inbound   | TCP      | HTTPS | All {webui}, client, and proxy server requests travel via HTTP or HTTPS.
+| 443         | Outbound  | TCP      | HTTPS | {productname} uses this port to reach {scc} (unless running in a disconnected mode with RMT or SMT{mdash}as described in <<disconnect-setup>>)
 | 4505         | Inbound  | TCP | salt | Required by the Salt-master to accept communication requests via TCP from clients.
 The connection is initiated by the client and remains open to allow the master to send commands.
 This port uses a publish/subscribe topology; the client subscribes to notifications from the master.
@@ -79,8 +84,8 @@ This port uses a publish/subscribe topology; the client subscribes to notificati
 The connection is initiated by the client and is open only when needed.
 Usually, clients will open this port when they have to report results to the master, such as when a command received on port 4505 has finished.
 This port uses a request/response topology; the client sends requests to the master.
-| 5222        | Inbound   | TCP       | For push actions and connections issued by [systemitem]``osad`` running on the client systems.
-| 5269        | Inbound/Outbound | TCP | For push actions with the server.
+| 5222        | Inbound   | TCP     |  | For push actions and connections issued by [systemitem]``osad`` running on the client systems.
+| 5269        | Inbound/Outbound | TCP | | For push actions with the server.
 |===
 
 
