@@ -31,7 +31,7 @@ systemctl restart taskomatic
 
 == Import Entitlements and CA Certificate
 
-{redhat} clients require a {redhat} certificate authority (CA) and entitlement certificate.
+{redhat} clients require a {redhat} certificate authority (CA) and entitlement certificate and entitlemente key.
 
 Entitlement certificates are embedded with expiration dates, which match the length of the support subscription.
 To avoid disruption, you will need to repeat this process at the end of every support subscription period.
@@ -40,6 +40,29 @@ To avoid disruption, you will need to repeat this process at the end of every su
 It runs locally to track installed products and subscriptions.
 Clients must be registered with the subscription manager to obtain certificates.
 
+Depending on where the {redhat} system is registered, the URL’s to which the system is authorized to replicate differ.
+
+{redhat} systems can be registered to three different infrastructures:
+
+1. {redhat} CDN (redhat.com)
+2. {redhat} Satellite Server
+3. RHUI (update infrastructure in the cloud)
+
+This guide focuses on a system registered to {redhat} CDN (redhat.com). Register at least one system there with an authorized subscription to obtain repository content.
+
+[IMPORTANT]
+====
+Entitlement certificates for RHUI (cloud-based systems) only authorize you to get content there.
+Satellite certificates for client systems require a Satellite server and subscription: such client certificates are UNSUPPORTED with {productname} server.
+====
+
+[WARNING]
+====
+Entitlement certificates are embedded with expiration dates, which match the length of the support subscription.
+To avoid disruption, you will need to repeat this process at the end of every support subscription period.
+====
+
+{redhat} supplies the subscription-manager tool to manage subscription assignments. It runs locally on the client system to track installed products and subscriptions. Register to redhat.com with subscription-manager, then follow this procedure to obtain certificates.
 
 
 .Procedure: Registering Clients to Subscription Manager
