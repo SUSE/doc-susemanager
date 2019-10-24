@@ -1,158 +1,125 @@
 [[clients-centos]]
 = Registering {centos} Clients
 
-
 This section contains information about registering traditional and Salt clients running {centos} operating systems.
 
+[IMPORTANT]
+====
+{centos} clients are based on {centos} and are unrelated to {sleses}, RES, {redhat}, or {slesesa}.
+You are responsible for arranging access to {centos} base media repositories and {centos} installation media, as well as connecting {productname} Server to the {centos} content delivery network.
+====
+
+ifeval::[{suma-content} == true]
+
+[IMPORTANT]
+====
+{suse} does not provide support for {centos} operating systems.
+{productname} allows you to manage {centos} clients, but support is not provided.
+====
+
+endif::[]
 
 
-== Set up a {centos} Client
 
-The [package]``spacewalk-utils`` package contains a number of upstream command line tools required for client administration.
-You will also require the [command]``spacewalk-common-channels`` tool.
-Keep in mind {suse} only provides support for [command]``spacewalk-clone-by-date`` and [command]``spacewalk-manage-channel-lifecycle`` tools.
+== Server Requirements
 
-The [path]``/etc/rhn/spacewalk-common-channels.ini`` configuration file must contain the channel references you want to add.
-If a channel is not listed, check the latest version for updates: https://github.com/spacewalkproject/spacewalk/tree/master/utils
+Before you begin, check that your {productname} Server meets the requirements at xref:installation:hardware-requirements.adoc[].
 
-You will also need an activation key associated with the {centos} channel.
-For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
+Taskomatic uses one CPU core, and requires at least 3072{nbsp}MB of RAM.
+To ensure that taskomatic has access to enough memory, open the [path]``/etc/rhn/rhn.conf`` configuration file, and add this line:
+
+----
+taskomatic.java.maxmemory=3072
+----
+
+Restart Taskomatic:
+----
+systemctl restart taskomatic
+----
+
+
+
+== Channel and Repository Management
+
+The [package]``spacewalk-utils`` package contains a number of command line tools required for client administration, including the [command]``spacewalk-common-channels`` tool.
+
+
+ifeval::[{suma-content} == true]
+
+[IMPORTANT]
+====
+{suse} only provides support for [command]``spacewalk-clone-by-date`` and [command]``spacewalk-manage-channel-lifecycle`` tools.
+====
+
+endif::[]
+
 
 
 .Procedure: Adding Channels and Repositories
-
 . At the command prompt on the {productname} Server, as root, install the [package]``spacewalk-utils`` package:
 +
 ----
 zypper in spacewalk-utils
 ----
-. Add the {centos} base, updates, and client channels using the [command]``spacewalk-common-channels`` script:
+
+// Because of the way mgr-create-bootstrap-repo works and because we don't have CentOS products at SCC, SUSE Manager users MUST use the same procedure as at Uyuni
+// They CANNOT use RES Client Tools.
+. Add the {centos} base, updates, and client channels, specifying the {centos} version and architecture:
 +
 ----
-spacewalk-common-channels -u admin -p `secret` -a x86_64 'centos7'
-spacewalk-common-channels -u admin -p `secret` -a x86_64 'centos7-updates'
-spacewalk-common-channels -u admin -p `secret` -a x86_64 'centos7-uyuni-client-x86_64'
+spacewalk-common-channels -a x86_64 centos7 \
+centos7-uyuni-client centos7-uyuni-client
 ----
 
-.Procedure: Synchronizing {centos} Clients
+[NOTE]
+====
+The client tools channel provided by [command]``spacewalk-common-channels`` is sourced from {uyuni} and not from {suse}.
+====
 
-. In the {productname} {webui}, navigate to menu:Main Menu[Software > Manage], and select the base channel you want to synchronize.
+
+
+.Procedure: Synchronizing {centos} repositories
+
+. In the {productname} {webui}, navigate to menu:Software[Manage], and check every {centos} channel.
 . In the [guimenu]``Repositories`` tab, navigate to the [guimenu]``Sync`` subtab, and click btn:[Sync Now].
 You can also create a regular synchronization schedule on this page.
 
-When you have prepared you {productname} Server, you can install your {centos} client using your preferred installation media and method.
-
-.Procedure: Setting up a {centos} Client
-
-. At the command prompt, copy all relevant GPG keys to [path]``/srv/www/htdocs/pub``.
-If you intend to use a bootstrap script to register your client, you can add the GPG keys to your bootstrap script.
-. Check that the client machine can resolve itself and your {productname} Server using DNS.
-. Check that there is an entry in [path]``/etc/hosts`` for the real IP address of the client.
-. Create an activation key called `centos7` on the {productname} Server that points to the correct parent and child channels, including the {centos} base repository, updates, and client channels.
-
-When you are ready to register your {centos} client, follow the instructions in xref:client-configuration:registration-overview.adoc[].
 
 
-////
-This is all duplicated content. LKB 2018-08-31
+== Create an Activation Key
 
-Now prepare the bootstrap script.
+You will need to create an activation key that is associated with your {centos} channels.
 
-[[proc.bp.expanded-support.centos-repos.trad.bsscript]]
-.Procedure: Preparing the Bootstrap Script
-. Create/edit your bootstrap script to correctly reflect the following:
-+
+For more information on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[].
 
+
+
+ifeval::[{uyuni-content} == true]
+
+== Trust GPG Keys on Clients
+
+By default, {centos} does not trust the GPG key for {productname} {centos} client tools.
+
+The clients can be successfully bootstrapped without the GPG key being trusted.
+
+However, they will not be able to install new client tool packages or update them.
+
+To fix this, add this key to the [systemitem]``ORG_GPG_KEY=`` parameter in all {centos} bootstrap scripts:
 ----
-# can be edited, but probably correct (unless created during initial install):
-
-# NOTE: ACTIVATION_KEYS *must* be used to bootstrap a client machine.
-
-ACTIVATION_KEYS=1-centos7
-
-ORG_GPG_KEY=res.key,RPM-GPG-KEY-CentOS-7,suse-307E3D54.key,suse-9C800ACA.key,RPM-GPG-KEY-spacewalk-2015
-
-FULLY_UPDATE_THIS_BOX=0
-
-yum clean all
-# Install the prerequisites
-yum -y install yum-rhn-plugin rhn-setup
+uyuni-gpg-pubkey-0d20833e.key
 ----
-. Add the following lines to the bottom of your script, (just before `echo "`-bootstrap complete -`"`):
-+
 
-----
-# This section is for commands to be executed after registration
-mv /etc/yum.repos.d/Cent* /root/
-yum clean all
-chkconfig rhnsd on
-chkconfig osad on
-service rhnsd restart
-service osad restart
-----
-. Continue by following normal bootstrap procedures to bootstrap the new client.
+ You do not need to delete any previously stored keys.
+
+If you are boostrapping clients from the {productname} {webui}, you will need to use a salt state to trust the key.
+Create the salt state and assign it to the organization.
+You can then use an activation key and configuration channels to deploy the key to the clients.
+
+endif::[]
 
 
-[[bp.expanded-support.centos_salt]]
-== Registering CentOS Salt Clients with {productname}
 
+== Register Clients
 
-The following procedure will guide you through registering a CentOS client.
-
-.Support for CentOS Patches
-[WARNING]
-====
-
-CentOS uses patches originating from CentOS is not officially supported by {suse}
-.
-See the matrix of {productname} clients on the main page of the {productname} wiki, linked from the [ref]_Quick Links_ section: https://wiki.microfocus.com/index.php?title=SUSE_Manager
-
-====
-
-////
-
-
-////
-I'm fairly certain this isn't supported, which is why we took it out of the SLE instructions. LKB 2018-08-12
-
-
-.Procedure: Register a CentOS 7 Client
-. Add the Open Build Service repo for Salt:
-+
-
-----
-yum-config-manager --add-repo http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/
-----
-. Import the repo key:
-+
-
-----
-rpm --import http://download.opensuse.org/repositories/systemsmanagement:/saltstack:/products/RHEL_7/repodata/repomd.xml.key
-----
-. Check if there is a different repository that contains Salt. If there is more than one repository listed disable the repository that contains Salt apart from the OBS one.
-+
-
-----
-yum list --showduplicates salt
-----
-. Install the Salt client:
-+
-
-----
-yum install salt salt-minion
-----
-. Change the Salt configuration to point to the {productname} server:
-+
-
-----
-mkdir -p /etc/salt/minion.d
-echo "master:`server_fqdn`" > /etc/salt/minion.d/susemanager.conf
-----
-. Restart the client
-+
-
-----
-systemctl restart salt-minion
-----
-. Proceed to menu:Main Menu[Salt > Keys] from the {webui} and accept the client's key.
-////
+{centos} clients are registered in the same way as all other clients.
+For more information, see xref:client-configuration:registration-overview.adoc[].
