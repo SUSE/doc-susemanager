@@ -8,11 +8,40 @@ For more information on VHMs, see xref:client-configuration:vhm.adoc[].
 
 
 
-# GCE related variables
-GOOGLE_SERVICE_ACCOUNT_EMAIL = "EXAMPLE"
-GOOGLE_CERT_PATH = "/foo/bar/example.json"   <-- This file is downloaded from Google CE panel and should be placed on a path inside the SUSE MAnager server.
-GOOGLE_PROJECT_ID = "EXAMPLE"
+== Create a GCE VHM
 
-The instances running on the Public Cloud that are registered on SUSE Manager, will report the UUID reported by the specific Public Cloud provider:
 
-GCE: 152986662232938449
+The Virtual Host Manager (VHM) runs on the {productname} Server.
+
+To run a VHM, your {productname} Server will need to have port 443 open, in order to access the clients.
+
+Ensure you have installed the [systemitem]``virtual-host-gatherer-libcloud`` package on the {productname} Server.
+
+Before you begin, log in to the GCE panel, and download a certificate file.
+Store this file locally on your {productname} Server, and take note of the path.
+
+
+
+.Procedure: Creating a GCE VHM
+
+. In the {productname} {webui}, navigate to menu:Systems[Virtual Host Managers].
+. Click btn:[Create] and select [guimenu]``Google Compute Engine`` from the drop-down menu.
+. In the [guimenu]``Add a Google Conpute Engine Virtual Host Manager`` section, use these parameters:
+* In the [guimenu]``Label`` field, type a custom name for your VHM.
+* In the [guimenu]``Service Account Email`` field, type the email address associated with your Google account.
+* In the [guimenu]``Cert Path`` field, type the path to the certificate downloaded from the GCE panel.
+* In the [guimenu]``Project ID`` field, type the project ID used by the GCE instance.
+* In the [guimenu]``Zone`` field, type the zone to create instances from.
+This is required for subscription matching to work.
+. Click btn:[Create] to save your changes and create the VHM.
+. On the [guimenu]``Virtual Host Managers`` page select the new VHM.
+. On the [guimenu]``Properties`` page, click btn:[Refresh Data] to inventory the new VHM.
+
+To see which objects and resources have been inventoried, navigate to menu:Systems[System List > Virtual Systems].
+
+
+Instances running on the Google public cloud will report this UUID to {productname} Server:
+
+----
+152986662232938449
+----
