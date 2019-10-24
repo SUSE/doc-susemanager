@@ -40,7 +40,9 @@ This procedure does not manipulate the original client, which will still be regi
 
 .Procedure: Resolving Duplicate Machine IDs in Cloned Salt Clients
 
-. For {slsa}{nbsp}12: If your machines have the same machine ID, delete the file on each duplicated client and re-create it:
+. On the cloned machine, change the hostname and IP addresses.
+Make sure [path]``/etc/hosts`` contains the changes you made and the correct host entries.
+. For distributions that support systemd: If your machines have the same machine ID, delete the file on each duplicated client and re-create it:
 +
 ----
 # rm /etc/machine-id
@@ -49,7 +51,7 @@ This procedure does not manipulate the original client, which will still be regi
 # systemd-machine-id-setup
 ----
 
-. For {slsa}{nbsp}11 and {rhel} 6: As there is no systemd machine ID, generate one from dbus:
+. For distributions that do not support systemd: Generate a machine ID from dbus:
 +
 ----
 # rm /var/lib/dbus/machine-id
