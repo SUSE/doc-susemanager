@@ -6,27 +6,31 @@ This diagram shows the Salt file structure, as it is used by the {productname} S
 The files are listed in the [path]``/etc/salt/master.d/susemanager.conf`` configuration file.
 
 ----
-# Configure different file roots
 
+# Configure different file roots. Custom salt states should only be placed in /srv/salt.
+# Users should not touch other directories listed here.
 file_roots:
   base:
-    - /usr/share/susemanager/salt    #Should not be touched by a user
-    - /srv/susemanager/salt          #Should not be touched by a user
-    - /srv/salt                      #Your custom states go here
+    - /usr/share/susemanager/salt
+    - /usr/share/salt-formulas/states
+    - /usr/share/susemanager/formulas/states
+    - /srv/susemanager/salt
+    - /srv/salt
 
-# Configure different pillar roots
-
-pillar_roots:
+# Configure different file roots. Custom salt states should only be placed in /srv/salt.
+# Users should not touch other directories listed here.
+file_roots:
   base:
-    - /usr/share/susemanager/pillar  #Should not be touched by a user
-    - /srv/pillar                    #Custom pillars go here
+    - /usr/share/susemanager/salt
+    - /usr/share/salt-formulas/states
+    - /usr/share/susemanager/formulas/states
+    - /srv/susemanager/salt
+    - /srv/salt
 
 # Extension modules path
-
 extension_modules: /usr/share/susemanager/modules
 
 # Master top configuration
-
 master_tops:
   mgr_master_tops: True
 ----
@@ -36,10 +40,19 @@ When you are working with [path]``/etc/salt/master.d/susemanager.conf``, be awar
 * Files listed are searched in the order they appear
 * The first matching file found is called
 
-The {productname} Server reads Salt state data from three root directories:
+The {productname} Server reads Salt state data from five root directories:
 
 [path]``/usr/share/susemanager/salt``::
 This directory is shipped and updated with {productname} and includes certificate setup and common state logic to be applied to packages and channels.
+
+[WARNING]
+====
+Do not edit or add custom Salt data to this directory.
+====
+
+[path]``/usr/share/salt-formulas/states``::
+[path]``/usr/share/susemanager/formulas/states``::
+These directories are shipped and updated with {productname} or additional extensions. They inclucde states for salt formulas.
 
 [WARNING]
 ====
