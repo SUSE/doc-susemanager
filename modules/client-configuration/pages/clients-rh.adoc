@@ -31,7 +31,7 @@ systemctl restart taskomatic
 
 == Import Entitlements and CA Certificate
 
-{redhat} clients require a {redhat} certificate authority (CA) and entitlement certificate.
+{redhat} clients require a {redhat} certificate authority (CA) and entitlement certificate and entitlement key.
 
 Entitlement certificates are embedded with expiration dates, which match the length of the support subscription.
 To avoid disruption, you will need to repeat this process at the end of every support subscription period.
@@ -40,6 +40,34 @@ To avoid disruption, you will need to repeat this process at the end of every su
 It runs locally to track installed products and subscriptions.
 Clients must be registered with the subscription manager to obtain certificates.
 
+{redhat} clients use a URL to replicate repositories.
+The URL will change depending on where the {redhat} client is registered.
+
+{redhat} clients can be registered in three different ways:
+
+* {redhat} content delivery network (CDN) at redhat.com
+* {redhat} Satellite Server
+* {redhat} update infrastructure (RHUI) in the cloud
+
+This guide covers clients registered to {redhat} CDN. 
+You must have at least one system registered to the CDN, with an authorized subscription for repository content.
+
+[IMPORTANT]
+====
+Entitlement certificates for RHUI (cloud-based systems) only allow you to download content, not repository data.
+Satellite certificates for client systems require a Satellite server and subscription.
+Clients using Satellite certificates are not supported with {productname} Server.
+====
+
+[WARNING]
+====
+Entitlement certificates are embedded with expiration dates, which match the length of the support subscription.
+To avoid disruption, you will need to repeat this process at the end of every support subscription period.
+====
+
+{redhat} supplies the subscription-manager tool to manage subscription assignments. 
+It runs locally on the client system to track installed products and subscriptions. 
+Register to redhat.com with subscription-manager, then follow this procedure to obtain certificates.
 
 
 .Procedure: Registering Clients to Subscription Manager
