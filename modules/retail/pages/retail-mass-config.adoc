@@ -13,6 +13,15 @@ If you are working in an environment with many branch servers, you might find it
 
 // https://gitlab.suse.de/SLEPOS/SUMA_Retail/tree/master/python-susemanager-retail
 
+[WARNING]
+====
+Before working with the mass configuration tool, back up the existing branch servers configuration.
+
+The Mass configuration tool overwrites the existing configuration with data specified in the provided YAML file.
+
+The Mass configuration tool does not support all possible formula configurations.
+Always make sure on a small sample, that the mass configuration tool can configure systems as expected.
+====
 
 
 === Configure Multiple Branch Servers
@@ -31,6 +40,11 @@ retail_yaml --from-yaml filename.yaml
 ----
 +
 See the [command]``retail_yaml --help`` output for additional options.
+. In the {susemgr} {webui}, check that your systems are listed and displaying correctly, and the formulas you require are available.
+. Create activation keys for each of your branch servers, connect them using bootstrap, and configure them as proxy servers.
+For more information, see xref:retail:retail-install-unified.adoc[].
+. In the [guimenu]``States`` tab, click btn:[Apply Highstate] to deploy your configuration changes for each branch server.
+
 
 If you need to change your configuration, you can edit the YAML file at any time, and use the [command]``retail_yaml --from-yaml`` command to upload the new configuration.
 
@@ -62,7 +76,7 @@ You should always check that the details have been applied as expected after usi
 .Procedure: Configuring Multiple Terminals
 
 . Create a YAML file describing the infrastructure you intend to install, specifying the hardware address for each terminal.
-For an example YAML file, xref:retail-mass-config-yaml.adoc[].
+For an example YAML file, see xref:retail-mass-config-yaml.adoc[].
 . On a clean {productname} installation, import the YAML file you have created:
 +
 ----
@@ -72,19 +86,21 @@ retail_yaml --from-yaml filename.yaml
 See the [command]``retail_yaml --help`` output for additional options.
 . In the {susemgr} {webui}, check that your systems are listed and displaying correctly, and the formulas you require are available.
 . Create activation keys for each of your branch servers, connect them using bootstrap, and configure them as proxy servers.
-// FIXME: look up exact refs
-For further information on these steps, see the {susemgr} documentation.
-. In the [guimenu]``States`` tab, click btn:[Apply Highstate] to deploy your configuration changes.
+For more information, see xref:retail:retail-install-unified.adoc[].
+. In the [guimenu]``States`` tab, click btn:[Apply Highstate] to deploy your configuration changes for each branch server.
 . Connect your terminals according to your infrastructure plan.
 
 If you need to change your configuration, you can edit the YAML file at any time, and use the [command]``retail_yaml --from-yaml`` command to upload the new configuration.
+
+
+== Export Configuration to Mass Configuration File
 
 If you already have a configuration that you would like to export to a YAML file, use:
 ----
 retail_yaml --to-yaml filename.yaml
 ----
 This can be a good way to create a basic mass configuration file.
-However, it is important to check the file before using it, because some mandatory configuration entries are probably missing.
+However, it is important to check the file before using it, because some mandatory configuration entries may be missing.
 
 [IMPORTANT]
 ====

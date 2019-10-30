@@ -384,12 +384,13 @@ For more information about the Kiwi build system, see the https://doc.opensuse.o
 [[at.images.kiwi.requirements]]
 === Requirements
 
-The Kiwi image building feature is available for Salt clients running {sles}{nbsp}12.
-From {sles}{nbsp}15, ``kiwi-ng`` is used instead of the legacy Kiwi.
+The Kiwi image building feature is available for Salt clients running {sles}{nbsp}12 and {sles}{nbsp}11.
+//SLE15 images support is not yet released for SUMA4, will be part of SUMA4.0.4 as tech preview
+//From {sles}{nbsp}15, ``kiwi-ng`` is used instead of the legacy Kiwi.
 
 Kiwi image configuration files and configuration scripts must be accessible in one of these locations:
 
-* git repository
+* Git repository
 * HTTP hosted tarball
 * Local build host directory
 
@@ -403,6 +404,11 @@ Disk space depends on the actual size of the image.
 For more information, see the documentation of the underlying system.
 ====
 
+[WARNING]
+====
+The build host must be a Salt client.
+Do not install the build host as a traditional client.
+====
 
 
 [[at.images.kiwi.buildhost]]
@@ -410,17 +416,27 @@ For more information, see the documentation of the underlying system.
 
 
 To build all kinds of images with {productname}, create and configure a build host.
-OS Image build hosts are Salt clients running {sles}{nbsp}12 (SP3 or later) or 15.
+OS Image build hosts are Salt clients running on {sles}{nbsp}12 (SP3 or later) or {sles}{nbsp}11 SP4.
+
 This procedure will guide you through the initial configuration for a build host.
 
-From the {productname} {webui}, perform these steps to configure a build host:
+[IMPORTANT]
+====
+The operating system on the build host must match the operating system on the targeted image.
+
+For example, build {sles}{nbsp}12 based images on a build host running {sles}{nbsp}12 OS version.
+Build {sles}{nbsp}11 based images on a build host running {sles}{nbsp}11 OS version.
+====
+
+
+Configure the build host in the {productname} {webui}:
 
 . Select a client that will be designated as a build host from the menu:Systems[Overview] page.
-. From the menu:System Details[Properties] page, enable the [guimenu]``Add-on System Type:`` [guimenu]``OS Image Build Host`` and confirm with btn:[Update Properties].
+. Navigate to the menu:System Details[Properties] tab, enable the [guimenu]``Add-on System Type`` [guimenu]``OS Image Build Host``. Confirm with btn:[Update Properties].
 +
 image::os-image-build-host.png[scaledwidth=80%]
 +
-. From the menu:System Details[Software > Software Channels] page, enable ``SLE-Manager-Tools12-Pool`` and ``SLE-Manager-Tools12-Updates`` (or a later version).
+. Navigate to the menu:System Details[Software > Software Channels] tab, enable {productname} Client tools (for example: ``SLE-Manager-Tools12-Pool`` and ``SLE-Manager-Tools12-Updates``).
 Schedule and click btn:[Confirm].
 . Install Kiwi and all required packages by applying `Highstate`.
 From the system details page select menu:States[Highstate] and click btn:[Apply Highstate].
