@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>SUSE Manager Documentation</title>
-<date>2018-11-20</date>
+<date>2019-11-04</date>
 </info>
 <part xml:id="book.suma.getting-started">
 <title>Getting Started</title>
@@ -52,6 +52,7 @@ This book will guide you through an initial proof-of-concept setup, using these 
 <simpara>Register a Salt minion</simpara>
 </listitem>
 </orderedlist>
+<simpara>The book also contains a section about getting started with Salt.</simpara>
 </section>
 <section xml:id="quickstart.sect.prereq">
 <title>Prerequisites for Installation</title>
@@ -823,7 +824,7 @@ Then click <guibutton>Next</guibutton> to continue.</simpara>
 </informalfigure>
 </listitem>
 <listitem>
-<simpara>Enter your SUSE Customer Center<literal role="systemitem">Organization Credentials</literal>.
+<simpara>Enter your SUSE Customer Center <literal role="systemitem">Organization Credentials</literal>.
 Open <link xl:href="https://scc.suse.com/login">https://scc.suse.com/login</link> to register or access to your organization credentials.</simpara>
 <note>
 <title><guibutton>Skip</guibutton></title>
@@ -1105,7 +1106,7 @@ Multiple options for parent channel found. Please use option
 <title>Registering Traditional Clients</title>
 <section xml:id="generate.bootstrap.script">
 <title>Generating a Bootstrap Script</title>
-<simpara>This section goes over generating a template bootstrap script which will be copied and modified for use with &#8220;traditional&#8221; clients.
+<simpara>This section goes over generating a template bootstrap script which will be copied and modified for use with <quote>traditional</quote> clients.
 Traditional clients register with SUSE Manager via a bootstrap script executed on the client which deploys all necessary packages to it.
 The bootstrap script contains parameters which assigns a client system to its base channel.
 Two of these important parameters are:</simpara>
@@ -1213,8 +1214,7 @@ You must enter the full name of the key you wish to use in the bootstrap script 
 </listitem>
 <listitem>
 <simpara>Run the following command to execute the bootstrap script on the client:</simpara>
-<screen>cat MODIFIED-SCRIPT.SH \
-| ssh root@example.com /bin/bash</screen>
+<screen>cat MODIFIED-SCRIPT.SH | ssh root@example.com /bin/bash</screen>
 </listitem>
 <listitem>
 <simpara>The script will execute and proceed to download the required dependencies located in the repositories directory you created earlier.
@@ -1260,37 +1260,17 @@ Note that even if you do not select a date and time, the lock might not deactiva
 <title>Registering Salt Clients</title>
 <simpara>There are currently three methods for registering Salt minions.
 This section describes the first method and uses a bootstrap repository.
-The second method uses the bootstrap script, and is mostly similar to the procedure described in <xref linkend="registering.clients.traditional"/>-the difference is enabling <literal role="guimenu">Bootstrap using Salt</literal> and <literal role="guimenu">Enable Remote Commands</literal> (<literal role="literal">ALLOW_REMOTE_COMMANDS=1</literal>).
+The second method uses the bootstrap script, and is mostly similar to the procedure described in <xref linkend="registering.clients.traditional"/>-the difference is enabling <literal role="guimenu">Bootstrap using Salt</literal> and the activation key option <literal role="guimenu">Configuration File Deployment</literal> that applies highstate automatically.
 The third method uses the Web UI, and is described in <xref linkend="ref.webui.systems.bootstrapping"/>.</simpara>
 <simpara>You can also use these methods to change existing traditional clients into Salt minions.</simpara>
-<simpara>The following section assumes you have created a SUSE Manager tools repository.
+<simpara>The rest of this section assumes you have created a SUSE Manager tools repository.
 You can review creating a tools repository in <xref linkend="create.tools.repository"/>.</simpara>
-<warning>
-<title>Ensure the Salt Master is Reachable During Bootstrap</title>
-<simpara>The Salt master and its proxy should always be reachable via both IP address and the FQDN.
-In the following rare scenario:</simpara>
-<itemizedlist>
-<listitem>
-<simpara>The Salt master (SUSE Manager) is in some DNS.</simpara>
-</listitem>
-<listitem>
-<simpara>Your Minions are in a different subnet bound to an alternate DNS and the Salt master record is absent.</simpara>
-</listitem>
-<listitem>
-<simpara>The Salt master cannot know that the minion is not utilizing the same DNS record. The the Salt master nevertheless sends the FQDN of itself to the minion expecting it to join.</simpara>
-</listitem>
-<listitem>
-<simpara>The minion looks for a different DNS, one where the master record does not exist therefore bootstrap fails.</simpara>
-</listitem>
-</itemizedlist>
-</warning>
-<simpara>Once you have fully synced a base channel from the Web UI
-for clients to obtain software sources from, for example: <literal>SLES12-SP4-Pool_for_x86_64</literal> perform the following procedure to register a Salt minion.</simpara>
+<simpara>When you have fully synchronized a base channel from the Web UI for clients to obtain software packages from (for example: <literal>SLES12-SP4-Pool_for_x86_64</literal>) perform the following procedure to register a Salt minion.</simpara>
 <orderedlist numeration="arabic">
 <title>Procedure: Registering Salt Minions</title>
 <listitem>
 <simpara>On your minion as root enter the following command:</simpara>
-<screen>zypper ar http://`FQDN.SUSE.Manager.com`/pub/repositories/sle/12/3/bootstrap/ \
+<screen>zypper ar http://FQDN.server.example.com/pub/repositories/sle/12/4/bootstrap/ \
    sles12-sp4</screen>
 <note>
 <simpara>Do not use <literal>HTTPS</literal>.
@@ -1307,7 +1287,7 @@ Use <literal>HTTP</literal> instead to avoid errors.</simpara>
 <simpara>Find and change the line:</simpara>
 <screen>master: salt</screen>
 <simpara>to:</simpara>
-<screen>master:`FQDN.SUSE.Manager.com`</screen>
+<screen>master: FQDN.server.example.com</screen>
 </listitem>
 <listitem>
 <simpara>Restart the Salt minion with:</simpara>
@@ -1316,10 +1296,21 @@ Use <literal>HTTP</literal> instead to avoid errors.</simpara>
 </orderedlist>
 <simpara>Your newly registered minion should now show up within the Web UI under <menuchoice><guimenu>Salt</guimenu> <guimenuitem>Keys</guimenuitem></menuchoice>.
 Accept the <literal role="guimenu">pending</literal> key to begin management.</simpara>
+</section>
+<section xml:id="_troubleshooting_salt_clients">
+<title>Troubleshooting Salt Clients</title>
+<section xml:id="_mounting_tmp_with_noexec">
+<title>Mounting /tmp with noexec</title>
+<simpara>Salt runs remote commands from <literal role="filename">/tmp</literal> of the client&#8217;s filesystem.
+Therefore you must not mount <literal role="filename">/tmp</literal> with the <literal role="option">noexec</literal> option.</simpara>
+</section>
+<section xml:id="_cloned_salt_clients">
+<title>Cloned Salt Clients</title>
 <simpara>If you have used your hypervisor clone utility, and attempted to register the cloned Salt client, you might get this error:</simpara>
 <screen>We're sorry, but the system could not be found.</screen>
 <simpara>This is caused by the new, cloned, system having the same machine ID as an existing, registered, system.
 You can adjust this manually to correct the error and register the cloned system successfully.</simpara>
+</section>
 </section>
 </chapter>
 <chapter xml:id="salt.gs.guide.introduction">
@@ -1716,6 +1707,80 @@ Select it to view a list of installed formulas.</simpara>
 </listitem>
 </orderedlist>
 </section>
+<section xml:id="salt.pillars.setpackageendpoint">
+<title>Use Pillars to Set the Package Download Endpoint</title>
+<simpara>By default, SUSE Manager assumes that the download endpoint to use is the FQDN of the SUSE Manager server, or the SUSE Manager Proxy.
+However, there are some cases where you might like to use a different FQDN as the download endpoint.
+The most common example is if you need to use load balancing, caching proxies, or in environments with complicated networking requirements.</simpara>
+<simpara>To change the package download endpoint, you can manually adjust three salt pillars:
+* <literal role="systemitem">pkg_download_point_protocol</literal>, defaults to <literal role="systemitem">https</literal>.
+* <literal role="systemitem">pkg_download_point_host</literal>, defaults to the FQDN of the SUSE Manager Server (or Proxy, if in use).
+* <literal role="systemitem">pkg_download_point_port</literal>, defaults to <literal role="systemitem">443</literal>.</simpara>
+<simpara>If you do not adjust these pillars directly, SUSE Manager will fall back to the default values.</simpara>
+<orderedlist numeration="arabic">
+<title>Procedure: Changing the package download endpoint pillar</title>
+<listitem>
+<simpara>Navigate to <literal role="path">/srv/pillar/</literal> and create a file called <literal role="filename">top.sls</literal>  with these contents:</simpara>
+<screen>base:
+  '*':
+    - pkg_download_endpoints</screen>
+<simpara>This example directs Salt to look at the <literal role="filename">pkg_download_endpoints.sls</literal> file to determine the base URL to use.
+You can adjust this file to target different minions or groups, depending on your environment.</simpara>
+</listitem>
+<listitem>
+<simpara>Remain in <literal role="path">/srv/pillar/</literal> and create a file called <literal role="filename">pkg_download_endpoints.sls</literal> with the base URLs you want to use.
+For example:</simpara>
+<screen>pkg_download_point_protocol: http
+pkg_download_point_host: example.com
+pkg_download_point_port: 444</screen>
+</listitem>
+<listitem>
+<simpara>OPTIONAL: You can use grains to set conditional values, for example:</simpara>
+</listitem>
+</orderedlist>
+<screen>{% if grains['fqdn'] == 'minion1.example.com' %}
+    pkg_download_point: example1.com
+{% elif grains['fqdn'] == 'minion2.example.com' %}
+    pkg_download_point: example2.com
+{% else %}
+    pkg_download_point: example.com
+{% endif %}</screen>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>OPTIONAL: If you want to use external pillars, for example Group IDs, open the master configuration file and set the <literal role="systemitem">ext_pillar_first</literal> parameter to <literal role="systemitem">true</literal>.
+You can then use Group IDs to set conditional values, for example:</simpara>
+<screen>{% if pillar['group_ids'] is defined and Group_ID in pillar['group_ids'] %}
+  pkg_download_point_protocol: http
+  pkg_download_point_host: example.com
+  pkg_download_point_port: 444
+{% else %}
+  pkg_download_point_protocol: ftp
+  pkg_download_point_host: example.com
+  pkg_download_point_port: 445
+{% endif %}</screen>
+</listitem>
+</orderedlist>
+</section>
+<section xml:id="_disabling_the_salt_mine">
+<title>Disabling the Salt Mine</title>
+<simpara>In older versions, SUSE Manager used a tool called Salt mine to check minion availability.
+The Salt mine would cause minions to contact the server every hour, which created significant load.
+With the introduction of a more efficient mechanism in SUSE Manager&#160;3.2, the Salt mine is no longer required.
+Instead, the SUSE Manager server uses Taskomatic to ping only the minions that appear to have been offline for twelve hours or more, with all minions being contacted at least once in every twenty four hour period by default.
+You can adjust this by changing the <literal role="systemitem">web.system_checkin_threshold</literal> parameter in <literal role="path">rhn.conf</literal>.
+The value is expressed in days, and the default value is <literal role="literal">1</literal>.</simpara>
+<simpara>Newly registered Salt minions will have the Salt mine disabled by default.
+If the Salt mine is running on your system, you can reduce load by disabling it.
+This is especially effective if you have a large number of minions.</simpara>
+<simpara>Disable the Salt mine by running this command on the server:</simpara>
+<screen>salt '*' state.sls util.mgr_mine_config_clean_up</screen>
+<simpara>This will restart the minions and generate some Salt events to be processed by the server.
+If you have a large number of minions, handling these events could create excessive load.
+To avoid this, you can execute the command in batch mode with this command:</simpara>
+<screen>salt --batch-size 50 '*' state.sls util.mgr_mine_config_clean_up</screen>
+<simpara>You will need to wait for this command to finish executing.
+Do not end the process with <keycombo><keycap>Ctrl</keycap><keycap>C</keycap></keycombo>.</simpara>
+</section>
 </chapter>
 </part>
 <part xml:id="book.suma.best.practices">
@@ -1723,7 +1788,7 @@ Select it to view a list of installed formulas.</simpara>
 <chapter xml:id="mgr.conceptual.overview">
 <title>Introduction</title>
 <simpara>This document targets system administrators.</simpara>
-<section xml:id="_what_s_covered_in_this_guide">
+<section xml:id="_whats_covered_in_this_guide">
 <title>What&#8217;s Covered in this Guide?</title>
 <simpara>This document describes SUSE recommended best practices for SUSE Manager.
 This information has been collected from a large number of successful SUSE Manager real world implementations and includes feedback provided by product management, sales and engineering.</simpara>
@@ -1987,7 +2052,7 @@ The following tables provide you with an overview of ports which are used by SUS
 </tbody>
 </tgroup>
 </table>
-<simpara>For more information, see <link xl:href="advanced.topics.app.ports.server.xml#at-ports">Port Listing</link>.</simpara>
+<simpara>For more information, see <link xl:href="advanced.topics.app.ports.server#at-ports">Port Listing</link>.</simpara>
 <tip>
 <title>Denying External Network Access</title>
 <simpara>When your network requires denying external network access to and from SUSE Manager, an RMT or SMT Server may be registered against SUSE Manager.
@@ -2140,7 +2205,7 @@ For more information on using SUSE Customer Center
 <title>Disconnected Setup with RMT or SMT (DMZ)</title>
 <simpara>If it is not possible to connect SUSE Manager
 directly or via a proxy to the Internet, a disconnected setup in combination with RMT or SMT is the recommended solution.
-In this scenario, RMT or SMT stays in an &#8220;external&#8221;
+In this scenario, RMT or SMT stays in an <quote>external</quote>
  network with a connection to SUSE Customer Center
  and synchronizes the software channels and repositories on a removable storage medium.
 Then you separate the storage medium from RMT or SMT, and mount it locally on your SUSE Manager
@@ -2237,7 +2302,7 @@ server, continue with <xref linkend="disconnect.mgr.update-repos"/>.</simpara>
 <simpara>Using SMT, mirror all required repositories.</simpara>
 </listitem>
 <listitem>
-<simpara>Create a &#8220;database replacement file&#8221; (for example, <literal role="path">/tmp/dbrepl.xml</literal> ).</simpara>
+<simpara>Create a <quote>database replacement file</quote> (for example, <literal role="path">/tmp/dbrepl.xml</literal> ).</simpara>
 <screen>{prompt.root}smt-sync --createdbreplacementfile /tmp/dbrepl.xml</screen>
 </listitem>
 </orderedlist>
@@ -2338,7 +2403,7 @@ To avoid data corruption, do not trigger a sync if the storage medium is not mou
 </chapter>
 <chapter xml:id="bp.expanded-support">
 <title>Expanded Support</title>
-<simpara>In the following sections find information about Red Hat and Centos clients.</simpara>
+<simpara>In the following sections find information about Red Hat, CentOS, and Ubuntu clients.</simpara>
 <section xml:id="bp.expanded-support.resclients">
 <title>Managing Red Hat Enterprise Linux Clients</title>
 <simpara>The following sections provide guidance on managing Red Hat Expanded Support clients, this includes Salt minions and traditional systems.</simpara>
@@ -2635,7 +2700,7 @@ yum clean all
 yum -y install yum-rhn-plugin rhn-setup</screen>
 </listitem>
 <listitem>
-<simpara>Add the following lines to the bottom of your script, (just before <literal>echo &#8220;-bootstrap complete -&#8221;</literal>):</simpara>
+<simpara>Add the following lines to the bottom of your script, (just before <literal>echo <quote>-bootstrap complete -</quote></literal>):</simpara>
 <screen># This section is for commands to be executed after registration
 mv /etc/yum.repos.d/Cent* /root/
 yum clean all
@@ -2689,6 +2754,161 @@ See the matrix of SUSE Manager clients on the main page of the SUSE Manager wiki
 </listitem>
 </orderedlist>
 </section>
+<section xml:id="bp.expanded-support.ubuntu">
+<title>Managing Ubuntu Clients</title>
+<simpara>Support for Ubuntu Clients was added in SUSE Manager 3.2.
+Currently, Salt minions running Ubuntu 16.04 LTS and 18.04 LTS are supported.</simpara>
+<note>
+<simpara>Ubuntu clients must be Salt minions.
+Traditional clients are not supported.</simpara>
+</note>
+<simpara>Bootstrapping is supported for starting Ubuntu clients and performing initial state runs such as setting repositories and performing profile updates.
+However, the root user on Ubuntu is disabled by default, so in order to use bootstrapping, you will require an existing user with <literal role="command">sudo</literal> privileges for Python.</simpara>
+<simpara>Other supported features:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Synchronizing <literal role="systemitem">.deb</literal> channels</simpara>
+</listitem>
+<listitem>
+<simpara>Assigning <literal role="systemitem">.deb</literal> channels to minions</simpara>
+</listitem>
+<listitem>
+<simpara>GPG signing <literal role="systemitem">.deb</literal> repositories</simpara>
+</listitem>
+<listitem>
+<simpara>Information displayed in System details pages</simpara>
+</listitem>
+<listitem>
+<simpara>Package install, update, and remove</simpara>
+</listitem>
+<listitem>
+<simpara>Package install using <literal role="systemitem">Package States</literal></simpara>
+</listitem>
+<listitem>
+<simpara>Configuration and state channels</simpara>
+</listitem>
+</itemizedlist>
+<simpara>Some actions are not yet supported:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Patch and errata support</simpara>
+</listitem>
+<listitem>
+<simpara>Bare metal installations, PXE booting, and virtual host provisioning</simpara>
+</listitem>
+<listitem>
+<simpara>Live patching</simpara>
+</listitem>
+<listitem>
+<simpara>CVE Audit</simpara>
+</listitem>
+<listitem>
+<simpara>If you use are using a repository from storage media (<literal>server.susemanager.fromdir = &#8230;&#8203;</literal> option in rhn.conf), Ubuntu Client Tools will not work.</simpara>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="_prepare_to_register_ubuntu_clients">
+<title>Prepare to Register Ubuntu Clients</title>
+<simpara>Some preparation is required before you can register Ubuntu clients to SUSE Manager Server.</simpara>
+<simpara>Before you begin, ensure you have the Ubuntu product enabled, and have synchronized the Ubuntu channels:</simpara>
+<simpara>For Ubuntu 18.04:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Product: Ubuntu Client 18.04</simpara>
+</listitem>
+<listitem>
+<simpara>Mandatory channels: <literal role="systemitem">ubuntu-18.04-pool-amd64</literal></simpara>
+</listitem>
+</itemizedlist>
+<simpara>For Ubuntu 16.04:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Product: Ubuntu Client 16.04</simpara>
+</listitem>
+<listitem>
+<simpara>Mandatory channels: <literal role="systemitem">ubuntu-16.04-pool-amd64</literal></simpara>
+</listitem>
+</itemizedlist>
+<note>
+<simpara>The mandatory channels do not contain Ubuntu upstream packages.
+The repositories and channels for synchronizing upstream content must be configured manually.</simpara>
+</note>
+<orderedlist numeration="arabic">
+<title>Procedure: Preparing to Register Ubuntu Clients</title>
+<listitem>
+<simpara>Ensure that you have the appropriate software channels available on your system.
+In the SUSE Manager Web UI, navigate to <menuchoice><guimenu>Software</guimenu> <guisubmenu>Channel List</guisubmenu> <guimenuitem>All</guimenuitem></menuchoice>.
+You should see a base channel and a child channel for your architecture, for example:</simpara>
+<screen> ubuntu-18.04-pool for amd64
+ |
+ +- Ubuntu-18.04-SUSE-Manager-Tools for amd64</screen>
+</listitem>
+<listitem>
+<simpara>Create custom repositories to mirror the Ubuntu packages.
+For example:</simpara>
+<simpara>For <literal>main</literal>:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Repository Label: ubuntu-bionic-main</simpara>
+</listitem>
+<listitem>
+<simpara>Repository URL: <link xl:href="http://ubuntumirror.example.com/ubuntu/dists/bionic/main/binary-amd64/">http://ubuntumirror.example.com/ubuntu/dists/bionic/main/binary-amd64/</link></simpara>
+</listitem>
+<listitem>
+<simpara>Repository Type: deb</simpara>
+<simpara>For <literal>main-updates</literal>:</simpara>
+</listitem>
+<listitem>
+<simpara>Repository Label: ubuntu-bionic-main-updates</simpara>
+</listitem>
+<listitem>
+<simpara>Repository URL: <link xl:href="http://ubuntumirror.example.com/ubuntu/dists/bionic-updates/main/binary-amd64/">http://ubuntumirror.example.com/ubuntu/dists/bionic-updates/main/binary-amd64/</link></simpara>
+</listitem>
+<listitem>
+<simpara>Repository Type: deb</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
+<simpara>Create custom channels under the <literal>pool</literal> channel, mirroring the vendor channels.
+Ensure the custom channels you create have <literal>AMD64 Debian</literal> architecture.</simpara>
+<simpara>For example:</simpara>
+<screen> ubuntu-18.04-pool for amd64 (vendor channel)
+ |
+ +- Ubuntu-18.04-SUSE-Manager-Tools for amd64 (vendor channel)
+ |
+ +- ubuntu-18.04-amd64-main (custom channel)
+ |
+ +- ubuntu-18.04-amd64-main-updates (custom channel)</screen>
+</listitem>
+<listitem>
+<simpara>Associate the custom channels with the appropriate custom repositories.</simpara>
+</listitem>
+<listitem>
+<simpara>Synchronize the new custom channels.
+You can check the progress of your synchronization from the command line with this command:</simpara>
+</listitem>
+</orderedlist>
+<screen>tail -f /var/log/rhn/reposync.log /var/log/rhn/reposync/*</screen>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>To use bootstrap with Ubuntu, you will need to create a bootstrap repository.
+You can  do this from the command line with <literal role="command">mgr-create-bootstrap-repo</literal>:</simpara>
+<screen>mgr-create-bootstrap-repo --with-custom-channels</screen>
+</listitem>
+</orderedlist>
+<simpara>The root user on Ubuntu is disabled by default.
+You can enable it by editing the <literal role="filename">sudoers</literal> file.</simpara>
+<orderedlist numeration="arabic">
+<title>Procedure: Granting Root User Access</title>
+<listitem>
+<simpara>On the client, edit the <literal role="filename">sudoers</literal> file:</simpara>
+<screen>sudo visudo</screen>
+<simpara>Grant <literal role="command">sudo</literal> access to the user by adding this line to the <literal role="filename">sudoers</literal> file. Replace <literal role="systemitem">&lt;user&gt;</literal> with the name of the user that will be used to bootsrap the client in the Web UI:</simpara>
+<screen>&lt;user&gt;   ALL=NOPASSWD: /usr/bin/python, /usr/bin/python2, /usr/bin/python3</screen>
+</listitem>
+</orderedlist>
+</section>
 </chapter>
 <chapter xml:id="best.practice.salt.formulas.and.forms">
 <title>Salt Formulas and SUSE Manager</title>
@@ -2699,7 +2919,7 @@ Creation of custom formulas will also be introduced.</simpara>
 <simpara>Formulas are collections of Salt States that have been pre-written by other Salt users and contain generic parameter fields.
 Formulas allow for reliable reproduction of a specific configuration again and again.
 Formulas can be installed from RPM packages or an external git repository.</simpara>
-<simpara>The following list will help you in making the decision to use a state or a formula.</simpara>
+<simpara>This list will help you decide whether to use a state or a formula:</simpara>
 <itemizedlist>
 <title>Formula Tips</title>
 <listitem>
@@ -2713,21 +2933,18 @@ Formulas can be installed from RPM packages or an external git repository.</simp
 Once written and stored you will have a snapshot of what your infrastructure should look like.</simpara>
 </listitem>
 <listitem>
-<simpara>You can greatly decrease the amount of time required for writing a formula by grabbing one of the many pre-written formulas on github.
-There are pre-written formulas for hundreds of configurations.
-You can find these located at <link xl:href="https://github.com/saltstack-formulas">https://github.com/saltstack-formulas</link>.</simpara>
+<simpara>Pre-written formulas are available from the <link xl:href="https://github.com/saltstack-formulas">Saltstack formula repository on Github</link>.
+Use these as a starting point for your own custom formulas.</simpara>
+</listitem>
+<listitem>
+<simpara>Formula data can be managed via the XMLRPC API.</simpara>
 </listitem>
 </itemizedlist>
 <note>
 <title>Formula with Forms Improvements</title>
-<itemizedlist>
-<listitem>
-<simpara>Formula data can now be managed via the XMLRPC API</simpara>
-</listitem>
-<listitem>
-<simpara>New types were added to help SUSE Manager handle almost any kind of upstream formula.</simpara>
-</listitem>
-</itemizedlist>
+<simpara>Forms are a graphical representation of the formulas parameter data.
+You can customize these configuration data in the SUSE Manager Web UI, with entry fields, drop-down, check boxes, etc.</simpara>
+<simpara>For more information, see <link xl:href="https://www.suse.com/c/forms-formula-success/">https://www.suse.com/c/forms-formula-success/</link>.</simpara>
 </note>
 </section>
 <section xml:id="best.practice.salt.formulas.install">
@@ -2763,7 +2980,8 @@ Installed Size: 47.9 KiB
 Installed: No
 Source package : locale-formula-0.2-1.1.src
 Summary        : Locale Salt Formula for SUSE Manager
-Description    : Salt Formula for SUSE Manager. Sets up the locale.</screen>
+Description    :
+    Salt Formula for SUSE Manager. Sets up the locale.</screen>
 </listitem>
 <listitem>
 <simpara>To install a formula run as root:</simpara>
@@ -2790,12 +3008,8 @@ For example, the <phrase role="package">locale-formula</phrase> states directory
 <varlistentry>
 <term>The Formula Metadata Directory</term>
 <listitem>
-<simpara>The metadata directory contains a <literal role="path">form.yml</literal>
-file which defines the forms for SUSE Manager
-and an optional <literal role="path">metadata.yml</literal>
-file that can contain additional information about a formula.
-For example, the <phrase role="package">locale-formula</phrase>
-metadata directory is located in:</simpara>
+<simpara>The metadata directory contains a <literal role="path">form.yml</literal> file which defines the forms for SUSE Manager and an optional <literal role="path">metadata.yml</literal> file that can contain additional information about a formula.
+For example, the <phrase role="package">locale-formula</phrase> metadata directory is located in:</simpara>
 <screen>/usr/share/susemanager/formulas/metadata/locale/</screen>
 </listitem>
 </varlistentry>
@@ -2822,9 +3036,9 @@ metadata directory is located in:</simpara>
 </listitem>
 </varlistentry>
 </variablelist>
-<simpara>All custom folders located in the following directories needs to contain a <literal role="path">form.yml</literal> file.
+<simpara>All custom folders located in the following directories need to contain a <literal role="path">form.yml</literal> file.
 These files are detected as form recipes and may be applied to groups and systems from the Web UI:</simpara>
-<screen>/srv/salt/formula_metadata/`custom-formula-name`/form.yml</screen>
+<screen>/srv/formula_metadata/&lt;custom-formula-name&gt;/form.yml</screen>
 </section>
 <section xml:id="best.practice.salt.formulas.pillar">
 <title>Editing Pillar Data in SUSE Manager</title>
@@ -2997,13 +3211,30 @@ The following represent the supported types:</simpara>
 <simpara>The <literal>password</literal> type generates a password field</simpara>
 </listitem>
 <listitem>
-<simpara>The <literal>color</literal> type generates a color picker.</simpara>
+<simpara>The <literal>color</literal> type generates a color picker</simpara>
 </listitem>
 </itemizedlist>
 <simpara>The <literal>group</literal>, <literal>edit-group</literal>, and <literal>namespace</literal> (formerly <literal>hidden-group</literal>) types do not generate an editable field and are used to structure form and pillar data.
 The difference between <literal>group</literal> and <literal>namespace</literal> is <literal>group</literal> generates a visible border with a heading, and <literal>namespace</literal> shows nothing visually (and is only used to structure pillar data).
-The difference between <literal>group</literal> and <literal>edit-group</literal> is <literal>edit-group</literal> allows to structure and restrict editable fields in a more flexible way.
-For example, <literal>edit-group</literal> supports the <literal>$minItems</literal> and <literal>$maxItems</literal> attributes, and thus it simplifies complex and repeatable input structures.
+The difference between <literal>group</literal> and <literal>edit-group</literal> is: <literal>edit-group</literal> allows to structure and restrict editable fields in a more flexible way.
+<literal>edit-group</literal> is a collection of items of the same kind; collections can have the following four "shapes":</simpara>
+<itemizedlist>
+<listitem>
+<simpara>A list of primitive items</simpara>
+</listitem>
+<listitem>
+<simpara>A list of dictionaries</simpara>
+</listitem>
+<listitem>
+<simpara>A dictionary of primitive items</simpara>
+</listitem>
+<listitem>
+<simpara>A dictionary of dictionaries</simpara>
+</listitem>
+</itemizedlist>
+<simpara>The size of each collection is variable; users can add or remove elements.</simpara>
+<simpara>For example, <literal>edit-group</literal> supports the <literal>$minItems</literal> and <literal>$maxItems</literal> attributes, and thus it simplifies complex and repeatable input structures.
+These, and also <literal>itemName</literal>, are optional.
 For an <literal>edit-group</literal> example, see <xref linkend="salt.formulas.ex.edit-group"/>.</simpara>
 <variablelist>
 <varlistentry>
@@ -3011,6 +3242,27 @@ For an <literal>edit-group</literal> example, see <xref linkend="salt.formulas.e
 <listitem>
 <simpara><literal>$default</literal> allows you to specify a default value that is displayed and used, if no other value is entered.
 In an <literal>edit-group</literal> it allows to create initial members of the group and populate them with specified data.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>$optional</term>
+<listitem>
+<simpara><literal>$optional</literal> is a boolean attribute.
+If it is <literal>true</literal> and the field is empty in the form, then this field will not be generated in the formula data and the generated dictionary will not contain the field name key.
+If <literal>$optional</literal> is <literal>false</literal> and the field is empty, the formula data will contain a <literal>&lt;field name&gt;: null</literal> entry.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>$ifEmpty</term>
+<listitem>
+<simpara>The value to be used if the field is empty (because the user did not input
+any value).
+<literal>ifEmpty</literal> can only be used when <literal>$optional</literal> is <literal>false</literal> or not defined at all!
+If <literal>$optional</literal> is <literal>true</literal>, then <literal>$ifEmpty</literal> is ignored.
+In the following example, the <literal>DP2</literal> string would be used if user leaves the field empty:</simpara>
+<screen>displayName:
+  $type: string
+  $ifEmpty: DP2</screen>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -3030,7 +3282,7 @@ You reference it in the same section with <literal>${name}</literal>.</simpara>
 <simpara><literal>$help</literal> defines the message a user sees when hovering over a field</simpara>
 </listitem>
 <listitem>
-<simpara><literal>$placeholder</literal> displays a gray placeholder text in the field.</simpara>
+<simpara><literal>$placeholder</literal> displays a gray placeholder text in the field</simpara>
 </listitem>
 </itemizedlist>
 </listitem>
@@ -3040,6 +3292,30 @@ You reference it in the same section with <literal>${name}</literal>.</simpara>
 It does not make sense to add a placeholder if you also use <literal>$default</literal> as this will hide the placeholder.</simpara>
 <variablelist>
 <varlistentry>
+<term>$key</term>
+<listitem>
+<simpara><literal>$key</literal> is applicable if the <literal>edit-group</literal> has the "shape" of a dictionary; you use it when the pillar data is supposed to be a dictionary.
+The <literal>$key</literal> attribute then determines the key of an entry in the dictionary.
+Example:</simpara>
+<screen>user_passwords:
+  $type: edit-group
+  $minItems: 1
+  $prototype:
+    $key:
+        $type: text
+    $type: text
+  $default:
+    alice: secret-password
+    bob: you-shall-not-pass</screen>
+<simpara>Pillar:</simpara>
+<screen>user_passwords:
+  alice:
+    secret-password
+  bob:
+    you-shall-not-pass</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
 <term>$minItems and $maxItems</term>
 <listitem>
 <simpara>In an <literal>edit-group</literal>, <literal>$minItems</literal> and <literal>$maxItems</literal> allow you to specify the lowest and highest number the group can occur.</simpara>
@@ -3048,27 +3324,27 @@ It does not make sense to add a placeholder if you also use <literal>$default</l
 <varlistentry>
 <term>$itemName</term>
 <listitem>
-<simpara>In an <literal>edit-group</literal>, <literal>$itemName</literal> allows to define a template for the name to be used for the members of the group.</simpara>
+<simpara>In an <literal>edit-group</literal>, <literal>$itemName</literal> allows you to define a template for the name to be used for the members of the group.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
 <term>$prototype</term>
 <listitem>
-<simpara>In an <literal>edit-group</literal>, <literal>$prototype</literal> allows to define default (or pre-filled) values for newly added members in the group.</simpara>
+<simpara>In an <literal>edit-group</literal>, <literal>$prototype</literal> is mandatory and allows to define default (or pre-filled) values for newly added members in the group.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
 <term>$scope</term>
 <listitem>
 <simpara><literal>$scope</literal> allows you to specify a hierarchy level at which a value may be edited.
-Possible values are <literal>system</literal>, <literal>group</literal> and <literal>readonly</literal>.</simpara>
+Possible values are <literal>system</literal>, <literal>group</literal>, and <literal>readonly</literal>.</simpara>
 <simpara>The default <literal>$scope: system</literal> allows values to be edited at group and system levels.
 A value can be entered for each system but if no value is entered the system will fall back to the group default.</simpara>
 <simpara>If using <literal>$scope: group</literal>, a value may only be edited for a group.
 On the system level you will be able to see the value, but not edit it.</simpara>
 <simpara>The <literal>$scope: readonly</literal> option makes a field read-only.
 It can be used to show a user data which should be known, but should not be editable.
-This option only makes sense in combination with the $default attribute.</simpara>
+This option only makes sense in combination with the <literal>$default</literal> attribute.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -3177,7 +3453,7 @@ The formula itself is called <literal role="path">hd-partitions</literal> and wi
 <textobject><phrase>formula custom harddisk partitions</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>To remove definition of a partition click the minus symbol in the title line of an inner group.
+<simpara>To remove the definition of a partition click the minus symbol in the title line of an inner group.
 When form fields are properly filled confirm with clicking <guibutton>Save Formula</guibutton> in the upper right corner of the formula.</simpara>
 </section>
 </section>
@@ -3186,19 +3462,17 @@ When form fields are properly filled confirm with clicking <guibutton>Save Formu
 <simpara>Salt formulas are pre-written Salt states, which may be configured with pillar data.
 You can parametrize state files using Jinja.
 Jinja allows you to access pillar data by using the following syntax.
-(This syntax works best when your uncertain a pillar value exists as it will throw an error):</simpara>
+This syntax works best when you are uncertain whether a pillar value exists as it will throw an error:</simpara>
 <screen>pillar.some.value</screen>
-<simpara>When you are sure a pillar exists may also use the following syntax:</simpara>
+<simpara>When you are sure a pillar exists you may also use the following syntax:</simpara>
 <screen>salt['pillar.get']('some:value', 'default value')</screen>
 <simpara>You may also replace the <literal>pillar</literal> value with <literal>grains</literal> (for example, <literal>grains.some.value</literal>) allowing access to grains.</simpara>
 <simpara>Using data this way allows you to make a formula configurable.
-The following code snippet will install a package specified in the pillar <literal>package_name</literal>.
-For example:</simpara>
+The following code snippet will install a package specified in the pillar <literal>package_name</literal>:</simpara>
 <screen>install_a_package:
   pkg.installed:
     - name: {{ pillar.package_name }}</screen>
-<simpara>You may also use more complex constructs such as <literal>if/else</literal> and <literal>for-loops</literal> to provide greater functionality.
-For Example:</simpara>
+<simpara>You may also use more complex constructs such as <literal>if/else</literal> and <literal>for-loops</literal> to provide greater functionality:</simpara>
 <screen>{% if pillar.installSomething %}
 something:
   pkg.installed
@@ -3245,7 +3519,7 @@ It will also merge data with the pillar using the <literal>some.pillar.data</lit
         'service': 'service_a'
     }
 }, merge=salt['pillar.get']('some:pillar:data')) %}</screen>
-<simpara>After creating a map file like the above example, you can easily maintain compatibility with multiple system types while accessing "deep" pillar data in a simpler way.
+<simpara>After creating a map file like the above example, you can maintain compatibility with multiple system types while accessing "deep" pillar data in a simpler way.
 Now you can import and use <literal>data</literal> in any file.
 For example:</simpara>
 <screen>{% from "some_folder/map.jinja" import data with context %}
@@ -3277,8 +3551,7 @@ For Example:</simpara>
 </section>
 <section xml:id="best.practice.salt.formulas.pillardata">
 <title>SUSE Manager Generated Pillar Data</title>
-<simpara>When pillar data is generated (for example, after applying the highstate) the following external pillar script generates pillar data for packages, group ids, etc.
-and includes all pillar data for a system:</simpara>
+<simpara>When pillar data is generated (for example, after applying the highstate) the following external pillar script generates pillar data for packages, group ids, etc. and includes all pillar data for a system:</simpara>
 <screen>/usr/share/susemanager/modules/pillar/suma_minion.py</screen>
 <simpara>The process is executed as follows:</simpara>
 <orderedlist numeration="arabic">
@@ -3313,7 +3586,7 @@ These should be automatically generated by the server.</simpara>
 </listitem>
 <listitem>
 <simpara>Formulas must be included for every minion listed in the top file.
-Currently this process is initiated by the <literal role="path">mgr_master_tops.py</literal> script which includes the formulas.sls file located in:</simpara>
+Currently this process is initiated by the <literal role="path">mgr_master_tops.py</literal> script which includes the <literal>formulas.sls</literal> file located in:</simpara>
 <screen>/usr/share/susemanager/formulas/states/</screen>
 <simpara>This directory must be a salt file root.
 File roots are configured on the salt-master (SUSE Manager) located in:</simpara>
@@ -3409,6 +3682,8 @@ These formulas such as the PXE boot, branch server network, or saltboot formulas
 <textobject><phrase>formula saltboot 02</phrase></textobject>
 </mediaobject>
 </figure>
+<simpara>In the Saltboot formula settings, configure either the <literal role="systemitem">filesystem</literal> parameter, or the <literal role="systemitem">image</literal> parameter, not both.
+If the <literal role="systemitem">filesystem</literal> and <literal role="systemitem">image</literal> fields both contain values, the <literal role="systemitem">filesystem</literal> parameter will be ignored and the <literal role="systemitem">image</literal> field settings will be used.</simpara>
 </section>
 <section xml:id="retail.formulas.image-sync">
 <title>Image Sync Formula</title>
@@ -3421,6 +3696,10 @@ This means it is not visible in the Web UI.  Apply it from the command-line or 
 <section xml:id="bp.saltforms.susemgr">
 <title>Salt Formulas Coming with SUSE Manager</title>
 <simpara>For general information, see the <literal>Salt Formulas installation and usage instructions</literal> at <link xl:href="https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html">https://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html</link>.</simpara>
+<section xml:id="bp.saltforms.susemgr.locale">
+<title>Locale</title>
+<simpara>The locale formula allows setting <literal role="guimenu">Timezone` and [guimenu]</literal>Keyboard and Language`.</simpara>
+</section>
 <section xml:id="bp.saltforms.susemgr.dns">
 <title>Domain Name System (Bind)</title>
 <simpara>With the bind formula you set up and configure a Domain Name System (DNS) server.
@@ -3484,7 +3763,7 @@ this URL, see <literal role="path">pillar.example</literal>.</simpara>
 <textobject><phrase>formula bind 04 reverse</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>When saved, data is written to /srv/susemanager/formula_data/pillar/&lt;salt-minion.example.com&gt;_bind.json</simpara>
+<simpara>When saved, data is written to <literal role="path">/srv/susemanager/formula_data/pillar/&lt;salt-minion.example.com&gt;_bind.json</literal>.</simpara>
 <simpara>If you apply the highstate (<menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice>), it first ensures that <literal role="package">bind</literal> and all required packages will get installed.
 Then it will start the DNS service (<literal>named</literal>).</simpara>
 </section>
@@ -3530,17 +3809,13 @@ A TFTP server is a component that provides infrastructure for booting with PXE.<
 <textobject><phrase>formula tftpd 01</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>For setting up a TFTP server, specify the <literal>Internal Network Address</literal>,
-<literal>TFTP base directory</literal> (default: <literal role="path">/srv/tftpboot</literal>), and <literal>run
-TFTP under user</literal> (default: <literal role="systemitem">sftp</literal>).</simpara>
+<simpara>For setting up a TFTP server, specify the <literal>Internal Network Address</literal>, <literal>TFTP base directory</literal> (default: <literal role="path">/srv/tftpboot</literal>), and <literal>run TFTP under user</literal> (default: <literal role="systemitem">sftp</literal>).</simpara>
 <simpara>If you apply the highstate (<menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Highstate</guimenuitem></menuchoice>), it first ensures that <literal role="package">atftp</literal> and all required packages will get installed.
 Then it will start TFTP (<literal>atftpd</literal>).</simpara>
 </section>
 <section xml:id="bp.saltforms.susemgr.vsftp">
 <title>Vsftpd</title>
-<simpara>With the vsftpd formula you set up and configure Vsftpd.  Vsftpd is an
-FTP server or daemon, written with security in mind.  "vs" in its name
-stands for "Very Secure".</simpara>
+<simpara>With the vsftpd formula you set up and configure Vsftpd.  Vsftpd is an FTP server or daemon, written with security in mind.  "vs" in its name stands for "Very Secure".</simpara>
 <figure xml:id="fig-formula-vsftpd-01">
 <title>vsftpd formula</title>
 <mediaobject>
@@ -3550,7 +3825,8 @@ stands for "Very Secure".</simpara>
 <textobject><phrase>formula vsftpd 01</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>For configuring a VSFTP server, specify the settings and options in the Vsftpd formula.  There are settings such as
+<simpara>For configuring a VSFTP server, specify the settings and options in the Vsftpd formula.
+There are settings such as
 <literal>FTP server directory</literal>,
 <literal>Internal Network Address</literal>
 <literal>Enable ssl</literal>, etc.</simpara>
@@ -3695,16 +3971,9 @@ A safe starting point would be to on-board a minion every 15 seconds, which can 
 <simpara>Minions which have not been on-boarded, (minions running with unaccepted Salt keys) consume resources, in particular inbound network bandwidth for ~2.5 Kb/s per minion.
 1000 idle minions will consume around ~2.5 Mb/s, and this number will drop to almost 0 once on-boarding has been completed.
 Limit non-onboarded systems for optimal performance.</simpara>
-<simpara>Salt&#8217;s official documentation suggests the maximum number of opened files should be set to at least 2 × the minion count.
-Current default is 16384, which is sufficient for ~8000 minions.
-For larger installations, this number may be increased by editing the following line in <literal role="path">/usr/lib/systemd/system/salt-master.service</literal>
-:</simpara>
-<screen>LimitNOFILE=16384</screen>
 </section>
 <section xml:id="bp.chap.salt.minion.scaleability.timeouts">
 <title>Salt Timeouts</title>
-<section xml:id="_background_information">
-<title>Background Information</title>
 <simpara>Salt features two timeout parameters called <literal>timeout</literal> and <literal>gather_job_timeout</literal> that are relevant during the execution of Salt commands and jobs&#8212;&#8203;it does not matter whether they are triggered using the command line interface or API.
 These two parameters are explained in the following article.</simpara>
 <simpara>This is a normal workflow when all minions are well reachable:</simpara>
@@ -3729,7 +3998,7 @@ These two parameters are explained in the following article.</simpara>
 <simpara>If some of the minions are down during this process, the workflow continues as follows:</simpara>
 <orderedlist numeration="arabic">
 <listitem>
-<simpara>If <literal>timeout</literal> is reached before getting all expected responses from the minions, then Salt master would trigger an aditional job (a Salt <literal role="command">find_job</literal> job) targeting only pending minions to check whether the job is already running on the minion.</simpara>
+<simpara>If <literal>timeout</literal> is reached before getting all expected responses from the minions, then Salt master would trigger an additional job (a Salt <literal role="command">find_job</literal> job) targeting only pending minions to check whether the job is already running on the minion.</simpara>
 </listitem>
 <listitem>
 <simpara>Now <literal>gather_job_timeout</literal> is evaluated. A new counter is now triggered.</simpara>
@@ -3743,25 +4012,45 @@ These two parameters are explained in the following article.</simpara>
 </orderedlist>
 <simpara>By default, SUSE Manager globally sets <literal>timeout</literal> and <literal>gather_job_timeout</literal> to 120 seconds.
 So, in the worst case, a Salt call targeting unreachable minions will end up <emphasis>with 240 seconds of waiting</emphasis> until getting a response.</simpara>
-</section>
 <section xml:id="bp.chap.salt.minion.scaleability.timeouts.presence">
-<title>A Presence Ping Mechanism for Unreachable Salt Minions</title>
-<simpara>In order to prevent waiting until timeouts are reached when some minions are down, SUSE
-introduced a so-called "presence mechanism" for Salt minions.</simpara>
-<simpara>This presence mechanism checks for unreachable Salt minions when SUSE Manager is performing synchronous calls to these minions, and it excludes unreachable minions from that call.
-Synchronous calls are going to be displaced in favor of asynchronous calls but currently still being used during some workflows.</simpara>
-<simpara>The presence mechanism triggers a Salt <literal role="command">test.ping</literal> with a custom and fixed short Salt timeout values.
-Default Salt values for the presence ping are: <literal>timeout
-     = 4</literal> and <literal>gather_job_timeout = 1</literal>.
-This way, we can quickly detect which targeted minions are unreachable, and then exclude them from the synchronous call.</simpara>
+<title>Presence Ping Timeout</title>
+<simpara>There are two parameters that control how presence pings from the Salt master are handled, one for the ping timeout, and one for the ping gather job.</simpara>
+<simpara>Salt batch calls begin with the Salt master performing a presence ping on the target minions.
+A ping gather job runs on the Salt master to handle the incoming pings from the minions.
+Batched commands will begin only after all minions have either responded to the ping, or timed out.</simpara>
+<simpara>The presence ping is an ordinary Salt command, but is not subject to the same timeout parameters as all other Salt commands (<literal>timeout</literal>/<literal>gather_job_timeout</literal>), rather, it has its own parameters (<literal>presence_ping_timeout</literal>/<literal>presence_ping_gather_job_timeout</literal>).
+You can configure the global timeout values in the <literal role="filename">/etc/salt/master.d/custom.conf</literal> configuration file.
+However, to allow for quicker detection of unresponsive minions, the timeout values for presence pings are by default significantly shorter than those used elsewhere.
+You can configure the presence ping parameters in <literal role="filename">/etc/rhn/rhn.conf</literal>, however the default values should be sufficient in most cases.</simpara>
+<simpara>A lower total presence ping timeout value will increase the chance of false negatives.
+In some cases, a minion might be marked as non-responding, when it is responding, but did not respond quickly enough.
+A higher total presence ping timeout will increase the accuracy of the test, as even slow minions will respond to the presence ping before timing out.
+Additionally, a higher presence ping timeout could limit throughput if you are targeting a large number of minions, when some of them are slow.</simpara>
+<simpara>If a minion does not reply to a ping within the allocated time, it will be marked as <literal role="systemitem">not available</literal>, and will be excluded from the command.
+The Web UI will show a <literal role="systemitem">minion is down</literal> message in this case.</simpara>
+<simpara>For more information on minion timeouts, see <link xl:href="scale-minions.xml">scale-minions.xml</link>.</simpara>
+<simpara>The presence ping timeout parameter changes the timeout setting for the presence ping, in seconds.
+Adjust the <literal role="systemitem">java.salt_presence_ping_timeout</literal> parameter.
+Defaults to 4 seconds.</simpara>
+<simpara>The presence ping gather job parameter changes the timeout setting for gathering the presence ping, in seconds.
+Adjust the <literal role="systemitem">java.salt_presence_ping_gather_job_timeout</literal> parameter.
+Defaults to 1 second.</simpara>
 </section>
-<section xml:id="_overriding_salt_presence_timeout_values">
-<title>Overriding Salt Presence Timeout Values</title>
-<simpara>SUSE Manager administrators can increase or decrease default presence ping timeout values by removing the comment markers (<literal>\#</literal>) and setting the desired values for <literal>salt_presence_ping_timeout</literal> and <literal>salt_presence_ping_gather_job_timeout</literal> options in <literal role="path">/etc/rhn/rhn.conf</literal>:</simpara>
-<screen># SUSE Manager presence timeouts for Salt minions
-# salt_presence_ping_timeout = 4
-# salt_presence_ping_gather_job_timeout = 1</screen>
 </section>
+<section xml:id="_batching">
+<title>Batching</title>
+<simpara>There are two parameters that control how actions are sent to clients, one for the batch size, and one for the delay.</simpara>
+<simpara>When the Salt master sends a batch of actions to the target minions, it will send it to the number of minions determined in the batch size parameter.
+After the specified delay period, commands will be sent to the next batch of minions.
+The number of minions in each subsequent batch is equal to the number of minions that have completed in the previous batch.</simpara>
+<simpara>Choosing a lower batch size will reduce system load and parallelism, but might reduce overall performance for processing actions.</simpara>
+<simpara>The batch size parameter sets the maximum number of clients that can execute a single action at the same time.
+Adjust the <literal role="systemitem">java.salt_batch_size</literal> parameter.
+Defaults to 100.</simpara>
+<simpara>Increasing the delay increases the chance that multiple minions will have completed before the next action is issued, resulting in fewer overall commands, and reducing load.</simpara>
+<simpara>The batch delay parameter sets the amount of time, in seconds, to wait after a command is processed before beginning to process the command on the next minion.
+Adjust the <literal role="systemitem">java.salt_batch_delay</literal> parameter.
+Defaults to 1.0 seconds.</simpara>
 <section xml:id="_salt_ssh_minions_ssh_push">
 <title>Salt SSH Minions (SSH Push)</title>
 <simpara>Salt SSH minions are slightly different that regular minions (zeromq). Salt SSH minions do not use Salt PUB/RET channels but a wrapper Salt command inside of an SSH call.
@@ -3993,28 +4282,23 @@ For general information about Salt clients, see <xref linkend="salt.gs.guide.int
 </note>
 </section>
 <section xml:id="bp.contact.methods.rhnsd">
-<title>Default (the SUSE Manager Daemon rhnsd)</title>
-<simpara>The SUSE Manager daemon (<literal role="command">rhnsd</literal>) runs on client systems and periodically connects with SUSE Manager to check for new updates and notifications.
-The daemon, which runs in the background, is started by <literal role="systemitem">rhnsd.service</literal>
-.
-By default, it will check every 4 hours for new actions, therefore it may take some time for your clients to begin updating after actions have been scheduled for them.</simpara>
-<simpara>To check for updates, <literal role="systemitem">rhnsd</literal>
- runs the external <literal role="systemitem">mgr_check</literal>
- program located in <literal role="path">/usr/sbin/</literal>
-.
+<title>Traditional Contact Method (rhnsd)</title>
+<simpara>The SUSE Manager daemon (<literal role="command">rhnsd</literal>) runs on traditional client systems and periodically connects with SUSE Manager to check for new updates and notifications.
+The daemon is started by <literal role="path">/etc/init.d/rhnsd</literal>.
+It is only still in use on SUSE Linux Enterprise 11 and Red Hat Enterprise Linux Server 6-these are systems that are not based on systemd.
+On later systems, a systemd timer (<literal role="systemitem">rhnsd.timer</literal>) is used and controlled by <literal role="systemitem">rhnsd.service</literal>.</simpara>
+<simpara>By default, rhnsd will check every 4 hours for new actions, therefore it may take some time for your clients to begin updating after actions have been scheduled for them.</simpara>
+<simpara>To check for updates, <literal role="systemitem">rhnsd</literal> runs the external <literal role="systemitem">mgr_check</literal> program located in <literal role="path">/usr/sbin/</literal>.
 This is a small application that establishes the network connection to SUSE Manager.
 The SUSE Manager daemon does not listen on any network ports or talk to the network directly.
-All network activity is done via the <literal role="systemitem">mgr_check</literal>
- utility.</simpara>
+All network activity is done via the <literal role="systemitem">mgr_check</literal> utility.</simpara>
 <warning>
 <title>Auto accepting (EULAs)</title>
 <simpara>When new packages or updates are installed on the client using SUSE Manager, any end user licence agreements (EULAs) are automatically accepted.
 To review a package EULA, open the package detail page in the Web UI.</simpara>
 </warning>
-<simpara>This figure provides an overview of the default <literal role="systemitem">rhnsd</literal>
- process path.
-All items left of the <literal role="systemitem">Python XMLRPC server</literal>
- block represent processes running on a SUSE Manager client.</simpara>
+<simpara>This figure provides an overview of the default <literal role="systemitem">rhnsd</literal> process path.
+All items left of the <literal role="systemitem">Python XMLRPC server</literal> block represent processes running on a SUSE Manager client.</simpara>
 <figure>
 <title>rhnsd Contact Method</title>
 <mediaobject>
@@ -4024,30 +4308,43 @@ All items left of the <literal role="systemitem">Python XMLRPC server</literal>
 <textobject><phrase>rhnsd taigon</phrase></textobject>
 </mediaobject>
 </figure>
-<section xml:id="_configuring_suse_manager_rhnsd_daemon">
-<title>Configuring SUSE Manager rhnsd Daemon</title>
+<section xml:id="_configuring_suse_manager_rhnsd_daemon_or_timer">
+<title>Configuring SUSE Manager rhnsd Daemon or Timer</title>
 <simpara>The SUSE Manager daemon can be configured by editing the file on the client:</simpara>
 <screen>/etc/sysconfig/rhn/rhnsd</screen>
 <simpara>This is the configuration file the rhnsd initialization script uses.
 An important parameter for the daemon is its check-in frequency.
-The default interval time is four hours (240 minutes). If you modify the configuration file, you must as root
-restart the daemon with <literal role="command">systemctl rhnsd restart</literal>.</simpara>
+The default interval time is four hours (240 minutes). If you modify the configuration file, you must as root restart the daemon with:</simpara>
+<screen>/etc/init.d/rhnsd restart</screen>
 <important>
 <title>Minimum Allowed Check-in Parameter</title>
-<simpara>The minimum allowed time interval is one hour (60 minutes). If you set the interval below one hour, it will change back to the default of 4 hours (240 minutes).</simpara>
+<simpara>The minimum allowed time interval is one hour (60 minutes).
+If you set the interval below one hour, it will change back to the default of 4 hours (240 minutes).</simpara>
 </important>
+<simpara>On systemd-based systems (for example, SLE 12 and later), the default time interval is set in <literal role="path">/etc/systemd/system/timers.target.wants/rhnsd.timer</literal>:</simpara>
+<screen>[Timer]
+OnCalendar=00/4:00
+RandomizedDelaySec=30min</screen>
+<simpara>You can create an overriding drop-in file of <literal role="path">rhnsd.timer</literal> with:</simpara>
+<screen>systemctl edit rhnsd.timer</screen>
+<simpara>For example, if you want configure a two hour time interval, enter:</simpara>
+<screen>[Timer]
+OnCalendar=00/2:00</screen>
+<simpara>On write, the file will be saved as <literal role="path">/etc/systemd/system/rhnsd.timer.d/override.conf</literal>.
+For more information about system timers, see the manpages of <literal role="command">systemd.timer</literal> and <literal role="command">systemctl</literal>.</simpara>
 </section>
-<section xml:id="_viewing_rhnsd_daemon_status">
-<title>Viewing rhnsd Daemon Status</title>
-<simpara>You can view the status of rhnsd by typing the command <literal role="command">systemctl status
-     rhnsd</literal> as root
-.</simpara>
+<section xml:id="_viewing_rhnsd_daemon_or_timer_status">
+<title>Viewing rhnsd Daemon or Timer Status</title>
+<simpara>As the root you may view the status of the <literal role="systemitem">rhnsd</literal> daemon with:</simpara>
+<screen>/etc/init.d/rhnsd status</screen>
+<simpara>And the status of the <literal role="systemitem">rhnsd</literal> service with:</simpara>
+<screen>service rhnsd status</screen>
 </section>
 </section>
 <section xml:id="bp.contact.methods.ssh.push">
 <title>Push via SSH</title>
 <simpara>Push via SSH is intended to be used in environments where your clients cannot reach the SUSE Manager server directly to regularly check in and, for example, fetch package updates.</simpara>
-<simpara>In detail, this feature enables a SUSE Manager located within an internal network to manage clients located on a &#8220;Demilitarized Zone&#8221; (DMZ) outside of the firewall protected network.
+<simpara>In detail, this feature enables a SUSE Manager located within an internal network to manage clients located on a <quote>Demilitarized Zone</quote> (DMZ) outside of the firewall protected network.
 Due to security reasons, no system on a DMZ is authorized to open a connection to the internal network and therefore your SUSE Manager server.
 The solution is to configure Push via SSH which utilizes an encrypted tunnel from your SUSE Manager server on the internal network to the clients located on the DMZ.
 After all actions/events are executed, the tunnel is closed.
@@ -4222,7 +4519,7 @@ For Push via SSH, see <xref linkend="bp.contact.methods.ssh.push"/>.</simpara>
 <textobject><phrase>salt ssh contact taigon</phrase></textobject>
 </mediaobject>
 </figure>
-<simpara>Salt provides &#8220;Salt SSH&#8221;
+<simpara>Salt provides <quote>Salt SSH</quote>
  (<literal role="command">salt-ssh</literal>), a feature to manage clients from a server.
 It works without installing Salt related software on clients.
 Using Salt SSH there is no need to have minions connected to the Salt master.
@@ -4344,6 +4641,11 @@ While on traditional clients with SSH push configured only <literal role="comman
 <simpara>OSAD is an alternative contact method between SUSE Manager and its clients.
 By default, SUSE Manager uses <literal role="systemitem">rhnsd</literal>, which contacts the server every four hours to execute scheduled actions.
 OSAD allows registered client systems to execute scheduled actions immediately.</simpara>
+<note>
+<title>Keep <literal role="systemitem">rhnsd</literal> Running</title>
+<simpara>Use OSAD only in addition to <literal role="systemitem">rhnsd</literal>.
+If you disable <literal role="systemitem">rhnsd</literal> your client will be shown as not checking in after 24 hours.</simpara>
+</note>
 <simpara>OSAD has several distinct components:</simpara>
 <itemizedlist>
 <listitem>
@@ -4456,7 +4758,7 @@ In the example above, we have assumed 500 current clients, so the soft limit is 
 <simpara>Keeping systems patched and secure remains one of the greatest ongoing challenges that you will face as an administrator.
 Both proprietary and open-source companies are constantly working to provide updates which fix flaws discovered within their software products.</simpara>
 <simpara>For the official <emphasis><phrase role="ref">Best Practice Guide</phrase></emphasis>
- on &#8220;Advanced Patch Lifecycle Management&#8221;
+ on <quote>Advanced Patch Lifecycle Management</quote>
 , see <link xl:href="https://www.suse.com/documentation/suse-best-practices/susemanager/data/susemanager.html">https://www.suse.com/documentation/suse-best-practices/susemanager/data/susemanager.html</link>.</simpara>
 </chapter>
 <chapter xml:id="bp.live.patching">
@@ -4476,7 +4778,7 @@ SLE Live Patching allows you skipping the reboot by applying a subset of Linux k
 <simpara>SUSE Manager fully updated.</simpara>
 </listitem>
 <listitem>
-<simpara>At least 1 Salt Minion running SLES 12 SP1 or later and registered with SUSE Manager .</simpara>
+<simpara>At least 1 Salt Minion running SLES 12 SP1 or later and registered with SUSE Manager.</simpara>
 </listitem>
 <listitem>
 <simpara>The matching SLES 12 SPx channels including the SLE Live Patching child channel fully synced.</simpara>
@@ -4487,7 +4789,7 @@ SLE Live Patching allows you skipping the reboot by applying a subset of Linux k
 <title>Live Patching Setup</title>
 <orderedlist numeration="arabic">
 <listitem>
-<simpara>Subscribe all systems to be managed via live patching to your fully synced live patching child channels within your systems base channel by browsing to <menuchoice><guimenu>Software</guimenu> <guimenuitem>Software Channels</guimenuitem></menuchoice> . Select both live patching channels and change subscription.</simpara>
+<simpara>Subscribe all systems to be managed via live patching to your fully synced live patching child channels within your systems base channel by browsing to <menuchoice><guimenu>Software</guimenu> <guimenuitem>Software Channels</guimenuitem></menuchoice>. Select both live patching channels and change subscription.</simpara>
 <note>
 <simpara>When subscribing to a channel that contains a product, the product package will automatically be installed on traditionaly registered systems and added to the package state on Salt managed systems.
 For Salt managed systems please apply the highstate to push these changes to your systems.</simpara>
@@ -4545,8 +4847,7 @@ For Salt managed systems please apply the highstate to push these changes to you
 <section xml:id="live.patching.clones">
 <title>Cloning Channels</title>
 <simpara>It is considered best practice to clone a vendor channel that will be modified into a new channel with one of the following prefix names: <literal>dev</literal>, <literal>testing</literal>, and <literal>prod</literal>.
-In the following procedure you will clone the default vendor channel into a new channel named <literal role="systemitem">dev-sles12-sp3-pool-x86_64</literal>
- using the command line.</simpara>
+In the following procedure you will clone the default vendor channel into a new channel named <literal role="systemitem">dev-sles12-sp3-pool-x86_64</literal> using the command line.</simpara>
 <orderedlist xml:id="proc.live.patching.clones" numeration="arabic">
 <listitem>
 <simpara>Open a terminal and as root enter:</simpara>
@@ -4556,7 +4857,11 @@ Spacewalk Password:
 Channel tree:
 
  1. sles{sles-version}-sp{sp-ver}-pool-x86_64
-      \__ sle-live-patching{sles-version}-pool-x86_64-sp{sp-ver}\__ sle-live-patching{sles-version}-updates-x86_64-sp{sp-ver}\__ sle-manager-tools{sles-version}-pool-x86_64-sp{sp-ver}\__ sle-manager-tools{sles-version}-updates-x86_64-sp{sp-ver}\__ sles{sles-version}-sp{sp-ver}-updates-x86_64</screen>
+      \__ sle-live-patching{sles-version}-pool-x86_64-sp{sp-ver}
+      \__ sle-live-patching{sles-version}-updates-x86_64-sp{sp-ver}
+      \__ sle-manager-tools{sles-version}-pool-x86_64-sp{sp-ver}
+      \__ sle-manager-tools{sles-version}-updates-x86_64-sp{sp-ver}
+      \__ sles{sles-version}-sp{sp-ver}-updates-x86_64</screen>
 </listitem>
 <listitem>
 <simpara>Now use the <emphasis>--init</emphasis> argument to automatically create a new development clone of the original vendor channel:</simpara>
@@ -4566,12 +4871,8 @@ Channel tree:
 </section>
 <section xml:id="live.patching.kernel">
 <title>Removing Non-live Kernel Patches from the Cloned Channels</title>
-<simpara>In the following procedure you will remove all kernel patch updates located in the dev-sles12
--spSP4
--updates-x86_64 channel that require a reboot.
-You created dev-sles12
--spSP4
--updates-x86_64 during <xref linkend="proc.live.patching.clones"/>.</simpara>
+<simpara>In the following procedure you will remove all kernel patch updates located in the dev-sles12-sp4-updates-x86_64 channel that require a reboot.
+You created dev-sles12-sp4-updates-x86_64 during <xref linkend="live.patching.clones"/>.</simpara>
 <orderedlist numeration="arabic">
 <listitem>
 <simpara>Check the current kernel version in use on your client:</simpara>
@@ -4596,14 +4897,14 @@ You will change the subscription from the dev repositories on your client to the
 You will also add the SLE Live Patching child channels to your client.</simpara>
 <orderedlist numeration="arabic">
 <listitem>
-<simpara>Promote and clone the <literal>dev-sles12 -spSP4 -pool-x86_64</literal> to a new testing channel:</simpara>
-<screen>{prompt.root}spacewalk-manage-channel-lifecycle -promote -c dev-sles{sles-version}-sp{sp-ver}-pool-x86_64</screen>
+<simpara>Promote and clone the <literal>dev-sles12 -sp4 -pool-x86_64</literal> to a new testing channel:</simpara>
+<screen>{prompt.root}spacewalk-manage-channel-lifecycle --promote -c dev-sles{sles-version}-sp{sp-ver}-pool-x86_64</screen>
 </listitem>
 <listitem>
-<simpara>From the SUSE Manager Web UI under the <menuchoice><guimenu>Systems</guimenu> <guimenuitem>] tab select your client system to view the menu:System Details[</guimenuitem></menuchoice> page. Select <menuchoice><guimenu>Software</guimenu> <guimenuitem>Software Channels</guimenuitem></menuchoice> . From the Software Channels page you can edit which channels a system is subscribed to. Select the new base software channel, in this case it should be <literal role="systemitem">test-sles12-sp3-pool-x86_64</literal> . Click the <menuchoice><guimenu>Confirm</guimenu> <guimenuitem>] button to switch the Base Software Channel and finalize it by clicking the menu:Modify Base Software Channel[</guimenuitem></menuchoice> button.</simpara>
+<simpara>From the SUSE Manager Web UI under the <literal role="guimenu">Systems</literal> tab select your client system to view the <menuchoice><guimenu>System Details</guimenu> <guimenuitem>] page. Select menu:Software[Software Channels</guimenuitem></menuchoice>. From the Software Channels page you can edit which channels a system is subscribed to. Select the new base software channel, in this case it should be <literal role="systemitem">test-sles12-sp3-pool-x86_64</literal>. Click the <guibutton>Confirm</guibutton> button to switch the Base Software Channel and finalize it by clicking the <guibutton>Modify Base Software Channel</guibutton> button.</simpara>
 </listitem>
 <listitem>
-<simpara>From the <menuchoice><guimenu>Software Channels</guimenu> <guimenuitem>] page select and add both SLE Live Patching child channels by clicking the menu:Change Subscriptions[</guimenuitem></menuchoice> button.</simpara>
+<simpara>From the <guimenu>Software Channels</guimenu> page select and add both SLE Live Patching child channels by clicking the <guibutton>Change Subscriptions</guibutton> button.</simpara>
 </listitem>
 </orderedlist>
 </section>
@@ -4612,7 +4913,7 @@ You will also add the SLE Live Patching child channels to your client.</simpara>
 <simpara>The following procedure will guide you through selecting and viewing available CVE Patches (Common Vulnerabilities and Exposures) then applying these kernel updates using the new SLE Live Patching feature.</simpara>
 <orderedlist numeration="arabic">
 <listitem>
-<simpara>Select your SLES 12 SPSP4 minion from the <menuchoice><guimenu>Systems</guimenu> <guimenuitem>] page to view its menu:System Details[</guimenuitem></menuchoice> . Once you have added the SLES 12 SPSP4 Updates child channel to your client, you should see several <literal>Critical</literal> software updates available. Click on <literal>Critical</literal> to see a list of available patches. Select any of these patches listed with the following synopsis: <emphasis>Important: Security update for the Linux kernel</emphasis>. All fixed security bugs will be listed along with their number. For example:(CVE-2016-8666)</simpara>
+<simpara>Select your SLES 12 SP4 minion from the <literal role="guimenu">Systems</literal> page to view its <guimenu>System Details</guimenu> . Once you have added the SLES 12 SP4 Updates child channel to your client, you should see several <literal>Critical</literal> software updates available. Click on <literal>Critical</literal> to see a list of available patches. Select any of these patches listed with the following synopsis: <emphasis>Important: Security update for the Linux kernel</emphasis>. All fixed security bugs will be listed along with their number. For example:(CVE-2016-8666)</simpara>
 <important>
 <title>Reboot Icon</title>
 <simpara>Normal or non-live kernel patches always require a reboot.
@@ -4751,7 +5052,7 @@ YaST will show possible migration targets with detailed summaries.</simpara>
 Restart YaST , otherwise the newly installed module will not be shown in the control center.</simpara>
 </listitem>
 <listitem>
-<simpara>If there are &#8220;old&#8221; online updates available for installation, the migration tool will warn and ask to install them now before starting the actual migration.
+<simpara>If there are <quote>old</quote> online updates available for installation, the migration tool will warn and ask to install them now before starting the actual migration.
 It is recommended to install all updates before proceeding.</simpara>
 </listitem>
 </itemizedlist>
@@ -4781,7 +5082,7 @@ This does not apply when being logged in from a remote machine (unless you are r
 <simpara>If the <literal role="command">migration</literal> subcommand is not available install the <phrase role="package">zypper-migration-plugin</phrase> package and its dependencies.</simpara>
 </listitem>
 <listitem>
-<simpara>If there are &#8220;old&#8221; online updates available for installation, the migration tool will warn and ask to install them now before starting the actual migration.
+<simpara>If there are <quote>old</quote> online updates available for installation, the migration tool will warn and ask to install them now before starting the actual migration.
 It is recommended to install all updates before proceeding.</simpara>
 </listitem>
 </itemizedlist>
@@ -4809,7 +5110,7 @@ While this has the drawback that you temporarily need two machines, it also has 
 <title>Migration Process</title>
 <simpara>The whole process may be tricky, so it is strongly advised that the migration is done by an experienced consultant.</simpara>
 </important>
-<simpara>Given the complexity of the product, the migration is an &#8220;all-or-nothing&#8221;
+<simpara>Given the complexity of the product, the migration is an <quote>all-or-nothing</quote>
  procedure-
 if something goes wrong you will need to start all over.
 Error handling is very limited.
@@ -4853,7 +5154,7 @@ If you want the dump to be stored somewhere else, change the definition of the v
 <orderedlist xml:id="proc.mgr.migration.setup.target" numeration="arabic">
 <title>Procedure: Setup Target Machine</title>
 <listitem>
-<simpara>On the target machine install SUSE Linux Enterprise Server 12 SP2 including the extension product &#8220;SUSE Manager&#8221; .</simpara>
+<simpara>On the target machine install SUSE Linux Enterprise Server 12 SP2 including the extension product <quote>SUSE Manager</quote> .</simpara>
 <important>
 <title>Background Information on Required Target Machine</title>
 <simpara>It is actually required to install version 12 SP2 on the target machine.
@@ -5170,7 +5471,7 @@ Password:
 This also applies for other supported products based on SLE&#160;12.</simpara>
 <note>
 <title>Supported Upgrade Paths</title>
-<simpara>For generally supported SUSE Linux Enterprise upgrade paths, see  <link xl:href="https://www.suse.com/documentation/sles-15/book_sle_upgrade/data/sec_upgrade-paths_supported.html">https://www.suse.com/documentation/sles-15/book_sle_upgrade/data/sec_upgrade-paths_supported.html</link> (SUSE Linux Enterprise Upgrade Guide, Chapter &#8220;Supported Upgrade Paths to SLE 15&#8221;).
+<simpara>For generally supported SUSE Linux Enterprise upgrade paths, see  <link xl:href="https://www.suse.com/documentation/sles-15/book_sle_upgrade/data/sec_upgrade-paths_supported.html">https://www.suse.com/documentation/sles-15/book_sle_upgrade/data/sec_upgrade-paths_supported.html</link> (SUSE Linux Enterprise Upgrade Guide, Chapter <quote>Supported Upgrade Paths to SLE 15</quote>).
 It is important that you migrate the client to the latest available SP first.
 Upgrade to SLE 12 SP4 after December 2018.</simpara>
 </note>
@@ -5459,37 +5760,62 @@ The matching update channels such as <literal role="systemitem">SLE-Manager-Tool
 </chapter>
 <chapter xml:id="bp.postgresql.database.migration">
 <title>PostgreSQL Database Migration</title>
-<simpara>SUSE Manager 3 uses postgresql database version 9.4.
-Postgresql version 9.6 has been officially released for SUSE Linux Enterprise Server 12 SP3.
-In the near future postgresql 9.6 will become the base version provided by SUSE Manager.
-Currently version 9.4 is hardcoded into SUSE Manager, therefore when installing SUSE Manager it will explicitly use this version.
-This chapter provides guidance on migrating an existing 9.4 database to 9.6 on your SUSE Manager Server.</simpara>
+<simpara>SUSE Manager 3 uses PostgreSQL version 9.4.
+SUSE Manager 3.2 uses PostgreSQL version 10.</simpara>
+<simpara>PostgreSQL version 9.6 has been released for SUSE Linux Enterprise Server 12 SP3.
+PostgreSQL version 10 has been released for SUSE Linux Enterprise Server 12 SP4 and later.
+This chapter provides guidance on migrating your SUSE Manager Server from PostgreSQL 9.4 to 9.6, or migrating from 9.6 to 10.</simpara>
 <section xml:id="bp.postgresql.database.migration.new.installations">
 <title>New SUSE Manager Installations</title>
-<simpara>Once support for postgresql version 9.6 has been officially released for SUSE Manager, no action will be required for new installations.
-The SUSE Manager extension will pick up the latest version during installation on SLES 12 SP3.
+<simpara>PostgreSQL version 10 is now supported on SUSE Manager.
+New SUSE Manager installations will have PostgreSQL version 10 installed by default.
+When you install SUSE Manager on SUSE Linux Enterprise&#160;12 SP4, the latest version of PostgreSQL will be installed by default.
 This will be fully transparent to the user.
-Check the active postgresql version with the following command:</simpara>
+Check the active PostgreSQL version with this command:</simpara>
 <screen>suse-manager-example-srv:~ # psql --version
-psql (PostgreSQL) 9.6.3</screen>
+psql (PostgreSQL) 10.9</screen>
 </section>
 <section xml:id="bp.postgresql.database.migrating.existing.installations">
 <title>Migrating an Existing Installation</title>
-<simpara>Before migrating to the new database version, ensure SUSE Manager is fully patched to the latest version.
-You can check if the system is ready to use postgresql 9.6 by issuing the following command:</simpara>
-<screen>suma-test-srv:~ # rpm -q smdba
-smdba-1.5.8-0.2.3.1.x86_64</screen>
-<important>
-<simpara>Postgresql 9.6 requires smdba version 1.5.8 or higher</simpara>
-</important>
 <warning>
-<simpara>Always create a database backup before performing a migration</simpara>
+<simpara>Always create a database backup before performing a migration.
+For more information about a database backup, see <xref linkend="bp.chap.suma.backup"/>.</simpara>
 </warning>
-<simpara>.
-The database migration begins by executing the following command:</simpara>
-<screen>$&gt; /usr/lib/susemanager/bin/pg-migrate.sh</screen>
-<simpara>The <literal role="path">pg-migrate.sh</literal>
- script will automatically perform the following operations:</simpara>
+<simpara>PostgreSQL upgrades can be performed in two ways: a regular upgrade, or a fast upgrade:</simpara>
+<simpara>A regular upgrade will create a complete copy of the database, so you will need double the existing database size of space available.
+Regular upgrades can take a considerable amount of time, depending on the size of the database and the speed of the storage system.</simpara>
+<simpara>A fast upgrade only takes a few minutes, and uses almost no additional disk space.
+However, if a fast upgrade fails, you must restore the database from the backup.
+A fast upgrade reduces the risk of running out of disk space.
+The regular upgrade will copy the database files instead of hardlinking them.</simpara>
+<simpara>PostgreSQL stores data at <literal role="path">/var/lib/pgsql/data/</literal>, and logs to <literal role="path">/var/lib/pgsql/data/pg_xlog/</literal>.</simpara>
+<section xml:id="_upgrade_from_postgresql9_4_to9_6">
+<title>Upgrade from PostgreSQL 9.4 to 9.6</title>
+<simpara>Before you migrate to PostgreSQL 9.6, ensure SUSE Manager is the latest version, and fully updated.
+You can check if the system is ready to use PostgreSQL 9.6 with:</simpara>
+<screen>psql --version</screen>
+<simpara>If you are using PostgreSQL&#160;9.4, you can upgrade to PostgreSQL&#160;9.6.</simpara>
+<important>
+<simpara>PostgreSQL 9.6 requires smdba version 1.5.8 or higher.
+Check with:</simpara>
+<screen>rpm -q smdba</screen>
+</important>
+<orderedlist numeration="arabic">
+<title>Procedure: Performing a Regular Upgrade</title>
+<listitem>
+<simpara>Perform a database backup.
+For more information on backing up, see <xref linkend="bp.chap.suma.backup"/>.</simpara>
+</listitem>
+<listitem>
+<simpara>Start the upgrade:</simpara>
+<screen>/usr/lib/susemanager/bin/pg-migrate.sh</screen>
+</listitem>
+<listitem>
+<simpara>When the upgrade has successfully completed, you can safely delete the old database directory and reclaim lost disk space.
+The old directory is renamed to <literal role="path">/var/lib/pgsql/data-pg94</literal>.</simpara>
+</listitem>
+</orderedlist>
+<simpara>The <literal role="path">pg-migrate.sh</literal> script performs these operations:</simpara>
 <itemizedlist>
 <listitem>
 <simpara>Stop spacewalk services</simpara>
@@ -5498,48 +5824,109 @@ The database migration begins by executing the following command:</simpara>
 <simpara>Shut down the running database</simpara>
 </listitem>
 <listitem>
-<simpara>Check if postgresql 9.6 is installed and install it if not already present</simpara>
+<simpara>Check if PostgreSQL 9.6 is installed and install it if necessary</simpara>
 </listitem>
 <listitem>
-<simpara>Switch from postgresql 9.4 to postgresql 9.6 as the new default</simpara>
+<simpara>Switch from PostgreSQL 9.4 to PostgreSQL 9.6 as the new default</simpara>
 </listitem>
 <listitem>
-<simpara>Initiates the database migration</simpara>
+<simpara>Start the database migration</simpara>
 </listitem>
 <listitem>
-<simpara>Creates a postgresql configuration file tuned for use by SUSE Manager (The reason for the latest version of smdba)</simpara>
+<simpara>Create a PostgreSQL configuration file tuned for use by SUSE Manager</simpara>
 </listitem>
 <listitem>
-<simpara>Start both the database and spacewalk services</simpara>
+<simpara>Start the database and spacewalk services</simpara>
 </listitem>
 </itemizedlist>
 <note>
-<simpara>Please note that during the migration the data directory of the database is copied for use by the postgresql 9.6.
-This results in temporarily doubling the amount of required disk space.
-In case of a failure, the migration script will attempt a restore to the original state.
-After a successful migration, you may safely delete the old database directory (renamed to /var/lib/pgsql/data-pg94) to reclaim lost disk space.</simpara>
+<simpara>If the upgrade fails, the migration script will attempt to restore the database to its original state.</simpara>
 </note>
+<orderedlist numeration="arabic">
+<title>Procedure: Performing a Fast PostgreSQL Upgrade</title>
+<listitem>
+<simpara>Perform a database backup.
+Without a verified database backup, you must not initiate a fast upgrade.
+For more information on backing up, see <xref linkend="bp.chap.suma.backup"/>.</simpara>
+</listitem>
+<listitem>
+<simpara>Begin the upgrade:</simpara>
+<screen>/usr/lib/susemanager/bin/pg-migrate.sh fast</screen>
+</listitem>
+<listitem>
+<simpara>When the upgrade has successfully completed, you can safely delete the old database directory and reclaim lost disk space.
+The old directory is renamed to <literal role="path">/var/lib/pgsql/data-pg94</literal>.</simpara>
+</listitem>
+</orderedlist>
 </section>
-<section xml:id="_performing_a_fast_migration">
-<title>Performing a Fast Migration</title>
-<simpara>There are two negative aspects to performing a regular migration:</simpara>
+<section xml:id="_upgrade_from_postgresql9_6_to10">
+<title>Upgrade from PostgreSQL 9.6 to 10</title>
+<simpara>Before you migrate to PostgreSQL 9.10, ensure SUSE Manager is the latest version, and fully updated.
+You can check if the system is ready to use PostgreSQL 9.10 with:</simpara>
+<screen>psql --version</screen>
+<simpara>If you are using PostgreSQL&#160;9.6, you can upgrade to PostgreSQL&#160;10.</simpara>
+<important>
+<simpara>PostgreSQL 9.10 requires smdba version 1.6.2 or higher.
+Check with:</simpara>
+<screen>rpm -q smdba</screen>
+</important>
+<orderedlist numeration="arabic">
+<title>Procedure: Performing a Regular Upgrade</title>
+<listitem>
+<simpara>Perform a database backup.</simpara>
+</listitem>
+<listitem>
+<simpara>Start the upgrade:</simpara>
+<screen>/usr/lib/susemanager/bin/pg-migrate-96-to-10.sh</screen>
+</listitem>
+<listitem>
+<simpara>When the upgrade has successfully completed, you can safely delete the old database directory and reclaim lost disk space.
+The old directory is renamed to <literal role="path">/var/lib/pgsql/data-pg96</literal>.</simpara>
+</listitem>
+</orderedlist>
+<simpara>The <literal role="path">pg-migrate-96-to-10.sh</literal> script performs these operations:</simpara>
 <itemizedlist>
 <listitem>
-<simpara>You temporarily need double the disk space under <literal role="path">/var/lib/pgsql</literal></simpara>
+<simpara>Stop spacewalk services</simpara>
 </listitem>
 <listitem>
-<simpara>Depending on the size of the database the migration can take up some time because the whole data directory needs to be copied.</simpara>
+<simpara>Shut down the running database</simpara>
+</listitem>
+<listitem>
+<simpara>Check if PostgreSQL&#160;10 is installed and install it if necessary</simpara>
+</listitem>
+<listitem>
+<simpara>Switch from PostgreSQL&#160;9.6 to PostgreSQL&#160;10 as the new default</simpara>
+</listitem>
+<listitem>
+<simpara>Initiate the database migration</simpara>
+</listitem>
+<listitem>
+<simpara>Create a PostgreSQL configuration file tuned for use by SUSE Manager</simpara>
+</listitem>
+<listitem>
+<simpara>Start the database and spacewalk services</simpara>
 </listitem>
 </itemizedlist>
-<simpara>It is possible however to perform a <literal>fast migration</literal>.
-In this case you do not need the additional disk space as the database files will not be copied but hard linked.
-This also has the natural effect of greatly increasing the speed of the migration process The entire migration could be completed in less than one minute.</simpara>
-<warning>
-<simpara>Keep in mind if a fast migration fails, database restoration will only be possible with a database backup.
-Only perform a fast migration if you have an availabel database backup.</simpara>
-</warning>
-<simpara>Perform a fast migration with the following command (Ensure you have a database backup):</simpara>
-<screen>$&gt; /usr/lib/susemanager/bin/pg-migrate.sh fast</screen>
+<note>
+<simpara>If the upgrade fails, the migration script will attempt to restore the database to its original state.</simpara>
+</note>
+<orderedlist numeration="arabic">
+<title>Procedure: Performing a Fast PostgreSQL Upgrade</title>
+<listitem>
+<simpara>Perform a database backup.
+Without a verified database backup, you must not initiate a fast upgrade.</simpara>
+</listitem>
+<listitem>
+<simpara>Start the upgrade:</simpara>
+<screen>/usr/lib/susemanager/bin/pg-migrate-96-to-10.sh fast</screen>
+</listitem>
+<listitem>
+<simpara>When the upgrade has successfully completed, you can safely delete the old database directory and reclaim lost disk space.
+The old directory is renamed to <literal role="path">/var/lib/pgsql/data-pg96</literal>.</simpara>
+</listitem>
+</orderedlist>
+</section>
 </section>
 <section xml:id="_typical_migration_sample_session">
 <title>Typical Migration Sample Session</title>
@@ -5697,9 +6084,10 @@ Running out of space can result in backups failing, so check this often.</simpar
 <simpara>The most comprehensive method for backing up your SUSE Manager installation is to back up the relevant files and directories.
 This can save you time in administering your backup, and can be faster to reinstall and re-synchronize in the case of failure.
 However, this method requires significant disk space and could take a long time to perform the backup.</simpara>
-<simpara>If you want to only back up the required files and directories, use this list:</simpara>
 <note>
-<simpara>To make this process simpler, and more comprehensive, we recommend backing up the entire <literal role="path">/etc</literal> and <literal role="path">/root</literal> directories, not just the ones specified here.</simpara>
+<simpara>If you want to only back up the required files and directories, use the following list.
+To make this process simpler, and more comprehensive, we recommend backing up the entire <literal role="path">/etc</literal> and <literal role="path">/root</literal> directories, not just the ones specified here.
+Some files only exist if you are actually using the related SUSE Manager feature.</simpara>
 </note>
 <itemizedlist>
 <listitem>
@@ -5728,20 +6116,23 @@ However, this method requires significant disk space and could take a long time 
 </listitem>
 <listitem>
 <simpara><literal role="path">/root/.ssh</literal></simpara>
-<itemizedlist>
-<listitem>
-<simpara>This file exists if you are using an SSH tunnel or SSH <literal role="command">push</literal>. You will also need to have saved a copy of the <literal>id-susemanager</literal> key.</simpara>
-</listitem>
-</itemizedlist>
+<simpara>This file exists if you are using an SSH tunnel or SSH <literal role="command">push</literal>.
+You will also need to have saved a copy of the <literal>id-susemanager</literal> key.</simpara>
 </listitem>
 <listitem>
 <simpara><literal role="path">/root/ssl-build/</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal role="path">/srv/formula_metadata</literal></simpara>
 </listitem>
 <listitem>
 <simpara><literal role="path">/srv/pillar</literal></simpara>
 </listitem>
 <listitem>
 <simpara><literal role="path">/srv/salt</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal role="path">/srv/susemanager</literal></simpara>
 </listitem>
 <listitem>
 <simpara><literal role="path">/srv/tftpboot/</literal></simpara>
@@ -5753,28 +6144,41 @@ However, this method requires significant disk space and could take a long time 
 <simpara><literal role="path">/srv/www/htdocs/pub/</literal></simpara>
 </listitem>
 <listitem>
+<simpara><literal role="path">/srv/www/os-images</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal role="path">/var/cache/rhn</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal role="path">/var/cache/salt</literal></simpara>
+</listitem>
+<listitem>
 <simpara><literal role="path">/var/lib/cobbler/</literal></simpara>
 </listitem>
 <listitem>
-<simpara><literal role="path">/var/lib/rhn/kickstarts/</literal></simpara>
+<simpara><literal role="path">/var/lib/Kiwi</literal></simpara>
+</listitem>
+<listitem>
+<simpara><literal role="path">/var/lib/rhn/</literal></simpara>
 </listitem>
 <listitem>
 <simpara><literal role="path">/var/spacewalk/</literal></simpara>
 </listitem>
 <listitem>
-<simpara>Any directories containing custom data (such as scripts, Kickstart profiles, AutoYaST, and custom RPMs).</simpara>
+<simpara>Plus any directories containing custom data such as scripts, Kickstart profiles, AutoYaST, and custom RPMs.</simpara>
 </listitem>
 </itemizedlist>
 <important>
-<simpara>You will also need to back up your database, which you can do by copying <literal role="path">/var/spacewalk/db-backup</literal> or by using the <literal role="command">smdba</literal> tool, which is explained later in this chapter.</simpara>
+<simpara>You will also need to back up your database, which you can do by using the <literal role="command">smdba</literal> tool, which is explained in <xref linkend="bp.sect.backup.smdba.admin"/>.</simpara>
 </important>
 <orderedlist numeration="arabic">
 <title>Procedure: Restore from a Manual Backup</title>
 <listitem>
-<simpara>Re-install SUSE Manager</simpara>
+<simpara>Re-install SUSE Manager.  For more information, see <xref linkend="config-smdb.recover-root"/>.</simpara>
 </listitem>
 <listitem>
-<simpara>Re-synchronize your installation with the <literal role="command">mgr-sync</literal> tool.</simpara>
+<simpara>Re-synchronize your SUSE Manager repositories with the <literal role="command">mgr-sync</literal> tool.
+For more information about the <literal role="command">mgr-sync</literal> tool, see <xref linkend="syncing.suse.mgr.repositories.scc"/>.</simpara>
 </listitem>
 <listitem>
 <simpara>You can choose to re-register your product, or skip the registration and SSL certificate generation sections.</simpara>
@@ -5784,10 +6188,14 @@ However, this method requires significant disk space and could take a long time 
 </listitem>
 <listitem>
 <simpara>Schedule the re-creation of search indexes next time the <literal role="command">rhn-search</literal> service is started:</simpara>
-<screen>rcrhn-search cleanindex</screen>
+<screen>rhn-search cleanindex</screen>
+<simpara>This command produces only debug messages.
+It does not produce error messages.</simpara>
 </listitem>
 <listitem>
-<simpara>If you did not have <literal role="path">/var/spacewalk/packages/</literal> in your backup, but the source repository still exists, you can restore it by performing a complete channel synchronization.</simpara>
+<simpara>If you did not have <literal role="path">/var/spacewalk/packages/</literal> in your backup, but the source repository still exists, you can restore it by performing a complete channel synchronization with:</simpara>
+<screen>mgr-sync refresh --refresh-channels</screen>
+<simpara>You can check the progress by running <literal role="command">tail -f /var/log/rhn/reposync/</literal>&lt;CHANNEL_NAME&gt;<literal>.log</literal> as <emphasis>root</emphasis>.</simpara>
 </listitem>
 </orderedlist>
 </section>
@@ -5811,7 +6219,7 @@ Checking database core...       online</screen>
 <simpara>To check the full connection to the database, use the <literal role="command">smdba db-check</literal> command.
 Depending on your environment, this command will report on the status of listeners, in addition to connectivity status.</simpara>
 <screen>smdba db-check</screen>
-<simpara>Starting and stopping the database can be performed with <literal role="command">smdba db-start</literal> and <literal role="command">smdba db-stop</literal></simpara>
+<simpara>Starting and stopping the database can be performed with <literal role="command">smdba db-start</literal> and <literal role="command">smdba db-stop</literal>.</simpara>
 <screen>smdba db-start
 Starting core...       done</screen>
 <screen>smdba db-stop
@@ -5828,7 +6236,7 @@ A continuous archiving backup with <literal role="command">smdba</literal> is pe
 Ensure you have at least three times the current database size of space available for backups.
 You can check your current database size by navigating to <literal role="path">/var/lib/pgsql/</literal> and running <literal role="command">df -h</literal>.</simpara>
 <simpara>The <literal role="command">smdba</literal> tool also manages your archives, keeping only the most recent backup, and the current archive of logs.
-The log files can only be a maximum file size of 16&#160;MB, so a new log file will be created once the files reach this size.
+The log files can only be a maximum file size of 16&#160;MB, so a new log file will be created when the files reach this size.
 Every time you create a new backup, previous backups will be purged to release disk space.
 We recommend you use <literal role="command">cron</literal> to schedule your <literal role="command">smdba</literal> backups to ensure that your storage is managed effectively, and you always have a backup ready in case of failure.</simpara>
 <section xml:id="_performing_a_manual_database_backup">
@@ -5838,19 +6246,20 @@ We recommend you run a manual database backup immediately after installation, or
 <note>
 <simpara>When <literal role="command">smdba</literal> is run for the first time, or if you have changed the location of the backup, it will need to restart your database before performing the archive.
 This will result in a small amount of downtime.
-Note that regular database backups will not require any downtime.</simpara>
+Regular database backups will not require any downtime.</simpara>
 </note>
 <orderedlist numeration="arabic">
 <title>Procedure: Performing a Manual Database Backup</title>
 <listitem>
-<simpara>Allocate permanent storage space for your backup. In this procedure, we will be using an NFS share located at <literal role="path">/var/spacewalk/</literal>.
+<simpara>Allocate permanent storage space for your backup.
+This example uses a directory located at <literal role="path">/var/spacewalk/</literal>.
 This will become a permanent target for your backup, so ensure it will remain accessible by your server at all times.</simpara>
 </listitem>
 <listitem>
 <simpara>In your backup location, create a directory for the backup:</simpara>
 <screen>sudo -u postgres mkdir /var/spacewalk/db-backup</screen>
 <simpara>Or, as root:</simpara>
-<screen>install -d -o postgres /var/spacewalk/db-backup</screen>
+<screen>install -d -o postgres -g postgres -m 700 /var/spacewalk/db-backup</screen>
 </listitem>
 <listitem>
 <simpara>Ensure you have the correct permissions set on the backup location:</simpara>
@@ -5860,9 +6269,11 @@ This will become a permanent target for your backup, so ensure it will remain ac
 <simpara>To run a backup for the first time, run the <literal role="command">smdba backup-hot</literal> command with the <literal role="command">enable</literal> option set.
 This will create the backup in the specified directory, and, if necessary, restart the database:</simpara>
 <screen>smdba backup-hot --enable=on --backup-dir=/var/spacewalk/db-backup</screen>
+<simpara>This command produces debug messages and finishes sucessfully with the output:</simpara>
+<screen>INFO: Finished</screen>
 </listitem>
 <listitem>
-<simpara>Check that the backup files exist in the <literal role="path">/mnt/backup/database</literal> directory, to ensure that your backup has been successful.</simpara>
+<simpara>Check that the backup files exist in the <literal role="path">/var/spacewalk/db-backup</literal> directory, to ensure that your backup has been successful.</simpara>
 </listitem>
 </orderedlist>
 </section>
@@ -5879,12 +6290,10 @@ You can check your current database size by navigating to <literal role="path">/
 <title>Procedure: Scheduling Automatic Backups</title>
 <listitem>
 <simpara>Create a directory for the backup, and set the appropriate permissions:</simpara>
-<screen># mkdir /var/spacewalk/db-backup
-# chown -R postgres:postgres /var/spacewalk/db-backup
-# chmod 700 /var/spacewalk/db-backup</screen>
+<screen># install -m 700 -o postgres -g postgres /var/spacewalk/db-backup</screen>
 </listitem>
 <listitem>
-<simpara>Open <literal role="path">/etc/cron.d/db-backup-mgr</literal>, or create it if it doesn&#8217;t exist, and add the following line to create the cron job:</simpara>
+<simpara>Open <literal role="path">/etc/cron.d/db-backup-mgr</literal>, or create it if it does not exist, and add the following line to create the cron job:</simpara>
 <screen>0 2 * * * root /usr/bin/smdba backup-hot --enable=on --backup-dir=/var/spacewalk/db-backup</screen>
 </listitem>
 <listitem>
@@ -5899,7 +6308,7 @@ You can check your current database size by navigating to <literal role="path">/
 <orderedlist numeration="arabic">
 <title>Procedure: Restoring from Backup</title>
 <listitem>
-<simpara>Shutdown the database:</simpara>
+<simpara>Shut down the database:</simpara>
 <screen>smdba db-stop</screen>
 </listitem>
 <listitem>
@@ -5918,13 +6327,13 @@ You can check your current database size by navigating to <literal role="path">/
 </section>
 <section xml:id="config-smdb.archivelog">
 <title>Archive Log Settings</title>
-<simpara>In SUSE Manager
-with an embedded database, archive logging is enabled by default.
+<simpara>In SUSE Manager with an embedded database, archive logging is enabled by default.
 This feature allows the database management tool <literal role="command">smdba</literal> to perform hot backups.</simpara>
 <simpara>With archive log enabled, even more data is stored on the hard disk:</simpara>
 <itemizedlist>
 <listitem>
-<simpara>Postgresql maintains a limited number of archive logs. Using the default configuration, approx. 64 files with a size of 16 MiB are stored.</simpara>
+<simpara>PostgreSQL maintains a limited number of archive logs.
+Using the default configuration, approximately 64 files with a size of 16 MiB are stored.</simpara>
 </listitem>
 </itemizedlist>
 <simpara>Creating a user and syncing the channels:</simpara>
@@ -5942,14 +6351,9 @@ This feature allows the database management tool <literal role="command">smdba</
 <simpara>SLE-Manager-Tools12-Updates-x86_64-SP2</simpara>
 </listitem>
 </itemizedlist>
-<simpara>Postgresql will generate an additional ~1 GB of data.
+<simpara>PostgreSQL will generate an additional roughly 1 GB of data.
 So it is important to think about a backup strategy and create a backups in a regular way.</simpara>
-<simpara>Archive logs are stored at:</simpara>
-<itemizedlist>
-<listitem>
-<simpara><literal role="path">/var/lib/pgsql/data/pg_xlog/</literal> (postgresql)</simpara>
-</listitem>
-</itemizedlist>
+<simpara>Archive logs are stored at <literal role="path">/var/lib/pgsql/data/pg_xlog/</literal> (postgresql).</simpara>
 </section>
 <section xml:id="config-smdb.spaces">
 <title>Retrieving an Overview of Occupied Database Space</title>
@@ -5963,7 +6367,7 @@ Tablespace  | Size (Mb) | Avail (Mb) | Use %
 ------------+-----------+------------+------
 postgres    | 7         | 49168      | 0.013
 susemanager | 776       | 48399      | 1.602</screen>
-<simpara>The following command is available for Postgresql.
+<simpara>The <literal role="command">smdba</literal> command is available for PostgreSQL.
 For a more detailed report, use the <literal role="command">space-tables</literal> subcommand.
 It lists the table and its size, for example:</simpara>
 <screen>smdba space-tables
@@ -5990,22 +6394,22 @@ The following procedure will guide you through moving the database to a new loca
 <orderedlist numeration="arabic">
 <title>Procedure: Moving the Database</title>
 <listitem>
-<simpara>The default storage location for SUSE Manager is: <literal role="path">/var/lib/pgsql/</literal> . You would like to move it, for example to: <literal role="path">/storage/postgres/</literal> . To begin, stop the running database with:</simpara>
+<simpara>The default storage location for SUSE Manager is <literal role="path">/var/lib/pgsql/</literal>. If you would like to move it, for example to <literal role="path">/storage/postgres/</literal>, proceed as follows.</simpara>
+</listitem>
+<listitem>
+<simpara>Stop the running database with:</simpara>
 <screen># rcpostgresql stop</screen>
-<simpara>Shutdown running spacewalk services with:</simpara>
+<simpara>Shut down the running spacewalk services with:</simpara>
 <screen># spacewalk-service stop</screen>
 </listitem>
 <listitem>
-<simpara>Copy the current working directory structure with the following syntax:</simpara>
-<screen>cp [OPTION]... SOURCE... DIRECTORY</screen>
-<simpara>using the <literal role="option">-a, --archive</literal> option.
+<simpara>Copy the current working directory structure with <literal role="command">cp</literal> using the <literal role="option">-a, --archive</literal> option.
 For example:</simpara>
-<screen># cp -ar /var/lib/pgsql/ /storage/postgres/</screen>
+<screen># cp --archive /var/lib/pgsql/ /storage/postgres/</screen>
 <simpara>This command will copy the contents of <literal role="path">/var/lib/pgsql/</literal>
-to <literal role="path">/storage/postgres/pgsql/</literal>
-.</simpara>
+to <literal role="path">/storage/postgres/pgsql/</literal>.</simpara>
 <important>
-<simpara>The contents of the /var/lib/pgsql needs to remain the same or the SUSE Manager database may malfunction.
+<simpara>The contents of the <literal role="path">/var/lib/pgsql</literal> directory needs to remain the same, otherwise the SUSE Manager database may malfunction.
 You also should ensure there is enough available disk space.</simpara>
 </important>
 </listitem>
@@ -6014,52 +6418,49 @@ You also should ensure there is enough available disk space.</simpara>
 <screen># mount /storage/postgres/pgsql</screen>
 </listitem>
 <listitem>
-<simpara>Make sure ownership is <literal>postgres:postgres</literal> and not <literal>root:root</literal> by changing to the new directory and running the following command:</simpara>
-<screen>/var/lib/pgsql/ # cd /storage/postgres/pgsql/
-/storage/postgres/pgsql/ # l
+<simpara>Make sure ownership is <literal>postgres:postgres</literal> and not <literal>root:root</literal> by changing to the new directory and running the following commands:</simpara>
+<screen># cd /storage/postgres/pgsql/
+# ls -l
 total 8
 drwxr-x---  4 postgres postgres   47 Jun  2 14:35 ./</screen>
 </listitem>
 <listitem>
-<simpara>Add the new database mount location to your servers fstab by editing  <literal role="path">etc/fstab</literal> .</simpara>
+<simpara>Add the new database mount location to your servers fstab by editing  <literal role="path">etc/fstab</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara>Start the database with:</simpara>
 <screen># rcpostgresql start</screen>
-<simpara>Start spacewalk-services with:</simpara>
+<simpara>Start the spacewalk services with:</simpara>
 <screen># spacewalk-service start</screen>
 </listitem>
 </orderedlist>
 </section>
-<section xml:id="_recovering_from_a_crashed_root_partition">
+<section xml:id="config-smdb.recover-root">
 <title>Recovering from a Crashed Root Partition</title>
 <simpara>This section provides guidance on restoring your server after its root partition has crashed.
-This section assumes you have setup your server similar to the procedure explained in Getting Started guide with separate partitions for the database and for channels mounted at <literal role="path">/var/lib/pgsql</literal>
- and <literal role="path">/var/spacewalk/</literal>
-.</simpara>
+This section assumes you have set up your server similar to the procedure explained in the Getting Started guide with separate partitions for the database and for channels mounted at <literal role="path">/var/lib/pgsql</literal> and <literal role="path">/var/spacewalk/</literal>.</simpara>
 <orderedlist numeration="arabic">
 <title>Procedure: Recovering from a Crashed Root Partition</title>
 <listitem>
-<simpara>Start by installing SLES12 SP2 and the SUSE Manager Extension. Do not mount the <literal role="path">/var/spacewalk</literal> and <literal role="path">/var/lib/pgsql</literal> partitions.</simpara>
+<simpara>Install SUSE Linux Enterprise Server 12 SPx and the SUSE Manager Extension. Do not mount the <literal role="path">/var/spacewalk</literal> and <literal role="path">/var/lib/pgsql</literal> partitions.</simpara>
 </listitem>
 <listitem>
-<simpara>Once installation of SUSE Manager has completed shutdown services with <literal role="command">spacewalk-service shutdown</literal> and the database with <literal role="command">rcpostgresql stop</literal>.</simpara>
+<simpara>When the installation of SUSE Manager has completed shut down the spacewalk services with <literal role="command">spacewalk-service shutdown</literal> and the database with <literal role="command">rcpostgresql stop</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara>Mount your <literal role="path">/var/spacewalk</literal> and <literal role="path">/var/lib/pgsql</literal> partitions and restore the directories listed in section one.</simpara>
+<simpara>Mount your <literal role="path">/var/spacewalk</literal> and <literal role="path">/var/lib/pgsql</literal> partitions and restore the directories listed in the section above.</simpara>
 </listitem>
 <listitem>
-<simpara>Start SUSE Manager services and the database with <literal role="command">spacewalk-services start</literal> and <literal role="command">rcpostgresql start</literal></simpara>
+<simpara>Start SUSE Manager services and the database with <literal role="command">spacewalk-service start</literal> and <literal role="command">rcpostgresql start</literal>.</simpara>
 </listitem>
 <listitem>
-<simpara>SUSE Manager should now operate normally without loss of your database or synced channels.</simpara>
+<simpara>SUSE Manager now operates normally without loss of your database or synchronized channels.</simpara>
 </listitem>
 </orderedlist>
 </section>
 <section xml:id="_database_connection_information">
 <title>Database Connection Information</title>
-<simpara>The information for connecting to the SUSE Manager database is located in <literal role="path">/etc/rhn/rhn.conf</literal>
-:</simpara>
+<simpara>The information for connecting to the SUSE Manager database is located in <literal role="path">/etc/rhn/rhn.conf</literal>:</simpara>
 <screen>db_backend = postgresql
 db_user = susemanager
 db_password = susemanager
@@ -6302,10 +6703,10 @@ The cloned virtual machine should have a different UUID from the original (this 
 <simpara>Change the Hostname and IP addresses, also make sure /etc/hosts contains the changes you made and the correct host entries.</simpara>
 </listitem>
 <listitem>
-<simpara>Stop rhnsd daemon with:</simpara>
+<simpara>Stop the rhnsd daemon, on Red Hat Enterprise Linux Server 6 and SUSE Linux Enterprise 11 with:</simpara>
 <screen># /etc/init.d/rhnsd stop</screen>
-<simpara>or alternativly:</simpara>
-<screen># rcrhnsd stop</screen>
+<simpara>or, on newer systemd-based systems, with:</simpara>
+<screen># service rhnsd stop</screen>
 </listitem>
 <listitem>
 <simpara>Stop osad with:</simpara>
@@ -6533,6 +6934,181 @@ The following procedures provide information on capturing data from both the cli
 </listitem>
 </orderedlist>
 </section>
+</section>
+<section xml:id="bp.chapt.suma3.troubleshooting.spacewalk-report">
+<title>Gathering Information with <literal role="command">spacewalk-report</literal></title>
+<simpara>The <literal role="command">spacewalk-report</literal> command is used to produce a variety of reports for system administrators.
+These reports can be helpful for taking inventory of your entitlements, subscribed systems, users, and organizations.
+Using reports is often simpler than gathering information manually from the SUSE Manager Web UI, especially if you have many systems under management.</simpara>
+<note>
+<title><literal role="package">spacewalk-reports</literal> Package</title>
+<simpara>To use spacewalk-report, you must have the <literal role="package">spacewalk-reports</literal> package installed.</simpara>
+</note>
+<simpara><literal role="command">spacewalk-report</literal> allows administrators to organize and display reports about content, systems, and user resources across SUSE Manager.
+Using <literal role="command">spacewalk-report</literal>, you can receive reports on:</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>System Inventory: lists all of the systems registered to SUSE Manager.</simpara>
+</listitem>
+<listitem>
+<simpara>Entitlements: lists all organizations on SUSE Manager, sorted by system or channel entitlements.</simpara>
+</listitem>
+<listitem>
+<simpara>Patches: lists all the patches relevant to the registered systems and sorts patches by severity, as well as the systems that apply to a particular patch.</simpara>
+</listitem>
+<listitem>
+<simpara>Users: lists all the users registered to SUSE Manager and any systems associated with a particular user.</simpara>
+</listitem>
+</orderedlist>
+<simpara><literal role="command">spacewalk-report</literal> allows administrators to organize and display reports about content, systems, and user resources across SUSE Manager.
+To get the report in CSV format, run the following at the command line of your SUSE Manager server.</simpara>
+<screen>spacewalk-report report_name</screen>
+<simpara>The following reports are available:</simpara>
+<table xml:id="tab.bp.troubleshooting.spacewalk-report" frame="all" rowsep="1" colsep="1">
+<title><literal role="command">spacewalk-report</literal> Reports</title>
+<tgroup cols="3">
+<colspec colname="col_1" colwidth="33.3333*"/>
+<colspec colname="col_2" colwidth="33.3333*"/>
+<colspec colname="col_3" colwidth="33.3334*"/>
+<thead>
+<row>
+<entry align="left" valign="top">Report</entry>
+<entry align="left" valign="top">Invoked as</entry>
+<entry align="left" valign="top">Description</entry>
+</row>
+</thead>
+<tbody>
+<row>
+<entry align="left" valign="top"><simpara>Channel Packages</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">channel-packages</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of packages in a channel.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Channel Report</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">channels</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Detailed report of a given channel.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Cloned Channel Report</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">cloned-channels</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Detailed report of cloned channels.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Custom Info</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">custom-info</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>System custom information.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Entitlements</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">entitlements</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Lists all organizations on SUSE Manager with their system or channel entitlements.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Patches in Channels</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">errata-channels</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Lists of patches in channels.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Patches Details</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">errata-list</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Lists all patches that affect systems registered to SUSE Manager.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>All patches</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">errata-list-all</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Complete list of all patches.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Patches for Systems</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">errata-systems</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Lists applicable patches and any registered systems that are affected.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Host Guests</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">host-guests</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of host-guests mapping.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Inactive Systems</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">inactive-systems</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of inactive systems.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>System Inventory</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">inventory</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of systems registered to the server, together with hardware and software information.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Kickstart Trees</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">kickstartable-trees</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of kickstartable trees.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>All Upgradable Versions</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">packages-updates-all</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of all newer package versions that can be upgraded.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Newest Upgradable Version</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">packages-updates-newest</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of only newest package versions that can be upgraded.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Result of SCAP</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">scap-scan</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Result of OpenSCAP sccdf eval.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Result of SCAP</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">scap-scan-results</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Result of OpenSCAP sccdf eval, in a different format.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>System Data</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">splice-export</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>System data needed for splice integration.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>System Groups</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">system-groups</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of system groups.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Activation Keys for System Groups</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">system-groups-keys</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of activation keys for system groups.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Systems in System Groups</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">system-groups-systems</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of systems in system groups.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>System Groups Users</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">system-groups-users</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Report of system groups users.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Installed Packages</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">system-packages-installed</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of packages installed on systems.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Users in the System</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">users</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>Lists all users registered to SUSE Manager.</simpara></entry>
+</row>
+<row>
+<entry align="left" valign="top"><simpara>Systems administered</simpara></entry>
+<entry align="left" valign="top"><simpara><literal role="command">users-systems</literal></simpara></entry>
+<entry align="left" valign="top"><simpara>List of systems that individual users can administer.</simpara></entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+<simpara>For more information about an individual report, run <literal role="command">spacewalk-report</literal> with the option <literal role="option">--info</literal> or <literal role="option">--list-fields-info</literal> and the report name.
+The description and list of possible fields in the report will be shown.</simpara>
+<simpara>For further information on program invocations and options, see the <literal role="literal">spacewalk-report(8)</literal> man page as well as the <literal role="option">--help</literal>parameter of the <literal role="command">spacewalk-report</literal>.</simpara>
 </section>
 <section xml:id="bp.troubleshooting.timeouts">
 <title>RPC Connection Timeout Settings</title>
@@ -6803,7 +7379,7 @@ This includes features in development and features available only to their paren
 <row>
 <entry align="left" valign="top"><simpara>Snapshots and Profiles</simpara></entry>
 <entry align="left" valign="top"><simpara>Supported</simpara></entry>
-<entry align="left" valign="top"><simpara>Under Review (Profiles are supported)</simpara></entry>
+<entry align="left" valign="top"><simpara>Under Review (Profiles are supported, syncing is not)</simpara></entry>
 </row>
 <row>
 <entry align="left" valign="top"><simpara>Power Management</simpara></entry>
@@ -7793,10 +8369,11 @@ Your results appear at the bottom of the page.</simpara>
 <textobject><phrase>top search</phrase></textobject>
 </mediaobject>
 </informalfigure>
-<simpara>If you misspell a word during your search query, the SUSE Manager search engine performs approximate string (or fuzzy string) matching, returning results that may be similar in spelling to your misspelled queries.</simpara>
-<simpara>For example, if you want to search for a certain development system called <literal>test-1.example.com</literal> that is registered with SUSE Manager, but you misspell your query <literal>tset</literal>, the <literal>test-1.example.com</literal> system still appears in the search results.</simpara>
+<simpara>If you misspell a word during your search query, the SUSE Manager search engine performs approximate string (or fuzzy string) matching, returning results that may be similar in spelling to your misspelled queries.
+For example, if you want to search for a certain development system called <literal>test-1.example.com</literal> that is registered with SUSE Manager, but you misspell your query <literal>tset</literal>, the <literal>test-1.example.com</literal> system still appears in the search results.</simpara>
 <note>
-<simpara>If you add a distribution or register a system with a SUSE Manager server, it may take several minutes for it to be indexed and appear in search results.</simpara>
+<simpara>If you add a distribution, newly synchronize channels, or register a system with a SUSE Manager server, it may take several minutes for it to be indexed and appear in search results.
+To force the rebuild of the search index, enter <literal role="command">rhn-search cleanindex</literal> on the command line and wait until the rebuild is finished.</simpara>
 </note>
 <itemizedlist>
 <listitem>
@@ -7837,7 +8414,7 @@ For instance, you can set the number of <literal role="guimenu">items per page</
 Some lists also offer the option to retrieve items alphabetically by clicking numbers or letters from the <literal role="guimenu">Alphabetical Index</literal> above the table.</simpara>
 <note>
 <title>Performing Large List Operations</title>
-<simpara>Performing operations on large lists (such as removing RPM packages from the database with the SUSE Manager Web UI) may take some time and the system may become unresponsive or signal &#8220;Internal Server Error 500&#8221;.
+<simpara>Performing operations on large lists (such as removing RPM packages from the database with the SUSE Manager Web UI) may take some time and the system may become unresponsive or signal <quote>Internal Server Error 500</quote>.
 Nevertheless, the command will succeed in the background if you wait long enough.</simpara>
 </note>
 <simpara>Login to the SUSE Manager Web UI to view the <menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Home</guisubmenu> <guimenuitem>Overview</guimenuitem></menuchoice> page.
@@ -7957,6 +8534,14 @@ At the bottom of the <literal role="guimenu">Recently Registered Systems</litera
 <textobject><phrase>home notification messages</phrase></textobject>
 </mediaobject>
 </informalfigure>
+<simpara>The default lifetime of notification messages is 30 days, after which messages are deleted from the database, regardless of read status.
+You can configure the amount of time in <literal role="path">/etc/rhn/rhn.conf</literal>:</simpara>
+<screen># Configure the lifetime of notification messages in days
+java.notifications_lifetime = 30</screen>
+<simpara>All notification types are enabled by default.
+To disable a notification type, open the <literal role="path">/etc/rhn/rhn.conf</literal> configuration file and edit the <literal role="systemitem">java.notifications_type_disabled</literal> parameter:</simpara>
+<screen># Configure the disablement of notification messages by type - example disabling all notification types
+java.notifications_type_disabled = OnboardingFailed,ChannelSyncFailed,ChannelSyncFinished</screen>
 <section xml:id="_notification_messages_tabs">
 <title>Notification Messages Tabs</title>
 <simpara>The <literal role="guimenu">Notification Messages</literal> page displays two tabs:</simpara>
@@ -8620,8 +9205,9 @@ System types are:</simpara>
 <textobject><phrase>systems inactive</phrase></textobject>
 </mediaobject>
 </informalfigure>
-<simpara>Checking in means that Zypper on SUSE Linux Enterprise or Red Hat Update Agent on Red Hat Enterprise Linux client systems connects to SUSE Manager to see if there are any updates available or if any actions have been scheduled.
-If you see a message telling you that check-ins are not taking place, the client system is not successfully connecting to SUSE Manager.</simpara>
+<simpara>On traditional clients, checking in is performed periodically by client tools (specifically <literal>mgr_check</literal>) - client systems connect to SUSE Manager to see if there are any updates available or if any actions have been scheduled.
+For Salt systems, a Taskomatic job checks on the minions periodically by pinging them when otherwise inactive.
+If you see a message telling you that check-ins are not taking place, the system is not successfully connecting to SUSE Manager.</simpara>
 <simpara>The reason may be one of the following:</simpara>
 <itemizedlist>
 <listitem>
@@ -8629,7 +9215,7 @@ If you see a message telling you that check-ins are not taking place, the client
 System profiles that remain unentitled for 180 days (6 months) are removed.</simpara>
 </listitem>
 <listitem>
-<simpara>The system is entitled, but the SUSE Manager daemon (<literal role="systemitem">rhnsd</literal>) has been disabled on the system.
+<simpara>The system is entitled, but the SUSE Manager daemon (<literal role="systemitem">rhnsd</literal>) has been disabled on the traditional client.
 Refer to
 <xref linkend="bp.contact.methods.rhnsd"/>
 for instructions on restarting and troubleshooting.</simpara>
@@ -8651,6 +9237,9 @@ for instructions on restarting and troubleshooting.</simpara>
 </listitem>
 <listitem>
 <simpara>Some other barrier exists between the system and the SUSE Manager Server.</simpara>
+</listitem>
+<listitem>
+<simpara>For Salt minions, Taskomatic might not be operational.</simpara>
 </listitem>
 </itemizedlist>
 </section>
@@ -8824,6 +9413,12 @@ Keep in mind that FQDN is not equal to hostname.</simpara>
 <term>IPv6 Address</term>
 <listitem>
 <simpara>The IPv6 address of the client.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>Minion Id</term>
+<listitem>
+<simpara>On salt clients only, shows the minion identification value.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -9091,8 +9686,7 @@ In addition to including the system here, you must activate to receive e-mail no
 <term>Auto Patch Update</term>
 <listitem>
 <simpara>If this box is checked, available patches are automatically applied to the system when it checks in (Pull) or immediately if you select either Push option.
-This action takes place without user intervention.
-The SUSE Manager Daemon (<literal role="systemitem">rhnsd</literal>) must be enabled on the system for this feature to work.</simpara>
+This action takes place without user intervention.</simpara>
 <note>
 <title>Conflicts With Third Party Packages</title>
 <simpara>Enabling auto-update might lead to failures because of conflicts between system updates and third party packages.
@@ -9184,7 +9778,7 @@ If you do, the autoinstallation will fail.</simpara>
 <simpara>This subtab provides information about the system, such as networking, BIOS, memory, and other devices.
 This only works if you included the hardware profile during registration.
 If the hardware profile looks incomplete or outdated, click the <guibutton>Schedule Hardware Refresh</guibutton> button.
-The next time the SUSE Manager Daemon (<literal role="systemitem">rhnsd</literal>) connects to SUSE Manager, it will update your system profile with the latest hardware information.</simpara>
+The next time the system connects to SUSE Manager, it will update your system profile with the latest hardware information.</simpara>
 </section>
 <section xml:id="s5-sm-system-details-migrate">
 <title><menuchoice><guimenu>System Details</guimenu> <guisubmenu>Details</guisubmenu> <guimenuitem>Migrate</guimenuitem></menuchoice></title>
@@ -9328,7 +9922,7 @@ For further information on action chains, see
 <listitem>
 <simpara>The default display of the <literal role="guimenu">Packages</literal> tab describes the options available and provides the means to update your package list.
 To update or complete a potentially outdated list, possibly because of the manual installation of packages, click the <guibutton>Update Package List</guibutton> button in the bottom right-hand corner of this page.
-The next time the SUSE Manager daemon (<literal role="systemitem">rhnsd</literal>) connects to SUSE Manager, it updates your system profile with the latest list of installed packages.</simpara>
+The next time the system connects to SUSE Manager, it updates your system profile with the latest list of installed packages.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -9509,11 +10103,13 @@ Therefore it is recommended to have a working system backup available for an eme
 </section>
 </section>
 <section xml:id="s5-sm-system-details-channels-config">
-<title><menuchoice><guimenu>System Details</guimenu> <guimenuitem>Configuration</guimenuitem></menuchoice> [Management]</title>
+<title><menuchoice><guimenu>System Details</guimenu> <guimenuitem>Configuration</guimenuitem></menuchoice></title>
 <simpara>This tab and its subtabs assist in managing the configuration files associated with the system.
-These configuration files may be managed solely for the current system or distributed widely via a Configuration Channel.
+On Salt based systems, these configuration files are distributed via a Configuration Channel.
+On traditionally managed systems, these configuration files may be managed solely for the current system or distributed widely via a Configuration Channel.
 The following sections describe these and other available options on the <menuchoice><guimenu>System Details</guimenu> <guimenuitem>Configuration</guimenuitem></menuchoice> subtabs.</simpara>
 <note>
+<title>Required Packages [Management]</title>
 <simpara>To manage the configuration of a system, it must have the latest <phrase role="package">rhncfg*</phrase> packages installed.
 Refer to
 for instructions on enabling and disabling scheduled actions for a system.</simpara>
@@ -9549,6 +10145,9 @@ Here you also find shortcuts to perform any of the common configuration manageme
 <simpara>This subtab lists all configuration files currently associated with the system.
 These are sorted via subtabs in centrally and locally managed files and a local sandbox for files under development.</simpara>
 <simpara>Using the appropriate buttons on a subtab, you can copy from one to the other subtabs.</simpara>
+<informalexample>
+<simpara><literal role="guimenu">Modify Files</literal> is not available on Salt based systems.</simpara>
+</informalexample>
 <variablelist>
 <varlistentry>
 <term>Centrally-Managed Files</term>
@@ -9557,9 +10156,6 @@ These are sorted via subtabs in centrally and locally managed files and a local 
 Determine which channel provides which file by examining the <literal role="guimenu">Provided By</literal> column below.
 Some of these centrally-managed files may be overridden by locally-managed files.
 Check the <literal role="guimenu">Overridden By</literal> column to find out if any files are overridden, or click <guibutton>Override this file</guibutton> to provide such an overriding file.</simpara>
-</listitem>
-</varlistentry>
-</variablelist>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -9568,15 +10164,13 @@ Check the <literal role="guimenu">Overridden By</literal> column to find out if 
 <textobject><phrase>system details traditional configuration view mod central paths</phrase></textobject>
 </mediaobject>
 </informalfigure>
-<variablelist>
+</listitem>
+</varlistentry>
 <varlistentry>
-<term>Locally-Managed Files</term>
+<term>Locally-Managed Files [Management]</term>
 <listitem>
 <simpara>Locally-managed configuration files are useful for overriding centrally-managed configuration profiles that cause problems on particular systems.
 Also, locally-managed configuration files are a method by which system group administrators who do not have configuration administration privileges can manage configuration files on the machines they can manage.</simpara>
-</listitem>
-</varlistentry>
-</variablelist>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -9585,16 +10179,14 @@ Also, locally-managed configuration files are a method by which system group adm
 <textobject><phrase>system details traditional configuration view mod local paths</phrase></textobject>
 </mediaobject>
 </informalfigure>
-<variablelist>
+</listitem>
+</varlistentry>
 <varlistentry>
-<term>Local Sandbox</term>
+<term>Local Sandbox [Management]</term>
 <listitem>
 <simpara>In the sandbox you can store configuration files under development.
 You can promote files from the sandbox to a centrally-managed configuration channel using <literal role="guimenu">Copy Latest to Central Channel</literal>.
 After files in this sandbox have been promoted to a centrally-managed configuration channel, you can deploy them to other systems.</simpara>
-</listitem>
-</varlistentry>
-</variablelist>
 <simpara>Use <literal role="guimenu">Copy Latest to System Channel</literal> to install a configuration on the local system only.
 When done, the file will end up on the <literal role="guimenu">Locally-Managed Files</literal> subtab.</simpara>
 <informalfigure>
@@ -9605,9 +10197,12 @@ When done, the file will end up on the <literal role="guimenu">Locally-Managed F
 <textobject><phrase>system details traditional configuration view mod sandbox paths</phrase></textobject>
 </mediaobject>
 </informalfigure>
+</listitem>
+</varlistentry>
+</variablelist>
 </section>
 <section xml:id="s5-sdc-configuration-add-files">
-<title><menuchoice><guimenu>System Details</guimenu> <guisubmenu>Configuration</guisubmenu> <guimenuitem>Add Files</guimenuitem></menuchoice></title>
+<title><menuchoice><guimenu>System Details</guimenu> <guisubmenu>Configuration</guisubmenu> <guimenuitem>Add Files</guimenuitem></menuchoice> [Management]</title>
 <simpara>To upload, import, or create new configuration files, open the <literal role="guimenu">Add Files</literal> subtab.</simpara>
 <variablelist>
 <varlistentry>
@@ -9727,8 +10322,8 @@ For example, the higher-ranked channel may have an <literal role="path">httpd.co
 <title><menuchoice><guimenu>System Details</guimenu> <guimenuitem>Provisioning</guimenuitem></menuchoice>  [Management]</title>
 <simpara>The <literal role="guimenu">Provisioning</literal> tab and its subtabs allow you to schedule and monitor AutoYaST or Kickstart installations and to restore a system to its previous state.</simpara>
 <note>
-<title>Available for Clients Using the &#8220;Traditional&#8221; Method</title>
-<simpara>The note <literal role="guimenu">Provisioning</literal> tab will be available when adding a client using the &#8220;traditional&#8221; method (system type <literal>management</literal>). Using Salt the <literal role="guimenu">Provisioning</literal> tab will not be available (system type <literal>salt</literal>).</simpara>
+<title>Available for Clients Using the <quote>Traditional</quote> Method</title>
+<simpara>The note <literal role="guimenu">Provisioning</literal> tab will be available when adding a client using the <quote>traditional</quote> method (system type <literal>management</literal>). Using Salt the <literal role="guimenu">Provisioning</literal> tab will not be available (system type <literal>salt</literal>).</simpara>
 </note>
 <simpara>AutoYaST is a SUSE Linux Enterprise and Kickstart is a Red Hat utility-both allow you to automate the reinstallation of a system.
 Snapshot rollbacks provide the ability to revert certain changes on the system.
@@ -9887,7 +10482,7 @@ To see the list again, click <guibutton>Return to snapshot list</guibutton>.</si
 <title>Background Information About Snapshots</title>
 <simpara>There is no maximum number of snapshots that SUSE Manager will keep, thus related database tables will grow with system count, package count, channel count, and the number of configuration changes over time.
 Installations with more than a thousand systems should consider setting up a recurring cleanup script via the API or disabling this feature altogether.</simpara>
-<simpara>There is currently no integrated support for &#8220;rotated snapshots&#8221;.</simpara>
+<simpara>There is currently no integrated support for <quote>rotated snapshots</quote>.</simpara>
 <simpara>Snapshot rollback gets scheduled like any other action, this means the rollback usually does not happen immediately.</simpara>
 </note>
 </section>
@@ -10024,7 +10619,7 @@ For more information on auditing and OpenSCAP, refer to
 <note>
 <simpara>The following subtabs are only available for Salt minions.</simpara>
 </note>
-<section xml:id="_menuchoice_guimenu_system_details_guimenu_guisubmenu_states_guisubmenu_guimenuitem_packages_guimenuitem_menuchoice">
+<section xml:id="_system_details_states_packages">
 <title><menuchoice><guimenu>System Details</guimenu> <guisubmenu>States</guisubmenu> <guimenuitem>Packages</guimenuitem></menuchoice></title>
 <simpara><literal role="guimenu">Search and install</literal> packages then assign them with a pre-defined state for a selected machine.</simpara>
 <informalfigure>
@@ -10892,7 +11487,7 @@ Select a date and time to execute the command and click <guibutton>Schedule</gui
 </section>
 <section xml:id="ref.webui.systems.ssm.audit">
 <title>System Set Manager &gt;  Audit</title>
-<simpara>System sets can be scheduled for XCCDF scans; XCCDF stands for &#8220;The Extensible Configuration Checklist Description Format&#8221;.</simpara>
+<simpara>System sets can be scheduled for XCCDF scans; XCCDF stands for <quote>The Extensible Configuration Checklist Description Format</quote>.</simpara>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -11044,10 +11639,6 @@ This allows the script to auto-accept host keys without requiring a user to manu
 <varlistentry>
 <term>Manage System Completely via SSH (Will not Install an Agent)</term>
 <listitem>
-<note>
-<title>Technology Preview</title>
-<simpara>This feature is a Technology preview.</simpara>
-</note>
 <simpara>If selected a system will automatically be configured to use SSH.
 No other connection method will be configured.</simpara>
 </listitem>
@@ -11167,6 +11758,10 @@ This can be performed in two ways:</simpara>
 To list all systems that do <emphasis>not</emphasis> match the criteria, select the <literal role="guimenu">Invert Result</literal> check box.</simpara>
 <simpara>The results appear at the bottom of the page.
 For details on how to use the resulting system list, refer to <xref linkend="ref.webui.systems.systems"/>.</simpara>
+<note>
+<simpara>If you add a distribution, newly synchronize channels, or register a system with a SUSE Manager server, it may take several minutes for it to be indexed and appear in search results.
+To force the rebuild of the search index, enter <literal role="command">rhn-search cleanindex</literal> on the command line and wait until the rebuild is finished.</simpara>
+</note>
 </section>
 <section xml:id="ref.webui.systems.activ-keys">
 <title>Systems &gt; Activation Keys</title>
@@ -11266,6 +11861,7 @@ In the upper right corner find also the <literal role="guimenu">Clone Key</liter
 The Client Tools channel should be selected in the <literal role="guimenu">Child Channels</literal> listing below the selected base channel.</simpara>
 <simpara>After creating the activation key, you can see in the <literal role="guimenu">Details</literal> tab a check box named <literal role="guimenu">Configuration File Deployment</literal>.
 If you select it, all needed packages are automatically added to the <literal role="guimenu">Packages</literal> list.
+In case of Salt clients the <literal role="guimenu">Configuration File Deployment</literal> option also ensures that highstate will get applied automatically.
 By default, the following packages are added: <phrase role="package">rhncfg</phrase>, <phrase role="package">rhncfg-client</phrase>, and <phrase role="package">rhncfg-actions</phrase>.</simpara>
 <simpara>If you select <literal role="guimenu">Virtualization Host</literal> you automatically get the following package: <phrase role="package">rhn-virtualization-host</phrase>.</simpara>
 <simpara>Adding the <phrase role="package">osad</phrase> package makes sense to execute scheduled actions immediately after the schedule time.
@@ -11367,7 +11963,7 @@ Before explaining the various automated installation options on this page, the n
 <simpara>Using AutoYaST, a system administrator can create a single file containing the answers to all the questions that would normally be asked during a typical installation of a SUSE Linux Enterprise system.</simpara>
 <simpara>AutoYaST files can be kept on a single server system and read by individual computers during the installation.
 This way the same AutoYaST file is used to install SUSE Linux Enterprise on multiple machines.</simpara>
-<simpara>The <emphasis><phrase role="ref">SUSE Linux Enterprise Server AutoYaST Guide</phrase></emphasis> at (<link xl:href="https://www.suse.com/documentation/sles-15/">https://www.suse.com/documentation/sles-15/</link>) will contain an in-depth discussion of &#8220;Automated Installation&#8221; using AutoYaST.</simpara>
+<simpara>The <emphasis><phrase role="ref">SUSE Linux Enterprise Server AutoYaST Guide</phrase></emphasis> at (<link xl:href="https://www.suse.com/documentation/sles-15/">https://www.suse.com/documentation/sles-15/</link>) will contain an in-depth discussion of <quote>Automated Installation</quote> using AutoYaST.</simpara>
 <section xml:id="s4-system-ay-intro-explain">
 <title>AutoYaST Explained</title>
 <simpara>When a machine is to receive a network-based AutoYaST installation, the following events must occur in this order:</simpara>
@@ -12089,7 +12685,7 @@ The <literal role="guimenu">All Snippets</literal> tab lists default and custom 
 </section>
 <section xml:id="ref.webui.systems.virt-host-managers">
 <title>Systems &gt; Virtual Host Managers</title>
-<simpara>Third party hypervisors and hypervisor managers such as VMWare vCenter are called &#8220;Virtual Host Managers&#8221; (VHM) within SUSE Manager.
+<simpara>Third party hypervisors and hypervisor managers such as VMWare vCenter are called <quote>Virtual Host Managers</quote> (VHM) within SUSE Manager.
 These managers can manage one or multiple virtual hosts, which in turn may contain virtual guests. SUSE Manager ships with a tool called <literal role="command">virtual-host-gatherer</literal> that can connect to VHMs using their API, and request information about virtual hosts.
 This tool is automatically invoked via Taskomatic nightly, therefore you need to configure your VHMs via XMLRPC APIs. <literal role="command">virtual-host-gatherer</literal> maintains the concept of optional modules, where each module enables a specific Virtual Host Manager.</simpara>
 <simpara>Proceed to <menuchoice><guimenu>Systems</guimenu> <guimenuitem>Virtual Host Managers</guimenuitem></menuchoice> page in the Web UI to begin working with a Virtual Host Manager.
@@ -12253,6 +12849,8 @@ Toggle the check mark or cross in the <literal>actions</literal> column.</simpar
 <textobject><phrase>remote commands</phrase></textobject>
 </mediaobject>
 </figure>
+<simpara>Salt runs remote commands from <literal role="filename">/tmp</literal> of the client&#8217;s filesystem.
+Therefore you must not mount <literal role="filename">/tmp</literal> with the <literal role="option">noexec</literal> option.</simpara>
 <warning>
 <title>Remote Commands Security</title>
 <simpara>All commands run from the <literal role="guimenu">Remote Commands</literal> page are executed as root on minions.
@@ -12456,7 +13054,7 @@ Each patch consists of a summary of the problem and solution, including the RPM 
 </inlinemediaobject>&#8201;&#8212;&#8201;Enhancement Updates available, optional</simpara>
 </listitem>
 </itemizedlist>
-<simpara>A summary of each patch is provided in list form displaying its type, advisory ID, synopsis (with the severity as a textual prefix in case of security updates, such as &#8220;critical&#8221;, &#8220;important&#8221;, &#8220;moderate&#8221;, or &#8220;low&#8221;), number of affected systems in your network, and date updated.</simpara>
+<simpara>A summary of each patch is provided in list form displaying its type, advisory ID, synopsis (with the severity as a textual prefix in case of security updates, such as <quote>critical</quote>, <quote>important</quote>, <quote>moderate</quote>, or <quote>low</quote>), number of affected systems in your network, and date updated.</simpara>
 <simpara>In addition, you may view patches by product line at the following location: <link xl:href="http://download.suse.com/patch/psdb/">http://download.suse.com/patch/psdb/</link>.
 For more information on security updates, see <link xl:href="https://www.suse.com/support/security/">https://www.suse.com/support/security/</link>.</simpara>
 <section xml:id="ref.webui.patches.relevant">
@@ -12507,8 +13105,8 @@ Pending updates are excluded.</simpara>
 </listitem>
 </itemizedlist>
 <important>
-<simpara>If you use scheduled package installation, the packages or patches are installed via the SUSE Manager daemon (<literal role="command">rhnsd</literal>). You must enable the SUSE Manager daemon on your systems.
-For more information about the SUSE Manager daemon, see <xref linkend="bp.contact.methods.rhnsd"/>.</simpara>
+<simpara>If you use scheduled package installation, the packages or patches are installed via the configured contact method.
+For more information, see <xref linkend="bp.contact.methods.rhnsd"/>.</simpara>
 </important>
 <simpara>The following rules apply to patches:</simpara>
 <itemizedlist>
@@ -12530,7 +13128,7 @@ This page is further divided into the following tabs:</simpara>
 <section xml:id="s4-sm-errata-details-details">
 <title><menuchoice><guimenu>Patch Details</guimenu> <guimenuitem>Details</guimenuitem></menuchoice></title>
 <simpara>This subtab displays the patch report issued by SUSE.
-It provides a synopsis of the patch first (with the severity as a textual prefix in case of security updates, such as &#8220;critical&#8221;, &#8220;important&#8221;, &#8220;moderate&#8221;, or &#8220;low&#8221;), issue date, and any update dates.
+It provides a synopsis of the patch first (with the severity as a textual prefix in case of security updates, such as <quote>critical</quote>, <quote>important</quote>, <quote>moderate</quote>, or <quote>low</quote>), issue date, and any update dates.
 This is followed by a description of the patch and the steps required to resolve the issue.</simpara>
 <simpara>Below the <literal role="guimenu">Affected Channels</literal> label, all channels that contain the affected package are listed.
 Clicking a channel name displays the <literal role="guimenu">Packages</literal> subtab of the <literal role="guimenu">Channel Details</literal> page for that channel.
@@ -13277,7 +13875,7 @@ This might mean that, after installing such a patch, others might be needed—us
 </note>
 <simpara>For each system, the <literal role="guimenu">Next Action</literal> column contains suggestions on the steps to take to address the vulnerabilities.
 Under these circumstances it is either sensible to install a certain patch or assign a new channel.
-If applicable, a list of &#8220;candidate&#8221; channels or patches is displayed for your convenience.</simpara>
+If applicable, a list of <quote>candidate</quote> channels or patches is displayed for your convenience.</simpara>
 <simpara>You can also assign systems to a <literal role="guimenu">System Set</literal> for further batch processing.</simpara>
 </section>
 <section xml:id="ref-api-usage">
@@ -13314,8 +13912,8 @@ It is recommended to run such a refresh right after the SUSE Manager installatio
 <simpara>Audit results are only correct if the assignment of channels to systems did not change since the last scheduled refresh (normally at 11:00 PM every night).
 If a CVE audit is needed and channels were assigned or unassigned to any system during the day, a manual run is recommended.
 For more information, see <xref linkend="sec-cve-maint"/>.</simpara>
-<simpara>Systems are called &#8220;affected&#8221;, &#8220;not affected&#8221; or &#8220;patched&#8221; not in an absolute sense, but based on information available to SUSE Manager.
-This implies that concepts such as &#8220;being affected by a vulnerability&#8221; have particular meanings in this context.
+<simpara>Systems are called <quote>affected</quote>, <quote>not affected</quote> or <quote>patched</quote> not in an absolute sense, but based on information available to SUSE Manager.
+This implies that concepts such as <quote>being affected by a vulnerability</quote> have particular meanings in this context.
 The following definitions apply:</simpara>
 <variablelist>
 <varlistentry>
@@ -13386,7 +13984,7 @@ The Subscription Matcher is excellent at matching systems and products registere
 This tool is not intended to act as a replacement for auditing.
 Auditing should always take precedence over subscription matching.</simpara>
 </important>
-<section xml:id="_menuchoice_guimenu_main_menu_guimenu_guisubmenu_audit_guisubmenu_guisubmenu_subscription_matching_guisubmenu_guimenuitem_subscriptions_guimenuitem_menuchoice">
+<section xml:id="_main_menu_audit_subscription_matching_subscriptions">
 <title><menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Audit</guisubmenu> <guisubmenu>Subscription Matching</guisubmenu> <guimenuitem>Subscriptions</guimenuitem></menuchoice></title>
 <simpara>The Subscription Matching overview provides subscription part numbers, product descriptions, policies, matched total subscriptions used and remaining, and the start and end dates of subscriptions.</simpara>
 <figure>
@@ -13721,16 +14319,15 @@ Due to security concerns the <literal role="command">oscap xccdf eval</literal> 
 </warning>
 <simpara>Run the <literal role="command">mgr_check</literal> command to ensure the action is being picked up by the client system.</simpara>
 <screen>mgr_check -vv</screen>
-<note>
-<simpara>If the SUSE Manager daemon (<literal role="command">rhnsd</literal>) or <literal role="command">osad</literal> are running on the client system, the action will be picked up by these services.
-To check if they are running, use:</simpara>
-</note>
 </listitem>
 </orderedlist>
-<screen>service rhnsd start</screen>
-<simpara>or</simpara>
-<screen>service osad start</screen>
+<note>
+<simpara>If <literal role="command">rhnsd</literal> or <literal role="command">osad</literal> are running on the client system, the action will be picked up by these services.
+On systemd-based systems, you can check if they are running with:</simpara>
+</note>
 <simpara>+</simpara>
+<screen>service rhnsd start
+service osad start</screen>
 <simpara>To view the results of the scan, refer to <xref linkend="s2-openscap-suma-audit-scans_view"/>.</simpara>
 <figure>
 <title>Scheduling a Scan via the Web Interface</title>
@@ -13809,7 +14406,7 @@ spacewalk-report scap-scan-results</screen>
 <simpara>Click the <guimenu>Audit</guimenu>
  tab on the top navigation bar, then OpenSCAP on the left.
 Here you can view, search for, and compare completed OpenSCAP scans.</simpara>
-<section xml:id="_menuchoice_guimenu_openscap_guimenu_guisubmenu_guisubmenu_guimenuitem_menu_all_scans_guimenuitem_menuchoice">
+<section xml:id="_openscap_menuall_scans">
 <title><menuchoice><guimenu>OpenSCAP</guimenu> <guisubmenu>]</guisubmenu> <guimenuitem>menu:All Scans[</guimenuitem></menuchoice></title>
 <simpara><menuchoice><guimenu>All Scans</guimenu> <guimenuitem>]
  is the default page that appears on the menu:Audit[OpenSCAP</guimenuitem></menuchoice>
@@ -13863,7 +14460,7 @@ In such cases, the given rule is not included in the statistics on this page.
 See <menuchoice><guimenu>System Details</guimenu> <guimenuitem>Audit</guimenuitem></menuchoice>
  for information on these types of results.</simpara>
 </section>
-<section xml:id="_menuchoice_guimenu_openscap_guimenu_guisubmenu_guisubmenu_guimenuitem_menu_xccdf_diff_guimenuitem_menuchoice">
+<section xml:id="_openscap_menuxccdf_diff">
 <title><menuchoice><guimenu>OpenSCAP</guimenu> <guisubmenu>]</guisubmenu> <guimenuitem>menu:XCCDF Diff[</guimenuitem></menuchoice></title>
 <simpara>XCCDF Diff is an application that visualizes the comparison of two XCCDF scans.
 It shows metadata for two scans as well as the lists of results.</simpara>
@@ -13894,7 +14491,7 @@ There are three possible comparison modes:</simpara>
 </varlistentry>
 </variablelist>
 </section>
-<section xml:id="_menuchoice_guimenu_openscap_guimenu_guisubmenu_guisubmenu_guimenuitem_menu_advanced_search_guimenuitem_menuchoice">
+<section xml:id="_openscap_menuadvanced_search">
 <title><menuchoice><guimenu>OpenSCAP</guimenu> <guisubmenu>]</guisubmenu> <guimenuitem>menu:Advanced Search[</guimenuitem></menuchoice></title>
 <simpara>Use the Advanced Search page to search through your scans according to specified criteria including:</simpara>
 <itemizedlist>
@@ -14283,7 +14880,7 @@ Clicking the blue text displays the <menuchoice><guimenu>System Details</guimenu
 <simpara>As mentioned above, SUSE Manager manages both central and local configuration channels and files.
 Central configuration management allows you to deploy configuration files to multiple systems (both traditional clients ([Management]) and Salt minions ([Salt])).
 Local configuration management is available for traditional clients ([Management]) only and allows you to specify overrides or configuration files that are not changed by subscribing the system to a central channel.</simpara>
-<simpara>A &#8220;state channel&#8221; is a type of a configuration channel but for Salt minion only.
+<simpara>A <quote>state channel</quote> is a type of a configuration channel but for Salt minion only.
 For a state channel, the <literal role="path">init.sls</literal> file is not auto-generated, the user creates and edits it.
 Additionally, state channels can contain arbitrary configuration files that could be referenced from within the <literal role="path">init.sls</literal> file.
 Therefore, state channels effectively replace custom states.</simpara>
@@ -14559,7 +15156,7 @@ ip_address={| rhn.system.net_interface.ip_address(eth0) |}</screen>
 In the above example configuration file the deployed version resembles the following:</simpara>
 <screen>hostname=test.example.domain.com
 ip_address=177.18.54.7</screen>
-<simpara>To capture custom system information, insert the key label into the custom information macro (<literal>rhn.system.custom_info</literal>). For example, if you developed a key labeled &#8220;`asset`&#8221; you can add it to the custom information macro in a configuration file to have the value substituted on any system containing it.
+<simpara>To capture custom system information, insert the key label into the custom information macro (<literal>rhn.system.custom_info</literal>). For example, if you developed a key labeled <quote><literal>asset</literal></quote> you can add it to the custom information macro in a configuration file to have the value substituted on any system containing it.
 The macro would look like this:</simpara>
 <screen>asset={@ rhn.system.custom_info(asset) @}</screen>
 <simpara>When the file is deployed to a system containing a value for that key, the macro gets translated, resulting in a string similar to the following:</simpara>
@@ -14746,7 +15343,7 @@ Schedulable actions are located under a systems, <literal role="guimenu">System 
 </informalfigure>
 <simpara>In the <literal role="guimenu">Action Chain List</literal> you can click the label to view or edit an <literal role="guimenu">Action Chain</literal>.
 In the top right corner is the <literal role="guimenu">delete action chain</literal> link.
-To add actions to an existing chain, pick up a &#8220;chainable&#8221; action (such as running a remote command) from a system details page (see
+To add actions to an existing chain, pick up a <quote>chainable</quote> action (such as running a remote command) from a system details page (see
 <xref linkend="s3-sm-system-details"/>).
 Then check <literal role="guimenu">Add to Action Chain</literal> and select an action chain from the drop-down box.
 Confirm with <guibutton>Schedule</guibutton>.</simpara>
@@ -15150,7 +15747,7 @@ If the list contains more items than can be displayed on one page, click the <gu
 This preference applies to the user&#8217;s view of system lists, patch lists, package lists, and so on.</simpara>
 </listitem>
 <listitem>
-<simpara><literal role="guimenu">Overview Start Page</literal> : Configure which information to be displayed on the &#8220;Overview&#8221; page at login.</simpara>
+<simpara><literal role="guimenu">Overview Start Page</literal> : Configure which information to be displayed on the <quote>Overview</quote> page at login.</simpara>
 </listitem>
 <listitem>
 <simpara><literal role="guimenu">Time Zone</literal> : Select the time zone from the drop-down box.
@@ -15305,7 +15902,7 @@ You cannot disable required channels.</simpara>
 <simpara>Filter by architecture.
 Click in the search field (or press <keycap>Enter</keycap> ) and then select from drop-down menu.
 You can repeat this as often as necessary.
-To remove an architecture either click the &#8220;x&#8221; symbol (or press <keycap>Backspace</keycap> ).</simpara>
+To remove an architecture either click the <quote>x</quote> symbol (or press <keycap>Backspace</keycap> ).</simpara>
 <simpara>Once you have made your selection(s), click <guibutton>Add products</guibutton> in the upper right area.
 This is equivalent to running <literal role="command">mgr-sync add products</literal> or <literal role="command">mgr-sync</literal> without any arguments.</simpara>
 <simpara>View the synchronization progress in the status bar field to the right.</simpara>
@@ -15420,7 +16017,7 @@ You may add a trust by checking the box next to an organization (or remove a tru
 </section>
 <section xml:id="s2-sattools-org-details-conf">
 <title><menuchoice><guimenu>Organization Details</guimenu> <guimenuitem>Configuration</guimenuitem></menuchoice></title>
-<simpara>Allow the Organization Administrator to manage Organization configuration, configure the organization to use staged contents (&#8220;pre-fetching&#8221; packages, etc.), set up software crash reporting, and upload of SCAP files.</simpara>
+<simpara>Allow the Organization Administrator to manage Organization configuration, configure the organization to use staged contents (<quote>pre-fetching</quote> packages, etc.), set up software crash reporting, and upload of SCAP files.</simpara>
 <informalfigure>
 <mediaobject>
 <imageobject>
@@ -15478,11 +16075,11 @@ You may add a trust by checking the box next to an organization (or remove a tru
 <listitem>
 <simpara>The clients will download packages in advance and stage them.
 This has the advantage that the package installation action will take place immediately, when the schedule is actually executed.
-This &#8220;pre-fetching&#8221; saves maintenance window time, which is good for service uptime.</simpara>
+This <quote>pre-fetching</quote> saves maintenance window time, which is good for service uptime.</simpara>
 </listitem>
 </varlistentry>
 </variablelist>
-<simpara>For staging contents (&#8220;pre-fetching&#8221;), edit on the client <literal role="path">/etc/sysconfig/rhn/up2date</literal>:</simpara>
+<simpara>For staging contents (<quote>pre-fetching</quote>), edit on the client <literal role="path">/etc/sysconfig/rhn/up2date</literal>:</simpara>
 <screen>stagingContent=1
 stagingContentWindow=24</screen>
 <simpara><literal>stagingContentWindow</literal> is a time value expressed in hours and determines when downloading will start.
@@ -15770,7 +16367,7 @@ This limitation also applies to mixed sets with regular and bare-metal systems: 
 <textobject><phrase>admin iss configuration master</phrase></textobject>
 </mediaobject>
 </informalfigure>
-<simpara>Click <menuchoice><guimenu>Admin</guimenu> <guisubmenu></guisubmenu> <guisubmenu>ISS Configuration</guisubmenu> <guimenuitem>Master Setup</guimenuitem></menuchoice>.
+<simpara>Click <menuchoice><guimenu>Admin</guimenu> <guisubmenu>ISS Configuration</guisubmenu> <guimenuitem>Master Setup</guimenuitem></menuchoice>.
 In the top right-hand corner of this page, click <guibutton>Add New Slave</guibutton>:</simpara>
 <informalfigure>
 <mediaobject>
@@ -15790,7 +16387,7 @@ In the top right-hand corner of this page, click <guibutton>Add New Slave</guibu
 Otherwise, contact with this slave will be denied.</simpara>
 </listitem>
 <listitem>
-<simpara>Sync All Orgs to Slave? Checking this field will synchronize all organizations to the slave SUSE Manager.</simpara>
+<simpara>Sync All Orgs to Slave? Checking this checkbox will synchronize all organizations to the slave SUSE Manager.</simpara>
 </listitem>
 </itemizedlist>
 <note>
@@ -15843,7 +16440,7 @@ In the top right-hand corner, click <guibutton>Add New Master</guibutton>.</simp
 </listitem>
 </itemizedlist>
 <simpara>Click <guibutton>Add New Master</guibutton>.
-Once the master and slave servers are configured, start the synchronization on the Master server by executing <literal role="command">mgr-inter-sync</literal>:</simpara>
+When the master and slave servers are configured, start the synchronization on the slave server by executing <literal role="command">mgr-inter-sync</literal>:</simpara>
 <screen>mgr-inter-sync -c`YOUR-CHANNEL`</screen>
 </section>
 <section xml:id="s3-sattools-iss-map-orgs">
@@ -16276,7 +16873,7 @@ The disk should fulfill the following requirements:</para>
 </listitem>
 </itemizedlist>
 </section>
-<section xml:id="_sles_12sp4_installation_and_the_suse_manager_extension">
+<section xml:id="_sles12sp4_installation_and_the_suse_manager_extension">
 <title>SLES 12SP4 Installation and the SUSE Manager Extension</title>
 <simpara>This section covers the installation of SUSE Manager3.2
 as an extension to SLES 12SP4
@@ -16310,6 +16907,7 @@ It also provides notes about migrating a previous proxy to version 3.2.</simpar
 <simpara>SUSE Manager 3.2 Proxy is a SUSE Manager add-on that caches software packages on an internal, central server.
 The proxy caches patch updates from SUSE or custom RPMs generated by third-party organizations.
 A proxy allows you to use bandwidth more effectively because client systems connect to the proxy for updates, and the SUSE Manager server is no longer required to handle all client requests.
+A SUSE Manager Proxy can serve both Traditional and Salt clients.
 The proxy also supports transparent custom package deployment.</simpara>
 <simpara>SUSE Manager Proxy is an open source (GPLv2) solution that provides the following features:</simpara>
 <itemizedlist>
@@ -16423,8 +17021,7 @@ For more information, see <link xl:href="https://www.suse.com/documentation/sles
 <simpara><link xl:href="http://www.microsoft.com/en-us/server-cloud/solutions/virtualization.aspx">http://www.microsoft.com/en-us/server-cloud/solutions/virtualization.aspx</link></simpara>
 </listitem>
 </itemizedlist>
-<simpara>For running SUSE Manager Proxy
-in virtual environments, use the following settings for the virtual machine (VM):</simpara>
+<simpara>For running SUSE Manager Proxy in virtual environments, use the following settings for the virtual machine (VM):</simpara>
 <itemizedlist>
 <listitem>
 <simpara>At least 1 GB of RAM</simpara>
@@ -16438,7 +17035,8 @@ in virtual environments, use the following settings for the virtual machine (VM)
 <title>Installation and Setup</title>
 <simpara>The following section will guide you through the installation and setup procedure.</simpara>
 <simpara>SUSE Manager Proxy systems are registered as traditional clients or as Salt clients using a bootstrap script.
-A SUSE Manager Proxy can serve both Traditional and Salt clients.</simpara>
+Migrating a traditionally registered Proxy system to a Salt Proxy system is not possible.
+Re-install the Proxy if you want to switch to Salt.</simpara>
 <important>
 <title>Downloading Channels</title>
 <simpara>Before you can select the correct child channels while creating the activation key, ensure you have completely downloaded the channels for SUSE Linux Enterprise 12 SP4.</simpara>
@@ -16473,7 +17071,7 @@ For normal SLES clients, <literal role="systemitem">SLES12-SP4-Updates</literal>
 </figure>
 </listitem>
 <listitem>
-<simpara>Modify a bootstrap script for the proxy if needed.
+<simpara>Navigate to <menuchoice><guimenu>Main Menu</guimenu> <guisubmenu>Admin</guisubmenu> <guisubmenu>Manager Configuration</guisubmenu> <guimenuitem>Bootstrap Script</guimenuitem></menuchoice>, and create or modify a bootstrap script for the proxy if needed.
 If you want to run the proxy on a traditional client (system type <literal>Management</literal>) uncheck <literal role="guimenu">Bootstrap using Salt</literal>.
 Using Salt is supported since version 3.2.
 For more information about bootstrap scripts, see <xref linkend="modify.bootstrap.script"/>.</simpara>
@@ -16526,22 +17124,23 @@ For more information, see <xref linkend="at.manager.proxy.register.saltclients"/
 </section>
 <section xml:id="at.manager.proxy.run.pattern">
 <title>Install the <literal role="path">suma_proxy</literal> pattern</title>
-<simpara>On the server select the <literal role="package">pattern_suma_proxy</literal> package for installation, or make sure the <literal role="path">suma_proxy</literal> pattern is installed using the following command on the proxy as root:</simpara>
+<simpara>On the server select the <literal role="package">patterns-suma_proxy</literal> package for installation, or make sure the <literal role="path">suma_proxy</literal> pattern is installed using the following command on the proxy as root:</simpara>
 <screen>zypper in -t pattern suma_proxy</screen>
 <simpara>The new salt-broker service will be automatically started at the end of the package installation.
 This service forwards the Salt interactions to the SUSE Manager server.</simpara>
 <note>
 <title>Proxy Chains</title>
 <simpara>It is possible to arrange Salt proxies in a chain.
-In such a case, the upstream proxy is named &#8220;parent&#8221;.</simpara>
+In such a case, the upstream proxy is named <quote>parent</quote>.</simpara>
 </note>
 <simpara>Make sure the proxie&#8217;s TCP ports <literal>4505</literal> and <literal>4506</literal> are open and that the proxy can reach the SUSE Manager server (or another upstream proxy) on these ports.</simpara>
 </section>
 <section xml:id="at.manager.proxy.run.copycert">
 <title>Copy Server Certificate and Key</title>
 <simpara>The proxy will share some SSL information with the SUSE Manager server, so the next step is to copy the certificate and its key from the SUSE Manager server or the upstream proxy.</simpara>
-<simpara>As root, enter the following commands on the proxy using your SUSE Manager server or chained proxy named as <literal role="replaceable">PARENT</literal>:</simpara>
-<screen>cd /root/ssl-build
+<simpara>As root, enter the following commands on the proxy using your SUSE Manager server or chained proxy named <literal role="replaceable">PARENT</literal>:</simpara>
+<screen>mkdir /root/ssl-build
+cd /root/ssl-build
 scp root@PARENT:/root/ssl-build/RHN-ORG-PRIVATE-SSL-KEY .
 scp root@PARENT:/root/ssl-build/RHN-ORG-TRUSTED-SSL-CERT .
 scp root@PARENT:/root/ssl-build/rhn-ca-openssl.cnf .</screen>
@@ -16610,16 +17209,26 @@ The organization might be the same organization that was used on the server, unl
 </listitem>
 </varlistentry>
 <varlistentry>
+<term>Common Name</term>
+<listitem>
+<simpara>The default value here is also the proxy&#8217;s hostname.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
 <term>City</term>
 <listitem>
-<simpara>Further information attached to the proxy&#8217;s certificate.
-Beware the country code must be made of two upper case letters.
-For further information on country codes, refer to the online <link xl:href="https://www.iso.org/obp/ui/#search">list of alpha-2 codes</link>.</simpara>
-<tip>
-<title>Country Code</title>
+<simpara>Further information attached to the proxy&#8217;s certificate.</simpara>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>Country Code</term>
+<listitem>
 <simpara>As the country code enter the country code set during the SUSE Manager installation.
 For example, if your proxy is in US and your SUSE Manager in DE, you must enter <literal>DE</literal> for the proxy.</simpara>
-</tip>
+<note>
+<simpara>The country code must be two upper case letters.
+For a complete list of country codes, see <link xl:href="https://www.iso.org/obp/ui/#search">https://www.iso.org/obp/ui/#search</link>.</simpara>
+</note>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -17291,7 +17900,7 @@ However, it is possible to clone systems and register them successfully by delet
 <simpara>On the cloned system, change the hostname and IP addresses, and check the <literal role="path">/etc/hosts</literal> file to ensure you have the right host entries.</simpara>
 </listitem>
 <listitem>
-<simpara>Stop the <literal role="command">rhnsd</literal> daemon with <literal role="command">/etc/init.d/rhnsd stop</literal> or <literal role="command">rcosad stop</literal>.</simpara>
+<simpara>On traditional clients, stop the <literal role="command">rhnsd</literal> daemon with <literal role="command">/etc/init.d/rhnsd stop</literal> or, on newer systemd-based systems, with <literal role="command">service rhnsd stop</literal>.</simpara>
 </listitem>
 <listitem>
 <simpara>For SLES 11 or Red Hat Enterprise Linux 5 or 6 clients, run these commands:</simpara>
@@ -17311,7 +17920,7 @@ However, it is possible to clone systems and register them successfully by delet
 # rm -rf /var/cache/salt</screen>
 </listitem>
 <listitem>
-<simpara>If you are using a traditional registered system, clean up the working files with this command:</simpara>
+<simpara>If you are using a traditional client, clean up the working files with:</simpara>
 <screen># rm -f /etc/sysconfig/rhn/{osad-auth.conf,systemid}</screen>
 </listitem>
 </orderedlist>
@@ -17402,6 +18011,9 @@ For example <literal role="path">server-tuning.conf</literal> file:</simpara>
            # http://httpd.apache.org/docs/2.2/mod/mpm_common.html#maxrequestsperchild
            MaxRequestsPerChild  10000
    &lt;/IfModule&gt;</screen>
+<warning>
+<simpara>Whenever the Apache httpd <literal role="parameter">MaxClients</literal> parameter is changed, the <literal role="parameter">ServerLimit</literal> must also be updated to the same value, or the change will have no effect.</simpara>
+</warning>
 </section>
 <section xml:id="at.tomcat.maxthreads.parameter">
 <title>Tomcat&#8217;s maxThreads Parameter</title>
@@ -17509,16 +18121,41 @@ Keep the server monitored in order to identify possible issues early.</simpara>
 <simpara>Increase the number of PostgreSQL connections available to Java applications (Tomcat, Taskomatic) according to the previous parameters, otherwise extra workers will starve waiting for a connection. Set parameter <literal role="parameter">hibernate.c3p0.max_size = 150</literal> in <literal role="path">/etc/rhn/rhn.conf</literal> (affects all minion operations). Make sure enough PostgreSQL connections are configured before changing this parameter - refer to <literal>smdba system-check autotuning --help</literal> to get automatic tuning of the PostgreSQL configuration file while changing the number of available connections. Additional manual tuning is usually not necessary but might be required depending on scale and exact use cases.</simpara>
 </listitem>
 <listitem>
-<simpara>Increase Salt&#8217;s presence ping timeouts if responses might come back later than the defaults. Set parameters <literal role="parameter">salt_presence_ping_timeout = 20</literal> and <literal role="parameter">salt_presence_ping_timeout = 20</literal> in <literal role="path">/etc/rhn/rhn.conf</literal> (affects all minion operations).</simpara>
+<simpara>Increase Salt&#8217;s presence ping timeouts if responses might come back later than the defaults. Set parameters <literal role="parameter">java.salt_presence_ping_timeout = 20</literal> and <literal role="parameter">java.salt_presence_ping_gather_job_timeout = 20</literal> in <literal role="path">/etc/rhn/rhn.conf</literal> (affects all minion operations).</simpara>
 </listitem>
 <listitem>
-<simpara>Increase the Salt master worker threads allowing to parallelize more requests (otherwise Tomcat and Taskomatic workers will starve waiting for the Salt API). Set parameter <literal role="parameter">worker_threads: 100</literal> in <literal role="path">/etc/salt/master.d/susemanager.conf</literal> (affects onboarding and patching).</simpara>
+<simpara>Increase the number of Salt master workers so that more requests can run in parallel (otherwise Tomcat and Taskomatic workers will starve waiting for the Salt API, and Salt will not be able to serve files timely). Set parameter <literal role="parameter">worker_threads: 100</literal> in <literal role="path">/etc/salt/master.d/susemanager.conf</literal> (affects onboarding and patching).</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Increase this parameter further if file management states fail with the error "Unable to manage file: Message timed out"</simpara>
 </listitem>
 <listitem>
-<simpara>Disable daily comparison of configuration files. Click on <menuchoice><guimenu>Admin</guimenu> <guimenuitem>Task Schedules</guimenuitem></menuchoice>, then on the <guibutton>compare-configs-default</guibutton> link, then on the <guibutton>Disable Schedule</guibutton> button and finally on <guibutton>Delete Schedule</guibutton>.</simpara>
+<simpara>Note that Salt master workers can consume significant amounts of RAM (typically about 70&#160;MB per worker). It is recommended to keep usage monitored when increasing this value and to do so in relatively small increments (eg. 20) until failures are no longer produced.</simpara>
 </listitem>
 </itemizedlist>
-<simpara>Note that increasing the number of Postgres connections and Salt workers will require more RAM, make sure the SUSE Manager server is monitored and swap is never used.</simpara>
+</listitem>
+<listitem>
+<simpara>Increase the maximum heap memory for the search daemon to be able to index many minions. Set 4 GiB instead of the current default 512 MB: add <literal role="parameter">rhn-search.java.maxmemory=4096</literal> in <literal role="path">/etc/rhn/rhn.conf</literal> (affects background indexing only).</simpara>
+</listitem>
+<listitem>
+<simpara>Consider disabling Taskomatic jobs, especially if the provided functionality is not used:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Disable daily comparison of configuration files.
+Click <menuchoice><guimenu>Admin</guimenu> <guimenuitem>Task Schedules</guimenuitem></menuchoice>, then the <guibutton>compare-configs-default</guibutton> link, then the <guibutton>Disable Schedule</guibutton> button and finally <guibutton>Delete Schedule</guibutton>.</simpara>
+</listitem>
+<listitem>
+<simpara>Disable hourly synchronization of Cobbler files.
+Click <menuchoice><guimenu>Admin</guimenu> <guimenuitem>Task Schedules</guimenuitem></menuchoice>, then the <guibutton>cobbler-sync-default</guibutton> link, then the <guibutton>Disable Schedule</guibutton> button and finally <guibutton>Delete Schedule</guibutton>.</simpara>
+</listitem>
+<listitem>
+<simpara>Disable daily run of Gatherer and Subscription Matcher.
+Click <menuchoice><guimenu>Admin</guimenu> <guimenuitem>Task Schedules</guimenuitem></menuchoice>, then the <guibutton>gatherer-matcher-default</guibutton> link, then the <guibutton>Disable Schedule</guibutton> button and finally <guibutton>Delete Schedule</guibutton>.</simpara>
+</listitem>
+</itemizedlist>
+</listitem>
+</itemizedlist>
+<simpara>Note that increasing the number of PostgreSQL connections will require more RAM, make sure the SUSE Manager server is monitored and swap is never used.</simpara>
 <simpara>Also note the above settings should be regarded as guidelines-they have been tested to be safe but care should be exercised when changing them, and consulting support is highly recommended.</simpara>
 </section>
 </section>
@@ -17578,7 +18215,7 @@ Keep the server monitored in order to identify possible issues early.</simpara>
 <simpara>If the value of <literal>ssh_push_sudo_user</literal> is not <literal>root</literal> then the <literal>--sudo</literal> options of <literal>salt-ssh</literal> are used.</simpara>
 </section>
 </section>
-<section xml:id="_ssh_push_tunnel_http_s_redirection">
+<section xml:id="_ssh_push_tunnel_https_redirection">
 <title>SSH Push Tunnel HTTP(s) Redirection</title>
 <simpara>For the <literal>ssh-push-tunnel</literal> method the traffic originating from zypper/yum has to be redirected through an ssh tunnel in order to bypass any firewall blocking a direct connection from the minion to the server.</simpara>
 <simpara>This is achieved by using port <literal>1233</literal> in the repo url:</simpara>
@@ -18750,7 +19387,7 @@ For additional information on setting up Portus as a registry provider, see the 
 <section xml:id="at.images.docker.buildhost">
 <title>Creating a Build Host</title>
 <simpara>To build images with SUSE Manager, you will need to create and configure a build host.
-Build hosts are Salt minions running SUSE Linux Enterprise 12 or later.
+Container build hosts are Salt minions running SUSE Linux Enterprise 12 or later.
 This section guides you though the initial configuration for a build host.</simpara>
 <simpara>From the SUSE Manager Web UI perform these steps to configure a build host.</simpara>
 <orderedlist numeration="arabic">
@@ -19114,7 +19751,8 @@ They can be of various types: PXE, QCOW2, LiveCD images, and others.</simpara>
 </section>
 <section xml:id="at.images.kiwi.requirements">
 <title>Requirements</title>
-<simpara>The Kiwi image building feature is available for Salt minions running SUSE Linux Enterprise Server&#160;12 or later.</simpara>
+<simpara>The Kiwi image building feature is available for Salt minions running SUSE Linux Enterprise Server&#160;12.
+It is currently not supported to build SUSE Linux Enterprise 15 images.</simpara>
 <simpara>Kiwi image configuration files and configuration scripts must be accessible in one of these locations:</simpara>
 <itemizedlist>
 <listitem>
@@ -19128,11 +19766,17 @@ They can be of various types: PXE, QCOW2, LiveCD images, and others.</simpara>
 </listitem>
 </itemizedlist>
 <simpara>Example scripts are provided in the following sections.</simpara>
+<note>
+<title>Hardware Requirements for Hosts Running OS Images</title>
+<simpara>Hosts running OS images built with Kiwi need at least 1 GB of RAM.
+Disk space depends on the actual size of the image.
+For more information, see the documentation of the underlying system.</simpara>
+</note>
 </section>
 <section xml:id="at.images.kiwi.buildhost">
 <title>Creating a Build Host</title>
 <simpara>To build all kinds of images with SUSE Manager, create and configure a build host.
-Build hosts are Salt minions running SUSE Linux Enterprise Server&#160;12 or later.
+OS image build hosts are Salt minions running SUSE Linux Enterprise Server&#160;12 (SP3 or later).
 This procedure will guide you though the initial configuration for a build host.</simpara>
 <simpara>From the SUSE Manager Web UI perform these steps to configure a build host:</simpara>
 <orderedlist numeration="arabic">
@@ -20242,7 +20886,7 @@ Therefore, we recommended that you do not power on bare metal systems multiple t
 <title>Virtualization</title>
 <simpara>SUSE Manager allows you to autoinstall and manage Xen and KVMVM Guests on a registered VM Host Server.
 To autoinstall a VM Guest, an autoinstallable distribution and an autoinstallation profile (AutoYaST or {kickstart}) need to exist on SUSE Manager.
-VM Guests registered with SUSE Manager can be managed like &#8220;regular&#8221; machines.
+VM Guests registered with SUSE Manager can be managed like <quote>regular</quote> machines.
 In addition, basic VM Guestmanagement tasks such as (re)starting and stopping or changing processor and memory allocation can be carried out using SUSE Manager.</simpara>
 <simpara>The following documentation is valid in the context of traditional clients.
 Salt minions must be treated differently:</simpara>
@@ -20300,11 +20944,11 @@ needs to be installed as well.</simpara>
 <section xml:id="sec.virtualzation.autoinstall.req-mgr.inst-source">
 <title>Setting up an Autoinstallable Distribution</title>
 <simpara>To autoinstall clients from SUSE Manager
-, you need to provide an &#8220;autoinstallable distribution&#8221;
+, you need to provide an <quote>autoinstallable distribution</quote>
 , also referred to as autoinstallable tree or installation source.
 This installation source needs to be made available through the file system of the SUSE Manager
  host.
-It can for example be a mounted local or remote directory or a &#8220;loop-mounted&#8221;
+It can for example be a mounted local or remote directory or a <quote>loop-mounted</quote>
  ISO image.
 It must match the following requirements:</simpara>
 <itemizedlist>
@@ -20349,7 +20993,7 @@ system has to be a complete installation source (same as for a regular installat
 <orderedlist numeration="arabic">
 <title>Procedure: Creating Autoinstallable Distribution</title>
 <listitem>
-<simpara>Make sure an installation source is available from a local directory. The data source can be any kind of network resource, a local directory or an ISO image (which has to be &#8220;loop-mounted&#8221; ). Files and directories must be world readable.</simpara>
+<simpara>Make sure an installation source is available from a local directory. The data source can be any kind of network resource, a local directory or an ISO image (which has to be <quote>loop-mounted</quote> ). Files and directories must be world readable.</simpara>
 </listitem>
 <listitem>
 <simpara>Log in to the SUSE Manager Web UI} and navigate to <menuchoice><guimenu>Systems</guimenu> <guisubmenu>Autoinstallation</guisubmenu> <guisubmenu>Distributions</guisubmenu> <guimenuitem>Create Distribution</guimenuitem></menuchoice> .</simpara>
@@ -20685,50 +21329,32 @@ guests, which are managed by <literal role="library">libvirt</literal>
 </section>
 <section xml:id="sec.virtualization.autoinstall.req_vmhost.traditional">
 <title>VM Host Server setup on Traditional clients</title>
-<simpara>Once the registration process is finished and all packages have been installed, enable the <literal role="daemon">osad</literal>
-(Open Source Architecture Daemon). On a SUSE Linux Enterprise Server
-system this can be achieved by running the following commands as user root
-:</simpara>
-<screen>systemctl stop rhnsd
-systemctl disable rhnsd</screen>
-<screen>systemctl enable osad
-systemctl start osad</screen>
+<simpara>When the registration process is finished and all packages have been installed, enable the <literal role="daemon">osad</literal> (Open Source Architecture Daemon).
+On SUSE Linux Enterprise Server 12 systems and later, it can be achieved by running the following commands as user root:</simpara>
+<screen>service rhnsd stop
+service rhnsd disable</screen>
+<screen>service osad enable
+service osad start</screen>
 <important>
-<title><literal role="daemon">osad</literal>Together with <literal role="daemon">rhnsd</literal></title>
-<simpara>The <literal role="daemon">rhnsd</literal>
- daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
-If many clients are registered with SUSE Manager
-, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.</simpara>
+<title><literal role="systemitem">osad</literal>Together with <literal role="systemitem">rhnsd</literal></title>
+<simpara><literal role="systemitem">rhnsd</literal> daemon checks for scheduled actions every four hours, so it can take up to four hours before a scheduled action is carried out.
+If many clients are registered with SUSE Manager, this long interval ensures a certain level of load balancing since not all clients act on a scheduled action at the same time.</simpara>
 </important>
-<simpara>However, when managing VM Guest
-s, you usually want actions like rebooting a VM Guest
-to be carried out immediately. Adding <literal role="daemon">osad</literal>
- ensures that.
-The <literal role="daemon">osad</literal>
- daemon receives commands over the jabber protocol from SUSE Manager
- and commands are instantly executed.
-Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with <literal role="daemon">rhnsd</literal>
- you can only schedule for a time in the future plus up to four hours).</simpara>
+<simpara>For setting the time interval, see &lt;&lt;[[bp.systems.management&gt;&gt;.</simpara>
+<simpara>However, when managing VM Guests, you usually want actions like rebooting a VM Guest to be carried out immediately, which can be done by adding <literal role="systemitem">osad</literal>.
+The <literal role="systemitem">osad</literal> daemon receives commands over the jabber protocol from SUSE Manager and commands are instantly executed.
+Alternatively you may schedule actions to be carried out at a fixed time in the future (whereas with <literal role="systemitem">rhnsd</literal> you can only schedule for a time in the future plus up to four hours).</simpara>
 </section>
 </section>
 <section xml:id="sec.virtualization.autoinstall.installation">
 <title>Autoinstalling VM Guest s</title>
-<simpara>Once all requirements on the SUSE Manager
-and the VM Host Server
-are met, you can start to autoinstall VM Guest
-s on the host.
-Note that VM Guest
-s will not be automatically registered with SUSE Manager
-, therefore we strongly recommend to modify the autoinstallation profile as described in <xref linkend="sec.virtualzation.autoinstall.req-mgr.profile.scripts"/>. VM Guest
-s need to be registered to manage them with SUSE Manager
-.
-Proceed as follows to autoinstall a VM Guest
-;.</simpara>
+<simpara>When all requirements on the SUSE Manager and the VM Host Server are met, you can start to autoinstall VM Guests on the host.
+Note that VM Guests will not be automatically registered with SUSE Manager, therefore we strongly recommend to modify the autoinstallation profile as described in <xref linkend="sec.virtualzation.autoinstall.req-mgr.profile.scripts"/>. VM Guests need to be registered to manage them with SUSE Manager.
+Proceed as follows to autoinstall a VM Guest:</simpara>
 <important>
 <title>No parallel Autoinstallations on VM Host Server</title>
 <simpara>It is not possible to install more than one VM Guest
-at a time on a single VM Host Server
-.
+at a time on a single VM Host Server.
 When scheduling more than one autoinstallation with SUSE Manager
 make sure to choose a timing, that starts the next installation after the previous one has finished.
 If a guest installation starts while another one is still running, the running installation will be cancelled.</simpara>
@@ -20759,11 +21385,8 @@ On the menu:System History Event[</guimenuitem></menuchoice>
  it from this page once you have corrected the problem.
 You do not have to configure the installation again.</simpara>
 <simpara>If the event log does not contain enough information to locate a problem, log in to the VM Host Server
-console and read the log file <literal role="path">/var/log/up2date</literal>
-.
-If you are using the <literal role="daemon">rhnsd</literal>
-, you may alternatively immediately trigger any scheduled actions by calling <literal role="command">rhn_ckeck</literal> on the VM Host Server
-.
+console and read the log file <literal role="path">/var/log/up2date</literal>.
+If you are using <literal role="systemitem">rhnsd</literal>, you may alternatively immediately trigger any scheduled actions by calling <literal role="command">rhn_ckeck</literal> on the VM Host Server.
 Increase the command&#8217;s verbosity by using the options <literal role="option">-v</literal>, <literal role="option">-vv</literal>, or <literal role="option">-vvv</literal>, respectively.</simpara>
 </note>
 </section>
@@ -20933,7 +21556,7 @@ Note that SUSE Manager will not inventory any objects or resources assigned with
 </listitem>
 </itemizedlist>
 </section>
-<section xml:id="_inventorying_vcenter_vsphere_esxi_hosts">
+<section xml:id="_inventorying_vcentervsphere_esxi_hosts">
 <title>Inventorying vCenter/vSphere ESXi Hosts</title>
 <simpara>This procedure guides you through inventorying a VSphere ESXi host with SUSE Manager.</simpara>
 <orderedlist numeration="arabic">
@@ -21706,7 +22329,6 @@ Uploading /tmp/ola_world.txt from blah4/tmp/ola_world.txt</screen>
 <simpara><literal role="command">mgr-sync</literal> should be used if SUSE Manager is connected to SUSE Customer Center (SCC).
 With <literal role="command">mgr-sync</literal> you may add or synchronize products and channels.
 The <literal role="command">mgr-sync</literal> command also enables and refreshes SCC data.</simpara>
-<simpara>This tool requires that SCC is enabled by running <literal role="command">mgr-sync enable-scc</literal> first (Enabled by default in SUSE Manager 2.1 and greater).</simpara>
 <simpara>By default, log rotation of <literal role="path">spacewalk-repo-sync</literal> is disabled.
 This logfile is run by a cron job, and managed by a configuration file.
 You can enable log rotation by editing the configuration file at <literal role="path">etc/sysconfig/rhn/reposync</literal> and setting the <literal role="command">MAX_DAYS</literal> parameter.
@@ -21719,9 +22341,7 @@ Most functions are available as part of the public API.</simpara>
 <simpara>mgr-sync provides a command structure with sub-commands similar to git or osc.
 For a complete list of command line option, see the mgr-sync manpage (man mgr-sync).
 Basic actions are:</simpara>
-<screen>mgr-sync enable-scc
-
-mgr-sync list channel(s)|product(s)|credentials
+<screen>mgr-sync list channel(s)|product(s)|credentials
 mgr-sync add  channel(s)|product(s)|credentials
 mgr-sync delete  credentials
 
@@ -22018,6 +22638,13 @@ Always put <literal>--</literal> before arguments, to avoid them being treated a
 Additionally, make sure you escape any quotes that you pass to the functions so that they are not interpreted.
 An example of a well-formed <literal role="command">spacecmd</literal> command:</simpara>
 <screen>spacecmd -s server1 -- softwarechannel_create -n \'My Channel\' -l channel1 -a x86_64</screen>
+</section>
+<section xml:id="_spacecmd_caching_problems">
+<title>Spacecmd caching problems</title>
+<simpara>The <literal role="command">spacecmd</literal> command keeps a cache of the various systems and packages that you have installed.
+Sometimes, this can result in a mismatch between the system name and the system ID.
+To clear the <literal role="command">spacecmd</literal> cache, use this command:</simpara>
+<screen>spacecmd clear_caches</screen>
 </section>
 </section>
 <section xml:id="at.spacecmd.command.reference">
@@ -25674,7 +26301,7 @@ Port 80 is used temporarily for some bootstrap repositories and automated instal
 <listitem>
 <simpara>Inbound /</simpara>
 <simpara>Required when using ssh-push or ssh-push-tunnel contact methods.
-Check-in on clients connected to a SUSE Manager Proxy will be initiated on the SUSE Manager Server and &#8220;hop through&#8221; through to clients.</simpara>
+Check-in on clients connected to a SUSE Manager Proxy will be initiated on the SUSE Manager Server and <quote>hop through</quote> through to clients.</simpara>
 </listitem>
 </varlistentry>
 <varlistentry>
