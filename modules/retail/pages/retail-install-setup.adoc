@@ -16,49 +16,6 @@ These are the branch server setup steps:
 
 Each procedure is detailed in this section.
 
-[NOTE]
-.Cobbler and {smr}
-====
-Cobbler is not currently supported within {smr} environments.
-If you intend to use your installation with {smr} formulas, do not configure Cobbler.
-====
-
-== Install the Build Host and Register It to {susemgr}
-
-Your build host must be a Salt client, running {sles}{nbsp}12 SP3 or SP4 for building {sles} 12 images (SP4 recommended).
-For instructions to install Salt clients, see xref:client-configuration:registration-overview.adoc[].
-
-[WARNING]
-====
-The build host must be a Salt client.
-Do not install the build host as a traditionally managed client.
-====
-
-
-
-== Configure the Build Host
-
-The build host must be set as an OS Image build host in the {susemgr} {webui}, and highstate applied.
-
-.Procedure: Configuring the Build Host
-
-. In the {susemgr} {webui}, navigate to menu:Systems[Overview].
-Locate the system to be made a build host, and click its name.
-. In the [guimenu]``System Properties`` window, click btn:[Edit These Properties].
-. In the [guimenu]``Edit System Details`` window, ensure the [guimenu]``OS Image Build Host`` option is checked, and click btn:[Update Properties] to save your changes.
-. Select the [guimenu]``States`` tab, and navigate to the [guimenu]``Highstate`` window.
-. In the [guimenu]``States`` tab, click btn:[Apply Highstate].
-
-[IMPORTANT]
-====
-Check that the build host has these packages installed after you have run Highstate:
-
-* [package]``kiwi``
-* [package]``kiwi-desc-saltboot``
-
-If any package is missing, make sure the ``SUSE Manager Tools`` repository is available on the build host and install any missing packages manually using ``zypper install``.
-====
-
 
 
 == Create Required System Groups
@@ -75,38 +32,6 @@ You can create system groups using the {susemgr} {webui}.
 Navigate to menu:Systems[System Groups] and click btn:[Create System Group].
 
 For more information about system groups, see xref:reference:systems/system-groups.adoc[].
-
-
-
-[[retail.sect.install.branch]]
-== Install the Branch Server and Register it to {susemgr}
-
-Your branch server must be a Salt client, running {susemgrproxy} 4.0.
-With a limited feature set, {susemgrproxy} 3.2 is also possible.
-
-[WARNING]
-====
-Do not install the branch server as a traditionally managed client.
-====
-
-For instructions to install Salt-based proxy clients and register them to {susemgr}, see xref:installation:install-proxy-unified.adoc[].
-
-The activation key should have these channels, pools, and respective updates:
-
-----
-- SUSE Manager Retail Branch Server 4.0 x86_64
-  - Basesystem Module 15 SP1 x86_64
-  - Server Applications Module 15 SP1 x86_64
-    - SUSE Manager Proxy Module 4.0 x86_64
-      - SUSE Manager Retail Branch Server Module 4.0 x86_64
-----
-
-For mass deployments, see xref:retail:retail-mass-config.adoc[].
-
-
-When you are installing the branch server with a dedicated internal network, check that you are using the same fully qualified domain name (FQDN) on both the external and internal branch networks.
-If the FQDN does not match on both networks, the branch server will not be recognized as a proxy server.
-
 
 
 == Assign and Configure Branch Server Formulas
@@ -134,7 +59,6 @@ You can do this through the {webui}, or by running this command:
 ----
 salt <branch_server_salt_id> state.apply
 ----
-
 
 
 == Synchronize Images to the Branch Server
