@@ -1,7 +1,29 @@
 [[kubernetes]]
-= VHM and SUSE Container-as-a-Service Platform
+= VHM and SUSE Container as a Service Platform
 
 You can use a {productname} VHM to gather instances from SUSE Container-as-a-Service Platform ({caasp}).
 
 The VHM allows {productname} to obtain and report information about your virtual machines.
 For more information on VHMs, see xref:client-configuration:vhm.adoc[].
+
+= Registering the Container as a Service Platform nodes to {productname}
+
+You can register each node of the Container as a Service Platform to {productname} using the usual way of registering a Salt minion client.
+For more information, see xref:client-configuration:registration-overview.adoc[]
+
+It is recommended to create an activation key (see xref:clients-and-activation-keys.adoc[]) to associate Container as a Service Platform channels and use the activation key when onboarding the associated nodes.
+If you are using cloud-init, it is also recommended to use the bootstrap script in the cloud-init configuration.
+
+By registering the Container as a Service Platform nodes to {productname}:
+
+- You can see the patch level status of the CaaS Platform nodes
+- You can perform configuration management operations against the nodes using SUSE Manager. For example: Salt states.
+- You can assign different set of channels (with channel staging and/or CLM filters) to different clusters. The self-updating daemon already running on Container as a Service Platform nodes will automatically install any update related to Kubernetes. For more information on the self-updating daemon, see the Container as a Service Platform documentation.
+
+[WARNING]
+====
+The following actions must NOT be executed fom {productname} on any of the Container as a Platform nodes:
+
+* Package installation, upgrade, removal and patch installation related to the following packages: `kubernetes-kubeadm kubernetes-kubelet kubernetes-client cri-o cni-plugins`
+* Scheduling and executing a reboot of a node
+====
