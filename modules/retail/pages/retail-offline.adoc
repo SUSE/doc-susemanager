@@ -2,12 +2,12 @@
 = Offline Use
 
 If the {productname} Server is offline, you can still perform some operations on the terminals.
-This is useful if the connection between the branch server and the terminals is unstable or has low bandwidth.
+This is useful if the connection between the branch server and the {productname} Server is unstable or has low bandwidth.
 This feature uses caching to perform updates.
 
 [IMPORTANT]
 ====
-Offline features are available only for {productname} Server 4.0 and above.
+Offline features are available only for {productname} Server 4.0 and above.
 ====
 
 
@@ -18,7 +18,7 @@ If the {productname} Server is offline, and a terminal is rebooted, it will fall
 
 This will occur in these situations:
 
-* If the Saltboot formula has not started within a specified time (default value is 60 seconds).
+* If the Saltboot formula has not started within a specified time (default value is 60 seconds).
 * If the terminal does not acknowledge that the Saltboot formula has started.
 * If the root partition is specified on the kernel command line (handled by the PXE formula), is mountable (and is not encrypted), and contains [path]``/etc/ImageVersion`` (which is created by Kiwi).
 
@@ -37,9 +37,27 @@ For more about kernel parameters, see xref:salt:formula-pxe.adoc[].
 
 If there is low bandwidth or an unstable connection between the branch server and the terminal, images can be cached in advance and the upgrade performed on the terminals later on.
 
-// This looks incomplete or not detailed enough
+This functionality requires the terminal to have a dedicated service partition. A service partition is a partition mounted as `/srv/saltboot`.
+This partition must be created before the system partition and large enough to store a system image.
+To ensure that terminals will always have such a partition, use the Saltboot formula for terminal hardware type to specify the partition details.
+For more information, see xref:salt:formula-saltboot.adoc[].
+
+When the service partition is set up on the terminal, a system image can be downloaded in advance by applying the `saltboot.cache_image` state:
+
+----
+salt $TERMINALID state.apply saltboot.cache_image
+----
+
+This can be done regularly to ensure that terminals always have an uptodate system image downloaded.
+
+When the terminal is rebooted and an uptodate system image is found in the service partition, the terminal will automatically use this cached image for system redeployment.
+
+////
+// If a procedure is wanted we can use this as a template
+
 To set this up:
 
 * Create a service partition on the terminal, which will be used for caching the images.
 * Download the image to the terminal during regular operations, when a connection is present.
 * Reboot the terminal, during which the image will be replaced from the cache.
+////
