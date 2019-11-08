@@ -11,9 +11,9 @@ Next steps in configuring {smr} environment are:
 
 These steps are usually performed multiple times in lifetime of {smr} and are loosely related.
 
-Typically POS images are periodically rebuild when updated packages are available and then synchronized to the {smr} branch servers before update window.
+Usually, POS images are rebuild when updated packages are available, and synchronized to the branch servers before the update window opens.
 
-Configuration of {smr} branch server services have to be done each time a new branch server is registered.
+You will need to configure the services on the branch server every time a new branch server is registered.
 
 == Prepare and Build Terminal Images
 
@@ -31,7 +31,7 @@ These templates need to be adapted for specific usecases, for example by includi
 POS templates do not describe any system user. Using {suse} provided templates as is will result in system without possibility of user login. Salt management of the system is unaffected, however.
 ====
 
-=== Terminals Based on SLES{nbsp}11 SP{nbsp}3
+=== SLES{nbsp}11 SP{nbsp}3 Terminals
 
 POS Terminals based on {sles}{nbsp}11 SP{nbsp}3 can be deployed in much the same way as other terminals, with a few differences.
 
@@ -51,13 +51,13 @@ SLES{nbsp}11 does not support later versions of TLS.
 You will need to clone the repository locally in order to use it for building.
 ====
 
-== Configure {smr} Branch Server services
+== Configure Services on the Branch Server
 
 Before you configure the branch server, ensure you have decided on networking topology, and know the minion ID of the branch server.
 For the information about the possible network topologies, see xref:retail:retail-network-arch.adoc[].
 
-All configuration of branch server services is done on {susemgr} server.
-The configuration is then applied to the selected branch server through salt states.
+Configure branch server services from the {susemgr} Server.
+The configuration is then applied to the selected branch server using Salt states.
 {susemgr} Formulas with Forms functionality is used to configure branch server services, however there are multiple ways to configure them:
 
 * {smr} provided command line tool [command]``retail_branch_init``
@@ -182,5 +182,6 @@ salt <branch_server_minion_id> state.apply image-sync
 ----
 . The image details will be transferred to [path]``/srv/saltboot`` on the branch server.
 
-Synchronization can also be enabled to be done automatically on applying highstate on {smr} branch server using [systemitem]``Image Synchronization Formula``.
+You can also set synchronization to run automatically on the branch server.
+Configure the image synchronization formula to apply the highstate regularly.
 For more information about [systemitem]``Image Synchronization Formula``, see xref:salt:formula-imagesync.adoc[].
