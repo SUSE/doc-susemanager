@@ -1,29 +1,44 @@
-[[kubernetes]]
-= VHM and SUSE Container as a Service Platform
+[[vhm-caasp]]
+= VHM and SUSE CaaS Platform
 
-You can use a {productname} VHM to gather instances from SUSE Container-as-a-Service Platform ({caasp}).
+You can use a {productname} VHM to gather instances from {caasp}.
 
 The VHM allows {productname} to obtain and report information about your virtual machines.
 For more information on VHMs, see xref:client-configuration:vhm.adoc[].
 
-= Registering the Container as a Service Platform nodes to {productname}
 
-You can register each node of the Container as a Service Platform to {productname} using the usual way of registering a Salt minion client.
+
+== Register CaaSP nodes
+
+You can register each {caasp} node to {productname} using the same method as you would a Salt client.
 For more information, see xref:client-configuration:registration-overview.adoc[]
 
-It is recommended to create an activation key (see xref:clients-and-activation-keys.adoc[]) to associate Container as a Service Platform channels and use the activation key when onboarding the associated nodes.
-If you are using cloud-init, it is also recommended to use the bootstrap script in the cloud-init configuration.
+We recommend that you create an activation key to associate {caasp} channels, and to onboard the associated nodes.
+For more on activation keys, see xref:client-configuration:clients-and-activation-keys.adoc[]
 
-By registering the Container as a Service Platform nodes to {productname}:
+If you are using ``cloud-init``, we recommended that you use a bootstrap script in the ``cloud-init`` configuration.
+For more on bootstrapping, see xref:client-configuration:registration-bootstrap.adoc[].
 
-- You can see the patch level status of the CaaS Platform nodes
-- You can perform configuration management operations against the nodes using SUSE Manager. For example: Salt states.
-- You can assign different set of channels (with channel staging and/or CLM filters) to different clusters. The self-updating daemon already running on Container as a Service Platform nodes will automatically install any update related to Kubernetes. For more information on the self-updating daemon, see the Container as a Service Platform documentation.
 
+When you have added the {caasp} nodes to {productname}, you will be able to:
+
+* View the patch level status of each node
+* Perform configuration management operations against the nodes, including using Salt states.
+* Assign different set of channels to clusters using channel staging and lifecycle management filters.
+
+Additionally, updates related to {k8s} are automatically installed, because of a self-updating daemon running on the {caasp} nodes.
+// Is this referring to skuba? LKB 2019-11-11
+For more information, see the {caasp} documentation.
+
+////
+Waiting on clarification of this. LKB 2019-11-11
 [WARNING]
 ====
-The following actions must NOT be executed fom {productname} on any of the Container as a Platform nodes:
+Do not use {productname} to perform these actions on any {caasp} nodes:
 
-* Package installation, upgrade, removal and patch installation related to the following packages: `kubernetes-kubeadm kubernetes-kubelet kubernetes-client cri-o cni-plugins`
-* Scheduling and executing a reboot of a node
+* Install, upgrade, or removal of ``kubernetes-kubeadm``, ``kubernetes-kubelet``, ``kubernetes-client``, ``cri-o``, or ``cni-plugins``.
+* Scheduling and executing a node reboot
+
+These actions are not supported.
 ====
+////
