@@ -108,10 +108,43 @@ When you have the channels set up, associate each channel with the appropriate r
 
 [IMPORTANT]
 ====
-You need all the new channels fully syncronized before bootstrapping any Ubuntu client.
+You need all the new channels fully synchronized before bootstrapping any Ubuntu client.
 ====
 endif::[]
 
+
+ifeval::[{suma-content} == true]
+
+[WARNING]
+====
+The ``spacewalk-utils`` package is not supported by {suse}, including the ``spacewalk-common-channels`` tool.
+You will not be supported if your system becomes inoperable by using these tools.
+====
+
+
+
+.Procedure: Alternative Method for Adding {ubuntu} Channels (Unsupported)
+
+. At the command prompt on the {productname} Server, as root, install the [systemitem]``spacewalk-utils`` package:
++
+----
+sudo zypper in spacewalk-utils
+----
+. Add the {ubuntu} channels.
+Adjust the version of the channel names to match your {ubuntu} version:
++
+----
+sudo spacewalk-common-channels ubuntu-1804-amd64
+----
+. Synchronize the new custom channels.
+
+[IMPORTANT]
+====
+You need all the new channels fully synchronized, including ``Universe``, before you can bootstrap an {ubuntu} client.
+The Universe channel contains important dependencies for Salt.
+====
+
+endif::[]
 
 
 ifeval::[{uyuni-content} == true]
