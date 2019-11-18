@@ -1,19 +1,23 @@
 [[retail-install-setup]]
 = Setting up
 
-This section requires an installed and configured {susemgr} Server, one or more {smr} branch servers, and one or more {susemgr} build host.
+To set up an {smr} environment, you will need to have already installed and configured {susemgr} Server, have one or more {smr} branch server, and one or more {susemgr} build host.
 
-Next steps in configuring {smr} environment are:
+This section covers how to configure your {smr} environment, including:
+* Prepare POS images
+* Configure services on the branch server
+* Synchronize POS images to the branch servers
 
-. Prepare POS images
-. Configure {smr} branch server services
-. Synchronize POS images to {smr} branch servers
+The very first time you set up an {smr} environment, you will need to perform all three steps.
+You will need to revisit some of these steps later on as you are working with {smr}.
 
-These steps are usually performed multiple times in lifetime of {smr} and are loosely related.
+For example, the first time you configure the branch server, you will need to have images prepared for synchronization.
+If you are configuring more than one branch server, you can use the same images across different branch servers.
+
+If you have an existing environment, and need to build new images, you do not need to re-initialize the branches.
+You will need to synchronize the images, and can skip setting up the services on the branch server.
 
 Usually, POS images are rebuild when updated packages are available, and synchronized to the branch servers before the update window opens.
-
-You will need to configure the services on the branch server every time a new branch server is registered.
 
 == Prepare and Build Terminal Images
 
@@ -28,8 +32,8 @@ These templates need to be adapted for specific usecases, for example by includi
 
 [IMPORTANT]
 ====
-By default, POS templates do not include a system user. 
-You will not be able to login as a user to a system that has been installed with a {suse} provided template. 
+By default, POS templates do not include a system user.
+You will not be able to login as a user to a system that has been installed with a {suse} provided template.
 However you can use Salt to manage clients without a system user.
 You can use Salt to install a system user after the terminal has been deployed.
 ====
@@ -142,12 +146,12 @@ retail_yaml --from-yaml branch.yaml
 
 [WARNING]
 ====
-Both [command]``retail_branch_init`` and [command]``retail_yaml`` commands overwrites existing configuration of specified branch server.
+Both [command]``retail_branch_init`` and [command]``retail_yaml`` commands override existing configuration settings of the specified branch server.
 ====
 
 After the initial configuration done by command line tools, branch server configuration can be further adjusted in {susemgr} {webui} through branch server formulas.
 
-=== Create Required System Groups
+=== Required System Groups
 
 {smr} requires system groups for terminals and servers.
 Manually create these system groups during installation:
