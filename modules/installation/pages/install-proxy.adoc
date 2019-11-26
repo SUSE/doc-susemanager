@@ -1,8 +1,64 @@
 [[installation-proxy]]
-= {productname} {productnumber} Proxy
+= Install {productname} Proxy (wip)
+
+This chapter provides the required KVM settings for installation of {sles} media as the base for {productname} Proxy.
+A kernel virtual machine KVM combined with Virtual Machine Manager ([command]``virt-manager``) will be used as a sandbox for this installation.
 
 
 
+[[installation-proxy-requirements]]
+== SLES KVM Requirements
+
+Enter the following settings when creating a new virtual machine using [command]``virt-manager`` (replace [literal]``<version>`` with the actual version string):
+
+[cols="1,1", options="header"]
+|===
+| KVM Settings for SLES
+| Installation Method: | Local install media (ISO image or CDROM)
+| OS:                  | Linux
+| Version:             |``SLE-``[literal]``<version>````-Server-x86_64-GM-DVD1.iso``
+| Memory:              | _Test Server_ Minumum 2{nbsp}GB
+|                      | _Production Server_ Minimum 8{nbsp}GB
+| CPUs:                | 2
+| Storage Format:      | ISO 3{nbsp}GB
+| Disk Space:          | 230{nbsp}GB split between
+|                      | [path]``/`` _(root)_ Minimum 24{nbsp}GB
+|                      | (Virtual Disk 1) [path]``/srv`` Minimum 100{nbsp}GB
+|                      | (Virtual Disk 2) [path]``/var/cache`` _(Squid)_ Minimum 100{nbsp}GB
+| Name:                | example-proxy
+| Network              | Bridge br0
+|===
 
 
-Watch this space ...
+
+[[installation-proxy-sles-settings]]
+=== SLES KVM Settings
+
+This section provides guidance on installation of {productname} Proxy
+utilizing the full installation media with KVM and [command]``virt-manager``.
+This section assumes you have previously setup an account with SCC and downloaded the SLES full installation media.
+
+====>>>> Cont. here !!!!!!!!!!!!!!!!
+.Procedure: Preparing for SLES Installation
+. In [command]``virt-manager`` select menu:File[New Virtual Machine].
+
+. Select btn:[Local install media (ISO image or CDROM)].
+
+. Ensure btn:[Use ISO Image] is selected then click btn:[Browse] and locate the full SLES image you downloaded from your SCC account.
+
+. Configure your machine with at least 4096 MB RAM and a minimum of 2 CPUs.
+
+. Create a storage device with a minimum of 234 GB storage space for the installation.
+During the partitioning setup of the SLES installation this disk should be partitioned into the following disks:
++
+
+[cols="1", options="header"]
+|===
+| Disk Space Requirements
+|4{nbsp}GB Swap space
+|130{nbsp}GB XFS partition (or dedicated virtual disk) for [path]``/var/spacewalk/``
+|50{nbsp}GB XFS partition (or dedicated virtual disk) for [path]``/var/lib/pgsql/``
+|===
+
+. The remaining storage space will be used by the operating system for the root partition.
+Select btn:[Finish] to begin the installation.
