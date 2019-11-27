@@ -65,3 +65,79 @@ During the partitioning setup of the SLES installation this disk should be parti
 
 . The remaining storage space will be used by the operating system for the root partition.
 Select btn:[Finish] to begin the installation.
+
+Installation of {sles} will begin.
+For more information on completing an installation of {sles}, see: https://documentation.suse.com/sles/15-SP1/html/SLES-all/art-sle-installquick.html.
+
+
+
+[[installation-proxy-prep]]
+== Prepare SLES for SUSE Manager Proxy
+
+[[proc.jeos.susemgr.prep]]
+.Procedure: Preparing SLES for {productname} Proxy Installation
+
+// Most steps are currently needed because of 4.0 workarounds
+. Log in as `root`.
+
+. Uninstall the `sles-release` package:
++
+
+----
+rpm -e --nodeps sles-release
+----
+
+. Register {productname} Proxy with SCC (for example, replace `<productnumber>` with `{productnumber}` and `<architecture>` with `x86_64`):
++
+// -=-=-=-=-=-=-=-=-=-=-=-=-=- cut here -=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+----
+SUSEConnect -e<EMAIL_ADDRESS> -r<SUSE_MANAGER_PROXY_CODE> \
+  -p SUSE-Manager-Server/<productnumber>/<architecture>
+----
+
+. Add {productname} repositories:
++
+
+----
+SUSEConnect -p sle-module-basesystem/15.1/x86_64
+SUSEConnect -p sle-module-python2/15.1/x86_64
+SUSEConnect -p sle-module-server-applications/15.1/x86_64
+SUSEConnect -p sle-module-web-scripting/15.1/x86_64
+SUSEConnect -p sle-module-suse-manager-server/<productnumber>/x86_64
+----
++
+JeOS is configured to install only required packages.
+To get all features working you should allow to install also recommended packages.
+In `/etc/zypp/zypp.conf` change:
++
+
+----
+solver.onlyRequires = true
+----
++
+
+To:
++
+----
+solver.onlyRequires = false
+----
+
+
+[[quickstart3.sec.suma.installation.sles.sumaext]]
+== Selecting the {productname} Extension
+
+. During {sles} installation, you will be presented with the [systemitem]``Extension and Module Selection`` screen.
++
+[NOTE]
+====
+This screen will not be shown if you have skipped the registration step at the beginning of the installation process.
+Ensure you have registered with {suse} and logged in.
+====
++
+. Select the {productname} Extension and then click the btn:[Next] button.
+
+. Complete the {sles} installation.
+//TODO Update image its outdated!
+
+image::manager-extension.png[scaledwidth=80%]
