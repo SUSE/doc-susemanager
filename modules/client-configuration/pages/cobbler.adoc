@@ -58,10 +58,6 @@ To PXE boot systems, you will require a DHCP server, or have access to a network
 // ke, 2019-11-26: Maybe, we should say that this on SUMA has to be the address of the SUMA server?
 Edit the [path]``/etc/dhcp.conf`` configuration file to change [option]``next-server`` to the hostname or IP address of your Cobbler server.
 
-Cobbler requires an open HTTP port to synchronize data between the server and the proxy.
-By default, Cobbler uses port 80, but you can configure it to use port 443 instead if that suits your environment.
-
-
 [IMPORTANT]
 ====
 Cobbler uses host names as a unique key for each system.
@@ -84,6 +80,8 @@ Cobbler uses DHCP to automate bare metal installations from a PXE boot server.
 You must have administrative access to the network's DHCP server, or be able to configure DHCP directly on the the Cobbler server.
 
 If you have an existing DHCP server, you will need to edit the DHCP configuration file so that it points to the Cobbler server and PXE boot image.
+
+
 
 .Procedure: Configuring DHCP for Cobbler
 . On the DHCP server, as root, open the [path]``/etc/dhcpd.conf`` file.
@@ -170,6 +168,9 @@ The TFTP service must be running so it can serve the [path]``pxelinux.0`` boot i
 Start {yast} and use menu:System[Services Manager] to configure the [daemon]``tftp`` daemon.
 
 You can also synchronize Cobbler-generated TFTP contents to a {productname} Proxy.
+For synchronization, HTTPS port 443 must be open.
+
+
 
 .Procedure: Installing TFTP
 
@@ -183,6 +184,8 @@ zypper install susemanager-tftpsync
 ----
 zypper install susemanager-tftpsync-recv
 ----
+
+
 
 .Procedure: Configuring TFTP on a Proxy
 
@@ -203,11 +206,11 @@ configure-tftpsync.sh proxy1.example.com proxy2.example.com
 This will fail if you have not configured the proxies correctly.
 . If you want to change the list of proxies later on, you can use the [command]``configure-tftpsync.sh`` script to edit them.
 
-
 [NOTE]
 ====
 If you reinstall an already configured proxy and want to push all the files again, you must remove the cache file at [path]``/var/lib/cobbler/pxe_cache.json`` before you call [command]``cobbler sync``.
 ====
+
 
 
 == Synchronize and Start the Cobbler Service
