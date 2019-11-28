@@ -1,32 +1,26 @@
 [[server-setup]]
-= SUSE Manager Server Setup
+= Uyuni Server Setup
 
 This section covers {productname} Server setup, using these procedures:
 
-* Start {productname} setup with YaST
+* Start {productname} setup with {yast}
 * Create the main administration account with the {productname} {webui}
 * Name your base organization and add login credentials
 * Synchronize the {sle} product channel from {scc}
 
-[WARNING]
-====
-{productname} is part of the {sle} 4.0 product family and thus compatible with the software shipped with {sles}.
-
-{productname} is a complex system, and therefore installing third party software is not allowed.
-Installing monitoring software provided by a third party vendor is allowed only if you do not exchange basic libraries such as SSL, cryptographic software, and similar tools.
-As part of providing product support, SUSE reserves the right to ask to remove any third party software (and associated configuration changes) and then to reproduce the problem on a clean system.
-====
 
 
-
-== Set up {productname} with YaST
+[[server-setup-yast]]
+== Set up {productname} with {yast}
 
 This section will guide you through {productname} setup procedures.
 
 .Procedure: {productname} Setup
-. On the {productname} Server, at the command line, use the [command]``yast2 susemanager_setup`` command to begin setup.
+. Log in to the {productname} Server and start {yast}.
 
-. From the introduction screen select menu:SUSE Manager Setup[Setup SUSE Manager from scratch] and click btn:[Next] to continue.
+. In {yast}, navigate to menu:Network Services[Uyuni Setup] to begin the setup.
+
+. From the introduction screen select menu:Uyuni Setup[Set up Uyuni from scratch] and click btn:[Next] to continue.
 
 . Enter an email address to receive status notifications and click btn:[Next] to continue.
 {productname} can sometimes send a large volume of notification emails.
@@ -38,22 +32,21 @@ Always store your passwords in a secure location.
 +
 
 [IMPORTANT]
-.Certificate Password
 ====
-Without this password it will not be possible to set up a {productname} Proxy Server.
+You must have the certificate password to set up a {productname} Proxy Server.
 ====
 
 . Click btn:[Next] to continue.
 +
 
-image::quickstart-mgr-setup4-ncurses.png[scaledwidth=80%]
+// image::quickstart-mgr-setup4-ncurses.png[scaledwidth=80%]
 
-. From the menu:SUSE Manager Setup[Database Settings] screen, enter a database user and password and click btn:[Next] to continue.
+. From the menu:Uyuni Setup[Database Settings] screen, enter a database user and password and click btn:[Next] to continue.
 Passwords must be at at least seven characters in length, and must not contain spaces, single or double quotation marks (``'`` or ``"``), exclamation marks (``!``), or dollar signs (``$``).
 Always store your passwords in a secure location.
 +
 
-image::quickstart-mgr-setup5-ncurses.png[scaledwidth=80%]
+// image::quickstart-mgr-setup5-ncurses.png[scaledwidth=80%]
 
 . Click btn:[Next] to continue.
 
@@ -67,24 +60,27 @@ You will see the address of the {productname} {webui}.
 // In the next section you will create the administrator's account and synchronize with {scc}.
 
 
-== Creating the Main Administration Account
+== Create the Main Administration Account
 
-This section will walk you through creating your organization's main administration account for {productname}.
+This section covers how to create your organization's main administration account for {productname}.
 
 [WARNING]
-.Admin and User Accounts
 ====
-The main administration account is the _highest authority account_ within {productname} and therefore account access information should be stored in a secure location.
+The main administration account has the highest authority within {productname}.
+Ensure you keep access information for this account secure.
 
-For security it is recommended that the main administrator creates _low level admin accounts_ designated for administration of organizations and individual groups.
+We recommend that you create lower level administration accounts for organizations and groups.
+Do not share the main administration access details.
 ====
 
 
 .Procedure: Setting Up the Main Administration Account
-. In the browser, enter the address provided after completing setup.
-With this address you open the {productname} {webui}.
 
-. In the {webui}, navigate to the menu:Create Organization[Organization Name] field and enter your organization name.
+. In your web browser, enter the address for the {productname} {webui}.
+This address was provided after you completed setup.
+For more information, see xref:uyuni-server-setup.adoc#server-setup-yast[].
+
+. Log in to the {webui}, navigate to the menu:Create Organization[Organization Name] field, and enter your organization name.
 
 . In the menu:Create Organization[Desired Login] and menu:Create Organization[Desired Password] fields, enter your username and password.
 
@@ -93,41 +89,46 @@ With this address you open the {productname} {webui}.
 . Click btn:[Create Organization] to finish creating your administration account.
 +
 
-image::quickstart-mgr-setup-admin1.png[scaledwidth=80%]
+// image::quickstart-mgr-setup-admin1.png[scaledwidth=80%]
 
-You are now presented with the {productname} menu:Home[Overview] page.
+When you have completed the {productname} {webui} setup, you are taken to the menu:Home[Overview] page.
 // In the next section you will prepare the server for connecting the first client.
 
 
-== Synchronizing Products from {scc}
+== Optional: Synchronizing Products from {scc}
 
 {scc} (SCC) maintains a collection of repositories which contain packages, software and updates for all supported enterprise client systems.
 These repositories are organized into channels each of which provide software specific to a distribution, release, and architecture.
-After synchronizing with SCC clients may receive updates, and be organized into groups and assigned to specific product software channels.
+After synchronizing with SCC, clients can receive updates, be organized into groups, and assigned to specific product software channels.
 
 This section covers synchronizing with SCC from the {webui} and adding your first client channel.
 
-Before you can synchronize software repositories with SCC, you will need to enter organization credentials in {susemgr}.
-In previous versions, so-called mirror credentials were used instead.
-The organization credentials give you access to the SUSE product downloads.
+[NOTE]
+====
+For Uyuni, synchronizing products from {scc} is optional.
+====
+
+Before you can synchronize software repositories with SCC, you will need to enter organization credentials in {productname}.
+The organization credentials give you access to the {suse} product downloads.
 You will find your organization credentials in https://scc.suse.com/organization.
 
-Enter your organization credentials in the {susemgr} {webui}:
+Enter your organization credentials in the {productname} {webui}:
 
 
 [[proc-admin-organization-credentials]]
 .Procedure: Entering Organization Credentials
-. In the {susemgr} {webui}, select menu:Admin[Setup Wizard].
-. From the [guimenu]``Setup Wizard`` page select the btn:[Organization Credentials] tab.
+. In the {susemgr} {webui}, navigate to menu:Main Menu[Admin > Setup Wizard].
+. In the [guimenu]``Setup Wizard`` page, navigate to the btn:[Organization Credentials] tab.
 . Click btn:[Add a new credential].
-. In the dialog, enter [guimenu]``Username`` and [guimenu]``Password``, and confirm with btn:[Save].
+. Enter a username and password, and click btn:[Save].
 
-When the credentials are confirmed with a check-mark icon, proceed with <<proc-quickstart-first-channel-sync>>.
+A check mark icon is shown when the credentials are confirmed.
+When you have successfully entered the new credentials, you can synchronize with {scc}.
 
 
 [[proc-quickstart-first-channel-sync]]
 .Procedure: Synchronizing with {scc}
-. In the {webui}, navigate to menu:Admin[Setup Wizard].
+. In the {productname} {webui}, navigate to menu:Admin[Setup Wizard].
 
 . From the [guimenu]``Setup Wizard`` page select the btn:[SUSE Products] tab.
 Wait a moment for the products list to populate.
@@ -149,13 +150,13 @@ After adding the channel, {productname} will schedule the channel to be synchron
 This can take a long time as {productname} will copy channel software sources from the {suse} repositories located at {scc} to local [path]``/var/spacewalk/`` directory of your server.
 
 
-[TIP]
-.PostgreSQL and Transparent Huge Pages
+[NOTE]
 ====
-In some environments, _Transparent Huge Pages_ provided by the kernel may slow down PostgreSQL workloads significantly.
+In some environments, transparent huge pages provided by the kernel can slow down PostgreSQL workloads significantly.
 
-To disable _Transparant Huge Pages_ set the [option]``transparent_hugepage`` kernel parameter to [option]``never``.
-This has to be changed in [path]``/etc/default/grub`` and added to the line [option]``GRUB_CMDLINE_LINUX_DEFAULT``, for example:
+To disable transparent huge pages, set the [parameter]``transparent_hugepage`` kernel parameter to ``never``.
+You will also need to open the [path]``/etc/default/grub`` file and add or edit the line [option]``GRUB_CMDLINE_LINUX_DEFAULT``.
+For example:
 
 ----
 GRUB_CMDLINE_LINUX_DEFAULT="resume=/dev/sda1 splash=silent quiet showopts elevator=noop transparent_hugepage=never"
