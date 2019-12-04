@@ -19,8 +19,7 @@ This section explains the Cobbler features most commonly used with {productname}
 * Virtual machine guest installation automation with the [command]``koan`` client-side tool
 * Building installation ISOs with PXE-like menus using the [command]``cobbler buildiso`` command (for {productname} systems with x86_64 architecture)
 
-For more detailed Cobbler documentation, see http://cobbler.github.io/manuals/.
-
+For more information about Cobbler, see https://cobbler.readthedocs.io.
 
 [IMPORTANT]
 ====
@@ -238,118 +237,6 @@ When you had to change the configuration, restart the {productname} service:
 ----
 
 
-////
-Commented out as per https://bugzilla.suse.com/show_bug.cgi?id=1136611 LKB 2019-05-29
-
-[[advanced.topics.cobbler.adddistro]]
-== Adding a Distribution to Cobbler
-
-
-If all Cobbler prerequisites have been met and Cobbler is running, you can use the Cobbler server as an installation source for a distribution:
-
-Make installation files such as the kernel image and the initrd image available on the Cobbler server.
-Then add a distribution to Cobbler, using either the Web interface or the command line tools.
-
-For information about creating and configuring {ay} or Kickstart distributions from the {productname} interface, refer to pass:c[xref:FILENAME.adoc#ref.webui.systems.autoinst.distribution[]].
-
-To create a distribution from the command line, use the [command]``cobbler`` command as root:
-
-----
-cobbler distro add --name=`string`--kernel=`path`--initrd=`path`
-----
-
-
-[option]``--name=``[replaceable]``string`` option::
-A label used to differentiate one distribution choice from another (for example, ``sles12server``).
-
-[option]``--kernel=``[replaceable]``path`` option::
-Specifies the path to the kernel image file.
-
-[option]``--initrd=``[replaceable]``path`` option::
-specifies the path to the initial ram disk (initrd) image file.
-
-////
-
-////
-Commented out as per https://bugzilla.suse.com/show_bug.cgi?id=1136611 LKB 2019-05-29
-
-[[advanced.topics.cobbler.addprofile]]
-== Adding a Profile to Cobbler
-
-Once you have added a distribution to Cobbler, you can add profiles.
-
-Cobbler profiles associate a distribution with additional options like {ay} or Kickstart files.
-Profiles are the core unit of provisioning and there must be at least one Cobbler profile for every distribution added.
-For example, two profiles might be created for a Web server and a desktop configuration.
-While both profiles use the same distribution, the profiles are for different installation types.
-
-For information about creating and configuring Kickstart and {ay} profiles in the {productname} interface, refer to pass:c[xref:FILENAME.adoc#ref.webui.systems.autoinst.profiles[]].
-
-Use the [command]``cobbler`` command as root to create profiles from the command line:
-
-----
-cobbler profile add --name=string --distro=string [--autoinstall=url] \
-  [--virt-file-size=gigabytes] [--virt-ram=megabytes]
-----
-
-[option]``--name=``[replaceable]``string``::
-A unique label for the profile, such as `sles12webserver` or ``sles12workstation``.
-
-[option]``--distro=``[replaceable]``string``::
-The distribution that will be used for this profile.
-For adding distributions, see pass:c[xref:FILENAME.adoc#advanced.topics.cobbler.adddistro[]].
-
-[option]``--autoinstall=``[replaceable]``url``::
-The location of the Kickstart file (if available).
-
-[option]``--virt-file-size=``[replaceable]``gigabytes``::
-The size of the virtual guest file image (in gigabytes).
-The default is 5{nbsp}GB.
-
-[option]``--virt-ram=``[replaceable]``megabytes``::
-The maximum amount of physical RAM a virtual guest can consume (in megabytes).
-The default is 512{nbsp}MB.
-
-////
-
-////
-Commented out as per https://bugzilla.suse.com/show_bug.cgi?id=1136611 LKB 2019-05-29
-
-[[advanced.topics.cobbler.addsystem]]
-== Adding a System to Cobbler
-
-Once the distributions and profiles for Cobbler have been created, add systems to Cobbler.
-System records map a piece of hardware on a client with the Cobbler profile assigned to run on it.
-
-[NOTE]
-====
-If you are provisioning using [command]``koan`` and PXE menus alone, it is not required to create system records.
-They are useful when system-specific Kickstart templating is required or to establish that a specific system should always get specific content installed.
-If a client is intended for a certain role, system records should be created for it.
-====
-
-For information about creating and configuring automated installation from the {productname} interface, refer to pass:c[xref:FILENAME.adoc#s4-sm-system-details-kick[]].
-
-Run this command as the root user to add a system to the Cobbler configuration:
-
-----
-cobbler system add --name=string --profile=string \
-  --mac-address=AA:BB:CC:DD:EE:FF
-----
-
-
-[option]``--name=``[replaceable]``string``::
- A unique label for the system, such as `engineering_server` or ``frontoffice_workstation``.
-
-[option]``--profile=``[replaceable]``string``::
-Specifies the name of one of the profiles added in pass:c[xref:FILENAME.adoc#advanced.topics.cobbler.addprofile[]].
-
-[option]``--mac-address=``[replaceable]``AA:BB:CC:DD:EE:FF``::
-Allows systems with the specified MAC address to automatically be provisioned to the profile associated with the system record when they are being installed.
-
-For more options, such as setting hostname or IP addresses, refer to the Cobbler manpage ([command]``man cobbler``).
-
-////
 
 == Autoinstallation Templates
 
@@ -448,62 +335,6 @@ $SNIPPET('my_partition')
 Cobbler will parse the function with the snippet of code contained in the [path]``my_partition`` file.
 
 
-////
-Commented out as per https://bugzilla.suse.com/show_bug.cgi?id=1136611 LKB 2019-05-29
-
-[[advanced.topics.cobbler.koan]]
-== Using Koan
-
-Whether you are provisioning guests on a virtual machine or reinstalling a new distribution on a running system, Koan works in conjunction with Cobbler to provision systems.
-
-
-
-[[advanced.topics.cobbler.koan.virt]]
-=== Using Koan to Provision Virtual Systems
-
-If you have created a virtual machine profile as documented in pass:c[xref:FILENAME.adoc#advanced.topics.cobbler.addprofile[]], you can use [command]``koan`` to initiate the installation of a virtual guest on a system.
-For example, create a Cobbler profile with the following command:
-
-----
-cobbler add profile --name=virtualfileserver \
-  --distro=sles12-x86_64-server --virt-file-size=20 --virt-ram=1000
-----
-
-This profile is for a fileserver running {sles}{nbsp}12 with a 20{nbsp}GB guest image size and allocated 1{nbsp}GB of system RAM.
-To find the name of the virtual guest system profile, use the [command]``koan`` command:
-
-----
-koan --server=hostname --list-profiles
-----
-
-This command lists all the available profiles created with [command]``cobbler profile add``.
-
-Create the image file, and begin installation of the virtual guest system:
-
-----
-koan --virt --server=cobbler-server.example.com \
-  --profile=virtualfileserver --virtname=marketingfileserver
-----
-
-This command specifies that a virtual guest system be created from the Cobbler server (hostname [server]``cobbler-server.example.com``) using the `virtualfileserver` profile.
-The [option]``virtname`` option specifies a label for the virtual guest, which by default is the system's MAC address.
-
-Once the installation of the virtual guest is complete, it can be used as any other virtual guest system.
-
-
-
-[[advanced.topics.cobbler.koan.reinstall]]
-=== Using Koan to Reinstall Running Systems
-
-[command]``koan`` can replace a still running system with a new installation from the available Cobbler profiles by executing the following command __on the system to be reinstalled__:
-
-----
-koan --replace-self --server=hostname --profile=name
-----
-
-This command, running on the system to be replaced, will start the provisioning process and replace the system with the profile in [option]``--profile=name`` on the Cobbler server specified in [option]``--server=hostname``.
-
-////
 
 
 == Build ISOs with Cobbler
