@@ -23,36 +23,11 @@ For more information about Cobbler, see https://cobbler.readthedocs.io.
 
 
 
-////
-=== Background Information about the Synchronization Process
-
-// Taken from https://bugzilla.suse.com/show_bug.cgi?id=1141603
-// To be edited!!!
-
-A sync is basically a rebuild of every file cobbler touched.
-
-1. Run Pre-Sync-Triggers (this can be any number of shell scripts to my knowledge)
-2. Delete all files and directories which are not allowed in /var/www/cobbler
-3. Create all needed folders
-4. Delete all elements inside the folders.
-5. Generate the tftpd directory
-6. Write the DHCP files (if management is enabled)
-7. Do the same with DNS
-8. Clean the Cache
-9. If rsync management is enabled do that
-10. Run Post-Sync-Triggers (this can also be any number of shell scripts to my knowledge)
-
-////
-
-
-
 == Cobbler Requirements
 
 To use Cobbler for system installation with PXE, you will require a TFTP server.
 {productname} installs a TFTP server by default.
 To PXE boot systems, you will require a DHCP server, or have access to a network DHCP server.
-
-
 
 [IMPORTANT]
 ====
@@ -206,6 +181,32 @@ This will fail if you have not configured the proxies correctly.
 ====
 If you reinstall an already configured proxy and want to push all the files again, you must remove the cache file at [path]``/var/lib/cobbler/pxe_cache.json`` before you call [command]``cobbler sync``.
 ====
+
+=== [command]``cobbler sync``
+
+////
+=== Background Information about the Synchronization Process
+
+// Taken from https://bugzilla.suse.com/show_bug.cgi?id=1141603
+// To be edited!!!
+
+A sync is basically a rebuild of every file cobbler touched.
+
+1. Run Pre-Sync-Triggers (this can be any number of shell scripts to my knowledge)
+2. Delete all files and directories which are not allowed in /var/www/cobbler
+3. Create all needed folders
+4. Delete all elements inside the folders.
+5. Generate the tftpd directory
+6. Write the DHCP files (if management is enabled)
+7. Do the same with DNS
+8. Clean the Cache
+9. If rsync management is enabled do that
+10. Run Post-Sync-Triggers (this can also be any number of shell scripts to my knowledge)
+
+////
+
+On {productname}, [command]``cobbler sync`` does the following actions:
+
 
 
 
